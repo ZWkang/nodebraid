@@ -1,5 +1,5 @@
 {
-  "name": "cflow",
+  "name": "@cflow/index",
   "private": true,
   "packageManager": "bun@1.2.19",
   "workspaces": [
