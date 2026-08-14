@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "esnext",
+    "lib": ["esnext"],
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noImplicitAny": true,
+    "noEmit": true,
+    "strictNullChecks": true,
+    "resolveJsonModule": true,
+    "types": ["bun", "node"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true
+  },
+  "include": ["src/**/*.ts", "tests/**/*.ts", "packages/*/src/**/*.ts"],
+  "exclude": ["dist", "node_modules"]
+}

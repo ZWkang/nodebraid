@@ -1,0 +1,67 @@
+{
+  "name": "cflow",
+  "private": true,
+  "packageManager": "bun@1.2.19",
+  "workspaces": [
+    "packages/*"
+  ],
+  "description": "A Bun-powered TypeScript monorepo for cflow.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.13.0",
+    "bun": ">=1.2.19"
+  },
+  "author": {
+    "name": "zwkang",
+    "email": "kang95630@gmail.com"
+  },
+  "keywords": [
+    "bun",
+    "cflow",
+    "monorepo",
+    "typescript"
+  ],
+  "sideEffects": false,
+  "devDependencies": {
+    "@changesets/cli": "^2.31.0",
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
+    "@types/bun": "^1.2.19",
+    "@types/node": "^22.19.21",
+    "@typescript/native-preview": "^7.0.0-dev.20260614.1",
+    "lint-staged": "^17.0.7",
+    "oxlint": "^1.69.0",
+    "prettier": "^3.8.4",
+    "simple-git-hooks": "^2.13.1",
+    "zwkang-prettier-config": "^0.0.3"
+  },
+  "scripts": {
+    "check": "bun run lint && bun run typecheck && bun run format:check && bun run test && bun run build",
+    "changeset": "changeset",
+    "dev": "bun build ./src/index.ts --outdir ./dist --target bun --watch",
+    "build": "bun build ./src/index.ts --outdir ./dist --target bun",
+    "format": "prettier --write --ignore-unknown .",
+    "format:check": "prettier --check --ignore-unknown .",
+    "lint": "oxlint .",
+    "test": "bun test",
+    "typecheck": "tsgo --noEmit -p tsconfig.base.json",
+    "release:version": "changeset version",
+    "release": "changeset publish",
+    "update-deps": "bun update --latest",
+    "setup": "bun install"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,mjs,cjs}": "oxlint --fix",
+    "*.{js,jsx,ts,tsx,mjs,cjs,json,yml,yaml,md}": "prettier --write"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "bunx lint-staged",
+    "commit-msg": "bunx commitlint --edit \"$1\""
+  },
+  "trustedDependencies": [
+    "simple-git-hooks"
+  ],
+  "license": "MIT"
+}
