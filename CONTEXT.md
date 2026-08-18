@@ -115,3 +115,11 @@ _Avoid_: CanvasKernel Service, Global Kernel, Mutable Document Service
 **Commit Observer**:
 订阅同一个 Kernel Service，并按本地 revision 顺序同步接收成功且有净变化的 Canvas Commit 的消费者。
 _Avoid_: Transaction Observer, Draft Listener, Change Stream
+
+**Command**:
+安装到一个 Canvas Runtime、由强类型身份标识并可执行同步或异步准备工作的行为定义；它通过所属 Plugin 已声明的 Runtime Service 提交最终状态变化。
+_Avoid_: Action, Event Handler, Kernel Operation
+
+**Command Service**:
+一次 Activation 内负责注册、查找、执行和释放 Command 的 Runtime Service，不拥有 Kernel、Session 或其他状态能力。
+_Avoid_: Global Command Registry, Command Bus, Action Store
