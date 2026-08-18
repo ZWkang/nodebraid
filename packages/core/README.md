@@ -33,9 +33,10 @@ bun run --filter '@cflow/core' test
 bun run --filter '@cflow/core' build
 ```
 
-Build output is written to `packages/core/dist/`.
-The core build first builds every non-core workspace dependency, then emits the
-facade declarations and verifies the published declaration boundary.
+Build output is written to `packages/core/dist/`. Core typecheck and build first
+build every non-core workspace dependency so package-name resolution also works
+from a clean checkout. The build then emits the facade declarations and verifies
+the published declaration boundary.
 
 ## License
 

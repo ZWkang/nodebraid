@@ -1,27 +1,16 @@
 import { describe, expect, test } from 'bun:test';
 
 import { edgeId, nodeId, type CanvasCommit } from '@cflow/kernel';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+import { createPluginHost, definePlugin, type PluginHost } from '@cflow/runtime-cordis';
 
 import { KernelPluginError, kernelPlugin, kernelService, type KernelService } from '../src';
 
 describe('@cflow/plugin-kernel', () => {
   test('provides one revision-zero Kernel Service for an Activation', async () => {
-    let service: KernelService | undefined;
-    const consumer = definePlugin({
-      requires: { kernel: kernelService },
-      setup(context) {
-        service = context.services.kernel;
-      },
-    });
-    const host = createPluginHost();
-    const providerInstallation = host.install(kernelPlugin);
-    const consumerInstallation = host.install(consumer);
+    const { host, service } = await activateKernelService();
 
-    await Promise.all([providerInstallation.whenActive(), consumerInstallation.whenActive()]);
-
-    expect(service?.read().snapshot).toEqual({ revision: 0, nodes: [], edges: [] });
-    const commit = service?.transact((transaction) => {
+    expect(service.read().snapshot).toEqual({ revision: 0, nodes: [], edges: [] });
+    const commit = service.transact((transaction) => {
       transaction.nodes.add({
         id: nodeId('task'),
         type: 'task',
@@ -30,30 +19,19 @@ describe('@cflow/plugin-kernel', () => {
       });
     });
 
-    expect(commit?.changeSet.revision).toBe(1);
-    expect(service?.read()).toBe(commit?.after);
+    if (!commit) throw new Error('Expected Transaction to commit.');
+    expect(commit.changeSet.revision).toBe(1);
+    expect(service.read()).toBe(commit.after);
 
     await host.dispose();
   });
 
   test('synchronously observes only successful net-changing Transactions', async () => {
-    let service: KernelService | undefined;
-    const consumer = definePlugin({
-      requires: { kernel: kernelService },
-      setup(context) {
-        service = context.services.kernel;
-      },
-    });
-    const host = createPluginHost();
-    host.install(kernelPlugin);
-    const consumerInstallation = host.install(consumer);
-    await consumerInstallation.whenActive();
-    if (!service) throw new Error('Expected Kernel Service to activate.');
-    const activeService = service;
+    const { host, service } = await activateKernelService();
 
     const observed: CanvasCommit[] = [];
-    const unsubscribe = activeService.observeCommits((commit) => observed.push(commit));
-    const committed = activeService.transact((transaction) => {
+    const unsubscribe = service.observeCommits((commit) => observed.push(commit));
+    const committed = service.transact((transaction) => {
       transaction.nodes.add({
         id: nodeId('observed'),
         type: 'task',
@@ -64,15 +42,15 @@ describe('@cflow/plugin-kernel', () => {
 
     if (!committed) throw new Error('Expected Transaction to commit.');
     expect(observed).toEqual([committed]);
-    expect(activeService.transact(() => {})).toBeNull();
+    expect(service.transact(() => {})).toBeNull();
     const callbackError = new Error('Transaction failed');
     expect(() =>
-      activeService.transact(() => {
+      service.transact(() => {
         throw callbackError;
       }),
     ).toThrow(callbackError);
     expect(() =>
-      activeService.transact((transaction) => {
+      service.transact((transaction) => {
         transaction.edges.add({
           id: edgeId('invalid'),
           type: 'flow',
@@ -86,7 +64,7 @@ describe('@cflow/plugin-kernel', () => {
 
     unsubscribe();
     unsubscribe();
-    activeService.transact((transaction) => {
+    service.transact((transaction) => {
       transaction.nodes.remove(nodeId('observed'));
     });
     expect(observed).toEqual([committed]);
@@ -105,17 +83,7 @@ describe('@cflow/plugin-kernel', () => {
     const host = createPluginHost();
 
     try {
-      let service: KernelService | undefined;
-      const consumer = definePlugin({
-        requires: { kernel: kernelService },
-        setup(context) {
-          service = context.services.kernel;
-        },
-      });
-      host.install(kernelPlugin);
-      const consumerInstallation = host.install(consumer);
-      await consumerInstallation.whenActive();
-      if (!service) throw new Error('Expected Kernel Service to activate.');
+      const { service } = await activateKernelService(host);
 
       const laterRevisions: number[] = [];
       service.observeCommits(() => {
@@ -158,17 +126,7 @@ describe('@cflow/plugin-kernel', () => {
     const host = createPluginHost();
 
     try {
-      let service: KernelService | undefined;
-      const consumer = definePlugin({
-        requires: { kernel: kernelService },
-        setup(context) {
-          service = context.services.kernel;
-        },
-      });
-      host.install(kernelPlugin);
-      const consumerInstallation = host.install(consumer);
-      await consumerInstallation.whenActive();
-      if (!service) throw new Error('Expected Kernel Service to activate.');
+      const { service } = await activateKernelService(host);
 
       service.observeCommits(() => {
         throw observerError;
@@ -203,26 +161,14 @@ describe('@cflow/plugin-kernel', () => {
   });
 
   test('queues reentrant Commits until every Observer sees the current revision', async () => {
-    let service: KernelService | undefined;
-    const consumer = definePlugin({
-      requires: { kernel: kernelService },
-      setup(context) {
-        service = context.services.kernel;
-      },
-    });
-    const host = createPluginHost();
-    host.install(kernelPlugin);
-    const consumerInstallation = host.install(consumer);
-    await consumerInstallation.whenActive();
-    if (!service) throw new Error('Expected Kernel Service to activate.');
-    const activeService = service;
+    const { host, service } = await activateKernelService();
 
     const deliveries: string[] = [];
-    activeService.observeCommits((commit) => {
+    service.observeCommits((commit) => {
       const revision = commit.changeSet.revision;
       deliveries.push(`first:${revision}`);
       if (revision < 3) {
-        activeService.transact((transaction) => {
+        service.transact((transaction) => {
           transaction.nodes.add({
             id: nodeId(`reentrant-${revision}`),
             type: 'task',
@@ -232,11 +178,11 @@ describe('@cflow/plugin-kernel', () => {
         });
       }
     });
-    activeService.observeCommits((commit) => {
+    service.observeCommits((commit) => {
       deliveries.push(`second:${commit.changeSet.revision}`);
     });
 
-    activeService.transact((transaction) => {
+    service.transact((transaction) => {
       transaction.nodes.add({
         id: nodeId('initial'),
         type: 'task',
@@ -246,7 +192,7 @@ describe('@cflow/plugin-kernel', () => {
     });
 
     expect(deliveries).toEqual(['first:1', 'second:1', 'first:2', 'second:2', 'first:3', 'second:3']);
-    expect(activeService.read().snapshot.revision).toBe(3);
+    expect(service.read().snapshot.revision).toBe(3);
 
     await host.dispose();
   });
@@ -321,3 +267,21 @@ describe('@cflow/plugin-kernel', () => {
     await host.dispose();
   });
 });
+
+async function activateKernelService(host: PluginHost = createPluginHost()): Promise<{
+  readonly host: PluginHost;
+  readonly service: KernelService;
+}> {
+  let service: KernelService | undefined;
+  const consumer = definePlugin({
+    requires: { kernel: kernelService },
+    setup(context) {
+      service = context.services.kernel;
+    },
+  });
+  const providerInstallation = host.install(kernelPlugin);
+  const consumerInstallation = host.install(consumer);
+  await Promise.all([providerInstallation.whenActive(), consumerInstallation.whenActive()]);
+  if (!service) throw new Error('Expected Kernel Service to activate.');
+  return { host, service };
+}

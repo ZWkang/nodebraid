@@ -106,6 +106,16 @@ bun run format:check
 bun run test
 ```
 
+Workspace package typechecks first build the dependency declarations required
+for package-name resolution, so the same commands work from a clean checkout
+without pre-existing `dist` directories.
+
+Build only the declarations required by `@cflow/plugin-kernel`:
+
+```bash
+bun run --filter '@cflow/plugin-kernel' build:dependencies
+```
+
 Format supported files:
 
 ```bash

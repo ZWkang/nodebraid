@@ -11,7 +11,8 @@
 - `bun install`：安装依赖并启用 Git hooks。
 - `bun run dev`：监听根入口并持续构建到 `dist/`。
 - `bun run build`：构建根入口，再由 `@cflow/core` 先构建其余 workspace 依赖并构建公共 facade。
-- `bun run typecheck`：检查根 TypeScript project 和所有 `@cflow/*` workspace。
+- `bun run typecheck`：先构建 workspace package-name 类型解析所需的依赖声明，再检查根 TypeScript project 和所有 `@cflow/*` workspace。
+- `bun run --filter '@cflow/plugin-kernel' build:dependencies`：按 Kernel、Runtime 顺序生成 Kernel Runtime Plugin 构建与类型检查所需的 workspace 声明。
 - `bun run format`：使用 Prettier 格式化支持的文件。
 - `bun run test`：运行 Bun 测试。
 - `bun run check`：依次运行 lint、类型检查、格式检查、测试和构建。

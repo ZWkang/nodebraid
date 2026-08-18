@@ -42,7 +42,12 @@ Run package scripts from the monorepo root:
 bun run --filter '@cflow/plugin-kernel' typecheck
 bun run --filter '@cflow/plugin-kernel' test
 bun run --filter '@cflow/plugin-kernel' build
+bun run --filter '@cflow/plugin-kernel' build:dependencies
 ```
+
+Typecheck and build first emit the Kernel and Runtime declarations needed for
+package-name resolution, so neither command depends on stale local `dist`
+artifacts.
 
 ## License
 

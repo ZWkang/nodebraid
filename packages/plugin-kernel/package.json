@@ -39,13 +39,11 @@
   ],
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
-    "build": "bun run build:dependencies && bun run build:self",
+    "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts",
     "build:dependencies": "bun run --filter '@cflow/kernel' build && bun run --filter '@cflow/runtime-cordis' build",
-    "build:self": "tsgo -p tsconfig.build.json && bun run test:artifacts",
     "prepack": "bun run build",
     "test": "bun test ./tests",
-    "test:artifacts": "bun run ./artifacts/check-declarations.ts",
-    "typecheck": "tsgo --noEmit -p tsconfig.json"
+    "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@cflow/kernel": "workspace:*",

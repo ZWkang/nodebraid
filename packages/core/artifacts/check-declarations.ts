@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
-import { readdir, readFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { collectDeclarations } from '../../../scripts/collect-declarations';
 
 const forbiddenCordisImport = /(?:from\s+|import\()["']cordis["']/;
 const forbiddenCordisType = /\b(?:Context|CordisError|Effect|Fiber|FiberState)\b/;
@@ -33,16 +35,3 @@ const kernel = corePackage.createCanvasKernel();
 assert.equal(kernel.read().snapshot.revision, 0);
 assert.ok(corePackage.kernelPlugin);
 assert.ok(corePackage.kernelService);
-
-async function collectDeclarations(directory: string): Promise<Array<{ path: string; contents: string }>> {
-  const declarations: Array<{ path: string; contents: string }> = [];
-  for (const entry of await readdir(directory, { withFileTypes: true })) {
-    const path = join(directory, entry.name);
-    if (entry.isDirectory()) {
-      declarations.push(...(await collectDeclarations(path)));
-    } else if (entry.name.endsWith('.d.ts')) {
-      declarations.push({ path, contents: await readFile(path, 'utf8') });
-    }
-  }
-  return declarations;
-}

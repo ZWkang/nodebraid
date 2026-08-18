@@ -46,7 +46,7 @@
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "test:artifacts": "bun run ./artifacts/check-declarations.ts",
-    "typecheck": "tsgo --noEmit -p tsconfig.json"
+    "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@cflow/kernel": "workspace:*",
