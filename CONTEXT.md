@@ -4,6 +4,42 @@ CFlow 是一个插件化、渲染器无关的流程画布框架。这里记录�
 
 ## Language
 
+**Kernel**:
+一个 Canvas Runtime 内拥有权威 Document、并维护渲染器无关图一致性的核心模块。
+_Avoid_: Canvas Store, Global Graph, Renderer Model
+
+**Document**:
+一个 Kernel 内由 Node、Edge、Endpoint 和本地 revision 构成的权威图状态。
+_Avoid_: Canvas Snapshot, Session State, Renderer Scene
+
+**Node**:
+Document 中可由 Edge 引用的图实体，包含跨渲染器成立的位置、可选尺寸、父子关系和不透明领域数据。
+_Avoid_: Shape, Component, Renderer Node
+
+**Edge**:
+Document 中连接两个 Endpoint 的图实体。
+_Avoid_: Renderer Line, Connection Object
+
+**Endpoint**:
+Edge 的一端，引用一个 Node，并可以带有由上层领域能力解释的 Port 标识。
+_Avoid_: Port, Anchor Object, Renderer Handle
+
+**Transaction**:
+对 Document 的一次同步、原子更新尝试；只有最终图满足 Kernel 结构不变量时才会提交。
+_Avoid_: Async Transaction, Mutation Session, Direct Write
+
+**Canvas Snapshot**:
+Document 在一个本地 revision 上的不可变读取表示，不等同于可持久化的 Serialized Document。
+_Avoid_: Serialized Document, Mutable State, Renderer Snapshot
+
+**Canvas Query**:
+按实体与图关系读取状态的只读能力；Canvas View 中的 Query 绑定一个已提交 revision，Transaction 中的 Query 反映当前暂存状态。
+_Avoid_: Live Query, Mutable Store, Document Handle
+
+**Change Set**:
+一次已提交 Transaction 在相邻 revision 之间产生的实体级 before/after 变化。
+_Avoid_: Patch, Operation Log, Domain Event
+
 **Canvas Runtime**:
 一张活动画布的能力组合与生命周期范围。每个 Canvas Runtime 拥有彼此隔离的图状态、会话状态和插件环境。
 _Avoid_: App Runtime, Global Runtime
