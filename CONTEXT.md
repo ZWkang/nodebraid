@@ -107,3 +107,11 @@ _Avoid_: String Service Key, Dynamic Lookup
 **Plugin Context**:
 一次 Activation 中供 Plugin 使用 Required Service、登记 Owned Resource 和创建 Child Installation 的受限环境。
 _Avoid_: Cordis Context, Global Context, Plugin Host
+
+**Kernel Service**:
+一次 Activation 内由 Kernel Plugin 提供的窄 Runtime Service，代表一份权威 Document 的读取、同步事务与已提交变化观察能力。
+_Avoid_: CanvasKernel Service, Global Kernel, Mutable Document Service
+
+**Commit Observer**:
+订阅同一个 Kernel Service，并按本地 revision 顺序同步接收成功且有净变化的 Canvas Commit 的消费者。
+_Avoid_: Transaction Observer, Draft Listener, Change Stream
