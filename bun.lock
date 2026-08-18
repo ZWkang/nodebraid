@@ -21,8 +21,13 @@
       "name": "@cflow/core",
       "version": "0.0.1",
       "dependencies": {
+        "@cflow/kernel": "workspace:*",
         "@cflow/runtime-cordis": "workspace:*",
       },
+    },
+    "packages/kernel": {
+      "name": "@cflow/kernel",
+      "version": "0.0.1",
     },
     "packages/runtime-cordis": {
       "name": "@cflow/runtime-cordis",
@@ -43,6 +48,8 @@
     "@babel/runtime": ["@babel/runtime@7.29.7", "", {}, "sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw=="],
 
     "@cflow/core": ["@cflow/core@workspace:packages/core"],
+
+    "@cflow/kernel": ["@cflow/kernel@workspace:packages/kernel"],
 
     "@cflow/runtime-cordis": ["@cflow/runtime-cordis@workspace:packages/runtime-cordis"],
 

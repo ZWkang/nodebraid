@@ -1,15 +1,15 @@
 # @cflow/core
 
-Public CFlow facade for the Plugin Host API.
+Public CFlow facade for the Kernel and Plugin Host APIs.
 
 ```ts
-import { createPluginHost, definePlugin, defineService } from '@cflow/core';
+import { createCanvasKernel, createPluginHost, definePlugin, defineService } from '@cflow/core';
 ```
 
-The facade re-exports the CFlow-owned interface from
-`@cflow/runtime-cordis`. Cordis remains an implementation dependency and does
-not appear in the public CFlow types. Advanced consumers that need the narrow
-runtime entry can import `@cflow/runtime-cordis` directly.
+The facade re-exports the pure graph interface from `@cflow/kernel` and the
+CFlow-owned Plugin Host interface from `@cflow/runtime-cordis`. Cordis remains
+an implementation dependency and does not appear in the public CFlow types.
+Advanced consumers can import either narrow package directly.
 
 ## Development
 

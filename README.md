@@ -17,7 +17,8 @@ The repository is currently at an early implementation stage. The planned archit
 ```text
 .
 ├── packages/
-│   ├── core/          # @cflow/core public facade
+│   ├── core/           # @cflow/core public facade
+│   ├── kernel/         # @cflow/kernel graph state and transactions
 │   └── runtime-cordis/ # @cflow/runtime-cordis implementation package
 ├── src/               # Root TypeScript source
 ├── tests/             # Root automated tests
@@ -44,6 +45,17 @@ dependencies, lifecycle ownership, and Child Installation composition. It does
 not install Kernel, Session, Renderer, or other Canvas capabilities implicitly.
 “Everything is Plugin” applies to those Canvas capabilities; the minimal Host
 substrate is the boundary that owns the first installation and final disposal.
+
+## Kernel package
+
+`@cflow/kernel` now implements the renderer-independent graph core: Node and
+Edge state, synchronous atomic Transactions, revision-bound Canvas Views,
+Canvas Query, and reversible before/after Change Sets.
+
+Most consumers can import the same interface from `@cflow/core`. The pure
+Kernel does not depend on Plugin Host, Cordis, RxJS, a Renderer, DOM objects, or
+framework adapters. A Kernel Plugin adapter and Canvas Composition remain
+future Runtime work and are not hidden inside the Kernel package.
 
 ## Commands
 

@@ -1,6 +1,14 @@
 import { describe, expect, test } from 'bun:test';
 
-import { createPluginHost, definePlugin, defineService, type PluginInstallation } from '../src';
+import {
+  createCanvasKernel,
+  createPluginHost,
+  definePlugin,
+  defineService,
+  edgeId,
+  nodeId,
+  type PluginInstallation,
+} from '../src';
 
 describe('@cflow/core', () => {
   test('publishes the typed Plugin Host seam', async () => {
@@ -52,5 +60,37 @@ describe('@cflow/core', () => {
     await host.dispose();
     expect(disposed).toBe(true);
     expect(installation.getSnapshot()).toEqual({ status: 'disposed' });
+  });
+
+  test('publishes the reversible Kernel seam', () => {
+    const kernel = createCanvasKernel();
+    const sourceId = nodeId('source');
+    const targetId = nodeId('target');
+    const connectionId = edgeId('connection');
+    const source = { id: sourceId, type: 'task', position: { x: 0, y: 0 }, data: null };
+    const target = { id: targetId, type: 'task', position: { x: 100, y: 0 }, data: null };
+
+    kernel.transact((transaction) => {
+      transaction.nodes.add(source);
+      transaction.nodes.add(target);
+      transaction.edges.add({
+        id: connectionId,
+        type: 'flow',
+        source: { nodeId: sourceId },
+        target: { nodeId: targetId },
+        data: null,
+      });
+    });
+    const moved = kernel.transact((transaction) => {
+      transaction.nodes.replace(sourceId, { ...source, position: { x: 40, y: 20 } });
+    });
+    if (!moved) throw new Error('Expected the move Transaction to commit.');
+
+    kernel.transact((transaction) => transaction.applyChangeSet(moved.changeSet, 'reverse'));
+    expect(kernel.read().query.getNode(sourceId)?.position).toEqual({ x: 0, y: 0 });
+
+    kernel.transact((transaction) => transaction.applyChangeSet(moved.changeSet, 'forward'));
+    expect(kernel.read().query.getNode(sourceId)?.position).toEqual({ x: 40, y: 20 });
+    expect(kernel.read().query.getEdge(connectionId)?.target.nodeId).toBe(targetId);
   });
 });

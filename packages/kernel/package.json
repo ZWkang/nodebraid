@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/core",
+  "name": "@cflow/kernel",
   "type": "module",
   "version": "0.0.1",
-  "description": "Public CFlow facade for the Kernel and Plugin Host APIs.",
+  "description": "Renderer-independent graph kernel for CFlow.",
   "publishConfig": {
     "access": "public"
   },
@@ -14,15 +14,15 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ZWkang/cflow.git",
-    "directory": "packages/core"
+    "directory": "packages/kernel"
   },
   "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/core#readme",
+  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/kernel#readme",
   "keywords": [
     "cflow",
-    "core",
-    "graph-kernel",
-    "plugin-runtime"
+    "canvas",
+    "graph",
+    "kernel"
   ],
   "sideEffects": false,
   "exports": {
@@ -40,16 +40,10 @@
   ],
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
-    "build": "bun run build:dependencies && bun run build:self",
-    "build:dependencies": "bun run --filter '!@cflow/core' build",
-    "build:self": "tsgo -p tsconfig.build.json && bun run test:artifacts",
+    "build": "tsgo -p tsconfig.build.json && bun run test:artifacts",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "test:artifacts": "bun run ./artifacts/check-declarations.ts",
     "typecheck": "tsgo --noEmit -p tsconfig.json"
-  },
-  "dependencies": {
-    "@cflow/kernel": "workspace:*",
-    "@cflow/runtime-cordis": "workspace:*"
   }
 }
