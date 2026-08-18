@@ -92,6 +92,7 @@ describe('@cflow/plugin-command', () => {
       return completion.promise;
     });
     const execution = service.execute(wait, undefined);
+    const replacement = defineCommand<void, string>('execution.wait');
     let disposeSettled = false;
     const disposal = registration.dispose().then(() => {
       disposeSettled = true;
@@ -102,11 +103,15 @@ describe('@cflow/plugin-command', () => {
     expect(executionSignal?.aborted).toBeTrue();
     expect(disposeSettled).toBeFalse();
     await expect(service.execute(wait, undefined)).rejects.toMatchObject({ code: 'COMMAND_NOT_FOUND' });
+    expectCommandError(() => service.register(replacement, () => 'early'), 'COMMAND_ALREADY_REGISTERED');
 
     completion.resolve('finished');
     await expect(execution).resolves.toBe('finished');
     await disposal;
     expect(disposeSettled).toBeTrue();
+    const replacementRegistration = service.register(replacement, () => 'ready');
+    await expect(service.execute(replacement, undefined)).resolves.toBe('ready');
+    await replacementRegistration.dispose();
 
     await host.dispose();
   });

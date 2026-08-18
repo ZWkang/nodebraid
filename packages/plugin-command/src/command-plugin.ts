@@ -49,15 +49,17 @@ export const commandPlugin = definePlugin({
       registration.disposePromise = new Promise<void>((resolve) => {
         completeDisposal = resolve;
       });
-      if (registrations.get(registration.command) === registration) {
-        registrations.delete(registration.command);
-      }
-      if (commandsById.get(registration.commandId) === registration) {
-        commandsById.delete(registration.commandId);
-      }
       const executions = Array.from(registration.executions);
       for (const execution of executions) execution.controller.abort();
-      void Promise.all(executions.map((execution) => execution.settled)).then(completeDisposal);
+      void Promise.all(executions.map((execution) => execution.settled)).then(() => {
+        if (registrations.get(registration.command) === registration) {
+          registrations.delete(registration.command);
+        }
+        if (commandsById.get(registration.commandId) === registration) {
+          commandsById.delete(registration.commandId);
+        }
+        completeDisposal();
+      });
       return registration.disposePromise;
     };
 
@@ -97,7 +99,7 @@ export const commandPlugin = definePlugin({
         assertActive();
         const commandId = getCommandId(command);
         const registration = registrations.get(command as AnyCommand);
-        if (!registration) {
+        if (!registration || registration.disposePromise) {
           throw new CommandError(
             'COMMAND_NOT_FOUND',
             `Command "${commandId}" is not registered.`,
