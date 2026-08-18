@@ -4,9 +4,13 @@
 
 **Blocked by:** 02 — 只分发成功提交并隔离 Observer 错误.
 
-**Status:** open
+**Status:** resolved
 
-- [ ] Commit 按 revision 与 Transaction 完成顺序进入 activation-local 队列。
-- [ ] 重入 transact 不启动嵌套分发循环。
-- [ ] 所有 Observer 先完成 N 的通知，再开始 N+1。
-- [ ] 多次重入仍保持单调且无重复的 Commit 序列。
+- [x] Commit 按 revision 与 Transaction 完成顺序进入 activation-local 队列。
+- [x] 重入 transact 不启动嵌套分发循环。
+- [x] 所有 Observer 先完成 N 的通知，再开始 N+1。
+- [x] 多次重入仍保持单调且无重复的 Commit 序列。
+
+## Answer
+
+Activation-local Commit 队列将 Observer 重入产生的后续提交追加到当前分发循环。公开测试连续重入两次，并锁定两个 Observer 的顺序为 `first:1`、`second:1`、`first:2`、`second:2`、`first:3`、`second:3`，最终 Kernel revision 为 3。

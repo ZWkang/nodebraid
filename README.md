@@ -19,6 +19,7 @@ The repository is currently at an early implementation stage. The planned archit
 ├── packages/
 │   ├── core/           # @cflow/core public facade
 │   ├── kernel/         # @cflow/kernel graph state and transactions
+│   ├── plugin-kernel/  # @cflow/plugin-kernel Runtime Service adapter
 │   └── runtime-cordis/ # @cflow/runtime-cordis implementation package
 ├── src/               # Root TypeScript source
 ├── tests/             # Root automated tests
@@ -54,8 +55,21 @@ Canvas Query, and reversible before/after Change Sets.
 
 Most consumers can import the same interface from `@cflow/core`. The pure
 Kernel does not depend on Plugin Host, Cordis, RxJS, a Renderer, DOM objects, or
-framework adapters. A Kernel Plugin adapter and Canvas Composition remain
-future Runtime work and are not hidden inside the Kernel package.
+framework adapters.
+
+## Kernel Runtime Plugin
+
+`@cflow/plugin-kernel` now provides one fresh Kernel per Plugin Activation
+through a narrow `KernelService`. Consumers can read revision-bound Views, run
+synchronous Transactions, and observe successful net-changing Canvas Commits
+in revision order. Observer failures are reported without rolling back Kernel
+state or blocking later Observers, and reentrant Transactions queue later
+Commits until the current revision reaches every Observer.
+
+The adapter depends directly on the CFlow-owned seams in `@cflow/kernel` and
+`@cflow/runtime-cordis`; it does not introduce a speculative plugin-api package.
+Command, Session, Renderer, History, Persistence, initial Document import, and
+asynchronous Transactions remain future Runtime work.
 
 ## Commands
 

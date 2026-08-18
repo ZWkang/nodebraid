@@ -6,7 +6,10 @@ import {
   definePlugin,
   defineService,
   edgeId,
+  kernelPlugin,
+  kernelService,
   nodeId,
+  type KernelService,
   type PluginInstallation,
 } from '../src';
 
@@ -92,5 +95,23 @@ describe('@cflow/core', () => {
     kernel.transact((transaction) => transaction.applyChangeSet(moved.changeSet, 'forward'));
     expect(kernel.read().query.getNode(sourceId)?.position).toEqual({ x: 40, y: 20 });
     expect(kernel.read().query.getEdge(connectionId)?.target.nodeId).toBe(targetId);
+  });
+
+  test('publishes the Kernel Runtime Plugin seam', async () => {
+    let service: KernelService | undefined;
+    const consumer = definePlugin({
+      requires: { kernel: kernelService },
+      setup(context) {
+        service = context.services.kernel;
+      },
+    });
+    const host = createPluginHost();
+    host.install(kernelPlugin);
+    const consumerInstallation = host.install(consumer);
+
+    await consumerInstallation.whenActive();
+
+    expect(service?.read().snapshot.revision).toBe(0);
+    await host.dispose();
   });
 });

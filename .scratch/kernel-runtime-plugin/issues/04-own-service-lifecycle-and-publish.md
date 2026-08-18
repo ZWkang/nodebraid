@@ -4,10 +4,14 @@
 
 **Blocked by:** 03 — 串行化重入 Commit 分发.
 
-**Status:** open
+**Status:** resolved
 
-- [ ] Consumer Owned Resource 在 Kernel Service 关闭前释放。
-- [ ] Service dispose 清空 Observer，旧 Service 后续调用显式失败。
-- [ ] 重装产生全新 Service、revision-zero View 和空 Observer 集合。
-- [ ] core 重导出 plugin-kernel，声明不泄漏 Cordis 或 core 反向依赖。
-- [ ] README、changeset、package metadata、build/pack 验证与当前能力一致。
+- [x] Consumer Owned Resource 在 Kernel Service 关闭前释放。
+- [x] Service dispose 清空 Observer，旧 Service 后续调用显式失败。
+- [x] 重装产生全新 Service、revision-zero View 和空 Observer 集合。
+- [x] core 重导出 plugin-kernel，声明不泄漏 Cordis 或 core 反向依赖。
+- [x] README、changeset、package metadata、build/pack 验证与当前能力一致。
+
+## Answer
+
+Kernel Plugin 用 Activation Owned Resource 关闭 Service 并清空 Observer；Runtime 先释放 Required Service Consumer，旧 Service 随后以 `SERVICE_DISPOSED` 显式失败。重装返回全新 revision-zero Service；core 重导出、声明检查、package-name import probe 与 core/plugin-kernel dry-run pack 均已通过。

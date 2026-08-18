@@ -22,12 +22,21 @@
       "version": "0.0.1",
       "dependencies": {
         "@cflow/kernel": "workspace:*",
+        "@cflow/plugin-kernel": "workspace:*",
         "@cflow/runtime-cordis": "workspace:*",
       },
     },
     "packages/kernel": {
       "name": "@cflow/kernel",
       "version": "0.0.1",
+    },
+    "packages/plugin-kernel": {
+      "name": "@cflow/plugin-kernel",
+      "version": "0.0.1",
+      "dependencies": {
+        "@cflow/kernel": "workspace:*",
+        "@cflow/runtime-cordis": "workspace:*",
+      },
     },
     "packages/runtime-cordis": {
       "name": "@cflow/runtime-cordis",
@@ -50,6 +59,8 @@
     "@cflow/core": ["@cflow/core@workspace:packages/core"],
 
     "@cflow/kernel": ["@cflow/kernel@workspace:packages/kernel"],
+
+    "@cflow/plugin-kernel": ["@cflow/plugin-kernel@workspace:packages/plugin-kernel"],
 
     "@cflow/runtime-cordis": ["@cflow/runtime-cordis@workspace:packages/runtime-cordis"],
 
