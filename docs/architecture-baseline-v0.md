@@ -462,7 +462,7 @@ RendererInput 和 HitResult 的精确字段暂不冻结。确定原则是只包�
 - 读取 Query；
 - 注册与生命周期绑定的 Disposable。
 
-Command Registry 可以是 Runtime 内部服务，但不作为独立架构层。Node Type Registry、Port Registry、Effect Registry、UI Registry 和 Renderer Contribution Registry 当前都不是必需基础设施。
+Command Service 由官方 `@cflow/plugin-command` 通过普通 Runtime Service 提供，但不形成独立架构层。定义 handler 的 Feature Plugin 通过自己的静态 Service Binding 获取 Kernel、Session 或其他依赖，Command Service 不提供动态 Service lookup。Node Type Registry、Port Registry、Effect Registry、UI Registry 和 Renderer Contribution Registry 当前都不是必需基础设施。
 
 ### 7.2 提交后副作用
 
@@ -481,6 +481,8 @@ Transaction 只保证 Document 状态的同步原子提交。Persistence、业�
 ```text
 packages/
 ├── kernel/             @cflow/kernel
+├── plugin-kernel/      @cflow/plugin-kernel
+├── plugin-command/     @cflow/plugin-command
 ├── renderer-api/       @cflow/renderer-api
 ├── runtime-cordis/     @cflow/runtime-cordis
 ├── interaction-core/   @cflow/interaction-core

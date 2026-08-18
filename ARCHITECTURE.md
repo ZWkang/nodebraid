@@ -447,6 +447,7 @@ packages/
 │   ├── geometry.ts
 │   └── identifiers.ts
 ├── runtime-cordis/
+├── plugin-command/
 ├── renderer-api/
 ├── renderer-konva/
 ├── interaction-core/

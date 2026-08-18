@@ -1,8 +1,11 @@
 import { describe, expect, test } from 'bun:test';
 
 import {
+  commandPlugin,
+  commandService,
   createCanvasKernel,
   createPluginHost,
+  defineCommand,
   definePlugin,
   defineService,
   edgeId,
@@ -11,6 +14,7 @@ import {
   nodeId,
   type KernelService,
   type PluginInstallation,
+  type CommandService,
 } from '../src';
 
 describe('@cflow/core', () => {
@@ -112,6 +116,50 @@ describe('@cflow/core', () => {
     await consumerInstallation.whenActive();
 
     expect(service?.read().snapshot.revision).toBe(0);
+    await host.dispose();
+  });
+
+  test('composes asynchronous Command preparation with a synchronous Kernel Transaction', async () => {
+    const addNode = defineCommand<string, number>('node.add-prepared');
+    let commands: CommandService | undefined;
+    let kernel: KernelService | undefined;
+    let committedCommandId: string | undefined;
+    const feature = definePlugin({
+      requires: { commands: commandService, kernel: kernelService },
+      setup(context) {
+        commands = context.services.commands;
+        kernel = context.services.kernel;
+        const registration = commands.register(addNode, async (value, execution) => {
+          await Promise.resolve();
+          const commit = context.services.kernel.transact(
+            (transaction) => {
+              transaction.nodes.add({
+                id: nodeId(value),
+                type: 'task',
+                position: { x: 0, y: 0 },
+                data: null,
+              });
+            },
+            { origin: 'command', commandId: execution.commandId },
+          );
+          if (!commit) throw new Error('Expected Command Transaction to commit.');
+          committedCommandId = commit.changeSet.commandId;
+          return commit.changeSet.revision;
+        });
+        context.own(() => registration.dispose());
+      },
+    });
+    const host = createPluginHost();
+    host.install(commandPlugin);
+    host.install(kernelPlugin);
+    const installation = host.install(feature);
+    await installation.whenActive();
+    if (!commands || !kernel) throw new Error('Expected Command and Kernel Services to activate.');
+
+    await expect(commands.execute(addNode, 'prepared')).resolves.toBe(1);
+    expect(committedCommandId).toBe('node.add-prepared');
+    expect(kernel.read().query.getNode(nodeId('prepared'))?.id).toBe(nodeId('prepared'));
+
     await host.dispose();
   });
 });

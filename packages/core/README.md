@@ -1,11 +1,13 @@
 # @cflow/core
 
-Public CFlow facade for the Kernel, Kernel Runtime Plugin, and Plugin Host APIs.
+Public CFlow facade for the Kernel, Runtime Plugins, and Plugin Host APIs.
 
 ```ts
 import {
+  commandPlugin,
   createCanvasKernel,
   createPluginHost,
+  defineCommand,
   definePlugin,
   defineService,
   kernelPlugin,
@@ -15,13 +17,19 @@ import {
 
 The facade re-exports the pure graph interface from `@cflow/kernel` and the
 CFlow-owned Plugin Host interface from `@cflow/runtime-cordis`. It also
-re-exports the official Kernel Runtime Plugin from `@cflow/plugin-kernel`.
+re-exports the official Kernel and Command Runtime Plugins from
+`@cflow/plugin-kernel` and `@cflow/plugin-command`.
 Cordis remains an implementation dependency and does not appear in the public
 CFlow types. Advanced consumers can import the narrow packages directly.
 
 `kernelPlugin` composes one fresh Kernel into a Plugin Host Activation through
 the narrow `KernelService` interface. It adds synchronous ordered Canvas Commit
 observation while keeping the underlying `CanvasKernel` private.
+
+`commandPlugin` provides an Activation-scoped `CommandService` for strongly
+typed registration, asynchronous execution, cancellation, and lifecycle-bound
+cleanup. Feature Plugins obtain Kernel or Session dependencies through their
+own declared Service Bindings rather than through a hidden Service locator.
 
 ## Development
 

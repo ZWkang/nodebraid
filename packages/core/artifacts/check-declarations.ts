@@ -10,17 +10,20 @@ const forbiddenCordisType = /\b(?:Context|CordisError|Effect|Fiber|FiberState)\b
 
 const coreDist = fileURLToPath(new URL('../dist/', import.meta.url));
 const kernelDist = fileURLToPath(new URL('../../kernel/dist/', import.meta.url));
+const pluginCommandDist = fileURLToPath(new URL('../../plugin-command/dist/', import.meta.url));
 const pluginKernelDist = fileURLToPath(new URL('../../plugin-kernel/dist/', import.meta.url));
 const runtimeDist = fileURLToPath(new URL('../../runtime-cordis/dist/', import.meta.url));
 const coreDeclaration = await readFile(join(coreDist, 'index.d.ts'), 'utf8');
 const declarationFiles = await Promise.all([
   collectDeclarations(coreDist),
   collectDeclarations(kernelDist),
+  collectDeclarations(pluginCommandDist),
   collectDeclarations(pluginKernelDist),
   collectDeclarations(runtimeDist),
 ]);
 
 assert.match(coreDeclaration, /export \* from '@cflow\/kernel';/);
+assert.match(coreDeclaration, /export \* from '@cflow\/plugin-command';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-kernel';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/runtime-cordis';/);
 for (const declaration of declarationFiles.flat()) {
@@ -35,3 +38,6 @@ const kernel = corePackage.createCanvasKernel();
 assert.equal(kernel.read().snapshot.revision, 0);
 assert.ok(corePackage.kernelPlugin);
 assert.ok(corePackage.kernelService);
+assert.ok(corePackage.commandPlugin);
+assert.ok(corePackage.commandService);
+assert.equal(corePackage.defineCommand('artifact.command').id, 'artifact.command');

@@ -19,6 +19,7 @@ The repository is currently at an early implementation stage. The planned archit
 ├── packages/
 │   ├── core/           # @cflow/core public facade
 │   ├── kernel/         # @cflow/kernel graph state and transactions
+│   ├── plugin-command/ # @cflow/plugin-command Runtime Service adapter
 │   ├── plugin-kernel/  # @cflow/plugin-kernel Runtime Service adapter
 │   └── runtime-cordis/ # @cflow/runtime-cordis implementation package
 ├── src/               # Root TypeScript source
@@ -68,8 +69,20 @@ Commits until the current revision reaches every Observer.
 
 The adapter depends directly on the CFlow-owned seams in `@cflow/kernel` and
 `@cflow/runtime-cordis`; it does not introduce a speculative plugin-api package.
-Command, Session, Renderer, History, Persistence, initial Document import, and
+Session, Renderer, History, Persistence, initial Document import, and
 asynchronous Transactions remain future Runtime work.
+
+## Command Runtime Plugin
+
+`@cflow/plugin-command` provides one empty `CommandService` per Plugin
+Activation. Feature Plugins register strongly typed Command tokens and own the
+returned registrations; callers execute the same tokens through a Promise
+seam that supports synchronous or asynchronous handlers.
+
+Registration or Service disposal first removes Commands from lookup, then
+aborts and awaits in-flight handlers. The Command package depends only on the
+CFlow-owned Plugin Host seam. Feature Plugins acquire Kernel, Session, or
+external capabilities through their own static Service Bindings.
 
 ## Commands
 
@@ -114,6 +127,12 @@ Build only the declarations required by `@cflow/plugin-kernel`:
 
 ```bash
 bun run --filter '@cflow/plugin-kernel' build:dependencies
+```
+
+Build only the declaration required by `@cflow/plugin-command`:
+
+```bash
+bun run --filter '@cflow/plugin-command' build:dependencies
 ```
 
 Format supported files:

@@ -22,6 +22,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@cflow/kernel": "workspace:*",
+        "@cflow/plugin-command": "workspace:*",
         "@cflow/plugin-kernel": "workspace:*",
         "@cflow/runtime-cordis": "workspace:*",
       },
@@ -29,6 +30,13 @@
     "packages/kernel": {
       "name": "@cflow/kernel",
       "version": "0.0.1",
+    },
+    "packages/plugin-command": {
+      "name": "@cflow/plugin-command",
+      "version": "0.0.1",
+      "dependencies": {
+        "@cflow/runtime-cordis": "workspace:*",
+      },
     },
     "packages/plugin-kernel": {
       "name": "@cflow/plugin-kernel",
@@ -59,6 +67,8 @@
     "@cflow/core": ["@cflow/core@workspace:packages/core"],
 
     "@cflow/kernel": ["@cflow/kernel@workspace:packages/kernel"],
+
+    "@cflow/plugin-command": ["@cflow/plugin-command@workspace:packages/plugin-command"],
 
     "@cflow/plugin-kernel": ["@cflow/plugin-kernel@workspace:packages/plugin-kernel"],
 
