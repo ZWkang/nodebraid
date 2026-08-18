@@ -1,6 +1,8 @@
-# cflow
+# CFlow
 
-A Bun-powered TypeScript monorepo for cflow.
+CFlow is a plugin-based, renderer-agnostic flow canvas engine built as a Bun-powered TypeScript monorepo.
+
+The repository is currently at an early implementation stage. The planned architecture and package boundaries are documented in [ARCHITECTURE.md](./ARCHITECTURE.md); the document describes the target design rather than the currently implemented feature set.
 
 ## Stack
 
@@ -14,13 +16,34 @@ A Bun-powered TypeScript monorepo for cflow.
 
 ```text
 .
-├── packages/          # Workspace packages
+├── packages/
+│   ├── core/          # @cflow/core public facade
+│   └── runtime-cordis/ # @cflow/runtime-cordis implementation package
 ├── src/               # Root TypeScript source
 ├── tests/             # Root automated tests
 ├── .changeset/        # Changesets configuration
 ├── bun.lock           # Bun lockfile
-└── tsconfig.base.json # Shared TypeScript configuration
+├── tsconfig.base.json # Shared TypeScript compiler options
+└── tsconfig.json      # Root TypeScript project
 ```
+
+## Plugin Host packages
+
+Most consumers should import the CFlow-owned Plugin Host API from `@cflow/core`:
+
+```ts
+import { createPluginHost, definePlugin, defineService } from '@cflow/core';
+```
+
+`@cflow/core` is the public facade. It delegates the implementation to
+`@cflow/runtime-cordis`; advanced consumers can import that narrow package
+directly, but Cordis types remain internal to it.
+
+The first version implements the empty Plugin Host substrate, Runtime Service
+dependencies, lifecycle ownership, and Child Installation composition. It does
+not install Kernel, Session, Renderer, or other Canvas capabilities implicitly.
+“Everything is Plugin” applies to those Canvas capabilities; the minimal Host
+substrate is the boundary that owns the first installation and final disposal.
 
 ## Commands
 
@@ -36,7 +59,7 @@ Start a watch build for local development:
 bun run dev
 ```
 
-Build the root entry into `dist/`:
+Build the root entry and every `@cflow/*` workspace package:
 
 ```bash
 bun run build
@@ -87,6 +110,13 @@ packages/
 ```
 
 Each workspace package can define its own build and publish behavior while sharing the root toolchain.
+
+Run a script for one workspace package from the repository root:
+
+```bash
+bun run --filter '@cflow/core' build
+bun run --filter '@cflow/core' test
+```
 
 ## License
 

@@ -1,0 +1,50 @@
+{
+  "name": "@cflow/runtime-cordis",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Cordis-backed plugin runtime for cflow.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "zwkang",
+    "email": "kang95630@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZWkang/cflow.git",
+    "directory": "packages/runtime-cordis"
+  },
+  "bugs": "https://github.com/ZWkang/cflow/issues",
+  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/runtime-cordis#readme",
+  "keywords": [
+    "cflow",
+    "cordis",
+    "plugin-runtime"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsgo -p tsconfig.build.json --watch",
+    "build": "tsgo -p tsconfig.build.json",
+    "prepack": "bun run build",
+    "test": "bun test ./tests",
+    "typecheck": "tsgo --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "cordis": "4.0.0-rc.8"
+  }
+}
