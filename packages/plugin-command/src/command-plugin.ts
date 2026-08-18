@@ -46,11 +46,15 @@ export const commandPlugin = definePlugin({
     const disposeRegistration = (registration: RegisteredCommand): Promise<void> => {
       if (registration.disposePromise) return registration.disposePromise;
       let completeDisposal!: () => void;
+      // Publish the Promise before aborting because an abort listener may
+      // synchronously re-enter dispose() and must receive the same result.
       registration.disposePromise = new Promise<void>((resolve) => {
         completeDisposal = resolve;
       });
       const executions = Array.from(registration.executions);
       for (const execution of executions) execution.controller.abort();
+      // execute() treats disposePromise as unavailable, while both maps keep
+      // the token and ID reserved until every already-started handler settles.
       void Promise.all(executions.map((execution) => execution.settled)).then(() => {
         if (registrations.get(registration.command) === registration) {
           registrations.delete(registration.command);
@@ -116,6 +120,8 @@ export const commandPlugin = definePlugin({
           settleExecution = resolve;
         });
         const execution: RunningExecution = { controller, settled };
+        // Track before invoking so synchronous handler code can dispose or
+        // re-enter the Service without escaping lifecycle ownership.
         activeRegistration.executions.add(execution);
         const executionContext: CommandExecutionContext = Object.freeze({
           commandId,

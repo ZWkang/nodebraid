@@ -3,15 +3,19 @@
 Command Runtime Plugin for CFlow Canvas Runtime instances.
 
 ```ts
-import { commandPlugin, commandService, defineCommand } from '@cflow/plugin-command';
+import { commandPlugin, commandService, defineCommand, type CommandService } from '@cflow/plugin-command';
 import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
 
 const greet = defineCommand<string, string>('message.greet');
+let commands: CommandService | undefined;
 const feature = definePlugin({
   requires: { commands: commandService },
   setup(context) {
+    commands = context.services.commands;
     const registration = context.services.commands.register(greet, async (name, execution) => {
-      if (execution.signal.aborted) throw execution.signal.reason;
+      execution.signal.throwIfAborted();
+      await Promise.resolve();
+      execution.signal.throwIfAborted();
       return `Hello, ${name}`;
     });
     context.own(() => registration.dispose());
@@ -19,8 +23,22 @@ const feature = definePlugin({
 });
 
 const host = createPluginHost();
-host.install(commandPlugin);
-host.install(feature);
+const provider = host.install(commandPlugin);
+const consumer = host.install(feature);
+await Promise.all([provider.whenActive(), consumer.whenActive()]);
+if (!commands) throw new Error('Expected Command Service to activate.');
+
+const controller = new AbortController();
+const message = await commands.execute(greet, 'CFlow', { signal: controller.signal });
+console.log(message);
+
+const cancelled = commands.execute(greet, 'CFlow', { signal: controller.signal });
+controller.abort();
+await cancelled.catch((error) => {
+  if (error !== controller.signal.reason) throw error;
+});
+
+await host.dispose();
 ```
 
 Each Plugin Activation owns an empty `CommandService`. Command tokens preserve
@@ -31,6 +49,34 @@ Command handlers obtain Kernel, Session, or external dependencies through the
 Feature Plugin's declared Runtime Service bindings. The Command Service owns
 only registration, execution, cancellation, and cleanup. Registration disposal
 aborts and awaits all in-flight handlers without timeouts or fake completion.
+
+## Execution and lifecycle
+
+- `execute()` always returns a Promise. Synchronous and asynchronous handler
+  results use the same path, and handler errors retain their original value.
+- A caller `AbortSignal` aborts only that invocation's handler signal.
+  Cancellation is cooperative: the handler decides how the signal affects its
+  result, as the example does with `throwIfAborted()`.
+- `CommandRegistration.dispose()` makes the Command unavailable immediately,
+  aborts every in-flight handler signal, and resolves only after those handlers
+  settle. The token and diagnostic ID remain reserved until then, so a
+  replacement cannot overlap the old registration.
+- Command Service deactivation applies the same cleanup to every remaining
+  registration. An old Service rejects later registration or execution rather
+  than silently accepting work.
+
+Structural failures use `CommandError` with a stable code:
+
+| Code                         | Meaning                                                         |
+| ---------------------------- | --------------------------------------------------------------- |
+| `INVALID_COMMAND`            | The ID is empty or the token was not created by `defineCommand` |
+| `COMMAND_ALREADY_REGISTERED` | The token or diagnostic ID is still reserved                    |
+| `COMMAND_NOT_FOUND`          | The exact token is unregistered or currently disposing          |
+| `SERVICE_DISPOSED`           | The Command Service Activation has ended                        |
+
+Registration failures throw synchronously. Execution failures reject the
+returned Promise; errors thrown or rejected by a handler are not wrapped in a
+`CommandError`.
 
 The package depends on the CFlow-owned Plugin Host seam in
 `@cflow/runtime-cordis`, not on `@cflow/kernel`, `@cflow/plugin-kernel`, or
