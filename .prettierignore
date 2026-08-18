@@ -1,0 +1,6 @@
+# Vendored engineering skills preserve their upstream formatting.
+.agents/skills/
+
+# Generated tool adapter skill trees mirror the vendored sources above.
+.claude/skills/
+.codebuddy/skills/
