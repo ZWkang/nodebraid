@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/core",
+  "name": "@cflow/layout-dagre",
   "type": "module",
   "version": "0.0.1",
-  "description": "Public CFlow facade for Kernel and Runtime Plugin APIs.",
+  "description": "Dagre Layout Provider for CFlow.",
   "publishConfig": {
     "access": "public"
   },
@@ -14,15 +14,15 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ZWkang/cflow.git",
-    "directory": "packages/core"
+    "directory": "packages/layout-dagre"
   },
   "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/core#readme",
+  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/layout-dagre#readme",
   "keywords": [
     "cflow",
-    "core",
-    "graph-kernel",
-    "plugin-runtime"
+    "dagre",
+    "graph",
+    "layout"
   ],
   "sideEffects": false,
   "exports": {
@@ -39,21 +39,14 @@
     "dist"
   ],
   "scripts": {
-    "dev": "tsgo -p tsconfig.build.json --watch",
-    "build": "bun run build:dependencies && bun run build:self",
-    "build:dependencies": "bun run --filter '!@cflow/core' build",
-    "build:self": "tsgo -p tsconfig.build.json && bun run test:artifacts",
+    "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts",
+    "build:dependencies": "bun run --filter '@cflow/layout-api' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
-    "test:artifacts": "bun run ./artifacts/check-declarations.ts",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/kernel": "workspace:*",
     "@cflow/layout-api": "workspace:*",
-    "@cflow/plugin-command": "workspace:*",
-    "@cflow/plugin-kernel": "workspace:*",
-    "@cflow/plugin-layout": "workspace:*",
-    "@cflow/runtime-cordis": "workspace:*"
+    "@dagrejs/dagre": "^3.1.1"
   }
 }

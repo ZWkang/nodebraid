@@ -1,6 +1,6 @@
 # @cflow/core
 
-Public CFlow facade for the Kernel, Runtime Plugins, and Plugin Host APIs.
+Public CFlow facade for the Kernel, provider-neutral Layout API, Runtime Plugins, and Plugin Host APIs.
 
 ```ts
 import {
@@ -18,9 +18,14 @@ import {
 The facade re-exports the pure graph interface from `@cflow/kernel` and the
 CFlow-owned Plugin Host interface from `@cflow/runtime-cordis`. It also
 re-exports the official Kernel and Command Runtime Plugins from
-`@cflow/plugin-kernel` and `@cflow/plugin-command`.
+`@cflow/plugin-kernel` and `@cflow/plugin-command`, plus the generic Layout
+contracts and Runtime integration from `@cflow/layout-api` and
+`@cflow/plugin-layout`.
 Cordis remains an implementation dependency and does not appear in the public
 CFlow types. Advanced consumers can import the narrow packages directly.
+
+Concrete Layout Providers remain explicit optional packages. Core does not
+depend on or re-export `@cflow/layout-dagre` or `@cflow/layout-elk`.
 
 `kernelPlugin` composes one fresh Kernel into a Plugin Host Activation through
 the narrow `KernelService` interface. It adds synchronous ordered Canvas Commit
