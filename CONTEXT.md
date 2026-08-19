@@ -145,7 +145,7 @@ Viewport 变换前的绝对画布位置；Node position 表示其边界左上角
 _Avoid_: Screen Point, Client Point, Device Point
 
 **Screen Point**:
-World Point 经 Viewport 变换后得到的逻辑屏幕位置；浏览器中使用 CSS pixel，而不是设备物理像素。
+World Point 经 Viewport 变换后得到的 Renderer Target-local 逻辑屏幕位置；浏览器中以 Target 可视区域左上角为原点并使用 CSS pixel，而不是 SVG user unit 或设备物理像素。
 _Avoid_: World Point, Device Point, Backing-store Point
 
 **Renderer**:
@@ -160,6 +160,10 @@ _Avoid_: Remountable Renderer, Global Renderer, Shared Stage
 基于一种具体渲染后端实现 Renderer interface 的角色；各官方 Provider 彼此平级，CFlow 不指定默认实现。
 _Avoid_: Default Renderer, Renderer Plugin, Backend Registry Entry
 
+**SVG Renderer Provider**:
+CFlow 用 SVG 投影通用 Canvas 语义的参考级官方 Renderer Provider；它不解释产品 Node type 或 data，也不是默认 Renderer。
+_Avoid_: Default Renderer, Product Node Renderer, SVG Node System
+
 **Renderer Factory**:
 Renderer Provider 用类型化配置和可选后端目标创建一份新 Renderer 的入口。
 _Avoid_: Renderer Registry, Global Renderer, Universal Mount
@@ -168,8 +172,24 @@ _Avoid_: Renderer Registry, Global Renderer, Universal Mount
 具体 Renderer Provider 投影输出所需的后端环境目标；它不是所有 Renderer 共享的 universal mount 类型。
 _Avoid_: Canvas Container, Universal HTMLElement, Renderer Host
 
+**SVG Renderer Target**:
+由调用方拥有、并与一份 SVG Renderer Instance 绑定的现有 SVG 根元素；Provider 不创建或移除该 Target 本身。
+_Avoid_: HTML Container, Provider-created SVG, Shared SVG Renderer Target
+
+**Renderer Target Reservation**:
+一份 Renderer Instance 从 Factory 接受 Target 到成功完成终态清理期间持有的排他绑定权；Reservation 未释放时不得为同一 Target 创建第二份实例。
+_Avoid_: Target Lock, Global Renderer Slot, DOM Ownership
+
+**SVG Projection**:
+一份 SVG Renderer Instance 在 SVG Renderer Target 内拥有的通用 Canvas 语义表示；它不是权威 Document，也不包含调用方的产品节点标记。
+_Avoid_: SVG Document, Product Scene, Authoritative Graph
+
+**Port Geometry**:
+一个 port-qualified Endpoint 可供 Renderer 解析的世界坐标连接位置；缺失时不得把 Node 中心猜测为该 Port 的位置。
+_Avoid_: Node-center Fallback, Renderer Handle, Port ID
+
 **Renderer Baseline**:
-Renderer 最近一次完整重置或连续提交后已经接受的 Document revision，是判断后续提交是否连续的本地基线。
+Renderer 最近一次完整重置或连续提交后已经接受的 Document 状态与本地 revision，是判断后续提交是否连续且内容一致的基线。
 _Avoid_: Kernel Revision Source, Persistence Version, Collaboration Clock
 
 **Renderer Document Update**:
@@ -183,6 +203,10 @@ _Avoid_: Native Event, DOM Event, Backend Event
 **Pointer Input**:
 Renderer Input 中描述一个 Pointer 的 down、move、up 或 cancel 转换及其逻辑坐标、按钮和修饰键事实的成员。
 _Avoid_: Pointer Event, Mouse Event, Touch Event
+
+**Active Pointer**:
+一个 Renderer Instance 已接受 `pointer.down` 但尚未接受对应 `pointer.up` 或 `pointer.cancel` 的 Pointer；只有 Active Pointer 可以获得 Pointer Capture。
+_Avoid_: Hover Pointer, Native Capture State, Drag Session
 
 **Wheel Input**:
 Renderer Input 中描述一个 Screen Point 上以逻辑屏幕像素规范化的二维滚轮增量及修饰键事实的成员。
@@ -205,7 +229,7 @@ Renderer Target 接收 Keyboard Input 所需的逻辑输入焦点，不等同于
 _Avoid_: DOM Active Element, Native Focus Handle, Selection Focus
 
 **Hit Result**:
-Renderer 对一个 Screen Point 报告的最上层 Canvas、Node、Edge 或 Port 语义目标及其 World Point；Target 外没有 Hit Result。
+Renderer 按当前已接受的投影 Geometry，对一个 Screen Point 报告的最上层 Canvas、Node、Edge 或 Port 语义目标及其 World Point；Target 外没有 Hit Result，调用方的后端 DOM 或样式不会改变该语义结果。
 _Avoid_: Native Target, Event Target, Renderer Object
 
 **Renderer Runtime Plugin**:
