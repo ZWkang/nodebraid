@@ -413,7 +413,7 @@ screenY = worldY × zoom + y
 
 ### 6.1 官方 Provider
 
-**状态：稳定原则。**
+**状态：Renderer 协议与 Runtime adapter 已实现；具体 Provider 暂缓。**
 
 Renderer API 与 Renderer Provider 分包。CFlow 可以逐步提供多个官方 Provider：
 
@@ -432,10 +432,9 @@ Renderer 只能接收或输出由 CFlow 定义的数据结构：
 
 ```text
 Runtime → Renderer
-    CanvasSnapshot
-    ChangeSet
-    Selection
-    Viewport
+    CanvasView reset
+    CanvasCommit
+    SessionSnapshot
 
 Renderer → Runtime
     RendererInput
@@ -454,28 +453,29 @@ Renderer 负责绘制、坐标转换、命中测试和原始输入标准化；In
 
 ### 6.3 文档更新协议
 
-**状态：当前候选。**
+**状态：已实现。**
 
 ```ts
 type RenderDocumentUpdate =
   | {
       readonly type: 'reset';
-      readonly snapshot: CanvasSnapshot;
+      readonly view: CanvasView;
     }
   | {
       readonly type: 'commit';
-      readonly snapshot: CanvasSnapshot;
-      readonly changeSet: ChangeSet;
+      readonly commit: CanvasCommit;
     };
 ```
 
 - 首次挂载或重新同步使用 `reset`；
 - 正常事务提交使用 `commit`；
-- commit 中 Snapshot 与 ChangeSet 的 revision 必须一致；
-- Renderer 可以使用 ChangeSet 增量更新，但不拥有权威 Document；
+- commit 中 before、after 与 ChangeSet revision evidence 必须一致且连续；
+- Renderer 可以使用 ChangeSet 增量更新，也可以从 commit.after 整图重建；
 - Document 更新与 Session 更新保持为两个显式通道。
 
-RendererInput 和 HitResult 的精确字段暂不冻结。确定原则是只包含 ID、坐标、按键状态和显式 CFlow 语义，不复制完整原生事件。
+RendererInput 已冻结为 Pointer、Wheel 与 Keyboard 的最小 union；HitResult
+只表达 Canvas、Node、Edge、Port 与 World Point。两者只包含 ID、坐标、按键
+状态和显式 CFlow 语义，不复制完整原生事件或后端对象。
 
 ## 7. Plugin 与副作用
 
@@ -512,8 +512,10 @@ packages/
 ├── kernel/             @cflow/kernel
 ├── plugin-kernel/      @cflow/plugin-kernel
 ├── plugin-command/     @cflow/plugin-command
+├── session-api/        @cflow/session-api
 ├── plugin-session/     @cflow/plugin-session
 ├── renderer-api/       @cflow/renderer-api
+├── plugin-renderer/    @cflow/plugin-renderer
 ├── runtime-cordis/     @cflow/runtime-cordis
 ├── interaction-core/   @cflow/interaction-core
 ├── plugin-history/     @cflow/plugin-history
@@ -609,15 +611,10 @@ Cordis 生命周期
 
 ## 12. 尚未冻结的问题
 
-以下问题应当在对应阶段实现前，通过真实用例决定：
+以下问题仍应当在对应阶段实现前，通过真实用例决定：
 
 1. 第一个官方 Renderer 采用何种技术；
-2. Canvas Snapshot 最终使用数组、自定义只读集合还是其他表示；
-3. Canvas 与 Renderer API 的准确命名与泛型；
-4. RendererInput 的最小字段集合；
-5. HitResult 是否需要表达 Port 以外的交互目标；
-6. Renderer 文档更新最终采用联合事件还是其他窄协议；
-7. Plugin Service 的最小公开表面；
-8. `data` 不可变约定是否需要额外的开发期诊断能力。
+2. 其他 Runtime Plugin Service 是否需要进一步收窄公开表面；
+3. `data` 不可变约定是否需要额外的开发期诊断能力。
 
 这些问题没有在本文中被遗漏，而是被有意保留到具有实现证据时再决定。

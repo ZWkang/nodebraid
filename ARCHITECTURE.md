@@ -322,29 +322,30 @@ interface CanvasObserver {
 
 ## Renderer Provider
 
-Renderer 是可替换能力。Kernel 只依赖 CFlow 自己定义的渲染接口。
+Renderer 是可替换能力。`@cflow/renderer-api` 只依赖 CFlow-owned
+Diagnostics、Kernel 与 Session 值契约，不依赖 Runtime、DOM 或具体渲染后端。
 
 ```ts
-interface RendererCapabilities {
-  htmlOverlay: boolean;
-  nativeTextEditing: boolean;
-  imageExport: boolean;
-  gpuAcceleration: boolean;
-  accessibilityTree: boolean;
-}
+type RendererDocumentUpdate =
+  { readonly type: 'reset'; readonly view: CanvasView } | { readonly type: 'commit'; readonly commit: CanvasCommit };
 
 interface CanvasRenderer {
-  readonly capabilities: RendererCapabilities;
-
-  mount(container: HTMLElement): void;
-  setDocument(snapshot: CanvasSnapshot): void;
-  applyChanges(changeSet: ChangeSet): void;
-  setViewport(viewport: Viewport): void;
-  setSelection(selection: SelectionSnapshot): void;
-  hitTest(point: ScreenPoint): HitResult | undefined;
-  dispose(): void;
+  updateDocument(update: RendererDocumentUpdate): void;
+  updateSession(snapshot: SessionSnapshot): void;
+  subscribeInput(listener: RendererInputListener): () => void;
+  hitTest(point: ScreenPoint): HitResult | null;
+  capturePointer(pointerId: number): void;
+  releasePointer(pointerId: number): void;
+  focus(): void;
+  dispose(): Promise<void>;
 }
 ```
+
+具体 Provider 通过类型化 Renderer Factory 接收自己的 Target 与配置；
+`CanvasRenderer` 不定义 universal `mount(HTMLElement)`。一个 Renderer Instance
+在创建时绑定一个 Target，切换 Target 或 Provider 需要释放旧实例并创建新实例。
+`@cflow/plugin-renderer` 负责把 Factory 与 Kernel、Session、Plugin Host 生命周期
+组合起来，并只向 Interaction 暴露输入、命中、Pointer Capture 与 Focus。
 
 Renderer Provider 可以包括：
 
@@ -356,7 +357,8 @@ Renderer Provider 可以包括：
 @cflow/renderer-headless
 ```
 
-Renderer 能力并不完全相同。依赖 HTML Overlay、原生文本编辑、GPU 或可访问性树的插件必须声明要求；当前 Renderer 无法满足时，Runtime 应明确拒绝加载并指出缺少的能力。
+首版不定义 Renderer Capability Registry。HTML Overlay、原生文本编辑、图片导出、
+GPU、可访问性树和动画留给具有真实消费者的后续设计。
 
 渲染接口应表达节点、边、选择和 Viewport 等画布语义，不应抽象成 `drawRect()`、`drawLine()` 等通用绘图 API。后者会迫使 CFlow 重新实现一个只能表达最小公约数的图形库。
 
@@ -465,7 +467,9 @@ packages/
 ├── runtime-cordis/
 ├── plugin-command/
 ├── plugin-session/
+├── session-api/
 ├── renderer-api/
+├── plugin-renderer/
 ├── renderer-konva/
 ├── interaction-core/
 ├── plugin-history/

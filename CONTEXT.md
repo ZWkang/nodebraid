@@ -140,6 +140,86 @@ _Avoid_: Ordered Selection, Primary Selection, Renderer Selection State
 Session 中将世界坐标映射为逻辑屏幕坐标的平移与缩放状态；浏览器中的逻辑屏幕单位对应 CSS pixel，物理像素缩放属于 Renderer。
 _Avoid_: Camera Object, Renderer Transform, Device-pixel Transform
 
+**World Point**:
+Viewport 变换前的绝对画布位置；Node position 表示其边界左上角的 World Point。
+_Avoid_: Screen Point, Client Point, Device Point
+
+**Screen Point**:
+World Point 经 Viewport 变换后得到的逻辑屏幕位置；浏览器中使用 CSS pixel，而不是设备物理像素。
+_Avoid_: World Point, Device Point, Backing-store Point
+
+**Renderer**:
+将 Document 与 Session 的 Canvas 语义投影为可显示输出，并把后端输入标准化为 CFlow 值的角色；它不拥有 Document、Session 或 Command 写权。
+_Avoid_: Drawing API, Scene Store, Canvas Controller
+
+**Renderer Instance**:
+Renderer Factory 为一个固定 Renderer Target 创建、并在终态释放前保持该绑定的一份 Renderer 生命周期实例。
+_Avoid_: Remountable Renderer, Global Renderer, Shared Stage
+
+**Renderer Provider**:
+基于一种具体渲染后端实现 Renderer interface 的角色；各官方 Provider 彼此平级，CFlow 不指定默认实现。
+_Avoid_: Default Renderer, Renderer Plugin, Backend Registry Entry
+
+**Renderer Factory**:
+Renderer Provider 用类型化配置和可选后端目标创建一份新 Renderer 的入口。
+_Avoid_: Renderer Registry, Global Renderer, Universal Mount
+
+**Renderer Target**:
+具体 Renderer Provider 投影输出所需的后端环境目标；它不是所有 Renderer 共享的 universal mount 类型。
+_Avoid_: Canvas Container, Universal HTMLElement, Renderer Host
+
+**Renderer Baseline**:
+Renderer 最近一次完整重置或连续提交后已经接受的 Document revision，是判断后续提交是否连续的本地基线。
+_Avoid_: Kernel Revision Source, Persistence Version, Collaboration Clock
+
+**Renderer Document Update**:
+Runtime 向 Renderer 交付的一次 Document 语义更新，只可能是完整重置或一个已提交变化，不是绘图指令或可写 Document 句柄。
+_Avoid_: Draw Command, Document Patch, Renderer Mutation
+
+**Renderer Input**:
+Renderer 从后端输入标准化得到的 CFlow 交互事实，只包含 CFlow 值，不携带原生事件或后端目标对象。
+_Avoid_: Native Event, DOM Event, Backend Event
+
+**Pointer Input**:
+Renderer Input 中描述一个 Pointer 的 down、move、up 或 cancel 转换及其逻辑坐标、按钮和修饰键事实的成员。
+_Avoid_: Pointer Event, Mouse Event, Touch Event
+
+**Wheel Input**:
+Renderer Input 中描述一个 Screen Point 上以逻辑屏幕像素规范化的二维滚轮增量及修饰键事实的成员。
+_Avoid_: Wheel Event, Scroll Command, Native Delta
+
+**Keyboard Input**:
+Renderer Input 中描述 key down 或 key up、逻辑键值、物理键位、重复状态与修饰键事实的成员。
+_Avoid_: Keyboard Event, Text Input, Shortcut Command
+
+**Renderer Input Subscription**:
+按 Renderer 已标准化的输入顺序同步接收 Renderer Input 的可取消观察关系。
+_Avoid_: Native Listener, Event Queue, Observable Stream
+
+**Pointer Capture**:
+Renderer 为一个仍然活跃的 Pointer 保持连续输入归属、直到 release、up 或 cancel 的 CFlow 交互控制状态。
+_Avoid_: DOM Pointer Capture, Native Capture Handle, Drag State
+
+**Renderer Focus**:
+Renderer Target 接收 Keyboard Input 所需的逻辑输入焦点，不等同于暴露后端焦点对象。
+_Avoid_: DOM Active Element, Native Focus Handle, Selection Focus
+
+**Hit Result**:
+Renderer 对一个 Screen Point 报告的最上层 Canvas、Node、Edge 或 Port 语义目标及其 World Point；Target 外没有 Hit Result。
+_Avoid_: Native Target, Event Target, Renderer Object
+
+**Renderer Runtime Plugin**:
+把一个 Renderer Factory 与 Kernel、Session 组合起来，拥有 Renderer Instance、状态同步、输入转发和 Activation 清理的 Runtime adapter。
+_Avoid_: Renderer Provider, Canvas Renderer, Preset
+
+**Renderer Service**:
+Renderer Runtime Plugin 向 Interaction 提供的窄 Runtime Service，只暴露输入观察、命中与 CFlow-owned 输入控制，不暴露渲染状态更新或释放权。
+_Avoid_: Canvas Renderer Service, Renderer Host, Mutable Renderer
+
+**Interaction**:
+解释 Renderer Input 与 Hit Result，并据此更新 Session 或执行 Command 的画布行为能力。
+_Avoid_: Renderer Behavior, Native Event Handler, Direct Document Mutation
+
 **Layout Engine**:
 根据已提交的画布图计算候选布局、但不修改 Document 的能力。
 _Avoid_: Layout Writer, Auto-layout Transaction, Graph Mutator
