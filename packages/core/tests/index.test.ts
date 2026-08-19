@@ -9,12 +9,16 @@ import {
   definePlugin,
   defineService,
   edgeId,
+  historyPlugin,
+  historyService,
   kernelPlugin,
   kernelService,
   nodeId,
   sessionPlugin,
   sessionService,
   type CommandService,
+  redoCommand,
+  undoCommand,
   type KernelService,
   type PluginInstallation,
   type SessionService,
@@ -186,5 +190,12 @@ describe('@cflow/core', () => {
     expect(kernel.read().query.getNode(nodeId('prepared'))?.id).toBe(nodeId('prepared'));
 
     await host.dispose();
+  });
+
+  test('publishes the History Runtime Plugin seam', () => {
+    expect(historyPlugin).toBeDefined();
+    expect(historyService).toBeDefined();
+    expect(undoCommand.id).toBe('history.undo');
+    expect(redoCommand.id).toBe('history.redo');
   });
 });

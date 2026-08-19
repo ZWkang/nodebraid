@@ -147,3 +147,31 @@ _Avoid_: Action, Event Handler, Kernel Operation
 **Command Service**:
 一次 Activation 内负责注册、查找、执行和释放 Command 的 Runtime Service，不拥有 Kernel、Session 或其他状态能力。
 _Avoid_: Global Command Registry, Command Bus, Action Store
+
+**History**:
+一次 Activation 内按提交顺序保留可撤销与可重做 Document 变化的画布能力。
+_Avoid_: Command Log, Document Backup, Persistent Timeline
+
+**History Entry**:
+由一个 Recordable Commit 的 Change Set 形成的可逆 Document 变化单元；其中的领域 `data` 继承 Kernel 的不可变值约定。
+_Avoid_: Command Entry, Snapshot Copy, Undo Action
+
+**Recordable Commit**:
+History 应当建立 History Entry 的 Canvas Commit；包括当前 Activation 观察到的所有非 Replay Commit。
+_Avoid_: User Commit, Command Commit, Ordinary Commit
+
+**Replay Commit**:
+History 为撤销或重做 History Entry 而产生的新 Canvas Commit，其 revision 继续单调递增。
+_Avoid_: Restored Commit, Reverted Revision, Rollback Commit
+
+**History Snapshot**:
+History 在当前状态下是否可撤销、可重做的稳定不可变读取表示。
+_Avoid_: History Stack, Entry List, Mutable History State
+
+**History Service**:
+一次 Activation 内提供 History Snapshot 稳定读取与变化订阅的窄 Runtime Service，不另行提供撤销或重做行为入口。
+_Avoid_: Undo Manager, History Controller, History Command Bus
+
+**History Baseline**:
+一次 History Activation 开始记录时的 Kernel revision；更早的 Canvas Commit 不形成该 Activation 的 History Entry。
+_Avoid_: Initial Snapshot, Restored History, Revision Zero

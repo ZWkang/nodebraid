@@ -15,6 +15,7 @@
 - `bun run --filter '@cflow/plugin-kernel' build:dependencies`：按 Kernel、Runtime 顺序生成 Kernel Runtime Plugin 构建与类型检查所需的 workspace 声明。
 - `bun run --filter '@cflow/plugin-command' build:dependencies`：生成 Command Runtime Plugin 构建与类型检查所需的 Runtime workspace 声明。
 - `bun run --filter '@cflow/plugin-session' build:dependencies`：生成 Session Runtime Plugin 构建与类型检查所需的 Kernel、Runtime 与 Kernel Plugin workspace 声明。
+- `bun run --filter '@cflow/plugin-history' build:dependencies`：生成 History Runtime Plugin 构建与类型检查所需的 Command 与 Kernel Plugin workspace 声明。
 - `bun run format`：使用 Prettier 格式化支持的文件。
 - `bun run test`：运行 Bun 测试。
 - `bun run check`：依次运行 lint、类型检查、格式检查、测试和构建。

@@ -20,6 +20,7 @@ The repository is currently at an early implementation stage. The planned archit
 │   ├── core/           # @cflow/core public facade
 │   ├── kernel/         # @cflow/kernel graph state and transactions
 │   ├── plugin-command/ # @cflow/plugin-command Runtime Service adapter
+│   ├── plugin-history/ # @cflow/plugin-history History Runtime Plugin
 │   ├── plugin-kernel/  # @cflow/plugin-kernel Runtime Service adapter
 │   ├── plugin-session/ # @cflow/plugin-session Runtime Service adapter
 │   └── runtime-cordis/ # @cflow/runtime-cordis implementation package
@@ -70,7 +71,7 @@ Commits until the current revision reaches every Observer.
 
 The adapter depends directly on the CFlow-owned seams in `@cflow/kernel` and
 `@cflow/runtime-cordis`; it does not introduce a speculative plugin-api package.
-Renderer, History, Persistence, initial Document import, and asynchronous
+Renderer, Persistence, initial Document import, and asynchronous
 Transactions remain future Runtime work.
 
 ## Session Runtime Plugin
@@ -97,6 +98,19 @@ Registration or Service disposal first removes Commands from lookup, then
 aborts and awaits in-flight handlers. The Command package depends only on the
 CFlow-owned Plugin Host seam. Feature Plugins acquire Kernel, Session, or
 external capabilities through their own static Service Bindings.
+
+## History Runtime Plugin
+
+`@cflow/plugin-history` records each post-Baseline non-replay Canvas Commit as
+one History Entry and exposes strongly typed Undo/Redo Commands. Replay applies
+the stored Change Set through Kernel Service Transactions, creates a new
+increasing revision, and returns the resulting Canvas Commit.
+
+`HistoryService` exposes only a stable `canUndo` / `canRedo` Snapshot and a
+subscription seam. Replay is single-flight, observer-reentrant Commit delivery
+remains revision ordered, and public Snapshot publication waits until History
+has caught up with Kernel. Losing Kernel Service or Command Service ends the
+current History Activation; reactivation starts from a fresh empty Baseline.
 
 ## Commands
 
@@ -153,6 +167,12 @@ Build the declarations required by `@cflow/plugin-session`:
 
 ```bash
 bun run --filter '@cflow/plugin-session' build:dependencies
+```
+
+Build the declarations required by `@cflow/plugin-history`:
+
+```bash
+bun run --filter '@cflow/plugin-history' build:dependencies
 ```
 
 Format supported files:

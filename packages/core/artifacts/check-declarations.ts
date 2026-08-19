@@ -11,6 +11,7 @@ const forbiddenCordisType = /\b(?:Context|CordisError|Effect|Fiber|FiberState)\b
 const coreDist = fileURLToPath(new URL('../dist/', import.meta.url));
 const kernelDist = fileURLToPath(new URL('../../kernel/dist/', import.meta.url));
 const pluginCommandDist = fileURLToPath(new URL('../../plugin-command/dist/', import.meta.url));
+const pluginHistoryDist = fileURLToPath(new URL('../../plugin-history/dist/', import.meta.url));
 const pluginKernelDist = fileURLToPath(new URL('../../plugin-kernel/dist/', import.meta.url));
 const pluginSessionDist = fileURLToPath(new URL('../../plugin-session/dist/', import.meta.url));
 const runtimeDist = fileURLToPath(new URL('../../runtime-cordis/dist/', import.meta.url));
@@ -19,6 +20,7 @@ const declarationFiles = await Promise.all([
   collectDeclarations(coreDist),
   collectDeclarations(kernelDist),
   collectDeclarations(pluginCommandDist),
+  collectDeclarations(pluginHistoryDist),
   collectDeclarations(pluginKernelDist),
   collectDeclarations(pluginSessionDist),
   collectDeclarations(runtimeDist),
@@ -26,6 +28,7 @@ const declarationFiles = await Promise.all([
 
 assert.match(coreDeclaration, /export \* from '@cflow\/kernel';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-command';/);
+assert.match(coreDeclaration, /export \* from '@cflow\/plugin-history';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-kernel';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-session';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/runtime-cordis';/);
@@ -46,3 +49,7 @@ assert.ok(corePackage.commandService);
 assert.ok(corePackage.sessionPlugin);
 assert.ok(corePackage.sessionService);
 assert.equal(corePackage.defineCommand('artifact.command').id, 'artifact.command');
+assert.ok(corePackage.historyPlugin);
+assert.ok(corePackage.historyService);
+assert.equal(corePackage.undoCommand.id, 'history.undo');
+assert.equal(corePackage.redoCommand.id, 'history.redo');
