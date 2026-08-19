@@ -27,7 +27,10 @@ The repository is currently at an early implementation stage. The planned archit
 │   ├── plugin-history/ # @cflow/plugin-history History Runtime Plugin
 │   ├── plugin-kernel/  # @cflow/plugin-kernel Runtime Service adapter
 │   ├── plugin-layout/  # @cflow/plugin-layout Runtime Command integration
+│   ├── plugin-renderer/ # @cflow/plugin-renderer Renderer Runtime adapter
 │   ├── plugin-session/ # @cflow/plugin-session Runtime Service adapter
+│   ├── renderer-api/   # @cflow/renderer-api backend-neutral contracts
+│   ├── session-api/    # @cflow/session-api immutable Session values
 │   └── runtime-cordis/ # @cflow/runtime-cordis implementation package
 ├── src/               # Root TypeScript source
 ├── tests/             # Root automated tests
@@ -88,8 +91,8 @@ Commits until the current revision reaches every Observer.
 
 The adapter depends directly on the CFlow-owned seams in `@cflow/kernel` and
 `@cflow/runtime-cordis`; it does not introduce a speculative plugin-api package.
-Renderer, Persistence, initial Document import, and asynchronous
-Transactions remain future Runtime work.
+Concrete Renderer Providers, Persistence, initial Document import, and
+asynchronous Transactions remain future Runtime work.
 
 ## Session Runtime Plugin
 
@@ -103,6 +106,21 @@ Commits remove invalid Selection members through the Session channel rather
 than another Kernel Change Set or History entry. Reentrant Session mutations
 use breadth-first FIFO delivery so every subscriber observes one consistent
 Snapshot per notification round.
+
+## Renderer packages
+
+`@cflow/renderer-api` defines the backend-neutral `CanvasRenderer` protocol:
+reset-or-commit Document updates, independent Session Snapshots, normalized
+Pointer/Wheel/Keyboard input, semantic Hit Results, input control, and
+structured Renderer errors. It contains no DOM, Canvas Context, native Event,
+Konva, Pixi, Cordis, or framework types.
+
+`@cflow/plugin-renderer` binds one typed Renderer Factory to Kernel and Session
+Services. Each Activation owns one target-bound Renderer Instance, delivers a
+Document reset before Session state, preserves resolvable Selection ordering,
+and exposes only input, hit testing, Pointer Capture, and Focus through the
+narrow `RendererService`. Concrete Renderer Providers remain separate,
+explicit packages; CFlow does not select a default Provider or registry.
 
 ## Command Runtime Plugin
 

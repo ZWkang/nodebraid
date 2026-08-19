@@ -15,9 +15,12 @@ const layoutApiDist = fileURLToPath(new URL('../../layout-api/dist/', import.met
 const pluginCommandDist = fileURLToPath(new URL('../../plugin-command/dist/', import.meta.url));
 const pluginHistoryDist = fileURLToPath(new URL('../../plugin-history/dist/', import.meta.url));
 const pluginKernelDist = fileURLToPath(new URL('../../plugin-kernel/dist/', import.meta.url));
+const pluginRendererDist = fileURLToPath(new URL('../../plugin-renderer/dist/', import.meta.url));
 const pluginSessionDist = fileURLToPath(new URL('../../plugin-session/dist/', import.meta.url));
 const pluginLayoutDist = fileURLToPath(new URL('../../plugin-layout/dist/', import.meta.url));
+const rendererApiDist = fileURLToPath(new URL('../../renderer-api/dist/', import.meta.url));
 const runtimeDist = fileURLToPath(new URL('../../runtime-cordis/dist/', import.meta.url));
+const sessionApiDist = fileURLToPath(new URL('../../session-api/dist/', import.meta.url));
 const coreDeclaration = await readFile(join(coreDist, 'index.d.ts'), 'utf8');
 const declarationFiles = await Promise.all([
   collectDeclarations(coreDist),
@@ -27,9 +30,12 @@ const declarationFiles = await Promise.all([
   collectDeclarations(pluginCommandDist),
   collectDeclarations(pluginHistoryDist),
   collectDeclarations(pluginKernelDist),
+  collectDeclarations(pluginRendererDist),
   collectDeclarations(pluginSessionDist),
   collectDeclarations(pluginLayoutDist),
+  collectDeclarations(rendererApiDist),
   collectDeclarations(runtimeDist),
+  collectDeclarations(sessionApiDist),
 ]);
 
 assert.match(coreDeclaration, /export \* from '@cflow\/diagnostics';/);
@@ -38,9 +44,12 @@ assert.match(coreDeclaration, /export \* from '@cflow\/layout-api';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-command';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-history';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-kernel';/);
+assert.match(coreDeclaration, /export \* from '@cflow\/plugin-renderer';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-session';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-layout';/);
+assert.match(coreDeclaration, /export \* from '@cflow\/renderer-api';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/runtime-cordis';/);
+assert.match(coreDeclaration, /export \* from '@cflow\/session-api';/);
 assert.doesNotMatch(coreDeclaration, /@cflow\/layout-(?:dagre|elk)/);
 for (const declaration of declarationFiles.flat()) {
   assert.doesNotMatch(declaration.contents, forbiddenCordisImport, declaration.path);
@@ -60,6 +69,9 @@ assert.ok(corePackage.commandPlugin);
 assert.ok(corePackage.commandService);
 assert.ok(corePackage.sessionPlugin);
 assert.ok(corePackage.sessionService);
+assert.equal(typeof corePackage.RendererError, 'function');
+assert.equal(typeof corePackage.createRendererPlugin, 'function');
+assert.ok(corePackage.rendererService);
 assert.equal(corePackage.defineCommand('artifact.command').id, 'artifact.command');
 assert.ok(corePackage.historyPlugin);
 assert.ok(corePackage.historyService);

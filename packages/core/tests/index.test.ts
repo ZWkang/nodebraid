@@ -3,9 +3,11 @@ import { describe, expect, test } from 'bun:test';
 import {
   CFlowError,
   KernelError,
+  RendererError,
   commandPlugin,
   commandService,
   createCanvasKernel,
+  createRendererPlugin,
   createPluginHost,
   defineCommand,
   definePlugin,
@@ -20,6 +22,7 @@ import {
   nodeId,
   sessionPlugin,
   sessionService,
+  rendererService,
   type CommandService,
   redoCommand,
   undoCommand,
@@ -169,6 +172,18 @@ describe('@cflow/core', () => {
       viewport: { x: 0, y: 0, zoom: 1 },
     });
     await host.dispose();
+  });
+
+  test('publishes the backend-neutral Renderer and Runtime integration seams', () => {
+    const error = new RendererError('DOCUMENT_OUT_OF_SYNC', 'Renderer is out of sync.', {
+      expectedRevision: 1,
+      receivedRevision: 3,
+    });
+
+    expect(error).toBeInstanceOf(CFlowError);
+    expect(error.domain).toBe('renderer');
+    expect(typeof createRendererPlugin).toBe('function');
+    expect(rendererService).toBeDefined();
   });
 
   test('composes asynchronous Command preparation with a synchronous Kernel Transaction', async () => {
