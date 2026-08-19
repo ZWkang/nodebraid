@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/plugin-session",
+  "name": "@cflow/session-api",
   "type": "module",
   "version": "0.0.1",
-  "description": "Session Runtime Plugin for CFlow.",
+  "description": "Renderer-independent Session value contracts for CFlow.",
   "publishConfig": {
     "access": "public"
   },
@@ -14,14 +14,15 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ZWkang/cflow.git",
-    "directory": "packages/plugin-session"
+    "directory": "packages/session-api"
   },
   "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/plugin-session#readme",
+  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/session-api#readme",
   "keywords": [
     "cflow",
     "session",
-    "plugin-runtime"
+    "viewport",
+    "selection"
   ],
   "sideEffects": false,
   "exports": {
@@ -39,17 +40,14 @@
   ],
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
-    "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts",
-    "build:dependencies": "bun run --filter '@cflow/session-api' build && bun run --filter '@cflow/plugin-kernel' build",
+    "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
+    "build:dependencies": "bun run --filter '@cflow/kernel' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
+    "test:artifacts": "bun run ./artifacts/check-declarations.ts",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/diagnostics": "workspace:*",
-    "@cflow/kernel": "workspace:*",
-    "@cflow/plugin-kernel": "workspace:*",
-    "@cflow/runtime-cordis": "workspace:*",
-    "@cflow/session-api": "workspace:*"
+    "@cflow/kernel": "workspace:*"
   }
 }

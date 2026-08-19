@@ -40,10 +40,11 @@ Host-scoped Fault Reporter with the stable
 old Service handles; restoring the Kernel dependency creates a new default
 Session.
 
-The package depends on `@cflow/diagnostics`, `@cflow/kernel`,
-`@cflow/plugin-kernel`, and the CFlow-owned Plugin Host seam from
-`@cflow/runtime-cordis`. It does not depend on Command, History, Renderer, or
-`@cflow/core`.
+The pure Selection, Viewport, and Session Snapshot contracts come from
+`@cflow/session-api`. The Runtime Plugin additionally depends on
+`@cflow/diagnostics`, `@cflow/kernel`, `@cflow/plugin-kernel`, and the
+CFlow-owned Plugin Host seam from `@cflow/runtime-cordis`. It does not depend
+on Command, History, Renderer, or `@cflow/core`.
 
 ## Development
 
