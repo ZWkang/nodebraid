@@ -10,15 +10,19 @@ import {
   defineCommand,
   definePlugin,
   defineService,
+  historyPlugin,
+  historyService,
   kernelPlugin,
   kernelService,
+  redoCommand,
+  undoCommand,
 } from '@cflow/core';
 ```
 
 The facade re-exports the pure graph interface from `@cflow/kernel` and the
 CFlow-owned Plugin Host interface from `@cflow/runtime-cordis`. It also
-re-exports the official Kernel and Command Runtime Plugins from
-`@cflow/plugin-kernel` and `@cflow/plugin-command`.
+re-exports the official Kernel, Command, and History Runtime Plugins from
+`@cflow/plugin-kernel`, `@cflow/plugin-command`, and `@cflow/plugin-history`.
 Cordis remains an implementation dependency and does not appear in the public
 CFlow types. Advanced consumers can import the narrow packages directly.
 
@@ -30,6 +34,11 @@ observation while keeping the underlying `CanvasKernel` private.
 typed registration, asynchronous execution, cancellation, and lifecycle-bound
 cleanup. Feature Plugins obtain Kernel or Session dependencies through their
 own declared Service Bindings rather than through a hidden Service locator.
+
+`historyPlugin` requires Kernel Service and Command Service, records post-Baseline
+Recordable Commits, and provides a stable `HistoryService` Snapshot. Callers
+execute the strongly typed `undoCommand` and `redoCommand`; the Service does not
+expose duplicate imperative behavior methods or internal History Entries.
 
 ## Development
 

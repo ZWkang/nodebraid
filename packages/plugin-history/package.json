@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/core",
+  "name": "@cflow/plugin-history",
   "type": "module",
   "version": "0.0.1",
-  "description": "Public CFlow facade for Kernel and Runtime Plugin APIs.",
+  "description": "History Runtime Plugin for CFlow.",
   "publishConfig": {
     "access": "public"
   },
@@ -14,15 +14,15 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ZWkang/cflow.git",
-    "directory": "packages/core"
+    "directory": "packages/plugin-history"
   },
   "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/core#readme",
+  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/plugin-history#readme",
   "keywords": [
     "cflow",
-    "core",
-    "graph-kernel",
-    "plugin-runtime"
+    "history",
+    "plugin-runtime",
+    "undo-redo"
   ],
   "sideEffects": false,
   "exports": {
@@ -40,18 +40,15 @@
   ],
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
-    "build": "bun run build:dependencies && bun run build:self",
-    "build:dependencies": "bun run --filter '@cflow/kernel' build && bun run --filter '@cflow/runtime-cordis' build && bun run --filter '@cflow/plugin-command' build && bun run --filter '@cflow/plugin-kernel' build && bun run --filter '@cflow/plugin-history' build",
-    "build:self": "tsgo -p tsconfig.build.json && bun run test:artifacts",
+    "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts",
+    "build:dependencies": "bun run --filter '@cflow/plugin-command' build && bun run --filter '@cflow/plugin-kernel' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
-    "test:artifacts": "bun run ./artifacts/check-declarations.ts",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@cflow/kernel": "workspace:*",
     "@cflow/plugin-command": "workspace:*",
-    "@cflow/plugin-history": "workspace:*",
     "@cflow/plugin-kernel": "workspace:*",
     "@cflow/runtime-cordis": "workspace:*"
   }

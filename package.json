@@ -47,7 +47,7 @@
     "format:check": "prettier --check --ignore-unknown .",
     "lint": "oxlint .",
     "test": "bun test",
-    "typecheck": "tsgo --noEmit -p tsconfig.json && bun run --filter '@cflow/*' typecheck",
+    "typecheck": "tsgo --noEmit -p tsconfig.json && bun run --filter '@cflow/kernel' typecheck && bun run --filter '@cflow/runtime-cordis' typecheck && bun run --filter '@cflow/plugin-command' typecheck && bun run --filter '@cflow/plugin-kernel' typecheck && bun run --filter '@cflow/plugin-history' typecheck && bun run --filter '@cflow/core' typecheck",
     "release:version": "changeset version",
     "release": "changeset publish",
     "update-deps": "bun update --latest",
