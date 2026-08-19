@@ -116,6 +116,30 @@ _Avoid_: CanvasKernel Service, Global Kernel, Mutable Document Service
 订阅同一个 Kernel Service，并按本地 revision 顺序同步接收成功且有净变化的 Canvas Commit 的消费者。
 _Avoid_: Transaction Observer, Draft Listener, Change Stream
 
+**Session**:
+一张活动 Canvas Runtime 中与 Document 分离的本地视图状态；首版只包含 Selection 与 Viewport，不进入 Document History、Persistence 或 Collaboration。
+_Avoid_: Editor Store, UI Store, Document State
+
+**Session Service**:
+一次 Activation 内代表一份 Session 的窄 Runtime Service，不拥有 Document、Command、History 或 Renderer 能力。
+_Avoid_: Global Session Store, Runtime State Bag, Editor Service
+
+**Session Snapshot**:
+Session 在一个观察时刻的不可变读取表示，由 Selection 与 Viewport 组成。
+_Avoid_: Mutable Session State, Renderer Snapshot, Document Snapshot
+
+**Selection**:
+Session 中当前被选中的 Node 与 Edge 标识，不表达选择先后，重复标识属于同一成员，首版不区分主选项；外部设置只接受当前 Canvas View 中存在的标识，Document 变化后失效标识会按 Session 转换顺序协调移除。
+_Avoid_: Renderer Selection, Preselection, Selected Objects
+
+**Selection Snapshot**:
+Selection 在一个观察时刻的不可变读取表示，Node 与 Edge 标识分别按规范 ID 顺序排列；该顺序只提供确定性观察，不承载选择语义。
+_Avoid_: Ordered Selection, Primary Selection, Renderer Selection State
+
+**Viewport**:
+Session 中将世界坐标映射为逻辑屏幕坐标的平移与缩放状态；浏览器中的逻辑屏幕单位对应 CSS pixel，物理像素缩放属于 Renderer。
+_Avoid_: Camera Object, Renderer Transform, Device-pixel Transform
+
 **Command**:
 安装到一个 Canvas Runtime、由强类型身份标识并可执行同步或异步准备工作的行为定义；它通过所属 Plugin 已声明的 Runtime Service 提交最终状态变化。
 _Avoid_: Action, Event Handler, Kernel Operation

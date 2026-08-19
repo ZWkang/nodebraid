@@ -448,6 +448,7 @@ packages/
 │   └── identifiers.ts
 ├── runtime-cordis/
 ├── plugin-command/
+├── plugin-session/
 ├── renderer-api/
 ├── renderer-konva/
 ├── interaction-core/

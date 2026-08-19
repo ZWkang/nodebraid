@@ -34,15 +34,17 @@ CFlow 将提供多个相互平级的官方 Renderer 包。使用者通常从官�
 flowchart TB
     Application["Application / Framework Adapter"]
     Core["@cflow/core<br/>公共入口与导出收口"]
+    Canvas["Canvas Runtime / Composition"]
 
-    subgraph Runtime["@cflow/runtime-cordis"]
-        Canvas["Canvas Runtime"]
-        Commands["Commands"]
-        Session["Session State"]
+    subgraph Runtime["@cflow/runtime-cordis / Plugin Host"]
         Lifecycle["Cordis Lifecycle"]
-        Observers["Observers / Internal Streams"]
-        RendererHost["Renderer Host"]
+        InstallationObservers["Installation Observers"]
     end
+
+    KernelPlugin["@cflow/plugin-kernel<br/>Kernel Service"]
+    CommandPlugin["@cflow/plugin-command<br/>Command Service"]
+    SessionPlugin["@cflow/plugin-session<br/>Session Service"]
+    RendererHost["Renderer Host"]
 
     subgraph Kernel["@cflow/kernel"]
         Document["Document"]
@@ -63,16 +65,26 @@ flowchart TB
     end
 
     Application --> Core
-    Core -. "聚合公开能力" .-> Canvas
-    Canvas --> Transaction
-    Canvas --> Query
+    Core -. "聚合公开能力" .-> Runtime
+    Core -. "聚合公开能力" .-> KernelPlugin
+    Core -. "聚合公开能力" .-> CommandPlugin
+    Core -. "聚合公开能力" .-> SessionPlugin
+    Canvas --> Runtime
+    Canvas --> KernelPlugin
+    Canvas --> CommandPlugin
+    Canvas --> SessionPlugin
+    Canvas --> RendererHost
+    Runtime -. "激活与释放" .-> KernelPlugin
+    Runtime -. "激活与释放" .-> CommandPlugin
+    Runtime -. "激活与释放" .-> SessionPlugin
+    KernelPlugin --> Transaction
+    KernelPlugin --> Query
     Transaction --> Document
     Document --> Snapshot
     Transaction --> ChangeSet
-    Snapshot --> Observers
-    ChangeSet --> Observers
-    Session --> RendererHost
-    Observers --> RendererHost
+    SessionPlugin --> KernelPlugin
+    SessionPlugin --> RendererHost
+    KernelPlugin --> RendererHost
     RendererHost --> RendererAPI
     RendererProvider -. "implements" .-> RendererAPI
     Interaction -. "plugin" .-> Lifecycle
@@ -85,37 +97,39 @@ flowchart TB
 | 状态                                                   | 所属模块        | 是否进入 Document History |
 | ------------------------------------------------------ | --------------- | ------------------------- |
 | Node、Edge、Endpoint、revision                         | Kernel Document | 是                        |
-| Selection、Viewport                                    | Runtime Session | 否                        |
+| Selection、Viewport                                    | Session         | 否                        |
 | Pointer、Hover、Drag Preview、Connect Preview          | Interaction     | 否                        |
 | SVG Element、Canvas Context、Konva/Pixi 对象、命中缓存 | Renderer        | 否                        |
 
 ### 3.2 依赖方向
 
 ```text
-Application / Adapter
-          │
-          ▼
-     @cflow/core                 只做公共收口
-          │
-          ▼
-@cflow/runtime-cordis ───────▶ @cflow/kernel
-          │
-          └───────────────────▶ @cflow/renderer-api
-                                        ▲
-                                        │ implements
-                              @cflow/renderer-*
+Application / Adapter ────────▶ @cflow/core
+                                      │ 只做公共收口
+                  ┌───────────────────┼────────────────────┐
+                  ▼                   ▼                    ▼
+       @cflow/runtime-cordis  @cflow/plugin-kernel  @cflow/plugin-command
+                                      │
+                                      ▼
+                               @cflow/kernel
 
-@cflow/feature-* ─────────────▶ Runtime / Kernel 的公开协议
+@cflow/plugin-session ────────▶ @cflow/plugin-kernel
+          │                    ▶ @cflow/kernel
+          └───────────────────▶ @cflow/runtime-cordis
+
+@cflow/renderer-* ────────────▶ @cflow/renderer-api
+@cflow/feature-* ─────────────▶ 所需 Runtime Service 的公开协议
 ```
 
 约束如下：
 
 1. Kernel 不依赖 Runtime、Renderer、框架适配器和业务插件。
-2. Runtime 只依赖 Kernel 与 Renderer API，不依赖具体 Renderer 实现。
-3. Renderer 实现依赖 Renderer API，不向外暴露原生对象。
-4. 内部包不得反向依赖 `@cflow/core`。
-5. 包之间不得通过深层 import 访问其他包的私有文件。
-6. RxJS 即使被 Runtime 使用，也只属于内部传播实现，不成为公共状态 API。
+2. `@cflow/runtime-cordis` 只提供 Plugin Host 与生命周期，不直接拥有 Kernel、Command 或 Session。
+3. Kernel、Command 与 Session 分别由官方 Plugin 提供窄 Runtime Service；Session Plugin 静态依赖 Kernel Service。
+4. Renderer 实现依赖 Renderer API，不向外暴露原生对象。
+5. 内部包不得反向依赖 `@cflow/core`。
+6. 包之间不得通过深层 import 访问其他包的私有文件。
+7. RxJS 即使被 Runtime 使用，也只属于内部传播实现，不成为公共状态 API。
 
 ## 4. Kernel
 
@@ -307,23 +321,23 @@ Kernel 对自己定义的 Node、Edge、Point、Size、Endpoint 和公开数组�
 
 因为 Kernel 不要求 JSON-safe，也无法安全地通用深拷贝任意 `data`。`data` 按不可变值契约使用，更新时创建新值并通过 replace 提交。
 
-## 5. Runtime
+## 5. Canvas Runtime 组合
 
 ### 5.1 Runtime 职责
 
 **状态：稳定原则。**
 
-Runtime 负责：
+Canvas Runtime 通过 Plugin Graph 组合以下职责，而不是由 `@cflow/runtime-cordis` 直接拥有全部能力：
 
-- 创建和持有一个 Kernel；
-- 通过 Cordis 管理插件依赖、配置、生命周期与释放；
-- 执行 Command；
-- 持有 Session State；
-- 分发 Snapshot、ChangeSet 与 Session 变化；
+- Kernel Plugin 创建和持有一个 Kernel；
+- Plugin Host 通过 Cordis 管理插件依赖、配置、生命周期与释放；
+- Command Plugin 提供 Command 注册与执行；
+- Session Plugin 持有 Selection 与 Viewport；
+- 各能力通过自己的窄 Runtime Service 分发 Snapshot、ChangeSet 与 Session 变化；
 - 驱动一个符合 Renderer API 的实例；
 - 在 dispose 时释放 Renderer、插件和内部订阅。
 
-Runtime 不拥有第二份 Document，也不允许多个可写响应式流分别成为权威状态。
+Canvas Runtime 不拥有第二份 Document，也不允许多个可写响应式流分别成为权威状态。
 
 ### 5.2 Command 与异步
 
@@ -343,16 +357,29 @@ committed ChangeSet
 
 首版不提供跨 `await` 的异步 Transaction，也不在 Transaction 期间锁住实时 Document。
 
-### 5.3 Session State
+### 5.3 Session
 
-**状态：状态边界稳定，精确结构为当前候选。**
+**状态：状态边界与首版公开契约已确认。**
 
 初版 Session 只考虑 Selection 和 Viewport：
 
 ```ts
-interface CanvasSessionSnapshot {
+interface SessionSnapshot {
   readonly selection: SelectionSnapshot;
   readonly viewport: Viewport;
+}
+
+interface SessionService {
+  getSnapshot(): SessionSnapshot;
+  subscribe(listener: () => void): () => void;
+  setSelection(selection: SelectionInput): void;
+  clearSelection(): void;
+  setViewport(viewport: Viewport): void;
+}
+
+interface SelectionInput {
+  readonly nodeIds: readonly NodeId[];
+  readonly edgeIds: readonly EdgeId[];
 }
 
 interface SelectionSnapshot {
@@ -367,9 +394,11 @@ interface Viewport {
 }
 ```
 
-Session 不经过 Document Transaction，不进入 Document History、Persistence 或 Collaboration。
+Session Plugin 静态依赖 Kernel Service。Session 不经过 Document Transaction，不进入 Document History、Persistence 或 Collaboration。
 
-Document 删除已选实体后，Runtime 可以清理无效 Selection。这属于派生视图状态同步，不是 Kernel 的隐式级联。
+Selection 是无序集合，重复 ID 规范化为一个成员，Snapshot 中的 NodeId 与 EdgeId 分别按规范 ID 顺序排列；首版没有 primary item。外部设置包含当前 Kernel View 中不存在的实体时整次拒绝且保持原状态。Document 删除已选实体后，Session 依据每个 Kernel Commit 的 `after` View 按 Session 转换顺序清理无效 Selection；这属于派生视图状态同步，不是 Kernel 的隐式级联，也不产生 History。
+
+Session Snapshot 不带独立 revision。同一逻辑状态保持根引用，只有 Selection 或 Viewport 变化时才创建新根，并复用未变化的子引用。Session subscriber 不接收参数，通过 `getSnapshot()` 读取状态；重入更新使用同步广度优先队列，使同轮 subscriber 观察同一个 Snapshot。
 
 Viewport 首版只表达平移与缩放：
 
@@ -378,7 +407,7 @@ screenX = worldX × zoom + x
 screenY = worldY × zoom + y
 ```
 
-底层只要求数值有限且 `zoom > 0`，不硬编码产品级缩放上下限。
+`x` 与 `y` 使用逻辑屏幕单位，浏览器中对应 CSS pixel；`devicePixelRatio` 与物理像素缩放属于 Renderer。底层只要求数值有限且 `zoom > 0`，不硬编码或静默应用产品级缩放上下限。
 
 ## 6. Renderer 边界
 
@@ -483,6 +512,7 @@ packages/
 ├── kernel/             @cflow/kernel
 ├── plugin-kernel/      @cflow/plugin-kernel
 ├── plugin-command/     @cflow/plugin-command
+├── plugin-session/     @cflow/plugin-session
 ├── renderer-api/       @cflow/renderer-api
 ├── runtime-cordis/     @cflow/runtime-cordis
 ├── interaction-core/   @cflow/interaction-core
@@ -582,13 +612,12 @@ Cordis 生命周期
 以下问题应当在对应阶段实现前，通过真实用例决定：
 
 1. 第一个官方 Renderer 采用何种技术；
-2. Snapshot 最终使用数组、自定义只读集合还是其他表示；
-3. Canvas、Command、Session 和 Renderer API 的准确命名与泛型；
+2. Canvas Snapshot 最终使用数组、自定义只读集合还是其他表示；
+3. Canvas 与 Renderer API 的准确命名与泛型；
 4. RendererInput 的最小字段集合；
 5. HitResult 是否需要表达 Port 以外的交互目标；
-6. Selection 是否需要主选项或稳定顺序；
-7. Renderer 文档更新最终采用联合事件还是其他窄协议；
-8. Plugin Service 的最小公开表面；
-9. `data` 不可变约定是否需要额外的开发期诊断能力。
+6. Renderer 文档更新最终采用联合事件还是其他窄协议；
+7. Plugin Service 的最小公开表面；
+8. `data` 不可变约定是否需要额外的开发期诊断能力。
 
 这些问题没有在本文中被遗漏，而是被有意保留到具有实现证据时再决定。
