@@ -1,5 +1,7 @@
 # @cflow/plugin-command
 
+> Documentation: [English](https://zwkang.github.io/cflow/en/modules/plugin-command) · [简体中文](https://zwkang.github.io/cflow/modules/plugin-command)
+
 Command Runtime Plugin for CFlow Canvas Runtime instances.
 
 ```ts

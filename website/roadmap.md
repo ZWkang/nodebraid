@@ -1,0 +1,28 @@
+---
+title: Roadmap
+description: 与当前能力严格分离的 CFlow 后续方向。
+---
+
+# Roadmap
+
+Roadmap 记录尚未交付的方向，不承诺日期、package 名或最终 API。任何方向只有在进入当前实现、公共导出和验证门禁后，才会出现在 [当前状态](/status) 与 [全部模块](/modules/) 中。
+
+## 发布身份
+
+在面向外部应用发布 package 前，需要迁移到本项目拥有的 npm scope，并同步更新 manifests、依赖、文档与 release workflow。这是公开安装体验的前置条件，但不在当前文档站实现范围内。
+
+## Renderer 生态
+
+SVG Renderer Provider 已经通过真实 Target、Document/Session 同步、输入、Hit Test 与 lifecycle 验证。后续 Canvas2D、WebGL、Konva、Pixi 或其他 Provider 仍应通过同一个 contract 独立交付，而不是在核心中增加默认 Renderer 或动态 Registry。
+
+## Interaction 与框架接入
+
+后续 Interaction capability 可以在标准化 Renderer Input 之上解释选择、拖拽、连线、快捷键等行为，并通过 Command/Session/Kernel 的现有写入边界工作。React、Vue 或其他 framework adapter 应保持在 Runtime 与 UI 框架之间，不取得第二份 Document authority。
+
+## Composition 与示例
+
+当 Interaction 链路成立后，可以增加带真实 SVG Provider 的可运行产品示例和显式 Canvas Composition，降低初次组合成本。它们仍不会成为 Plugin Host 隐式安装的默认能力。
+
+## 更后面的探索
+
+Persistence、Collaboration、序列化 schema、远程同步和更多 Layout/Renderer Provider 都需要独立场景、契约与验证。它们目前是探索方向，不是已承诺模块。

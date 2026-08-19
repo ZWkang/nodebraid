@@ -1,5 +1,7 @@
 # @cflow/layout-api
 
+> Documentation: [English](https://zwkang.github.io/cflow/en/modules/layout-api) · [简体中文](https://zwkang.github.io/cflow/modules/layout-api)
+
 Provider-neutral Layout contracts and validation for CFlow.
 
 The package projects a committed Canvas View into an immutable Layout Input, defines asynchronous Layout Engines, and validates Layout Proposals before they reach a Runtime Transaction. Node positions use the top-left corner of Node bounds in absolute world coordinates.

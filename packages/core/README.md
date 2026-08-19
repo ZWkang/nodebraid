@@ -1,5 +1,7 @@
 # @cflow/core
 
+> Documentation: [English](https://zwkang.github.io/cflow/en/modules/core) · [简体中文](https://zwkang.github.io/cflow/modules/core)
+
 Public CFlow facade for the Kernel, provider-neutral Layout API, Runtime Plugins, and Plugin Host APIs.
 
 ```ts

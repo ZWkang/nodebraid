@@ -1,5 +1,7 @@
 # @cflow/runtime-cordis
 
+> Documentation: [English](https://zwkang.github.io/cflow/en/modules/runtime-cordis) · [简体中文](https://zwkang.github.io/cflow/modules/runtime-cordis)
+
 Cordis-backed Plugin Host for CFlow Canvas Runtime instances.
 
 The package exposes CFlow-owned Plugin lifecycle interfaces and keeps Cordis
@@ -22,6 +24,8 @@ const host = createPluginHost({
     faultReporter: ({ error }) => globalThis.reportError(error),
   },
 });
+
+await host.dispose();
 ```
 
 The Sink is synchronous and observational. Successful event delivery never

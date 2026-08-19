@@ -96,6 +96,10 @@ _Avoid_: Load Order, Plugin List
 通过一组 Child Installation 组合出可用 Canvas Runtime 的 Plugin。
 _Avoid_: Default Canvas, Hard-coded Runtime, Preset Class
 
+**Documentation Site**:
+面向正在评估或采用 CFlow 的外部 TypeScript 开发者，介绍当前已交付的 Plugin、Runtime Service、Provider 与 package 组合关系的公开知识入口；不参与 Canvas Runtime 的能力发现或选择。
+_Avoid_: Runtime Registry, Capability Registry, Architecture Roadmap
+
 **Child Installation**:
 由父 Plugin 的 Activation 安装并拥有、随父 Activation 结束而释放的 Plugin Installation。
 _Avoid_: Nested Runtime, Detached Plugin

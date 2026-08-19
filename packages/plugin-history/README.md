@@ -1,5 +1,7 @@
 # @cflow/plugin-history
 
+> Documentation: [English](https://zwkang.github.io/cflow/en/modules/plugin-history) · [简体中文](https://zwkang.github.io/cflow/modules/plugin-history)
+
 History Runtime Plugin for CFlow Canvas Runtime instances.
 
 ```ts
@@ -45,6 +47,7 @@ kernel.transact((transaction) => {
 });
 const undoCommit = await commands.execute(undoCommand, undefined);
 console.log(undoCommit.changeSet.revision);
+await host.dispose();
 ```
 
 Each Plugin Activation starts an empty History at the current Kernel revision.

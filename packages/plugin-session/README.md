@@ -1,5 +1,7 @@
 # @cflow/plugin-session
 
+> Documentation: [English](https://zwkang.github.io/cflow/en/modules/plugin-session) · [简体中文](https://zwkang.github.io/cflow/modules/plugin-session)
+
 Session Runtime Plugin for CFlow Canvas Runtime instances.
 
 ```ts
@@ -18,9 +20,9 @@ const consumer = definePlugin({
 });
 
 const host = createPluginHost();
-host.install(kernelPlugin);
-host.install(sessionPlugin);
-host.install(consumer);
+const installations = [host.install(kernelPlugin), host.install(sessionPlugin), host.install(consumer)];
+await Promise.all(installations.map((installation) => installation.whenActive()));
+await host.dispose();
 ```
 
 Each Plugin Activation owns a fresh Session with an empty Selection and a

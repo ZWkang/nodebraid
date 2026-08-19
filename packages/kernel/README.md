@@ -1,5 +1,7 @@
 # @cflow/kernel
 
+> Documentation: [English](https://zwkang.github.io/cflow/en/modules/kernel) · [简体中文](https://zwkang.github.io/cflow/modules/kernel)
+
 Renderer-independent graph state and Transaction semantics for CFlow.
 
 ```ts
@@ -26,7 +28,8 @@ Renderer implementations, DOM objects, or framework adapters.
 Its only shared infrastructure dependency is the zero-runtime
 `@cflow/diagnostics` error contract; the Kernel does not emit Diagnostic Events.
 
-The future Kernel Plugin adapter is intentionally outside this package.
+The implemented Kernel Runtime Plugin adapter lives in `@cflow/plugin-kernel`
+and intentionally remains outside this package.
 
 ## Development
 

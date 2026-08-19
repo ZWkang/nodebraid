@@ -1,5 +1,7 @@
 # @cflow/plugin-layout
 
+> Documentation: [English](https://zwkang.github.io/cflow/en/modules/plugin-layout) · [简体中文](https://zwkang.github.io/cflow/modules/plugin-layout)
+
 Runtime Command integration for CFlow Layout Engines.
 
 `createLayoutPlugin()` statically binds one Layout Engine to one typed Command. The Command reads the current Canvas View, checks capabilities and cancellation, computes and validates a Layout Proposal, rejects stale revisions, and applies every changed Node position in one synchronous Transaction. A successful layout therefore produces at most one Canvas Commit and one History Entry.

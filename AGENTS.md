@@ -11,6 +11,11 @@
 - `bun install`：安装依赖并启用 Git hooks。
 - `bunx agent-browser install`：安装 SVG Renderer 真实浏览器测试所需的 Chromium；Linux CI 使用 `bunx agent-browser install --with-deps`。
 - `bun run dev`：监听根入口并持续构建到 `dist/`。
+- `bun run docs:dev`：启动中文默认、English 可切换的 Documentation Site 本地开发服务器。
+- `bun run docs:quick-start`：构建公共 facade 依赖并执行站点展示的真实 Quick Start。
+- `bun run docs:build`：生产构建 VitePress Documentation Site。
+- `bun run docs:check`：校验公开内容、执行 Quick Start 并生产构建站点。
+- `bun run docs:preview`：本地预览已经生产构建的 Documentation Site。
 - `bun run build`：构建根入口，再由 `@cflow/core` 先构建其余 workspace 依赖并构建公共 facade。
 - `bun run typecheck`：先构建 workspace package-name 类型解析所需的依赖声明，再检查根 TypeScript project 和所有 `@cflow/*` workspace。
 - `bun run --filter '@cflow/diagnostics' build`：构建零依赖 Diagnostics 契约、运行声明隔离检查并验证 package-name import。
@@ -30,7 +35,7 @@
 - `bun run format`：使用 Prettier 格式化支持的文件。
 - `bun run test`：运行 Bun 测试。
 - `bun run test:browser`：通过仓库锁定的 `agent-browser` 在真实 Chromium 中运行 SVG Renderer 公共 seam 测试。
-- `bun run check`：依次运行 lint、类型检查、格式检查、Bun 测试、真实浏览器测试和构建。
+- `bun run check`：依次运行 lint、类型检查、格式检查、Bun 测试、真实浏览器测试、构建和 Documentation Site 检查。
 
 提交前至少运行：
 

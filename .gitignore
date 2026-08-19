@@ -2,5 +2,8 @@ dist/
 node_modules/
 reference/
 .tmp/
+.playwright-cli/
+website/.vitepress/cache/
+website/.vitepress/dist/
 
 .env

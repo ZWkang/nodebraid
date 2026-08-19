@@ -1,5 +1,7 @@
 # @cflow/diagnostics
 
+> Documentation: [English](https://zwkang.github.io/cflow/en/modules/diagnostics) · [简体中文](https://zwkang.github.io/cflow/modules/diagnostics)
+
 Structured errors and Diagnostic Event contracts for CFlow.
 
 ```ts

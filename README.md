@@ -4,6 +4,18 @@ CFlow is a plugin-based, renderer-agnostic flow canvas engine built as a Bun-pow
 
 The repository is currently at an early implementation stage. The planned architecture and package boundaries are documented in [ARCHITECTURE.md](./ARCHITECTURE.md); the document describes the target design rather than the currently implemented feature set.
 
+## Documentation
+
+The public, Chinese-first Documentation Site explains the currently implemented capability families and workspace packages:
+
+- [Documentation Site](https://zwkang.github.io/cflow/)
+- [English Documentation](https://zwkang.github.io/cflow/en/)
+- [Quick Start](https://zwkang.github.io/cflow/guide/quick-start)
+- [Capability Map](https://zwkang.github.io/cflow/capabilities/)
+- [Module Index](https://zwkang.github.io/cflow/modules/)
+
+The packages declared under the `@cflow/*` names are not yet published by this project. Do not install the unrelated package currently using the `@cflow/core` name; follow the source-checkout Quick Start instead.
+
 ## Stack
 
 - Bun for package management, development, builds, tests, and workspace scripts.
@@ -186,6 +198,24 @@ Start a watch build for local development:
 
 ```bash
 bun run dev
+```
+
+Start the documentation site locally:
+
+```bash
+bun run docs:dev
+```
+
+Execute the documented Quick Start and build the production site:
+
+```bash
+bun run docs:check
+```
+
+Preview the built documentation site:
+
+```bash
+bun run docs:preview
 ```
 
 Build the root entry and every `@cflow/*` workspace package:

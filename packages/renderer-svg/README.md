@@ -1,5 +1,7 @@
 # @cflow/renderer-svg
 
+> Documentation: [English](https://zwkang.github.io/cflow/en/modules/renderer-svg) · [简体中文](https://zwkang.github.io/cflow/modules/renderer-svg)
+
 Reference-quality SVG Renderer Provider for CFlow.
 
 The package binds one existing `SVGSVGElement` to a synchronous

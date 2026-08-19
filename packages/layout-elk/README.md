@@ -1,5 +1,7 @@
 # @cflow/layout-elk
 
+> Documentation: [English](https://zwkang.github.io/cflow/en/modules/layout-elk) · [简体中文](https://zwkang.github.io/cflow/modules/layout-elk)
+
 ELK Layout Provider for CFlow.
 
 The Provider implements deterministic full layout with `elkjs` and exposes self-loop support. ELK Stress additionally provides incremental layout and Fixed Node constraints: the Adapter enables interactive positioning and restores ELK's component-local result translation to CFlow absolute world coordinates only when every Fixed Node proves the same translation.

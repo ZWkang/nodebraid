@@ -1,5 +1,7 @@
 # @cflow/plugin-kernel
 
+> Documentation: [English](https://zwkang.github.io/cflow/en/modules/plugin-kernel) · [简体中文](https://zwkang.github.io/cflow/modules/plugin-kernel)
+
 Kernel Runtime Plugin for CFlow Canvas Runtime instances.
 
 ```ts
@@ -17,8 +19,10 @@ const consumer = definePlugin({
 });
 
 const host = createPluginHost();
-host.install(kernelPlugin);
-host.install(consumer);
+const provider = host.install(kernelPlugin);
+const app = host.install(consumer);
+await Promise.all([provider.whenActive(), app.whenActive()]);
+await host.dispose();
 ```
 
 Each Plugin Activation owns a fresh revision-zero Kernel. The narrow
