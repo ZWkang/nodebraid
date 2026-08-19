@@ -1,0 +1,3 @@
+# Use Provider-specific Layout Commands without a Registry
+
+The first Layout version has no dynamic LayoutService Registry and no default Provider; each Provider exposes an independent typed Command whose existing Command identity and lifecycle rules handle coexistence and diagnostic-ID conflicts. A Provider's stable string ID is diagnostic metadata rather than registration identity, while the exact Command token remains its Runtime identity. Shared full/incremental and Fixed Node constraints belong to the Layout Request, while direction, spacing, and algorithm options remain in the Provider's concrete configuration type; a Registry is deferred until a real runtime-discovery requirement exists.
