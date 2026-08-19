@@ -1,4 +1,4 @@
-import type { ServiceTokenBase } from './service-token';
+import { CFlowError, type DiagnosticAttributes } from '@cflow/diagnostics';
 
 export type PluginHostErrorCode =
   | 'HOST_DISPOSED'
@@ -8,34 +8,38 @@ export type PluginHostErrorCode =
   | 'DEPENDENCY_CYCLE'
   | 'INVALID_DEFINITION';
 
-export interface ProviderConflictErrorDetails {
+export interface ProviderConflictErrorDetails extends DiagnosticAttributes {
   readonly type: 'provider-conflict';
-  readonly token: ServiceTokenBase;
+  readonly serviceName: string;
   readonly existingProvider: string;
   readonly conflictingProvider: string;
 }
 
-export interface DependencyCyclePathSegment {
+export interface DependencyCyclePathSegment extends DiagnosticAttributes {
   readonly plugin: string;
-  readonly service: ServiceTokenBase;
+  readonly serviceName: string;
   readonly provider: string;
 }
 
-export interface DependencyCycleErrorDetails {
+export interface DependencyCycleErrorDetails extends DiagnosticAttributes {
   readonly type: 'dependency-cycle';
   readonly path: readonly DependencyCyclePathSegment[];
 }
 
 export type PluginHostErrorDetails = ProviderConflictErrorDetails | DependencyCycleErrorDetails;
 
-export class PluginHostError extends Error {
+export class PluginHostError extends CFlowError<'runtime.plugin-host', PluginHostErrorCode, PluginHostErrorDetails> {
   override readonly name = 'PluginHostError';
 
   constructor(
-    readonly code: PluginHostErrorCode,
+    code: PluginHostErrorCode,
     message: string,
-    readonly details?: PluginHostErrorDetails,
+    details: PluginHostErrorDetails = {} as PluginHostErrorDetails,
+    options?: Readonly<{ cause?: unknown }>,
   ) {
-    super(message);
+    super('runtime.plugin-host', code, message, {
+      details,
+      cause: options?.cause,
+    });
   }
 }

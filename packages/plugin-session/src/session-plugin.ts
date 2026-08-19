@@ -1,9 +1,10 @@
+import { describeNonFiniteNumber, type DiagnosticAttributes } from '@cflow/diagnostics';
 import { kernelService } from '@cflow/plugin-kernel';
 import { definePlugin, defineService } from '@cflow/runtime-cordis';
 
 import type { SelectionInput, SelectionSnapshot, SessionService, SessionSnapshot, Viewport } from './contracts';
+import { sessionDiagnosticEvents } from './diagnostic-events';
 import { SessionError } from './session-error';
-import { reportSubscriberError } from './subscriber-error-reporting';
 
 export const sessionService = defineService<SessionService>('session');
 
@@ -41,7 +42,9 @@ export const sessionPlugin = definePlugin({
             try {
               listener();
             } catch (error) {
-              reportSubscriberError(error);
+              context.diagnostics.reportFault(error, {
+                name: sessionDiagnosticEvents.subscriberFault,
+              });
             }
           }
         }
@@ -71,7 +74,7 @@ export const sessionPlugin = definePlugin({
           throw new SessionError(
             'INVALID_SUBSCRIBER',
             'Session subscriber must be a function.',
-            Object.freeze({ subscriber: listener }),
+            Object.freeze({ receivedType: describeReceivedType(listener) }),
           );
         }
         const registration: SubscriptionRegistration = { listener, active: true };
@@ -179,34 +182,56 @@ function normalizeZero(value: number): number {
   return Object.is(value, -0) ? 0 : value;
 }
 
-type ViewportIssue = Readonly<{ field: 'viewport' | keyof Viewport; value: unknown }>;
+type ViewportIssue = DiagnosticAttributes;
 
 function collectViewportIssues(viewport: unknown): readonly ViewportIssue[] {
   if (typeof viewport !== 'object' || viewport === null) {
-    const issue: ViewportIssue = Object.freeze({ field: 'viewport', value: viewport });
+    const issue: ViewportIssue = Object.freeze({
+      field: 'viewport',
+      code: 'EXPECTED_OBJECT',
+      receivedType: describeReceivedType(viewport),
+    });
     return Object.freeze([issue]);
   }
   const issues: ViewportIssue[] = [];
   const x = Reflect.get(viewport, 'x');
   const y = Reflect.get(viewport, 'y');
   const zoom = Reflect.get(viewport, 'zoom');
-  if (typeof x !== 'number' || !Number.isFinite(x)) issues.push(Object.freeze({ field: 'x', value: x }));
-  if (typeof y !== 'number' || !Number.isFinite(y)) issues.push(Object.freeze({ field: 'y', value: y }));
+  if (typeof x !== 'number' || !Number.isFinite(x)) issues.push(describeInvalidViewportNumber('x', x));
+  if (typeof y !== 'number' || !Number.isFinite(y)) issues.push(describeInvalidViewportNumber('y', y));
   if (typeof zoom !== 'number' || !Number.isFinite(zoom) || zoom <= 0) {
-    issues.push(Object.freeze({ field: 'zoom', value: zoom }));
+    issues.push(describeInvalidViewportNumber('zoom', zoom));
   }
   return Object.freeze(issues);
 }
 
-type SelectionInputIssue =
-  | Readonly<{ field: 'selection'; code: 'EXPECTED_OBJECT'; value: unknown }>
-  | Readonly<{ field: 'nodeIds' | 'edgeIds'; code: 'EXPECTED_ARRAY'; value: unknown }>
-  | Readonly<{ field: 'nodeIds' | 'edgeIds'; code: 'INVALID_ID'; index: number; value: unknown }>;
+function describeInvalidViewportNumber(field: keyof Viewport, value: unknown): ViewportIssue {
+  const code = field === 'zoom' ? 'EXPECTED_POSITIVE_NUMBER' : 'EXPECTED_FINITE_NUMBER';
+  if (typeof value !== 'number') {
+    return Object.freeze({ field, code, receivedType: describeReceivedType(value) });
+  }
+  if (!Number.isFinite(value)) {
+    return Object.freeze({ field, code, receivedNumber: describeNonFiniteNumber(value) });
+  }
+  return Object.freeze({ field, code, value });
+}
+
+function describeReceivedType(value: unknown): string {
+  return value === null ? 'null' : typeof value;
+}
+
+type SelectionInputIssue = DiagnosticAttributes;
 
 function validateSelectionInput(selection: unknown): asserts selection is SelectionInput {
   const issues: SelectionInputIssue[] = [];
   if (typeof selection !== 'object' || selection === null) {
-    issues.push(Object.freeze({ field: 'selection', code: 'EXPECTED_OBJECT', value: selection }));
+    issues.push(
+      Object.freeze({
+        field: 'selection',
+        code: 'EXPECTED_OBJECT',
+        receivedType: describeReceivedType(selection),
+      }),
+    );
   } else {
     collectSelectionFieldIssues('nodeIds', Reflect.get(selection, 'nodeIds'), issues);
     collectSelectionFieldIssues('edgeIds', Reflect.get(selection, 'edgeIds'), issues);
@@ -226,13 +251,20 @@ function collectSelectionFieldIssues(
   issues: SelectionInputIssue[],
 ): void {
   if (!Array.isArray(value)) {
-    issues.push(Object.freeze({ field, code: 'EXPECTED_ARRAY', value }));
+    issues.push(Object.freeze({ field, code: 'EXPECTED_ARRAY', receivedType: describeReceivedType(value) }));
     return;
   }
   for (let index = 0; index < value.length; index += 1) {
     const id = value[index];
     if (typeof id !== 'string' || id.length === 0) {
-      issues.push(Object.freeze({ field, code: 'INVALID_ID', index, value: id }));
+      issues.push(
+        Object.freeze({
+          field,
+          code: 'INVALID_ID',
+          index,
+          ...(typeof id === 'string' ? { value: id } : { receivedType: describeReceivedType(id) }),
+        }),
+      );
     }
   }
 }

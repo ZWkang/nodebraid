@@ -79,7 +79,7 @@ test('a Layout Engine rejects incomplete, foreign, invalid, or constraint-breaki
     { code: 'INVALID_PROPOSAL', details: { issue: 'UNKNOWN_NODE', nodeId: foreignId } },
     {
       code: 'INVALID_PROPOSAL',
-      details: { issue: 'INVALID_POSITION', nodeId: betaId, coordinate: 'x', value: Number.NaN },
+      details: { issue: 'INVALID_POSITION', nodeId: betaId, coordinate: 'x', receivedNumber: 'nan' },
     },
     {
       code: 'INVALID_PROPOSAL',

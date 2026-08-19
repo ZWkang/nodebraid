@@ -1,3 +1,4 @@
+export * from '@cflow/diagnostics';
 export * from '@cflow/kernel';
 export * from '@cflow/layout-api';
 export * from '@cflow/plugin-command';

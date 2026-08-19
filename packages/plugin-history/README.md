@@ -61,6 +61,9 @@ History replay is single-flight. A concurrent replay fails with `HISTORY_BUSY`,
 and an invocation made before History observes the current Kernel revision fails
 with `HISTORY_NOT_CAUGHT_UP`. Requests are never queued against a later stack
 top. Subscriber publication waits until History has caught up with Kernel.
+Subscriber failures are isolated through the Host-scoped Fault Reporter with
+the stable `cflow.plugin.history.subscriber.fault` event and never change the
+History Snapshot or block later subscribers.
 
 The Plugin requires both Kernel Service and Command Service. Losing either
 dependency ends the current Activation, closes old Service handles, removes the

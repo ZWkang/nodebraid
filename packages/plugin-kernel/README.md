@@ -29,10 +29,12 @@ synchronous ordered Canvas Commit observation without exposing the underlying
 Only successful Transactions with net changes are delivered. Reentrant
 Transactions queue their Commits until every Observer has received the current
 revision. Observer failures never roll back Kernel state or block other
-Observers; they are reported through the platform error channel.
+Observers; they are reported through the current Host-scoped Fault Reporter
+with the stable `cflow.plugin.kernel.observer.fault` event.
 
-The package depends on the CFlow-owned seams from `@cflow/kernel` and
-`@cflow/runtime-cordis`, not on `@cflow/core`. It does not expose Cordis types.
+The package depends on the CFlow-owned seams from `@cflow/diagnostics`,
+`@cflow/kernel`, and `@cflow/runtime-cordis`, not on `@cflow/core`. It does not
+expose Cordis types.
 
 ## Development
 

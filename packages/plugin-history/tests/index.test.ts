@@ -1,13 +1,28 @@
 import { describe, expect, test } from 'bun:test';
 
+import { CFlowError, type DiagnosticEvent, type DiagnosticFault } from '@cflow/diagnostics';
 import { nodeId, type CanvasCommit } from '@cflow/kernel';
 import { commandPlugin, commandService, defineCommand, type CommandService } from '@cflow/plugin-command';
 import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
 import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
 
-import { HistoryError, historyPlugin, historyService, redoCommand, undoCommand, type HistoryService } from '../src';
+import {
+  HistoryError,
+  historyDiagnosticEvents,
+  historyPlugin,
+  historyService,
+  redoCommand,
+  undoCommand,
+  type HistoryService,
+} from '../src';
 
 describe('@cflow/plugin-history', () => {
+  test('publishes the stable History diagnostic event catalog', () => {
+    expect(historyDiagnosticEvents).toEqual({
+      subscriberFault: 'cflow.plugin.history.subscriber.fault',
+    });
+  });
+
   test('records the first post-Baseline Commit and undoes it through Command Service', async () => {
     let kernel: KernelService | undefined;
     const kernelConsumer = definePlugin({
@@ -198,7 +213,12 @@ describe('@cflow/plugin-history', () => {
     const initialSnapshot = history.getSnapshot();
 
     await expect(commands.execute(undoCommand, undefined)).rejects.toBeInstanceOf(HistoryError);
-    await expect(commands.execute(undoCommand, undefined)).rejects.toMatchObject({ code: 'UNDO_EMPTY' });
+    await expect(commands.execute(undoCommand, undefined)).rejects.toBeInstanceOf(CFlowError);
+    await expect(commands.execute(undoCommand, undefined)).rejects.toMatchObject({
+      domain: 'plugin.history',
+      code: 'UNDO_EMPTY',
+      details: {},
+    });
     expect(kernel.read().snapshot.revision).toBe(0);
     expect(history.getSnapshot()).toBe(initialSnapshot);
 
@@ -228,13 +248,22 @@ describe('@cflow/plugin-history', () => {
 
   test('snapshots subscriber recipients and isolates their errors', async () => {
     const listenerError = new Error('History subscriber failed');
-    const reportedErrors: unknown[] = [];
+    const events: DiagnosticEvent[] = [];
+    const faults: DiagnosticFault[] = [];
+    const platformErrors: unknown[] = [];
     const originalReportError = Object.getOwnPropertyDescriptor(globalThis, 'reportError');
     Object.defineProperty(globalThis, 'reportError', {
       configurable: true,
-      value: (error: unknown) => reportedErrors.push(error),
+      value: (error: unknown) => platformErrors.push(error),
     });
-    const { commands, history, host, kernel } = await activateHistory();
+    const diagnosticsHost = createPluginHost({
+      diagnostics: {
+        hostId: 'history-host',
+        sink: (event) => events.push(event),
+        faultReporter: (fault) => faults.push(fault),
+      },
+    });
+    const { commands, history, host, kernel } = await activateHistory(diagnosticsHost);
 
     try {
       const deliveries: string[] = [];
@@ -263,7 +292,32 @@ describe('@cflow/plugin-history', () => {
       deliveries.length = 0;
       await commands.execute(undoCommand, undefined);
       expect(deliveries).toEqual(['first', 'failing', 'last', 'late']);
-      expect(reportedErrors).toEqual([listenerError, listenerError]);
+      expect(platformErrors).toEqual([]);
+      expect(faults.map((fault) => fault.error)).toEqual([listenerError, listenerError]);
+      expect(
+        events
+          .filter((event) => event.name === 'cflow.plugin.history.subscriber.fault')
+          .map((event) => ({ scope: event.scope, attributes: event.attributes })),
+      ).toEqual([
+        {
+          scope: {
+            hostId: 'history-host',
+            installationId: 'history-host.installation.3',
+            activationId: expect.any(String),
+            pluginName: '@cflow/plugin-history',
+          },
+          attributes: { canUndo: true, canRedo: false },
+        },
+        {
+          scope: {
+            hostId: 'history-host',
+            installationId: 'history-host.installation.3',
+            activationId: expect.any(String),
+            pluginName: '@cflow/plugin-history',
+          },
+          attributes: { canUndo: false, canRedo: true },
+        },
+      ]);
     } finally {
       await host.dispose();
       if (originalReportError) {
@@ -806,7 +860,7 @@ async function expectCommittedQueuedReplayToSettleWhenProviderDisappears(
   await host.dispose();
 }
 
-async function activateHistory(): Promise<{
+async function activateHistory(host: ReturnType<typeof createPluginHost> = createPluginHost()): Promise<{
   readonly commands: CommandService;
   readonly history: HistoryService;
   readonly host: ReturnType<typeof createPluginHost>;
@@ -823,7 +877,6 @@ async function activateHistory(): Promise<{
       kernel = context.services.kernel;
     },
   });
-  const host = createPluginHost();
   const installations = [
     host.install(kernelPlugin),
     host.install(commandPlugin),

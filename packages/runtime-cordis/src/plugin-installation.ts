@@ -1,4 +1,6 @@
 import { collectCleanupError } from './cleanup-errors';
+import { runtimeDiagnosticEvents } from './diagnostic-events';
+import type { InstallationDiagnostics } from './host-diagnostics';
 import type {
   ChildInstaller,
   DependencyCleanupReporter,
@@ -39,6 +41,7 @@ export class CordisPluginInstallation implements PluginInstallation {
   constructor(
     private readonly definition: PluginDefinition<unknown, ServiceBindings, ServiceBindings>,
     private readonly config: unknown,
+    private readonly diagnostics: InstallationDiagnostics,
     missing: readonly ServiceTokenBase[],
     private readonly getMissing: () => readonly ServiceTokenBase[],
     private readonly installChild: ChildInstaller,
@@ -47,6 +50,7 @@ export class CordisPluginInstallation implements PluginInstallation {
     private readonly onDisposed: () => void,
   ) {
     this.#snapshot = createPendingSnapshot(missing);
+    this.#emitStatusChanged('none', this.#snapshot);
   }
 
   attachFiber(fiber: RuntimeFiber): void {
@@ -92,7 +96,18 @@ export class CordisPluginInstallation implements PluginInstallation {
 
   async activate(context: RuntimeContext): Promise<OwnedResourceDisposer> {
     if (this.#failed) throw this.#terminalError;
-    const activation = new PluginActivation(this.definition, this.config, this.installChild, this.publishService);
+    const activationDiagnostics = this.diagnostics.createActivation();
+    activationDiagnostics.emit({
+      name: runtimeDiagnosticEvents.activationStarted,
+      level: 'debug',
+    });
+    const activation = new PluginActivation(
+      this.definition,
+      this.config,
+      this.installChild,
+      this.publishService,
+      activationDiagnostics,
+    );
     this.#currentActivation = activation;
     const requiredServiceNames = new Set(Object.values(this.definition.requires ?? {}).map(getServiceName));
     let disappearingServiceName: string | undefined;
@@ -119,7 +134,7 @@ export class CordisPluginInstallation implements PluginInstallation {
         (this.#disposeRequested || this.getMissing().length > 0)
       ) {
         try {
-          await activation.dispose();
+          await activation.dispose(this.#disposeRequested ? 'installation-disposed' : 'dependency-lost');
         } catch (cleanupError) {
           if (!this.#disposeRequested) {
             this.#failDependencyCleanup(activation, disappearingServiceName, cleanupError);
@@ -132,13 +147,13 @@ export class CordisPluginInstallation implements PluginInstallation {
         }
         return async () => {};
       }
-      this.#fail(error);
+      this.#fail(error, 'setup');
       throw error;
     }
 
     if (activation.controller.signal.aborted || this.#disposeRequested) {
       try {
-        await activation.dispose();
+        await activation.dispose(this.#disposeRequested ? 'installation-disposed' : 'dependency-lost');
       } catch (cleanupError) {
         if (!this.#disposeRequested) {
           this.#failDependencyCleanup(activation, disappearingServiceName, cleanupError);
@@ -168,7 +183,7 @@ export class CordisPluginInstallation implements PluginInstallation {
       })
       .catch((error: unknown) => {
         if (this.#disposeRequested || this.#failed) return;
-        this.#fail(error);
+        this.#fail(error, 'activation');
       });
 
     let deactivation: Promise<void> | undefined;
@@ -191,7 +206,9 @@ export class CordisPluginInstallation implements PluginInstallation {
           }
         }
         try {
-          await activation.dispose();
+          await activation.dispose(
+            this.#disposeRequested ? 'installation-disposed' : dependencyDriven ? 'dependency-lost' : 'setup-completed',
+          );
         } catch (error) {
           collectCleanupError(errors, error);
         }
@@ -210,7 +227,7 @@ export class CordisPluginInstallation implements PluginInstallation {
           }
           this.#cleanupErrors.push(...errors);
           if (!this.#disposeRequested) {
-            this.#fail(error);
+            this.#fail(error, 'cleanup');
           }
           throw error;
         }
@@ -236,7 +253,7 @@ export class CordisPluginInstallation implements PluginInstallation {
         .then(() => this.#fiber!.dispose())
         .then(async () => {
           try {
-            await this.#currentActivation?.dispose();
+            await this.#currentActivation?.dispose('installation-disposed');
           } catch (error) {
             collectCleanupError(this.#cleanupErrors, error);
           }
@@ -252,6 +269,15 @@ export class CordisPluginInstallation implements PluginInstallation {
           (error: unknown) => {
             this.onDisposed();
             this.#setSnapshot(Object.freeze({ status: 'disposed' }));
+            const diagnosticError = this.diagnostics.findUndiagnosedError(error);
+            if (diagnosticError.found) {
+              this.diagnostics.diagnostics.emit({
+                name: runtimeDiagnosticEvents.installationDisposeFailed,
+                level: 'error',
+                attributes: { phase: 'cleanup' },
+                error: diagnosticError.error,
+              });
+            }
             throw error;
           },
         );
@@ -259,16 +285,41 @@ export class CordisPluginInstallation implements PluginInstallation {
     return this.#disposal;
   }
 
-  #setSnapshot(snapshot: InstallationSnapshot): void {
+  #setSnapshot(snapshot: InstallationSnapshot, failurePhase?: FailurePhase): void {
     if (this.#snapshot === snapshot) return;
+    const previousStatus = this.#snapshot.status;
     this.#snapshot = snapshot;
+    this.#emitStatusChanged(previousStatus, snapshot, failurePhase);
     for (const listener of this.#listeners) {
       try {
         listener();
       } catch (error) {
-        reportSubscriberError(error);
+        this.diagnostics.diagnostics.reportFault(error, {
+          name: runtimeDiagnosticEvents.installationSubscriberFault,
+          attributes: { status: snapshot.status },
+        });
       }
     }
+  }
+
+  #emitStatusChanged(
+    from: InstallationSnapshot['status'] | 'none',
+    snapshot: InstallationSnapshot,
+    failurePhase?: FailurePhase,
+  ): void {
+    this.diagnostics.diagnostics.emit({
+      name: runtimeDiagnosticEvents.installationStatusChanged,
+      level: snapshot.status === 'failed' ? 'error' : 'debug',
+      attributes: {
+        from,
+        to: snapshot.status,
+        ...(snapshot.status === 'pending'
+          ? { missingServiceNames: snapshot.missing.map((service) => service.name).sort() }
+          : {}),
+        ...(snapshot.status === 'failed' && failurePhase ? { phase: failurePhase } : {}),
+      },
+      ...(snapshot.status === 'failed' ? { error: snapshot.error } : {}),
+    });
   }
 
   #resolveWaiters(): void {
@@ -295,7 +346,7 @@ export class CordisPluginInstallation implements PluginInstallation {
     const aggregate =
       error instanceof AggregateError ? error : new AggregateError([error], 'Plugin resource cleanup failed.');
     if (this.#currentActivation === activation) this.#currentActivation = undefined;
-    this.#fail(aggregate);
+    this.#fail(aggregate, 'cleanup');
     const missingService = this.getMissing()[0];
     const serviceName = disappearingServiceName ?? (missingService ? getServiceName(missingService) : undefined);
     // Return dependency cleanup failures to the Service withdrawal that caused
@@ -303,10 +354,10 @@ export class CordisPluginInstallation implements PluginInstallation {
     if (serviceName) this.reportDependencyCleanupError(serviceName, aggregate);
   }
 
-  #fail(error: unknown): void {
+  #fail(error: unknown, phase: FailurePhase): void {
     this.#failed = true;
     this.#terminalError = error;
-    this.#setSnapshot(Object.freeze({ status: 'failed', error }));
+    this.#setSnapshot(Object.freeze({ status: 'failed', error }), phase);
     this.#rejectWaiters(error);
   }
 
@@ -314,6 +365,8 @@ export class CordisPluginInstallation implements PluginInstallation {
     return new PluginHostError('INSTALLATION_DISPOSED', 'Plugin Installation has been disposed.');
   }
 }
+
+type FailurePhase = 'setup' | 'activation' | 'cleanup';
 
 function createPendingSnapshot(missing: readonly ServiceTokenBase[]): PendingInstallationSnapshot {
   return Object.freeze({
@@ -332,20 +385,4 @@ function getAbortReason(signal: AbortSignal): unknown {
 function isCancellationError(error: unknown, signal: AbortSignal): boolean {
   if (error === signal.reason) return true;
   return error instanceof Error && error.name === 'AbortError';
-}
-
-function reportSubscriberError(error: unknown): void {
-  // Observer code is outside the Plugin lifecycle. Report it through the host
-  // platform (or an asynchronous throw) without corrupting Installation state.
-  if (typeof globalThis.reportError === 'function') {
-    try {
-      globalThis.reportError(error);
-      return;
-    } catch (reporterError) {
-      error = new AggregateError([error, reporterError], 'Plugin subscriber error reporting failed.');
-    }
-  }
-  queueMicrotask(() => {
-    throw error;
-  });
 }

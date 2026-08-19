@@ -1,4 +1,5 @@
 export { createPluginHost } from './cordis-plugin-host';
+export { runtimeDiagnosticEvents } from './diagnostic-events';
 export { definePlugin } from './plugin-definition';
 export {
   PluginHostError,
@@ -20,6 +21,8 @@ export type {
   PluginContext,
   PluginDefinition,
   PluginHost,
+  PluginHostDiagnosticsOptions,
+  PluginHostOptions,
   PluginInstallation,
 } from './plugin-contracts';
 export {

@@ -47,7 +47,7 @@
     "format:check": "prettier --check --ignore-unknown .",
     "lint": "oxlint .",
     "test": "bun test",
-    "typecheck": "bun run --filter '@cflow/core' build && tsgo --noEmit -p tsconfig.json && tsgo --noEmit -p packages/kernel/tsconfig.json && tsgo --noEmit -p packages/runtime-cordis/tsconfig.json && tsgo --noEmit -p packages/plugin-command/tsconfig.json && tsgo --noEmit -p packages/plugin-kernel/tsconfig.json && tsgo --noEmit -p packages/plugin-session/tsconfig.json && tsgo --noEmit -p packages/plugin-history/tsconfig.json && tsgo --noEmit -p packages/layout-api/tsconfig.json && tsgo --noEmit -p packages/layout-dagre/tsconfig.json && tsgo --noEmit -p packages/layout-elk/tsconfig.json && tsgo --noEmit -p packages/plugin-layout/tsconfig.json && tsgo --noEmit -p packages/core/tsconfig.json",
+    "typecheck": "bun run --filter '@cflow/core' build && tsgo --noEmit -p tsconfig.json && tsgo --noEmit -p packages/diagnostics/tsconfig.json && tsgo --noEmit -p packages/kernel/tsconfig.json && tsgo --noEmit -p packages/runtime-cordis/tsconfig.json && tsgo --noEmit -p packages/plugin-command/tsconfig.json && tsgo --noEmit -p packages/plugin-kernel/tsconfig.json && tsgo --noEmit -p packages/plugin-session/tsconfig.json && tsgo --noEmit -p packages/plugin-history/tsconfig.json && tsgo --noEmit -p packages/layout-api/tsconfig.json && tsgo --noEmit -p packages/layout-dagre/tsconfig.json && tsgo --noEmit -p packages/layout-elk/tsconfig.json && tsgo --noEmit -p packages/plugin-layout/tsconfig.json && tsgo --noEmit -p packages/core/tsconfig.json",
     "release:version": "changeset version",
     "release": "changeset publish",
     "update-deps": "bun update --latest",

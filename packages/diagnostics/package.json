@@ -1,0 +1,48 @@
+{
+  "name": "@cflow/diagnostics",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Structured diagnostics and error contracts for CFlow.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "zwkang",
+    "email": "kang95630@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZWkang/cflow.git",
+    "directory": "packages/diagnostics"
+  },
+  "bugs": "https://github.com/ZWkang/cflow/issues",
+  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/diagnostics#readme",
+  "keywords": [
+    "cflow",
+    "diagnostics",
+    "errors"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsgo -p tsconfig.build.json --watch",
+    "build": "tsgo -p tsconfig.build.json && bun run test:artifacts",
+    "prepack": "bun run build",
+    "test": "bun test ./tests",
+    "test:artifacts": "bun run ./artifacts/check-declarations.ts",
+    "typecheck": "tsgo --noEmit -p tsconfig.json"
+  }
+}

@@ -4,7 +4,14 @@ import { CommandError } from './command-error';
 const commandIds = new WeakMap<object, string>();
 
 export function defineCommand<Input = void, Output = void>(id: string): Command<Input, Output> {
-  if (typeof id !== 'string' || id.length === 0) {
+  if (typeof id !== 'string') {
+    throw new CommandError(
+      'INVALID_COMMAND',
+      'Command ID must be a non-empty string.',
+      Object.freeze({ receivedType: id === null ? 'null' : typeof id }),
+    );
+  }
+  if (id.length === 0) {
     throw new CommandError(
       'INVALID_COMMAND',
       'Command ID must be a non-empty string.',

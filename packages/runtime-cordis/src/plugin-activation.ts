@@ -1,3 +1,6 @@
+import type { PluginDiagnostics } from '@cflow/diagnostics';
+
+import { runtimeDiagnosticEvents } from './diagnostic-events';
 import type { ChildInstaller, RuntimeContext, ServicePublisher } from './internal-contracts';
 import type { OwnedResourceDisposer, PluginDefinition, ProvidedServices } from './plugin-contracts';
 import { PluginHostError } from './plugin-host-error';
@@ -14,6 +17,7 @@ export class PluginActivation<Config, Requires extends ServiceBindings, Provides
     private readonly config: Config,
     private readonly installChild: ChildInstaller,
     private readonly publishService: ServicePublisher,
+    private readonly diagnostics: PluginDiagnostics,
   ) {}
 
   async run(context: RuntimeContext): Promise<ProvidedServices<Provides>> {
@@ -26,6 +30,7 @@ export class PluginActivation<Config, Requires extends ServiceBindings, Provides
     try {
       return await this.definition.setup(
         {
+          diagnostics: this.diagnostics,
           signal: this.controller.signal,
           services: Object.freeze(services),
           own: (dispose) => {
@@ -45,7 +50,7 @@ export class PluginActivation<Config, Requires extends ServiceBindings, Provides
       );
     } catch (error) {
       try {
-        await this.dispose();
+        await this.dispose('setup-failed');
       } catch {
         // Preserve the setup error here; Installation.dispose() exposes the
         // cached cleanup AggregateError without asking Cordis to retain it.
@@ -54,21 +59,29 @@ export class PluginActivation<Config, Requires extends ServiceBindings, Provides
     }
   }
 
-  dispose(): Promise<void> {
+  dispose(reason: ActivationEndReason = 'installation-disposed'): Promise<void> {
     if (!this.#disposal) {
       this.#ended = true;
       this.controller.abort();
       this.#disposal = (async () => {
-        const errors: unknown[] = [];
-        for (const dispose of this.resources.splice(0).reverse()) {
-          try {
-            await dispose();
-          } catch (error) {
-            errors.push(error);
+        try {
+          const errors: unknown[] = [];
+          for (const dispose of this.resources.splice(0).reverse()) {
+            try {
+              await dispose();
+            } catch (error) {
+              errors.push(error);
+            }
           }
-        }
-        if (errors.length) {
-          throw new AggregateError(errors, 'Plugin resource cleanup failed.');
+          if (errors.length) {
+            throw new AggregateError(errors, 'Plugin resource cleanup failed.');
+          }
+        } finally {
+          this.diagnostics.emit({
+            name: runtimeDiagnosticEvents.activationEnded,
+            level: 'debug',
+            attributes: { reason },
+          });
         }
       })();
     }
@@ -87,3 +100,5 @@ export class PluginActivation<Config, Requires extends ServiceBindings, Provides
     }
   }
 }
+
+export type ActivationEndReason = 'dependency-lost' | 'installation-disposed' | 'setup-failed' | 'setup-completed';

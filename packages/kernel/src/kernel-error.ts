@@ -1,3 +1,5 @@
+import { CFlowError, type DiagnosticAttributes } from '@cflow/diagnostics';
+
 export type KernelErrorCode =
   | 'INVALID_ID'
   | 'ENTITY_NOT_FOUND'
@@ -12,14 +14,15 @@ export type KernelErrorCode =
   | 'REVISION_OVERFLOW';
 
 /** Structural Kernel failures use stable codes; callback failures are deliberately left untouched. */
-export class KernelError extends Error {
+export class KernelError extends CFlowError<'kernel', KernelErrorCode> {
   override readonly name = 'KernelError';
 
   constructor(
-    readonly code: KernelErrorCode,
+    code: KernelErrorCode,
     message: string,
-    readonly details?: Readonly<Record<string, unknown>>,
+    details: DiagnosticAttributes = {},
+    options?: Readonly<{ cause?: unknown }>,
   ) {
-    super(message);
+    super('kernel', code, message, { details, cause: options?.cause });
   }
 }

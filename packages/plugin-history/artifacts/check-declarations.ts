@@ -13,6 +13,7 @@ const pluginDeclaration = await readFile(join(pluginDist, 'index.d.ts'), 'utf8')
 assert.match(pluginDeclaration, /export type \{ HistoryService, HistorySnapshot \}/);
 assert.match(pluginDeclaration, /export \{ redoCommand, undoCommand \}/);
 assert.match(pluginDeclaration, /export \{ HistoryError/);
+assert.match(pluginDeclaration, /export \{ historyDiagnosticEvents \}/);
 assert.match(pluginDeclaration, /export \{ historyPlugin, historyService \}/);
 
 for (const declaration of await collectDeclarations(pluginDist)) {

@@ -1,3 +1,5 @@
+import { describeNonFiniteNumber, type DiagnosticAttributes } from '@cflow/diagnostics';
+
 import type { CanvasEdge, CanvasNode, ChangeDirection, ChangeSet, EntityWriter, GraphChange } from './contracts';
 import { canvasEdgesEqual, canvasNodesEqual, isCanvasEdgeValue, isCanvasNodeValue, isRecord } from './entity-values';
 import type { EdgeId, NodeId } from './identifiers';
@@ -45,7 +47,16 @@ export function applyChangeSetToDraft(
 function validateChangeSet(changeSet: ChangeSet, direction: ChangeDirection): void {
   // Runtime validation is required because JavaScript callers can forge values despite TypeScript declarations.
   if (direction !== 'forward' && direction !== 'reverse') {
-    throwInvalidChangeSet('Change Set direction must be forward or reverse.', { direction });
+    if (typeof direction !== 'string') {
+      throwInvalidChangeSet('Change Set direction must be forward or reverse.', {
+        issue: 'INVALID_DIRECTION',
+        receivedType: direction === null ? 'null' : typeof direction,
+      });
+    }
+    throwInvalidChangeSet('Change Set direction must be forward or reverse.', {
+      issue: 'INVALID_DIRECTION',
+      direction,
+    });
   }
   if (!isRecord(changeSet)) {
     throwInvalidChangeSet('Change Set must be an object.', {});
@@ -57,8 +68,9 @@ function validateChangeSet(changeSet: ChangeSet, direction: ChangeDirection): vo
     changeSet.revision !== changeSet.beforeRevision + 1
   ) {
     throwInvalidChangeSet('Change Set revisions must be adjacent non-negative safe integers.', {
-      beforeRevision: changeSet.beforeRevision,
-      revision: changeSet.revision,
+      issue: 'INVALID_REVISIONS',
+      beforeRevision: describeInvalidRevision(changeSet.beforeRevision),
+      revision: describeInvalidRevision(changeSet.revision),
     });
   }
   if (!Array.isArray(changeSet.changes) || changeSet.changes.length === 0) {
@@ -112,10 +124,28 @@ function throwChangeSetConflict(
   throw new KernelError(
     'CHANGE_SET_CONFLICT',
     `Change Set source does not match ${change.entity} "${change.id}".`,
-    Object.freeze({ entity: change.entity, id: change.id, direction, expected, actual }),
+    Object.freeze({
+      entity: change.entity,
+      id: change.id,
+      direction,
+      expectedState: expected === null ? 'missing' : 'present',
+      actualState: actual === null ? 'missing' : 'present',
+    }),
   );
 }
 
-function throwInvalidChangeSet(message: string, details: Readonly<Record<string, unknown>>): never {
+function throwInvalidChangeSet(message: string, details: DiagnosticAttributes): never {
   throw new KernelError('INVALID_CHANGE_SET', message, Object.freeze({ ...details }));
+}
+
+function describeInvalidRevision(value: unknown): DiagnosticAttributes {
+  if (typeof value !== 'number') {
+    return Object.freeze({
+      receivedType: value === null ? 'null' : typeof value,
+    });
+  }
+  if (!Number.isFinite(value)) {
+    return Object.freeze({ receivedNumber: describeNonFiniteNumber(value) });
+  }
+  return Object.freeze({ value });
 }

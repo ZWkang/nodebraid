@@ -18,6 +18,7 @@ The repository is currently at an early implementation stage. The planned archit
 .
 ├── packages/
 │   ├── core/           # @cflow/core public facade
+│   ├── diagnostics/    # @cflow/diagnostics errors and Diagnostic Events
 │   ├── kernel/         # @cflow/kernel graph state and transactions
 │   ├── layout-api/     # @cflow/layout-api provider-neutral contracts
 │   ├── layout-dagre/   # @cflow/layout-dagre official Provider
@@ -53,6 +54,18 @@ dependencies, lifecycle ownership, and Child Installation composition. It does
 not install Kernel, Session, Renderer, or other Canvas capabilities implicitly.
 “Everything is Plugin” applies to those Canvas capabilities; the minimal Host
 substrate is the boundary that owns the first installation and final disposal.
+
+## Diagnostics package
+
+`@cflow/diagnostics` provides the shared `CFlowError`, stable `domain + code`
+identity, immutable Diagnostic Event contracts, safe error description, and
+package-owned event catalogs. It has no runtime or logging dependency.
+
+Each Plugin Host can receive its own synchronous Diagnostic Sink and Fault
+Reporter. Host, Installation, Activation, and Plugin scope plus a monotonic
+sequence make events directly searchable without parsing messages. Console,
+files, Sentry, OpenTelemetry, filtering, batching, and persistence remain
+application-owned adapters.
 
 ## Kernel package
 
@@ -167,6 +180,12 @@ bun run test
 Workspace package typechecks first build the dependency declarations required
 for package-name resolution, so the same commands work from a clean checkout
 without pre-existing `dist` directories.
+
+Build and verify only the standalone Diagnostics package:
+
+```bash
+bun run --filter '@cflow/diagnostics' build
+```
 
 Build only the declarations required by `@cflow/plugin-kernel`:
 

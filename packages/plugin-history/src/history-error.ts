@@ -1,14 +1,17 @@
+import { CFlowError, type DiagnosticAttributes } from '@cflow/diagnostics';
+
 export type HistoryErrorCode =
   'UNDO_EMPTY' | 'REDO_EMPTY' | 'HISTORY_BUSY' | 'HISTORY_NOT_CAUGHT_UP' | 'SERVICE_DISPOSED';
 
-export class HistoryError extends Error {
+export class HistoryError extends CFlowError<'plugin.history', HistoryErrorCode> {
   override readonly name = 'HistoryError';
 
   constructor(
-    readonly code: HistoryErrorCode,
+    code: HistoryErrorCode,
     message: string,
-    readonly details?: Readonly<Record<string, unknown>>,
+    details: DiagnosticAttributes = {},
+    options?: Readonly<{ cause?: unknown }>,
   ) {
-    super(message);
+    super('plugin.history', code, message, { details, cause: options?.cause });
   }
 }

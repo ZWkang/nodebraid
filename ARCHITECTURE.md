@@ -259,6 +259,21 @@ const historyConsumer = definePlugin({
 - Collaboration、Comments 和 Presence。
 - BPMN、DAG、AI Workflow 等领域能力。
 
+## 诊断与错误
+
+CFlow 将调用失败、无法返回给调用者的 Fault 和普通 Diagnostic Event 分成三条语义不同的路径。成功记录事件不等于处理失败，Diagnostic Sink 不参与 Transaction、Command 或 Plugin 生命周期的控制流。
+
+```text
+Structural Failure ──throw/reject──────────────▶ Caller
+Contained Fault ────Diagnostic Event──────────▶ Diagnostic Sink
+        └───────────Fault Report──────────────▶ Fault Reporter
+Lifecycle Event ────Diagnostic Event──────────▶ Diagnostic Sink
+```
+
+零依赖的 `@cflow/diagnostics` 定义 CFlowError、稳定的 `domain + code` 错误身份、不可变诊断值、事件 envelope 与安全错误描述。Kernel、Layout API 和算法 Provider 只产生结构性错误，不主动记录；Plugin Host 与 Runtime Plugin 在拥有状态转换、监听者隔离或清理聚合的语义 seam 记录一次。每个 Host 独立注入同步 Sink 和 Fault Reporter，并为事件补齐 Host、Installation、Activation、Plugin、单调序号和时间上下文。
+
+内置事件名和错误身份必须是低基数、可精确搜索的稳定协议。事件属性和 CFlow 错误详情不得包含 Plugin 配置、Command 输入输出、Node/Edge 领域数据、Runtime Service 值或其他任意对象。具体 console、文件、Sentry、OpenTelemetry、过滤、批量、重试和持久化由宿主 Adapter 决定。
+
 ## RxJS 内部数据流
 
 RxJS 用于传播已经提交的变化以及组合异步任务。它不保存 Document 的权威状态，也不作为 Vue/React 用户必须理解的公开 API。
@@ -439,6 +454,7 @@ Interaction Plugin
 
 ```text
 packages/
+├── diagnostics/
 ├── kernel/
 │   ├── document.ts
 │   ├── transaction.ts
@@ -467,6 +483,8 @@ packages/
 Framework Adapter ─┐
 Renderer Provider ─┼──▶ Runtime ──▶ Kernel
 Feature Plugins ───┘
+                         │          │
+                         └──────────┴──▶ Diagnostics
 ```
 
 Kernel 不反向依赖 Runtime、Renderer 或 Framework Adapter。

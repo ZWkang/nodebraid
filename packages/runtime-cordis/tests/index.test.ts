@@ -407,7 +407,8 @@ describe('@cflow/runtime-cordis', () => {
     expect(pendingConflict).toMatchObject({
       code: 'PROVIDER_CONFLICT',
       details: {
-        token: catalog,
+        type: 'provider-conflict',
+        serviceName: 'catalog',
         existingProvider: 'first-provider',
         conflictingProvider: 'replacement-provider',
       },
@@ -415,7 +416,7 @@ describe('@cflow/runtime-cordis', () => {
     const pendingDetails = pendingConflict?.details;
     expect(pendingDetails?.type).toBe('provider-conflict');
     if (pendingDetails?.type !== 'provider-conflict') throw new Error('Expected provider conflict details.');
-    expect(pendingDetails.token).toBe(catalog);
+    expect(pendingDetails.serviceName).toBe('catalog');
 
     await firstInstallation.whenActive();
     expect(() => host.install(replacementProvider)).toThrow(expect.objectContaining({ code: 'PROVIDER_CONFLICT' }));
@@ -740,7 +741,7 @@ describe('@cflow/runtime-cordis', () => {
     expect(firstStartedBeforeSecondFinished).toBe(false);
     expect(cleanupOrder).toEqual(['second-start', 'second-finish', 'first']);
     expect(providerDisposalError).toBeInstanceOf(AggregateError);
-    expect((providerDisposalError as AggregateError).errors).toEqual([secondCleanupError]);
+    expect(collectAggregateLeaves(providerDisposalError)).toEqual([secondCleanupError]);
     expect(hostDisposalResult).toBeUndefined();
   });
 
@@ -991,12 +992,12 @@ describe('@cflow/runtime-cordis', () => {
     const providerDisposalError = await providerInstallation.dispose().catch((error: unknown) => error);
 
     expect(providerDisposalError).toBeInstanceOf(AggregateError);
-    expect((providerDisposalError as AggregateError).errors).toEqual([cleanupError]);
+    expect(collectAggregateLeaves(providerDisposalError)).toEqual([cleanupError]);
     const failedSnapshot = consumerInstallation.getSnapshot();
     expect(failedSnapshot.status).toBe('failed');
     if (failedSnapshot.status !== 'failed') throw new Error('Expected failed Consumer Installation.');
     expect(failedSnapshot.error).toBeInstanceOf(AggregateError);
-    expect((failedSnapshot.error as AggregateError).errors).toEqual([cleanupError]);
+    expect(collectAggregateLeaves(failedSnapshot.error)).toEqual([cleanupError]);
     expect(await existingWaiter).toBe(failedSnapshot.error);
     await expect(consumerInstallation.whenActive()).rejects.toBe(failedSnapshot.error);
     await expect(consumerInstallation.dispose()).resolves.toBeUndefined();
@@ -1034,12 +1035,12 @@ describe('@cflow/runtime-cordis', () => {
     const providerDisposalError = await providerInstallation.dispose().catch((error: unknown) => error);
 
     expect(providerDisposalError).toBeInstanceOf(AggregateError);
-    expect((providerDisposalError as AggregateError).errors).toEqual([cleanupError]);
+    expect(collectAggregateLeaves(providerDisposalError)).toEqual([cleanupError]);
     const failedSnapshot = consumerInstallation.getSnapshot();
     expect(failedSnapshot.status).toBe('failed');
     if (failedSnapshot.status !== 'failed') throw new Error('Expected failed Consumer Installation.');
     expect(failedSnapshot.error).toBeInstanceOf(AggregateError);
-    expect((failedSnapshot.error as AggregateError).errors).toEqual([cleanupError]);
+    expect(collectAggregateLeaves(failedSnapshot.error)).toEqual([cleanupError]);
     expect(await pendingWaiter).toBe(failedSnapshot.error);
     await expect(consumerInstallation.whenActive()).rejects.toBe(failedSnapshot.error);
     await expect(consumerInstallation.dispose()).resolves.toBeUndefined();
@@ -1199,16 +1200,16 @@ describe('@cflow/runtime-cordis', () => {
         'Plugin dependency cycle: "first-plugin" --[second-service]--> "cyclic-plugin" --[first-service]--> "first-plugin".',
       details: {
         path: [
-          { plugin: 'first-plugin', provider: 'cyclic-plugin' },
-          { plugin: 'cyclic-plugin', provider: 'first-plugin' },
+          { plugin: 'first-plugin', serviceName: 'second-service', provider: 'cyclic-plugin' },
+          { plugin: 'cyclic-plugin', serviceName: 'first-service', provider: 'first-plugin' },
         ],
       },
     });
     const cycleDetails = cycleError?.details;
     expect(cycleDetails?.type).toBe('dependency-cycle');
     if (cycleDetails?.type !== 'dependency-cycle') throw new Error('Expected dependency cycle details.');
-    expect(cycleDetails.path[0]?.service).toBe(secondService);
-    expect(cycleDetails.path[1]?.service).toBe(firstService);
+    expect(cycleDetails.path[0]?.serviceName).toBe('second-service');
+    expect(cycleDetails.path[1]?.serviceName).toBe('first-service');
     expect(firstInstallation.getSnapshot()).toEqual({
       status: 'pending',
       missing: [secondService],
@@ -2187,7 +2188,7 @@ describe('@cflow/runtime-cordis', () => {
 
     expect(secondDisposal).toBe(firstDisposal);
     expect(disposalError).toBeInstanceOf(AggregateError);
-    expect((disposalError as AggregateError).errors).toEqual([secondError, firstError]);
+    expect(collectAggregateLeaves(disposalError)).toEqual([secondError, firstError]);
     expect(cleanupAttempts).toEqual(['second', 'middle', 'first']);
     expect(installation.getSnapshot()).toEqual({ status: 'disposed' });
     expect(installation.dispose()).toBe(firstDisposal);
@@ -2213,9 +2214,42 @@ describe('@cflow/runtime-cordis', () => {
     const disposalError = await host.dispose().catch((error: unknown) => error);
 
     expect(disposalError).toBeInstanceOf(AggregateError);
-    expect((disposalError as AggregateError).errors).toEqual([firstError, secondError]);
+    expect(collectAggregateLeaves(disposalError)).toEqual([firstError, secondError]);
     expect(firstInstallation.getSnapshot()).toEqual({ status: 'disposed' });
     expect(secondInstallation.getSnapshot()).toEqual({ status: 'disposed' });
+  });
+
+  test('preserves cleanup aggregation stages through Host disposal', async () => {
+    const leafError = new Error('disposer failed');
+    const plugin = definePlugin({
+      setup(context) {
+        context.own(() => {
+          throw leafError;
+        });
+      },
+    });
+    const host = createPluginHost();
+    const installation = host.install(plugin);
+    await installation.whenActive();
+
+    const hostError = await host.dispose().catch((error: unknown) => error);
+
+    expect(hostError).toBeInstanceOf(AggregateError);
+    const installationError = (hostError as AggregateError).errors[0];
+    expect(installationError).toBeInstanceOf(AggregateError);
+    const activationError = (installationError as AggregateError).errors[0];
+    expect(activationError).toBeInstanceOf(AggregateError);
+    expect({
+      hostMessage: (hostError as AggregateError).message,
+      installationMessage: (installationError as AggregateError).message,
+      activationMessage: (activationError as AggregateError).message,
+      leaf: (activationError as AggregateError).errors[0],
+    }).toEqual({
+      hostMessage: 'Plugin Host cleanup failed.',
+      installationMessage: 'Plugin resource cleanup failed.',
+      activationMessage: 'Plugin resource cleanup failed.',
+      leaf: leafError,
+    });
   });
 
   test('reports an owned Child cleanup failure once during terminal Host disposal', async () => {
@@ -2244,9 +2278,14 @@ describe('@cflow/runtime-cordis', () => {
 
     expect(secondDisposal).toBe(firstDisposal);
     expect(disposalError).toBeInstanceOf(AggregateError);
-    expect((disposalError as AggregateError).errors).toEqual([childError]);
+    expect(collectAggregateLeaves(disposalError)).toEqual([childError]);
     expect(parentInstallation.getSnapshot()).toEqual({ status: 'disposed' });
     expect(childInstallation?.getSnapshot()).toEqual({ status: 'disposed' });
     expect(() => host.install(child)).toThrow(expect.objectContaining({ code: 'HOST_DISPOSED' }));
   });
 });
+
+function collectAggregateLeaves(error: unknown): unknown[] {
+  if (!(error instanceof AggregateError)) return [error];
+  return error.errors.flatMap(collectAggregateLeaves);
+}

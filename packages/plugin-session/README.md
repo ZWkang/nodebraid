@@ -34,13 +34,16 @@ and Viewport replacement. Equivalent inputs preserve Snapshot identity and do
 not notify. Reentrant changes are delivered through a breadth-first FIFO queue
 so every subscriber observes one consistent Snapshot per notification round.
 
-Session subscriber failures are isolated and reported through the platform
-error channel. Disposing the Activation closes old Service handles; restoring
-the Kernel dependency creates a new default Session.
+Session subscriber failures are isolated and reported through the current
+Host-scoped Fault Reporter with the stable
+`cflow.plugin.session.subscriber.fault` event. Disposing the Activation closes
+old Service handles; restoring the Kernel dependency creates a new default
+Session.
 
-The package depends on `@cflow/kernel`, `@cflow/plugin-kernel`, and the
-CFlow-owned Plugin Host seam from `@cflow/runtime-cordis`. It does not depend on
-Command, History, Renderer, or `@cflow/core`.
+The package depends on `@cflow/diagnostics`, `@cflow/kernel`,
+`@cflow/plugin-kernel`, and the CFlow-owned Plugin Host seam from
+`@cflow/runtime-cordis`. It does not depend on Command, History, Renderer, or
+`@cflow/core`.
 
 ## Development
 

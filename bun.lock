@@ -21,6 +21,7 @@
       "name": "@cflow/core",
       "version": "0.0.1",
       "dependencies": {
+        "@cflow/diagnostics": "workspace:*",
         "@cflow/kernel": "workspace:*",
         "@cflow/layout-api": "workspace:*",
         "@cflow/plugin-command": "workspace:*",
@@ -31,14 +32,22 @@
         "@cflow/runtime-cordis": "workspace:*",
       },
     },
+    "packages/diagnostics": {
+      "name": "@cflow/diagnostics",
+      "version": "0.0.1",
+    },
     "packages/kernel": {
       "name": "@cflow/kernel",
       "version": "0.0.1",
+      "dependencies": {
+        "@cflow/diagnostics": "workspace:*",
+      },
     },
     "packages/layout-api": {
       "name": "@cflow/layout-api",
       "version": "0.0.1",
       "dependencies": {
+        "@cflow/diagnostics": "workspace:*",
         "@cflow/kernel": "workspace:*",
       },
     },
@@ -62,6 +71,7 @@
       "name": "@cflow/plugin-command",
       "version": "0.0.1",
       "dependencies": {
+        "@cflow/diagnostics": "workspace:*",
         "@cflow/runtime-cordis": "workspace:*",
       },
     },
@@ -69,6 +79,7 @@
       "name": "@cflow/plugin-history",
       "version": "0.0.1",
       "dependencies": {
+        "@cflow/diagnostics": "workspace:*",
         "@cflow/kernel": "workspace:*",
         "@cflow/plugin-command": "workspace:*",
         "@cflow/plugin-kernel": "workspace:*",
@@ -79,6 +90,7 @@
       "name": "@cflow/plugin-kernel",
       "version": "0.0.1",
       "dependencies": {
+        "@cflow/diagnostics": "workspace:*",
         "@cflow/kernel": "workspace:*",
         "@cflow/runtime-cordis": "workspace:*",
       },
@@ -97,6 +109,7 @@
       "name": "@cflow/plugin-session",
       "version": "0.0.1",
       "dependencies": {
+        "@cflow/diagnostics": "workspace:*",
         "@cflow/kernel": "workspace:*",
         "@cflow/plugin-kernel": "workspace:*",
         "@cflow/runtime-cordis": "workspace:*",
@@ -106,6 +119,7 @@
       "name": "@cflow/runtime-cordis",
       "version": "0.0.1",
       "dependencies": {
+        "@cflow/diagnostics": "workspace:*",
         "cordis": "4.0.0-rc.8",
       },
     },
@@ -121,6 +135,8 @@
     "@babel/runtime": ["@babel/runtime@7.29.7", "", {}, "sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw=="],
 
     "@cflow/core": ["@cflow/core@workspace:packages/core"],
+
+    "@cflow/diagnostics": ["@cflow/diagnostics@workspace:packages/diagnostics"],
 
     "@cflow/kernel": ["@cflow/kernel@workspace:packages/kernel"],
 

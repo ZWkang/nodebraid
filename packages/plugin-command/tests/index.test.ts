@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 
+import { CFlowError } from '@cflow/diagnostics';
 import { createPluginHost, definePlugin, type PluginInstallation } from '@cflow/runtime-cordis';
 
 import { CommandError, commandPlugin, commandService, defineCommand, type Command, type CommandService } from '../src';
@@ -10,9 +11,24 @@ describe('@cflow/plugin-command', () => {
     try {
       defineCommand('');
     } catch (error) {
-      expect((error as CommandError).code).toBe('INVALID_COMMAND');
-      expect((error as CommandError).details).toEqual({ commandId: '' });
+      expect(error).toBeInstanceOf(CFlowError);
+      expect(error).toMatchObject({
+        domain: 'plugin.command',
+        code: 'INVALID_COMMAND',
+        details: { commandId: '' },
+      });
     }
+  });
+
+  test('classifies a non-string JavaScript Command ID without copying it', () => {
+    expect(() => defineCommand({ secret: 'domain-data' } as never)).toThrow(
+      expect.objectContaining({
+        name: 'CommandError',
+        domain: 'plugin.command',
+        code: 'INVALID_COMMAND',
+        details: { receivedType: 'object' },
+      }),
+    );
   });
 
   test('registers and executes one typed Command in an Activation', async () => {

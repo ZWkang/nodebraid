@@ -5,6 +5,8 @@ Public CFlow facade for the Kernel, provider-neutral Layout API, Runtime Plugins
 ```ts
 import {
   commandPlugin,
+  diagnosticEvents,
+  describeError,
   createCanvasKernel,
   createPluginHost,
   defineCommand,
@@ -21,7 +23,8 @@ import {
 } from '@cflow/core';
 ```
 
-The facade re-exports the pure graph interface from `@cflow/kernel` and the
+The facade re-exports structured errors and Diagnostic Event contracts from
+`@cflow/diagnostics`, the pure graph interface from `@cflow/kernel`, and the
 CFlow-owned Plugin Host interface from `@cflow/runtime-cordis`. It also
 re-exports the official Kernel, Command, Session, and History Runtime Plugins
 from their corresponding `@cflow/plugin-*` packages. It also re-exports the

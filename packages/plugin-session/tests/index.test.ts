@@ -1,12 +1,26 @@
 import { describe, expect, test } from 'bun:test';
 
+import { CFlowError, type DiagnosticEvent, type DiagnosticFault } from '@cflow/diagnostics';
 import { edgeId, nodeId } from '@cflow/kernel';
 import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
 import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
 
-import { SessionError, sessionPlugin, sessionService, type SelectionInput, type SessionService } from '../src';
+import {
+  SessionError,
+  sessionDiagnosticEvents,
+  sessionPlugin,
+  sessionService,
+  type SelectionInput,
+  type SessionService,
+} from '../src';
 
 describe('@cflow/plugin-session', () => {
+  test('publishes the stable Session diagnostic event catalog', () => {
+    expect(sessionDiagnosticEvents).toEqual({
+      subscriberFault: 'cflow.plugin.session.subscriber.fault',
+    });
+  });
+
   test('provides a fresh default Session for an Activation', async () => {
     let service: SessionService | undefined;
     const consumer = definePlugin({
@@ -92,10 +106,14 @@ describe('@cflow/plugin-session', () => {
       throw new Error('Expected missing Selection entities to fail.');
     } catch (error) {
       expect(error).toBeInstanceOf(SessionError);
-      expect((error as SessionError).code).toBe('SELECTION_ENTITY_NOT_FOUND');
-      expect((error as SessionError).details).toEqual({
-        missingNodeIds: [nodeId('missing-a'), nodeId('missing-b')],
-        missingEdgeIds: [edgeId('missing-edge')],
+      expect(error).toBeInstanceOf(CFlowError);
+      expect(error).toMatchObject({
+        domain: 'plugin.session',
+        code: 'SELECTION_ENTITY_NOT_FOUND',
+        details: {
+          missingNodeIds: [nodeId('missing-a'), nodeId('missing-b')],
+          missingEdgeIds: [edgeId('missing-edge')],
+        },
       });
     }
     expect(session.getSnapshot()).toBe(before);
@@ -132,9 +150,9 @@ describe('@cflow/plugin-session', () => {
       expect((error as SessionError).code).toBe('INVALID_VIEWPORT');
       expect((error as SessionError).details).toEqual({
         issues: [
-          { field: 'x', value: Number.POSITIVE_INFINITY },
-          { field: 'y', value: Number.NaN },
-          { field: 'zoom', value: 0 },
+          { field: 'x', code: 'EXPECTED_FINITE_NUMBER', receivedNumber: 'positive-infinity' },
+          { field: 'y', code: 'EXPECTED_FINITE_NUMBER', receivedNumber: 'nan' },
+          { field: 'zoom', code: 'EXPECTED_POSITIVE_NUMBER', value: 0 },
         ],
       });
     }
@@ -251,13 +269,22 @@ describe('@cflow/plugin-session', () => {
 
   test('reports subscriber errors without corrupting Session or blocking later subscribers', async () => {
     const listenerError = new Error('Session subscriber failed');
-    const reportedErrors: unknown[] = [];
+    const events: DiagnosticEvent[] = [];
+    const faults: DiagnosticFault[] = [];
+    const platformErrors: unknown[] = [];
     const originalReportError = Object.getOwnPropertyDescriptor(globalThis, 'reportError');
     Object.defineProperty(globalThis, 'reportError', {
       configurable: true,
-      value: (error: unknown) => reportedErrors.push(error),
+      value: (error: unknown) => platformErrors.push(error),
     });
-    const { host, session } = await activateSessionServices();
+    const diagnosticsHost = createPluginHost({
+      diagnostics: {
+        hostId: 'session-host',
+        sink: (event) => events.push(event),
+        faultReporter: (fault) => faults.push(fault),
+      },
+    });
+    const { host, session } = await activateSessionServices(diagnosticsHost);
 
     try {
       const laterValues: number[] = [];
@@ -272,7 +299,19 @@ describe('@cflow/plugin-session', () => {
 
       expect(session.getSnapshot().viewport.x).toBe(1);
       expect(laterValues).toEqual([1]);
-      expect(reportedErrors).toEqual([listenerError]);
+      expect(platformErrors).toEqual([]);
+      expect(faults.map((fault) => fault.error)).toEqual([listenerError]);
+      expect(events.find((event) => event.name === 'cflow.plugin.session.subscriber.fault')).toMatchObject({
+        level: 'error',
+        scope: {
+          hostId: 'session-host',
+          installationId: 'session-host.installation.2',
+          activationId: expect.any(String),
+          pluginName: '@cflow/plugin-session',
+        },
+        attributes: {},
+        error: listenerError,
+      });
     } finally {
       await host.dispose();
       if (originalReportError) {
@@ -420,7 +459,17 @@ describe('@cflow/plugin-session', () => {
     const { host, session } = await activateSessionServices();
     const before = session.getSnapshot();
 
-    expectSessionError(() => session.subscribe(null as unknown as () => void), 'INVALID_SUBSCRIBER');
+    let subscriberError: unknown;
+    try {
+      session.subscribe(new Date() as unknown as () => void);
+    } catch (error) {
+      subscriberError = error;
+    }
+    expect(subscriberError).toBeInstanceOf(SessionError);
+    expect(subscriberError).toMatchObject({
+      code: 'INVALID_SUBSCRIBER',
+      details: { receivedType: 'object' },
+    });
     session.setViewport({ x: 1, y: 0, zoom: 1 });
     expect(session.getSnapshot()).not.toBe(before);
 
@@ -440,8 +489,8 @@ describe('@cflow/plugin-session', () => {
       expect((error as SessionError).code).toBe('INVALID_SELECTION');
       expect((error as SessionError).details).toEqual({
         issues: [
-          { field: 'nodeIds', code: 'EXPECTED_ARRAY', value: null },
-          { field: 'edgeIds', code: 'INVALID_ID', index: 0, value: 42 },
+          { field: 'nodeIds', code: 'EXPECTED_ARRAY', receivedType: 'null' },
+          { field: 'edgeIds', code: 'INVALID_ID', index: 0, receivedType: 'number' },
         ],
       });
       expect(Object.isFrozen((error as SessionError).details)).toBeTrue();
@@ -465,7 +514,7 @@ describe('@cflow/plugin-session', () => {
       expect(error).toBeInstanceOf(SessionError);
       expect((error as SessionError).code).toBe('INVALID_SELECTION');
       expect((error as SessionError).details).toEqual({
-        issues: [{ field: 'nodeIds', code: 'INVALID_ID', index: 0, value: undefined }],
+        issues: [{ field: 'nodeIds', code: 'INVALID_ID', index: 0, receivedType: 'undefined' }],
       });
     }
     expect(session.getSnapshot()).toBe(before);
@@ -483,7 +532,9 @@ describe('@cflow/plugin-session', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(SessionError);
       expect((error as SessionError).code).toBe('INVALID_VIEWPORT');
-      expect((error as SessionError).details).toEqual({ issues: [{ field: 'viewport', value: null }] });
+      expect((error as SessionError).details).toEqual({
+        issues: [{ field: 'viewport', code: 'EXPECTED_OBJECT', receivedType: 'null' }],
+      });
     }
     expect(session.getSnapshot()).toBe(before);
 
@@ -501,7 +552,7 @@ function expectSessionError(callback: () => unknown, code: SessionError['code'])
   }
 }
 
-async function activateSessionServices(): Promise<{
+async function activateSessionServices(host: ReturnType<typeof createPluginHost> = createPluginHost()): Promise<{
   readonly host: ReturnType<typeof createPluginHost>;
   readonly kernel: KernelService;
   readonly session: SessionService;
@@ -515,7 +566,6 @@ async function activateSessionServices(): Promise<{
       session = context.services.session;
     },
   });
-  const host = createPluginHost();
   const kernelInstallation = host.install(kernelPlugin);
   const sessionInstallation = host.install(sessionPlugin);
   const consumerInstallation = host.install(consumer);

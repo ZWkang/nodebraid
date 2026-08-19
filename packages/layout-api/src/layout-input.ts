@@ -4,6 +4,16 @@ import type { LayoutInput, LayoutInputOptions } from './contracts';
 import { LayoutError } from './layout-error';
 
 export function createLayoutInput(view: CanvasView, options: LayoutInputOptions): LayoutInput {
+  if (typeof options.mode !== 'string') {
+    throw new LayoutError(
+      'INVALID_REQUEST',
+      'Layout mode must be full or incremental.',
+      Object.freeze({
+        issue: 'INVALID_MODE',
+        receivedType: options.mode === null ? 'null' : typeof options.mode,
+      }),
+    );
+  }
   if (options.mode !== 'full' && options.mode !== 'incremental') {
     throw new LayoutError(
       'INVALID_REQUEST',

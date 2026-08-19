@@ -1,3 +1,5 @@
+import { describeNonFiniteNumber, type DiagnosticAttributes } from '@cflow/diagnostics';
+
 import type { LayoutInput, LayoutPosition, LayoutProposal } from './contracts';
 import { LayoutError } from './layout-error';
 import { freezeLayoutProposal } from './owned-values';
@@ -30,7 +32,7 @@ export function validateLayoutProposal(input: LayoutInput, proposal: LayoutPropo
         throwInvalidProposal('INVALID_POSITION', `Layout Proposal contains an invalid ${coordinate} coordinate.`, {
           nodeId: result.id,
           coordinate,
-          value,
+          receivedNumber: describeNonFiniteNumber(value),
         });
       }
     }
@@ -56,7 +58,7 @@ export function validateLayoutProposal(input: LayoutInput, proposal: LayoutPropo
   return freezeLayoutProposal(sortedProposal);
 }
 
-function throwInvalidProposal(issue: string, message: string, details: Readonly<Record<string, unknown>>): never {
+function throwInvalidProposal(issue: string, message: string, details: DiagnosticAttributes): never {
   throw new LayoutError('INVALID_PROPOSAL', message, Object.freeze({ issue, ...details }));
 }
 

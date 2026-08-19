@@ -1,3 +1,5 @@
+import type { DiagnosticSink, FaultReporter, PluginDiagnostics } from '@cflow/diagnostics';
+
 import type { BoundServices, ServiceBindings, ServiceTokenBase } from './service-token';
 
 export type Awaitable<T> = T | PromiseLike<T>;
@@ -5,6 +7,7 @@ export type Awaitable<T> = T | PromiseLike<T>;
 export type OwnedResourceDisposer = () => Awaitable<void>;
 
 export interface PluginContext<Requires extends ServiceBindings = {}> {
+  readonly diagnostics: PluginDiagnostics;
   readonly signal: AbortSignal;
   readonly services: BoundServices<Requires>;
   own(dispose: OwnedResourceDisposer): void;
@@ -69,6 +72,16 @@ export interface PluginInstallation {
 }
 
 export type InstallArguments<Config> = undefined extends Config ? [config?: Config] : [config: Config];
+
+export interface PluginHostDiagnosticsOptions {
+  readonly hostId?: string;
+  readonly sink?: DiagnosticSink;
+  readonly faultReporter?: FaultReporter;
+}
+
+export interface PluginHostOptions {
+  readonly diagnostics?: PluginHostDiagnosticsOptions;
+}
 
 export interface PluginHost {
   install<Config, Requires extends ServiceBindings, Provides extends ServiceBindings>(

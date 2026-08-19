@@ -1,11 +1,24 @@
 import { describe, expect, test } from 'bun:test';
 
+import { CFlowError, type DiagnosticEvent, type DiagnosticFault } from '@cflow/diagnostics';
 import { edgeId, nodeId, type CanvasCommit } from '@cflow/kernel';
 import { createPluginHost, definePlugin, type PluginHost } from '@cflow/runtime-cordis';
 
-import { KernelPluginError, kernelPlugin, kernelService, type KernelService } from '../src';
+import {
+  KernelPluginError,
+  kernelPlugin,
+  kernelPluginDiagnosticEvents,
+  kernelService,
+  type KernelService,
+} from '../src';
 
 describe('@cflow/plugin-kernel', () => {
+  test('publishes the stable Kernel Plugin diagnostic event catalog', () => {
+    expect(kernelPluginDiagnosticEvents).toEqual({
+      observerFault: 'cflow.plugin.kernel.observer.fault',
+    });
+  });
+
   test('provides one revision-zero Kernel Service for an Activation', async () => {
     const { host, service } = await activateKernelService();
 
@@ -74,13 +87,15 @@ describe('@cflow/plugin-kernel', () => {
 
   test('reports Observer errors without rolling back or blocking later Observers', async () => {
     const observerError = new Error('Observer failed');
-    const reportedErrors: unknown[] = [];
-    const originalReportError = Object.getOwnPropertyDescriptor(globalThis, 'reportError');
-    Object.defineProperty(globalThis, 'reportError', {
-      configurable: true,
-      value: (error: unknown) => reportedErrors.push(error),
+    const events: DiagnosticEvent[] = [];
+    const faults: DiagnosticFault[] = [];
+    const host = createPluginHost({
+      diagnostics: {
+        hostId: 'kernel-host',
+        sink: (event) => events.push(event),
+        faultReporter: (fault) => faults.push(fault),
+      },
     });
-    const host = createPluginHost();
 
     try {
       const { service } = await activateKernelService(host);
@@ -102,14 +117,20 @@ describe('@cflow/plugin-kernel', () => {
       expect(commit?.changeSet.revision).toBe(1);
       expect(service.read().snapshot.revision).toBe(1);
       expect(laterRevisions).toEqual([1]);
-      expect(reportedErrors).toEqual([observerError]);
+      expect(faults.map((fault) => fault.error)).toEqual([observerError]);
+      expect(events.find((event) => event.name === 'cflow.plugin.kernel.observer.fault')).toMatchObject({
+        level: 'error',
+        scope: {
+          hostId: 'kernel-host',
+          installationId: 'kernel-host.installation.1',
+          activationId: 'kernel-host.activation.1',
+          pluginName: '@cflow/plugin-kernel',
+        },
+        attributes: { revision: 1 },
+        error: observerError,
+      });
     } finally {
       await host.dispose();
-      if (originalReportError) {
-        Object.defineProperty(globalThis, 'reportError', originalReportError);
-      } else {
-        Reflect.deleteProperty(globalThis, 'reportError');
-      }
     }
   });
 
@@ -241,7 +262,12 @@ describe('@cflow/plugin-kernel', () => {
     try {
       firstService.read();
     } catch (error) {
-      expect((error as KernelPluginError).code).toBe('SERVICE_DISPOSED');
+      expect(error).toBeInstanceOf(CFlowError);
+      expect(error).toMatchObject({
+        domain: 'plugin.kernel',
+        code: 'SERVICE_DISPOSED',
+        details: {},
+      });
     }
     expect(() => firstService.transact(() => {})).toThrow(KernelPluginError);
     expect(() => firstService.observeCommits(() => {})).toThrow(KernelPluginError);

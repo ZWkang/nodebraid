@@ -1,6 +1,8 @@
 import { Context } from 'cordis';
 
 import { collectCleanupError } from './cleanup-errors';
+import { runtimeDiagnosticEvents } from './diagnostic-events';
+import { HostDiagnostics } from './host-diagnostics';
 import type { DependencyCleanupReporter, RuntimeContext, ServicePublisher } from './internal-contracts';
 import { getInternalPlugin, type InternalPlugin } from './plugin-definition';
 import { PluginGraph } from './plugin-graph';
@@ -11,6 +13,7 @@ import type {
   Plugin,
   PluginDefinition,
   PluginHost,
+  PluginHostOptions,
   PluginInstallation,
 } from './plugin-contracts';
 import { PluginHostError } from './plugin-host-error';
@@ -25,6 +28,7 @@ const cordisPlugins = new WeakMap<object, CordisPluginCallback>();
 
 class CordisPluginHost implements PluginHost {
   readonly #context = new Context();
+  readonly #diagnostics: HostDiagnostics;
   readonly #dependencyCleanupErrors = new Map<string, unknown[]>();
   // Register values on the Host context so a Provider Fiber owns one composite
   // deactivation. That composite can withdraw Services strictly in reverse
@@ -60,6 +64,14 @@ class CordisPluginHost implements PluginHost {
   #closed = false;
   #disposal?: Promise<void>;
 
+  constructor(options: PluginHostOptions = {}) {
+    this.#diagnostics = new HostDiagnostics(options.diagnostics);
+    this.#diagnostics.emit({
+      name: runtimeDiagnosticEvents.hostCreated,
+      level: 'info',
+    });
+  }
+
   install<Config, Requires extends ServiceBindings, Provides extends ServiceBindings>(
     plugin: Plugin<Config, Requires, Provides>,
     ...args: InstallArguments<Config>
@@ -92,6 +104,7 @@ class CordisPluginHost implements PluginHost {
       installation = new CordisPluginInstallation(
         definition,
         args[0],
+        this.#diagnostics.createInstallation(plugin.name),
         getMissing(),
         getMissing,
         (childPlugin, ...childArgs) => this.#install(childPlugin, childArgs, false),
@@ -115,6 +128,10 @@ class CordisPluginHost implements PluginHost {
   dispose(): Promise<void> {
     if (!this.#disposal) {
       this.#closed = true;
+      this.#diagnostics.emit({
+        name: runtimeDiagnosticEvents.hostDisposing,
+        level: 'debug',
+      });
       this.#disposal = (async () => {
         const results = await Promise.allSettled(
           [...this.#rootInstallations].map((installation) => installation.dispose()),
@@ -127,14 +144,18 @@ class CordisPluginHost implements PluginHost {
         if (errors.length) {
           throw new AggregateError(errors, 'Plugin Host cleanup failed.');
         }
+        this.#diagnostics.emit({
+          name: runtimeDiagnosticEvents.hostDisposed,
+          level: 'info',
+        });
       })();
     }
     return this.#disposal;
   }
 }
 
-export function createPluginHost(): PluginHost {
-  return new CordisPluginHost();
+export function createPluginHost(options?: PluginHostOptions): PluginHost {
+  return new CordisPluginHost(options);
 }
 
 function getCordisPlugin<Config, Requires extends ServiceBindings, Provides extends ServiceBindings>(

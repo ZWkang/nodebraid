@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 
 import {
+  CFlowError,
+  KernelError,
   commandPlugin,
   commandService,
   createCanvasKernel,
@@ -8,6 +10,8 @@ import {
   defineCommand,
   definePlugin,
   defineService,
+  describeError,
+  diagnosticEvents,
   edgeId,
   historyPlugin,
   historyService,
@@ -25,6 +29,25 @@ import {
 } from '../src';
 
 describe('@cflow/core', () => {
+  test('publishes the shared Diagnostics seam', () => {
+    const error = new KernelError('INVALID_ID', 'Node ID is invalid.', {
+      entity: 'node',
+      value: '',
+    });
+
+    expect(error).toBeInstanceOf(CFlowError);
+    expect(diagnosticEvents).toEqual({
+      sinkFault: 'cflow.diagnostics.sink.fault',
+      faultReportingFault: 'cflow.diagnostics.fault-reporting.fault',
+    });
+    expect(describeError(error)).toMatchObject({
+      kind: 'cflow',
+      domain: 'kernel',
+      code: 'INVALID_ID',
+      details: { entity: 'node', value: '' },
+    });
+  });
+
   test('publishes the typed Plugin Host seam', async () => {
     const input = defineService<{ read(): number }>('input');
     const output = defineService<{ value: number }>('output');

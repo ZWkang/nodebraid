@@ -23,6 +23,9 @@ Views, strict synchronous Transactions, Canvas Query, and reversible
 before/after Change Sets. It has no dependency on Plugin Host, Cordis, RxJS,
 Renderer implementations, DOM objects, or framework adapters.
 
+Its only shared infrastructure dependency is the zero-runtime
+`@cflow/diagnostics` error contract; the Kernel does not emit Diagnostic Events.
+
 The future Kernel Plugin adapter is intentionally outside this package.
 
 ## Development

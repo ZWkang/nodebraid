@@ -4,9 +4,9 @@ import { kernelService } from '@cflow/plugin-kernel';
 import { definePlugin, defineService } from '@cflow/runtime-cordis';
 
 import type { HistoryService, HistorySnapshot } from './contracts';
+import { historyDiagnosticEvents } from './diagnostic-events';
 import { redoCommand, undoCommand } from './history-commands';
 import { HistoryError } from './history-error';
-import { reportHistorySubscriberError } from './subscriber-error-reporting';
 
 interface PendingReplay {
   readonly direction: 'undo' | 'redo';
@@ -99,7 +99,10 @@ export const historyPlugin = definePlugin({
         try {
           listener();
         } catch (error) {
-          reportHistorySubscriberError(error);
+          context.diagnostics.reportFault(error, {
+            name: historyDiagnosticEvents.subscriberFault,
+            attributes: { canUndo: snapshot.canUndo, canRedo: snapshot.canRedo },
+          });
         }
       }
     };

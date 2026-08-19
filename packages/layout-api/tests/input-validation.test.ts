@@ -20,6 +20,7 @@ test('invalid mode and Fixed Node identities are rejected as invalid Layout Requ
 
   const invalidOptions: LayoutInputOptions[] = [
     { mode: 'unknown' as LayoutInputOptions['mode'], fixedNodeIds: [] },
+    { mode: { secret: 'domain-data' } as never, fixedNodeIds: [] },
     { mode: 'full', fixedNodeIds: [taskId, taskId] },
     { mode: 'full', fixedNodeIds: [missingId] },
   ];
@@ -35,6 +36,7 @@ test('invalid mode and Fixed Node identities are rejected as invalid Layout Requ
 
   expect(errors).toEqual([
     { code: 'INVALID_REQUEST', details: { issue: 'INVALID_MODE', mode: 'unknown' } },
+    { code: 'INVALID_REQUEST', details: { issue: 'INVALID_MODE', receivedType: 'object' } },
     { code: 'INVALID_REQUEST', details: { issue: 'DUPLICATE_FIXED_NODE', nodeId: taskId } },
     { code: 'INVALID_REQUEST', details: { issue: 'UNKNOWN_FIXED_NODE', nodeId: missingId } },
   ]);

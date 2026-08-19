@@ -16,6 +16,7 @@ assert.match(
   /export type \{ SelectionInput, SelectionSnapshot, SessionService, SessionSnapshot, Viewport \}/,
 );
 assert.match(pluginDeclaration, /export \{ SessionError/);
+assert.match(pluginDeclaration, /export \{ sessionDiagnosticEvents \}/);
 assert.match(pluginDeclaration, /export \{ sessionPlugin, sessionService \}/);
 
 for (const declaration of await collectDeclarations(pluginDist)) {

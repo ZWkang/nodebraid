@@ -1,14 +1,17 @@
+import { CFlowError, type DiagnosticAttributes } from '@cflow/diagnostics';
+
 export type LayoutErrorCode =
   'INVALID_REQUEST' | 'INVALID_INPUT' | 'UNSUPPORTED_FEATURE' | 'INVALID_PROPOSAL' | 'STALE_PROPOSAL';
 
-export class LayoutError extends Error {
+export class LayoutError extends CFlowError<'layout', LayoutErrorCode> {
   override readonly name = 'LayoutError';
 
   constructor(
-    readonly code: LayoutErrorCode,
+    code: LayoutErrorCode,
     message: string,
-    readonly details?: Readonly<Record<string, unknown>>,
+    details: DiagnosticAttributes = {},
+    options?: Readonly<{ cause?: unknown }>,
   ) {
-    super(message);
+    super('layout', code, message, { details, cause: options?.cause });
   }
 }

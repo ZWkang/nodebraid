@@ -47,6 +47,7 @@
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@cflow/diagnostics": "workspace:*",
     "@cflow/kernel": "workspace:*",
     "@cflow/plugin-command": "workspace:*",
     "@cflow/plugin-kernel": "workspace:*",

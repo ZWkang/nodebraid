@@ -28,7 +28,7 @@ export class PluginGraph {
           `Plugin "${pluginName ?? '<anonymous>'}" cannot provide Service Token "${token.name}" because it is reserved by "${existing.pluginName ?? '<anonymous>'}".`,
           {
             type: 'provider-conflict',
-            token,
+            serviceName: token.name,
             existingProvider: existing.pluginName ?? '<anonymous>',
             conflictingProvider: pluginName ?? '<anonymous>',
           },
@@ -115,7 +115,7 @@ function createDependencyCycleDetails(cycle: readonly DependencyEdge[]): Depende
       cycle.map((edge) =>
         Object.freeze({
           plugin: edge.consumer.pluginName ?? '<anonymous>',
-          service: edge.token,
+          serviceName: edge.token.name,
           provider: edge.provider.pluginName ?? '<anonymous>',
         }),
       ),

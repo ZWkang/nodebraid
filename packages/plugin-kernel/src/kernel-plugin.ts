@@ -7,8 +7,8 @@ import {
 import { definePlugin, defineService } from '@cflow/runtime-cordis';
 
 import type { CommitObserver, KernelService } from './contracts';
+import { kernelPluginDiagnosticEvents } from './diagnostic-events';
 import { KernelPluginError } from './kernel-plugin-error';
-import { reportObserverError } from './observer-error-reporting';
 
 export const kernelService = defineService<KernelService>('kernel');
 
@@ -39,7 +39,10 @@ export const kernelPlugin = definePlugin({
             try {
               observer(queuedCommit);
             } catch (error) {
-              reportObserverError(error);
+              context.diagnostics.reportFault(error, {
+                name: kernelPluginDiagnosticEvents.observerFault,
+                attributes: { revision: queuedCommit.changeSet.revision },
+              });
             }
           }
         }

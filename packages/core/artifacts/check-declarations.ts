@@ -9,6 +9,7 @@ const forbiddenCordisImport = /(?:from\s+|import\()["']cordis["']/;
 const forbiddenCordisType = /\b(?:Context|CordisError|Effect|Fiber|FiberState)\b/;
 
 const coreDist = fileURLToPath(new URL('../dist/', import.meta.url));
+const diagnosticsDist = fileURLToPath(new URL('../../diagnostics/dist/', import.meta.url));
 const kernelDist = fileURLToPath(new URL('../../kernel/dist/', import.meta.url));
 const layoutApiDist = fileURLToPath(new URL('../../layout-api/dist/', import.meta.url));
 const pluginCommandDist = fileURLToPath(new URL('../../plugin-command/dist/', import.meta.url));
@@ -20,6 +21,7 @@ const runtimeDist = fileURLToPath(new URL('../../runtime-cordis/dist/', import.m
 const coreDeclaration = await readFile(join(coreDist, 'index.d.ts'), 'utf8');
 const declarationFiles = await Promise.all([
   collectDeclarations(coreDist),
+  collectDeclarations(diagnosticsDist),
   collectDeclarations(kernelDist),
   collectDeclarations(layoutApiDist),
   collectDeclarations(pluginCommandDist),
@@ -30,6 +32,7 @@ const declarationFiles = await Promise.all([
   collectDeclarations(runtimeDist),
 ]);
 
+assert.match(coreDeclaration, /export \* from '@cflow\/diagnostics';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/kernel';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/layout-api';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-command';/);
@@ -49,6 +52,8 @@ const corePackageName = '@cflow/core';
 const corePackage = (await import(corePackageName)) as typeof import('../src/index');
 const kernel = corePackage.createCanvasKernel();
 assert.equal(kernel.read().snapshot.revision, 0);
+assert.ok(corePackage.CFlowError);
+assert.equal(corePackage.diagnosticEvents.sinkFault, 'cflow.diagnostics.sink.fault');
 assert.ok(corePackage.kernelPlugin);
 assert.ok(corePackage.kernelService);
 assert.ok(corePackage.commandPlugin);

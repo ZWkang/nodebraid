@@ -12,6 +12,7 @@ const pluginDist = fileURLToPath(new URL('../dist/', import.meta.url));
 const pluginDeclaration = await readFile(join(pluginDist, 'index.d.ts'), 'utf8');
 assert.match(pluginDeclaration, /export type \{ CommitObserver, KernelService \}/);
 assert.match(pluginDeclaration, /export \{ KernelPluginError/);
+assert.match(pluginDeclaration, /export \{ kernelPluginDiagnosticEvents \}/);
 assert.match(pluginDeclaration, /export \{ kernelPlugin, kernelService \}/);
 
 for (const declaration of await collectDeclarations(pluginDist)) {

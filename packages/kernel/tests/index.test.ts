@@ -205,13 +205,13 @@ describe('@cflow/kernel', () => {
               code: 'INVALID_POSITION',
               nodeId: nodeId('invalid-node'),
               coordinate: 'x',
-              value: Number.POSITIVE_INFINITY,
+              receivedNumber: 'positive-infinity',
             },
             {
               code: 'INVALID_POSITION',
               nodeId: nodeId('invalid-node'),
               coordinate: 'y',
-              value: Number.NaN,
+              receivedNumber: 'nan',
             },
           ],
         },
@@ -769,14 +769,14 @@ describe('@cflow/kernel', () => {
               code: 'INVALID_POSITION',
               nodeId: invalidId,
               coordinate: 'x',
-              value: Number.POSITIVE_INFINITY,
+              receivedNumber: 'positive-infinity',
             },
             { code: 'INVALID_SIZE', nodeId: invalidId, dimension: 'width', value: -1 },
             {
               code: 'INVALID_SIZE',
               nodeId: invalidId,
               dimension: 'height',
-              value: Number.NaN,
+              receivedNumber: 'nan',
             },
           ],
         },
@@ -907,9 +907,22 @@ describe('@cflow/kernel', () => {
     });
     const beforeReplay = kernel.read();
 
-    expect(() => kernel.transact((transaction) => transaction.applyChangeSet(moved.changeSet, 'reverse'))).toThrow(
-      expect.objectContaining({ code: 'CHANGE_SET_CONFLICT' }),
-    );
+    let replayError: unknown;
+    try {
+      kernel.transact((transaction) => transaction.applyChangeSet(moved.changeSet, 'reverse'));
+    } catch (error) {
+      replayError = error;
+    }
+    expect(replayError).toMatchObject({
+      code: 'CHANGE_SET_CONFLICT',
+      details: {
+        entity: 'node',
+        id: secondId,
+        direction: 'reverse',
+        expectedState: 'present',
+        actualState: 'present',
+      },
+    });
     expect(kernel.read()).toBe(beforeReplay);
     expect(kernel.read().query.getNode(firstId)?.position).toEqual({ x: 1, y: 1 });
     expect(kernel.read().query.getNode(secondId)?.position).toEqual({ x: 99, y: 99 });

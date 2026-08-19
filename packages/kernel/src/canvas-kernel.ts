@@ -15,7 +15,7 @@ import type {
 import { collectEntityChanges, createEntityWriter } from './entity-collection';
 import { canvasEdgesEqual, canvasNodesEqual, freezeCanvasEdge, freezeCanvasNode } from './entity-values';
 import { createCanvasQuery, GraphIndex } from './graph-index';
-import { validateGraph } from './graph-validation';
+import { describeGraphIssues, validateGraph } from './graph-validation';
 import type { EdgeId, NodeId } from './identifiers';
 import { KernelError } from './kernel-error';
 import { incrementRevision } from './revision';
@@ -104,7 +104,7 @@ export function createCanvasKernel(): CanvasKernel {
         throw new KernelError(
           'INVALID_GRAPH',
           'The final graph is invalid.',
-          Object.freeze({ issues: Object.freeze(issues) }),
+          Object.freeze({ issues: describeGraphIssues(issues) }),
         );
       }
       // Coalesce repeated writes into the original before and final after values, dropping net-zero entries.

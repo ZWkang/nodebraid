@@ -1,3 +1,5 @@
+import { describeNonFiniteNumber, type DiagnosticAttributes } from '@cflow/diagnostics';
+
 import type { CanvasEdge, CanvasNode, GraphIssue, ParentCycleIssue } from './contracts';
 import type { EdgeId, NodeId } from './identifiers';
 import { compareIds } from './ordering';
@@ -36,6 +38,40 @@ export function validateGraph(
   }
   issues.push(...findParentCycles(nodes));
   return issues.sort(compareGraphIssues);
+}
+
+export function describeGraphIssues(issues: readonly GraphIssue[]): readonly DiagnosticAttributes[] {
+  return issues.map((issue): DiagnosticAttributes => {
+    switch (issue.code) {
+      case 'MISSING_EDGE_ENDPOINT':
+        return {
+          code: issue.code,
+          edgeId: issue.edgeId,
+          endpoint: issue.endpoint,
+          nodeId: issue.nodeId,
+        };
+      case 'MISSING_PARENT':
+        return { code: issue.code, nodeId: issue.nodeId, parentId: issue.parentId };
+      case 'PARENT_CYCLE':
+        return { code: issue.code, nodeIds: issue.nodeIds };
+      case 'INVALID_POSITION':
+        return {
+          code: issue.code,
+          nodeId: issue.nodeId,
+          coordinate: issue.coordinate,
+          receivedNumber: describeNonFiniteNumber(issue.value),
+        };
+      case 'INVALID_SIZE':
+        return {
+          code: issue.code,
+          nodeId: issue.nodeId,
+          dimension: issue.dimension,
+          ...(Number.isFinite(issue.value)
+            ? { value: issue.value }
+            : { receivedNumber: describeNonFiniteNumber(issue.value) }),
+        };
+    }
+  });
 }
 
 function findParentCycles(nodes: ReadonlyMap<NodeId, CanvasNode>): ParentCycleIssue[] {
