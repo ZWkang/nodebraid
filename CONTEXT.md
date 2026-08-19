@@ -13,7 +13,7 @@ _Avoid_: Canvas Store, Global Graph, Renderer Model
 _Avoid_: Canvas Snapshot, Session State, Renderer Scene
 
 **Node**:
-Document 中可由 Edge 引用的图实体，包含跨渲染器成立的位置、可选尺寸、父子关系和不透明领域数据。
+Document 中可由 Edge 引用的图实体，其位置表示 Node 边界左上角的绝对世界坐标，并可包含尺寸、父子关系和不透明领域数据。
 _Avoid_: Shape, Component, Renderer Node
 
 **Edge**:
@@ -139,6 +139,38 @@ _Avoid_: Ordered Selection, Primary Selection, Renderer Selection State
 **Viewport**:
 Session 中将世界坐标映射为逻辑屏幕坐标的平移与缩放状态；浏览器中的逻辑屏幕单位对应 CSS pixel，物理像素缩放属于 Renderer。
 _Avoid_: Camera Object, Renderer Transform, Device-pixel Transform
+
+**Layout Engine**:
+根据已提交的画布图计算候选布局、但不修改 Document 的能力。
+_Avoid_: Layout Writer, Auto-layout Transaction, Graph Mutator
+
+**Layout Request**:
+一次布局计算意图，将全量或增量模式、固定 Node 约束与某个 Layout Provider 的类型化配置组合起来。
+_Avoid_: Layout Command, Layout Transaction, Layout Job
+
+**Layout Input**:
+从一个已提交 Canvas View 规范化得到的不可变、Provider-neutral 布局图投影。
+_Avoid_: Canvas View, Layout Snapshot, Kernel Query
+
+**Layout Proposal**:
+一次 Layout Engine 基于一个已提交 revision 产生的、精确覆盖输入 Node 的候选位置集合；它不是已提交变化，也不表达 Edge Routing、Node Size 或任意实体补丁。
+_Avoid_: Layout Patch, Change Set, Positioned Document
+
+**Layout Provider**:
+基于一种具体布局算法或引擎实现 Layout Engine 的角色。
+_Avoid_: Layout Plugin, Default Layout, Algorithm Registry Entry
+
+**Layout Capability**:
+Layout Provider 对 incremental、Fixed Node 或自环等可选布局语义的显式支持声明。
+_Avoid_: Provider Registry, Silent Fallback, Feature Guess
+
+**Incremental Layout**:
+对整张布局图重新计算，同时将非固定 Node 的现有位置视为尽量减少移动的软约束。
+_Avoid_: Partial Layout, New-node-only Layout, Cached Layout
+
+**Fixed Node**:
+在布局计算中必须保持原有绝对世界坐标的 Node；它仍参与布局约束并出现在 Layout Proposal 中。
+_Avoid_: Pinned Node, Anchor Node, Excluded Node
 
 **Command**:
 安装到一个 Canvas Runtime、由强类型身份标识并可执行同步或异步准备工作的行为定义；它通过所属 Plugin 已声明的 Runtime Service 提交最终状态变化。

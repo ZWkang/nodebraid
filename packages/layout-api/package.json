@@ -1,0 +1,51 @@
+{
+  "name": "@cflow/layout-api",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Provider-neutral Layout contracts and validation for CFlow.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "zwkang",
+    "email": "kang95630@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZWkang/cflow.git",
+    "directory": "packages/layout-api"
+  },
+  "bugs": "https://github.com/ZWkang/cflow/issues",
+  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/layout-api#readme",
+  "keywords": [
+    "cflow",
+    "graph",
+    "layout",
+    "provider-api"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts",
+    "build:dependencies": "bun run --filter '@cflow/kernel' build",
+    "prepack": "bun run build",
+    "test": "bun test ./tests",
+    "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@cflow/kernel": "workspace:*"
+  }
+}

@@ -1,0 +1,3 @@
+# Reject stale or incomplete Layout Proposals
+
+A Layout Proposal identifies the committed revision from which it was computed and must contain exactly one finite position for every input Node, with no duplicate, missing, or extra IDs. Before committing, Runtime compares that revision with the current Kernel revision and rejects the entire Proposal on any mismatch instead of rebasing or partially applying stale results. Concurrent Layout Commands therefore follow first-commit-wins: they may compute in parallel, but a later result fails as stale after another command advances the revision, while a preceding net-zero result leaves the revision available.
