@@ -12,9 +12,12 @@ import {
   kernelPlugin,
   kernelService,
   nodeId,
+  sessionPlugin,
+  sessionService,
+  type CommandService,
   type KernelService,
   type PluginInstallation,
-  type CommandService,
+  type SessionService,
 } from '../src';
 
 describe('@cflow/core', () => {
@@ -116,6 +119,28 @@ describe('@cflow/core', () => {
     await consumerInstallation.whenActive();
 
     expect(service?.read().snapshot.revision).toBe(0);
+    await host.dispose();
+  });
+
+  test('publishes the Session Runtime Plugin seam', async () => {
+    let service: SessionService | undefined;
+    const consumer = definePlugin({
+      requires: { session: sessionService },
+      setup(context) {
+        service = context.services.session;
+      },
+    });
+    const host = createPluginHost();
+    host.install(kernelPlugin);
+    host.install(sessionPlugin);
+    const consumerInstallation = host.install(consumer);
+
+    await consumerInstallation.whenActive();
+
+    expect(service?.getSnapshot()).toEqual({
+      selection: { nodeIds: [], edgeIds: [] },
+      viewport: { x: 0, y: 0, zoom: 1 },
+    });
     await host.dispose();
   });
 

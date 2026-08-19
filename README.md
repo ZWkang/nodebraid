@@ -21,6 +21,7 @@ The repository is currently at an early implementation stage. The planned archit
 │   ├── kernel/         # @cflow/kernel graph state and transactions
 │   ├── plugin-command/ # @cflow/plugin-command Runtime Service adapter
 │   ├── plugin-kernel/  # @cflow/plugin-kernel Runtime Service adapter
+│   ├── plugin-session/ # @cflow/plugin-session Runtime Service adapter
 │   └── runtime-cordis/ # @cflow/runtime-cordis implementation package
 ├── src/               # Root TypeScript source
 ├── tests/             # Root automated tests
@@ -69,8 +70,21 @@ Commits until the current revision reaches every Observer.
 
 The adapter depends directly on the CFlow-owned seams in `@cflow/kernel` and
 `@cflow/runtime-cordis`; it does not introduce a speculative plugin-api package.
-Session, Renderer, History, Persistence, initial Document import, and
-asynchronous Transactions remain future Runtime work.
+Renderer, History, Persistence, initial Document import, and asynchronous
+Transactions remain future Runtime work.
+
+## Session Runtime Plugin
+
+`@cflow/plugin-session` provides one fresh `SessionService` per Plugin
+Activation. It owns immutable Selection and Viewport Snapshots outside the
+Document and requires the narrow Kernel Service so external Selection updates
+can accept only entities from the current Canvas View.
+
+Equivalent updates preserve Snapshot identity and do not notify. Kernel
+Commits remove invalid Selection members through the Session channel rather
+than another Kernel Change Set or History entry. Reentrant Session mutations
+use breadth-first FIFO delivery so every subscriber observes one consistent
+Snapshot per notification round.
 
 ## Command Runtime Plugin
 
@@ -133,6 +147,12 @@ Build only the declaration required by `@cflow/plugin-command`:
 
 ```bash
 bun run --filter '@cflow/plugin-command' build:dependencies
+```
+
+Build the declarations required by `@cflow/plugin-session`:
+
+```bash
+bun run --filter '@cflow/plugin-session' build:dependencies
 ```
 
 Format supported files:

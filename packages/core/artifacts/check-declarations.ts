@@ -12,6 +12,7 @@ const coreDist = fileURLToPath(new URL('../dist/', import.meta.url));
 const kernelDist = fileURLToPath(new URL('../../kernel/dist/', import.meta.url));
 const pluginCommandDist = fileURLToPath(new URL('../../plugin-command/dist/', import.meta.url));
 const pluginKernelDist = fileURLToPath(new URL('../../plugin-kernel/dist/', import.meta.url));
+const pluginSessionDist = fileURLToPath(new URL('../../plugin-session/dist/', import.meta.url));
 const runtimeDist = fileURLToPath(new URL('../../runtime-cordis/dist/', import.meta.url));
 const coreDeclaration = await readFile(join(coreDist, 'index.d.ts'), 'utf8');
 const declarationFiles = await Promise.all([
@@ -19,12 +20,14 @@ const declarationFiles = await Promise.all([
   collectDeclarations(kernelDist),
   collectDeclarations(pluginCommandDist),
   collectDeclarations(pluginKernelDist),
+  collectDeclarations(pluginSessionDist),
   collectDeclarations(runtimeDist),
 ]);
 
 assert.match(coreDeclaration, /export \* from '@cflow\/kernel';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-command';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-kernel';/);
+assert.match(coreDeclaration, /export \* from '@cflow\/plugin-session';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/runtime-cordis';/);
 for (const declaration of declarationFiles.flat()) {
   assert.doesNotMatch(declaration.contents, forbiddenCordisImport, declaration.path);
@@ -40,4 +43,6 @@ assert.ok(corePackage.kernelPlugin);
 assert.ok(corePackage.kernelService);
 assert.ok(corePackage.commandPlugin);
 assert.ok(corePackage.commandService);
+assert.ok(corePackage.sessionPlugin);
+assert.ok(corePackage.sessionService);
 assert.equal(corePackage.defineCommand('artifact.command').id, 'artifact.command');
