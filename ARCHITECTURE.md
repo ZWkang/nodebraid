@@ -232,20 +232,20 @@ Advanced Consumer ────────────▶ @cflow/runtime-cordis
 插件通过 CFlow Plugin Context 注册 Owned Resource。Plugin Installation 结束后，它注册的命令、监听器、节点类型、快捷键和 UI 贡献必须同时消失。
 
 ```ts
-import { definePlugin, defineService } from '@cflow/core';
+import { definePlugin, historyService } from '@cflow/core';
 
-const canvasService = defineService<CanvasObserver>('canvas');
-
-const historyPlugin = definePlugin({
-  requires: { canvas: canvasService },
+const historyConsumer = definePlugin({
+  requires: { history: historyService },
   setup(context) {
-    const subscription = context.services.canvas.observeChanges((changeSet) => {
-      history.record(changeSet);
+    const unsubscribe = context.services.history.subscribe(() => {
+      console.log(context.services.history.getSnapshot());
     });
-    context.own(() => subscription.dispose());
+    context.own(unsubscribe);
   },
 });
 ```
+
+官方 `historyPlugin` 同时要求 Kernel Service 与 Command Service，提供窄 `historyService`；Undo/Redo 只通过强类型 Command token 执行。
 
 适合由插件提供的能力包括：
 
@@ -451,7 +451,7 @@ packages/
 ├── renderer-api/
 ├── renderer-konva/
 ├── interaction-core/
-├── history/
+├── plugin-history/
 ├── layout-api/
 ├── validation/
 ├── serialization/

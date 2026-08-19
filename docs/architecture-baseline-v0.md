@@ -58,7 +58,7 @@ flowchart TB
 
     subgraph Features["Feature Packages"]
         Interaction["@cflow/interaction-core"]
-        History["@cflow/history"]
+        History["@cflow/plugin-history"]
         Optional["Layout / Serialization / Collaboration / Domain ..."]
     end
 
@@ -486,7 +486,7 @@ packages/
 ├── renderer-api/       @cflow/renderer-api
 ├── runtime-cordis/     @cflow/runtime-cordis
 ├── interaction-core/   @cflow/interaction-core
-├── history/            @cflow/history
+├── plugin-history/     @cflow/plugin-history
 ├── renderer-<first>/   第一个真实官方 Renderer
 └── core/               @cflow/core，公共收口
 ```
