@@ -10,6 +10,7 @@ The repository is currently at an early implementation stage. The planned archit
 - tsgo for TypeScript checking.
 - oxlint for linting.
 - Prettier for formatting.
+- agent-browser for real Chromium Renderer seam tests.
 - Changesets for versioning and publishing.
 
 ## Structure
@@ -30,6 +31,7 @@ The repository is currently at an early implementation stage. The planned archit
 │   ├── plugin-renderer/ # @cflow/plugin-renderer Renderer Runtime adapter
 │   ├── plugin-session/ # @cflow/plugin-session Runtime Service adapter
 │   ├── renderer-api/   # @cflow/renderer-api backend-neutral contracts
+│   ├── renderer-svg/   # @cflow/renderer-svg official SVG Provider
 │   ├── session-api/    # @cflow/session-api immutable Session values
 │   └── runtime-cordis/ # @cflow/runtime-cordis implementation package
 ├── src/               # Root TypeScript source
@@ -122,6 +124,12 @@ and exposes only input, hit testing, Pointer Capture, and Focus through the
 narrow `RendererService`. Concrete Renderer Providers remain separate,
 explicit packages; CFlow does not select a default Provider or registry.
 
+`@cflow/renderer-svg` is the first reference-quality official Provider. It
+binds one existing `SVGSVGElement`, projects generic rectangular Nodes and
+straight Edges, and exposes stable SVG classes and data attributes without
+interpreting product Node types or data. It remains an explicit peer Provider
+and is not re-exported as a default through `@cflow/core`.
+
 ## Command Runtime Plugin
 
 `@cflow/plugin-command` provides one empty `CommandService` per Plugin
@@ -168,6 +176,12 @@ Install dependencies:
 bun install
 ```
 
+Install Chromium for the SVG Renderer browser tests:
+
+```bash
+bunx agent-browser install
+```
+
 Start a watch build for local development:
 
 ```bash
@@ -193,6 +207,7 @@ bun run lint
 bun run typecheck
 bun run format:check
 bun run test
+bun run test:browser
 ```
 
 Workspace package typechecks first build the dependency declarations required
@@ -236,6 +251,15 @@ Build the declarations required by `@cflow/plugin-history`:
 
 ```bash
 bun run --filter '@cflow/plugin-history' build:dependencies
+```
+
+Build the declarations required by the SVG Renderer Provider and run its real
+browser seam tests:
+
+```bash
+bun run --filter '@cflow/renderer-svg' build:dependencies
+bun run --filter '@cflow/renderer-svg' build:test-dependencies
+bun run --filter '@cflow/renderer-svg' test:browser
 ```
 
 Format supported files:

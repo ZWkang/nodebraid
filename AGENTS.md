@@ -9,6 +9,7 @@
 使用 Bun 1.2.19 或更高版本。可复现命令如下：
 
 - `bun install`：安装依赖并启用 Git hooks。
+- `bunx agent-browser install`：安装 SVG Renderer 真实浏览器测试所需的 Chromium；Linux CI 使用 `bunx agent-browser install --with-deps`。
 - `bun run dev`：监听根入口并持续构建到 `dist/`。
 - `bun run build`：构建根入口，再由 `@cflow/core` 先构建其余 workspace 依赖并构建公共 facade。
 - `bun run typecheck`：先构建 workspace package-name 类型解析所需的依赖声明，再检查根 TypeScript project 和所有 `@cflow/*` workspace。
@@ -23,10 +24,13 @@
 - `bun run --filter '@cflow/session-api' build:dependencies`：生成 Session 值契约所需的 Kernel workspace 声明。
 - `bun run --filter '@cflow/renderer-api' build:dependencies`：生成 Renderer 协议所需的 Diagnostics、Kernel 与 Session API workspace 声明。
 - `bun run --filter '@cflow/plugin-renderer' build:dependencies`：生成 Renderer Runtime Plugin 所需的 Renderer API、Kernel Plugin 与 Session Plugin workspace 声明。
+- `bun run --filter '@cflow/renderer-svg' build:dependencies`：生成 SVG Renderer Provider 生产构建所需的 Renderer API 及其传递 workspace 声明。
+- `bun run --filter '@cflow/renderer-svg' build:test-dependencies`：通过 Renderer Plugin 的构建链生成真实 Runtime 浏览器场景及 Renderer API 所需的全部 workspace 声明。
 - `bun run --filter '@cflow/plugin-history' build:dependencies`：生成 History Runtime Plugin 构建与类型检查所需的 Command 与 Kernel Plugin workspace 声明。
 - `bun run format`：使用 Prettier 格式化支持的文件。
 - `bun run test`：运行 Bun 测试。
-- `bun run check`：依次运行 lint、类型检查、格式检查、测试和构建。
+- `bun run test:browser`：通过仓库锁定的 `agent-browser` 在真实 Chromium 中运行 SVG Renderer 公共 seam 测试。
+- `bun run check`：依次运行 lint、类型检查、格式检查、Bun 测试、真实浏览器测试和构建。
 
 提交前至少运行：
 
@@ -41,7 +45,7 @@
 
 ## 测试指南
 
-测试使用 Bun 内置测试运行器，尚未设置覆盖率门槛。新增行为必须配套自动化测试；修复缺陷时先加入能复现问题的回归用例。测试文件使用 `tests/foo.test.ts` 命名。测试应可重复、无外部隐式依赖，并让失败直接暴露原因。
+常规测试使用 Bun 内置测试运行器，SVG Renderer 的 DOM、坐标与原生输入验收通过 `agent-browser` 驱动真实 Chromium；尚未设置覆盖率门槛。新增行为必须配套自动化测试；修复缺陷时先加入能复现问题的回归用例。Bun 测试文件使用 `tests/foo.test.ts` 命名，浏览器场景使用 `browser-tests/foo.browser.ts` 命名以避免被根 `bun test` 误发现。测试应可重复、无外部隐式依赖，并让失败直接暴露原因。
 
 ## 提交与拉取请求
 

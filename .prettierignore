@@ -4,3 +4,6 @@
 # Generated tool adapter skill trees mirror the vendored sources above.
 .claude/skills/
 .codebuddy/skills/
+
+# Browser test bundles and reports are generated during verification.
+.tmp/
