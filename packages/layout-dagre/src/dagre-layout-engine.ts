@@ -2,20 +2,14 @@ import { graphlib, layout } from '@dagrejs/dagre';
 import { defineLayoutEngine } from '@cflow/layout-api';
 
 import type { DagreLayoutConfig } from './contracts';
+import { resolveDagreLayoutConfig } from './dagre-config';
 
 export const dagreLayoutEngine = defineLayoutEngine<DagreLayoutConfig>({
   id: 'dagre',
   capabilities: { incremental: false, fixedNodes: false, selfLoops: true },
   compute(input, config, context) {
     context.signal.throwIfAborted();
-    const effectiveConfig = Object.freeze({
-      direction: config.direction ?? 'TB',
-      nodeSpacing: config.nodeSpacing ?? 50,
-      edgeSpacing: config.edgeSpacing ?? 20,
-      rankSpacing: config.rankSpacing ?? 50,
-      marginX: config.marginX ?? 0,
-      marginY: config.marginY ?? 0,
-    });
+    const effectiveConfig = resolveDagreLayoutConfig(config);
     const graph = new graphlib.Graph({ directed: true, multigraph: true })
       .setGraph({
         rankdir: effectiveConfig.direction,

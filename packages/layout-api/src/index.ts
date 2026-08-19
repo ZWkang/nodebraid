@@ -1,3 +1,4 @@
+export { assertLayoutCapabilities } from './capability-validation';
 export type {
   LayoutCapabilities,
   LayoutComputeContext,

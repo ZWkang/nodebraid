@@ -19,9 +19,13 @@ The repository is currently at an early implementation stage. The planned archit
 ├── packages/
 │   ├── core/           # @cflow/core public facade
 │   ├── kernel/         # @cflow/kernel graph state and transactions
+│   ├── layout-api/     # @cflow/layout-api provider-neutral contracts
+│   ├── layout-dagre/   # @cflow/layout-dagre official Provider
+│   ├── layout-elk/     # @cflow/layout-elk official Provider
 │   ├── plugin-command/ # @cflow/plugin-command Runtime Service adapter
 │   ├── plugin-history/ # @cflow/plugin-history History Runtime Plugin
 │   ├── plugin-kernel/  # @cflow/plugin-kernel Runtime Service adapter
+│   ├── plugin-layout/  # @cflow/plugin-layout Runtime Command integration
 │   ├── plugin-session/ # @cflow/plugin-session Runtime Service adapter
 │   └── runtime-cordis/ # @cflow/runtime-cordis implementation package
 ├── src/               # Root TypeScript source
@@ -112,6 +116,19 @@ remains revision ordered, and public Snapshot publication waits until History
 has caught up with Kernel. Losing Kernel Service or Command Service ends the
 current History Activation; reactivation starts from a fresh empty Baseline.
 
+## Layout packages
+
+`@cflow/layout-api` defines immutable Layout Inputs, asynchronous Layout
+Engines, explicit capabilities, and strict Layout Proposal validation.
+`@cflow/plugin-layout` binds one Engine to one typed Command and commits a valid
+Proposal through one synchronous Kernel Transaction with cancellation and stale
+revision protection.
+
+`@cflow/layout-dagre` and `@cflow/layout-elk` are explicit optional Providers;
+they are not re-exported by `@cflow/core`. Dagre provides deterministic full
+layout. ELK provides full layout and uses its Stress algorithm for incremental
+and Fixed Node requests.
+
 ## Commands
 
 Install dependencies:
@@ -161,6 +178,15 @@ Build only the declaration required by `@cflow/plugin-command`:
 
 ```bash
 bun run --filter '@cflow/plugin-command' build:dependencies
+```
+
+Build the declarations required by the Layout packages:
+
+```bash
+bun run --filter '@cflow/layout-api' build:dependencies
+bun run --filter '@cflow/plugin-layout' build:dependencies
+bun run --filter '@cflow/layout-dagre' build:dependencies
+bun run --filter '@cflow/layout-elk' build:dependencies
 ```
 
 Build the declarations required by `@cflow/plugin-session`:

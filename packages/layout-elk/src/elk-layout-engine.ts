@@ -1,4 +1,4 @@
-import type { ELK, ElkNode } from 'elkjs/lib/elk-api.js';
+import type { ElkNode } from 'elkjs/lib/elk-api.js';
 import {
   defineLayoutEngine,
   LayoutError,
@@ -8,24 +8,17 @@ import {
 } from '@cflow/layout-api';
 
 import type { ElkLayoutConfig } from './contracts';
-
-let elkPromise: Promise<ELK> | undefined;
+import { resolveElkLayoutConfig } from './elk-config';
+import { getElk } from './elk-runtime';
 
 export const elkLayoutEngine = defineLayoutEngine<ElkLayoutConfig>({
   id: 'elk',
   capabilities: { incremental: true, fixedNodes: true, selfLoops: true },
   async compute(input, config, context) {
     context.signal.throwIfAborted();
+    const effectiveConfig = resolveElkLayoutConfig(config);
     const elk = await getElk();
     context.signal.throwIfAborted();
-    const effectiveConfig = Object.freeze({
-      algorithm: config.algorithm ?? 'layered',
-      direction: config.direction ?? 'DOWN',
-      nodeSpacing: config.nodeSpacing ?? 20,
-      layerSpacing: config.layerSpacing ?? 50,
-      padding: config.padding ?? 0,
-      randomSeed: config.randomSeed ?? 1,
-    });
     if (input.mode === 'incremental' && effectiveConfig.algorithm !== 'stress') {
       throw new LayoutError(
         'UNSUPPORTED_FEATURE',
@@ -80,11 +73,6 @@ export const elkLayoutEngine = defineLayoutEngine<ElkLayoutConfig>({
     };
   },
 });
-
-function getElk(): Promise<ELK> {
-  elkPromise ??= createElk();
-  return elkPromise;
-}
 
 function getWorldTranslations(
   input: LayoutInput,
@@ -177,18 +165,4 @@ function translate(
 
 function nearlyEqual(left: number, right: number): boolean {
   return Number.isFinite(left) && Math.abs(left - right) <= 1e-7;
-}
-
-async function createElk(): Promise<ELK> {
-  const selfDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'self');
-  const bunRuntime = Reflect.get(globalThis, 'Bun') !== undefined;
-  if (bunRuntime && !Reflect.deleteProperty(globalThis, 'self')) {
-    throw new Error('ELK cannot initialize because the Bun self global is not configurable.');
-  }
-  try {
-    const module = await import('elkjs/lib/elk.bundled.js');
-    return new module.default();
-  } finally {
-    if (bunRuntime && selfDescriptor) Object.defineProperty(globalThis, 'self', selfDescriptor);
-  }
 }

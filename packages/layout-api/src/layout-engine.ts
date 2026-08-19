@@ -1,4 +1,5 @@
 import type { LayoutEngine, LayoutEngineDefinition } from './contracts';
+import { assertLayoutCapabilities } from './capability-validation';
 import { validateLayoutProposal } from './proposal-validation';
 
 export function defineLayoutEngine<Config>(definition: LayoutEngineDefinition<Config>): LayoutEngine<Config> {
@@ -8,6 +9,7 @@ export function defineLayoutEngine<Config>(definition: LayoutEngineDefinition<Co
     capabilities,
     async compute(input, config, context) {
       context.signal.throwIfAborted();
+      assertLayoutCapabilities(definition.id, capabilities, input);
       const proposal = await definition.compute(input, config, context);
       context.signal.throwIfAborted();
       return validateLayoutProposal(input, proposal);

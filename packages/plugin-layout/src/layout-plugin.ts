@@ -1,10 +1,4 @@
-import {
-  createLayoutInput,
-  LayoutError,
-  validateLayoutProposal,
-  type LayoutEngine,
-  type LayoutInput,
-} from '@cflow/layout-api';
+import { assertLayoutCapabilities, createLayoutInput, LayoutError, validateLayoutProposal } from '@cflow/layout-api';
 import { commandService } from '@cflow/plugin-command';
 import { kernelService } from '@cflow/plugin-kernel';
 import { definePlugin } from '@cflow/runtime-cordis';
@@ -24,7 +18,7 @@ export function createLayoutPlugin<Config>(options: CreateLayoutPluginOptions<Co
             mode: input.mode,
             fixedNodeIds: input.fixedNodeIds,
           });
-          assertCapabilities(options.engine, layoutInput);
+          assertLayoutCapabilities(options.engine.id, options.engine.capabilities, layoutInput);
           const proposal = validateLayoutProposal(
             layoutInput,
             await options.engine.compute(layoutInput, input.config, { signal: execution.signal }),
@@ -43,9 +37,14 @@ export function createLayoutPlugin<Config>(options: CreateLayoutPluginOptions<Co
             (transaction) => {
               for (const node of layoutInput.nodes) {
                 const position = positions.get(node.id);
-                if (!position || (position.x === node.position.x && position.y === node.position.y)) continue;
+                if (!position) {
+                  throw new Error(`Validated Layout Proposal is missing Node "${node.id}" during commit.`);
+                }
+                if (position.x === node.position.x && position.y === node.position.y) continue;
                 const currentNode = transaction.query.getNode(node.id);
-                if (!currentNode) continue;
+                if (!currentNode) {
+                  throw new Error(`Kernel Node "${node.id}" disappeared before the Layout Transaction.`);
+                }
                 transaction.nodes.replace(node.id, { ...currentNode, position });
               }
             },
@@ -56,24 +55,4 @@ export function createLayoutPlugin<Config>(options: CreateLayoutPluginOptions<Co
       context.own(() => registration.dispose());
     },
   });
-}
-
-function assertCapabilities<Config>(engine: LayoutEngine<Config>, input: LayoutInput): void {
-  if (input.mode === 'incremental' && !engine.capabilities.incremental) {
-    throwUnsupportedFeature(engine.id, 'incremental');
-  }
-  if (input.nodes.some((node) => node.fixed) && !engine.capabilities.fixedNodes) {
-    throwUnsupportedFeature(engine.id, 'fixedNodes');
-  }
-  if (input.edges.some((edge) => edge.sourceNodeId === edge.targetNodeId) && !engine.capabilities.selfLoops) {
-    throwUnsupportedFeature(engine.id, 'selfLoops');
-  }
-}
-
-function throwUnsupportedFeature(providerId: string, feature: string): never {
-  throw new LayoutError(
-    'UNSUPPORTED_FEATURE',
-    `Layout Provider "${providerId}" does not support ${feature}.`,
-    Object.freeze({ feature, providerId }),
-  );
 }

@@ -2,6 +2,7 @@ import { expect, test } from 'bun:test';
 
 import { createCanvasKernel, edgeId, nodeId } from '@cflow/kernel';
 import { createLayoutInput } from '@cflow/layout-api';
+import { registerFullLayoutProviderContract } from '../../../tests/layout-provider-contract';
 
 import { elkLayoutEngine } from '../src';
 
@@ -50,78 +51,25 @@ test('ELK computes deterministic top-left world positions for a full Layout Inpu
   });
 });
 
-test('ELK full layout supports the baseline graph shapes and self-loops', async () => {
-  const alphaId = nodeId('alpha');
-  const betaId = nodeId('beta');
-  const detachedId = nodeId('detached');
-  const kernel = createCanvasKernel();
-  kernel.transact((transaction) => {
-    transaction.nodes.add({
-      id: alphaId,
-      type: 'task',
-      position: { x: 0, y: 0 },
-      size: { width: 0, height: 0 },
-      data: null,
-    });
-    for (const id of [betaId, detachedId]) {
-      transaction.nodes.add({
-        id,
-        type: 'task',
-        position: { x: 0, y: 0 },
-        size: { width: 80, height: 40 },
-        data: null,
-      });
-    }
-    transaction.edges.add({
-      id: edgeId('alpha-beta-1'),
-      type: 'flow',
-      source: { nodeId: alphaId },
-      target: { nodeId: betaId },
-      data: null,
-    });
-    transaction.edges.add({
-      id: edgeId('alpha-beta-2'),
-      type: 'flow',
-      source: { nodeId: alphaId },
-      target: { nodeId: betaId },
-      data: null,
-    });
-    transaction.edges.add({
-      id: edgeId('beta-alpha'),
-      type: 'flow',
-      source: { nodeId: betaId },
-      target: { nodeId: alphaId },
-      data: null,
-    });
-    transaction.edges.add({
-      id: edgeId('beta-self'),
-      type: 'flow',
-      source: { nodeId: betaId },
-      target: { nodeId: betaId },
-      data: null,
-    });
-  });
-  const input = createLayoutInput(kernel.read(), { mode: 'full', fixedNodeIds: [] });
-  const emptyInput = createLayoutInput(createCanvasKernel().read(), { mode: 'full', fixedNodeIds: [] });
-  const context = { signal: new AbortController().signal };
+registerFullLayoutProviderContract({
+  name: 'ELK',
+  engine: elkLayoutEngine,
+  config: {},
+  capabilities: { incremental: true, fixedNodes: true, selfLoops: true },
+});
 
-  const [first, second, empty] = await Promise.all([
-    elkLayoutEngine.compute(input, {}, context),
-    elkLayoutEngine.compute(input, {}, context),
-    elkLayoutEngine.compute(emptyInput, {}, context),
-  ]);
+test('ELK rejects a non-finite Provider configuration before layout', async () => {
+  const input = createLayoutInput(createCanvasKernel().read(), { mode: 'full', fixedNodeIds: [] });
 
-  expect({
-    capabilities: elkLayoutEngine.capabilities,
-    ids: first.positions.map((position) => position.id),
-    finite: first.positions.every(({ position }) => Number.isFinite(position.x) && Number.isFinite(position.y)),
-    deterministic: JSON.stringify(first) === JSON.stringify(second),
-    empty,
-  }).toEqual({
-    capabilities: { incremental: true, fixedNodes: true, selfLoops: true },
-    ids: [alphaId, betaId, detachedId],
-    finite: true,
-    deterministic: true,
-    empty: { sourceRevision: 0, positions: [] },
+  let error: unknown;
+  try {
+    await elkLayoutEngine.compute(input, { nodeSpacing: Number.NaN }, { signal: new AbortController().signal });
+  } catch (reason) {
+    error = reason;
+  }
+
+  expect({ type: error?.constructor.name, message: (error as Error | undefined)?.message }).toEqual({
+    type: 'RangeError',
+    message: 'ELK nodeSpacing must be a finite non-negative number.',
   });
 });
