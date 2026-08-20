@@ -1,3 +1,4 @@
+import type { InteractionProjection } from '@cflow/interaction-api';
 import type { CanvasCommit, CanvasView, EdgeId, NodeId, Point } from '@cflow/kernel';
 import type { SessionSnapshot } from '@cflow/session-api';
 
@@ -66,6 +67,7 @@ export interface CanvasRenderer {
   /** Reset establishes a Baseline; Commit must be contiguous with the accepted Baseline. */
   updateDocument(update: RendererDocumentUpdate): void;
   updateSession(snapshot: SessionSnapshot): void;
+  updateInteraction(projection: InteractionProjection | null): void;
   subscribeInput(listener: RendererInputListener): () => void;
   hitTest(point: ScreenPoint): HitResult | null;
   capturePointer(pointerId: number): void;

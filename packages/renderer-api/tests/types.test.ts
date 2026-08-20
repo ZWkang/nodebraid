@@ -1,5 +1,6 @@
 import { test } from 'bun:test';
 
+import type { InteractionProjection } from '@cflow/interaction-api';
 import type { SessionSnapshot } from '@cflow/session-api';
 
 import type { CanvasRenderer, RendererDocumentUpdate, RendererFactory } from '../src';
@@ -13,6 +14,9 @@ test('keeps Renderer construction and updates strongly typed', () => {
   ) => {
     renderer.updateDocument(update);
     renderer.updateSession(snapshot);
+    const interaction: InteractionProjection = { type: 'node-drag', nodes: [] };
+    renderer.updateInteraction(interaction);
+    renderer.updateInteraction(null);
     const created: CanvasRenderer | PromiseLike<CanvasRenderer> = factory({ target: 'surface' });
     // @ts-expect-error Renderer has no universal mount target.
     renderer.mount(document.body);

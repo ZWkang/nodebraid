@@ -42,6 +42,14 @@
       "name": "@cflow/diagnostics",
       "version": "0.0.1",
     },
+    "packages/interaction-api": {
+      "name": "@cflow/interaction-api",
+      "version": "0.0.1",
+      "dependencies": {
+        "@cflow/kernel": "workspace:*",
+        "@cflow/session-api": "workspace:*",
+      },
+    },
     "packages/kernel": {
       "name": "@cflow/kernel",
       "version": "0.0.1",
@@ -116,6 +124,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@cflow/diagnostics": "workspace:*",
+        "@cflow/interaction-api": "workspace:*",
         "@cflow/kernel": "workspace:*",
         "@cflow/plugin-kernel": "workspace:*",
         "@cflow/plugin-session": "workspace:*",
@@ -139,6 +148,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@cflow/diagnostics": "workspace:*",
+        "@cflow/interaction-api": "workspace:*",
         "@cflow/kernel": "workspace:*",
         "@cflow/session-api": "workspace:*",
       },
@@ -148,6 +158,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@cflow/diagnostics": "workspace:*",
+        "@cflow/interaction-api": "workspace:*",
         "@cflow/kernel": "workspace:*",
         "@cflow/renderer-api": "workspace:*",
         "@cflow/session-api": "workspace:*",
@@ -224,6 +235,8 @@
     "@cflow/core": ["@cflow/core@workspace:packages/core"],
 
     "@cflow/diagnostics": ["@cflow/diagnostics@workspace:packages/diagnostics"],
+
+    "@cflow/interaction-api": ["@cflow/interaction-api@workspace:packages/interaction-api"],
 
     "@cflow/kernel": ["@cflow/kernel@workspace:packages/kernel"],
 

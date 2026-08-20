@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 
 import type { DiagnosticFault } from '@cflow/diagnostics';
+import type { InteractionProjection } from '@cflow/interaction-api';
 import { nodeId, type CanvasView } from '@cflow/kernel';
 import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
 import {
@@ -41,6 +42,7 @@ describe('@cflow/plugin-renderer', () => {
 
     expect(recording.deliveries).toEqual(['document:reset:0', 'session:0:0:1']);
     expect(Object.keys(runtime.renderer).sort()).toEqual([
+      'bindInteractionProjection',
       'capturePointer',
       'focus',
       'hitTest',
@@ -119,6 +121,36 @@ describe('@cflow/plugin-renderer', () => {
     stop();
     recording.emit(createPointerInput('pointer.move'));
     expect(inputs).toEqual(['pointer.down']);
+
+    await runtime.host.dispose();
+  });
+
+  test('binds one exclusive Interaction Projection writer for the Renderer Activation', async () => {
+    const recording = new RecordingRenderer();
+    const runtime = await activateRenderer(createRendererPlugin(() => recording));
+    const projection: InteractionProjection = {
+      type: 'node-drag',
+      nodes: [
+        {
+          nodeId: nodeId('binding-node'),
+          basePosition: { x: 0, y: 0 },
+          position: { x: 20, y: 30 },
+        },
+      ],
+    };
+
+    const binding = runtime.renderer.bindInteractionProjection();
+    binding.update(projection);
+    expect(recording.interactions).toEqual([projection]);
+    expect(() => runtime.renderer.bindInteractionProjection()).toThrow(
+      expect.objectContaining({ code: 'INTERACTION_ALREADY_BOUND' }),
+    );
+
+    binding.dispose();
+    expect(recording.interactions).toEqual([projection, null]);
+    expect(() => binding.update(projection)).toThrow(expect.objectContaining({ code: 'INTERACTION_BINDING_DISPOSED' }));
+    const replacement = runtime.renderer.bindInteractionProjection();
+    replacement.dispose();
 
     await runtime.host.dispose();
   });
@@ -262,6 +294,7 @@ class RecordingRenderer implements CanvasRenderer {
   readonly deliveries: string[] = [];
   readonly controls: string[] = [];
   readonly inputListeners: RendererInputListener[] = [];
+  readonly interactions: Array<InteractionProjection | null> = [];
   disposeCalls = 0;
   hit: HitResult | null = null;
   rejectNextCommitAsOutOfSync = false;
@@ -287,6 +320,10 @@ class RecordingRenderer implements CanvasRenderer {
     this.deliveries.push(
       `session:${snapshot.selection.nodeIds.length}:${snapshot.viewport.x}:${snapshot.viewport.zoom}`,
     );
+  }
+
+  updateInteraction(projection: InteractionProjection | null): void {
+    this.interactions.push(projection);
   }
 
   subscribeInput(listener: RendererInputListener): () => void {

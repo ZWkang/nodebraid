@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "@cflow/diagnostics": "workspace:*",
+    "@cflow/interaction-api": "workspace:*",
     "@cflow/kernel": "workspace:*",
     "@cflow/renderer-api": "workspace:*",
     "@cflow/session-api": "workspace:*"

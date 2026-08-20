@@ -1,3 +1,4 @@
+import type { InteractionProjection } from '@cflow/interaction-api';
 import type { CanvasSnapshot } from '@cflow/kernel';
 import {
   RendererError,
@@ -28,6 +29,7 @@ import {
 import { normalizeInputPolicies, validateConfig } from './svg-config';
 import {
   applyCommit,
+  applyNodeDragProjection,
   createSvgElement,
   DomMutationJournal,
   ProjectionRollbackError,
@@ -72,6 +74,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
 
   let disposed = false;
   let acceptedSession: SessionSnapshot | undefined;
+  let acceptedInteraction: InteractionProjection | null = null;
   let baselineSnapshot: CanvasSnapshot | undefined;
   let projectionOutOfSync = false;
   let observedResizeError: unknown;
@@ -130,7 +133,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
     if (!acceptedSession) return targetMatrix;
     const journal = new DomMutationJournal(edgesLayer, nodesLayer);
     try {
-      applySession(acceptedSession, journal, targetMatrix);
+      applySession(createEffectiveSession(acceptedSession, acceptedInteraction), journal, targetMatrix);
       return targetMatrix;
     } catch (error) {
       const rollbackErrors = journal.rollback();
@@ -153,7 +156,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
     if (disposed || !acceptedSession || projectionOutOfSync) return;
     const journal = new DomMutationJournal(edgesLayer, nodesLayer);
     try {
-      applySession(acceptedSession, journal);
+      applySession(createEffectiveSession(acceptedSession, acceptedInteraction), journal);
       if (isTargetUnavailableError(observedResizeError)) observedResizeError = undefined;
     } catch (error) {
       const rollbackErrors = journal.rollback();
@@ -225,7 +228,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
       }
       refreshProjectionMapping();
       if (event.type === 'pointerdown') activePointerIds.add(event.pointerId);
-      emitInput(normalizePointerInput(event, target, acceptedSession));
+      emitInput(normalizePointerInput(event, target, createEffectiveSession(acceptedSession, acceptedInteraction)));
     } catch (error) {
       handlingFailed = true;
       handlingError = error;
@@ -262,7 +265,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
       });
     }
     refreshProjectionMapping();
-    emitInput(normalizeWheelInput(event, target, acceptedSession));
+    emitInput(normalizeWheelInput(event, target, createEffectiveSession(acceptedSession, acceptedInteraction)));
   };
   const handleKeyboard = (event: KeyboardEvent): void => {
     if (disposed) return;
@@ -358,6 +361,43 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
       }
       acceptedSession = accepted;
     },
+    updateInteraction(projection: InteractionProjection | null): void {
+      assertActive();
+      assertNoObservedResizeError();
+      assertProjectionSynchronized();
+      if (!baselineSnapshot || !acceptedSession) {
+        throw new RendererError(
+          'INVALID_SESSION_SNAPSHOT',
+          'SVG Renderer Interaction Projection requires Document and Session state.',
+          { issue: 'RENDERER_STATE_INCOMPLETE' },
+        );
+      }
+      if (projection !== null) {
+        assertInteractionProjectionType(projection);
+        assertInteractionProjectionBaseline(projection, baselineSnapshot, acceptedSession);
+      }
+      const accepted = projection === null ? null : cloneInteractionProjection(projection);
+      if (accepted?.type === 'viewport-pan') {
+        applySession({ selection: acceptedSession.selection, viewport: accepted.viewport });
+        acceptedInteraction = accepted;
+        return;
+      }
+      applyNodeDragProjection(
+        accepted ?? {
+          type: 'node-drag',
+          nodes: baselineSnapshot.nodes.map((node) => ({
+            nodeId: node.id,
+            basePosition: node.position,
+            position: node.position,
+          })),
+        },
+        baselineSnapshot,
+        edgesLayer,
+        nodesLayer,
+      );
+      if (accepted === null) applySession(acceptedSession);
+      acceptedInteraction = accepted;
+    },
     subscribeInput(listener: RendererInputListener): () => void {
       assertActive();
       assertNoObservedResizeError();
@@ -387,7 +427,13 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         );
       }
       refreshProjectionMapping();
-      return hitTestProjection(point, target, baselineSnapshot, acceptedSession, edgeHitTolerance);
+      return hitTestProjection(
+        point,
+        target,
+        createEffectiveSnapshot(baselineSnapshot, acceptedInteraction),
+        createEffectiveSession(acceptedSession, acceptedInteraction),
+        edgeHitTolerance,
+      );
     },
     capturePointer(pointerId: number): void {
       assertActive();
@@ -456,4 +502,135 @@ function attemptCleanup(errors: unknown[], cleanup: () => void): void {
 
 function isTargetUnavailableError(error: unknown): error is SvgRendererError {
   return error instanceof SvgRendererError && error.code === 'TARGET_UNAVAILABLE';
+}
+
+function createEffectiveSnapshot(baseline: CanvasSnapshot, interaction: InteractionProjection | null): CanvasSnapshot {
+  if (interaction?.type !== 'node-drag') return baseline;
+  const candidates = new Map(interaction.nodes.map((candidate) => [candidate.nodeId, candidate.position]));
+  return {
+    revision: baseline.revision,
+    nodes: baseline.nodes.map((node) => {
+      const position = candidates.get(node.id);
+      return position ? { ...node, position } : node;
+    }),
+    edges: baseline.edges,
+  };
+}
+
+function createEffectiveSession(session: SessionSnapshot, interaction: InteractionProjection | null): SessionSnapshot {
+  return interaction?.type === 'viewport-pan'
+    ? { selection: session.selection, viewport: interaction.viewport }
+    : session;
+}
+
+function cloneInteractionProjection(projection: InteractionProjection): InteractionProjection {
+  if (projection.type === 'viewport-pan') {
+    return Object.freeze({
+      type: 'viewport-pan',
+      baseViewport: Object.freeze({ ...projection.baseViewport }),
+      viewport: Object.freeze({ ...projection.viewport }),
+    });
+  }
+  return Object.freeze({
+    type: 'node-drag',
+    nodes: Object.freeze(
+      projection.nodes.map((candidate) =>
+        Object.freeze({
+          nodeId: candidate.nodeId,
+          basePosition: Object.freeze({ ...candidate.basePosition }),
+          position: Object.freeze({ ...candidate.position }),
+        }),
+      ),
+    ),
+  });
+}
+
+function assertInteractionProjectionBaseline(
+  projection: InteractionProjection,
+  document: CanvasSnapshot,
+  session: SessionSnapshot,
+): void {
+  if (projection.type === 'viewport-pan') {
+    assertInteractionViewport('baseViewport', projection.baseViewport);
+    assertInteractionViewport('viewport', projection.viewport);
+    if (viewportsEqual(projection.baseViewport, session.viewport)) return;
+    throw new RendererError('INTERACTION_OUT_OF_SYNC', 'Interaction Projection Viewport Baseline is stale.', {
+      issue: 'VIEWPORT_MISMATCH',
+    });
+  }
+  if (projection.nodes.length === 0) {
+    throw new RendererError(
+      'INVALID_INTERACTION_PROJECTION',
+      'Node Drag Interaction Projection requires at least one Node.',
+      { issue: 'EMPTY_NODE_DRAG' },
+    );
+  }
+  const nodes = new Map(document.nodes.map((node) => [node.id, node]));
+  const seenNodeIds = new Set<string>();
+  let previousNodeId: string | undefined;
+  for (const candidate of projection.nodes) {
+    if (seenNodeIds.has(candidate.nodeId)) {
+      throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Interaction Projection Node IDs must be unique.', {
+        issue: 'DUPLICATE_NODE',
+      });
+    }
+    seenNodeIds.add(candidate.nodeId);
+    if (previousNodeId !== undefined && previousNodeId > candidate.nodeId) {
+      throw new RendererError(
+        'INVALID_INTERACTION_PROJECTION',
+        'Interaction Projection Node IDs must use canonical order.',
+        { issue: 'NON_CANONICAL_NODE_ORDER' },
+      );
+    }
+    previousNodeId = candidate.nodeId;
+    for (const [field, value] of [
+      ['basePosition.x', candidate.basePosition.x],
+      ['basePosition.y', candidate.basePosition.y],
+      ['position.x', candidate.position.x],
+      ['position.y', candidate.position.y],
+    ] as const) {
+      if (Number.isFinite(value)) continue;
+      throw new RendererError(
+        'INVALID_INTERACTION_PROJECTION',
+        'Interaction Projection Node positions must be finite.',
+        { issue: 'INVALID_NODE_POSITION', field },
+      );
+    }
+    const node = nodes.get(candidate.nodeId);
+    if (node && node.position.x === candidate.basePosition.x && node.position.y === candidate.basePosition.y) {
+      continue;
+    }
+    throw new RendererError('INTERACTION_OUT_OF_SYNC', 'Interaction Projection Node Baseline is stale.', {
+      issue: 'NODE_POSITION_MISMATCH',
+    });
+  }
+}
+
+function assertInteractionViewport(prefix: 'baseViewport' | 'viewport', viewport: SessionSnapshot['viewport']): void {
+  for (const field of ['x', 'y', 'zoom'] as const) {
+    const value = viewport[field];
+    if (Number.isFinite(value) && (field !== 'zoom' || value > 0)) continue;
+    throw new RendererError(
+      'INVALID_INTERACTION_PROJECTION',
+      'Interaction Projection Viewport values must be finite with positive zoom.',
+      { issue: 'INVALID_VIEWPORT', field: `${prefix}.${field}` },
+    );
+  }
+}
+
+function assertInteractionProjectionType(value: unknown): asserts value is InteractionProjection {
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    (Reflect.get(value, 'type') === 'node-drag' || Reflect.get(value, 'type') === 'viewport-pan')
+  ) {
+    return;
+  }
+  throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Interaction Projection type is invalid.', {
+    issue: 'INVALID_PROJECTION_TYPE',
+  });
+}
+
+function viewportsEqual(left: SessionSnapshot['viewport'], right: SessionSnapshot['viewport']): boolean {
+  return left.x === right.x && left.y === right.y && left.zoom === right.zoom;
 }

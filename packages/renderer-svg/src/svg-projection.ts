@@ -1,3 +1,4 @@
+import type { NodeDragInteractionProjection } from '@cflow/interaction-api';
 import type {
   CanvasCommit,
   CanvasEdge,
@@ -99,6 +100,40 @@ export function applyCommit(
     if (rollbackErrors.length > 0) {
       throw new ProjectionRollbackError([error, ...rollbackErrors]);
     }
+    throw error;
+  }
+}
+
+/** @internal */
+export function applyNodeDragProjection(
+  projection: NodeDragInteractionProjection,
+  baselineSnapshot: CanvasSnapshot,
+  edgesLayer: SVGGElement,
+  nodesLayer: SVGGElement,
+): void {
+  const journal = new DomMutationJournal(edgesLayer, nodesLayer);
+  try {
+    const candidates = new Map(projection.nodes.map((candidate) => [candidate.nodeId, candidate]));
+    const effectiveNodes = new Map(
+      baselineSnapshot.nodes.map((node) => {
+        const candidate = candidates.get(node.id);
+        return [node.id, candidate ? { ...node, position: candidate.position } : node] as const;
+      }),
+    );
+    for (const candidate of projection.nodes) {
+      const element = requireEntityElement(nodesLayer, 'data-cflow-node-id', candidate.nodeId) as SVGRectElement;
+      setElementAttribute(element, 'x', String(candidate.position.x), journal);
+      setElementAttribute(element, 'y', String(candidate.position.y), journal);
+    }
+    for (const edge of baselineSnapshot.edges) {
+      if (!candidates.has(edge.source.nodeId) && !candidates.has(edge.target.nodeId)) continue;
+      const existing = requireEntityElement(edgesLayer, 'data-cflow-edge-id', edge.id) as SVGLineElement;
+      const validated = createEdgeElement(edgesLayer.ownerDocument, edge, effectiveNodes);
+      copyGeometryAttributes(validated, existing, ['x1', 'y1', 'x2', 'y2'], journal);
+    }
+  } catch (error) {
+    const rollbackErrors = journal.rollback();
+    if (rollbackErrors.length > 0) throw new ProjectionRollbackError([error, ...rollbackErrors]);
     throw error;
   }
 }

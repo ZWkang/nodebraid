@@ -1,5 +1,6 @@
 import { test } from 'bun:test';
 
+import type { InteractionProjection } from '@cflow/interaction-api';
 import type { CanvasRenderer, RendererFactory } from '@cflow/renderer-api';
 import type { Plugin } from '@cflow/runtime-cordis';
 
@@ -12,6 +13,11 @@ test('binds Provider config without exposing CanvasRenderer update authority', (
     return plugin;
   };
   const verifyService = (service: RendererService, renderer: CanvasRenderer) => {
+    const projection: InteractionProjection = { type: 'node-drag', nodes: [] };
+    const binding = service.bindInteractionProjection();
+    binding.update(projection);
+    binding.update(null);
+    binding.dispose();
     service.focus();
     // @ts-expect-error State projection belongs only to the CanvasRenderer Provider seam.
     service.updateDocument(renderer);

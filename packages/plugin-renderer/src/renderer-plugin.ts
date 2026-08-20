@@ -1,10 +1,11 @@
 import type { CanvasCommit, CanvasView } from '@cflow/kernel';
+import type { InteractionProjection } from '@cflow/interaction-api';
 import { kernelService } from '@cflow/plugin-kernel';
 import { sessionService, type SessionSnapshot } from '@cflow/plugin-session';
 import { RendererError, type RendererFactory, type RendererInputListener, type ScreenPoint } from '@cflow/renderer-api';
 import { definePlugin, defineService } from '@cflow/runtime-cordis';
 
-import type { RendererService } from './contracts';
+import type { InteractionProjectionBinding, RendererService } from './contracts';
 import { rendererDiagnosticEvents } from './diagnostic-events';
 import { RendererPluginError } from './renderer-plugin-error';
 
@@ -36,6 +37,7 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
       let resetThroughRevision: number | undefined;
       const pendingUpdates: PendingRendererUpdate[] = [];
       const inputSubscriptions = new Set<() => void>();
+      let interactionBindingActive = false;
       let stopKernel = (): void => undefined;
       let stopSession = (): void => undefined;
 
@@ -204,6 +206,35 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
       resetToCurrentState();
 
       const service: RendererService = Object.freeze({
+        bindInteractionProjection(): InteractionProjectionBinding {
+          assertActive();
+          if (interactionBindingActive) {
+            throw new RendererPluginError(
+              'INTERACTION_ALREADY_BOUND',
+              'Renderer Service already has an Interaction Projection Binding.',
+            );
+          }
+          interactionBindingActive = true;
+          let bindingDisposed = false;
+          return Object.freeze({
+            update(projection: InteractionProjection | null): void {
+              assertActive();
+              if (bindingDisposed) {
+                throw new RendererPluginError(
+                  'INTERACTION_BINDING_DISPOSED',
+                  'Interaction Projection Binding has been disposed.',
+                );
+              }
+              renderer.updateInteraction(projection);
+            },
+            dispose(): void {
+              if (bindingDisposed) return;
+              bindingDisposed = true;
+              renderer.updateInteraction(null);
+              interactionBindingActive = false;
+            },
+          });
+        },
         subscribeInput(listener: RendererInputListener): () => void {
           assertActive();
           if (typeof listener !== 'function') {

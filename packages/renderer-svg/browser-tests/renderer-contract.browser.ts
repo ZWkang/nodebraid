@@ -73,6 +73,131 @@ try {
     },
   });
 
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionFirstNode()', {
+    previewPosition: { x: '80', y: '90' },
+    documentPosition: { x: 10, y: 20 },
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionClear()', {
+    previewX: '80',
+    restoredX: '10',
+    preservedNodeIdentity: true,
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionEdge()', {
+    sourceX: '120',
+    sourceY: '110',
+    targetX: '240',
+    targetY: '120',
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgViewportInteractionProjection()', {
+    previewTransform: 'matrix(2 0 0 2 40 50)',
+    sessionViewport: { x: 10, y: 20, zoom: 2 },
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionHit()', {
+    hit: { type: 'node', nodeId: 'interaction-hit-node', worldPoint: { x: 100, y: 100 } },
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionIsolation()', {
+    nodeX: '80',
+    hit: { type: 'node', nodeId: 'interaction-isolation-node', worldPoint: { x: 100, y: 100 } },
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionBaselineMismatch()', {
+    error: {
+      name: 'RendererError',
+      domain: 'renderer',
+      code: 'INTERACTION_OUT_OF_SYNC',
+      details: { issue: 'NODE_POSITION_MISMATCH' },
+    },
+    projectionUnchanged: true,
+    nodeX: '10',
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionDuplicateNode()', {
+    error: {
+      name: 'RendererError',
+      domain: 'renderer',
+      code: 'INVALID_INTERACTION_PROJECTION',
+      details: { issue: 'DUPLICATE_NODE' },
+    },
+    projectionUnchanged: true,
+    nodeX: '10',
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionInvalidPosition()', {
+    error: {
+      name: 'RendererError',
+      domain: 'renderer',
+      code: 'INVALID_INTERACTION_PROJECTION',
+      details: { issue: 'INVALID_NODE_POSITION', field: 'position.x' },
+    },
+    projectionUnchanged: true,
+    nodeX: '10',
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionOrder()', {
+    error: {
+      name: 'RendererError',
+      domain: 'renderer',
+      code: 'INVALID_INTERACTION_PROJECTION',
+      details: { issue: 'NON_CANONICAL_NODE_ORDER' },
+    },
+    projectionUnchanged: true,
+    nodeX: '10',
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionEmpty()', {
+    error: {
+      name: 'RendererError',
+      domain: 'renderer',
+      code: 'INVALID_INTERACTION_PROJECTION',
+      details: { issue: 'EMPTY_NODE_DRAG' },
+    },
+    projectionUnchanged: true,
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionUnknownType()', {
+    error: {
+      name: 'RendererError',
+      domain: 'renderer',
+      code: 'INVALID_INTERACTION_PROJECTION',
+      details: { issue: 'INVALID_PROJECTION_TYPE' },
+    },
+    projectionUnchanged: true,
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionInvalidViewport()', {
+    error: {
+      name: 'RendererError',
+      domain: 'renderer',
+      code: 'INVALID_INTERACTION_PROJECTION',
+      details: { issue: 'INVALID_VIEWPORT', field: 'viewport.x' },
+    },
+    projectionUnchanged: true,
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgRuntimeInteractionProjection()', {
+    previewX: '80',
+    restoredX: '10',
+  });
+
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupInteractionProjectionInput()');
+  await runAgentBrowser(['click', '#interaction-projection-input-target']);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadInteractionProjectionInput()', {
+    type: 'pointer.down',
+    pointerId: 1,
+    pointerType: 'mouse',
+    screenPoint: { x: 200, y: 150 },
+    worldPoint: { x: 80, y: 50 },
+    button: 'primary',
+    pressedButtons: ['primary'],
+    modifiers: { alt: false, control: false, meta: false, shift: false },
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownInteractionProjectionInput()');
+
   await assertBrowserScenario('globalThis.__cflowRendererSvgTicket02FirstEdge()', {
     layerClasses: ['cflow-renderer-svg__edges', 'cflow-renderer-svg__nodes'],
     edgeIds: ['edge-a', 'edge-b'],
