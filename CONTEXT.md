@@ -220,6 +220,14 @@ _Avoid_: Wheel Event, Scroll Command, Native Delta
 Renderer Input 中描述 key down 或 key up、逻辑键值、物理键位、重复状态与修饰键事实的成员。
 _Avoid_: Keyboard Event, Text Input, Shortcut Command
 
+**Focus Input**:
+Renderer Input 中描述 Renderer Focus 获得或丢失的逻辑转换，不携带原生焦点对象或后端事件。
+_Avoid_: DOM Focus Event, Active Element, Keyboard Input
+
+**Input Rejection**:
+Interaction 因当前 Active Gesture 或 Pointer 所有权而明确不应用一条已规范化 Renderer Input 的结果；它可观察，但不是结构失败或 Gesture Cancellation。
+_Avoid_: Ignored Input, Silent Fallback, Input Fault
+
 **Renderer Input Subscription**:
 按 Renderer 已标准化的输入顺序同步接收 Renderer Input 的可取消观察关系。
 _Avoid_: Native Listener, Event Queue, Observable Stream
@@ -247,6 +255,58 @@ _Avoid_: Canvas Renderer Service, Renderer Host, Mutable Renderer
 **Interaction**:
 解释 Renderer Input 与 Hit Result，并据此更新 Session 或执行 Command 的画布行为能力。
 _Avoid_: Renderer Behavior, Native Event Handler, Direct Document Mutation
+
+**Active Gesture**:
+Interaction 当前正在解释的一段连续行为；它由一个 Gesture Pointer 驱动，并在提交稳定结果或取消时结束。
+_Avoid_: Active Pointer, Drag Session, Primary Gesture
+
+**Gesture Pointer**:
+驱动当前 Active Gesture 的 Active Pointer；同一 Interaction Activation 同时最多只有一个。
+_Avoid_: Primary Pointer, Selected Pointer, Captured Pointer
+
+**Gesture Preview**:
+Active Gesture 期间由 Interaction 拥有的瞬态候选视图状态，不是 Document 或 Session 的稳定状态。
+_Avoid_: Session State, Document Draft, Renderer State
+
+**Interaction Projection**:
+Interaction 为显示 Gesture Preview 产生的不可变、渲染后端无关语义表示；Renderer 可以持有可重建投影，但不因此拥有 Active Gesture。
+_Avoid_: Renderer Snapshot, DOM Overlay, Mutable Gesture State
+
+**Interaction Projection Binding**:
+一份 Renderer Activation 内排他替换或清除 Interaction Projection 的有界写权；同一 Renderer 同时最多只有一份。
+_Avoid_: Projection Registry, Renderer Handle, Shared Preview Channel
+
+**Projection Baseline**:
+Interaction Projection 所依赖的最小稳定状态证据；Node Drag 使用每个 Node 的起点 position，Viewport Pan 使用起点 Viewport，而不把无关的全局 revision 当作有效性条件。
+_Avoid_: Source Revision, Renderer Baseline, Full Session Snapshot
+
+**Effective Renderer State**:
+Renderer 当前已接受的 Document、Session 与最新 Interaction Projection 合成的语义状态，用于显示、命中与输入坐标转换。
+_Avoid_: Renderer Snapshot, Document State, Gesture State
+
+**Renderer Sync Failure**:
+Renderer Runtime 在一次状态同步失败及其唯一完整恢复也失败后进入的终态；该 Activation 不再发布 Input 或接受交互控制。
+_Avoid_: Temporary Renderer Error, Retry State, Interaction Cancellation
+
+**Additive Modifier**:
+Interaction 中表示成员资格切换的输入修饰语义；Shift、Meta 或 Control 任一按下时成立，Alt 不属于该语义。
+_Avoid_: Platform Command Key, Range Selection Modifier, Alt Modifier
+
+**Node Drag**:
+为一个或多个已选 Node 产生绝对候选 World position，并以稳定 Document 结果或取消结束的 Active Gesture。
+_Avoid_: Node Transaction, Renderer Drag, Position Stream
+
+**Viewport Pan**:
+根据 Gesture Pointer 的 Screen Point 位移产生候选 Viewport，并以稳定 Session 结果或取消结束的 Active Gesture。
+_Avoid_: Canvas Drag, Renderer Translation, Document Pan
+
+**Stale Gesture**:
+起点的 Document 或 Session 证据已不再与当前稳定状态一致、因而其 Gesture Preview 不能作为当前结果接受的 Active Gesture。
+_Avoid_: Old Pointer, Stale Renderer, Rebased Gesture
+
+**Move Nodes Command**:
+仅在每个目标 Node 的当前 position 与声明起点一致时，原子提交所有绝对目标 position 的强类型 Command。
+_Avoid_: Move Delta, Drag Commit, Position Patch
 
 **Layout Engine**:
 根据已提交的画布图计算候选布局、但不修改 Document 的能力。
