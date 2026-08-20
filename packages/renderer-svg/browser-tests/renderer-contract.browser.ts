@@ -184,6 +184,50 @@ try {
     restoredX: '10',
   });
 
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupSelectionInteraction()');
+  await runAgentBrowser(['click', '[data-cflow-node-id="selection-node"]']);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+    nodeIds: ['selection-node'],
+    edgeIds: [],
+  });
+  await runAgentBrowser(['click', '[data-cflow-edge-id="selection-edge"]']);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+    nodeIds: [],
+    edgeIds: ['selection-edge'],
+  });
+  await runAgentBrowser(['click', '#selection-interaction-target']);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+    nodeIds: [],
+    edgeIds: [],
+  });
+  await runAgentBrowser(['click', '[data-cflow-node-id="selection-node"]']);
+  await dispatchShiftClick(340, 120);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+    nodeIds: ['selection-node', 'selection-target-node'],
+    edgeIds: [],
+  });
+  await dispatchMouseDown(160, 120);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+    nodeIds: ['selection-node', 'selection-target-node'],
+    edgeIds: [],
+  });
+  await dispatchMouseUp(160, 120);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+    nodeIds: ['selection-node'],
+    edgeIds: [],
+  });
+  await dispatchShiftClick(250, 120);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+    nodeIds: ['selection-node'],
+    edgeIds: ['selection-edge'],
+  });
+  await dispatchShiftClick(200, 150);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+    nodeIds: ['selection-node'],
+    edgeIds: ['selection-edge'],
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownSelectionInteraction()');
+
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupInteractionProjectionInput()');
   await runAgentBrowser(['click', '#interaction-projection-input-target']);
   await assertBrowserScenario('globalThis.__cflowRendererSvgReadInteractionProjectionInput()', {
@@ -959,6 +1003,57 @@ async function dispatchCapturedPointerSequence(): Promise<void> {
       type: 'mouseReleased',
       x: 350,
       y: 50,
+      button: 'left',
+      buttons: 0,
+      clickCount: 1,
+    });
+  });
+}
+
+async function dispatchShiftClick(x: number, y: number): Promise<void> {
+  await withRendererPageCdp(async (send) => {
+    await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y, buttons: 0, modifiers: 8 });
+    await send('Input.dispatchMouseEvent', {
+      type: 'mousePressed',
+      x,
+      y,
+      button: 'left',
+      buttons: 1,
+      clickCount: 1,
+      modifiers: 8,
+    });
+    await send('Input.dispatchMouseEvent', {
+      type: 'mouseReleased',
+      x,
+      y,
+      button: 'left',
+      buttons: 0,
+      clickCount: 1,
+      modifiers: 8,
+    });
+  });
+}
+
+async function dispatchMouseDown(x: number, y: number): Promise<void> {
+  await withRendererPageCdp(async (send) => {
+    await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y, buttons: 0 });
+    await send('Input.dispatchMouseEvent', {
+      type: 'mousePressed',
+      x,
+      y,
+      button: 'left',
+      buttons: 1,
+      clickCount: 1,
+    });
+  });
+}
+
+async function dispatchMouseUp(x: number, y: number): Promise<void> {
+  await withRendererPageCdp(async (send) => {
+    await send('Input.dispatchMouseEvent', {
+      type: 'mouseReleased',
+      x,
+      y,
       button: 'left',
       buttons: 0,
       clickCount: 1,

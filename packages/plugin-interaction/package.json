@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/renderer-svg",
+  "name": "@cflow/plugin-interaction",
   "type": "module",
   "version": "0.0.1",
-  "description": "Reference-quality SVG Renderer Provider for CFlow.",
+  "description": "Interaction Runtime Plugin for CFlow.",
   "publishConfig": {
     "access": "public"
   },
@@ -14,15 +14,14 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ZWkang/cflow.git",
-    "directory": "packages/renderer-svg"
+    "directory": "packages/plugin-interaction"
   },
   "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/renderer-svg#readme",
+  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/plugin-interaction#readme",
   "keywords": [
     "cflow",
-    "canvas",
-    "renderer",
-    "svg"
+    "interaction",
+    "plugin-runtime"
   ],
   "sideEffects": false,
   "exports": {
@@ -41,19 +40,19 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
-    "build:dependencies": "bun run --filter '@cflow/renderer-api' build",
-    "build:test-dependencies": "bun run --filter '@cflow/plugin-renderer' build && bun run --filter '@cflow/plugin-interaction' build",
+    "build:dependencies": "bun run --filter '@cflow/plugin-command' build && bun run --filter '@cflow/plugin-kernel' build && bun run --filter '@cflow/plugin-session' build && bun run --filter '@cflow/plugin-renderer' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "test:artifacts": "bun run ./artifacts/check-declarations.ts",
-    "test:browser": "bun run build:test-dependencies && bun run ./browser-tests/renderer-contract.browser.ts",
-    "typecheck": "bun run build:test-dependencies && tsgo --noEmit -p tsconfig.json"
+    "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/diagnostics": "workspace:*",
     "@cflow/interaction-api": "workspace:*",
-    "@cflow/kernel": "workspace:*",
+    "@cflow/plugin-command": "workspace:*",
+    "@cflow/plugin-kernel": "workspace:*",
+    "@cflow/plugin-renderer": "workspace:*",
+    "@cflow/plugin-session": "workspace:*",
     "@cflow/renderer-api": "workspace:*",
-    "@cflow/session-api": "workspace:*"
+    "@cflow/runtime-cordis": "workspace:*"
   }
 }

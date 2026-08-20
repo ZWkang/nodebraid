@@ -1,6 +1,8 @@
 // Public-seam browser scenarios for the complete SVG Renderer contract.
 import { createCanvasKernel, edgeId, nodeId } from '@cflow/kernel';
 import type { DiagnosticFault } from '@cflow/diagnostics';
+import { interactionPlugin } from '@cflow/plugin-interaction';
+import { commandPlugin } from '@cflow/plugin-command';
 import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
 import { createRendererPlugin, rendererService, type RendererService } from '@cflow/plugin-renderer';
 import { sessionPlugin, sessionService, type SessionService } from '@cflow/plugin-session';
@@ -59,6 +61,11 @@ interface InteractionProjectionIsolationResult {
 interface RuntimeInteractionProjectionResult {
   readonly previewX: string | null;
   readonly restoredX: string | null;
+}
+
+interface SelectionInteractionResult {
+  readonly nodeIds: readonly string[];
+  readonly edgeIds: readonly string[];
 }
 
 interface FirstEdgeResult {
@@ -453,6 +460,9 @@ declare global {
   var __cflowRendererSvgInteractionProjectionUnknownType: () => Promise<GeometryErrorResult>;
   var __cflowRendererSvgInteractionProjectionInvalidViewport: () => Promise<GeometryErrorResult>;
   var __cflowRendererSvgRuntimeInteractionProjection: () => Promise<RuntimeInteractionProjectionResult>;
+  var __cflowRendererSvgSetupSelectionInteraction: () => Promise<void>;
+  var __cflowRendererSvgReadSelectionInteraction: () => SelectionInteractionResult;
+  var __cflowRendererSvgTeardownSelectionInteraction: () => Promise<void>;
   var __cflowRendererSvgSetupInteractionProjectionInput: () => Promise<void>;
   var __cflowRendererSvgReadInteractionProjectionInput: () => RendererInput | undefined;
   var __cflowRendererSvgTeardownInteractionProjectionInput: () => Promise<void>;
@@ -2730,6 +2740,84 @@ let interactionProjectionInputRenderer: CanvasRenderer | undefined;
 let interactionProjectionInputTarget: SVGSVGElement | undefined;
 let stopInteractionProjectionInput: (() => void) | undefined;
 const interactionProjectionInputs: RendererInput[] = [];
+let selectionInteractionHost: ReturnType<typeof createPluginHost> | undefined;
+let selectionInteractionTarget: SVGSVGElement | undefined;
+let selectionInteractionSession: SessionService | undefined;
+
+globalThis.__cflowRendererSvgSetupSelectionInteraction = async (): Promise<void> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.id = 'selection-interaction-target';
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  target.style.position = 'fixed';
+  target.style.left = '0';
+  target.style.top = '0';
+  target.style.zIndex = '1002';
+  document.body.append(target);
+  const host = createPluginHost();
+  const rendererPlugin = createRendererPlugin(createSvgRenderer);
+  let kernel: KernelService | undefined;
+  let session: SessionService | undefined;
+  const consumer = definePlugin({
+    requires: { kernel: kernelService, session: sessionService },
+    setup(context) {
+      kernel = context.services.kernel;
+      session = context.services.session;
+    },
+  });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(rendererPlugin, { target }),
+    host.install(interactionPlugin),
+    host.install(consumer),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (!kernel || !session) throw new Error('Expected the real Interaction Runtime Services.');
+  kernel.transact((transaction) => {
+    const selectedNodeId = nodeId('selection-node');
+    const targetNodeId = nodeId('selection-target-node');
+    transaction.nodes.add({
+      id: selectedNodeId,
+      type: 'task',
+      position: { x: 120, y: 100 },
+      size: { width: 80, height: 40 },
+      data: null,
+    });
+    transaction.nodes.add({
+      id: targetNodeId,
+      type: 'task',
+      position: { x: 300, y: 100 },
+      size: { width: 80, height: 40 },
+      data: null,
+    });
+    transaction.edges.add({
+      id: edgeId('selection-edge'),
+      type: 'flow',
+      source: { nodeId: selectedNodeId },
+      target: { nodeId: targetNodeId },
+      data: null,
+    });
+  });
+  selectionInteractionHost = host;
+  selectionInteractionTarget = target;
+  selectionInteractionSession = session;
+};
+
+globalThis.__cflowRendererSvgReadSelectionInteraction = (): SelectionInteractionResult => {
+  const selection = selectionInteractionSession?.getSnapshot().selection;
+  if (!selection) throw new Error('Expected the Selection Interaction Session.');
+  return selection;
+};
+
+globalThis.__cflowRendererSvgTeardownSelectionInteraction = async (): Promise<void> => {
+  await selectionInteractionHost?.dispose();
+  selectionInteractionHost = undefined;
+  selectionInteractionSession = undefined;
+  selectionInteractionTarget?.remove();
+  selectionInteractionTarget = undefined;
+};
 
 globalThis.__cflowRendererSvgSetupInteractionProjectionInput = async (): Promise<void> => {
   const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
