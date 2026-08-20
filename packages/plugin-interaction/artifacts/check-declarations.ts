@@ -10,6 +10,8 @@ const forbiddenPlatformType = /\b(?:HTMLElement|SVGElement|CanvasRenderingContex
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const indexDeclaration = await readFile(join(dist, 'index.d.ts'), 'utf8');
 assert.match(indexDeclaration, /export \{ interactionPlugin \}/);
+assert.match(indexDeclaration, /InteractionError/);
+assert.match(indexDeclaration, /moveNodesCommand/);
 for (const declaration of await collectDeclarations(dist)) {
   assert.doesNotMatch(declaration.contents, forbiddenImport, declaration.path);
   assert.doesNotMatch(declaration.contents, forbiddenPlatformType, declaration.path);
@@ -17,3 +19,5 @@ for (const declaration of await collectDeclarations(dist)) {
 
 const packageExports = await import('@cflow/plugin-interaction');
 assert.equal(typeof packageExports.interactionPlugin, 'object');
+assert.equal(typeof packageExports.InteractionError, 'function');
+assert.equal(typeof packageExports.moveNodesCommand, 'object');

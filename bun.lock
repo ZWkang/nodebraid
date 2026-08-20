@@ -104,7 +104,9 @@
       "name": "@cflow/plugin-interaction",
       "version": "0.0.1",
       "dependencies": {
+        "@cflow/diagnostics": "workspace:*",
         "@cflow/interaction-api": "workspace:*",
+        "@cflow/kernel": "workspace:*",
         "@cflow/plugin-command": "workspace:*",
         "@cflow/plugin-kernel": "workspace:*",
         "@cflow/plugin-renderer": "workspace:*",

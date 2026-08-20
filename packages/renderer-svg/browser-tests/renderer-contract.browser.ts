@@ -228,6 +228,68 @@ try {
   });
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownSelectionInteraction()');
 
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupNodeDragInteraction()');
+  await dispatchMouseDown(160, 120);
+  await dispatchMouseMove(200, 160);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteraction()', {
+    previewPosition: { x: '160', y: '140' },
+    documentPosition: { x: 120, y: 100 },
+  });
+  await dispatchMouseUp(200, 160);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteraction()', {
+    previewPosition: { x: '160', y: '140' },
+    documentPosition: { x: 160, y: 140 },
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgUndoNodeDragInteraction()');
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteraction()', {
+    previewPosition: { x: '120', y: '100' },
+    documentPosition: { x: 120, y: 100 },
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgRedoNodeDragInteraction()');
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteraction()', {
+    previewPosition: { x: '160', y: '140' },
+    documentPosition: { x: 160, y: 140 },
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgPrepareMultiNodeDragInteraction()');
+  await dispatchMouseDown(200, 160);
+  await dispatchMouseMove(240, 200);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadMultiNodeDragInteraction()', {
+    previewPositions: [
+      { id: 'drag-node', x: '200', y: '180' },
+      { id: 'drag-node-b', x: '340', y: '140' },
+    ],
+    documentPositions: [
+      { id: 'drag-node', x: 160, y: 140 },
+      { id: 'drag-node-b', x: 300, y: 100 },
+    ],
+  });
+  await dispatchMouseUp(240, 200);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadMultiNodeDragInteraction()', {
+    previewPositions: [
+      { id: 'drag-node', x: '200', y: '180' },
+      { id: 'drag-node-b', x: '340', y: '140' },
+    ],
+    documentPositions: [
+      { id: 'drag-node', x: 200, y: 180 },
+      { id: 'drag-node-b', x: 340, y: 140 },
+    ],
+  });
+  await dispatchMouseDown(240, 200);
+  await dispatchMouseMove(280, 240);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgMoveNodeDragExternally()');
+  await dispatchMouseUp(280, 240);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadMultiNodeDragInteraction()', {
+    previewPositions: [
+      { id: 'drag-node', x: '260', y: '180' },
+      { id: 'drag-node-b', x: '340', y: '140' },
+    ],
+    documentPositions: [
+      { id: 'drag-node', x: 260, y: 180 },
+      { id: 'drag-node-b', x: 340, y: 140 },
+    ],
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownNodeDragInteraction()');
+
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupInteractionProjectionInput()');
   await runAgentBrowser(['click', '#interaction-projection-input-target']);
   await assertBrowserScenario('globalThis.__cflowRendererSvgReadInteractionProjectionInput()', {
@@ -1057,6 +1119,18 @@ async function dispatchMouseUp(x: number, y: number): Promise<void> {
       button: 'left',
       buttons: 0,
       clickCount: 1,
+    });
+  });
+}
+
+async function dispatchMouseMove(x: number, y: number): Promise<void> {
+  await withRendererPageCdp(async (send) => {
+    await send('Input.dispatchMouseEvent', {
+      type: 'mouseMoved',
+      x,
+      y,
+      button: 'left',
+      buttons: 1,
     });
   });
 }

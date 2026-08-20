@@ -2,7 +2,8 @@
 import { createCanvasKernel, edgeId, nodeId } from '@cflow/kernel';
 import type { DiagnosticFault } from '@cflow/diagnostics';
 import { interactionPlugin } from '@cflow/plugin-interaction';
-import { commandPlugin } from '@cflow/plugin-command';
+import { commandPlugin, commandService, type CommandService } from '@cflow/plugin-command';
+import { historyPlugin, redoCommand, undoCommand } from '@cflow/plugin-history';
 import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
 import { createRendererPlugin, rendererService, type RendererService } from '@cflow/plugin-renderer';
 import { sessionPlugin, sessionService, type SessionService } from '@cflow/plugin-session';
@@ -66,6 +67,16 @@ interface RuntimeInteractionProjectionResult {
 interface SelectionInteractionResult {
   readonly nodeIds: readonly string[];
   readonly edgeIds: readonly string[];
+}
+
+interface NodeDragInteractionResult {
+  readonly previewPosition: Readonly<{ x: string | null; y: string | null }>;
+  readonly documentPosition: Readonly<{ x: number; y: number }>;
+}
+
+interface MultiNodeDragInteractionResult {
+  readonly previewPositions: readonly Readonly<{ id: string; x: string | null; y: string | null }>[];
+  readonly documentPositions: readonly Readonly<{ id: string; x: number; y: number }>[];
 }
 
 interface FirstEdgeResult {
@@ -463,6 +474,14 @@ declare global {
   var __cflowRendererSvgSetupSelectionInteraction: () => Promise<void>;
   var __cflowRendererSvgReadSelectionInteraction: () => SelectionInteractionResult;
   var __cflowRendererSvgTeardownSelectionInteraction: () => Promise<void>;
+  var __cflowRendererSvgSetupNodeDragInteraction: () => Promise<void>;
+  var __cflowRendererSvgReadNodeDragInteraction: () => NodeDragInteractionResult;
+  var __cflowRendererSvgUndoNodeDragInteraction: () => Promise<void>;
+  var __cflowRendererSvgRedoNodeDragInteraction: () => Promise<void>;
+  var __cflowRendererSvgPrepareMultiNodeDragInteraction: () => void;
+  var __cflowRendererSvgReadMultiNodeDragInteraction: () => MultiNodeDragInteractionResult;
+  var __cflowRendererSvgMoveNodeDragExternally: () => void;
+  var __cflowRendererSvgTeardownNodeDragInteraction: () => Promise<void>;
   var __cflowRendererSvgSetupInteractionProjectionInput: () => Promise<void>;
   var __cflowRendererSvgReadInteractionProjectionInput: () => RendererInput | undefined;
   var __cflowRendererSvgTeardownInteractionProjectionInput: () => Promise<void>;
@@ -2743,6 +2762,138 @@ const interactionProjectionInputs: RendererInput[] = [];
 let selectionInteractionHost: ReturnType<typeof createPluginHost> | undefined;
 let selectionInteractionTarget: SVGSVGElement | undefined;
 let selectionInteractionSession: SessionService | undefined;
+let nodeDragInteractionHost: ReturnType<typeof createPluginHost> | undefined;
+let nodeDragInteractionTarget: SVGSVGElement | undefined;
+let nodeDragInteractionKernel: KernelService | undefined;
+let nodeDragInteractionCommands: CommandService | undefined;
+let nodeDragInteractionSession: SessionService | undefined;
+
+globalThis.__cflowRendererSvgSetupNodeDragInteraction = async (): Promise<void> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.id = 'node-drag-interaction-target';
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  target.style.position = 'fixed';
+  target.style.left = '0';
+  target.style.top = '0';
+  target.style.zIndex = '1003';
+  document.body.append(target);
+  const host = createPluginHost();
+  const rendererPlugin = createRendererPlugin(createSvgRenderer);
+  let kernel: KernelService | undefined;
+  let commands: CommandService | undefined;
+  let session: SessionService | undefined;
+  const consumer = definePlugin({
+    requires: { kernel: kernelService, commands: commandService, session: sessionService },
+    setup(context) {
+      kernel = context.services.kernel;
+      commands = context.services.commands;
+      session = context.services.session;
+    },
+  });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(rendererPlugin, { target }),
+    host.install(interactionPlugin),
+    host.install(historyPlugin),
+    host.install(consumer),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (!kernel || !commands || !session) throw new Error('Expected the Node Drag Runtime Services.');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({
+      id: nodeId('drag-node'),
+      type: 'task',
+      position: { x: 120, y: 100 },
+      size: { width: 80, height: 40 },
+      data: null,
+    });
+    transaction.nodes.add({
+      id: nodeId('drag-node-b'),
+      type: 'task',
+      position: { x: 300, y: 100 },
+      size: { width: 80, height: 40 },
+      data: null,
+    });
+  });
+  nodeDragInteractionHost = host;
+  nodeDragInteractionTarget = target;
+  nodeDragInteractionKernel = kernel;
+  nodeDragInteractionCommands = commands;
+  nodeDragInteractionSession = session;
+};
+
+globalThis.__cflowRendererSvgReadNodeDragInteraction = (): NodeDragInteractionResult => {
+  const target = nodeDragInteractionTarget;
+  const kernel = nodeDragInteractionKernel;
+  if (!target || !kernel) throw new Error('Expected the active Node Drag Interaction Runtime.');
+  const node = target.querySelector<SVGRectElement>('[data-cflow-node-id="drag-node"]');
+  const documentNode = kernel.read().query.getNode(nodeId('drag-node'));
+  if (!node || !documentNode) throw new Error('Expected the Node Drag preview and Document Node.');
+  return {
+    previewPosition: { x: node.getAttribute('x'), y: node.getAttribute('y') },
+    documentPosition: documentNode.position,
+  };
+};
+
+globalThis.__cflowRendererSvgUndoNodeDragInteraction = async (): Promise<void> => {
+  if (!nodeDragInteractionCommands) throw new Error('Expected Node Drag Commands before Undo.');
+  await nodeDragInteractionCommands.execute(undoCommand, undefined);
+};
+
+globalThis.__cflowRendererSvgRedoNodeDragInteraction = async (): Promise<void> => {
+  if (!nodeDragInteractionCommands) throw new Error('Expected Node Drag Commands before Redo.');
+  await nodeDragInteractionCommands.execute(redoCommand, undefined);
+};
+
+globalThis.__cflowRendererSvgPrepareMultiNodeDragInteraction = (): void => {
+  if (!nodeDragInteractionSession) throw new Error('Expected Node Drag Session before group selection.');
+  nodeDragInteractionSession.setSelection({
+    nodeIds: [nodeId('drag-node'), nodeId('drag-node-b')],
+    edgeIds: [],
+  });
+};
+
+globalThis.__cflowRendererSvgReadMultiNodeDragInteraction = (): MultiNodeDragInteractionResult => {
+  const target = nodeDragInteractionTarget;
+  const kernel = nodeDragInteractionKernel;
+  if (!target || !kernel) throw new Error('Expected the active multi-Node Drag Runtime.');
+  const ids = [nodeId('drag-node'), nodeId('drag-node-b')];
+  return {
+    previewPositions: ids.map((id) => {
+      const node = target.querySelector<SVGRectElement>(`[data-cflow-node-id="${id}"]`);
+      if (!node) throw new Error('Expected each multi-Node Drag SVG Node.');
+      return { id, x: node.getAttribute('x'), y: node.getAttribute('y') };
+    }),
+    documentPositions: ids.map((id) => {
+      const node = kernel.read().query.getNode(id);
+      if (!node) throw new Error('Expected each multi-Node Drag Document Node.');
+      return { id, x: node.position.x, y: node.position.y };
+    }),
+  };
+};
+
+globalThis.__cflowRendererSvgMoveNodeDragExternally = (): void => {
+  if (!nodeDragInteractionKernel) throw new Error('Expected Node Drag Kernel before external movement.');
+  nodeDragInteractionKernel.transact((transaction) => {
+    const id = nodeId('drag-node');
+    const node = transaction.query.getNode(id);
+    if (!node) throw new Error('Expected the externally moved Node.');
+    transaction.nodes.replace(id, { ...node, position: { x: 260, y: 180 } });
+  });
+};
+
+globalThis.__cflowRendererSvgTeardownNodeDragInteraction = async (): Promise<void> => {
+  await nodeDragInteractionHost?.dispose();
+  nodeDragInteractionHost = undefined;
+  nodeDragInteractionKernel = undefined;
+  nodeDragInteractionCommands = undefined;
+  nodeDragInteractionSession = undefined;
+  nodeDragInteractionTarget?.remove();
+  nodeDragInteractionTarget = undefined;
+};
 
 globalThis.__cflowRendererSvgSetupSelectionInteraction = async (): Promise<void> => {
   const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
