@@ -4,7 +4,7 @@
 
 **Blocked by:** 02 — 实现完整 Selection 交互。
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 - [ ] primary Canvas drag 与 middle-button drag 使用 Screen delta 产生 Viewport Pan Projection，pointerup 清 Preview 后一次写入 Session。
 - [ ] Renderer Input 发布 backend-neutral focus gained/lost，SVG 不泄漏 DOM FocusEvent 或后端对象。

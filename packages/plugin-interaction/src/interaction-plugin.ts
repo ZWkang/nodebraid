@@ -19,6 +19,14 @@ interface NodeDragCandidate {
   moves?: readonly MoveNodeInput[];
 }
 
+interface ViewportPanCandidate {
+  readonly pointerId: number;
+  readonly startScreenPoint: Point;
+  readonly baseViewport: Readonly<{ x: number; y: number; zoom: number }>;
+  active: boolean;
+  viewport?: Readonly<{ x: number; y: number; zoom: number }>;
+}
+
 export const interactionPlugin = definePlugin({
   name: '@cflow/plugin-interaction',
   requires: {
@@ -81,7 +89,20 @@ export const interactionPlugin = definePlugin({
     let pressedPointerId: number | undefined;
     let completeClick: (() => void) | undefined;
     let nodeDragCandidate: NodeDragCandidate | undefined;
+    let viewportPanCandidate: ViewportPanCandidate | undefined;
     const stopInput = renderer.subscribeInput((input) => {
+      if (input.type === 'wheel') {
+        if (pressedPointerId !== undefined) return;
+        const current = session.getSnapshot().viewport;
+        const zoom = Math.max(0.1, Math.min(8, current.zoom * Math.exp(-input.deltaY * 0.002)));
+        if (zoom === current.zoom) return;
+        session.setViewport({
+          x: input.screenPoint.x - input.worldPoint.x * zoom,
+          y: input.screenPoint.y - input.worldPoint.y * zoom,
+          zoom,
+        });
+        return;
+      }
       if (input.type === 'pointer.down') {
         if (pressedPointerId !== undefined || input.button !== 'primary') return;
         const hit = renderer.hitTest(input.screenPoint);
@@ -111,6 +132,13 @@ export const interactionPlugin = definePlugin({
               }),
               active: false,
             };
+          } else if (hit.type === 'canvas') {
+            viewportPanCandidate = {
+              pointerId: input.pointerId,
+              startScreenPoint: input.screenPoint,
+              baseViewport: session.getSnapshot().viewport,
+              active: false,
+            };
           }
           if (hit.type === 'node' || hit.type === 'port') {
             const selection = session.getSnapshot().selection;
@@ -128,6 +156,7 @@ export const interactionPlugin = definePlugin({
           pressedPointerId = undefined;
           completeClick = undefined;
           nodeDragCandidate = undefined;
+          viewportPanCandidate = undefined;
           try {
             renderer.releasePointer(input.pointerId);
           } catch (cleanupError) {
@@ -160,6 +189,25 @@ export const interactionPlugin = definePlugin({
         });
         return;
       }
+      if (input.type === 'pointer.move' && input.pointerId === pressedPointerId && viewportPanCandidate) {
+        const deltaX = input.screenPoint.x - viewportPanCandidate.startScreenPoint.x;
+        const deltaY = input.screenPoint.y - viewportPanCandidate.startScreenPoint.y;
+        if (!viewportPanCandidate.active && Math.hypot(deltaX, deltaY) < 4) return;
+        viewportPanCandidate.active = true;
+        completeClick = undefined;
+        const viewport = {
+          x: viewportPanCandidate.baseViewport.x + deltaX,
+          y: viewportPanCandidate.baseViewport.y + deltaY,
+          zoom: viewportPanCandidate.baseViewport.zoom,
+        };
+        viewportPanCandidate.viewport = viewport;
+        projection.update({
+          type: 'viewport-pan',
+          baseViewport: viewportPanCandidate.baseViewport,
+          viewport,
+        });
+        return;
+      }
       if (input.type === 'pointer.up' && input.pointerId === pressedPointerId) {
         pressedPointerId = undefined;
         if (nodeDragCandidate?.active) {
@@ -185,7 +233,16 @@ export const interactionPlugin = definePlugin({
           }
           return;
         }
+        if (viewportPanCandidate?.active) {
+          const viewport = viewportPanCandidate.viewport;
+          viewportPanCandidate = undefined;
+          completeClick = undefined;
+          projection.update(null);
+          if (viewport) session.setViewport(viewport);
+          return;
+        }
         nodeDragCandidate = undefined;
+        viewportPanCandidate = undefined;
         const complete = completeClick;
         completeClick = undefined;
         complete?.();
@@ -193,7 +250,9 @@ export const interactionPlugin = definePlugin({
         pressedPointerId = undefined;
         completeClick = undefined;
         if (nodeDragCandidate?.active) projection.update(null);
+        if (viewportPanCandidate?.active) projection.update(null);
         nodeDragCandidate = undefined;
+        viewportPanCandidate = undefined;
       }
     });
     context.own(stopInput);

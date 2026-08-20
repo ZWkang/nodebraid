@@ -79,6 +79,11 @@ interface MultiNodeDragInteractionResult {
   readonly documentPositions: readonly Readonly<{ id: string; x: number; y: number }>[];
 }
 
+interface ViewportPanInteractionResult {
+  readonly transform: string | null;
+  readonly viewport: Readonly<{ x: number; y: number; zoom: number }>;
+}
+
 interface FirstEdgeResult {
   readonly layerClasses: readonly (string | null)[];
   readonly edgeIds: readonly (string | null)[];
@@ -482,6 +487,9 @@ declare global {
   var __cflowRendererSvgReadMultiNodeDragInteraction: () => MultiNodeDragInteractionResult;
   var __cflowRendererSvgMoveNodeDragExternally: () => void;
   var __cflowRendererSvgTeardownNodeDragInteraction: () => Promise<void>;
+  var __cflowRendererSvgSetupViewportPanInteraction: () => Promise<void>;
+  var __cflowRendererSvgReadViewportPanInteraction: () => ViewportPanInteractionResult;
+  var __cflowRendererSvgTeardownViewportPanInteraction: () => Promise<void>;
   var __cflowRendererSvgSetupInteractionProjectionInput: () => Promise<void>;
   var __cflowRendererSvgReadInteractionProjectionInput: () => RendererInput | undefined;
   var __cflowRendererSvgTeardownInteractionProjectionInput: () => Promise<void>;
@@ -2767,6 +2775,70 @@ let nodeDragInteractionTarget: SVGSVGElement | undefined;
 let nodeDragInteractionKernel: KernelService | undefined;
 let nodeDragInteractionCommands: CommandService | undefined;
 let nodeDragInteractionSession: SessionService | undefined;
+let viewportPanInteractionHost: ReturnType<typeof createPluginHost> | undefined;
+let viewportPanInteractionTarget: SVGSVGElement | undefined;
+let viewportPanInteractionSession: SessionService | undefined;
+
+globalThis.__cflowRendererSvgSetupViewportPanInteraction = async (): Promise<void> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.id = 'viewport-pan-interaction-target';
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  target.style.position = 'fixed';
+  target.style.left = '0';
+  target.style.top = '0';
+  target.style.zIndex = '1004';
+  document.body.append(target);
+  const host = createPluginHost();
+  const rendererPlugin = createRendererPlugin(createSvgRenderer);
+  let session: SessionService | undefined;
+  const consumer = definePlugin({
+    requires: { session: sessionService },
+    setup(context) {
+      session = context.services.session;
+    },
+  });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(rendererPlugin, { target }),
+    host.install(interactionPlugin),
+    host.install(consumer),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (!session) throw new Error('Expected the Viewport Pan Session Service.');
+  viewportPanInteractionHost = host;
+  viewportPanInteractionTarget = target;
+  viewportPanInteractionSession = session;
+};
+
+globalThis.__cflowRendererSvgReadViewportPanInteraction = (): ViewportPanInteractionResult => {
+  const target = viewportPanInteractionTarget;
+  const session = viewportPanInteractionSession;
+  if (!target || !session) throw new Error('Expected the active Viewport Pan Runtime.');
+  const viewport = session.getSnapshot().viewport;
+  return {
+    transform: target.querySelector('[data-cflow-renderer-svg-root]')?.getAttribute('transform') ?? null,
+    viewport: {
+      x: roundSix(viewport.x),
+      y: roundSix(viewport.y),
+      zoom: roundSix(viewport.zoom),
+    },
+  };
+};
+
+function roundSix(value: number): number {
+  return Math.round(value * 1_000_000) / 1_000_000;
+}
+
+globalThis.__cflowRendererSvgTeardownViewportPanInteraction = async (): Promise<void> => {
+  await viewportPanInteractionHost?.dispose();
+  viewportPanInteractionHost = undefined;
+  viewportPanInteractionSession = undefined;
+  viewportPanInteractionTarget?.remove();
+  viewportPanInteractionTarget = undefined;
+};
 
 globalThis.__cflowRendererSvgSetupNodeDragInteraction = async (): Promise<void> => {
   const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');

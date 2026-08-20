@@ -290,6 +290,29 @@ try {
   });
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownNodeDragInteraction()');
 
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupViewportPanInteraction()');
+  await dispatchMouseDown(50, 200);
+  await dispatchMouseMove(100, 250);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 50 50)',
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  await dispatchMouseUp(100, 250);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 50 50)',
+    viewport: { x: 50, y: 50, zoom: 1 },
+  });
+  await dispatchWheel(200, 150, 100);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(0.818730753078 0 0 0.818730753078 77.190387038303 68.126924692202)',
+    viewport: {
+      x: 77.190387,
+      y: 68.126925,
+      zoom: 0.818731,
+    },
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownViewportPanInteraction()');
+
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupInteractionProjectionInput()');
   await runAgentBrowser(['click', '#interaction-projection-input-target']);
   await assertBrowserScenario('globalThis.__cflowRendererSvgReadInteractionProjectionInput()', {
@@ -1131,6 +1154,18 @@ async function dispatchMouseMove(x: number, y: number): Promise<void> {
       y,
       button: 'left',
       buttons: 1,
+    });
+  });
+}
+
+async function dispatchWheel(x: number, y: number, deltaY: number): Promise<void> {
+  await withRendererPageCdp(async (send) => {
+    await send('Input.dispatchMouseEvent', {
+      type: 'mouseWheel',
+      x,
+      y,
+      deltaX: 0,
+      deltaY,
     });
   });
 }
