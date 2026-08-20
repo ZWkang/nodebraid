@@ -1,5 +1,6 @@
 export type {
   CanvasRenderer,
+  FocusInput,
   HitResult,
   InputModifiers,
   KeyboardInput,

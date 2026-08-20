@@ -277,6 +277,10 @@ interface FocusResult {
   readonly restoredTabIndex: string | null;
 }
 
+interface FocusInputResult {
+  readonly inputTypes: readonly string[];
+}
+
 interface PointerCaptureResult {
   readonly unknownBefore: GeometryErrorResult['error'];
   readonly sawDown: boolean;
@@ -489,6 +493,7 @@ declare global {
   var __cflowRendererSvgTeardownNodeDragInteraction: () => Promise<void>;
   var __cflowRendererSvgSetupViewportPanInteraction: () => Promise<void>;
   var __cflowRendererSvgReadViewportPanInteraction: () => ViewportPanInteractionResult;
+  var __cflowRendererSvgResetViewportPanInteraction: () => void;
   var __cflowRendererSvgTeardownViewportPanInteraction: () => Promise<void>;
   var __cflowRendererSvgSetupInteractionProjectionInput: () => Promise<void>;
   var __cflowRendererSvgReadInteractionProjectionInput: () => RendererInput | undefined;
@@ -524,6 +529,7 @@ declare global {
   var __cflowRendererSvgTicket08WheelKeyboardPolicy: () => Promise<WheelKeyboardPolicyResult>;
   var __cflowRendererSvgTicket09InputOrder: () => Promise<InputOrderResult>;
   var __cflowRendererSvgTicket09Focus: () => Promise<FocusResult>;
+  var __cflowRendererSvgInteractionFocusInput: () => Promise<FocusInputResult>;
   var __cflowRendererSvgTicket09SetupCapture: () => Promise<void>;
   var __cflowRendererSvgTicket09ReadCapture: () => PointerCaptureResult;
   var __cflowRendererSvgTicket09TeardownCapture: () => Promise<void>;
@@ -2792,10 +2798,12 @@ globalThis.__cflowRendererSvgSetupViewportPanInteraction = async (): Promise<voi
   const host = createPluginHost();
   const rendererPlugin = createRendererPlugin(createSvgRenderer);
   let session: SessionService | undefined;
+  let kernel: KernelService | undefined;
   const consumer = definePlugin({
-    requires: { session: sessionService },
+    requires: { session: sessionService, kernel: kernelService },
     setup(context) {
       session = context.services.session;
+      kernel = context.services.kernel;
     },
   });
   const installations = [
@@ -2807,10 +2815,24 @@ globalThis.__cflowRendererSvgSetupViewportPanInteraction = async (): Promise<voi
     host.install(consumer),
   ];
   await Promise.all(installations.map((installation) => installation.whenActive()));
-  if (!session) throw new Error('Expected the Viewport Pan Session Service.');
+  if (!session || !kernel) throw new Error('Expected the Viewport Pan Runtime Services.');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({
+      id: nodeId('pan-node'),
+      type: 'task',
+      position: { x: 120, y: 100 },
+      size: { width: 80, height: 40 },
+      data: null,
+    });
+  });
   viewportPanInteractionHost = host;
   viewportPanInteractionTarget = target;
   viewportPanInteractionSession = session;
+};
+
+globalThis.__cflowRendererSvgResetViewportPanInteraction = (): void => {
+  if (!viewportPanInteractionSession) throw new Error('Expected Viewport Pan Session before reset.');
+  viewportPanInteractionSession.setViewport({ x: 0, y: 0, zoom: 1 });
 };
 
 globalThis.__cflowRendererSvgReadViewportPanInteraction = (): ViewportPanInteractionResult => {
@@ -3310,6 +3332,32 @@ globalThis.__cflowRendererSvgTicket09Focus = async (): Promise<FocusResult> => {
   target.remove();
   document.body.style.minHeight = previousMinHeight;
   return { addedTabIndex, active, scrollY, restoredTabIndex };
+};
+
+globalThis.__cflowRendererSvgInteractionFocusInput = async (): Promise<FocusInputResult> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  document.body.append(target);
+  const renderer = createSvgRenderer({ target });
+  const kernel = createCanvasKernel();
+  renderer.updateDocument({ type: 'reset', view: kernel.read() });
+  renderer.updateSession({
+    selection: { nodeIds: [], edgeIds: [] },
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  const inputs: RendererInput[] = [];
+  const stop = renderer.subscribeInput((input) => inputs.push(input));
+  renderer.focus();
+  const nextFocus = document.createElement('button');
+  document.body.append(nextFocus);
+  nextFocus.focus();
+  const result: FocusInputResult = { inputTypes: inputs.map((input) => input.type) };
+  stop();
+  await renderer.dispose();
+  nextFocus.remove();
+  target.remove();
+  return result;
 };
 
 let captureRenderer: CanvasRenderer | undefined;

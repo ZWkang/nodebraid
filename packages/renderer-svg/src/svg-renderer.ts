@@ -287,10 +287,18 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
     assertProjectionSynchronized();
     applyDomEventPolicy(event, inputPolicies.contextMenu);
   };
+  const handleFocus = (event: FocusEvent): void => {
+    if (disposed) return;
+    assertNoObservedResizeError();
+    assertProjectionSynchronized();
+    emitInput(Object.freeze({ type: event.type === 'focus' ? 'focus.gained' : 'focus.lost' }));
+  };
   target.addEventListener('wheel', handleWheel, { passive: false });
   target.addEventListener('keydown', handleKeyboard);
   target.addEventListener('keyup', handleKeyboard);
   target.addEventListener('contextmenu', handleContextMenu);
+  target.addEventListener('focus', handleFocus);
+  target.addEventListener('blur', handleFocus);
 
   const renderer: CanvasRenderer = Object.freeze({
     updateDocument(update: RendererDocumentUpdate): void {
@@ -479,6 +487,8 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         attemptCleanup(cleanupErrors, () => target.removeEventListener('keydown', handleKeyboard));
         attemptCleanup(cleanupErrors, () => target.removeEventListener('keyup', handleKeyboard));
         attemptCleanup(cleanupErrors, () => target.removeEventListener('contextmenu', handleContextMenu));
+        attemptCleanup(cleanupErrors, () => target.removeEventListener('focus', handleFocus));
+        attemptCleanup(cleanupErrors, () => target.removeEventListener('blur', handleFocus));
         attemptCleanup(cleanupErrors, () => resizeObserver.disconnect());
         attemptCleanup(cleanupErrors, () => projection.remove());
         if (addedTabIndex) attemptCleanup(cleanupErrors, () => target.removeAttribute('tabindex'));

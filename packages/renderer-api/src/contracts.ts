@@ -49,7 +49,11 @@ export interface KeyboardInput {
   readonly modifiers: InputModifiers;
 }
 
-export type RendererInput = PointerInput | WheelInput | KeyboardInput;
+export interface FocusInput {
+  readonly type: 'focus.gained' | 'focus.lost';
+}
+
+export type RendererInput = PointerInput | WheelInput | KeyboardInput | FocusInput;
 
 export type RendererInputListener = (input: RendererInput) => void;
 

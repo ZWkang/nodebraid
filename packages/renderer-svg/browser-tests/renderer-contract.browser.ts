@@ -311,6 +311,20 @@ try {
       zoom: 0.818731,
     },
   });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await dispatchSpaceKey('keyDown');
+  await dispatchMouseDown(160, 120);
+  await dispatchMouseMove(190, 140);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 30 20)',
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  await dispatchSpaceKey('keyUp');
+  await dispatchMouseUp(190, 140);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 30 20)',
+    viewport: { x: 30, y: 20, zoom: 1 },
+  });
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownViewportPanInteraction()');
 
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupInteractionProjectionInput()');
@@ -692,6 +706,7 @@ try {
       pressedButtons: ['primary'],
       modifiers: noModifiers,
     },
+    { type: 'focus.gained' },
     {
       type: 'pointer.up',
       pointerId: 1,
@@ -731,6 +746,7 @@ try {
         deltaY: 300,
         modifiers: { alt: false, control: false, meta: false, shift: false },
       },
+      { type: 'focus.gained' },
       {
         type: 'key.down',
         key: 'a',
@@ -762,6 +778,10 @@ try {
     active: true,
     scrollY: 0,
     restoredTabIndex: null,
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionFocusInput()', {
+    inputTypes: ['focus.gained', 'focus.lost'],
   });
 
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgTicket09SetupCapture()');
@@ -1168,6 +1188,13 @@ async function dispatchWheel(x: number, y: number, deltaY: number): Promise<void
       deltaY,
     });
   });
+}
+
+async function dispatchSpaceKey(type: 'keyDown' | 'keyUp'): Promise<void> {
+  const domType = type === 'keyDown' ? 'keydown' : 'keyup';
+  await evaluateBrowserScenario(
+    `document.querySelector('#viewport-pan-interaction-target').dispatchEvent(new KeyboardEvent('${domType}', { key: ' ', code: 'Space', bubbles: true }))`,
+  );
 }
 
 async function dispatchFaultedPointerCleanupSequence(retryPointer = true): Promise<void> {

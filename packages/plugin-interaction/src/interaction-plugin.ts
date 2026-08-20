@@ -90,7 +90,17 @@ export const interactionPlugin = definePlugin({
     let completeClick: (() => void) | undefined;
     let nodeDragCandidate: NodeDragCandidate | undefined;
     let viewportPanCandidate: ViewportPanCandidate | undefined;
+    let spacePressed = false;
     const stopInput = renderer.subscribeInput((input) => {
+      if (input.type === 'key.down' || input.type === 'key.up') {
+        if (input.code === 'Space') spacePressed = input.type === 'key.down';
+        return;
+      }
+      if (input.type === 'focus.lost') {
+        spacePressed = false;
+        return;
+      }
+      if (input.type === 'focus.gained') return;
       if (input.type === 'wheel') {
         if (pressedPointerId !== undefined) return;
         const current = session.getSnapshot().viewport;
@@ -111,6 +121,15 @@ export const interactionPlugin = definePlugin({
         renderer.capturePointer(input.pointerId);
         pressedPointerId = input.pointerId;
         try {
+          if (spacePressed) {
+            viewportPanCandidate = {
+              pointerId: input.pointerId,
+              startScreenPoint: input.screenPoint,
+              baseViewport: session.getSnapshot().viewport,
+              active: false,
+            };
+            return;
+          }
           const additive = input.modifiers.shift || input.modifiers.meta || input.modifiers.control;
           if (additive) {
             completeClick = () =>
