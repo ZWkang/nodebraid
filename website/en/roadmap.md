@@ -15,13 +15,13 @@ Before packages can be released for external applications, the project must migr
 
 The SVG Renderer Provider has now proven a real Target, Document/Session synchronization, input, Hit Testing, and lifecycle. Future Canvas2D, WebGL, Konva, Pixi, or other Providers should ship independently through the same contract rather than adding a default Renderer or dynamic Registry to core.
 
-## Interaction and framework integration
+## Interaction extensions and framework integration
 
-A future Interaction capability can interpret selection, dragging, connection creation, keyboard shortcuts, and similar behavior on top of standardized Renderer Input, while working through the existing Command/Session/Kernel write boundaries. React, Vue, or other framework adapters should remain between the Runtime and UI framework without acquiring a second source of Document authority.
+Interaction v0 now interprets selection, multi-Node dragging, Pan, and Wheel Zoom on top of standardized Renderer Input while using the existing Command/Session/Kernel write boundaries. Box selection, edge connection, snapping, pinch/touch, text editing, and an extensible Tool Registry remain separate future designs. React, Vue, or other framework adapters should remain between the Runtime and UI framework without acquiring a second source of Document authority.
 
 ## Composition and examples
 
-Once the Interaction path exists, runnable product examples using the real SVG Provider and explicit Canvas Compositions can reduce the cost of initial assembly. They still will not become default capabilities installed implicitly by the Plugin Host.
+The Interaction path is now proven with the real SVG Provider and Chromium tests. Runnable product examples and explicit Canvas Compositions can still reduce the cost of initial assembly, but they will not become capabilities installed implicitly by the Plugin Host.
 
 ## Later exploration
 

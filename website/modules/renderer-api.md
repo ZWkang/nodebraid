@@ -26,10 +26,10 @@ description: CFlow-owned、backend-neutral 的 Renderer Provider contract。
 
 ## 提供的能力
 
-- `CanvasRenderer`：Document/Session 投影、Input subscription、Hit Test、Pointer Capture、Focus 与 terminal dispose；
+- `CanvasRenderer`：Document/Session/Interaction 投影、Input subscription、Hit Test、Pointer Capture、Focus 与 terminal dispose；
 - `RendererFactory<Config>`：用 Provider-specific immutable config 创建一份 Renderer Instance；
 - `RendererDocumentUpdate`：`reset` 完整建立 Baseline，`commit` 交付一个完整 Canvas Commit；
-- `RendererInput`：Pointer、Wheel 与 Keyboard discriminated union；
+- `RendererInput`：Pointer、Wheel、Keyboard 与 Focus discriminated union；
 - `ScreenPoint`、`InputModifiers`、`PointerButton` 与 `PointerType`；
 - `HitResult`：Canvas、Node、Edge 或 Port 语义目标与 World Point；
 - `RendererError`：Provider contract failure 的稳定错误身份。
@@ -38,7 +38,7 @@ Document update 调用返回时，Renderer 的逻辑状态必须已经接受更�
 
 ## 依赖与组合
 
-该 package 依赖 `@cflow/kernel` 的 Canvas View/Commit 与实体 identity、`@cflow/session-api` 的共享 Session Snapshot，以及 `@cflow/diagnostics` 的结构化错误。它不依赖 Runtime、Plugin Host、Interaction、具体后端、框架或 `@cflow/core`。
+该 package 依赖 `@cflow/kernel` 的 Canvas View/Commit 与实体 identity、`@cflow/session-api` 的共享 Session Snapshot、`@cflow/interaction-api` 的 Projection 值，以及 `@cflow/diagnostics` 的结构化错误。它不依赖 Runtime、Plugin Host、具体后端、框架或 `@cflow/core`。
 
 Provider package 应只依赖本 contract，自行导出具名 Factory 与具体 Config。当前 [`@cflow/renderer-svg`](/modules/renderer-svg) 就是这条边界的官方实现；应用可再通过 [`@cflow/plugin-renderer`](/modules/plugin-renderer) 把 Factory 接入 Runtime。
 
@@ -48,6 +48,7 @@ Provider package 应只依赖本 contract，自行导出具名 Factory 与具体
 import {
   RendererError,
   type CanvasRenderer,
+  type FocusInput,
   type HitResult,
   type InputModifiers,
   type KeyboardInput,
@@ -74,15 +75,17 @@ Provider 必须把 `reset` 视为完整 Baseline；后续 `commit.before` revisi
 
 Renderer Input 订阅按标准化后的真实顺序同步发布。listener 集合在每条 Input 开始时固定，重入 Input 采用 FIFO 广度优先顺序，取消幂等。`dispose()` 是 terminal、异步且幂等的；开始释放后，更新、命中和新增订阅应以 `RENDERER_DISPOSED` 显式失败。
 
-| Code                       | 适用失败                                   |
-| -------------------------- | ------------------------------------------ |
-| `INVALID_DOCUMENT_UPDATE`  | reset/commit 结构或 revision evidence 无效 |
-| `DOCUMENT_OUT_OF_SYNC`     | Commit 与当前 Renderer Baseline 不连续     |
-| `INVALID_SESSION_SNAPSHOT` | Session 值无效或无法由当前 Document 解析   |
-| `INVALID_SCREEN_POINT`     | Hit Test 输入坐标无效                      |
-| `INVALID_INPUT_SUBSCRIBER` | Input listener 无效                        |
-| `INVALID_POINTER`          | Pointer capture/release 请求无效           |
-| `RENDERER_DISPOSED`        | Renderer Instance 已开始终态释放           |
+| Code                             | 适用失败                                      |
+| -------------------------------- | --------------------------------------------- |
+| `INVALID_DOCUMENT_UPDATE`        | reset/commit 结构或 revision evidence 无效    |
+| `DOCUMENT_OUT_OF_SYNC`           | Commit 与当前 Renderer Baseline 不连续        |
+| `INVALID_SESSION_SNAPSHOT`       | Session 值无效或无法由当前 Document 解析      |
+| `INVALID_SCREEN_POINT`           | Hit Test 输入坐标无效                         |
+| `INVALID_INPUT_SUBSCRIBER`       | Input listener 无效                           |
+| `INVALID_POINTER`                | Pointer capture/release 请求无效              |
+| `INVALID_INTERACTION_PROJECTION` | Interaction Projection 结构无效               |
+| `INTERACTION_OUT_OF_SYNC`        | Projection 的 Document/Viewport evidence 失效 |
+| `RENDERER_DISPOSED`              | Renderer Instance 已开始终态释放              |
 
 这些约束由 concrete Provider 实现。结构校验必须发生在修改 Baseline 或逻辑状态之前；Provider Factory、后端投影和 dispose 的原始失败保留身份。
 
@@ -91,7 +94,7 @@ Renderer Input 订阅按标准化后的真实顺序同步发布。listener 集�
 - 当前只交付一个参考级 SVG Provider，不包含其他后端或默认选择策略；
 - 不提供默认 Provider、Factory Registry、通用 Config schema 或配置合并；
 - 不定义 DOM、SVG、Canvas、WebGL 或 framework 类型；
-- 不暴露 Document/Session 写权、Command execution 或 native event；
+- 不暴露 Document/Session 写权、Command execution 或 native event；Interaction update 只接受瞬态语义 Projection；
 - 不包含 text input、IME、clipboard、pressure、tilt、coalesced event 或时间戳；
 - 不定义 renderer scene、z-order、Handle、动画和业务 Node 外观。
 

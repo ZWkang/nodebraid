@@ -17,9 +17,12 @@ import {
   edgeId,
   historyPlugin,
   historyService,
+  interactionDiagnosticEvents,
+  interactionPlugin,
   kernelPlugin,
   kernelService,
   nodeId,
+  moveNodesCommand,
   sessionPlugin,
   sessionService,
   rendererService,
@@ -28,6 +31,7 @@ import {
   undoCommand,
   type KernelService,
   type PluginInstallation,
+  type InteractionProjection,
   type SessionService,
 } from '../src';
 
@@ -184,6 +188,19 @@ describe('@cflow/core', () => {
     expect(error.domain).toBe('renderer');
     expect(typeof createRendererPlugin).toBe('function');
     expect(rendererService).toBeDefined();
+  });
+
+  test('publishes backend-neutral Interaction values and Runtime behavior', () => {
+    const projection: InteractionProjection = {
+      type: 'viewport-pan',
+      baseViewport: { x: 0, y: 0, zoom: 1 },
+      viewport: { x: 20, y: 30, zoom: 1 },
+    };
+
+    expect(projection.type).toBe('viewport-pan');
+    expect(interactionPlugin).toBeDefined();
+    expect(moveNodesCommand.id).toBe('interaction.nodes.move');
+    expect(interactionDiagnosticEvents.inputRejected).toBe('cflow.plugin.interaction.input.rejected');
   });
 
   test('composes asynchronous Command preparation with a synchronous Kernel Transaction', async () => {

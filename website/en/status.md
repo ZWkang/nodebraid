@@ -14,6 +14,7 @@ CFlow is at an early implementation stage, but it already has a working headless
 - Renderer-independent Kernel, synchronous Transactions, Canvas Views, Queries, and Change Sets;
 - Kernel, Command, Session, History, and Renderer Runtime Plugins;
 - Selection, Viewport, and backend-neutral Renderer value contracts;
+- Backend-neutral Interaction Projections plus Selection, multi-Node Drag, Pan, and Wheel Zoom Runtime behavior;
 - The reference-quality `@cflow/renderer-svg` Provider, with real-Chromium verification of SVG projection, input, Hit Testing, and lifecycle;
 - Layout Input/Engine/Proposal contracts and Runtime Command integration;
 - Dagre full Layout Provider;
@@ -24,8 +25,8 @@ See [All modules](/en/modules/) for the complete inventory.
 
 ## Current gaps
 
-::: warning No complete editor delivery path yet
-The current branch now delivers an SVG Renderer Provider, but it has no Interaction package, framework adapter, or out-of-the-box preset. The SVG Provider projects generic Geometry and input facts; it does not supply product Node visuals, dragging, connections, or business behavior.
+::: warning No product-level editor shell yet
+The current branch delivers the Interaction v0 and SVG Renderer loop, but it has no framework adapter or out-of-the-box preset. The first version does not include box selection, edge connection, snapping, pinch/touch tools, text editing, product Node UI, or an extensible Tool Registry.
 :::
 
 There is also no Persistence, Collaboration, serialization schema, or remote synchronization capability. A name appearing in the target architecture does not mean it has become a public package.

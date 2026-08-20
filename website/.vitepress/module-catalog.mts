@@ -138,6 +138,32 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
     ],
   },
   {
+    slug: 'interaction',
+    title: 'Interaction',
+    summary: {
+      zh: 'Backend-neutral Preview 值与输入到语义行为的 Runtime 解释。',
+      en: 'Backend-neutral Preview values and Runtime interpretation from input to semantic behavior.',
+    },
+    modules: [
+      {
+        name: '@cflow/interaction-api',
+        slug: 'interaction-api',
+        summary: {
+          zh: 'Node Drag 与 Viewport Pan Projection 值契约。',
+          en: 'Node Drag and Viewport Pan Projection value contracts.',
+        },
+      },
+      {
+        name: '@cflow/plugin-interaction',
+        slug: 'plugin-interaction',
+        summary: {
+          zh: 'Selection、Drag、Pan 与 Wheel Zoom Runtime。',
+          en: 'The Selection, Drag, Pan, and Wheel Zoom Runtime.',
+        },
+      },
+    ],
+  },
+  {
     slug: 'rendering-contract',
     title: 'Rendering Contract',
     summary: {

@@ -32,12 +32,14 @@ The packages declared under the `@cflow/*` names are not yet published by this p
 ├── packages/
 │   ├── core/           # @cflow/core public facade
 │   ├── diagnostics/    # @cflow/diagnostics errors and Diagnostic Events
+│   ├── interaction-api/ # @cflow/interaction-api transient projection values
 │   ├── kernel/         # @cflow/kernel graph state and transactions
 │   ├── layout-api/     # @cflow/layout-api provider-neutral contracts
 │   ├── layout-dagre/   # @cflow/layout-dagre official Provider
 │   ├── layout-elk/     # @cflow/layout-elk official Provider
 │   ├── plugin-command/ # @cflow/plugin-command Runtime Service adapter
 │   ├── plugin-history/ # @cflow/plugin-history History Runtime Plugin
+│   ├── plugin-interaction/ # @cflow/plugin-interaction Interaction Runtime
 │   ├── plugin-kernel/  # @cflow/plugin-kernel Runtime Service adapter
 │   ├── plugin-layout/  # @cflow/plugin-layout Runtime Command integration
 │   ├── plugin-renderer/ # @cflow/plugin-renderer Renderer Runtime adapter
@@ -124,23 +126,39 @@ Snapshot per notification round.
 ## Renderer packages
 
 `@cflow/renderer-api` defines the backend-neutral `CanvasRenderer` protocol:
-reset-or-commit Document updates, independent Session Snapshots, normalized
-Pointer/Wheel/Keyboard input, semantic Hit Results, input control, and
-structured Renderer errors. It contains no DOM, Canvas Context, native Event,
-Konva, Pixi, Cordis, or framework types.
+reset-or-commit Document updates, independent Session Snapshots, transient
+Interaction Projections, normalized Pointer/Wheel/Keyboard/Focus input,
+semantic Hit Results, input control, and structured Renderer errors. It
+contains no DOM, Canvas Context, native Event, Konva, Pixi, Cordis, or framework
+types.
 
 `@cflow/plugin-renderer` binds one typed Renderer Factory to Kernel and Session
 Services. Each Activation owns one target-bound Renderer Instance, delivers a
 Document reset before Session state, preserves resolvable Selection ordering,
-and exposes only input, hit testing, Pointer Capture, and Focus through the
-narrow `RendererService`. Concrete Renderer Providers remain separate,
-explicit packages; CFlow does not select a default Provider or registry.
+and exposes input, hit testing, Pointer Capture, Focus, and one exclusive
+Interaction Projection Binding through the narrow `RendererService`. Concrete
+Renderer Providers remain separate, explicit packages; CFlow does not select a
+default Provider or registry.
 
 `@cflow/renderer-svg` is the first reference-quality official Provider. It
 binds one existing `SVGSVGElement`, projects generic rectangular Nodes and
 straight Edges, and exposes stable SVG classes and data attributes without
 interpreting product Node types or data. It remains an explicit peer Provider
 and is not re-exported as a default through `@cflow/core`.
+
+## Interaction packages
+
+`@cflow/interaction-api` owns immutable, backend-neutral Node Drag and Viewport
+Pan Projection values. `@cflow/plugin-interaction` consumes normalized Renderer
+Input and Hit Results, implements selection, multi-Node Drag, Canvas/middle/
+Space Pan, and anchored Wheel Zoom, and exposes no state Service.
+
+Stable Selection and Viewport changes go through Session; final Node movement
+goes through the typed `interaction.nodes.move` Command and one Kernel
+Transaction. Pointer-move Preview remains in the exclusive Renderer Projection
+Binding. Cancellation, stale evidence, lost capture, dependency recovery, and
+cleanup are explicit and observable. Core re-exports both backend-neutral
+Interaction packages but still does not re-export the concrete SVG Provider.
 
 ## Command Runtime Plugin
 
@@ -290,6 +308,13 @@ browser seam tests:
 bun run --filter '@cflow/renderer-svg' build:dependencies
 bun run --filter '@cflow/renderer-svg' build:test-dependencies
 bun run --filter '@cflow/renderer-svg' test:browser
+```
+
+Build the Interaction value and Runtime packages independently:
+
+```bash
+bun run --filter '@cflow/interaction-api' build:dependencies
+bun run --filter '@cflow/plugin-interaction' build:dependencies
 ```
 
 Format supported files:

@@ -13,7 +13,7 @@ description: CFlow 当前已交付公共能力的统一 facade。
 
 ## 解决的问题
 
-应用不应为了创建一个 Canvas Runtime 而先记住整张 package 依赖图。`@cflow/core` 提供一个稳定入口，让应用可以在同一模块中取得 Kernel、Session、Command、History、Layout、Renderer contract、Diagnostics 与 Plugin Host API。
+应用不应为了创建一个 Canvas Runtime 而先记住整张 package 依赖图。`@cflow/core` 提供一个稳定入口，让应用可以在同一模块中取得 Kernel、Session、Command、History、Interaction、Layout、Renderer contract、Diagnostics 与 Plugin Host API。
 
 它是 facade，不是另一个 Runtime：重导出的值、类型、错误和生命周期实现仍由各自的窄 package 拥有。
 
@@ -33,8 +33,9 @@ description: CFlow 当前已交付公共能力的统一 facade。
 - `@cflow/kernel` 的纯图模型、Transaction、Canvas View、Canvas Query 与 Change Set；
 - `@cflow/session-api` 的不可变 Session 值；
 - `@cflow/renderer-api` 的后端中立 Renderer contract；
+- `@cflow/interaction-api` 的后端中立 Interaction Projection 值；
 - `@cflow/runtime-cordis` 的 CFlow-owned Plugin Host API；
-- Kernel、Command、Session、Renderer 与 History Runtime Plugin；
+- Kernel、Command、Session、Renderer、Interaction 与 History Runtime Plugin；
 - 通用 Layout API 与 Layout Runtime Plugin。
 
 具体 Layout Provider 保持独立：`dagreLayoutEngine` 和 `elkLayoutEngine` 不在 facade 中。`@cflow/renderer-svg` 已作为具体 Renderer Provider 交付，但同样不由 core 选择或重导出。
@@ -46,7 +47,7 @@ Application
     │
     ▼
 @cflow/core (facade)
-    ├── Diagnostics / Kernel / Session / Renderer contracts
+    ├── Diagnostics / Kernel / Session / Interaction / Renderer contracts
     ├── Plugin Host
     ├── official Runtime Plugins
     └── generic Layout contracts and integration
@@ -69,6 +70,7 @@ Package 只有一个公开子路径：`@cflow/core`。代表性的公共入口�
 | History     | `historyPlugin`、`historyService`、`undoCommand`、`redoCommand`                |
 | Layout      | `createLayoutInput`、`defineLayoutEngine`、`createLayoutPlugin`、`LayoutError` |
 | Renderer    | `createRendererPlugin`、`rendererService`、`RendererError`                     |
+| Interaction | `interactionPlugin`、`moveNodesCommand`、`interactionDiagnosticEvents`         |
 | Diagnostics | `CFlowError`、`diagnosticEvents`、`describeError`                              |
 
 完整导出等于 facade 源码中各 public package 的显式 `export *`；没有额外的隐藏子路径。
@@ -87,7 +89,7 @@ Facade 测试会同时从 `@cflow/core` 验证这些对象的类型与行为，�
 
 ## 限制与非目标
 
-- 不自动安装 Kernel、Command、Session、History、Layout 或 Renderer Plugin。
+- 不自动安装 Kernel、Command、Session、History、Interaction、Layout 或 Renderer Plugin。
 - 不提供默认 Canvas Composition 或开箱即用编辑器 preset。
 - 不重导出 Dagre、ELK 等具体 Layout Provider。
 - 不选择或重导出 `@cflow/renderer-svg` 等 concrete Renderer Provider。
@@ -98,6 +100,6 @@ Facade 测试会同时从 `@cflow/core` 验证这些对象的类型与行为，�
 ## 验证依据
 
 - Facade 源码逐项重导出当前 public packages。
-- `packages/core/tests/index.test.ts` 从 facade 验证 Diagnostics、Plugin Host、Kernel、Session、Renderer、Command 与 History 公共 seam。
+- `packages/core/tests/index.test.ts` 从 facade 验证 Diagnostics、Plugin Host、Kernel、Session、Renderer、Interaction、Command 与 History 公共 seam。
 - `packages/core/tests/layout.test.ts` 验证通用 Layout API 可见，同时 Dagre 与 ELK Provider 不会泄漏。
 - declaration artifact 检查验证构建后的公开类型边界。

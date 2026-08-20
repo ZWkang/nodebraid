@@ -14,6 +14,7 @@ CFlow 处于早期实现阶段，但已经形成一条可运行的 headless Canv
 - Renderer-independent Kernel、同步 Transaction、Canvas View、Query 与 Change Set；
 - Kernel、Command、Session、History 与 Renderer Runtime Plugin；
 - Selection、Viewport 与 backend-neutral Renderer value contract；
+- Backend-neutral Interaction Projection，以及 Selection、multi-Node Drag、Pan 与 Wheel Zoom Runtime；
 - 参考级 `@cflow/renderer-svg` Provider，以及真实 Chromium 中的 SVG projection、输入、Hit Test 与 lifecycle 验证；
 - Layout Input/Engine/Proposal contract 与 Runtime Command integration；
 - Dagre full Layout Provider；
@@ -24,8 +25,8 @@ CFlow 处于早期实现阶段，但已经形成一条可运行的 headless Canv
 
 ## 当前缺口
 
-::: warning 尚无完整编辑器交付链
-当前分支已经交付 SVG Renderer Provider，但没有 Interaction package、framework adapter 或开箱即用 preset。SVG Provider 只投影通用 Geometry 和输入事实，不提供产品节点视觉、拖拽、连线或业务行为。
+::: warning 尚无产品级编辑器外壳
+当前分支已经交付 Interaction v0 与 SVG Renderer 闭环，但没有 framework adapter 或开箱即用 preset。首版不包含 box selection、edge connect、snapping、pinch/touch 工具、文本编辑、产品节点 UI 或可扩展 Tool Registry。
 :::
 
 当前也没有 Persistence、Collaboration、序列化 schema 或远程同步能力。目标架构中出现某个名称，不代表它已经成为公共 package。

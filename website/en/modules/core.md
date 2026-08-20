@@ -13,7 +13,7 @@ This name identifies the current source module boundary; it does not mean the pa
 
 ## The problem it solves
 
-An application should not need to memorize the entire package dependency graph before creating a Canvas Runtime. `@cflow/core` provides a stable entry point from which an application can access the Kernel, Session, Command, History, Layout, Renderer contract, Diagnostics, and Plugin Host API in one module.
+An application should not need to memorize the entire package dependency graph before creating a Canvas Runtime. `@cflow/core` provides a stable entry point from which an application can access the Kernel, Session, Command, History, Interaction, Layout, Renderer contract, Diagnostics, and Plugin Host API in one module.
 
 It is a facade, not another Runtime. The re-exported values, types, errors, and lifecycle implementations remain owned by their respective narrow packages.
 
@@ -33,8 +33,9 @@ If you are building an internal CFlow package or need only one narrow low-level 
 - the pure graph model, Transactions, Canvas View, Canvas Query, and Change Set from `@cflow/kernel`;
 - immutable Session values from `@cflow/session-api`;
 - backend-neutral Renderer contracts from `@cflow/renderer-api`;
+- backend-neutral Interaction Projection values from `@cflow/interaction-api`;
 - the CFlow-owned Plugin Host API from `@cflow/runtime-cordis`;
-- the Kernel, Command, Session, Renderer, and History Runtime Plugins;
+- the Kernel, Command, Session, Renderer, Interaction, and History Runtime Plugins;
 - the generic Layout API and Layout Runtime Plugin.
 
 Concrete Layout Providers stay separate: `dagreLayoutEngine` and `elkLayoutEngine` are not part of the facade. `@cflow/renderer-svg` is now delivered as a concrete Renderer Provider, but core still neither chooses nor re-exports it.
@@ -46,7 +47,7 @@ Application
     │
     ▼
 @cflow/core (facade)
-    ├── Diagnostics / Kernel / Session / Renderer contracts
+    ├── Diagnostics / Kernel / Session / Interaction / Renderer contracts
     ├── Plugin Host
     ├── official Runtime Plugins
     └── generic Layout contracts and integration
@@ -69,6 +70,7 @@ The package has one public subpath: `@cflow/core`. Representative public entry p
 | History     | `historyPlugin`, `historyService`, `undoCommand`, `redoCommand`                |
 | Layout      | `createLayoutInput`, `defineLayoutEngine`, `createLayoutPlugin`, `LayoutError` |
 | Renderer    | `createRendererPlugin`, `rendererService`, `RendererError`                     |
+| Interaction | `interactionPlugin`, `moveNodesCommand`, `interactionDiagnosticEvents`         |
 | Diagnostics | `CFlowError`, `diagnosticEvents`, `describeError`                              |
 
 The complete export surface is the facade source's explicit `export *` declarations for public packages. There are no additional hidden subpaths.
@@ -87,7 +89,7 @@ Facade tests exercise the types and behavior of these objects through `@cflow/co
 
 ## Limitations and non-goals
 
-- Does not install the Kernel, Command, Session, History, Layout, or Renderer Plugin automatically.
+- Does not install the Kernel, Command, Session, History, Interaction, Layout, or Renderer Plugin automatically.
 - Does not provide a default Canvas Composition or an out-of-the-box editor preset.
 - Does not re-export concrete Layout Providers such as Dagre or ELK.
 - Does not select or re-export concrete Renderer Providers such as `@cflow/renderer-svg`.
@@ -98,6 +100,6 @@ Facade tests exercise the types and behavior of these objects through `@cflow/co
 ## Verification evidence
 
 - The facade source explicitly re-exports each current public package.
-- `packages/core/tests/index.test.ts` verifies the Diagnostics, Plugin Host, Kernel, Session, Renderer, Command, and History public seams through the facade.
+- `packages/core/tests/index.test.ts` verifies the Diagnostics, Plugin Host, Kernel, Session, Renderer, Interaction, Command, and History public seams through the facade.
 - `packages/core/tests/layout.test.ts` verifies that the generic Layout API is visible while the Dagre and ELK Providers do not leak through.
 - Declaration artifact checks verify the built public type boundary.

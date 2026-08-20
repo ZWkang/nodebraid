@@ -27,8 +27,10 @@
 - `bun run --filter '@cflow/layout-elk' build:dependencies`：生成 ELK Layout Provider 构建与类型检查所需的 Layout API workspace 声明。
 - `bun run --filter '@cflow/plugin-session' build:dependencies`：生成 Session Runtime Plugin 构建与类型检查所需的 Kernel、Runtime 与 Kernel Plugin workspace 声明。
 - `bun run --filter '@cflow/session-api' build:dependencies`：生成 Session 值契约所需的 Kernel workspace 声明。
+- `bun run --filter '@cflow/interaction-api' build:dependencies`：生成 Interaction Projection 值契约所需的 Kernel 与 Session API workspace 声明。
 - `bun run --filter '@cflow/renderer-api' build:dependencies`：生成 Renderer 协议所需的 Diagnostics、Kernel 与 Session API workspace 声明。
 - `bun run --filter '@cflow/plugin-renderer' build:dependencies`：生成 Renderer Runtime Plugin 所需的 Renderer API、Kernel Plugin 与 Session Plugin workspace 声明。
+- `bun run --filter '@cflow/plugin-interaction' build:dependencies`：生成 Interaction Runtime Plugin 所需的 Command、Kernel、Session 与 Renderer Plugin workspace 声明。
 - `bun run --filter '@cflow/renderer-svg' build:dependencies`：生成 SVG Renderer Provider 生产构建所需的 Renderer API 及其传递 workspace 声明。
 - `bun run --filter '@cflow/renderer-svg' build:test-dependencies`：通过 Renderer Plugin 的构建链生成真实 Runtime 浏览器场景及 Renderer API 所需的全部 workspace 声明。
 - `bun run --filter '@cflow/plugin-history' build:dependencies`：生成 History Runtime Plugin 构建与类型检查所需的 Command 与 Kernel Plugin workspace 声明。

@@ -26,10 +26,10 @@ Ordinary applications interact with this seam directly only when selecting or im
 
 ## What it provides
 
-- `CanvasRenderer`: Document/Session projection, Input subscription, Hit Testing, Pointer Capture, Focus, and terminal disposal;
+- `CanvasRenderer`: Document/Session/Interaction projection, Input subscription, Hit Testing, Pointer Capture, Focus, and terminal disposal;
 - `RendererFactory<Config>`: creates one Renderer Instance from immutable Provider-specific config;
 - `RendererDocumentUpdate`: `reset` establishes a complete Baseline, while `commit` delivers one complete Canvas Commit;
-- `RendererInput`: a discriminated union of Pointer, Wheel, and Keyboard input;
+- `RendererInput`: a discriminated union of Pointer, Wheel, Keyboard, and Focus input;
 - `ScreenPoint`, `InputModifiers`, `PointerButton`, and `PointerType`;
 - `HitResult`: a semantic Canvas, Node, Edge, or Port target plus a World Point;
 - `RendererError`: stable error identity for Provider contract failures.
@@ -38,7 +38,7 @@ When a Document update call returns, the Renderer's logical state must have acce
 
 ## Dependencies and composition
 
-This package depends on Canvas View/Commit and entity identity from `@cflow/kernel`, the shared Session Snapshot from `@cflow/session-api`, and structured errors from `@cflow/diagnostics`. It does not depend on Runtime, the Plugin Host, Interaction, a concrete backend, a framework, or `@cflow/core`.
+This package depends on Canvas View/Commit and entity identity from `@cflow/kernel`, the shared Session Snapshot from `@cflow/session-api`, Projection values from `@cflow/interaction-api`, and structured errors from `@cflow/diagnostics`. It does not depend on Runtime, the Plugin Host, a concrete backend, a framework, or `@cflow/core`.
 
 A Provider package should depend only on this contract and export a named Factory plus its concrete Config. The current [`@cflow/renderer-svg`](/en/modules/renderer-svg) package is the official implementation of this boundary. An application can then connect the Factory to the Runtime through [`@cflow/plugin-renderer`](/en/modules/plugin-renderer).
 
@@ -48,6 +48,7 @@ A Provider package should depend only on this contract and export a named Factor
 import {
   RendererError,
   type CanvasRenderer,
+  type FocusInput,
   type HitResult,
   type InputModifiers,
   type KeyboardInput,
@@ -74,15 +75,17 @@ The Provider must treat `reset` as a complete Baseline. For every later `commit`
 
 Renderer Input subscriptions publish standardized input synchronously in actual order. The listener set is fixed when each Input begins, reentrant Input uses FIFO breadth-first ordering, and cancellation is idempotent. `dispose()` is terminal, asynchronous, and idempotent. Once disposal starts, updates, Hit Tests, and new subscriptions must fail explicitly with `RENDERER_DISPOSED`.
 
-| Code                       | Applicable failure                                                       |
-| -------------------------- | ------------------------------------------------------------------------ |
-| `INVALID_DOCUMENT_UPDATE`  | Invalid reset/commit structure or revision evidence                      |
-| `DOCUMENT_OUT_OF_SYNC`     | A Commit is not continuous with the current Renderer Baseline            |
-| `INVALID_SESSION_SNAPSHOT` | Session values are invalid or cannot be resolved by the current Document |
-| `INVALID_SCREEN_POINT`     | Invalid Hit Test input coordinates                                       |
-| `INVALID_INPUT_SUBSCRIBER` | Invalid Input listener                                                   |
-| `INVALID_POINTER`          | Invalid Pointer capture/release request                                  |
-| `RENDERER_DISPOSED`        | Terminal disposal of the Renderer Instance has begun                     |
+| Code                             | Applicable failure                                                       |
+| -------------------------------- | ------------------------------------------------------------------------ |
+| `INVALID_DOCUMENT_UPDATE`        | Invalid reset/commit structure or revision evidence                      |
+| `DOCUMENT_OUT_OF_SYNC`           | A Commit is not continuous with the current Renderer Baseline            |
+| `INVALID_SESSION_SNAPSHOT`       | Session values are invalid or cannot be resolved by the current Document |
+| `INVALID_SCREEN_POINT`           | Invalid Hit Test input coordinates                                       |
+| `INVALID_INPUT_SUBSCRIBER`       | Invalid Input listener                                                   |
+| `INVALID_POINTER`                | Invalid Pointer capture/release request                                  |
+| `INVALID_INTERACTION_PROJECTION` | Invalid Interaction Projection structure                                 |
+| `INTERACTION_OUT_OF_SYNC`        | Stale Document or Viewport evidence for a Projection                     |
+| `RENDERER_DISPOSED`              | Terminal disposal of the Renderer Instance has begun                     |
 
 Concrete Providers implement these constraints. Structural validation must happen before the Baseline or logical state is changed. Original Provider Factory, backend projection, and disposal failures preserve their identity.
 
@@ -91,7 +94,7 @@ Concrete Providers implement these constraints. Structural validation must happe
 - The current release ships one reference SVG Provider, with no other backend or default-selection policy;
 - No default Provider, Factory Registry, universal Config schema, or config merging;
 - No DOM, SVG, Canvas, WebGL, or framework types;
-- Does not expose Document/Session write authority, Command execution, or native events;
+- Does not expose Document/Session write authority, Command execution, or native events; Interaction updates accept only transient semantic Projections;
 - No text input, IME, clipboard, pressure, tilt, coalesced events, or timestamps;
 - Does not define renderer scenes, z-order, Handles, animation, or business-specific Node appearance.
 

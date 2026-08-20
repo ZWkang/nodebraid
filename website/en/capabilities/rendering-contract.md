@@ -27,15 +27,15 @@ The Rendering Contract capability family defines how CFlow Canvas semantics are 
 - Your Interaction Plugin needs standardized input, Hit Testing, Pointer Capture, or Focus;
 - You are evaluating the responsibility boundary between CFlow and a concrete rendering backend.
 
-If generic SVG Geometry and the stable DOM seam meet your needs, select `@cflow/renderer-svg` directly. Product-specific Node visuals, Interaction, and framework adapters remain explicit application responsibilities.
+If generic SVG Geometry and the stable DOM seam meet your needs, select `@cflow/renderer-svg` directly. CFlow now provides a separate Interaction Runtime, while product-specific Node visuals and framework adapters remain explicit application responsibilities.
 
 ## What it provides
 
-| Role                | Package                                                 | What it delivers                                                                                               |
-| ------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Provider contract   | [`@cflow/renderer-api`](/en/modules/renderer-api)       | `CanvasRenderer`, Factory, Document/Session updates, standardized input, Hit Result, and structured errors     |
-| Runtime integration | [`@cflow/plugin-renderer`](/en/modules/plugin-renderer) | Binds a Factory as a Plugin, coordinates Kernel/Session, and exposes a narrow `RendererService` to Interaction |
-| SVG Provider        | [`@cflow/renderer-svg`](/en/modules/renderer-svg)       | Projects generic Canvas Geometry, Session, and browser input into an existing `SVGSVGElement`                  |
+| Role                | Package                                                 | What it delivers                                                                                                       |
+| ------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Provider contract   | [`@cflow/renderer-api`](/en/modules/renderer-api)       | `CanvasRenderer`, Factory, Document/Session/Interaction updates, standardized input, Hit Result, and structured errors |
+| Runtime integration | [`@cflow/plugin-renderer`](/en/modules/plugin-renderer) | Binds a Factory as a Plugin, coordinates Kernel/Session, and provides one exclusive Interaction Binding                |
+| SVG Provider        | [`@cflow/renderer-svg`](/en/modules/renderer-svg)       | Projects generic Canvas Geometry, Session, and browser input into an existing `SVGSVGElement`                          |
 
 ```text
 Kernel Commit ───────────────┐
@@ -43,13 +43,14 @@ Kernel Commit ───────────────┐
 Session Snapshot ────────────┼────────▶ CanvasRenderer ─────▶ concrete Target
                              │                 │
 Interaction ◀── RendererService ◀── normalized Input / Hit Result
+Interaction ─── Interaction Projection Binding ───▶ Renderer
 ```
 
 The Renderer has no write authority over the Document, Session, or Commands. It projects state and reports input facts only; interpreting behavior and changing state belong to Interaction or another Feature Plugin.
 
 ## Dependencies and composition
 
-`@cflow/renderer-api` depends only on CFlow's Kernel and Session value contracts plus Diagnostics. It does not depend on the Plugin Host, a concrete backend, or a framework.
+`@cflow/renderer-api` depends only on CFlow's Kernel, Session, and Interaction Projection value contracts plus Diagnostics. It does not depend on the Plugin Host, a concrete backend, or a framework.
 
 `@cflow/plugin-renderer` statically requires `KernelService` and `SessionService`. The application obtains a `RendererFactory<Config>` from a concrete Provider, calls `createRendererPlugin(factory)` to generate a normal Runtime Plugin, then installs it with Provider-specific config. CFlow provides neither a Factory Registry nor a default Provider.
 
@@ -78,10 +79,10 @@ The CFlow packages are not publicly published under this project's identity. Ver
 - The only current concrete Provider is the reference SVG implementation; there is no Canvas2D, WebGL, Konva, Pixi, or framework adapter;
 - No default Provider, dynamic Registry, or universal `HTMLElement` mount;
 - The Renderer does not modify the Document or Session and does not execute Commands directly;
-- The initial input contract includes Pointer, Wheel, and Keyboard only, without native events or backend targets;
+- The initial input contract includes Pointer, Wheel, Keyboard, and Focus, without native events or backend targets;
 - Hit Result identifies only Canvas, Node, Edge, or Port and does not expose scene objects, z-order, or arbitrary details;
-- No business-specific Node visuals, Interaction behavior, animation, text editing, or complete canvas product.
+- No business-specific Node visuals, animation, text editing, or complete canvas product; Interaction behavior belongs to the separate Runtime Plugin.
 
 ## Verification evidence
 
-Renderer API tests lock down backend-neutral types, Factory config, Document/Session update authority, and structured errors. Renderer Plugin tests use a recording Provider to verify initial reset, resolvable Session ordering, input and control delegation, listener fault isolation, drift reset, the narrow Service surface, and disposal. The SVG Provider additionally uses real Chromium to verify SVG projection, coordinate mapping, native input, Hit Testing, Pointer Capture, Focus, rollback, and terminal disposal.
+Renderer API tests lock down backend-neutral types, Factory config, Document/Session/Interaction update authority, and structured errors. Renderer Plugin tests use a recording Provider to verify initial reset, resolvable Session ordering, the exclusive Binding, input and control delegation, listener fault isolation, one recovery attempt, terminal `SYNC_FAILED`, and disposal. The SVG Provider additionally uses real Chromium to verify SVG and Interaction projection, coordinate mapping, native input, Hit Testing, Pointer Capture, lost capture, Focus, rollback, and terminal disposal.

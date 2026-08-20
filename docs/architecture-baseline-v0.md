@@ -517,9 +517,10 @@ packages/
 ├── renderer-api/       @cflow/renderer-api
 ├── plugin-renderer/    @cflow/plugin-renderer
 ├── runtime-cordis/     @cflow/runtime-cordis
-├── interaction-core/   @cflow/interaction-core
+├── interaction-api/    @cflow/interaction-api
+├── plugin-interaction/ @cflow/plugin-interaction
 ├── plugin-history/     @cflow/plugin-history
-├── renderer-<first>/   第一个真实官方 Renderer
+├── renderer-svg/       @cflow/renderer-svg
 └── core/               @cflow/core，公共收口
 ```
 
@@ -559,7 +560,7 @@ Cordis 生命周期
 → ChangeSet 增量更新
 ```
 
-### 阶段 4：Interaction 与 History
+### 阶段 4：Interaction 与 History（已形成首版闭环）
 
 ```text
 选择
@@ -613,7 +614,7 @@ Cordis 生命周期
 
 以下问题仍应当在对应阶段实现前，通过真实用例决定：
 
-1. 第一个官方 Renderer 采用何种技术；
+1. 其他 Renderer Provider 的优先顺序；
 2. 其他 Runtime Plugin Service 是否需要进一步收窄公开表面；
 3. `data` 不可变约定是否需要额外的开发期诊断能力。
 

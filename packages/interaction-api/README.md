@@ -1,5 +1,7 @@
 # @cflow/interaction-api
 
+> Documentation: [English](https://zwkang.github.io/cflow/en/modules/interaction-api) · [简体中文](https://zwkang.github.io/cflow/modules/interaction-api)
+
 Backend-neutral Interaction Projection value contracts for CFlow.
 
 The package owns immutable Node Drag and Viewport Pan candidate values without

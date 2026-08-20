@@ -2,7 +2,7 @@
 
 > Documentation: [English](https://zwkang.github.io/cflow/en/modules/core) · [简体中文](https://zwkang.github.io/cflow/modules/core)
 
-Public CFlow facade for the Kernel, provider-neutral Layout API, Runtime Plugins, and Plugin Host APIs.
+Public CFlow facade for Kernel, Interaction, provider-neutral Layout/Renderer contracts, Runtime Plugins, and Plugin Host APIs.
 
 ```ts
 import {
@@ -16,8 +16,10 @@ import {
   defineService,
   historyPlugin,
   historyService,
+  interactionPlugin,
   kernelPlugin,
   kernelService,
+  moveNodesCommand,
   sessionPlugin,
   sessionService,
   redoCommand,
@@ -27,10 +29,10 @@ import {
 
 The facade re-exports structured errors and Diagnostic Event contracts from
 `@cflow/diagnostics`, the pure graph interface from `@cflow/kernel`, immutable
-Session values from `@cflow/session-api`, backend-neutral Renderer contracts
-from `@cflow/renderer-api`, and the CFlow-owned Plugin Host interface from
+Session values from `@cflow/session-api`, backend-neutral Interaction and Renderer
+contracts from `@cflow/interaction-api` and `@cflow/renderer-api`, and the CFlow-owned Plugin Host interface from
 `@cflow/runtime-cordis`. It also re-exports the official Kernel, Command,
-Session, Renderer, and History Runtime Plugins from their corresponding
+Session, Renderer, Interaction, and History Runtime Plugins from their corresponding
 `@cflow/plugin-*` packages, plus generic Layout contracts and Runtime
 integration from `@cflow/layout-api` and `@cflow/plugin-layout`.
 Cordis remains an implementation dependency and does not appear in the public
@@ -57,6 +59,11 @@ Change Set or History entry.
 Kernel and Session Services while exposing only the narrow `RendererService`
 to Interaction Plugins. Core does not select or re-export concrete Renderer
 Providers.
+
+`interactionPlugin` interprets normalized Renderer Input as Selection,
+Node Drag, Pan, and Wheel Zoom. It keeps transient Preview in an exclusive
+Interaction Projection Binding, writes stable Session state through
+`SessionService`, and commits final Node positions through `moveNodesCommand`.
 
 `historyPlugin` requires Kernel Service and Command Service, records post-Baseline
 Recordable Commits, and provides a stable `HistoryService` Snapshot. Callers

@@ -41,7 +41,7 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && bun run build:self",
-    "build:dependencies": "bun run --filter '@cflow/diagnostics' build && bun run --filter '@cflow/kernel' build && bun run --filter '@cflow/session-api' build && bun run --filter '@cflow/renderer-api' build && bun run --filter '@cflow/runtime-cordis' build && bun run --filter '@cflow/plugin-command' build && bun run --filter '@cflow/plugin-kernel' build && bun run --filter '@cflow/plugin-session' build && bun run --filter '@cflow/plugin-renderer' build && bun run --filter '@cflow/plugin-history' build && bun run --filter '@cflow/layout-api' build && bun run --filter '@cflow/layout-dagre' build && bun run --filter '@cflow/layout-elk' build && bun run --filter '@cflow/plugin-layout' build",
+    "build:dependencies": "bun run --filter '@cflow/diagnostics' build && bun run --filter '@cflow/kernel' build && bun run --filter '@cflow/session-api' build && bun run --filter '@cflow/interaction-api' build && bun run --filter '@cflow/renderer-api' build && bun run --filter '@cflow/runtime-cordis' build && bun run --filter '@cflow/plugin-command' build && bun run --filter '@cflow/plugin-kernel' build && bun run --filter '@cflow/plugin-session' build && bun run --filter '@cflow/plugin-renderer' build && bun run --filter '@cflow/plugin-interaction' build && bun run --filter '@cflow/plugin-history' build && bun run --filter '@cflow/layout-api' build && bun run --filter '@cflow/layout-dagre' build && bun run --filter '@cflow/layout-elk' build && bun run --filter '@cflow/plugin-layout' build",
     "build:self": "tsgo -p tsconfig.build.json && bun run test:artifacts",
     "prepack": "bun run build",
     "test": "bun test ./tests",
@@ -50,10 +50,12 @@
   },
   "dependencies": {
     "@cflow/diagnostics": "workspace:*",
+    "@cflow/interaction-api": "workspace:*",
     "@cflow/kernel": "workspace:*",
     "@cflow/layout-api": "workspace:*",
     "@cflow/plugin-command": "workspace:*",
     "@cflow/plugin-history": "workspace:*",
+    "@cflow/plugin-interaction": "workspace:*",
     "@cflow/plugin-kernel": "workspace:*",
     "@cflow/plugin-renderer": "workspace:*",
     "@cflow/plugin-session": "workspace:*",

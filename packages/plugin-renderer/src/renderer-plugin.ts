@@ -83,12 +83,8 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
             receivedRevision,
           });
         }
-        try {
-          renderer.updateDocument({ type: 'commit', commit });
-          deliveredView = commit.after;
-        } catch (error) {
-          throw error;
-        }
+        renderer.updateDocument({ type: 'commit', commit });
+        deliveredView = commit.after;
       };
 
       const deliverSession = (snapshot: SessionSnapshot): void => {

@@ -29,6 +29,7 @@ If the product needs custom Node DOM, Ports, complex Edges, component mounting, 
 - A synchronous `createSvgRenderer(config)` Factory bound to one existing `SVGSVGElement`;
 - Generic rectangular Nodes, straight Edges, Selection markers, and Viewport projection;
 - A real-DOM bridge for Pointer, Wheel, Keyboard, Focus, and Pointer Capture;
+- Node Drag and Viewport Pan Interaction Projection overrides, baseline invalidation, and compatible-Commit reprojection;
 - CSS-screen-pixel to SVG-user-space conversion and semantic Hit Testing;
 - Stable classes, `data-cflow-*` attributes, canonical layer order, and keyed DOM identity;
 - Atomic Document/Session updates, continuous revision validation, rollback on failure, and reset recovery;
@@ -38,7 +39,7 @@ The Provider manages only the projection subtree it creates under the Target. Th
 
 ## Dependencies and composition
 
-This package depends on the backend-neutral contract from [`@cflow/renderer-api`](/en/modules/renderer-api), plus value and error contracts from `@cflow/kernel`, `@cflow/session-api`, and `@cflow/diagnostics`. It does not depend on the Plugin Host, a framework adapter, Interaction, or `@cflow/core`.
+This package depends on the backend-neutral contract from [`@cflow/renderer-api`](/en/modules/renderer-api) and the Kernel, Session, Interaction Projection, and Diagnostics value contracts used by it. It does not depend on the Plugin Host, a framework adapter, the Interaction state machine, or `@cflow/core`.
 
 Applications can create the Renderer directly. To get Runtime lifecycle and Kernel/Session synchronization, pass `createSvgRenderer` to [`@cflow/plugin-renderer`](/en/modules/plugin-renderer). CFlow does not select this Provider by default, and `@cflow/core` does not re-export it.
 
@@ -113,10 +114,10 @@ Document revision, Session, Input subscriber, Pointer, and disposed-state failur
 - Renders only explicitly sized rectangular Nodes and straight Edges between valid endpoints;
 - No Ports, self-loops, curves, markers, labels, rich text, animation, or product-specific Node appearance;
 - No default theme, theme Registry, component slots, or framework adapter;
-- No Interaction, Commands, drag state machine, Selection writes, or persistence;
+- Does not interpret Interaction behavior and provides no Commands, drag state machine, Selection writes, or persistence; it only displays an accepted semantic Projection;
 - Does not create the SVG Target or take ownership of the caller's existing Target children;
 - Not a default Renderer and provides no Registry, default export, or Plugin wrapper.
 
 ## Verification evidence
 
-Type tests lock down the named synchronous Factory, Config, and error entry points. Bun tests cover config and value semantics. Real-Chromium tests cover SVG projection, DOM identity, continuous Commits, Session, Hit Testing, screen-to-SVG coordinate conversion, ResizeObserver, native input policies, Pointer Capture, Focus, Runtime Plugin composition, Target reservation, rollback, and disposal. Declaration-artifact checks also ensure that public entry points do not leak implementation details.
+Type tests lock down the named synchronous Factory, Config, and error entry points. Bun tests cover config and value semantics. Real-Chromium tests cover SVG and Interaction projection, DOM identity, continuous Commits, Session, Hit Testing, screen-to-SVG coordinate conversion, ResizeObserver, native input policies, Pointer Capture, lost capture, Focus, Runtime Plugin composition, Target reservation, rollback, and disposal. Declaration-artifact checks also ensure that public entry points do not leak implementation details.

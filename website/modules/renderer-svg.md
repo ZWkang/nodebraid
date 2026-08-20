@@ -29,6 +29,7 @@ description: 将 CFlow Canvas 语义投影到现有 SVG Target 的参考级 Rend
 - 同步 `createSvgRenderer(config)` Factory，一次绑定一个现有 `SVGSVGElement`；
 - 通用矩形 Node、直线 Edge、Selection 标记与 Viewport projection；
 - Pointer、Wheel、Keyboard、Focus 与 Pointer Capture 的真实 DOM bridge；
+- Node Drag 与 Viewport Pan Interaction Projection 覆盖、baseline 失效清理和 compatible Commit 重投影；
 - 从 CSS screen pixel 到 SVG user space 的坐标转换与语义 Hit Test；
 - 稳定 class、`data-cflow-*` 属性、canonical layer order 与 keyed DOM identity；
 - 原子 Document/Session 更新、连续 revision 校验、失败回滚与 reset 恢复；
@@ -38,7 +39,7 @@ Provider 只管理自己在 Target 下创建的 projection subtree。调用方�
 
 ## 依赖与组合
 
-该 package 依赖 [`@cflow/renderer-api`](/modules/renderer-api) 的 backend-neutral contract，以及 `@cflow/kernel`、`@cflow/session-api` 和 `@cflow/diagnostics` 的值与错误契约。它不依赖 Plugin Host、framework adapter、Interaction 或 `@cflow/core`。
+该 package 依赖 [`@cflow/renderer-api`](/modules/renderer-api) 的 backend-neutral contract，以及其使用的 Kernel、Session、Interaction Projection 与 Diagnostics 值契约。它不依赖 Plugin Host、framework adapter、Interaction 状态机或 `@cflow/core`。
 
 应用可以直接创建 Renderer；需要 Runtime 生命周期与 Kernel/Session 同步时，把 `createSvgRenderer` 交给 [`@cflow/plugin-renderer`](/modules/plugin-renderer)。CFlow 不会默认选择该 Provider，`@cflow/core` 也不会重导出它。
 
@@ -113,10 +114,10 @@ Document revision、Session、Input subscriber、Pointer 与 disposed-state 失�
 - 仅渲染显式 `Size` 的矩形 Node 与有效端点之间的直线 Edge；
 - 不支持 Port、自环、曲线、marker、label、富文本、动画或业务 Node 外观；
 - 不提供默认主题、theme registry、组件插槽或 framework adapter；
-- 不提供 Interaction、Command、拖拽状态机、Selection 写入或持久化；
+- 不解释 Interaction 行为，也不提供 Command、拖拽状态机、Selection 写入或持久化；它只显示已接受的语义 Projection；
 - 不创建 SVG Target，也不接管调用方已有的 Target 子节点；
 - 不作为默认 Renderer，不提供 Registry、默认导出或 Plugin wrapper。
 
 ## 验证依据
 
-类型测试锁定具名同步 Factory、Config 与错误入口；Bun 测试覆盖 config 和值语义；真实 Chromium 测试覆盖 SVG projection、DOM identity、连续 Commit、Session、Hit Test、screen-to-SVG 坐标转换、ResizeObserver、原生输入 policy、Pointer Capture、Focus、Runtime Plugin 组合、Target reservation、回滚与释放。声明产物检查同时保证公共入口不泄漏内部实现。
+类型测试锁定具名同步 Factory、Config 与错误入口；Bun 测试覆盖 config 和值语义；真实 Chromium 测试覆盖 SVG/Interaction projection、DOM identity、连续 Commit、Session、Hit Test、screen-to-SVG 坐标转换、ResizeObserver、原生输入 policy、Pointer Capture、lost capture、Focus、Runtime Plugin 组合、Target reservation、回滚与释放。声明产物检查同时保证公共入口不泄漏内部实现。

@@ -13,13 +13,13 @@ This name describes the current source-module boundary; it does not mean the pac
 
 A Renderer Provider should not know about the Plugin Host, subscribe to Kernel itself, coordinate Session, or manage Runtime cleanup. `@cflow/plugin-renderer` is the deep adapter between those layers: it creates one Renderer Instance per Activation, establishes its initial state, coordinates updates serially, and narrows the capabilities Interaction actually needs into `RendererService`.
 
-The Provider's projection methods and disposal authority remain private and are not leaked to Consumers through the Runtime Service.
+Document/Session projection methods and disposal authority remain private. Interaction can update transient semantic Projection only through one exclusive `InteractionProjectionBinding`.
 
 ## When to use it
 
 - You already have a concrete Provider that satisfies `RendererFactory<Config>`;
 - You want the Renderer to follow Kernel Commits and Session Snapshots;
-- An Interaction Plugin needs Input subscriptions, Hit Testing, Pointer Capture, or Focus;
+- An Interaction Plugin needs Input subscriptions, Hit Testing, Pointer Capture, Focus, or transient Projection delivery;
 - You need the Renderer, subscriptions, and Target resources to be cleaned up with the Canvas Runtime Activation.
 
 The current official concrete Provider is [`@cflow/renderer-svg`](/en/modules/renderer-svg). This module still handles Runtime integration only and does not draw a visible canvas by itself.
@@ -28,10 +28,10 @@ The current official concrete Provider is [`@cflow/renderer-svg`](/en/modules/re
 
 - `createRendererPlugin(factory)`: binds an explicitly selected Factory as a Runtime Plugin;
 - `rendererService`: the strongly typed Required Service token for Interaction Plugins;
-- `RendererService`: exposes only `subscribeInput`, `hitTest`, `capturePointer`, `releasePointer`, and `focus`;
+- `RendererService`: exposes one exclusive Interaction Projection Binding plus Input, Hit Testing, Pointer Capture, and Focus;
 - Delivery of the current Session Snapshot after the initial Document reset;
 - Serial, resolvable coordination of Kernel Commits and Session updates;
-- Renderer drift diagnostics and a reset from current authoritative state;
+- One current-state reset-plus-Session recovery after any internal synchronization failure; terminal `SYNC_FAILED` if recovery also fails;
 - Input-listener fault isolation and Host-scoped diagnostics;
 - Activation-owned subscriptions and Renderer Instance cleanup.
 
@@ -73,6 +73,7 @@ import {
   rendererDiagnosticEvents,
   rendererService,
   RendererPluginError,
+  type InteractionProjectionBinding,
   type RendererPluginErrorCode,
   type RendererService,
 } from '@cflow/plugin-renderer';
@@ -88,10 +89,10 @@ Subsequent updates pass through one coordinated drain:
 
 - When a selected entity is deleted, the already coordinated Session is delivered before the deletion Commit;
 - When a new entity is selected, the Commit that creates it is delivered before the Session;
-- When a Commit is not continuous with the Baseline, or the Provider throws `DOCUMENT_OUT_OF_SYNC`, the Runtime reports `cflow.plugin.renderer.sync.fault` and resets to the current Kernel View;
-- Other synchronous projection faults enter the same diagnostics boundary without manufacturing successful delivery.
+- Any synchronization fault is reported through `cflow.plugin.renderer.sync.fault`, followed by exactly one current Kernel View reset plus Session recovery;
+- If recovery also fails, both original errors are preserved in terminal `SYNC_FAILED`. Input forwarding stops and Hit/Focus/Capture/Projection updates reject explicitly without a retry loop.
 
-`RendererService.subscribeInput()` isolates Consumer listener errors and reports them through `cflow.plugin.renderer.input-listener.fault`; one listener failure does not block later listeners. The Service does not expose `updateDocument`, `updateSession`, or `dispose`.
+`RendererService.subscribeInput()` isolates Consumer listener errors and reports them through `cflow.plugin.renderer.input-listener.fault`; one listener failure does not block later listeners. The Service does not expose `updateDocument`, `updateSession`, or `dispose`; only the Binding has transient `updateInteraction` authority.
 
 When Activation ends, the Runtime first marks the Service as disposed, clears pending updates, and stops Session, Kernel, and Input subscriptions, then awaits Renderer `dispose()` asynchronously. Calls through the old Service fail with `RendererPluginError` code `SERVICE_DISPOSED`. Original Factory and disposal errors preserve their identity and participate in the Plugin Host's explicit cleanup-failure aggregation.
 
@@ -99,7 +100,7 @@ When Activation ends, the Runtime first marks the Service as disposed, clears pe
 
 - This package does not implement a concrete Provider; the official SVG implementation lives in the separate `@cflow/renderer-svg` package;
 - Does not choose a default Provider or provide a dynamic Factory Registry;
-- Does not let Consumers update Renderer state directly or dispose the instance;
+- Does not let Consumers update Document/Session Renderer state or dispose the instance; only the single Interaction Binding can update transient Projection;
 - Does not interpret input, modify Selection, or execute Commands; those responsibilities belong to Interaction;
 - No framework component, mount lifecycle, animation, or business-specific visuals;
 - No silent retry or backend switching for Provider faults other than drift recovery.

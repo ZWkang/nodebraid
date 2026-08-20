@@ -15,13 +15,13 @@ Roadmap 记录尚未交付的方向，不承诺日期、package 名或最终 API
 
 SVG Renderer Provider 已经通过真实 Target、Document/Session 同步、输入、Hit Test 与 lifecycle 验证。后续 Canvas2D、WebGL、Konva、Pixi 或其他 Provider 仍应通过同一个 contract 独立交付，而不是在核心中增加默认 Renderer 或动态 Registry。
 
-## Interaction 与框架接入
+## Interaction 扩展与框架接入
 
-后续 Interaction capability 可以在标准化 Renderer Input 之上解释选择、拖拽、连线、快捷键等行为，并通过 Command/Session/Kernel 的现有写入边界工作。React、Vue 或其他 framework adapter 应保持在 Runtime 与 UI 框架之间，不取得第二份 Document authority。
+Interaction v0 已经在标准化 Renderer Input 之上交付选择、多 Node 拖动、Pan 与 Wheel Zoom，并通过 Command/Session/Kernel 的既有写入边界工作。后续仍可独立设计 box selection、edge connect、snapping、pinch/touch、文本编辑或可扩展 Tool Registry。React、Vue 或其他 framework adapter 应保持在 Runtime 与 UI 框架之间，不取得第二份 Document authority。
 
 ## Composition 与示例
 
-当 Interaction 链路成立后，可以增加带真实 SVG Provider 的可运行产品示例和显式 Canvas Composition，降低初次组合成本。它们仍不会成为 Plugin Host 隐式安装的默认能力。
+Interaction 链路已经由真实 SVG Provider 与 Chromium 测试成立；后续可以增加可运行产品示例和显式 Canvas Composition，降低初次组合成本。它们仍不会成为 Plugin Host 隐式安装的默认能力。
 
 ## 更后面的探索
 

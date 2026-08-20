@@ -25,10 +25,12 @@
       "version": "0.0.1",
       "dependencies": {
         "@cflow/diagnostics": "workspace:*",
+        "@cflow/interaction-api": "workspace:*",
         "@cflow/kernel": "workspace:*",
         "@cflow/layout-api": "workspace:*",
         "@cflow/plugin-command": "workspace:*",
         "@cflow/plugin-history": "workspace:*",
+        "@cflow/plugin-interaction": "workspace:*",
         "@cflow/plugin-kernel": "workspace:*",
         "@cflow/plugin-layout": "workspace:*",
         "@cflow/plugin-renderer": "workspace:*",

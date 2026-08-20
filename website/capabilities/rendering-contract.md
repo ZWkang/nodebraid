@@ -27,15 +27,15 @@ Rendering Contract 能力族定义“怎样把 CFlow Canvas 语义交给渲染�
 - 你的 Interaction Plugin 需要订阅标准化输入、Hit Test、Pointer Capture 或 Focus；
 - 你在评估 CFlow 与具体渲染后端之间的责任边界。
 
-如果 SVG 的通用 Geometry 与 DOM seam 满足需求，可以直接选择 `@cflow/renderer-svg`；产品节点视觉、Interaction 与 framework adapter 仍由应用显式提供。
+如果 SVG 的通用 Geometry 与 DOM seam 满足需求，可以直接选择 `@cflow/renderer-svg`；CFlow 已提供独立 Interaction Runtime，但产品节点视觉与 framework adapter 仍由应用显式提供。
 
 ## 提供的能力
 
-| 角色                | Package                                              | 交付内容                                                                               |
-| ------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Provider contract   | [`@cflow/renderer-api`](/modules/renderer-api)       | `CanvasRenderer`、Factory、Document/Session 更新、标准化输入、Hit Result 与结构化错误  |
-| Runtime integration | [`@cflow/plugin-renderer`](/modules/plugin-renderer) | 将 Factory 绑定为 Plugin，协调 Kernel/Session，向 Interaction 暴露窄 `RendererService` |
-| SVG Provider        | [`@cflow/renderer-svg`](/modules/renderer-svg)       | 将通用 Canvas Geometry、Session 与浏览器输入投影到现有 `SVGSVGElement`                 |
+| 角色                | Package                                              | 交付内容                                                                                          |
+| ------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Provider contract   | [`@cflow/renderer-api`](/modules/renderer-api)       | `CanvasRenderer`、Factory、Document/Session/Interaction 更新、标准化输入、Hit Result 与结构化错误 |
+| Runtime integration | [`@cflow/plugin-renderer`](/modules/plugin-renderer) | 将 Factory 绑定为 Plugin，协调 Kernel/Session，并提供排他的 Interaction Binding                   |
+| SVG Provider        | [`@cflow/renderer-svg`](/modules/renderer-svg)       | 将通用 Canvas Geometry、Session 与浏览器输入投影到现有 `SVGSVGElement`                            |
 
 ```text
 Kernel Commit ───────────────┐
@@ -43,13 +43,14 @@ Kernel Commit ───────────────┐
 Session Snapshot ────────────┼────────▶ CanvasRenderer ─────▶ concrete Target
                              │                 │
 Interaction ◀── RendererService ◀── normalized Input / Hit Result
+Interaction ─── Interaction Projection Binding ───▶ Renderer
 ```
 
 Renderer 没有 Document、Session 或 Command 写权。它只投影状态并报告输入事实；真正的行为解释和状态变化属于 Interaction 或其他 Feature Plugin。
 
 ## 依赖与组合
 
-`@cflow/renderer-api` 只依赖 CFlow 的 Kernel、Session value contract 与 Diagnostics，不依赖 Plugin Host、具体后端或框架。
+`@cflow/renderer-api` 只依赖 CFlow 的 Kernel、Session、Interaction Projection value contract 与 Diagnostics，不依赖 Plugin Host、具体后端或框架。
 
 `@cflow/plugin-renderer` 静态要求 `KernelService` 与 `SessionService`。应用从 concrete Provider 获得 `RendererFactory<Config>`，调用 `createRendererPlugin(factory)` 生成一个普通 Runtime Plugin，再用 Provider-specific config 安装。CFlow 不提供 Factory Registry 或默认 Provider。
 
@@ -78,10 +79,10 @@ Renderer 没有 Document、Session 或 Command 写权。它只投影状态并报
 - 当前 concrete Provider 只有参考级 SVG 实现；没有 Canvas2D、WebGL、Konva、Pixi 或 framework adapter；
 - 不提供默认 Provider、动态 Registry 或 universal `HTMLElement` mount；
 - Renderer 不修改 Document、Session，也不直接执行 Command；
-- 首版输入只包含 Pointer、Wheel 与 Keyboard，不包含原生事件或 backend target；
+- 首版输入包含 Pointer、Wheel、Keyboard 与 Focus，不包含原生事件或 backend target；
 - Hit Result 只描述 Canvas、Node、Edge 或 Port，不暴露 scene object、z-order 或任意 detail；
-- 不定义 Node 业务视觉、Interaction 行为、动画、文本编辑或完整画布产品。
+- 不定义 Node 业务视觉、动画、文本编辑或完整画布产品；Interaction 行为由独立 Runtime Plugin 拥有。
 
 ## 验证依据
 
-Renderer API tests 锁定 backend-neutral 类型、Factory config、Document/Session update authority 与结构化错误。Renderer Plugin tests 通过 recording Provider 验证初始 reset、Session 可解析顺序、输入与控制委托、listener fault 隔离、失步 reset、窄 Service surface 与 dispose。SVG Provider 进一步通过真实 Chromium 验证 SVG projection、坐标映射、原生输入、Hit Test、Pointer Capture、Focus、回滚与 terminal disposal。
+Renderer API tests 锁定 backend-neutral 类型、Factory config、Document/Session/Interaction update authority 与结构化错误。Renderer Plugin tests 通过 recording Provider 验证初始 reset、Session 可解析顺序、排他 Binding、输入与控制委托、listener fault 隔离、单次 recovery、`SYNC_FAILED` 与 dispose。SVG Provider 进一步通过真实 Chromium 验证 SVG/Interaction projection、坐标映射、原生输入、Hit Test、Pointer Capture、lost capture、Focus、回滚与 terminal disposal。

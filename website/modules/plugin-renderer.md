@@ -13,13 +13,13 @@ description: 将 Renderer Factory 接入 Kernel 与 Session，并只向 Interact
 
 Renderer Provider 不应了解 Plugin Host，也不应自行订阅 Kernel、协调 Session 或管理 Runtime cleanup。`@cflow/plugin-renderer` 是这两层之间的深 adapter：它为每次 Activation 创建一份 Renderer Instance，建立初始状态，串行协调更新，并把 Interaction 真正需要的能力收口成 `RendererService`。
 
-Provider 的投影方法和 dispose authority 保持私有，不会通过 Runtime Service 泄漏给 Consumer。
+Document/Session 投影方法和 dispose authority 保持私有。Interaction 只能通过一份排他的 `InteractionProjectionBinding` 更新瞬态语义 Projection。
 
 ## 何时使用
 
 - 你已经有一个满足 `RendererFactory<Config>` 的 concrete Provider；
 - 你要让 Renderer 跟随 Kernel Commit 与 Session Snapshot；
-- Interaction Plugin 需要订阅输入、Hit Test、Pointer Capture 或 Focus；
+- Interaction Plugin 需要订阅输入、Hit Test、Pointer Capture、Focus 或发布瞬态 Projection；
 - 你需要让 Renderer、订阅与 Target 资源随 Canvas Runtime Activation 清理。
 
 当前官方 concrete Provider 是 [`@cflow/renderer-svg`](/modules/renderer-svg)；本模块自身仍只负责 Runtime integration，不绘制可见画布。
@@ -28,10 +28,10 @@ Provider 的投影方法和 dispose authority 保持私有，不会通过 Runtim
 
 - `createRendererPlugin(factory)`：把一个显式选择的 Factory 绑定为 Runtime Plugin；
 - `rendererService`：Interaction Plugin 的强类型 Required Service token；
-- `RendererService`：只暴露 `subscribeInput`、`hitTest`、`capturePointer`、`releasePointer` 与 `focus`；
+- `RendererService`：暴露一份排他的 Interaction Projection Binding，以及 Input、Hit Test、Pointer Capture 与 Focus；
 - 初始 Document reset 后再交付当前 Session Snapshot；
 - Kernel Commit 与 Session update 的串行、可解析协调；
-- Renderer 失步诊断与当前权威状态 reset；
+- 任意内部同步失败的一次当前权威状态 reset+Session recovery；恢复再失败进入 terminal `SYNC_FAILED`；
 - Input listener fault 隔离和 Host-scoped diagnostics；
 - Activation-owned subscription 与 Renderer Instance cleanup。
 
@@ -73,6 +73,7 @@ import {
   rendererDiagnosticEvents,
   rendererService,
   RendererPluginError,
+  type InteractionProjectionBinding,
   type RendererPluginErrorCode,
   type RendererService,
 } from '@cflow/plugin-renderer';
@@ -88,10 +89,10 @@ Renderer Installation 在 Kernel 或 Session Service 缺失时保持 pending。A
 
 - 删除已选实体时，先交付已经协调好的 Session，再交付删除 Commit；
 - 选中新实体时，先交付创建它的 Commit，再交付 Session；
-- Commit 与 Baseline 不连续，或 Provider 抛出 `DOCUMENT_OUT_OF_SYNC` 时，通过 `cflow.plugin.renderer.sync.fault` 报告并 reset 到当前 Kernel View；
-- 其他同步投影 fault 进入同一 diagnostics 边界，不伪造 delivery 成功。
+- 任意同步 fault 通过 `cflow.plugin.renderer.sync.fault` 报告，并且只尝试一次当前 Kernel View reset 加 Session recovery；
+- recovery 也失败时保留两条原始错误并进入 `SYNC_FAILED`，停止 Input forwarding，Hit/Focus/Capture/Projection update 都显式拒绝，不循环重试。
 
-`RendererService.subscribeInput()` 隔离 Consumer listener error，并通过 `cflow.plugin.renderer.input-listener.fault` 报告；一个 listener 失败不会阻断后续 listener。Service 不公开 `updateDocument`、`updateSession` 或 `dispose`。
+`RendererService.subscribeInput()` 隔离 Consumer listener error，并通过 `cflow.plugin.renderer.input-listener.fault` 报告；一个 listener 失败不会阻断后续 listener。Service 不公开 `updateDocument`、`updateSession` 或 `dispose`，只有 Binding 拥有瞬态 `updateInteraction` 权限。
 
 Activation 结束时，Runtime 先标记 Service disposed、清空待交付更新，停止 Session、Kernel 与 Input subscriptions，再异步等待 Renderer `dispose()`。旧 Service 调用以 `RendererPluginError` 的 `SERVICE_DISPOSED` 失败。Factory 与 dispose 原始错误保留身份，并参与 Plugin Host 的显式 cleanup failure 聚合。
 
@@ -99,7 +100,7 @@ Activation 结束时，Runtime 先标记 Service disposed、清空待交付更�
 
 - 本 package 不实现 concrete Provider；官方 SVG 实现在独立 `@cflow/renderer-svg` package 中；
 - 不选择默认 Provider，也不提供动态 Factory Registry；
-- 不允许 Consumer 直接更新 Renderer 状态或释放实例；
+- 不允许 Consumer 更新 Document/Session Renderer 状态或释放实例；只有唯一 Interaction Binding 可更新瞬态 Projection；
 - 不解释输入、不修改 Selection、不执行 Command；这些属于 Interaction；
 - 不提供 framework component、mount lifecycle、动画或业务视觉；
 - 不对非失步的 Provider fault 静默重试或切换后端。

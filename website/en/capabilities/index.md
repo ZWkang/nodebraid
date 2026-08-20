@@ -1,11 +1,11 @@
 ---
 title: Capability Map
-description: Understand CFlow's five current capability families and package composition from a developer's perspective.
+description: Understand CFlow's six current capability families and package composition from a developer's perspective.
 ---
 
 # Capability Map
 
-Package boundaries keep dependencies clear, but evaluating a system starts with a different question: “What can it help me build?” CFlow's current workspace packages form five capability families. Each family connects contracts, Runtime integration, and optional Providers instead of selling infrastructure packages in isolation.
+Package boundaries keep dependencies clear, but evaluating a system starts with a different question: “What can it help me build?” CFlow's current workspace packages form six capability families. Each family connects contracts, Runtime integration, and optional Providers instead of selling infrastructure packages in isolation.
 
 | Capability family                                         | Question it answers                                                          | Current delivery                                         |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------- |
@@ -13,6 +13,7 @@ Package boundaries keep dependencies clear, but evaluating a system starts with 
 | [Graph State](/en/capabilities/graph-state)               | Who owns the Document, and where do Selection and Viewport live?             | Kernel, Kernel Plugin, Session API, Session Plugin       |
 | [Execution & History](/en/capabilities/execution-history) | How are behaviors executed and Document Commits undone or redone?            | Command Plugin, History Plugin                           |
 | [Layout](/en/capabilities/layout)                         | How is layout computed asynchronously and committed to the current revision? | Layout API, Runtime integration, Dagre, ELK              |
+| [Interaction](/en/capabilities/interaction)               | How does normalized input become selection, dragging, and viewport behavior? | Interaction API and Interaction Runtime Plugin           |
 | [Rendering Contract](/en/capabilities/rendering-contract) | How can a rendering backend integrate without polluting core state?          | Renderer API, Renderer Plugin, and SVG Renderer Provider |
 
 ## A typical composition
@@ -27,6 +28,7 @@ Plugin Host
     ├── Command Plugin ─▶ typed behaviors
     ├── History Plugin ─▶ Undo / Redo
     ├── Layout Plugin ──▶ explicit Layout Engine
+    ├── Interaction Plugin ▶ Selection / Drag / Pan / Zoom
     └── Renderer Plugin ▶ application-provided Renderer Factory
 ```
 
