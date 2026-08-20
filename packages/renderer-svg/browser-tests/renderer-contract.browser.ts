@@ -293,10 +293,18 @@ try {
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupViewportPanInteraction()');
   await dispatchMouseDown(50, 200);
   await dispatchMouseMove(100, 250);
+  await dispatchWheel(100, 250, 100);
   await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 50 50)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteractionEvents()', [
+    {
+      name: 'cflow.plugin.interaction.input.rejected',
+      level: 'info',
+      attributes: { inputType: 'wheel', gestureType: 'viewport-pan', reason: 'active-gesture' },
+    },
+  ]);
   await dispatchMouseUp(100, 250);
   await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 50 50)',
@@ -324,6 +332,44 @@ try {
   await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 30 20)',
     viewport: { x: 30, y: 20, zoom: 1 },
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await dispatchMiddleDown(160, 120);
+  await dispatchMiddleMove(190, 140);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 30 20)',
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  await dispatchMiddleUp(190, 140);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 30 20)',
+    viewport: { x: 30, y: 20, zoom: 1 },
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownViewportPanInteraction()');
+
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupViewportPanInteraction(true)');
+  await dispatchMouseDown(50, 200);
+  await dispatchMouseMove(60, 200);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 0 0)',
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  await dispatchMouseMove(80, 200);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 30 0)',
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  await dispatchMouseUp(80, 200);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await dispatchWheel(200, 150, 100);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(0.5 0 0 0.5 100 75)',
+    viewport: { x: 100, y: 75, zoom: 0.5 },
+  });
+  await dispatchWheel(200, 150, -1000);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(2 0 0 2 -200 -150)',
+    viewport: { x: -200, y: -150, zoom: 2 },
   });
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownViewportPanInteraction()');
 
@@ -1195,6 +1241,45 @@ async function dispatchSpaceKey(type: 'keyDown' | 'keyUp'): Promise<void> {
   await evaluateBrowserScenario(
     `document.querySelector('#viewport-pan-interaction-target').dispatchEvent(new KeyboardEvent('${domType}', { key: ' ', code: 'Space', bubbles: true }))`,
   );
+}
+
+async function dispatchMiddleDown(x: number, y: number): Promise<void> {
+  await withRendererPageCdp(async (send) => {
+    await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y, buttons: 0 });
+    await send('Input.dispatchMouseEvent', {
+      type: 'mousePressed',
+      x,
+      y,
+      button: 'middle',
+      buttons: 4,
+      clickCount: 1,
+    });
+  });
+}
+
+async function dispatchMiddleMove(x: number, y: number): Promise<void> {
+  await withRendererPageCdp(async (send) => {
+    await send('Input.dispatchMouseEvent', {
+      type: 'mouseMoved',
+      x,
+      y,
+      button: 'middle',
+      buttons: 4,
+    });
+  });
+}
+
+async function dispatchMiddleUp(x: number, y: number): Promise<void> {
+  await withRendererPageCdp(async (send) => {
+    await send('Input.dispatchMouseEvent', {
+      type: 'mouseReleased',
+      x,
+      y,
+      button: 'middle',
+      buttons: 0,
+      clickCount: 1,
+    });
+  });
 }
 
 async function dispatchFaultedPointerCleanupSequence(retryPointer = true): Promise<void> {

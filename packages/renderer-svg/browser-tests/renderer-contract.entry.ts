@@ -1,6 +1,6 @@
 // Public-seam browser scenarios for the complete SVG Renderer contract.
 import { createCanvasKernel, edgeId, nodeId } from '@cflow/kernel';
-import type { DiagnosticFault } from '@cflow/diagnostics';
+import type { DiagnosticEvent, DiagnosticFault } from '@cflow/diagnostics';
 import { interactionPlugin } from '@cflow/plugin-interaction';
 import { commandPlugin, commandService, type CommandService } from '@cflow/plugin-command';
 import { historyPlugin, redoCommand, undoCommand } from '@cflow/plugin-history';
@@ -491,8 +491,13 @@ declare global {
   var __cflowRendererSvgReadMultiNodeDragInteraction: () => MultiNodeDragInteractionResult;
   var __cflowRendererSvgMoveNodeDragExternally: () => void;
   var __cflowRendererSvgTeardownNodeDragInteraction: () => Promise<void>;
-  var __cflowRendererSvgSetupViewportPanInteraction: () => Promise<void>;
+  var __cflowRendererSvgSetupViewportPanInteraction: (configured?: boolean) => Promise<void>;
   var __cflowRendererSvgReadViewportPanInteraction: () => ViewportPanInteractionResult;
+  var __cflowRendererSvgReadViewportPanInteractionEvents: () => readonly Readonly<{
+    name: string;
+    level: string;
+    attributes: unknown;
+  }>[];
   var __cflowRendererSvgResetViewportPanInteraction: () => void;
   var __cflowRendererSvgTeardownViewportPanInteraction: () => Promise<void>;
   var __cflowRendererSvgSetupInteractionProjectionInput: () => Promise<void>;
@@ -2784,8 +2789,9 @@ let nodeDragInteractionSession: SessionService | undefined;
 let viewportPanInteractionHost: ReturnType<typeof createPluginHost> | undefined;
 let viewportPanInteractionTarget: SVGSVGElement | undefined;
 let viewportPanInteractionSession: SessionService | undefined;
+const viewportPanInteractionEvents: DiagnosticEvent[] = [];
 
-globalThis.__cflowRendererSvgSetupViewportPanInteraction = async (): Promise<void> => {
+globalThis.__cflowRendererSvgSetupViewportPanInteraction = async (configured = false): Promise<void> => {
   const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   target.id = 'viewport-pan-interaction-target';
   target.setAttribute('width', '400');
@@ -2795,7 +2801,10 @@ globalThis.__cflowRendererSvgSetupViewportPanInteraction = async (): Promise<voi
   target.style.top = '0';
   target.style.zIndex = '1004';
   document.body.append(target);
-  const host = createPluginHost();
+  viewportPanInteractionEvents.length = 0;
+  const host = createPluginHost({
+    diagnostics: { sink: (event) => viewportPanInteractionEvents.push(event) },
+  });
   const rendererPlugin = createRendererPlugin(createSvgRenderer);
   let session: SessionService | undefined;
   let kernel: KernelService | undefined;
@@ -2806,15 +2815,24 @@ globalThis.__cflowRendererSvgSetupViewportPanInteraction = async (): Promise<voi
       kernel = context.services.kernel;
     },
   });
+  const interactionConfig = configured
+    ? { dragThreshold: 20, wheelZoomSensitivity: 0.01, minZoom: 0.5, maxZoom: 2 }
+    : undefined;
   const installations = [
     host.install(kernelPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(rendererPlugin, { target }),
-    host.install(interactionPlugin),
+    host.install(interactionPlugin, interactionConfig),
     host.install(consumer),
   ];
   await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (interactionConfig) {
+    interactionConfig.dragThreshold = 100;
+    interactionConfig.wheelZoomSensitivity = 0.000001;
+    interactionConfig.minZoom = 0.9;
+    interactionConfig.maxZoom = 1.1;
+  }
   if (!session || !kernel) throw new Error('Expected the Viewport Pan Runtime Services.');
   kernel.transact((transaction) => {
     transaction.nodes.add({
@@ -2849,6 +2867,15 @@ globalThis.__cflowRendererSvgReadViewportPanInteraction = (): ViewportPanInterac
     },
   };
 };
+
+globalThis.__cflowRendererSvgReadViewportPanInteractionEvents = () =>
+  viewportPanInteractionEvents
+    .filter((event) => event.name.startsWith('cflow.plugin.interaction.'))
+    .map((event) => ({
+      name: event.name,
+      level: event.level,
+      attributes: event.attributes,
+    }));
 
 function roundSix(value: number): number {
   return Math.round(value * 1_000_000) / 1_000_000;

@@ -6,7 +6,9 @@ import { sessionService } from '@cflow/plugin-session';
 import { definePlugin } from '@cflow/runtime-cordis';
 
 import { computeClickSelection } from './selection-transition';
-import type { MoveNodeInput } from './contracts';
+import type { InteractionConfig, MoveNodeInput } from './contracts';
+import { interactionDiagnosticEvents } from './diagnostic-events';
+import { resolveInteractionConfig } from './interaction-config';
 import { InteractionError } from './interaction-error';
 import { moveNodesCommand } from './move-nodes-command';
 
@@ -35,7 +37,8 @@ export const interactionPlugin = definePlugin({
     commands: commandService,
     kernel: kernelService,
   },
-  setup(context) {
+  setup(context, providedConfig: InteractionConfig | undefined) {
+    const config = resolveInteractionConfig(providedConfig);
     const renderer = context.services.renderer;
     const session = context.services.session;
     const kernel = context.services.kernel;
@@ -102,9 +105,23 @@ export const interactionPlugin = definePlugin({
       }
       if (input.type === 'focus.gained') return;
       if (input.type === 'wheel') {
-        if (pressedPointerId !== undefined) return;
+        if (pressedPointerId !== undefined) {
+          context.diagnostics.emit({
+            name: interactionDiagnosticEvents.inputRejected,
+            level: 'info',
+            attributes: {
+              inputType: 'wheel',
+              gestureType: viewportPanCandidate ? 'viewport-pan' : nodeDragCandidate ? 'node-drag' : 'selection',
+              reason: 'active-gesture',
+            },
+          });
+          return;
+        }
         const current = session.getSnapshot().viewport;
-        const zoom = Math.max(0.1, Math.min(8, current.zoom * Math.exp(-input.deltaY * 0.002)));
+        const zoom = Math.max(
+          config.minZoom,
+          Math.min(config.maxZoom, current.zoom * Math.exp(-input.deltaY * config.wheelZoomSensitivity)),
+        );
         if (zoom === current.zoom) return;
         session.setViewport({
           x: input.screenPoint.x - input.worldPoint.x * zoom,
@@ -114,14 +131,16 @@ export const interactionPlugin = definePlugin({
         return;
       }
       if (input.type === 'pointer.down') {
-        if (pressedPointerId !== undefined || input.button !== 'primary') return;
+        if (pressedPointerId !== undefined || (input.button !== 'primary' && input.button !== 'auxiliary')) {
+          return;
+        }
         const hit = renderer.hitTest(input.screenPoint);
         if (hit === null) return;
         renderer.focus();
         renderer.capturePointer(input.pointerId);
         pressedPointerId = input.pointerId;
         try {
-          if (spacePressed) {
+          if (input.button === 'auxiliary' || spacePressed) {
             viewportPanCandidate = {
               pointerId: input.pointerId,
               startScreenPoint: input.screenPoint,
@@ -188,7 +207,7 @@ export const interactionPlugin = definePlugin({
       if (input.type === 'pointer.move' && input.pointerId === pressedPointerId && nodeDragCandidate) {
         const screenDeltaX = input.screenPoint.x - nodeDragCandidate.startScreenPoint.x;
         const screenDeltaY = input.screenPoint.y - nodeDragCandidate.startScreenPoint.y;
-        if (!nodeDragCandidate.active && Math.hypot(screenDeltaX, screenDeltaY) < 4) return;
+        if (!nodeDragCandidate.active && Math.hypot(screenDeltaX, screenDeltaY) < config.dragThreshold) return;
         nodeDragCandidate.active = true;
         completeClick = undefined;
         const worldDeltaX = input.worldPoint.x - nodeDragCandidate.startWorldPoint.x;
@@ -211,7 +230,7 @@ export const interactionPlugin = definePlugin({
       if (input.type === 'pointer.move' && input.pointerId === pressedPointerId && viewportPanCandidate) {
         const deltaX = input.screenPoint.x - viewportPanCandidate.startScreenPoint.x;
         const deltaY = input.screenPoint.y - viewportPanCandidate.startScreenPoint.y;
-        if (!viewportPanCandidate.active && Math.hypot(deltaX, deltaY) < 4) return;
+        if (!viewportPanCandidate.active && Math.hypot(deltaX, deltaY) < config.dragThreshold) return;
         viewportPanCandidate.active = true;
         completeClick = undefined;
         const viewport = {
@@ -238,14 +257,14 @@ export const interactionPlugin = definePlugin({
             void commands.execute(moveNodesCommand, { moves }).catch((error) => {
               if (error instanceof InteractionError && error.code === 'STALE_GESTURE') {
                 context.diagnostics.emit({
-                  name: 'cflow.plugin.interaction.gesture.cancelled',
+                  name: interactionDiagnosticEvents.gestureCancelled,
                   level: 'info',
                   attributes: { gestureType: 'node-drag', reason: 'stale' },
                 });
                 return;
               }
               context.diagnostics.reportFault(error, {
-                name: 'cflow.plugin.interaction.command.fault',
+                name: interactionDiagnosticEvents.commandFault,
                 attributes: { gestureType: 'node-drag' },
               });
             });
