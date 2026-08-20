@@ -195,6 +195,66 @@ describe('@cflow/plugin-renderer', () => {
     await runtime.host.dispose();
   });
 
+  test('attempts one full recovery after an arbitrary internal synchronization fault', async () => {
+    const faults: DiagnosticFault[] = [];
+    const recording = new RecordingRenderer();
+    const syncError = new Error('injected commit synchronization failure');
+    recording.rejectNextCommitWith = syncError;
+    const runtime = await activateRenderer(
+      createRendererPlugin(() => recording),
+      undefined,
+      faults,
+    );
+
+    runtime.kernel.transact((transaction) => {
+      transaction.nodes.add({ id: nodeId('recovered-node'), type: 'task', position: { x: 0, y: 0 }, data: null });
+    });
+
+    expect(recording.deliveries).toEqual(['document:reset:0', 'session:0:0:1', 'document:reset:1', 'session:0:0:1']);
+    expect(faults.map((fault) => fault.error)).toEqual([syncError]);
+    runtime.renderer.focus();
+    expect(recording.controls).toEqual(['focus']);
+
+    await runtime.host.dispose();
+  });
+
+  test('enters terminal Sync Failure when the single full recovery also fails', async () => {
+    const faults: DiagnosticFault[] = [];
+    const recording = new RecordingRenderer();
+    const runtime = await activateRenderer(
+      createRendererPlugin(() => recording),
+      undefined,
+      faults,
+    );
+    const inputs: string[] = [];
+    runtime.renderer.subscribeInput((input) => inputs.push(input.type));
+    const binding = runtime.renderer.bindInteractionProjection();
+    const syncError = new Error('injected synchronization failure');
+    const recoveryError = new Error('injected recovery failure');
+    recording.rejectNextCommitWith = syncError;
+    recording.rejectNextResetWith = recoveryError;
+
+    runtime.kernel.transact((transaction) => {
+      transaction.nodes.add({ id: nodeId('failed-node'), type: 'task', position: { x: 0, y: 0 }, data: null });
+    });
+
+    expect(faults).toHaveLength(2);
+    expect(faults[0]?.error).toBe(syncError);
+    const terminalError = faults[1]?.error;
+    expect(terminalError).toMatchObject({ domain: 'plugin.renderer', code: 'SYNC_FAILED' });
+    expect(terminalError).toHaveProperty('cause', expect.objectContaining({ errors: [syncError, recoveryError] }));
+    recording.emit(createPointerInput('pointer.move'));
+    expect(inputs).toEqual([]);
+    expect(() => runtime.renderer.hitTest({ x: 10, y: 20 })).toThrow(terminalError);
+    expect(() => runtime.renderer.focus()).toThrow(terminalError);
+    expect(() => runtime.renderer.capturePointer(7)).toThrow(terminalError);
+    expect(() => runtime.renderer.releasePointer(7)).toThrow(terminalError);
+    expect(() => binding.update(null)).toThrow(terminalError);
+    binding.dispose();
+
+    await runtime.host.dispose();
+  });
+
   test('does not report queued Commits already subsumed by an out-of-sync reset', async () => {
     const faults: DiagnosticFault[] = [];
     const recording = new RecordingRenderer();
@@ -298,10 +358,22 @@ class RecordingRenderer implements CanvasRenderer {
   disposeCalls = 0;
   hit: HitResult | null = null;
   rejectNextCommitAsOutOfSync = false;
+  rejectNextCommitWith: unknown;
+  rejectNextResetWith: unknown;
   sessionIsResolvable = true;
   #view: CanvasView | undefined;
 
   updateDocument(update: RendererDocumentUpdate): void {
+    if (update.type === 'reset' && this.rejectNextResetWith !== undefined) {
+      const error = this.rejectNextResetWith;
+      this.rejectNextResetWith = undefined;
+      throw error;
+    }
+    if (update.type === 'commit' && this.rejectNextCommitWith !== undefined) {
+      const error = this.rejectNextCommitWith;
+      this.rejectNextCommitWith = undefined;
+      throw error;
+    }
     if (update.type === 'commit' && this.rejectNextCommitAsOutOfSync) {
       this.rejectNextCommitAsOutOfSync = false;
       throw new RendererError('DOCUMENT_OUT_OF_SYNC', 'test gap');

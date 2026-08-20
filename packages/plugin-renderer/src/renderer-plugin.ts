@@ -30,6 +30,7 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
       context.signal.throwIfAborted();
 
       let disposed = false;
+      let syncFailure: RendererPluginError | undefined;
       let draining = false;
       let deliveredView: CanvasView | undefined;
       let deliveredSession: SessionSnapshot | undefined;
@@ -45,6 +46,11 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
         if (disposed) {
           throw new RendererPluginError('SERVICE_DISPOSED', 'Renderer Service Activation has been disposed.');
         }
+      };
+
+      const assertOperational = (): void => {
+        assertActive();
+        if (syncFailure) throw syncFailure;
       };
 
       const reportSyncFault = (error: unknown): void => {
@@ -72,26 +78,15 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
         }
         const receivedRevision = commit.before.snapshot.revision;
         if (receivedRevision !== expectedRevision) {
-          reportSyncFault(
-            new RendererError('DOCUMENT_OUT_OF_SYNC', 'Renderer Commit is not contiguous with its Baseline.', {
-              expectedRevision,
-              receivedRevision,
-            }),
-          );
-          pendingUpdates.length = 0;
-          resetToCurrentState(true);
-          return;
+          throw new RendererError('DOCUMENT_OUT_OF_SYNC', 'Renderer Commit is not contiguous with its Baseline.', {
+            expectedRevision,
+            receivedRevision,
+          });
         }
         try {
           renderer.updateDocument({ type: 'commit', commit });
           deliveredView = commit.after;
         } catch (error) {
-          if (error instanceof RendererError && error.code === 'DOCUMENT_OUT_OF_SYNC') {
-            reportSyncFault(error);
-            pendingUpdates.length = 0;
-            resetToCurrentState(true);
-            return;
-          }
           throw error;
         }
       };
@@ -159,7 +154,7 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
       };
 
       const drainUpdates = (): void => {
-        if (draining || disposed) return;
+        if (draining || disposed || syncFailure) return;
         draining = true;
         try {
           while (deliverNextUpdate()) {
@@ -168,12 +163,26 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
         } catch (error) {
           pendingUpdates.length = 0;
           reportSyncFault(error);
+          try {
+            resetToCurrentState(true);
+          } catch (recoveryError) {
+            syncFailure = new RendererPluginError(
+              'SYNC_FAILED',
+              'Renderer synchronization and its single full recovery both failed.',
+              {},
+              {
+                cause: new AggregateError([error, recoveryError], 'Renderer synchronization and recovery both failed.'),
+              },
+            );
+            reportSyncFault(syncFailure);
+          }
         } finally {
           draining = false;
         }
       };
 
       const enqueueUpdate = (update: PendingRendererUpdate): void => {
+        if (syncFailure) return;
         pendingUpdates.push(update);
         drainUpdates();
       };
@@ -207,7 +216,7 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
 
       const service: RendererService = Object.freeze({
         bindInteractionProjection(): InteractionProjectionBinding {
-          assertActive();
+          assertOperational();
           if (interactionBindingActive) {
             throw new RendererPluginError(
               'INTERACTION_ALREADY_BOUND',
@@ -218,7 +227,7 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
           let bindingDisposed = false;
           return Object.freeze({
             update(projection: InteractionProjection | null): void {
-              assertActive();
+              assertOperational();
               if (bindingDisposed) {
                 throw new RendererPluginError(
                   'INTERACTION_BINDING_DISPOSED',
@@ -236,7 +245,7 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
           });
         },
         subscribeInput(listener: RendererInputListener): () => void {
-          assertActive();
+          assertOperational();
           if (typeof listener !== 'function') {
             throw new RendererError('INVALID_INPUT_SUBSCRIBER', 'Renderer Input listener must be a function.', {
               receivedType: describeReceivedType(listener),
@@ -244,7 +253,7 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
           }
           let active = true;
           const stopRenderer = renderer.subscribeInput((input) => {
-            if (!active || disposed) return;
+            if (!active || disposed || syncFailure) return;
             try {
               listener(input);
             } catch (error) {
@@ -264,19 +273,19 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
           return stop;
         },
         hitTest(point: ScreenPoint) {
-          assertActive();
+          assertOperational();
           return renderer.hitTest(point);
         },
         capturePointer(pointerId: number) {
-          assertActive();
+          assertOperational();
           renderer.capturePointer(pointerId);
         },
         releasePointer(pointerId: number) {
-          assertActive();
+          assertOperational();
           renderer.releasePointer(pointerId);
         },
         focus() {
-          assertActive();
+          assertOperational();
           renderer.focus();
         },
       });

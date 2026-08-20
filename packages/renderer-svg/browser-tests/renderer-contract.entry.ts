@@ -8,7 +8,7 @@ import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-k
 import { createRendererPlugin, rendererService, type RendererService } from '@cflow/plugin-renderer';
 import { sessionPlugin, sessionService, type SessionService } from '@cflow/plugin-session';
 import type { CanvasRenderer, RendererInput } from '@cflow/renderer-api';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+import { createPluginHost, definePlugin, type PluginInstallation } from '@cflow/runtime-cordis';
 
 import { createSvgRenderer, type SvgRendererConfig } from '../src';
 
@@ -38,6 +38,12 @@ interface InteractionProjectionClearResult {
   readonly preservedNodeIdentity: boolean;
 }
 
+interface InteractionProjectionResetResult {
+  readonly nodeX: string | null;
+  readonly stableHit: unknown;
+  readonly formerPreviewHit: unknown;
+}
+
 interface InteractionProjectionEdgeResult {
   readonly sourceX: string | null;
   readonly sourceY: string | null;
@@ -48,6 +54,11 @@ interface InteractionProjectionEdgeResult {
 interface ViewportInteractionProjectionResult {
   readonly previewTransform: string | null;
   readonly sessionViewport: Readonly<{ x: number; y: number; zoom: number }>;
+}
+
+interface ViewportInteractionInvalidationResult {
+  readonly transform: string | null;
+  readonly hit: unknown;
 }
 
 interface InteractionProjectionHitResult {
@@ -77,6 +88,20 @@ interface NodeDragInteractionResult {
 interface MultiNodeDragInteractionResult {
   readonly previewPositions: readonly Readonly<{ id: string; x: string | null; y: string | null }>[];
   readonly documentPositions: readonly Readonly<{ id: string; x: number; y: number }>[];
+}
+
+interface CompatibleNodeDragInteractionResult {
+  readonly previewNode: Readonly<{
+    x: string | null;
+    y: string | null;
+    width: string | null;
+    height: string | null;
+  }>;
+  readonly documentNode: Readonly<{
+    position: Readonly<{ x: number; y: number }>;
+    size: Readonly<{ width: number; height: number }> | null;
+    data: unknown;
+  }>;
 }
 
 interface ViewportPanInteractionResult {
@@ -468,8 +493,10 @@ declare global {
   var __cflowRendererSvgTicket01: () => Promise<FirstNodeResult>;
   var __cflowRendererSvgInteractionProjectionFirstNode: () => Promise<FirstInteractionProjectionResult>;
   var __cflowRendererSvgInteractionProjectionClear: () => Promise<InteractionProjectionClearResult>;
+  var __cflowRendererSvgInteractionProjectionReset: () => Promise<InteractionProjectionResetResult>;
   var __cflowRendererSvgInteractionProjectionEdge: () => Promise<InteractionProjectionEdgeResult>;
   var __cflowRendererSvgViewportInteractionProjection: () => Promise<ViewportInteractionProjectionResult>;
+  var __cflowRendererSvgViewportInteractionInvalidation: () => Promise<ViewportInteractionInvalidationResult>;
   var __cflowRendererSvgInteractionProjectionHit: () => Promise<InteractionProjectionHitResult>;
   var __cflowRendererSvgInteractionProjectionIsolation: () => Promise<InteractionProjectionIsolationResult>;
   var __cflowRendererSvgInteractionProjectionBaselineMismatch: () => Promise<EvidenceErrorResult>;
@@ -489,6 +516,13 @@ declare global {
   var __cflowRendererSvgRedoNodeDragInteraction: () => Promise<void>;
   var __cflowRendererSvgPrepareMultiNodeDragInteraction: () => void;
   var __cflowRendererSvgReadMultiNodeDragInteraction: () => MultiNodeDragInteractionResult;
+  var __cflowRendererSvgUpdateNodeDragDataExternally: () => void;
+  var __cflowRendererSvgReadCompatibleNodeDragInteraction: () => CompatibleNodeDragInteractionResult;
+  var __cflowRendererSvgReadNodeDragInteractionEvents: () => readonly Readonly<{
+    name: string;
+    level: string;
+    attributes: unknown;
+  }>[];
   var __cflowRendererSvgMoveNodeDragExternally: () => void;
   var __cflowRendererSvgTeardownNodeDragInteraction: () => Promise<void>;
   var __cflowRendererSvgSetupViewportPanInteraction: (configured?: boolean) => Promise<void>;
@@ -499,6 +533,9 @@ declare global {
     attributes: unknown;
   }>[];
   var __cflowRendererSvgResetViewportPanInteraction: () => void;
+  var __cflowRendererSvgSetViewportPanExternally: () => void;
+  var __cflowRendererSvgDisposeViewportPanInteraction: () => Promise<void>;
+  var __cflowRendererSvgHasViewportPanPointerCapture: () => boolean;
   var __cflowRendererSvgTeardownViewportPanInteraction: () => Promise<void>;
   var __cflowRendererSvgSetupInteractionProjectionInput: () => Promise<void>;
   var __cflowRendererSvgReadInteractionProjectionInput: () => RendererInput | undefined;
@@ -705,6 +742,51 @@ globalThis.__cflowRendererSvgInteractionProjectionClear = async (): Promise<Inte
   return result;
 };
 
+globalThis.__cflowRendererSvgInteractionProjectionReset = async (): Promise<InteractionProjectionResetResult> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  document.body.append(target);
+
+  const renderer = createSvgRenderer({ target });
+  const kernel = createCanvasKernel();
+  const id = nodeId('reset-interaction-node');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({
+      id,
+      type: 'task',
+      position: { x: 10, y: 20 },
+      size: { width: 80, height: 40 },
+      data: null,
+    });
+  });
+  renderer.updateDocument({ type: 'reset', view: kernel.read() });
+  renderer.updateSession({
+    selection: { nodeIds: [], edgeIds: [] },
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  renderer.updateInteraction({
+    type: 'node-drag',
+    nodes: [{ nodeId: id, basePosition: { x: 10, y: 20 }, position: { x: 80, y: 90 } }],
+  });
+  kernel.transact((transaction) => {
+    const node = transaction.query.getNode(id);
+    if (!node) throw new Error('Expected reset Interaction Node.');
+    transaction.nodes.replace(id, { ...node, position: { x: 30, y: 20 } });
+  });
+  renderer.updateDocument({ type: 'reset', view: kernel.read() });
+
+  const node = target.querySelector<SVGRectElement>('[data-cflow-node-id="reset-interaction-node"]');
+  const result: InteractionProjectionResetResult = {
+    nodeX: node?.getAttribute('x') ?? null,
+    stableHit: renderer.hitTest({ x: 40, y: 30 }),
+    formerPreviewHit: renderer.hitTest({ x: 100, y: 100 }),
+  };
+  await renderer.dispose();
+  target.remove();
+  return result;
+};
+
 globalThis.__cflowRendererSvgInteractionProjectionEdge = async (): Promise<InteractionProjectionEdgeResult> => {
   const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   target.setAttribute('width', '400');
@@ -791,6 +873,40 @@ globalThis.__cflowRendererSvgViewportInteractionProjection = async (): Promise<V
   target.remove();
   return result;
 };
+
+globalThis.__cflowRendererSvgViewportInteractionInvalidation =
+  async (): Promise<ViewportInteractionInvalidationResult> => {
+    const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    target.setAttribute('width', '400');
+    target.setAttribute('height', '300');
+    document.body.append(target);
+
+    const renderer = createSvgRenderer({ target });
+    const kernel = createCanvasKernel();
+    renderer.updateDocument({ type: 'reset', view: kernel.read() });
+    renderer.updateSession({
+      selection: { nodeIds: [], edgeIds: [] },
+      viewport: { x: 10, y: 20, zoom: 2 },
+    });
+    renderer.updateInteraction({
+      type: 'viewport-pan',
+      baseViewport: { x: 10, y: 20, zoom: 2 },
+      viewport: { x: 40, y: 50, zoom: 2 },
+    });
+    renderer.updateSession({
+      selection: { nodeIds: [], edgeIds: [] },
+      viewport: { x: 200, y: 100, zoom: 2 },
+    });
+
+    const projection = target.querySelector<SVGGElement>('[data-cflow-renderer-svg-root]');
+    const result: ViewportInteractionInvalidationResult = {
+      transform: projection?.getAttribute('transform') ?? null,
+      hit: renderer.hitTest({ x: 200, y: 100 }),
+    };
+    await renderer.dispose();
+    target.remove();
+    return result;
+  };
 
 globalThis.__cflowRendererSvgInteractionProjectionHit = async (): Promise<InteractionProjectionHitResult> => {
   const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -2786,9 +2902,11 @@ let nodeDragInteractionTarget: SVGSVGElement | undefined;
 let nodeDragInteractionKernel: KernelService | undefined;
 let nodeDragInteractionCommands: CommandService | undefined;
 let nodeDragInteractionSession: SessionService | undefined;
+const nodeDragInteractionEvents: DiagnosticEvent[] = [];
 let viewportPanInteractionHost: ReturnType<typeof createPluginHost> | undefined;
 let viewportPanInteractionTarget: SVGSVGElement | undefined;
 let viewportPanInteractionSession: SessionService | undefined;
+let viewportPanInteractionInstallation: PluginInstallation | undefined;
 const viewportPanInteractionEvents: DiagnosticEvent[] = [];
 
 globalThis.__cflowRendererSvgSetupViewportPanInteraction = async (configured = false): Promise<void> => {
@@ -2818,12 +2936,13 @@ globalThis.__cflowRendererSvgSetupViewportPanInteraction = async (configured = f
   const interactionConfig = configured
     ? { dragThreshold: 20, wheelZoomSensitivity: 0.01, minZoom: 0.5, maxZoom: 2 }
     : undefined;
+  const interactionInstallation = host.install(interactionPlugin, interactionConfig);
   const installations = [
     host.install(kernelPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(rendererPlugin, { target }),
-    host.install(interactionPlugin, interactionConfig),
+    interactionInstallation,
     host.install(consumer),
   ];
   await Promise.all(installations.map((installation) => installation.whenActive()));
@@ -2846,11 +2965,28 @@ globalThis.__cflowRendererSvgSetupViewportPanInteraction = async (configured = f
   viewportPanInteractionHost = host;
   viewportPanInteractionTarget = target;
   viewportPanInteractionSession = session;
+  viewportPanInteractionInstallation = interactionInstallation;
 };
 
 globalThis.__cflowRendererSvgResetViewportPanInteraction = (): void => {
   if (!viewportPanInteractionSession) throw new Error('Expected Viewport Pan Session before reset.');
+  viewportPanInteractionEvents.length = 0;
   viewportPanInteractionSession.setViewport({ x: 0, y: 0, zoom: 1 });
+};
+
+globalThis.__cflowRendererSvgSetViewportPanExternally = (): void => {
+  if (!viewportPanInteractionSession) throw new Error('Expected Viewport Pan Session before external update.');
+  viewportPanInteractionSession.setViewport({ x: 200, y: 100, zoom: 2 });
+};
+
+globalThis.__cflowRendererSvgDisposeViewportPanInteraction = async (): Promise<void> => {
+  await viewportPanInteractionInstallation?.dispose();
+  viewportPanInteractionInstallation = undefined;
+};
+
+globalThis.__cflowRendererSvgHasViewportPanPointerCapture = (): boolean => {
+  if (!viewportPanInteractionTarget) throw new Error('Expected Viewport Pan Target before Capture read.');
+  return viewportPanInteractionTarget.hasPointerCapture(1);
 };
 
 globalThis.__cflowRendererSvgReadViewportPanInteraction = (): ViewportPanInteractionResult => {
@@ -2885,6 +3021,7 @@ globalThis.__cflowRendererSvgTeardownViewportPanInteraction = async (): Promise<
   await viewportPanInteractionHost?.dispose();
   viewportPanInteractionHost = undefined;
   viewportPanInteractionSession = undefined;
+  viewportPanInteractionInstallation = undefined;
   viewportPanInteractionTarget?.remove();
   viewportPanInteractionTarget = undefined;
 };
@@ -2899,7 +3036,10 @@ globalThis.__cflowRendererSvgSetupNodeDragInteraction = async (): Promise<void> 
   target.style.top = '0';
   target.style.zIndex = '1003';
   document.body.append(target);
-  const host = createPluginHost();
+  nodeDragInteractionEvents.length = 0;
+  const host = createPluginHost({
+    diagnostics: { sink: (event) => nodeDragInteractionEvents.push(event) },
+  });
   const rendererPlugin = createRendererPlugin(createSvgRenderer);
   let kernel: KernelService | undefined;
   let commands: CommandService | undefined;
@@ -2995,6 +3135,51 @@ globalThis.__cflowRendererSvgReadMultiNodeDragInteraction = (): MultiNodeDragInt
     }),
   };
 };
+
+globalThis.__cflowRendererSvgUpdateNodeDragDataExternally = (): void => {
+  if (!nodeDragInteractionKernel) throw new Error('Expected Node Drag Kernel before compatible update.');
+  nodeDragInteractionKernel.transact((transaction) => {
+    const id = nodeId('drag-node');
+    const node = transaction.query.getNode(id);
+    if (!node) throw new Error('Expected the compatibly updated Node.');
+    transaction.nodes.replace(id, {
+      ...node,
+      size: { width: 100, height: 60 },
+      data: { label: 'updated' },
+    });
+  });
+};
+
+globalThis.__cflowRendererSvgReadCompatibleNodeDragInteraction = (): CompatibleNodeDragInteractionResult => {
+  const target = nodeDragInteractionTarget;
+  const kernel = nodeDragInteractionKernel;
+  if (!target || !kernel) throw new Error('Expected the active compatible Node Drag Runtime.');
+  const element = target.querySelector<SVGRectElement>('[data-cflow-node-id="drag-node"]');
+  const node = kernel.read().query.getNode(nodeId('drag-node'));
+  if (!element || !node) throw new Error('Expected the compatible Node Drag Node.');
+  return {
+    previewNode: {
+      x: element.getAttribute('x'),
+      y: element.getAttribute('y'),
+      width: element.getAttribute('width'),
+      height: element.getAttribute('height'),
+    },
+    documentNode: {
+      position: node.position,
+      size: node.size ?? null,
+      data: node.data,
+    },
+  };
+};
+
+globalThis.__cflowRendererSvgReadNodeDragInteractionEvents = () =>
+  nodeDragInteractionEvents
+    .filter((event) => event.name.startsWith('cflow.plugin.interaction.'))
+    .map((event) => ({
+      name: event.name,
+      level: event.level,
+      attributes: event.attributes,
+    }));
 
 globalThis.__cflowRendererSvgMoveNodeDragExternally = (): void => {
   if (!nodeDragInteractionKernel) throw new Error('Expected Node Drag Kernel before external movement.');

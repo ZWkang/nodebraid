@@ -110,8 +110,9 @@ export function applyNodeDragProjection(
   baselineSnapshot: CanvasSnapshot,
   edgesLayer: SVGGElement,
   nodesLayer: SVGGElement,
+  suppliedJournal?: DomMutationJournal,
 ): void {
-  const journal = new DomMutationJournal(edgesLayer, nodesLayer);
+  const journal = suppliedJournal ?? new DomMutationJournal(edgesLayer, nodesLayer);
   try {
     const candidates = new Map(projection.nodes.map((candidate) => [candidate.nodeId, candidate]));
     const effectiveNodes = new Map(
@@ -132,6 +133,7 @@ export function applyNodeDragProjection(
       copyGeometryAttributes(validated, existing, ['x1', 'y1', 'x2', 'y2'], journal);
     }
   } catch (error) {
+    if (suppliedJournal) throw error;
     const rollbackErrors = journal.rollback();
     if (rollbackErrors.length > 0) throw new ProjectionRollbackError([error, ...rollbackErrors]);
     throw error;

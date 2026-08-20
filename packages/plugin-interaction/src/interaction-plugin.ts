@@ -1,5 +1,5 @@
 import type { NodeId, Point } from '@cflow/kernel';
-import { commandService } from '@cflow/plugin-command';
+import { commandService, type CommandRegistration } from '@cflow/plugin-command';
 import { kernelService } from '@cflow/plugin-kernel';
 import { rendererService } from '@cflow/plugin-renderer';
 import { sessionService } from '@cflow/plugin-session';
@@ -43,9 +43,72 @@ export const interactionPlugin = definePlugin({
     const session = context.services.session;
     const kernel = context.services.kernel;
     const commands = context.services.commands;
+    let closing = false;
+    let pressedPointerId: number | undefined;
+    let completeClick: (() => void) | undefined;
+    let nodeDragCandidate: NodeDragCandidate | undefined;
+    let viewportPanCandidate: ViewportPanCandidate | undefined;
+    let spacePressed = false;
+    const rejectedPointerIds = new Set<number>();
+    let moveRegistration: CommandRegistration | undefined;
+    let stopKernel = (): void => undefined;
+    let stopSession = (): void => undefined;
+    let stopInput = (): void => undefined;
     const projection = renderer.bindInteractionProjection();
-    context.own(() => projection.dispose());
-    const moveRegistration = commands.register(moveNodesCommand, (input, execution) => {
+    context.signal.addEventListener('abort', () => {
+      closing = true;
+    });
+    context.own(async () => {
+      closing = true;
+      const pointerId = pressedPointerId;
+      const gestureType =
+        pointerId === undefined
+          ? undefined
+          : viewportPanCandidate
+            ? 'viewport-pan'
+            : nodeDragCandidate
+              ? 'node-drag'
+              : 'selection';
+      const cleanupErrors: unknown[] = [];
+      const attempt = (cleanup: () => void): void => {
+        try {
+          cleanup();
+        } catch (error) {
+          cleanupErrors.push(error);
+        }
+      };
+      attempt(stopInput);
+      attempt(stopSession);
+      attempt(stopKernel);
+      attempt(() => projection.dispose());
+      if (pointerId !== undefined) attempt(() => renderer.releasePointer(pointerId));
+      pressedPointerId = undefined;
+      completeClick = undefined;
+      nodeDragCandidate = undefined;
+      viewportPanCandidate = undefined;
+      spacePressed = false;
+      rejectedPointerIds.clear();
+      if (gestureType) {
+        attempt(() =>
+          context.diagnostics.emit({
+            name: interactionDiagnosticEvents.gestureCancelled,
+            level: 'info',
+            attributes: { gestureType, reason: 'lifecycle' },
+          }),
+        );
+      }
+      if (moveRegistration) {
+        try {
+          await moveRegistration.dispose();
+        } catch (error) {
+          cleanupErrors.push(error);
+        }
+      }
+      if (cleanupErrors.length > 0) {
+        throw new AggregateError(cleanupErrors, 'Interaction Runtime cleanup failed.');
+      }
+    });
+    moveRegistration = commands.register(moveNodesCommand, (input, execution) => {
       execution.signal.throwIfAborted();
       if (input.moves.length === 0) {
         throw new InteractionError('INVALID_MOVE', 'Move Nodes Command requires at least one Node.');
@@ -87,14 +150,81 @@ export const interactionPlugin = definePlugin({
         { origin: 'interaction', commandId: execution.commandId },
       );
     });
-    context.own(() => moveRegistration.dispose());
-
-    let pressedPointerId: number | undefined;
-    let completeClick: (() => void) | undefined;
-    let nodeDragCandidate: NodeDragCandidate | undefined;
-    let viewportPanCandidate: ViewportPanCandidate | undefined;
-    let spacePressed = false;
-    const stopInput = renderer.subscribeInput((input) => {
+    stopKernel = kernel.observeCommits((commit) => {
+      if (closing) return;
+      const candidate = nodeDragCandidate;
+      const pointerId = pressedPointerId;
+      if (!candidate || pointerId === undefined) {
+        if (viewportPanCandidate?.active && viewportPanCandidate.viewport) {
+          projection.update({
+            type: 'viewport-pan',
+            baseViewport: viewportPanCandidate.baseViewport,
+            viewport: viewportPanCandidate.viewport,
+          });
+        }
+        return;
+      }
+      const stale = candidate.nodes.some((evidence) => {
+        const node = commit.after.query.getNode(evidence.nodeId);
+        return !node || node.position.x !== evidence.basePosition.x || node.position.y !== evidence.basePosition.y;
+      });
+      if (!stale) {
+        if (candidate.active && candidate.moves) {
+          projection.update({ type: 'node-drag', nodes: candidate.moves });
+        }
+        return;
+      }
+      pressedPointerId = undefined;
+      completeClick = undefined;
+      nodeDragCandidate = undefined;
+      viewportPanCandidate = undefined;
+      if (candidate.active) projection.update(null);
+      renderer.releasePointer(pointerId);
+      context.diagnostics.emit({
+        name: interactionDiagnosticEvents.gestureCancelled,
+        level: 'info',
+        attributes: { gestureType: 'node-drag', reason: 'stale' },
+      });
+    });
+    stopSession = session.subscribe(() => {
+      if (closing) return;
+      const candidate = viewportPanCandidate;
+      const pointerId = pressedPointerId;
+      if (!candidate || pointerId === undefined) {
+        if (nodeDragCandidate?.active && nodeDragCandidate.moves) {
+          projection.update({ type: 'node-drag', nodes: nodeDragCandidate.moves });
+        }
+        return;
+      }
+      const viewport = session.getSnapshot().viewport;
+      if (
+        viewport.x === candidate.baseViewport.x &&
+        viewport.y === candidate.baseViewport.y &&
+        viewport.zoom === candidate.baseViewport.zoom
+      ) {
+        if (candidate.active && candidate.viewport) {
+          projection.update({
+            type: 'viewport-pan',
+            baseViewport: candidate.baseViewport,
+            viewport: candidate.viewport,
+          });
+        }
+        return;
+      }
+      pressedPointerId = undefined;
+      completeClick = undefined;
+      nodeDragCandidate = undefined;
+      viewportPanCandidate = undefined;
+      if (candidate.active) projection.update(null);
+      renderer.releasePointer(pointerId);
+      context.diagnostics.emit({
+        name: interactionDiagnosticEvents.gestureCancelled,
+        level: 'info',
+        attributes: { gestureType: 'viewport-pan', reason: 'stale' },
+      });
+    });
+    stopInput = renderer.subscribeInput((input) => {
+      if (closing) return;
       if (input.type === 'key.down' || input.type === 'key.up') {
         if (input.code === 'Space') spacePressed = input.type === 'key.down';
         return;
@@ -130,8 +260,30 @@ export const interactionPlugin = definePlugin({
         });
         return;
       }
+      if (input.type === 'pointer.move' && rejectedPointerIds.has(input.pointerId)) return;
+      if (
+        (input.type === 'pointer.up' || input.type === 'pointer.cancel') &&
+        rejectedPointerIds.delete(input.pointerId)
+      ) {
+        return;
+      }
       if (input.type === 'pointer.down') {
-        if (pressedPointerId !== undefined || (input.button !== 'primary' && input.button !== 'auxiliary')) {
+        if (pressedPointerId !== undefined) {
+          if (input.pointerId !== pressedPointerId && !rejectedPointerIds.has(input.pointerId)) {
+            rejectedPointerIds.add(input.pointerId);
+            context.diagnostics.emit({
+              name: interactionDiagnosticEvents.pointerRejected,
+              level: 'info',
+              attributes: {
+                inputType: 'pointer.down',
+                gestureType: viewportPanCandidate ? 'viewport-pan' : nodeDragCandidate ? 'node-drag' : 'selection',
+                reason: 'additional-pointer',
+              },
+            });
+          }
+          return;
+        }
+        if (input.button !== 'primary' && input.button !== 'auxiliary') {
           return;
         }
         const hit = renderer.hitTest(input.screenPoint);
@@ -255,6 +407,7 @@ export const interactionPlugin = definePlugin({
           projection.update(null);
           if (moves) {
             void commands.execute(moveNodesCommand, { moves }).catch((error) => {
+              if (closing) return;
               if (error instanceof InteractionError && error.code === 'STALE_GESTURE') {
                 context.diagnostics.emit({
                   name: interactionDiagnosticEvents.gestureCancelled,
@@ -285,14 +438,20 @@ export const interactionPlugin = definePlugin({
         completeClick = undefined;
         complete?.();
       } else if (input.type === 'pointer.cancel' && input.pointerId === pressedPointerId) {
+        const cancelledNodeDrag = nodeDragCandidate;
+        const cancelledViewportPan = viewportPanCandidate;
+        const gestureType = cancelledViewportPan ? 'viewport-pan' : cancelledNodeDrag ? 'node-drag' : 'selection';
         pressedPointerId = undefined;
         completeClick = undefined;
-        if (nodeDragCandidate?.active) projection.update(null);
-        if (viewportPanCandidate?.active) projection.update(null);
         nodeDragCandidate = undefined;
         viewportPanCandidate = undefined;
+        if (cancelledNodeDrag?.active || cancelledViewportPan?.active) projection.update(null);
+        context.diagnostics.emit({
+          name: interactionDiagnosticEvents.gestureCancelled,
+          level: 'info',
+          attributes: { gestureType, reason: 'pointer-cancel' },
+        });
       }
     });
-    context.own(stopInput);
   },
 });

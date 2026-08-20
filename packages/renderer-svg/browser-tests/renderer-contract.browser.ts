@@ -84,6 +84,16 @@ try {
     preservedNodeIdentity: true,
   });
 
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionReset()', {
+    nodeX: '30',
+    stableHit: {
+      type: 'node',
+      nodeId: 'reset-interaction-node',
+      worldPoint: { x: 40, y: 30 },
+    },
+    formerPreviewHit: { type: 'canvas', worldPoint: { x: 100, y: 100 } },
+  });
+
   await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionEdge()', {
     sourceX: '120',
     sourceY: '110',
@@ -94,6 +104,11 @@ try {
   await assertBrowserScenario('globalThis.__cflowRendererSvgViewportInteractionProjection()', {
     previewTransform: 'matrix(2 0 0 2 40 50)',
     sessionViewport: { x: 10, y: 20, zoom: 2 },
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgViewportInteractionInvalidation()', {
+    transform: 'matrix(2 0 0 2 200 100)',
+    hit: { type: 'canvas', worldPoint: { x: 0, y: 0 } },
   });
 
   await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionHit()', {
@@ -276,18 +291,53 @@ try {
   });
   await dispatchMouseDown(240, 200);
   await dispatchMouseMove(280, 240);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgUpdateNodeDragDataExternally()');
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadCompatibleNodeDragInteraction()', {
+    previewNode: { x: '240', y: '220', width: '100', height: '60' },
+    documentNode: {
+      position: { x: 200, y: 180 },
+      size: { width: 100, height: 60 },
+      data: { label: 'updated' },
+    },
+  });
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteractionEvents()', []);
+  await dispatchMouseUp(280, 240);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadCompatibleNodeDragInteraction()', {
+    previewNode: { x: '240', y: '220', width: '100', height: '60' },
+    documentNode: {
+      position: { x: 240, y: 220 },
+      size: { width: 100, height: 60 },
+      data: { label: 'updated' },
+    },
+  });
+  await dispatchMouseDown(280, 240);
+  await dispatchMouseMove(320, 280);
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgMoveNodeDragExternally()');
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteractionEvents()', [
+    {
+      name: 'cflow.plugin.interaction.gesture.cancelled',
+      level: 'info',
+      attributes: { gestureType: 'node-drag', reason: 'stale' },
+    },
+  ]);
   await dispatchMouseUp(280, 240);
   await assertBrowserScenario('globalThis.__cflowRendererSvgReadMultiNodeDragInteraction()', {
     previewPositions: [
       { id: 'drag-node', x: '260', y: '180' },
-      { id: 'drag-node-b', x: '340', y: '140' },
+      { id: 'drag-node-b', x: '380', y: '180' },
     ],
     documentPositions: [
       { id: 'drag-node', x: 260, y: 180 },
-      { id: 'drag-node-b', x: 340, y: 140 },
+      { id: 'drag-node-b', x: 380, y: 180 },
     ],
   });
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteractionEvents()', [
+    {
+      name: 'cflow.plugin.interaction.gesture.cancelled',
+      level: 'info',
+      attributes: { gestureType: 'node-drag', reason: 'stale' },
+    },
+  ]);
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownNodeDragInteraction()');
 
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupViewportPanInteraction()');
@@ -345,6 +395,126 @@ try {
     transform: 'matrix(1 0 0 1 30 20)',
     viewport: { x: 30, y: 20, zoom: 1 },
   });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await dispatchMouseDown(50, 200);
+  await dispatchMouseMove(100, 250);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 50 50)',
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  await dispatchPointerCancel(100, 250);
+  await dispatchMouseUp(100, 250);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 0 0)',
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteractionEvents()', [
+    {
+      name: 'cflow.plugin.interaction.gesture.cancelled',
+      level: 'info',
+      attributes: { gestureType: 'viewport-pan', reason: 'pointer-cancel' },
+    },
+  ]);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await dispatchMouseDown(50, 200);
+  await dispatchMouseMove(100, 250);
+  await releaseViewportPanPointerCapture();
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 0 0)',
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  await dispatchMouseUp(100, 250);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteractionEvents()', [
+    {
+      name: 'cflow.plugin.interaction.gesture.cancelled',
+      level: 'info',
+      attributes: { gestureType: 'viewport-pan', reason: 'pointer-cancel' },
+    },
+  ]);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await dispatchMouseDown(50, 200);
+  await dispatchMouseMove(100, 250);
+  assert.equal(await dispatchAdditionalPointerDown(), false);
+  await dispatchAdditionalPointerMoveAndUp();
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 50 50)',
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteractionEvents()', [
+    {
+      name: 'cflow.plugin.interaction.pointer.rejected',
+      level: 'info',
+      attributes: { inputType: 'pointer.down', gestureType: 'viewport-pan', reason: 'additional-pointer' },
+    },
+  ]);
+  await dispatchMouseMove(130, 280);
+  await dispatchMouseUp(130, 280);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 80 80)',
+    viewport: { x: 80, y: 80, zoom: 1 },
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await dispatchMouseDown(50, 200);
+  await dispatchMouseMove(450, 350);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 400 150)',
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  await dispatchMouseUp(450, 350);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 400 150)',
+    viewport: { x: 400, y: 150, zoom: 1 },
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await evaluateBrowserScenario(`document.querySelector('#viewport-pan-interaction-target').focus()`);
+  await dispatchSpaceKey('keyDown');
+  await evaluateBrowserScenario(`document.querySelector('#viewport-pan-interaction-target').blur()`);
+  await dispatchMouseDown(160, 120);
+  await dispatchMouseMove(190, 140);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 0 0)',
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  await dispatchPointerCancel(190, 140);
+  await dispatchMouseUp(190, 140);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await dispatchMouseDown(50, 200);
+  await dispatchMouseMove(100, 250);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetViewportPanExternally()');
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(2 0 0 2 200 100)',
+    viewport: { x: 200, y: 100, zoom: 2 },
+  });
+  await dispatchMouseUp(100, 250);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(2 0 0 2 200 100)',
+    viewport: { x: 200, y: 100, zoom: 2 },
+  });
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteractionEvents()', [
+    {
+      name: 'cflow.plugin.interaction.gesture.cancelled',
+      level: 'info',
+      attributes: { gestureType: 'viewport-pan', reason: 'stale' },
+    },
+  ]);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await dispatchMouseDown(50, 200);
+  await dispatchMouseMove(100, 250);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgHasViewportPanPointerCapture()', true);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgDisposeViewportPanInteraction()');
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+    transform: 'matrix(1 0 0 1 0 0)',
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  await assertBrowserScenario('globalThis.__cflowRendererSvgHasViewportPanPointerCapture()', false);
+  await dispatchMouseUp(100, 250);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteractionEvents()', [
+    {
+      name: 'cflow.plugin.interaction.gesture.cancelled',
+      level: 'info',
+      attributes: { gestureType: 'viewport-pan', reason: 'lifecycle' },
+    },
+  ]);
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownViewportPanInteraction()');
 
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupViewportPanInteraction(true)');
@@ -1280,6 +1450,69 @@ async function dispatchMiddleUp(x: number, y: number): Promise<void> {
       clickCount: 1,
     });
   });
+}
+
+async function dispatchPointerCancel(x: number, y: number): Promise<void> {
+  await evaluateBrowserScenario(
+    `document.querySelector('#viewport-pan-interaction-target').dispatchEvent(new PointerEvent('pointercancel', { pointerId: 1, pointerType: 'mouse', clientX: ${x}, clientY: ${y}, bubbles: true }))`,
+  );
+}
+
+async function releaseViewportPanPointerCapture(): Promise<void> {
+  await evaluateBrowserScenario(
+    `new Promise((resolve) => {
+      const target = document.querySelector('#viewport-pan-interaction-target');
+      target.releasePointerCapture(1);
+      target.dispatchEvent(new PointerEvent('lostpointercapture', {
+        pointerId: 1,
+        pointerType: 'mouse',
+      }));
+      requestAnimationFrame(() => resolve(true));
+    })`,
+  );
+}
+
+async function dispatchAdditionalPointerDown(): Promise<boolean> {
+  return evaluateBrowserScenario<boolean>(
+    `(() => {
+      const target = document.querySelector('#viewport-pan-interaction-target');
+      target.dispatchEvent(new PointerEvent('pointerdown', {
+        pointerId: 2,
+        pointerType: 'touch',
+        clientX: 250,
+        clientY: 200,
+        button: 0,
+        buttons: 1,
+        bubbles: true,
+      }));
+      return target.hasPointerCapture(2);
+    })()`,
+  );
+}
+
+async function dispatchAdditionalPointerMoveAndUp(): Promise<void> {
+  await evaluateBrowserScenario(
+    `(() => {
+      const target = document.querySelector('#viewport-pan-interaction-target');
+      target.dispatchEvent(new PointerEvent('pointermove', {
+        pointerId: 2,
+        pointerType: 'touch',
+        clientX: 280,
+        clientY: 230,
+        buttons: 1,
+        bubbles: true,
+      }));
+      target.dispatchEvent(new PointerEvent('pointerup', {
+        pointerId: 2,
+        pointerType: 'touch',
+        clientX: 280,
+        clientY: 230,
+        button: 0,
+        bubbles: true,
+      }));
+      return true;
+    })()`,
+  );
 }
 
 async function dispatchFaultedPointerCleanupSequence(retryPointer = true): Promise<void> {

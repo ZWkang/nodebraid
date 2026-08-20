@@ -9,6 +9,12 @@ The package binds one existing `SVGSVGElement` to a synchronous
 interpret product Node types or data. CFlow does not select it as a default
 Renderer.
 
+The Provider applies Node Drag and Viewport Pan projections over the same keyed
+geometry used by Hit Test and Input coordinate conversion. Reset or incompatible
+Document/Session updates clear stale projections; compatible commits reapply
+Preview atomically. Native `lostpointercapture` is normalized to semantic Pointer
+cancellation without exposing browser event objects.
+
 The Provider writes geometry plus stable classes and data attributes, but no
 runtime theme. A minimal application stylesheet can start with:
 

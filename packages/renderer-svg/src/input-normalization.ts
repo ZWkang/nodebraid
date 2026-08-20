@@ -22,6 +22,7 @@ export function normalizePointerInput(
   event: PointerEvent,
   target: SVGSVGElement,
   session: SessionSnapshot,
+  type = normalizePointerInputType(event.type),
 ): PointerInput {
   const bounds = target.getBoundingClientRect();
   const screenPoint = {
@@ -30,7 +31,7 @@ export function normalizePointerInput(
   };
   const viewport = session.viewport;
   return Object.freeze({
-    type: normalizePointerInputType(event.type),
+    type,
     pointerId: event.pointerId,
     pointerType: normalizePointerType(event.pointerType),
     screenPoint: Object.freeze(screenPoint),
@@ -38,8 +39,7 @@ export function normalizePointerInput(
       x: (screenPoint.x - viewport.x) / viewport.zoom,
       y: (screenPoint.y - viewport.y) / viewport.zoom,
     }),
-    button:
-      event.type === 'pointermove' || event.type === 'pointercancel' ? null : normalizePointerButton(event.button),
+    button: type === 'pointer.move' || type === 'pointer.cancel' ? null : normalizePointerButton(event.button),
     pressedButtons: Object.freeze(normalizePressedButtons(event.buttons)),
     modifiers: normalizeInputModifiers(event),
   });
@@ -148,6 +148,11 @@ export function releaseNativePointerCapture(
   capturedPointerIds: Set<number>,
 ): void {
   if (!capturedPointerIds.has(pointerId)) return;
-  if (target.hasPointerCapture(pointerId)) target.releasePointerCapture(pointerId);
   capturedPointerIds.delete(pointerId);
+  try {
+    if (target.hasPointerCapture(pointerId)) target.releasePointerCapture(pointerId);
+  } catch (error) {
+    capturedPointerIds.add(pointerId);
+    throw error;
+  }
 }
