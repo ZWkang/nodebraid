@@ -1,15 +1,16 @@
 ---
 title: Capability Map
-description: Understand CFlow's six current capability families and package composition from a developer's perspective.
+description: Understand CFlow's seven current capability families and package composition from a developer's perspective.
 ---
 
 # Capability Map
 
-Package boundaries keep dependencies clear, but evaluating a system starts with a different question: “What can it help me build?” CFlow's current workspace packages form six capability families. Each family connects contracts, Runtime integration, and optional Providers instead of selling infrastructure packages in isolation.
+Package boundaries keep dependencies clear, but evaluating a system starts with a different question: “What can it help me build?” CFlow's current workspace packages form seven capability families. Each family connects contracts, Runtime integration, and optional Providers instead of selling infrastructure packages in isolation.
 
 | Capability family                                         | Question it answers                                                          | Current delivery                                         |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------- |
 | [Foundations](/en/capabilities/foundations)               | How are capabilities composed, activated, disposed, and diagnosed?           | Core facade, Plugin Host, Diagnostics                    |
+| [Composition](/en/capabilities/composition)               | How is a Renderer selected explicitly for a complete basic Runtime?          | Basic Canvas Composition                                 |
 | [Graph State](/en/capabilities/graph-state)               | Who owns the Document, and where do Selection and Viewport live?             | Kernel, Kernel Plugin, Session API, Session Plugin       |
 | [Execution & History](/en/capabilities/execution-history) | How are behaviors executed and Document Commits undone or redone?            | Command Plugin, History Plugin                           |
 | [Layout](/en/capabilities/layout)                         | How is layout computed asynchronously and committed to the current revision? | Layout API, Runtime integration, Dagre, ELK              |
@@ -32,7 +33,7 @@ Plugin Host
     └── Renderer Plugin ▶ application-provided Renderer Factory
 ```
 
-The Plugin Host installs none of these capabilities implicitly, and `@cflow/core` remains a public facade. Each application explicitly decides which Plugins and Providers belong to a Canvas Runtime.
+The Plugin Host installs none of these capabilities implicitly, and `@cflow/core` remains a public facade. An application can install each member explicitly or explicitly install the Basic Canvas Composition; Renderer and other Provider choices remain application-owned.
 
 ## Next
 

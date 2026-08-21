@@ -4,7 +4,7 @@
 
 **Blocked by:** 02 — 完成 readiness、配置与失败回滚；03 — 完成冲突、隔离与异步释放；04 — 用真实 SVG 验证 Composition。
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 - [ ] `@cflow/core` 重导出 backend-neutral Composition，但仍不重导出 SVG 或其他 concrete Provider。
 - [ ] preset 声明不泄漏 core、Cordis、DOM、native event 或 concrete Provider 类型。

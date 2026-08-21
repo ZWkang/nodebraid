@@ -44,6 +44,7 @@ The packages declared under the `@cflow/*` names are not yet published by this p
 │   ├── plugin-layout/  # @cflow/plugin-layout Runtime Command integration
 │   ├── plugin-renderer/ # @cflow/plugin-renderer Renderer Runtime adapter
 │   ├── plugin-session/ # @cflow/plugin-session Runtime Service adapter
+│   ├── preset-basic/   # @cflow/preset-basic Basic Canvas Composition
 │   ├── renderer-api/   # @cflow/renderer-api backend-neutral contracts
 │   ├── renderer-svg/   # @cflow/renderer-svg official SVG Provider
 │   ├── session-api/    # @cflow/session-api immutable Session values
@@ -185,6 +186,19 @@ remains revision ordered, and public Snapshot publication waits until History
 has caught up with Kernel. Losing Kernel Service or Command Service ends the
 current History Activation; reactivation starts from a fresh empty Baseline.
 
+## Basic Canvas Composition
+
+`@cflow/preset-basic` exposes `createBasicCanvasPlugin(rendererFactory,
+options?)`, a backend-neutral ordinary Plugin that owns Kernel, Command,
+Session, Renderer, Interaction, and History through Child Installations. The
+Composition waits for every child to become active and releases them in reverse
+dependency-safe order.
+
+Applications still create the Plugin Host, configure Diagnostics, select a
+concrete Renderer Factory, and install Layout or domain capabilities as sibling
+Plugins. Core re-exports the Composition factory but does not re-export or
+select `@cflow/renderer-svg` or another concrete Provider.
+
 ## Layout packages
 
 `@cflow/layout-api` defines immutable Layout Inputs, asynchronous Layout
@@ -315,6 +329,12 @@ Build the Interaction value and Runtime packages independently:
 ```bash
 bun run --filter '@cflow/interaction-api' build:dependencies
 bun run --filter '@cflow/plugin-interaction' build:dependencies
+```
+
+Build the dependencies required by the Basic Canvas Composition:
+
+```bash
+bun run --filter '@cflow/preset-basic' build:dependencies
 ```
 
 Format supported files:

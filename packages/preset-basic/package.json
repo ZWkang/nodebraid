@@ -40,10 +40,11 @@
   ],
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
-    "build": "bun run build:dependencies && tsgo -p tsconfig.build.json",
+    "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
     "build:dependencies": "bun run --filter '@cflow/plugin-interaction' build && bun run --filter '@cflow/plugin-history' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
+    "test:artifacts": "bun run ./artifacts/check-declarations.ts",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {

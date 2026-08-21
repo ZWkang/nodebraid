@@ -9,6 +9,7 @@ export * from '@cflow/plugin-kernel';
 export * from '@cflow/plugin-layout';
 export * from '@cflow/plugin-renderer';
 export * from '@cflow/plugin-session';
+export * from '@cflow/preset-basic';
 export * from '@cflow/renderer-api';
 export * from '@cflow/runtime-cordis';
 export * from '@cflow/session-api';

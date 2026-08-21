@@ -20,6 +20,7 @@ const pluginKernelDist = fileURLToPath(new URL('../../plugin-kernel/dist/', impo
 const pluginRendererDist = fileURLToPath(new URL('../../plugin-renderer/dist/', import.meta.url));
 const pluginSessionDist = fileURLToPath(new URL('../../plugin-session/dist/', import.meta.url));
 const pluginLayoutDist = fileURLToPath(new URL('../../plugin-layout/dist/', import.meta.url));
+const presetBasicDist = fileURLToPath(new URL('../../preset-basic/dist/', import.meta.url));
 const rendererApiDist = fileURLToPath(new URL('../../renderer-api/dist/', import.meta.url));
 const runtimeDist = fileURLToPath(new URL('../../runtime-cordis/dist/', import.meta.url));
 const sessionApiDist = fileURLToPath(new URL('../../session-api/dist/', import.meta.url));
@@ -37,6 +38,7 @@ const declarationFiles = await Promise.all([
   collectDeclarations(pluginRendererDist),
   collectDeclarations(pluginSessionDist),
   collectDeclarations(pluginLayoutDist),
+  collectDeclarations(presetBasicDist),
   collectDeclarations(rendererApiDist),
   collectDeclarations(runtimeDist),
   collectDeclarations(sessionApiDist),
@@ -53,6 +55,7 @@ assert.match(coreDeclaration, /export \* from '@cflow\/plugin-kernel';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-renderer';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-session';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/plugin-layout';/);
+assert.match(coreDeclaration, /export \* from '@cflow\/preset-basic';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/renderer-api';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/runtime-cordis';/);
 assert.match(coreDeclaration, /export \* from '@cflow\/session-api';/);
@@ -83,6 +86,7 @@ assert.equal(corePackage.defineCommand('artifact.command').id, 'artifact.command
 assert.ok(corePackage.historyPlugin);
 assert.ok(corePackage.historyService);
 assert.ok(corePackage.interactionPlugin);
+assert.equal(typeof corePackage.createBasicCanvasPlugin, 'function');
 assert.equal(corePackage.moveNodesCommand.id, 'interaction.nodes.move');
 assert.equal(corePackage.interactionDiagnosticEvents.inputRejected, 'cflow.plugin.interaction.input.rejected');
 assert.equal(corePackage.undoCommand.id, 'history.undo');

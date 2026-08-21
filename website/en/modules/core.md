@@ -5,7 +5,7 @@ description: The unified facade for CFlow's currently delivered public capabilit
 
 # `@cflow/core`
 
-`@cflow/core` is the preferred public entry point for ordinary CFlow applications. It brings the delivered value contracts, Plugin Host, Runtime Plugins, and generic Layout contract together in one facade while preserving the original types and behavior of each narrow package.
+`@cflow/core` is the preferred public entry point for ordinary CFlow applications. It brings the delivered value contracts, Plugin Host, Runtime Plugins, Basic Canvas Composition, and generic Layout contract together in one facade while preserving the original types and behavior of each narrow package.
 
 ::: warning Package is not publicly released
 This name identifies the current source module boundary; it does not mean the package can be installed from npm. Follow the [Quick Start](/en/guide/quick-start) to verify it from source.
@@ -13,7 +13,7 @@ This name identifies the current source module boundary; it does not mean the pa
 
 ## The problem it solves
 
-An application should not need to memorize the entire package dependency graph before creating a Canvas Runtime. `@cflow/core` provides a stable entry point from which an application can access the Kernel, Session, Command, History, Interaction, Layout, Renderer contract, Diagnostics, and Plugin Host API in one module.
+An application should not need to memorize the entire package dependency graph before creating a Canvas Runtime. `@cflow/core` provides a stable entry point from which an application can access the Basic Canvas Composition, Kernel, Session, Command, History, Interaction, Layout, Renderer contract, Diagnostics, and Plugin Host API in one module.
 
 It is a facade, not another Runtime. The re-exported values, types, errors, and lifecycle implementations remain owned by their respective narrow packages.
 
@@ -36,6 +36,7 @@ If you are building an internal CFlow package or need only one narrow low-level 
 - backend-neutral Interaction Projection values from `@cflow/interaction-api`;
 - the CFlow-owned Plugin Host API from `@cflow/runtime-cordis`;
 - the Kernel, Command, Session, Renderer, Interaction, and History Runtime Plugins;
+- the backend-neutral Basic Canvas Composition from `@cflow/preset-basic`;
 - the generic Layout API and Layout Runtime Plugin.
 
 Concrete Layout Providers stay separate: `dagreLayoutEngine` and `elkLayoutEngine` are not part of the facade. `@cflow/renderer-svg` is now delivered as a concrete Renderer Provider, but core still neither chooses nor re-exports it.
@@ -50,10 +51,11 @@ Application
     ├── Diagnostics / Kernel / Session / Interaction / Renderer contracts
     ├── Plugin Host
     ├── official Runtime Plugins
+    ├── Basic Canvas Composition
     └── generic Layout contracts and integration
 ```
 
-Importing from core does not create global state or install any default Plugin. The application must still create its own Plugin Host and install each required capability explicitly; the application also remains responsible for Provider selection.
+Importing from core does not create global state or install any default Plugin. The application still creates its own Plugin Host and may explicitly install the Basic Canvas Composition or each required capability individually. Provider selection always remains application-owned.
 
 Advanced consumers can bypass the facade and depend directly on `@cflow/kernel`, `@cflow/runtime-cordis`, or another narrow package. Both entry paths share the same implementations; they do not create two runtimes.
 
@@ -71,6 +73,7 @@ The package has one public subpath: `@cflow/core`. Representative public entry p
 | Layout      | `createLayoutInput`, `defineLayoutEngine`, `createLayoutPlugin`, `LayoutError` |
 | Renderer    | `createRendererPlugin`, `rendererService`, `RendererError`                     |
 | Interaction | `interactionPlugin`, `moveNodesCommand`, `interactionDiagnosticEvents`         |
+| Composition | `createBasicCanvasPlugin`, `BasicCanvasPluginOptions`                          |
 | Diagnostics | `CFlowError`, `diagnosticEvents`, `describeError`                              |
 
 The complete export surface is the facade source's explicit `export *` declarations for public packages. There are no additional hidden subpaths.
@@ -90,7 +93,7 @@ Facade tests exercise the types and behavior of these objects through `@cflow/co
 ## Limitations and non-goals
 
 - Does not install the Kernel, Command, Session, History, Interaction, Layout, or Renderer Plugin automatically.
-- Does not provide a default Canvas Composition or an out-of-the-box editor preset.
+- Does not install the Basic Canvas Composition implicitly and does not select a default Renderer.
 - Does not re-export concrete Layout Providers such as Dagre or ELK.
 - Does not select or re-export concrete Renderer Providers such as `@cflow/renderer-svg`.
 - Does not provide framework Adapters, UI components, persistence, or collaboration.
@@ -102,4 +105,5 @@ Facade tests exercise the types and behavior of these objects through `@cflow/co
 - The facade source explicitly re-exports each current public package.
 - `packages/core/tests/index.test.ts` verifies the Diagnostics, Plugin Host, Kernel, Session, Renderer, Interaction, Command, and History public seams through the facade.
 - `packages/core/tests/layout.test.ts` verifies that the generic Layout API is visible while the Dagre and ELK Providers do not leak through.
+- `packages/core/tests/preset-basic.test.ts` verifies that the Basic Canvas Composition is visible while the SVG Provider does not leak through.
 - Declaration artifact checks verify the built public type boundary.

@@ -21,7 +21,7 @@ Interaction v0 now interprets selection, multi-Node dragging, Pan, and Wheel Zoo
 
 ## Composition and examples
 
-The Interaction path is now proven with the real SVG Provider and Chromium tests. Runnable product examples and explicit Canvas Compositions can still reduce the cost of initial assembly, but they will not become capabilities installed implicitly by the Plugin Host.
+The backend-neutral Basic Canvas Composition and a real SVG canonical example are now delivered, with Chromium verification of Selection, Move, History, Wheel input, and disposal. Future framework adapters or product examples remain explicit application-layer capabilities. The Plugin Host will not install the preset implicitly, and the preset will not choose a default Renderer.
 
 ## Later exploration
 

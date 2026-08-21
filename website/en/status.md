@@ -19,6 +19,7 @@ CFlow is at an early implementation stage, but it already has a working headless
 - Layout Input/Engine/Proposal contracts and Runtime Command integration;
 - Dagre full Layout Provider;
 - ELK full, incremental, and Fixed Node Layout Providers;
+- The backend-neutral `@cflow/preset-basic` Basic Canvas Composition and a real SVG canonical example;
 - A public facade aggregated through `@cflow/core`.
 
 See [All modules](/en/modules/) for the complete inventory.
@@ -26,7 +27,7 @@ See [All modules](/en/modules/) for the complete inventory.
 ## Current gaps
 
 ::: warning No product-level editor shell yet
-The current branch delivers the Interaction v0 and SVG Renderer loop, but it has no framework adapter or out-of-the-box preset. The first version does not include box selection, edge connection, snapping, pinch/touch tools, text editing, product Node UI, or an extensible Tool Registry.
+The current branch delivers the Basic Canvas Composition, Interaction v0, and SVG Renderer loop, but it still has no framework adapter or product-level editor shell. The first version does not include box selection, edge connection, snapping, pinch/touch tools, text editing, product Node UI, or an extensible Tool Registry.
 :::
 
 There is also no Persistence, Collaboration, serialization schema, or remote synchronization capability. A name appearing in the target architecture does not mean it has become a public package.

@@ -47,3 +47,11 @@ revision=1 nodes=1
 6. `host.dispose()` ends the lifecycles of the Installation, Activation, and Owned Resources.
 
 This example is deliberately headless: it verifies Document and Runtime composition without creating a visible canvas. The delivered [`@cflow/renderer-svg`](/en/modules/renderer-svg) can project the same Canvas semantics into SVG at the next layer, but it is not part of this minimal Kernel path.
+
+## 4. Next layer: Basic Canvas Composition with real SVG
+
+For the complete basic Kernel, Command, Session, Renderer, Interaction, and History composition, select the SVG Provider explicitly and install [`@cflow/preset-basic`](/en/modules/preset-basic). The canonical example below is the same source exercised by the real-Chromium acceptance path:
+
+<<< ../../examples/basic-canvas-svg.ts{ts}
+
+The application still creates the Host, passes an existing SVG Target, and consumes capabilities through static Required Service Bindings. The preset creates no default Renderer and does not turn SVG or DOM into generic dependencies.

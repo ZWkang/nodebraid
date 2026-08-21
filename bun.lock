@@ -35,6 +35,7 @@
         "@cflow/plugin-layout": "workspace:*",
         "@cflow/plugin-renderer": "workspace:*",
         "@cflow/plugin-session": "workspace:*",
+        "@cflow/preset-basic": "workspace:*",
         "@cflow/renderer-api": "workspace:*",
         "@cflow/runtime-cordis": "workspace:*",
         "@cflow/session-api": "workspace:*",

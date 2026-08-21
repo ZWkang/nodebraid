@@ -34,6 +34,7 @@
 - `bun run --filter '@cflow/renderer-svg' build:dependencies`：生成 SVG Renderer Provider 生产构建所需的 Renderer API 及其传递 workspace 声明。
 - `bun run --filter '@cflow/renderer-svg' build:test-dependencies`：通过 Renderer Plugin 的构建链生成真实 Runtime 浏览器场景及 Renderer API 所需的全部 workspace 声明。
 - `bun run --filter '@cflow/plugin-history' build:dependencies`：生成 History Runtime Plugin 构建与类型检查所需的 Command 与 Kernel Plugin workspace 声明。
+- `bun run --filter '@cflow/preset-basic' build:dependencies`：生成 Basic Canvas Composition 所需的 Interaction、History 及其传递 workspace 声明。
 - `bun run format`：使用 Prettier 格式化支持的文件。
 - `bun run test`：运行 Bun 测试。
 - `bun run test:browser`：通过仓库锁定的 `agent-browser` 在真实 Chromium 中运行 SVG Renderer 公共 seam 测试。

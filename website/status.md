@@ -19,6 +19,7 @@ CFlow 处于早期实现阶段，但已经形成一条可运行的 headless Canv
 - Layout Input/Engine/Proposal contract 与 Runtime Command integration；
 - Dagre full Layout Provider；
 - ELK full、incremental 与 Fixed Node Layout Provider；
+- 后端无关的 `@cflow/preset-basic` Basic Canvas Composition，以及真实 SVG canonical example；
 - 通过 `@cflow/core` 聚合的公共 facade。
 
 完整清单见 [全部模块](/modules/)。
@@ -26,7 +27,7 @@ CFlow 处于早期实现阶段，但已经形成一条可运行的 headless Canv
 ## 当前缺口
 
 ::: warning 尚无产品级编辑器外壳
-当前分支已经交付 Interaction v0 与 SVG Renderer 闭环，但没有 framework adapter 或开箱即用 preset。首版不包含 box selection、edge connect、snapping、pinch/touch 工具、文本编辑、产品节点 UI 或可扩展 Tool Registry。
+当前分支已经交付 Basic Canvas Composition、Interaction v0 与 SVG Renderer 闭环，但仍没有 framework adapter 或产品级编辑器外壳。首版不包含 box selection、edge connect、snapping、pinch/touch 工具、文本编辑、产品节点 UI 或可扩展 Tool Registry。
 :::
 
 当前也没有 Persistence、Collaboration、序列化 schema 或远程同步能力。目标架构中出现某个名称，不代表它已经成为公共 package。

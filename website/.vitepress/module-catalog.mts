@@ -46,6 +46,24 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
     ],
   },
   {
+    slug: 'composition',
+    title: 'Composition',
+    summary: {
+      zh: '显式选择 Renderer 并组装基础 Canvas Runtime。',
+      en: 'Explicit Renderer selection and assembly of a basic Canvas Runtime.',
+    },
+    modules: [
+      {
+        name: '@cflow/preset-basic',
+        slug: 'preset-basic',
+        summary: {
+          zh: '后端无关的 Basic Canvas Composition。',
+          en: 'The backend-neutral Basic Canvas Composition.',
+        },
+      },
+    ],
+  },
+  {
     slug: 'graph-state',
     title: 'Graph State',
     summary: {

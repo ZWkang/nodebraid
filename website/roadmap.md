@@ -21,7 +21,7 @@ Interaction v0 已经在标准化 Renderer Input 之上交付选择、多 Node �
 
 ## Composition 与示例
 
-Interaction 链路已经由真实 SVG Provider 与 Chromium 测试成立；后续可以增加可运行产品示例和显式 Canvas Composition，降低初次组合成本。它们仍不会成为 Plugin Host 隐式安装的默认能力。
+后端无关的 Basic Canvas Composition 与真实 SVG canonical example 已经交付，并通过 Chromium 验证 Selection、Move、History、Wheel 与 dispose。后续 framework adapter 或产品示例仍保持显式应用层能力；Plugin Host 不会隐式安装 preset，preset 也不会选择默认 Renderer。
 
 ## 更后面的探索
 

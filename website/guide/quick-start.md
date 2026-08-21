@@ -47,3 +47,11 @@ revision=1 nodes=1
 6. `host.dispose()` 结束 Installation、Activation 与 Owned Resource 生命周期。
 
 这个示例刻意保持 headless：它验证 Document 与 Runtime 组合，不创建可见画布。当前已经交付的 [`@cflow/renderer-svg`](/modules/renderer-svg) 可在下一层把同一 Canvas 语义投影到 SVG，但不属于这条最小 Kernel 路径。
+
+## 4. 下一层：Basic Canvas Composition 与真实 SVG
+
+如果需要 Kernel、Command、Session、Renderer、Interaction 与 History 的完整基础组合，可以显式选择 SVG Provider 并安装 [`@cflow/preset-basic`](/modules/preset-basic)。下面的 canonical example 与真实 Chromium 验收共用同一份源码：
+
+<<< ../examples/basic-canvas-svg.ts{ts}
+
+这里仍由应用创建 Host、传入现有 SVG Target 并通过静态 Required Service Consumer 取得能力。Preset 不创建默认 Renderer，也不把 SVG 或 DOM 变成通用依赖。

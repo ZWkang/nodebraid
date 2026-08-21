@@ -1,15 +1,16 @@
 ---
 title: 能力地图
-description: 从开发者问题出发，理解 CFlow 当前六个能力族及其 package 组合。
+description: 从开发者问题出发，理解 CFlow 当前七个能力族及其 package 组合。
 ---
 
 # 能力地图
 
-CFlow 的 package 边界用于保持依赖清晰，但评估一个系统时，首先需要回答的是“它能帮我完成什么”。当前 workspace packages 组成六个能力族；每个能力族都连接契约、Runtime integration 与可选 Provider，而不是把单个基础 package 当成孤立卖点。
+CFlow 的 package 边界用于保持依赖清晰，但评估一个系统时，首先需要回答的是“它能帮我完成什么”。当前 workspace packages 组成七个能力族；每个能力族都连接契约、Runtime integration 与可选 Provider，而不是把单个基础 package 当成孤立卖点。
 
 | 能力族                                                 | 回答的问题                                        | 当前交付                                             |
 | ------------------------------------------------------ | ------------------------------------------------- | ---------------------------------------------------- |
 | [Foundations](/capabilities/foundations)               | 能力怎样组合、激活、释放并报告结构化诊断？        | core facade、Plugin Host、Diagnostics                |
+| [Composition](/capabilities/composition)               | 如何显式选择 Renderer 并获得完整基础 Runtime？    | Basic Canvas Composition                             |
 | [Graph State](/capabilities/graph-state)               | 谁拥有 Document，Selection 与 Viewport 放在哪里？ | Kernel、Kernel Plugin、Session API、Session Plugin   |
 | [Execution & History](/capabilities/execution-history) | 行为怎样执行，Document Commit 怎样 Undo/Redo？    | Command Plugin、History Plugin                       |
 | [Layout](/capabilities/layout)                         | 如何异步计算布局，并安全提交到当前 revision？     | Layout API、Runtime integration、Dagre、ELK          |
@@ -32,7 +33,7 @@ Plugin Host
     └── Renderer Plugin ▶ application-provided Renderer Factory
 ```
 
-Plugin Host 不隐式安装这些能力，`@cflow/core` 也只是公共 facade。应用显式决定一张 Canvas Runtime 需要哪些 Plugin 和 Provider。
+Plugin Host 不隐式安装这些能力，`@cflow/core` 也只是公共 facade。应用可以显式逐项安装，或显式安装 Basic Canvas Composition；Renderer 与其他 Provider 仍由应用选择。
 
 ## 下一步
 
