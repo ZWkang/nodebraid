@@ -1,7 +1,7 @@
 // Public-seam browser scenarios for the complete SVG Renderer contract.
 import { createCanvasKernel, edgeId, nodeId } from '@cflow/kernel';
 import type { DiagnosticEvent, DiagnosticFault } from '@cflow/diagnostics';
-import { interactionPlugin } from '@cflow/plugin-interaction';
+import { interactionPlugin, moveNodesCommand } from '@cflow/plugin-interaction';
 import { commandPlugin, commandService, type CommandService } from '@cflow/plugin-command';
 import { historyPlugin, redoCommand, undoCommand } from '@cflow/plugin-history';
 import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
@@ -10,7 +10,19 @@ import { sessionPlugin, sessionService, type SessionService } from '@cflow/plugi
 import type { CanvasRenderer, RendererInput } from '@cflow/renderer-api';
 import { createPluginHost, definePlugin, type PluginInstallation } from '@cflow/runtime-cordis';
 
+import { createBasicCanvasSvgExample } from '../../../website/examples/basic-canvas-svg';
 import { createSvgRenderer, type SvgRendererConfig } from '../src';
+
+interface BasicCanvasCompositionResult {
+  readonly initialRevision: number;
+  readonly selected: boolean;
+  readonly moved: Readonly<{ revision: number; x: string | null; y: string | null }>;
+  readonly undone: Readonly<{ revision: number; x: string | null; y: string | null }>;
+  readonly redone: Readonly<{ revision: number; x: string | null; y: string | null }>;
+  readonly viewportTransform: string | null;
+  readonly projectionRemoved: boolean;
+  readonly targetReusable: boolean;
+}
 
 interface FirstNodeResult {
   readonly callerContentPreserved: boolean;
@@ -521,6 +533,7 @@ interface ResizeObserverMultipleErrorsResult {
 }
 
 declare global {
+  var __cflowBasicCanvasCompositionExample: () => Promise<BasicCanvasCompositionResult>;
   var __cflowRendererSvgTicket01: () => Promise<FirstNodeResult>;
   var __cflowRendererSvgInteractionProjectionFirstNode: () => Promise<FirstInteractionProjectionResult>;
   var __cflowRendererSvgInteractionProjectionClear: () => Promise<InteractionProjectionClearResult>;
@@ -634,6 +647,78 @@ declare global {
   var __cflowRendererSvgReviewResizeObserverRollbackFailure: () => Promise<ResizeObserverRollbackFailureResult>;
   var __cflowRendererSvgReviewResizeObserverMultipleErrors: () => Promise<ResizeObserverMultipleErrorsResult>;
 }
+
+globalThis.__cflowBasicCanvasCompositionExample = async (): Promise<BasicCanvasCompositionResult> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  document.body.append(target);
+  const example = await createBasicCanvasSvgExample(target);
+  const nodeSelector = `[data-cflow-node-id="${example.primaryNodeId}"]`;
+  const node = target.querySelector<SVGRectElement>(nodeSelector);
+  if (!node) throw new Error('Expected the Basic Canvas Composition to project its primary Node.');
+
+  const initialRevision = example.kernel.read().snapshot.revision;
+  example.session.setSelection({ nodeIds: [example.primaryNodeId], edgeIds: [] });
+  const selected = node.getAttribute('data-cflow-selected') === 'true';
+  const movedCommit = await example.commands.execute(moveNodesCommand, {
+    moves: [
+      {
+        nodeId: example.primaryNodeId,
+        basePosition: { x: 10, y: 20 },
+        position: { x: 80, y: 90 },
+      },
+    ],
+  });
+  const moved = {
+    revision: movedCommit?.after.snapshot.revision ?? -1,
+    x: node.getAttribute('x'),
+    y: node.getAttribute('y'),
+  };
+  const undoCommit = await example.commands.execute(undoCommand, undefined);
+  const undone = {
+    revision: undoCommit.after.snapshot.revision,
+    x: node.getAttribute('x'),
+    y: node.getAttribute('y'),
+  };
+  const redoCommit = await example.commands.execute(redoCommand, undefined);
+  const redone = {
+    revision: redoCommit.after.snapshot.revision,
+    x: node.getAttribute('x'),
+    y: node.getAttribute('y'),
+  };
+  const bounds = target.getBoundingClientRect();
+  target.dispatchEvent(
+    new WheelEvent('wheel', {
+      clientX: bounds.left,
+      clientY: bounds.top,
+      deltaY: -100,
+      deltaMode: WheelEvent.DOM_DELTA_PIXEL,
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
+  const viewportTransform =
+    target.querySelector<SVGGElement>('[data-cflow-renderer-svg-root]')?.getAttribute('transform') ?? null;
+
+  await example.dispose();
+  const projectionRemoved = target.querySelector('[data-cflow-renderer-svg-root]') === null;
+  const replacement = createSvgRenderer({ target });
+  const targetReusable = target.querySelector('[data-cflow-renderer-svg-root]') !== null;
+  await replacement.dispose();
+  target.remove();
+
+  return {
+    initialRevision,
+    selected,
+    moved,
+    undone,
+    redone,
+    viewportTransform,
+    projectionRemoved,
+    targetReusable,
+  };
+};
 
 globalThis.__cflowRendererSvgTicket01 = async (): Promise<FirstNodeResult> => {
   const target = document.querySelector<SVGSVGElement>('#target');

@@ -58,6 +58,17 @@ const server = Bun.serve({
 
 try {
   await runAgentBrowser(['open', server.url.href]);
+  await assertBrowserScenario('globalThis.__cflowBasicCanvasCompositionExample()', {
+    initialRevision: 1,
+    selected: true,
+    moved: { revision: 2, x: '80', y: '90' },
+    undone: { revision: 3, x: '10', y: '20' },
+    redone: { revision: 4, x: '80', y: '90' },
+    viewportTransform: 'matrix(2 0 0 2 0 0)',
+    projectionRemoved: true,
+    targetReusable: true,
+  });
+
   await assertBrowserScenario('globalThis.__cflowRendererSvgTicket01()', {
     callerContentPreserved: true,
     targetChildOrder: ['defs', 'g'],

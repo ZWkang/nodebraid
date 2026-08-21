@@ -42,11 +42,11 @@
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
     "build:dependencies": "bun run --filter '@cflow/renderer-api' build",
-    "build:test-dependencies": "bun run --filter '@cflow/plugin-renderer' build && bun run --filter '@cflow/plugin-interaction' build",
+    "build:test-dependencies": "bun run --filter '@cflow/plugin-renderer' build && bun run --filter '@cflow/plugin-interaction' build && bun run --filter '@cflow/preset-basic' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "test:artifacts": "bun run ./artifacts/check-declarations.ts",
-    "test:browser": "bun run build:test-dependencies && bun run ./browser-tests/renderer-contract.browser.ts",
+    "test:browser": "bun run build && bun run build:test-dependencies && bun run ./browser-tests/renderer-contract.browser.ts",
     "typecheck": "bun run build:test-dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
