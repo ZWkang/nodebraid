@@ -19,10 +19,11 @@ test('Basic Canvas Composition preserves required Renderer config and provides n
   expect(Object.keys(plugin.provides)).toEqual([]);
   host.install(plugin, { targetId: 'typed-target' });
 
-  if (false) {
+  const verifyInvalidInstallations = () => {
     // @ts-expect-error Renderer configuration remains required.
     host.install(plugin);
     // @ts-expect-error Provider-specific configuration retains its exact type.
     host.install(plugin, { target: 'wrong-field' });
-  }
+  };
+  void verifyInvalidInstallations;
 });
