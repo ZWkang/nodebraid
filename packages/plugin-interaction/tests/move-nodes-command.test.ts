@@ -54,6 +54,24 @@ test('Move Nodes rejects an empty input without changing Document', async () => 
   });
   const before = kernel.read();
 
+  for (const invalidInput of [
+    undefined,
+    { moves: null },
+    { moves: [{}] },
+    {
+      moves: [{ nodeId: '', basePosition: { x: 10, y: 20 }, position: { x: 30, y: 40 } }],
+    },
+    {
+      moves: [{ nodeId: nodeId('move-node'), basePosition: null, position: { x: 30, y: 40 } }],
+    },
+  ]) {
+    await expect(commands.execute(moveNodesCommand, invalidInput as never)).rejects.toMatchObject({
+      domain: 'interaction',
+      code: 'INVALID_MOVE',
+    });
+    expect(kernel.read()).toBe(before);
+  }
+
   await expect(commands.execute(moveNodesCommand, { moves: [] })).rejects.toMatchObject({
     domain: 'interaction',
     code: 'INVALID_MOVE',

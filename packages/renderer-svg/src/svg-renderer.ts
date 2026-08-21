@@ -364,6 +364,22 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         try {
           applyCommit(acceptedUpdate.commit, baselineSnapshot, session, document, edgesLayer, nodesLayer, (journal) => {
             if (session) applySession(createEffectiveSession(session, nextInteraction), journal, targetMatrix);
+            if (acceptedInteraction?.type === 'node-drag' && nextInteraction === null) {
+              applyNodeDragProjection(
+                {
+                  type: 'node-drag',
+                  nodes: acceptedUpdate.commit.after.snapshot.nodes.map((node) => ({
+                    nodeId: node.id,
+                    basePosition: node.position,
+                    position: node.position,
+                  })),
+                },
+                acceptedUpdate.commit.after.snapshot,
+                edgesLayer,
+                nodesLayer,
+                journal,
+              );
+            }
             if (nextInteraction?.type === 'node-drag') {
               applyNodeDragProjection(
                 nextInteraction,
@@ -430,25 +446,39 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         assertInteractionProjectionBaseline(projection, baselineSnapshot, acceptedSession);
       }
       const accepted = projection === null ? null : cloneInteractionProjection(projection);
-      if (accepted?.type === 'viewport-pan') {
-        applySession({ selection: acceptedSession.selection, viewport: accepted.viewport });
-        acceptedInteraction = accepted;
-        return;
+      const journal = new DomMutationJournal(edgesLayer, nodesLayer);
+      try {
+        if (acceptedInteraction?.type === 'node-drag') {
+          applyNodeDragProjection(
+            {
+              type: 'node-drag',
+              nodes: baselineSnapshot.nodes.map((node) => ({
+                nodeId: node.id,
+                basePosition: node.position,
+                position: node.position,
+              })),
+            },
+            baselineSnapshot,
+            edgesLayer,
+            nodesLayer,
+            journal,
+          );
+        } else if (acceptedInteraction?.type === 'viewport-pan') {
+          applySession(acceptedSession, journal);
+        }
+        if (accepted?.type === 'viewport-pan') {
+          applySession({ selection: acceptedSession.selection, viewport: accepted.viewport }, journal);
+        } else if (accepted?.type === 'node-drag') {
+          applyNodeDragProjection(accepted, baselineSnapshot, edgesLayer, nodesLayer, journal);
+        }
+      } catch (error) {
+        const rollbackErrors = journal.rollback();
+        if (rollbackErrors.length > 0) {
+          projectionOutOfSync = true;
+          throw new ProjectionRollbackError([error, ...rollbackErrors]);
+        }
+        throw error;
       }
-      applyNodeDragProjection(
-        accepted ?? {
-          type: 'node-drag',
-          nodes: baselineSnapshot.nodes.map((node) => ({
-            nodeId: node.id,
-            basePosition: node.position,
-            position: node.position,
-          })),
-        },
-        baselineSnapshot,
-        edgesLayer,
-        nodesLayer,
-      );
-      if (accepted === null) applySession(acceptedSession);
       acceptedInteraction = accepted;
     },
     subscribeInput(listener: RendererInputListener): () => void {
@@ -675,16 +705,41 @@ function assertInteractionViewport(prefix: 'baseViewport' | 'viewport', viewport
 }
 
 function assertInteractionProjectionType(value: unknown): asserts value is InteractionProjection {
-  if (
-    typeof value === 'object' &&
-    value !== null &&
-    (Reflect.get(value, 'type') === 'node-drag' || Reflect.get(value, 'type') === 'viewport-pan')
-  ) {
+  if (!isRecord(value) || (value.type !== 'node-drag' && value.type !== 'viewport-pan')) {
+    throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Interaction Projection type is invalid.', {
+      issue: 'INVALID_PROJECTION_TYPE',
+    });
+  }
+  if (value.type === 'node-drag') {
+    if (!Array.isArray(value.nodes)) throwInvalidInteractionProjectionStructure('nodes');
+    for (let index = 0; index < value.nodes.length; index += 1) {
+      const candidate = value.nodes[index];
+      if (!isRecord(candidate)) throwInvalidInteractionProjectionStructure(`nodes[${index}]`);
+      if (typeof candidate.nodeId !== 'string' || candidate.nodeId.length === 0) {
+        throwInvalidInteractionProjectionStructure(`nodes[${index}].nodeId`);
+      }
+      if (!isRecord(candidate.basePosition)) {
+        throwInvalidInteractionProjectionStructure(`nodes[${index}].basePosition`);
+      }
+      if (!isRecord(candidate.position)) {
+        throwInvalidInteractionProjectionStructure(`nodes[${index}].position`);
+      }
+    }
     return;
   }
-  throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Interaction Projection type is invalid.', {
-    issue: 'INVALID_PROJECTION_TYPE',
+  if (!isRecord(value.baseViewport)) throwInvalidInteractionProjectionStructure('baseViewport');
+  if (!isRecord(value.viewport)) throwInvalidInteractionProjectionStructure('viewport');
+}
+
+function throwInvalidInteractionProjectionStructure(field: string): never {
+  throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Interaction Projection structure is invalid.', {
+    issue: 'INVALID_PROJECTION_STRUCTURE',
+    field,
   });
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
 }
 
 function viewportsEqual(left: SessionSnapshot['viewport'], right: SessionSnapshot['viewport']): boolean {

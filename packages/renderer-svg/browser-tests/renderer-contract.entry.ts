@@ -38,6 +38,24 @@ interface InteractionProjectionClearResult {
   readonly preservedNodeIdentity: boolean;
 }
 
+interface InteractionProjectionReplacementResult {
+  readonly afterNodeReplacement: Readonly<{
+    nodeAX: string | null;
+    nodeBX: string | null;
+    formerNodeAHit: unknown;
+  }>;
+  readonly afterViewportReplacement: Readonly<{
+    nodeAX: string | null;
+    nodeBX: string | null;
+    transform: string | null;
+  }>;
+  readonly afterNodeFromViewport: Readonly<{
+    nodeAX: string | null;
+    nodeBX: string | null;
+    transform: string | null;
+  }>;
+}
+
 interface InteractionProjectionResetResult {
   readonly nodeX: string | null;
   readonly stableHit: unknown;
@@ -174,6 +192,19 @@ interface EvidenceErrorResult {
   readonly error: GeometryErrorResult['error'];
   readonly projectionUnchanged: boolean;
   readonly nodeX: string | null;
+}
+
+interface MalformedInteractionProjectionResult {
+  readonly errors: readonly GeometryErrorResult['error'][];
+  readonly nodeX: string | null;
+}
+
+interface InteractionProjectionRollbackResult {
+  readonly sameErrorIdentity: boolean;
+  readonly rollbackX: string | null;
+  readonly rollbackTransform: string | null;
+  readonly hit: unknown;
+  readonly clearedX: string | null;
 }
 
 interface ChangeSetMismatchResult extends EvidenceErrorResult {
@@ -493,6 +524,7 @@ declare global {
   var __cflowRendererSvgTicket01: () => Promise<FirstNodeResult>;
   var __cflowRendererSvgInteractionProjectionFirstNode: () => Promise<FirstInteractionProjectionResult>;
   var __cflowRendererSvgInteractionProjectionClear: () => Promise<InteractionProjectionClearResult>;
+  var __cflowRendererSvgInteractionProjectionReplacement: () => Promise<InteractionProjectionReplacementResult>;
   var __cflowRendererSvgInteractionProjectionReset: () => Promise<InteractionProjectionResetResult>;
   var __cflowRendererSvgInteractionProjectionEdge: () => Promise<InteractionProjectionEdgeResult>;
   var __cflowRendererSvgViewportInteractionProjection: () => Promise<ViewportInteractionProjectionResult>;
@@ -506,6 +538,8 @@ declare global {
   var __cflowRendererSvgInteractionProjectionEmpty: () => Promise<GeometryErrorResult>;
   var __cflowRendererSvgInteractionProjectionUnknownType: () => Promise<GeometryErrorResult>;
   var __cflowRendererSvgInteractionProjectionInvalidViewport: () => Promise<GeometryErrorResult>;
+  var __cflowRendererSvgInteractionProjectionMalformedShape: () => Promise<MalformedInteractionProjectionResult>;
+  var __cflowRendererSvgInteractionProjectionRollback: () => Promise<InteractionProjectionRollbackResult>;
   var __cflowRendererSvgRuntimeInteractionProjection: () => Promise<RuntimeInteractionProjectionResult>;
   var __cflowRendererSvgSetupSelectionInteraction: () => Promise<void>;
   var __cflowRendererSvgReadSelectionInteraction: () => SelectionInteractionResult;
@@ -741,6 +775,82 @@ globalThis.__cflowRendererSvgInteractionProjectionClear = async (): Promise<Inte
   target.remove();
   return result;
 };
+
+globalThis.__cflowRendererSvgInteractionProjectionReplacement =
+  async (): Promise<InteractionProjectionReplacementResult> => {
+    const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    target.setAttribute('width', '500');
+    target.setAttribute('height', '300');
+    document.body.append(target);
+
+    const renderer = createSvgRenderer({ target });
+    const kernel = createCanvasKernel();
+    const nodeA = nodeId('replacement-node-a');
+    const nodeB = nodeId('replacement-node-b');
+    kernel.transact((transaction) => {
+      transaction.nodes.add({
+        id: nodeA,
+        type: 'task',
+        position: { x: 10, y: 20 },
+        size: { width: 80, height: 40 },
+        data: null,
+      });
+      transaction.nodes.add({
+        id: nodeB,
+        type: 'task',
+        position: { x: 200, y: 20 },
+        size: { width: 80, height: 40 },
+        data: null,
+      });
+    });
+    renderer.updateDocument({ type: 'reset', view: kernel.read() });
+    renderer.updateSession({
+      selection: { nodeIds: [], edgeIds: [] },
+      viewport: { x: 10, y: 20, zoom: 2 },
+    });
+    renderer.updateInteraction({
+      type: 'node-drag',
+      nodes: [{ nodeId: nodeA, basePosition: { x: 10, y: 20 }, position: { x: 80, y: 90 } }],
+    });
+    renderer.updateInteraction({
+      type: 'node-drag',
+      nodes: [{ nodeId: nodeB, basePosition: { x: 200, y: 20 }, position: { x: 260, y: 90 } }],
+    });
+    const nodeAElement = target.querySelector<SVGRectElement>('[data-cflow-node-id="replacement-node-a"]');
+    const nodeBElement = target.querySelector<SVGRectElement>('[data-cflow-node-id="replacement-node-b"]');
+    const root = target.querySelector<SVGGElement>('[data-cflow-renderer-svg-root]');
+    if (!nodeAElement || !nodeBElement || !root) throw new Error('Expected replacement Projection geometry.');
+    const afterNodeReplacement = {
+      nodeAX: nodeAElement.getAttribute('x'),
+      nodeBX: nodeBElement.getAttribute('x'),
+      formerNodeAHit: renderer.hitTest({ x: 210, y: 220 }),
+    };
+
+    renderer.updateInteraction({
+      type: 'viewport-pan',
+      baseViewport: { x: 10, y: 20, zoom: 2 },
+      viewport: { x: 40, y: 50, zoom: 2 },
+    });
+    const afterViewportReplacement = {
+      nodeAX: nodeAElement.getAttribute('x'),
+      nodeBX: nodeBElement.getAttribute('x'),
+      transform: root.getAttribute('transform'),
+    };
+
+    renderer.updateInteraction({
+      type: 'node-drag',
+      nodes: [{ nodeId: nodeA, basePosition: { x: 10, y: 20 }, position: { x: 90, y: 100 } }],
+    });
+    const afterNodeFromViewport = {
+      nodeAX: nodeAElement.getAttribute('x'),
+      nodeBX: nodeBElement.getAttribute('x'),
+      transform: root.getAttribute('transform'),
+    };
+
+    await renderer.dispose();
+    target.remove();
+    return { afterNodeReplacement, afterViewportReplacement, afterNodeFromViewport };
+  };
 
 globalThis.__cflowRendererSvgInteractionProjectionReset = async (): Promise<InteractionProjectionResetResult> => {
   const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -1274,6 +1384,119 @@ globalThis.__cflowRendererSvgInteractionProjectionInvalidViewport = async (): Pr
   const result: GeometryErrorResult = {
     error,
     projectionUnchanged: projection?.getAttribute('transform') === beforeTransform,
+  };
+  await renderer.dispose();
+  target.remove();
+  return result;
+};
+
+globalThis.__cflowRendererSvgInteractionProjectionMalformedShape =
+  async (): Promise<MalformedInteractionProjectionResult> => {
+    const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    target.setAttribute('width', '400');
+    target.setAttribute('height', '300');
+    document.body.append(target);
+    const renderer = createSvgRenderer({ target });
+    const kernel = createCanvasKernel();
+    const id = nodeId('malformed-projection-node');
+    kernel.transact((transaction) => {
+      transaction.nodes.add({
+        id,
+        type: 'task',
+        position: { x: 10, y: 20 },
+        size: { width: 80, height: 40 },
+        data: null,
+      });
+    });
+    renderer.updateDocument({ type: 'reset', view: kernel.read() });
+    renderer.updateSession({
+      selection: { nodeIds: [], edgeIds: [] },
+      viewport: { x: 0, y: 0, zoom: 1 },
+    });
+    renderer.updateInteraction({
+      type: 'node-drag',
+      nodes: [{ nodeId: id, basePosition: { x: 10, y: 20 }, position: { x: 30, y: 40 } }],
+    });
+    const malformed = [
+      { type: 'node-drag' },
+      { type: 'node-drag', nodes: [{}] },
+      {
+        type: 'node-drag',
+        nodes: [{ nodeId: '', basePosition: { x: 10, y: 20 }, position: { x: 30, y: 40 } }],
+      },
+      { type: 'viewport-pan', viewport: { x: 0, y: 0, zoom: 1 } },
+    ];
+    const errors = malformed.map((projection) =>
+      captureRendererError(() => renderer.updateInteraction(projection as never)),
+    );
+    const result: MalformedInteractionProjectionResult = {
+      errors,
+      nodeX:
+        target.querySelector<SVGRectElement>('[data-cflow-node-id="malformed-projection-node"]')?.getAttribute('x') ??
+        null,
+    };
+    await renderer.dispose();
+    target.remove();
+    return result;
+  };
+
+globalThis.__cflowRendererSvgInteractionProjectionRollback = async (): Promise<InteractionProjectionRollbackResult> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  document.body.append(target);
+  const renderer = createSvgRenderer({ target });
+  const kernel = createCanvasKernel();
+  const id = nodeId('interaction-rollback-node');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({
+      id,
+      type: 'task',
+      position: { x: 10, y: 20 },
+      size: { width: 80, height: 40 },
+      data: null,
+    });
+  });
+  renderer.updateDocument({ type: 'reset', view: kernel.read() });
+  renderer.updateSession({
+    selection: { nodeIds: [], edgeIds: [] },
+    viewport: { x: 10, y: 20, zoom: 2 },
+  });
+  renderer.updateInteraction({
+    type: 'node-drag',
+    nodes: [{ nodeId: id, basePosition: { x: 10, y: 20 }, position: { x: 80, y: 90 } }],
+  });
+  const node = target.querySelector<SVGRectElement>('[data-cflow-node-id="interaction-rollback-node"]');
+  const root = target.querySelector<SVGGElement>('[data-cflow-renderer-svg-root]');
+  if (!node || !root) throw new Error('Expected Interaction rollback geometry.');
+  const injectedError = new Error('injected Interaction Projection transform failure');
+  const originalSetAttribute = root.setAttribute;
+  root.setAttribute = function setAttribute(name: string, value: string): void {
+    if (name === 'transform' && value === 'matrix(2 0 0 2 40 50)') throw injectedError;
+    originalSetAttribute.call(this, name, value);
+  };
+  let thrown: unknown;
+  try {
+    renderer.updateInteraction({
+      type: 'viewport-pan',
+      baseViewport: { x: 10, y: 20, zoom: 2 },
+      viewport: { x: 40, y: 50, zoom: 2 },
+    });
+  } catch (error) {
+    thrown = error;
+  } finally {
+    root.setAttribute = originalSetAttribute;
+  }
+  const rollbackX = node.getAttribute('x');
+  const rollbackTransform = root.getAttribute('transform');
+  const hit = renderer.hitTest({ x: 170, y: 200 });
+  renderer.updateInteraction(null);
+  const result: InteractionProjectionRollbackResult = {
+    sameErrorIdentity: thrown === injectedError,
+    rollbackX,
+    rollbackTransform,
+    hit,
+    clearedX: node.getAttribute('x'),
   };
   await renderer.dispose();
   target.remove();

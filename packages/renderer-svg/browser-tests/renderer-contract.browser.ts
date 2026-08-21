@@ -84,6 +84,24 @@ try {
     preservedNodeIdentity: true,
   });
 
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionReplacement()', {
+    afterNodeReplacement: {
+      nodeAX: '10',
+      nodeBX: '260',
+      formerNodeAHit: { type: 'canvas', worldPoint: { x: 100, y: 100 } },
+    },
+    afterViewportReplacement: {
+      nodeAX: '10',
+      nodeBX: '200',
+      transform: 'matrix(2 0 0 2 40 50)',
+    },
+    afterNodeFromViewport: {
+      nodeAX: '90',
+      nodeBX: '200',
+      transform: 'matrix(2 0 0 2 10 20)',
+    },
+  });
+
   await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionReset()', {
     nodeX: '30',
     stableHit: {
@@ -192,6 +210,48 @@ try {
       details: { issue: 'INVALID_VIEWPORT', field: 'viewport.x' },
     },
     projectionUnchanged: true,
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionMalformedShape()', {
+    errors: [
+      {
+        name: 'RendererError',
+        domain: 'renderer',
+        code: 'INVALID_INTERACTION_PROJECTION',
+        details: { issue: 'INVALID_PROJECTION_STRUCTURE', field: 'nodes' },
+      },
+      {
+        name: 'RendererError',
+        domain: 'renderer',
+        code: 'INVALID_INTERACTION_PROJECTION',
+        details: { issue: 'INVALID_PROJECTION_STRUCTURE', field: 'nodes[0].nodeId' },
+      },
+      {
+        name: 'RendererError',
+        domain: 'renderer',
+        code: 'INVALID_INTERACTION_PROJECTION',
+        details: { issue: 'INVALID_PROJECTION_STRUCTURE', field: 'nodes[0].nodeId' },
+      },
+      {
+        name: 'RendererError',
+        domain: 'renderer',
+        code: 'INVALID_INTERACTION_PROJECTION',
+        details: { issue: 'INVALID_PROJECTION_STRUCTURE', field: 'baseViewport' },
+      },
+    ],
+    nodeX: '30',
+  });
+
+  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionRollback()', {
+    sameErrorIdentity: true,
+    rollbackX: '80',
+    rollbackTransform: 'matrix(2 0 0 2 10 20)',
+    hit: {
+      type: 'node',
+      nodeId: 'interaction-rollback-node',
+      worldPoint: { x: 80, y: 90 },
+    },
+    clearedX: '10',
   });
 
   await assertBrowserScenario('globalThis.__cflowRendererSvgRuntimeInteractionProjection()', {
