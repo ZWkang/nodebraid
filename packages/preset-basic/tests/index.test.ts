@@ -1,9 +1,7 @@
 import { expect, test } from 'bun:test';
 
-import { nodeId } from '@cflow/kernel';
 import { commandService, type CommandService } from '@cflow/plugin-command';
-import { historyService, undoCommand, type HistoryService } from '@cflow/plugin-history';
-import { moveNodesCommand } from '@cflow/plugin-interaction';
+import { historyService, type HistoryService } from '@cflow/plugin-history';
 import { kernelService, type KernelService } from '@cflow/plugin-kernel';
 import { rendererService, type RendererService } from '@cflow/plugin-renderer';
 import { sessionService, type SessionService } from '@cflow/plugin-session';
@@ -12,7 +10,7 @@ import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
 import { createBasicCanvasPlugin } from '../src';
 import { TestCanvasRenderer } from './test-renderer';
 
-test('application activates the complete Basic Canvas Composition through one Plugin', async () => {
+test('Composition readiness publishes every base Service through static bindings', async () => {
   interface TestRendererConfig {
     readonly targetId: string;
   }
@@ -57,27 +55,6 @@ test('application activates the complete Basic Canvas Composition through one Pl
     expect(session).toBeDefined();
     expect(runtimeRenderer).toBeDefined();
     expect(history).toBeDefined();
-
-    const id = nodeId('basic-node');
-    kernel!.transact((transaction) => {
-      transaction.nodes.add({
-        id,
-        type: 'task',
-        position: { x: 10, y: 20 },
-        size: { width: 80, height: 40 },
-        data: null,
-      });
-    });
-    const moved = await commands!.execute(moveNodesCommand, {
-      moves: [{ nodeId: id, basePosition: { x: 10, y: 20 }, position: { x: 40, y: 50 } }],
-    });
-
-    expect(moved?.after.query.getNode(id)?.position).toEqual({ x: 40, y: 50 });
-    expect(history!.getSnapshot()).toEqual({ canUndo: true, canRedo: false });
-
-    await commands!.execute(undoCommand, undefined);
-
-    expect(kernel!.read().query.getNode(id)?.position).toEqual({ x: 10, y: 20 });
   } finally {
     await host.dispose();
   }

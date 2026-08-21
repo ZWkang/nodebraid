@@ -14,4 +14,4 @@
 
 ## Answer
 
-真实 Plugin Host 已验证已有 Kernel Provider 和第二份 Basic Canvas Composition 都通过标准 `PROVIDER_CONFLICT` 失败且不破坏现有 Runtime。两个独立 Host 获得不同 Renderer、Kernel revision 与 Session Snapshot。父 Composition 的 LIFO ownership 会先移除 History/Interaction Commands，再进入 Renderer cleanup，并等待异步 dispose；Binding、Input 与 Renderer dispose 的多个失败均被尝试并保留在最终 AggregateError 中。
+真实 Plugin Host 已验证已有 Kernel Provider、后置 Renderer Provider 和第二份 Basic Canvas Composition 都通过标准 `PROVIDER_CONFLICT` 失败且不破坏现有 Runtime；后置冲突会回滚已经创建的 Kernel、Command 与 Session reservations。真实 SVG Chromium 场景证明两个独立 Host 获得不同 Projection、Kernel revision 与 Session Snapshot。Host Diagnostics 锁定 History、Interaction、Renderer、Session、Command、Kernel 的完整逆序 Activation 释放；异步 Renderer dispose 会被等待，Binding、Input 与 Renderer cleanup 的多个失败也均被尝试并保留在最终 AggregateError 中。

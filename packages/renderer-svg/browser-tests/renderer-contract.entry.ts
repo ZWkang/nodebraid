@@ -36,6 +36,15 @@ interface BasicCanvasCaptureDisposalResult {
   readonly projectionRemoved: boolean;
 }
 
+interface BasicCanvasIsolationResult {
+  readonly firstRevision: number;
+  readonly secondRevision: number;
+  readonly snapshotsDistinct: boolean;
+  readonly projectionsDistinct: boolean;
+  readonly firstNodeCount: number;
+  readonly secondNodeCount: number;
+}
+
 interface FirstNodeResult {
   readonly callerContentPreserved: boolean;
   readonly targetChildOrder: readonly string[];
@@ -550,6 +559,7 @@ declare global {
   var __cflowBasicCanvasCompositionReadCapture: () => BasicCanvasCaptureResult;
   var __cflowBasicCanvasCompositionDisposeCapture: () => Promise<BasicCanvasCaptureDisposalResult>;
   var __cflowBasicCanvasCompositionTeardownCapture: () => void;
+  var __cflowBasicCanvasCompositionIsolation: () => Promise<BasicCanvasIsolationResult>;
   var __cflowRendererSvgTicket01: () => Promise<FirstNodeResult>;
   var __cflowRendererSvgInteractionProjectionFirstNode: () => Promise<FirstInteractionProjectionResult>;
   var __cflowRendererSvgInteractionProjectionClear: () => Promise<InteractionProjectionClearResult>;
@@ -782,6 +792,45 @@ globalThis.__cflowBasicCanvasCompositionTeardownCapture = (): void => {
   basicCanvasCaptureTarget?.remove();
   basicCanvasCaptureTarget = undefined;
   basicCanvasCaptureExample = undefined;
+};
+
+globalThis.__cflowBasicCanvasCompositionIsolation = async (): Promise<BasicCanvasIsolationResult> => {
+  const firstTarget = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const secondTarget = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  for (const target of [firstTarget, secondTarget]) {
+    target.setAttribute('width', '400');
+    target.setAttribute('height', '300');
+  }
+  document.body.append(firstTarget, secondTarget);
+  const first = await createBasicCanvasSvgExample(firstTarget);
+  const second = await createBasicCanvasSvgExample(secondTarget);
+
+  try {
+    first.kernel.transact((transaction) => {
+      transaction.nodes.add({
+        id: nodeId('basic-isolation-extra'),
+        type: 'task',
+        position: { x: 120, y: 220 },
+        size: { width: 80, height: 40 },
+        data: null,
+      });
+    });
+    const firstProjection = firstTarget.querySelector('[data-cflow-renderer-svg-root]');
+    const secondProjection = secondTarget.querySelector('[data-cflow-renderer-svg-root]');
+    return {
+      firstRevision: first.kernel.read().snapshot.revision,
+      secondRevision: second.kernel.read().snapshot.revision,
+      snapshotsDistinct: first.session.getSnapshot() !== second.session.getSnapshot(),
+      projectionsDistinct:
+        firstProjection !== null && secondProjection !== null && firstProjection !== secondProjection,
+      firstNodeCount: firstTarget.querySelectorAll('[data-cflow-node-id]').length,
+      secondNodeCount: secondTarget.querySelectorAll('[data-cflow-node-id]').length,
+    };
+  } finally {
+    await Promise.all([first.dispose(), second.dispose()]);
+    firstTarget.remove();
+    secondTarget.remove();
+  }
 };
 
 globalThis.__cflowRendererSvgTicket01 = async (): Promise<FirstNodeResult> => {

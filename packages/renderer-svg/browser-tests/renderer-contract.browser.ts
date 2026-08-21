@@ -68,6 +68,14 @@ try {
     projectionRemoved: true,
     targetReusable: true,
   });
+  await assertBrowserScenario('globalThis.__cflowBasicCanvasCompositionIsolation()', {
+    firstRevision: 2,
+    secondRevision: 1,
+    snapshotsDistinct: true,
+    projectionsDistinct: true,
+    firstNodeCount: 3,
+    secondNodeCount: 2,
+  });
 
   await evaluateBrowserScenario('globalThis.__cflowBasicCanvasCompositionSetupCapture()');
   await dispatchMouseDown(20, 30);

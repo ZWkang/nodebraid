@@ -1,12 +1,13 @@
 import { expect, test } from 'bun:test';
 
+import type { DiagnosticEvent } from '@cflow/diagnostics';
 import type { InteractionProjection } from '@cflow/interaction-api';
-import { nodeId } from '@cflow/kernel';
-import { commandService, type CommandService } from '@cflow/plugin-command';
+import { commandPlugin, commandService, type CommandService } from '@cflow/plugin-command';
 import { undoCommand } from '@cflow/plugin-history';
 import { moveNodesCommand } from '@cflow/plugin-interaction';
-import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
-import { sessionService, type SessionService } from '@cflow/plugin-session';
+import { kernelPlugin } from '@cflow/plugin-kernel';
+import { rendererService, type RendererService } from '@cflow/plugin-renderer';
+import { sessionPlugin } from '@cflow/plugin-session';
 import type { RendererInputListener } from '@cflow/renderer-api';
 import { createPluginHost, definePlugin, PluginHostError } from '@cflow/runtime-cordis';
 
@@ -52,58 +53,41 @@ test('second Basic Canvas Composition conflicts without disturbing the active on
   }
 });
 
-test('separate Plugin Hosts own isolated Basic Canvas Runtime state', async () => {
-  const renderers: TestCanvasRenderer[] = [];
-  const plugin = createBasicCanvasPlugin((_config: Readonly<{ readonly targetId: string }>) => {
-    const renderer = new TestCanvasRenderer();
-    renderers.push(renderer);
-    return renderer;
-  });
-  const firstHost = createPluginHost();
-  const secondHost = createPluginHost();
-  let firstKernel: KernelService | undefined;
-  let firstSession: SessionService | undefined;
-  let secondKernel: KernelService | undefined;
-  let secondSession: SessionService | undefined;
-  const firstConsumer = definePlugin({
-    requires: { kernel: kernelService, session: sessionService },
-    setup(context) {
-      firstKernel = context.services.kernel;
-      firstSession = context.services.session;
-    },
-  });
-  const secondConsumer = definePlugin({
-    requires: { kernel: kernelService, session: sessionService },
-    setup(context) {
-      secondKernel = context.services.kernel;
-      secondSession = context.services.session;
-    },
-  });
-  const installations = [
-    firstHost.install(plugin, { targetId: 'first-host' }),
-    firstHost.install(firstConsumer),
-    secondHost.install(plugin, { targetId: 'second-host' }),
-    secondHost.install(secondConsumer),
-  ];
+test('a later Renderer Provider conflict rolls back earlier Child reservations', async () => {
+  const host = createPluginHost();
+  const occupiedRenderer = host.install(
+    definePlugin({
+      name: 'test.occupied-renderer',
+      provides: { renderer: rendererService },
+      setup() {
+        return { renderer: createOccupiedRendererService() };
+      },
+    }),
+  );
+  await occupiedRenderer.whenActive();
+  const composition = host.install(
+    createBasicCanvasPlugin((_config: Readonly<{ readonly targetId: string }>) => new TestCanvasRenderer()),
+    { targetId: 'later-provider-conflict' },
+  );
 
+  const error = await composition.whenActive().catch((reason: unknown) => reason);
+  expect(error).toMatchObject({ code: 'PROVIDER_CONFLICT', details: { serviceName: 'renderer' } });
+
+  const kernel = host.install(kernelPlugin);
+  const commands = host.install(commandPlugin);
+  const session = host.install(sessionPlugin);
+  await Promise.all([kernel.whenActive(), commands.whenActive(), session.whenActive()]);
+  await Promise.all([session.dispose(), commands.dispose(), kernel.dispose(), occupiedRenderer.dispose()]);
+  await composition.dispose();
+
+  const replacement = host.install(
+    createBasicCanvasPlugin((_config: Readonly<{ readonly targetId: string }>) => new TestCanvasRenderer()),
+    { targetId: 'replacement-after-conflict' },
+  );
   try {
-    await Promise.all(installations.map((installation) => installation.whenActive()));
-    firstKernel!.transact((transaction) => {
-      transaction.nodes.add({
-        id: nodeId('isolated-node'),
-        type: 'task',
-        position: { x: 0, y: 0 },
-        data: null,
-      });
-    });
-
-    expect(firstKernel!.read().snapshot.revision).toBe(1);
-    expect(secondKernel!.read().snapshot.revision).toBe(0);
-    expect(firstSession!.getSnapshot()).not.toBe(secondSession!.getSnapshot());
-    expect(renderers).toHaveLength(2);
-    expect(renderers[0]).not.toBe(renderers[1]);
+    await expect(replacement.whenActive()).resolves.toBeUndefined();
   } finally {
-    await Promise.all([firstHost.dispose(), secondHost.dispose()]);
+    await host.dispose();
   }
 });
 
@@ -165,6 +149,36 @@ test('Composition cleanup attempts every Renderer resource and preserves all fai
   await host.dispose();
 });
 
+test('Composition diagnostics expose the complete reverse Child cleanup order', async () => {
+  const events: DiagnosticEvent[] = [];
+  const host = createPluginHost({ diagnostics: { sink: (event) => events.push(event) } });
+  const composition = host.install(
+    createBasicCanvasPlugin((_config: Readonly<{ readonly targetId: string }>) => new TestCanvasRenderer()),
+    { targetId: 'cleanup-order' },
+  );
+  await composition.whenActive();
+  events.length = 0;
+
+  await composition.dispose();
+
+  expect(
+    events
+      .filter(
+        (event) => event.name === 'cflow.runtime.activation.ended' && event.scope.pluginName !== '@cflow/preset-basic',
+      )
+      .map((event) => event.scope.pluginName),
+  ).toEqual([
+    '@cflow/plugin-history',
+    '@cflow/plugin-interaction',
+    '@cflow/plugin-renderer',
+    '@cflow/plugin-session',
+    '@cflow/plugin-command',
+    '@cflow/plugin-kernel',
+  ]);
+
+  await host.dispose();
+});
+
 class DeferredDisposalRenderer extends TestCanvasRenderer {
   readonly disposeStarted: Promise<void>;
   #startDisposal!: () => void;
@@ -216,4 +230,21 @@ class FailingCleanupRenderer extends TestCanvasRenderer {
 function collectAggregateLeaves(error: unknown): unknown[] {
   if (!(error instanceof AggregateError)) return [error];
   return error.errors.flatMap(collectAggregateLeaves);
+}
+
+function createOccupiedRendererService(): RendererService {
+  return Object.freeze({
+    bindInteractionProjection() {
+      return Object.freeze({ update() {}, dispose() {} });
+    },
+    subscribeInput() {
+      return () => undefined;
+    },
+    hitTest() {
+      return null;
+    },
+    capturePointer() {},
+    releasePointer() {},
+    focus() {},
+  });
 }
