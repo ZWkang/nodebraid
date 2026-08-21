@@ -160,6 +160,20 @@
         "@cflow/session-api": "workspace:*",
       },
     },
+    "packages/preset-basic": {
+      "name": "@cflow/preset-basic",
+      "version": "0.0.1",
+      "dependencies": {
+        "@cflow/plugin-command": "workspace:*",
+        "@cflow/plugin-history": "workspace:*",
+        "@cflow/plugin-interaction": "workspace:*",
+        "@cflow/plugin-kernel": "workspace:*",
+        "@cflow/plugin-renderer": "workspace:*",
+        "@cflow/plugin-session": "workspace:*",
+        "@cflow/renderer-api": "workspace:*",
+        "@cflow/runtime-cordis": "workspace:*",
+      },
+    },
     "packages/renderer-api": {
       "name": "@cflow/renderer-api",
       "version": "0.0.1",
@@ -276,6 +290,8 @@
     "@cflow/plugin-renderer": ["@cflow/plugin-renderer@workspace:packages/plugin-renderer"],
 
     "@cflow/plugin-session": ["@cflow/plugin-session@workspace:packages/plugin-session"],
+
+    "@cflow/preset-basic": ["@cflow/preset-basic@workspace:packages/preset-basic"],
 
     "@cflow/renderer-api": ["@cflow/renderer-api@workspace:packages/renderer-api"],
 

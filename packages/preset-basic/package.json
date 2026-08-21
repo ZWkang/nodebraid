@@ -1,0 +1,59 @@
+{
+  "name": "@cflow/preset-basic",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Backend-neutral Basic Canvas Composition for CFlow.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "zwkang",
+    "email": "kang95630@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZWkang/cflow.git",
+    "directory": "packages/preset-basic"
+  },
+  "bugs": "https://github.com/ZWkang/cflow/issues",
+  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/preset-basic#readme",
+  "keywords": [
+    "cflow",
+    "canvas",
+    "composition",
+    "plugin-runtime"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsgo -p tsconfig.build.json --watch",
+    "build": "bun run build:dependencies && tsgo -p tsconfig.build.json",
+    "build:dependencies": "bun run --filter '@cflow/plugin-interaction' build && bun run --filter '@cflow/plugin-history' build",
+    "prepack": "bun run build",
+    "test": "bun test ./tests",
+    "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@cflow/plugin-command": "workspace:*",
+    "@cflow/plugin-history": "workspace:*",
+    "@cflow/plugin-interaction": "workspace:*",
+    "@cflow/plugin-kernel": "workspace:*",
+    "@cflow/plugin-renderer": "workspace:*",
+    "@cflow/plugin-session": "workspace:*",
+    "@cflow/renderer-api": "workspace:*",
+    "@cflow/runtime-cordis": "workspace:*"
+  }
+}
