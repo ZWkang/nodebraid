@@ -1,22 +1,15 @@
 import { expect, test } from 'bun:test';
 
-import type { InteractionProjection } from '@cflow/interaction-api';
 import { InteractionError } from '@cflow/plugin-interaction';
-import type { SessionSnapshot } from '@cflow/plugin-session';
-import type {
-  CanvasRenderer,
-  HitResult,
-  RendererDocumentUpdate,
-  RendererInputListener,
-  ScreenPoint,
-} from '@cflow/renderer-api';
+import type { CanvasRenderer } from '@cflow/renderer-api';
 import { createPluginHost } from '@cflow/runtime-cordis';
 
 import { createBasicCanvasPlugin } from '../src';
+import { TestCanvasRenderer } from './test-renderer';
 
 test('invalid Interaction options fail the Composition with the original Interaction error', async () => {
   const plugin = createBasicCanvasPlugin(
-    (_config: Readonly<{ readonly targetId: string }>) => new ReadinessRenderer(),
+    (_config: Readonly<{ readonly targetId: string }>) => new TestCanvasRenderer(),
     { interaction: { minZoom: 2, maxZoom: 1 } },
   );
   const host = createPluginHost();
@@ -36,7 +29,7 @@ test('invalid Interaction options fail the Composition with the original Interac
 test('Composition snapshots Interaction options when the Plugin is created', async () => {
   const interaction = { minZoom: 0.5, maxZoom: 2 };
   const plugin = createBasicCanvasPlugin(
-    (_config: Readonly<{ readonly targetId: string }>) => new ReadinessRenderer(),
+    (_config: Readonly<{ readonly targetId: string }>) => new TestCanvasRenderer(),
     { interaction },
   );
   interaction.minZoom = 3;
@@ -52,7 +45,7 @@ test('Composition snapshots Interaction options when the Plugin is created', asy
 });
 
 test('Composition creation rejects malformed or unknown top-level options', () => {
-  const factory = (_config: Readonly<{ readonly targetId: string }>) => new ReadinessRenderer();
+  const factory = (_config: Readonly<{ readonly targetId: string }>) => new TestCanvasRenderer();
 
   expect(() => createBasicCanvasPlugin(factory, null as never)).toThrow(TypeError);
   expect(() => createBasicCanvasPlugin(factory, { interaction: {}, unexpected: true } as never)).toThrow(TypeError);
@@ -76,7 +69,7 @@ test('Composition waits for an asynchronous Renderer before becoming active', as
     expect(active).toBeFalse();
     expect(composition.getSnapshot()).toEqual({ status: 'pending', missing: [] });
 
-    resolveRenderer(new ReadinessRenderer());
+    resolveRenderer(new TestCanvasRenderer());
     await readiness;
 
     expect(active).toBeTrue();
@@ -100,7 +93,7 @@ test('Renderer Factory failure keeps its identity and releases the Child tree fo
 
   await failedComposition.dispose();
   const replacement = host.install(
-    createBasicCanvasPlugin((_config: Readonly<{ readonly targetId: string }>) => new ReadinessRenderer()),
+    createBasicCanvasPlugin((_config: Readonly<{ readonly targetId: string }>) => new TestCanvasRenderer()),
     { targetId: 'replacement-renderer' },
   );
 
@@ -110,19 +103,3 @@ test('Renderer Factory failure keeps its identity and releases the Child tree fo
     await host.dispose();
   }
 });
-
-class ReadinessRenderer implements CanvasRenderer {
-  updateDocument(_update: RendererDocumentUpdate): void {}
-  updateSession(_snapshot: SessionSnapshot): void {}
-  updateInteraction(_projection: InteractionProjection | null): void {}
-  subscribeInput(_listener: RendererInputListener): () => void {
-    return () => undefined;
-  }
-  hitTest(point: ScreenPoint): HitResult | null {
-    return { type: 'canvas', worldPoint: point };
-  }
-  capturePointer(_pointerId: number): void {}
-  releasePointer(_pointerId: number): void {}
-  focus(): void {}
-  async dispose(): Promise<void> {}
-}

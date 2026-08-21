@@ -1,30 +1,23 @@
 import { expect, test } from 'bun:test';
 
-import type { InteractionProjection } from '@cflow/interaction-api';
-import { nodeId, type Point } from '@cflow/kernel';
+import { nodeId } from '@cflow/kernel';
 import { commandService, type CommandService } from '@cflow/plugin-command';
 import { historyService, undoCommand, type HistoryService } from '@cflow/plugin-history';
 import { moveNodesCommand } from '@cflow/plugin-interaction';
 import { kernelService, type KernelService } from '@cflow/plugin-kernel';
 import { rendererService, type RendererService } from '@cflow/plugin-renderer';
-import { sessionService, type SessionService, type SessionSnapshot } from '@cflow/plugin-session';
-import type {
-  CanvasRenderer,
-  HitResult,
-  RendererDocumentUpdate,
-  RendererInputListener,
-  ScreenPoint,
-} from '@cflow/renderer-api';
+import { sessionService, type SessionService } from '@cflow/plugin-session';
 import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
 
 import { createBasicCanvasPlugin } from '../src';
+import { TestCanvasRenderer } from './test-renderer';
 
 test('application activates the complete Basic Canvas Composition through one Plugin', async () => {
   interface TestRendererConfig {
     readonly targetId: string;
   }
 
-  const renderer = new CompositionRenderer();
+  const renderer = new TestCanvasRenderer();
   const providerConfig: TestRendererConfig = Object.freeze({ targetId: 'canvas-a' });
   let receivedConfig: Readonly<TestRendererConfig> | undefined;
   const basicCanvasPlugin = createBasicCanvasPlugin((config: Readonly<TestRendererConfig>) => {
@@ -91,31 +84,3 @@ test('application activates the complete Basic Canvas Composition through one Pl
 
   expect(renderer.disposed).toBeTrue();
 });
-
-class CompositionRenderer implements CanvasRenderer {
-  disposed = false;
-
-  updateDocument(_update: RendererDocumentUpdate): void {}
-
-  updateSession(_snapshot: SessionSnapshot): void {}
-
-  updateInteraction(_projection: InteractionProjection | null): void {}
-
-  subscribeInput(_listener: RendererInputListener): () => void {
-    return () => undefined;
-  }
-
-  hitTest(point: ScreenPoint): HitResult | null {
-    return { type: 'canvas', worldPoint: point as Point };
-  }
-
-  capturePointer(_pointerId: number): void {}
-
-  releasePointer(_pointerId: number): void {}
-
-  focus(): void {}
-
-  async dispose(): Promise<void> {
-    this.disposed = true;
-  }
-}

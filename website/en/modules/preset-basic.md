@@ -47,6 +47,8 @@ The Composition creates children in Kernel, Command, Session, Renderer, Interact
 
 Renderer Factory, Interaction config, and other child setup failures preserve their original identity. Existing standard Providers, a second preset, or a second Renderer in one Host continue to fail through the current Service reservation rules; the preset never skips or replaces them. Disposal runs in reverse order and awaits asynchronous Renderer cleanup. Multiple cleanup failures remain visible through AggregateError.
 
+A failed Composition Installation never retries itself; recovery requires a new Installation. The caller still explicitly disposes the failed parent, but after child rollback it holds no extra preset reservation that blocks a replacement in the same Host.
+
 ## Extension model
 
 Applications consume the basic capabilities through static Required Service Bindings in sibling Consumer Plugins. Layout, Validation, domain rules, and other Providers are sibling Plugins as well. Applications that need to replace a basic member or control it independently should keep composing the individual Plugins instead of requesting an internal preset handle.

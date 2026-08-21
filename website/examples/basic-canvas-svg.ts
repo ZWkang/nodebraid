@@ -1,6 +1,7 @@
 import { edgeId, nodeId, type NodeId } from '@cflow/kernel';
 import { commandService, type CommandService } from '@cflow/plugin-command';
 import { kernelService, type KernelService } from '@cflow/plugin-kernel';
+import { rendererService } from '@cflow/plugin-renderer';
 import { sessionService, type SessionService } from '@cflow/plugin-session';
 import { createBasicCanvasPlugin } from '@cflow/preset-basic';
 import { createSvgRenderer } from '@cflow/renderer-svg';
@@ -11,6 +12,8 @@ export interface BasicCanvasSvgExample {
   readonly kernel: KernelService;
   readonly commands: CommandService;
   readonly session: SessionService;
+  getInputCount(): number;
+  getLastPointerId(): number | undefined;
   dispose(): Promise<void>;
 }
 
@@ -22,12 +25,24 @@ export async function createBasicCanvasSvgExample(target: SVGSVGElement): Promis
   let kernel: KernelService | undefined;
   let commands: CommandService | undefined;
   let session: SessionService | undefined;
+  let inputCount = 0;
+  let lastPointerId: number | undefined;
   const applicationPlugin = definePlugin({
-    requires: { kernel: kernelService, commands: commandService, session: sessionService },
+    requires: {
+      kernel: kernelService,
+      commands: commandService,
+      session: sessionService,
+      renderer: rendererService,
+    },
     setup(context) {
       kernel = context.services.kernel;
       commands = context.services.commands;
       session = context.services.session;
+      const stopInput = context.services.renderer.subscribeInput((input) => {
+        inputCount += 1;
+        if (input.type === 'pointer.down') lastPointerId = input.pointerId;
+      });
+      context.own(stopInput);
     },
   });
   const composition = host.install(basicCanvasPlugin, { target });
@@ -68,6 +83,8 @@ export async function createBasicCanvasSvgExample(target: SVGSVGElement): Promis
       kernel,
       commands,
       session,
+      getInputCount: () => inputCount,
+      getLastPointerId: () => lastPointerId,
       dispose: () => host.dispose(),
     });
   } catch (error) {

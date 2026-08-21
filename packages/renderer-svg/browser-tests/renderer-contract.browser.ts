@@ -69,6 +69,36 @@ try {
     targetReusable: true,
   });
 
+  await evaluateBrowserScenario('globalThis.__cflowBasicCanvasCompositionSetupCapture()');
+  await dispatchMouseDown(20, 30);
+  const captureBeforeDisposal = await evaluateBrowserScenario<
+    Readonly<{
+      inputCount: number;
+      pointerId: number | null;
+      captured: boolean;
+    }>
+  >('globalThis.__cflowBasicCanvasCompositionReadCapture()');
+  assert.ok(captureBeforeDisposal.inputCount > 0);
+  assert.notEqual(captureBeforeDisposal.pointerId, null);
+  assert.equal(captureBeforeDisposal.captured, true);
+  await assertBrowserScenario('globalThis.__cflowBasicCanvasCompositionDisposeCapture()', {
+    inputCount: captureBeforeDisposal.inputCount,
+    captureReleased: true,
+    projectionRemoved: true,
+  });
+  await dispatchMouseMove(40, 50);
+  await dispatchMouseUp(40, 50);
+  const captureAfterDisposal = await evaluateBrowserScenario<
+    Readonly<{
+      inputCount: number;
+      pointerId: number | null;
+      captured: boolean;
+    }>
+  >('globalThis.__cflowBasicCanvasCompositionReadCapture()');
+  assert.equal(captureAfterDisposal.inputCount, captureBeforeDisposal.inputCount);
+  assert.equal(captureAfterDisposal.captured, false);
+  await evaluateBrowserScenario('globalThis.__cflowBasicCanvasCompositionTeardownCapture()');
+
   await assertBrowserScenario('globalThis.__cflowRendererSvgTicket01()', {
     callerContentPreserved: true,
     targetChildOrder: ['defs', 'g'],

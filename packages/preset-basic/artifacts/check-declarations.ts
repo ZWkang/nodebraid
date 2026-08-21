@@ -7,7 +7,8 @@ import { collectDeclarations } from '../../../scripts/collect-declarations';
 
 const forbiddenImport = /(?:from\s+|import\()["'](?:@cflow\/(?:core|renderer-(?!api)[^"']+)|cordis|rxjs)["']/;
 const forbiddenCordisType = /\b(?:Context|CordisError|Effect|Fiber|FiberState)\b/;
-const forbiddenPlatformType = /\b(?:HTMLElement|SVGElement|CanvasRenderingContext2D|PointerEvent|KeyboardEvent)\b/;
+const forbiddenPlatformType =
+  /\b(?:HTMLElement|SVGElement|SVGSVGElement|CanvasRenderingContext2D|PointerEvent|KeyboardEvent|WheelEvent|FocusEvent)\b/;
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const indexDeclaration = await readFile(join(dist, 'index.d.ts'), 'utf8');
 

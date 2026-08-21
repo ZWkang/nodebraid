@@ -47,6 +47,8 @@ Composition 按 Kernel、Command、Session、Renderer、Interaction、History �
 
 Renderer Factory、Interaction config 与其他 child setup 失败保留原始错误身份。已有标准 Provider、第二份 preset 或同一 Host 内的第二个 Renderer 继续按现有 Service reservation 显式冲突，preset 不会跳过或替换。释放逆序进行并等待异步 Renderer dispose；多个清理失败通过 AggregateError 保留。
 
+Failed Composition Installation 不会自重试；恢复需要新 Installation。调用方仍应显式 dispose 失败父级，但 child 回滚完成后它不持有额外 preset reservation，因此不会阻止 replacement 进入同一 Host。
+
 ## 扩展方式
 
 应用通过 sibling Consumer Plugin 的静态 Required Service Binding 使用基础能力。Layout、Validation、领域规则和其他 Provider 也作为 sibling Plugin 安装。需要替换基础成员或单独控制生命周期时，应用应继续逐项组合，而不是从 preset 取得内部句柄。

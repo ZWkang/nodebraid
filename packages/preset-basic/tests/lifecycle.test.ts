@@ -6,24 +6,19 @@ import { commandService, type CommandService } from '@cflow/plugin-command';
 import { undoCommand } from '@cflow/plugin-history';
 import { moveNodesCommand } from '@cflow/plugin-interaction';
 import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
-import { sessionService, type SessionService, type SessionSnapshot } from '@cflow/plugin-session';
-import type {
-  CanvasRenderer,
-  HitResult,
-  RendererDocumentUpdate,
-  RendererInputListener,
-  ScreenPoint,
-} from '@cflow/renderer-api';
+import { sessionService, type SessionService } from '@cflow/plugin-session';
+import type { RendererInputListener } from '@cflow/renderer-api';
 import { createPluginHost, definePlugin, PluginHostError } from '@cflow/runtime-cordis';
 
 import { createBasicCanvasPlugin } from '../src';
+import { TestCanvasRenderer } from './test-renderer';
 
 test('existing standard Provider makes Basic Canvas Composition fail explicitly', async () => {
   const host = createPluginHost();
   const existingKernel = host.install(kernelPlugin);
   await existingKernel.whenActive();
   const composition = host.install(
-    createBasicCanvasPlugin((_config: Readonly<{ readonly targetId: string }>) => new LifecycleRenderer()),
+    createBasicCanvasPlugin((_config: Readonly<{ readonly targetId: string }>) => new TestCanvasRenderer()),
     { targetId: 'provider-conflict' },
   );
 
@@ -41,7 +36,9 @@ test('existing standard Provider makes Basic Canvas Composition fail explicitly'
 
 test('second Basic Canvas Composition conflicts without disturbing the active one', async () => {
   const host = createPluginHost();
-  const plugin = createBasicCanvasPlugin((_config: Readonly<{ readonly targetId: string }>) => new LifecycleRenderer());
+  const plugin = createBasicCanvasPlugin(
+    (_config: Readonly<{ readonly targetId: string }>) => new TestCanvasRenderer(),
+  );
   const first = host.install(plugin, { targetId: 'first-composition' });
   await first.whenActive();
   const second = host.install(plugin, { targetId: 'second-composition' });
@@ -56,9 +53,9 @@ test('second Basic Canvas Composition conflicts without disturbing the active on
 });
 
 test('separate Plugin Hosts own isolated Basic Canvas Runtime state', async () => {
-  const renderers: LifecycleRenderer[] = [];
+  const renderers: TestCanvasRenderer[] = [];
   const plugin = createBasicCanvasPlugin((_config: Readonly<{ readonly targetId: string }>) => {
-    const renderer = new LifecycleRenderer();
+    const renderer = new TestCanvasRenderer();
     renderers.push(renderer);
     return renderer;
   });
@@ -168,27 +165,7 @@ test('Composition cleanup attempts every Renderer resource and preserves all fai
   await host.dispose();
 });
 
-class LifecycleRenderer implements CanvasRenderer {
-  disposed = false;
-
-  updateDocument(_update: RendererDocumentUpdate): void {}
-  updateSession(_snapshot: SessionSnapshot): void {}
-  updateInteraction(_projection: InteractionProjection | null): void {}
-  subscribeInput(_listener: RendererInputListener): () => void {
-    return () => undefined;
-  }
-  hitTest(point: ScreenPoint): HitResult | null {
-    return { type: 'canvas', worldPoint: point };
-  }
-  capturePointer(_pointerId: number): void {}
-  releasePointer(_pointerId: number): void {}
-  focus(): void {}
-  async dispose(): Promise<void> {
-    this.disposed = true;
-  }
-}
-
-class DeferredDisposalRenderer extends LifecycleRenderer {
+class DeferredDisposalRenderer extends TestCanvasRenderer {
   readonly disposeStarted: Promise<void>;
   #startDisposal!: () => void;
   #finishDisposal!: () => void;
@@ -215,7 +192,7 @@ class DeferredDisposalRenderer extends LifecycleRenderer {
   }
 }
 
-class FailingCleanupRenderer extends LifecycleRenderer {
+class FailingCleanupRenderer extends TestCanvasRenderer {
   readonly projectionCleanupError = new Error('interaction projection cleanup failed');
   readonly inputCleanupError = new Error('renderer input cleanup failed');
   readonly rendererCleanupError = new Error('renderer dispose failed');

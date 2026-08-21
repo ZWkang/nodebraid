@@ -10,7 +10,7 @@ import { sessionPlugin, sessionService, type SessionService } from '@cflow/plugi
 import type { CanvasRenderer, RendererInput } from '@cflow/renderer-api';
 import { createPluginHost, definePlugin, type PluginInstallation } from '@cflow/runtime-cordis';
 
-import { createBasicCanvasSvgExample } from '../../../website/examples/basic-canvas-svg';
+import { createBasicCanvasSvgExample, type BasicCanvasSvgExample } from '../../../website/examples/basic-canvas-svg';
 import { createSvgRenderer, type SvgRendererConfig } from '../src';
 
 interface BasicCanvasCompositionResult {
@@ -22,6 +22,18 @@ interface BasicCanvasCompositionResult {
   readonly viewportTransform: string | null;
   readonly projectionRemoved: boolean;
   readonly targetReusable: boolean;
+}
+
+interface BasicCanvasCaptureResult {
+  readonly inputCount: number;
+  readonly pointerId: number | null;
+  readonly captured: boolean;
+}
+
+interface BasicCanvasCaptureDisposalResult {
+  readonly inputCount: number;
+  readonly captureReleased: boolean;
+  readonly projectionRemoved: boolean;
 }
 
 interface FirstNodeResult {
@@ -534,6 +546,10 @@ interface ResizeObserverMultipleErrorsResult {
 
 declare global {
   var __cflowBasicCanvasCompositionExample: () => Promise<BasicCanvasCompositionResult>;
+  var __cflowBasicCanvasCompositionSetupCapture: () => Promise<void>;
+  var __cflowBasicCanvasCompositionReadCapture: () => BasicCanvasCaptureResult;
+  var __cflowBasicCanvasCompositionDisposeCapture: () => Promise<BasicCanvasCaptureDisposalResult>;
+  var __cflowBasicCanvasCompositionTeardownCapture: () => void;
   var __cflowRendererSvgTicket01: () => Promise<FirstNodeResult>;
   var __cflowRendererSvgInteractionProjectionFirstNode: () => Promise<FirstInteractionProjectionResult>;
   var __cflowRendererSvgInteractionProjectionClear: () => Promise<InteractionProjectionClearResult>;
@@ -648,6 +664,9 @@ declare global {
   var __cflowRendererSvgReviewResizeObserverMultipleErrors: () => Promise<ResizeObserverMultipleErrorsResult>;
 }
 
+let basicCanvasCaptureExample: BasicCanvasSvgExample | undefined;
+let basicCanvasCaptureTarget: SVGSVGElement | undefined;
+
 globalThis.__cflowBasicCanvasCompositionExample = async (): Promise<BasicCanvasCompositionResult> => {
   const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   target.setAttribute('width', '400');
@@ -718,6 +737,51 @@ globalThis.__cflowBasicCanvasCompositionExample = async (): Promise<BasicCanvasC
     projectionRemoved,
     targetReusable,
   };
+};
+
+globalThis.__cflowBasicCanvasCompositionSetupCapture = async (): Promise<void> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.id = 'basic-canvas-composition-capture-target';
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  target.style.position = 'fixed';
+  target.style.left = '0';
+  target.style.top = '0';
+  target.style.zIndex = '2000';
+  document.body.append(target);
+  basicCanvasCaptureTarget = target;
+  basicCanvasCaptureExample = await createBasicCanvasSvgExample(target);
+};
+
+globalThis.__cflowBasicCanvasCompositionReadCapture = (): BasicCanvasCaptureResult => {
+  const example = basicCanvasCaptureExample;
+  const target = basicCanvasCaptureTarget;
+  if (!example || !target) throw new Error('Expected the Basic Canvas Capture example.');
+  const pointerId = example.getLastPointerId();
+  return {
+    inputCount: example.getInputCount(),
+    pointerId: pointerId ?? null,
+    captured: pointerId !== undefined && target.hasPointerCapture(pointerId),
+  };
+};
+
+globalThis.__cflowBasicCanvasCompositionDisposeCapture = async (): Promise<BasicCanvasCaptureDisposalResult> => {
+  const example = basicCanvasCaptureExample;
+  const target = basicCanvasCaptureTarget;
+  if (!example || !target) throw new Error('Expected the Basic Canvas Capture example.');
+  const pointerId = example.getLastPointerId();
+  await example.dispose();
+  return {
+    inputCount: example.getInputCount(),
+    captureReleased: pointerId === undefined || !target.hasPointerCapture(pointerId),
+    projectionRemoved: target.querySelector('[data-cflow-renderer-svg-root]') === null,
+  };
+};
+
+globalThis.__cflowBasicCanvasCompositionTeardownCapture = (): void => {
+  basicCanvasCaptureTarget?.remove();
+  basicCanvasCaptureTarget = undefined;
+  basicCanvasCaptureExample = undefined;
 };
 
 globalThis.__cflowRendererSvgTicket01 = async (): Promise<FirstNodeResult> => {
