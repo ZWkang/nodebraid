@@ -1,1 +1,1 @@
-export { createBasicCanvasPlugin } from './preset-basic-plugin';
+export { createBasicCanvasPlugin, type BasicCanvasPluginOptions } from './preset-basic-plugin';
