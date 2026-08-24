@@ -20,6 +20,111 @@ import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
 
 import { interactionPlugin, moveNodesCommand } from '../src';
 
+test('Connection materializer failure keeps identity and reports exactly once after terminal cleanup', async () => {
+  const faults: DiagnosticFault[] = [];
+  const recording = new CleanupFailureRenderer();
+  recording.connectionMode = true;
+  const materializerError = new Error('injected Connection materializer failure');
+  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => recording)),
+    host.install(interactionPlugin, {
+      connection: {
+        materializeEdge() {
+          throw materializerError;
+        },
+      },
+    }),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+
+  recording.emit(pointerInput('pointer.down', 0));
+  recording.emit(pointerInput('pointer.up', 10));
+  await nextTask();
+
+  expect(recording.projectionClearCount).toBe(1);
+  expect(recording.releasePointerCount).toBe(1);
+  expect(faults).toHaveLength(1);
+  expect(faults[0]?.event.name).toBe('cflow.plugin.interaction.connection-materializer.fault');
+  expect(faults[0]?.error).toBe(materializerError);
+  await host.dispose();
+});
+
+test('Connection dependency recovery creates a fresh idle Activation', async () => {
+  const first = new LifecycleRenderer();
+  const second = new LifecycleRenderer();
+  first.connectionMode = true;
+  second.connectionMode = true;
+  const host = createPluginHost();
+  const rendererInstallation = host.install(createRendererPlugin(() => first));
+  const interaction = host.install(interactionPlugin, {
+    connection: {
+      materializeEdge({ source, target }) {
+        return { id: 'connection' as never, type: 'flow', source, target, data: null };
+      },
+    },
+  });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    rendererInstallation,
+    interaction,
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  first.emit(pointerInput('pointer.down', 0));
+  expect(first.interactions.at(-1)?.type).toBe('connection-preview');
+
+  await rendererInstallation.dispose();
+  expect(interaction.getSnapshot().status).toBe('pending');
+  expect(first.interactions.at(-1)).toBeNull();
+  const replacement = host.install(createRendererPlugin(() => second));
+  await Promise.all([replacement.whenActive(), interaction.whenActive()]);
+  expect(second.interactions).toEqual([]);
+  second.emit(pointerInput('pointer.down', 0));
+  expect(second.interactions.at(-1)?.type).toBe('connection-preview');
+  await host.dispose();
+});
+
+test('Connection final Hit Test failure still clears Preview and releases Capture', async () => {
+  const faults: DiagnosticFault[] = [];
+  const recording = new CleanupFailureRenderer();
+  recording.connectionMode = true;
+  const hitError = new Error('injected final Connection Hit Test failure');
+  let materialized = 0;
+  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => recording)),
+    host.install(interactionPlugin, {
+      connection: {
+        materializeEdge({ source, target }) {
+          materialized += 1;
+          return { id: 'never' as never, type: 'flow', source, target, data: null };
+        },
+      },
+    }),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+
+  recording.emit(pointerInput('pointer.down', 0));
+  recording.hitTestError = hitError;
+  recording.emit(pointerInput('pointer.up', 10));
+
+  expect(recording.projectionClearCount).toBe(1);
+  expect(recording.releasePointerCount).toBe(1);
+  expect(materialized).toBe(0);
+  expect(faults).toHaveLength(1);
+  expect(faults[0]?.error).toBe(hitError);
+  recording.hitTestError = undefined;
+  await host.dispose();
+});
+
 test('Connection Escape attempts every terminal cleanup and never materializes after cleanup failure', async () => {
   const faults: DiagnosticFault[] = [];
   const recording = new CleanupFailureRenderer();
@@ -299,11 +404,16 @@ class CleanupFailureRenderer implements CanvasRenderer {
   readonly #listeners = new Set<RendererInputListener>();
   failCleanup = false;
   connectionMode = false;
+  hitTestError: unknown;
+  projectionClearCount = 0;
+  releasePointerCount = 0;
 
   updateDocument(_update: RendererDocumentUpdate): void {}
   updateSession(_snapshot: SessionSnapshot): void {}
   updateInteraction(projection: InteractionProjection | null): void {
-    if (projection !== null || !this.failCleanup) return;
+    if (projection !== null) return;
+    this.projectionClearCount += 1;
+    if (!this.failCleanup) return;
     this.cleanupCalls.push('clear-projection');
     throw this.clearProjectionError;
   }
@@ -318,6 +428,7 @@ class CleanupFailureRenderer implements CanvasRenderer {
     };
   }
   hitTest(point: ScreenPoint): HitResult {
+    if (point.x !== 0 && this.hitTestError !== undefined) throw this.hitTestError;
     if (this.connectionMode) {
       return {
         type: 'connection-anchor',
@@ -330,6 +441,7 @@ class CleanupFailureRenderer implements CanvasRenderer {
   }
   capturePointer(_pointerId: number): void {}
   releasePointer(pointerId: number): void {
+    this.releasePointerCount += 1;
     if (!this.failCleanup) return;
     this.cleanupCalls.push(`release:${pointerId}`);
     throw this.releasePointerError;
@@ -349,6 +461,7 @@ class LifecycleRenderer implements CanvasRenderer {
   readonly interactions: Array<InteractionProjection | null> = [];
   readonly #listeners = new Set<RendererInputListener>();
   rejectNextCommitWith: unknown;
+  connectionMode = false;
 
   updateDocument(update: RendererDocumentUpdate): void {
     if (update.type !== 'commit' || this.rejectNextCommitWith === undefined) return;
@@ -364,7 +477,15 @@ class LifecycleRenderer implements CanvasRenderer {
     this.#listeners.add(listener);
     return () => this.#listeners.delete(listener);
   }
-  hitTest(_point: ScreenPoint): HitResult {
+  hitTest(point: ScreenPoint): HitResult {
+    if (this.connectionMode) {
+      return {
+        type: 'connection-anchor',
+        nodeId: nodeId(point.x === 0 ? 'source' : 'target'),
+        role: point.x === 0 ? 'source' : 'target',
+        worldPoint: point,
+      };
+    }
     return { type: 'node', nodeId: nodeId('recovered-interaction-node'), worldPoint: { x: 0, y: 0 } };
   }
   capturePointer(pointerId: number): void {

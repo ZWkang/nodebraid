@@ -469,7 +469,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         assertInteractionProjectionBaseline(projection, baselineSnapshot, acceptedSession);
       }
       const accepted = projection === null ? null : cloneInteractionProjection(projection);
-      const journal = new DomMutationJournal(edgesLayer, nodesLayer);
+      const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
       try {
         if (acceptedInteraction?.type === 'node-drag') {
           applyNodeDragProjection(
@@ -488,7 +488,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
           );
         } else if (acceptedInteraction?.type === 'viewport-pan') {
           applySession(acceptedSession, journal);
-        } else if (acceptedInteraction?.type === 'connection-preview') {
+        } else if (acceptedInteraction?.type === 'connection-preview' && accepted?.type !== 'connection-preview') {
           clearConnectionPreview(interactionLayer);
         }
         if (accepted?.type === 'viewport-pan') {

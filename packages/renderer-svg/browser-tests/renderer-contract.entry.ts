@@ -1,5 +1,5 @@
 // Public-seam browser scenarios for the complete SVG Renderer contract.
-import { createCanvasKernel, edgeId, nodeId } from '@cflow/kernel';
+import { createCanvasKernel, edgeId, nodeId, type EdgeEndpoint } from '@cflow/kernel';
 import type { DiagnosticEvent, DiagnosticFault } from '@cflow/diagnostics';
 import { interactionPlugin, moveNodesCommand } from '@cflow/plugin-interaction';
 import { commandPlugin, commandService, type CommandService } from '@cflow/plugin-command';
@@ -69,6 +69,15 @@ interface ConnectionAnchorResult {
     cy: string | null;
   }>[];
   readonly sourceHit: unknown;
+}
+
+interface ConnectionProjectionRollbackResult {
+  readonly sameErrorIdentity: boolean;
+  readonly receivedName: string | null;
+  readonly receivedMessage: string | null;
+  readonly aggregateErrorCount: number;
+  readonly x2: string | null;
+  readonly y2: string | null;
 }
 
 interface FirstInteractionProjectionResult {
@@ -585,6 +594,7 @@ declare global {
   var __cflowBasicCanvasCompositionIsolation: () => Promise<BasicCanvasIsolationResult>;
   var __cflowRendererSvgTicket01: () => Promise<FirstNodeResult>;
   var __cflowRendererSvgConnectionAnchors: () => Promise<ConnectionAnchorResult>;
+  var __cflowRendererSvgConnectionProjectionRollback: () => Promise<ConnectionProjectionRollbackResult>;
   var __cflowRendererSvgInteractionProjectionFirstNode: () => Promise<FirstInteractionProjectionResult>;
   var __cflowRendererSvgInteractionProjectionClear: () => Promise<InteractionProjectionClearResult>;
   var __cflowRendererSvgInteractionProjectionReplacement: () => Promise<InteractionProjectionReplacementResult>;
@@ -622,8 +632,10 @@ declare global {
   }>[];
   var __cflowRendererSvgMoveNodeDragExternally: () => void;
   var __cflowRendererSvgTeardownNodeDragInteraction: () => Promise<void>;
-  var __cflowRendererSvgSetupConnectionInteraction: () => Promise<void>;
+  var __cflowRendererSvgSetupConnectionInteraction: (enabled?: boolean) => Promise<void>;
   var __cflowRendererSvgReadConnectionInteraction: () => ConnectionInteractionResult;
+  var __cflowRendererSvgReadConnectionSelection: () => readonly string[];
+  var __cflowRendererSvgReadConnectionViewport: () => Readonly<{ x: number; y: number; zoom: number }>;
   var __cflowRendererSvgUndoConnectionInteraction: () => Promise<void>;
   var __cflowRendererSvgRedoConnectionInteraction: () => Promise<void>;
   var __cflowRendererSvgDeleteConnectionSource: () => void;
@@ -940,6 +952,67 @@ globalThis.__cflowRendererSvgConnectionAnchors = async (): Promise<ConnectionAnc
     layerClasses: root ? Array.from(root.children, (child) => child.getAttribute('class')) : [],
     anchors,
     sourceHit: renderer.hitTest({ x: 100, y: 50 }),
+  };
+  await renderer.dispose();
+  target.remove();
+  return result;
+};
+
+globalThis.__cflowRendererSvgConnectionProjectionRollback = async (): Promise<ConnectionProjectionRollbackResult> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  document.body.append(target);
+  const renderer = createSvgRenderer({ target });
+  const kernel = createCanvasKernel();
+  const sourceNodeId = nodeId('rollback-source');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({
+      id: sourceNodeId,
+      type: 'task',
+      position: { x: 40, y: 100 },
+      size: { width: 80, height: 40 },
+      data: null,
+    });
+  });
+  renderer.updateDocument({ type: 'reset', view: kernel.read() });
+  renderer.updateSession({ selection: { nodeIds: [], edgeIds: [] }, viewport: { x: 0, y: 0, zoom: 1 } });
+  renderer.updateInteraction({
+    type: 'connection-preview',
+    source: { nodeId: sourceNodeId, role: 'source' },
+    pointerWorldPoint: { x: 150, y: 140 },
+    target: { type: 'none' },
+  });
+  const preview = target.querySelector<SVGLineElement>('[data-cflow-connection-preview]');
+  if (!preview) throw new Error('Expected Connection Preview before rollback injection.');
+  const injected = new Error('injected Connection Preview update failure');
+  const originalSetAttribute = preview.setAttribute.bind(preview);
+  let rejectNextY2 = true;
+  preview.setAttribute = (name: string, value: string): void => {
+    if (name === 'y2' && rejectNextY2) {
+      rejectNextY2 = false;
+      throw injected;
+    }
+    originalSetAttribute(name, value);
+  };
+  let received: unknown;
+  try {
+    renderer.updateInteraction({
+      type: 'connection-preview',
+      source: { nodeId: sourceNodeId, role: 'source' },
+      pointerWorldPoint: { x: 180, y: 170 },
+      target: { type: 'none' },
+    });
+  } catch (error) {
+    received = error;
+  }
+  const result = {
+    sameErrorIdentity: received === injected,
+    receivedName: received instanceof Error ? received.name : null,
+    receivedMessage: received instanceof Error ? received.message : null,
+    aggregateErrorCount: received instanceof AggregateError ? received.errors.length : 0,
+    x2: preview.getAttribute('x2'),
+    y2: preview.getAttribute('y2'),
   };
   await renderer.dispose();
   target.remove();
@@ -3397,6 +3470,7 @@ let connectionInteractionHost: ReturnType<typeof createPluginHost> | undefined;
 let connectionInteractionTarget: SVGSVGElement | undefined;
 let connectionInteractionKernel: KernelService | undefined;
 let connectionInteractionCommands: CommandService | undefined;
+let connectionInteractionSession: SessionService | undefined;
 let viewportPanInteractionHost: ReturnType<typeof createPluginHost> | undefined;
 let viewportPanInteractionTarget: SVGSVGElement | undefined;
 let viewportPanInteractionSession: SessionService | undefined;
@@ -3580,7 +3654,7 @@ globalThis.__cflowRendererSvgSetupNodeDragInteraction = async (): Promise<void> 
   nodeDragInteractionSession = session;
 };
 
-globalThis.__cflowRendererSvgSetupConnectionInteraction = async (): Promise<void> => {
+globalThis.__cflowRendererSvgSetupConnectionInteraction = async (enabled = true): Promise<void> => {
   const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   target.id = 'connection-interaction-target';
   target.setAttribute('width', '400');
@@ -3593,30 +3667,35 @@ globalThis.__cflowRendererSvgSetupConnectionInteraction = async (): Promise<void
   const host = createPluginHost();
   let kernel: KernelService | undefined;
   let commands: CommandService | undefined;
+  let session: SessionService | undefined;
   const consumer = definePlugin({
-    requires: { kernel: kernelService, commands: commandService },
+    requires: { kernel: kernelService, commands: commandService, session: sessionService },
     setup(context) {
       kernel = context.services.kernel;
       commands = context.services.commands;
+      session = context.services.session;
     },
   });
+  const interactionConfig = enabled
+    ? {
+        connection: {
+          materializeEdge({ source, target: targetEndpoint }: { source: EdgeEndpoint; target: EdgeEndpoint }) {
+            return { id: edgeId('connected-edge'), type: 'flow', source, target: targetEndpoint, data: null };
+          },
+        },
+      }
+    : undefined;
   const installations = [
     host.install(kernelPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(createSvgRenderer), { target }),
-    host.install(interactionPlugin, {
-      connection: {
-        materializeEdge({ source, target: targetEndpoint }) {
-          return { id: edgeId('connected-edge'), type: 'flow', source, target: targetEndpoint, data: null };
-        },
-      },
-    }),
+    host.install(interactionPlugin, interactionConfig),
     host.install(historyPlugin),
     host.install(consumer),
   ];
   await Promise.all(installations.map((installation) => installation.whenActive()));
-  if (!kernel || !commands) throw new Error('Expected Connection Runtime Services.');
+  if (!kernel || !commands || !session) throw new Error('Expected Connection Runtime Services.');
   kernel.transact((transaction) => {
     transaction.nodes.add({
       id: nodeId('connection-source'),
@@ -3637,6 +3716,17 @@ globalThis.__cflowRendererSvgSetupConnectionInteraction = async (): Promise<void
   connectionInteractionTarget = target;
   connectionInteractionKernel = kernel;
   connectionInteractionCommands = commands;
+  connectionInteractionSession = session;
+};
+
+globalThis.__cflowRendererSvgReadConnectionSelection = (): readonly string[] => {
+  if (!connectionInteractionSession) throw new Error('Expected Connection Session.');
+  return connectionInteractionSession.getSnapshot().selection.nodeIds;
+};
+
+globalThis.__cflowRendererSvgReadConnectionViewport = () => {
+  if (!connectionInteractionSession) throw new Error('Expected Connection Session.');
+  return connectionInteractionSession.getSnapshot().viewport;
 };
 
 globalThis.__cflowRendererSvgReadConnectionInteraction = (): ConnectionInteractionResult => {
@@ -3684,6 +3774,7 @@ globalThis.__cflowRendererSvgTeardownConnectionInteraction = async (): Promise<v
   connectionInteractionHost = undefined;
   connectionInteractionKernel = undefined;
   connectionInteractionCommands = undefined;
+  connectionInteractionSession = undefined;
   connectionInteractionTarget?.remove();
   connectionInteractionTarget = undefined;
 };

@@ -405,19 +405,22 @@ export function activateInteractionRuntime(
     }
     if (input.type === 'pointer.up' && gesture && input.pointerId === gesture.pointerId) {
       if (gesture.type === 'connection') {
-        updateConnectionGesture(gesture, input.worldPoint, renderer.hitTest(input.screenPoint));
         activeGesture = undefined;
-        const cleanupErrors: unknown[] = [];
+        const terminalErrors: unknown[] = [];
+        try {
+          updateConnectionGesture(gesture, input.worldPoint, renderer.hitTest(input.screenPoint));
+        } catch (error) {
+          terminalErrors.push(error);
+        }
         for (const cleanup of [() => projection.update(null), () => renderer.releasePointer(gesture.pointerId)]) {
           try {
             cleanup();
           } catch (error) {
-            cleanupErrors.push(error);
+            terminalErrors.push(error);
           }
         }
-        if (cleanupErrors.length > 0) {
-          throw new AggregateError(cleanupErrors, 'Connection Gesture terminal cleanup failed.');
-        }
+        if (terminalErrors.length === 1) throw terminalErrors[0];
+        if (terminalErrors.length > 1) throw new AggregateError(terminalErrors, 'Connection Gesture terminal failed.');
         if (gesture.target.type === 'valid' && config.connection) {
           executeCreateEdge(commands, context.diagnostics, config.connection.materializeEdge, gesture, () => closing);
         } else {
@@ -436,7 +439,7 @@ export function activateInteractionRuntime(
         gesture.completeClick?.();
       }
     } else if (input.type === 'pointer.cancel' && gesture && input.pointerId === gesture.pointerId) {
-      cancelGesture(gesture, 'pointer-cancel', false);
+      cancelGesture(gesture, 'pointer-cancel', true);
     }
   });
 }

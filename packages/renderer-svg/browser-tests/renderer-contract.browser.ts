@@ -134,6 +134,14 @@ try {
       worldPoint: { x: 100, y: 50 },
     },
   });
+  await assertBrowserScenario('globalThis.__cflowRendererSvgConnectionProjectionRollback()', {
+    sameErrorIdentity: true,
+    receivedName: 'Error',
+    receivedMessage: 'injected Connection Preview update failure',
+    aggregateErrorCount: 0,
+    x2: '150',
+    y2: '140',
+  });
 
   await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionFirstNode()', {
     previewPosition: { x: '80', y: '90' },
@@ -492,6 +500,53 @@ try {
   await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
     revision: 4,
     edgeIds: ['connected-edge'],
+    preview: null,
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction(false)');
+  await dispatchMouseDown(120, 120);
+  await dispatchMouseUp(120, 120);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionSelection()', ['connection-source']);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await dispatchConnectionKey('keydown', ' ', 'Space');
+  await dispatchMouseDown(120, 120);
+  await dispatchMouseMove(180, 160);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
+    preview: null,
+  });
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionViewport()', { x: 0, y: 0, zoom: 1 });
+  await dispatchMouseUp(180, 160);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionViewport()', { x: 60, y: 40, zoom: 1 });
+  await dispatchConnectionKey('keyup', ' ', 'Space');
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await dispatchConnectionPointer('pointerdown', 77, 'pen', 120, 120);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
+    preview: null,
+  });
+  await dispatchConnectionPointer('pointerup', 77, 'pen', 120, 120);
+  await dispatchMouseDown(120, 120);
+  await dispatchMouseMove(180, 160);
+  await dispatchConnectionPointer('pointercancel', 1, 'mouse', 180, 160);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
+    preview: null,
+  });
+  await dispatchMouseDown(120, 120);
+  await dispatchMouseMove(180, 160);
+  await dispatchConnectionLostCapture(1, 180, 160);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
     preview: null,
   });
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
@@ -1603,6 +1658,30 @@ async function dispatchConnectionEscape(): Promise<void> {
   await evaluateBrowserScenario(
     `document.querySelector('#connection-interaction-target').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }))`,
   );
+}
+
+async function dispatchConnectionKey(type: 'keydown' | 'keyup', key: string, code: string): Promise<void> {
+  await evaluateBrowserScenario(
+    `(() => { const target = document.querySelector('#connection-interaction-target'); target.focus(); return target.dispatchEvent(new KeyboardEvent('${type}', { key: '${key}', code: '${code}', bubbles: true })); })()`,
+  );
+}
+
+async function dispatchConnectionPointer(
+  type: 'pointerdown' | 'pointerup' | 'pointercancel',
+  pointerId: number,
+  pointerType: 'mouse' | 'pen',
+  x: number,
+  y: number,
+): Promise<void> {
+  await evaluateBrowserScenario(`document.querySelector('#connection-interaction-target').dispatchEvent(new PointerEvent('${type}', {
+    pointerId: ${pointerId}, pointerType: '${pointerType}', clientX: ${x}, clientY: ${y}, button: 0, buttons: ${type === 'pointerup' ? 0 : 1}, bubbles: true
+  }))`);
+}
+
+async function dispatchConnectionLostCapture(pointerId: number, x: number, y: number): Promise<void> {
+  await evaluateBrowserScenario(`document.querySelector('#connection-interaction-target').dispatchEvent(new PointerEvent('lostpointercapture', {
+    pointerId: ${pointerId}, pointerType: 'mouse', clientX: ${x}, clientY: ${y}, bubbles: true
+  }))`);
 }
 
 async function dispatchMiddleDown(x: number, y: number): Promise<void> {
