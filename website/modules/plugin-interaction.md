@@ -1,6 +1,6 @@
 ---
 title: '@cflow/plugin-interaction'
-description: 把 Renderer Input 解释为 Selection、Drag、Pan 与 Wheel Zoom 的 Runtime Plugin。
+description: 把 Renderer Input 解释为 Selection、Drag、Pan、Wheel Zoom 与 Edge Connection 的 Runtime Plugin。
 ---
 
 # `@cflow/plugin-interaction`
@@ -16,12 +16,13 @@ Renderer 只发布输入事实和 Hit Result，不应决定产品行为。该 Pl
 ## 提供的能力
 
 - `interactionPlugin`：无 Runtime Service 的 Feature Plugin；
-- `InteractionConfig`：`dragThreshold`、`wheelZoomSensitivity`、`minZoom`、`maxZoom`；
+- `InteractionConfig`：Drag/Zoom 策略与可选同步 Connection materializer；
 - `moveNodesCommand`：ID 为 `interaction.nodes.move`，一次同步 Transaction 更新全部目标 Node；
-- `InteractionError`：`INVALID_CONFIG`、`INVALID_MOVE`、`STALE_GESTURE`；
+- `createEdgeCommand`：ID 为 `interaction.edge.create`，一次同步 Transaction 创建完整 Edge；
+- `InteractionError`：`INVALID_CONFIG`、`INVALID_MOVE`、`INVALID_CONNECTION`、`STALE_GESTURE`；
 - `interactionDiagnosticEvents`：Pointer/Input rejection、Gesture cancellation 与 Command fault。
 
-首版行为包括普通/加法 Node、Edge、Canvas Selection，Port 到所属 Node 的选择映射，多 Node Drag Preview，Canvas/middle/Space Pan，以及按 Screen Point 锚定的 Wheel Zoom。
+当前行为还包括 mouse-only Node-level Edge Connection：Renderer 提供 source/target Anchor，应用 materializer 拥有 Edge ID/type/data，Interaction 只在 pointerup 提交一次 typed Command。
 
 ## 依赖与写入方向
 
@@ -41,4 +42,4 @@ Pointermove 只替换 Interaction Projection。pointerup 先清 Preview 并回�
 
 ## 非目标与验证
 
-首版不包含 box selection、edge connect、delete、snapping、pinch/touch tool、HTML overlay、文本编辑、协作 presence、产品 UI 或通用 Tool Registry。成功行为由真实 Chromium 中的完整 Runtime + SVG seam 验证；Bun 测试覆盖配置、命令、诊断、恢复和 cleanup failure。
+当前不包含 Port-aware Connection、self-loop、业务 validation、box selection、delete、snapping、pinch/touch tool、HTML overlay、文本编辑、协作 presence、产品 UI 或通用 Tool Registry。成功行为由真实 Chromium 中的完整 Runtime + SVG seam 验证。

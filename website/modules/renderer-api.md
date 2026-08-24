@@ -31,7 +31,7 @@ description: CFlow-owned、backend-neutral 的 Renderer Provider contract。
 - `RendererDocumentUpdate`：`reset` 完整建立 Baseline，`commit` 交付一个完整 Canvas Commit；
 - `RendererInput`：Pointer、Wheel、Keyboard 与 Focus discriminated union；
 - `ScreenPoint`、`InputModifiers`、`PointerButton` 与 `PointerType`；
-- `HitResult`：Canvas、Node、Edge 或 Port 语义目标与 World Point；
+- `HitResult`：Canvas、Node、Edge、Port 或 node-level Connection Anchor 语义目标与 World Point；
 - `RendererError`：Provider contract failure 的稳定错误身份。
 
 Document update 调用返回时，Renderer 的逻辑状态必须已经接受更新，使后续 Hit Test 能观察新状态；实际像素绘制仍可由 Provider 批处理。

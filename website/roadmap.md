@@ -17,7 +17,7 @@ SVG Renderer Provider 已经通过真实 Target、Document/Session 同步、输�
 
 ## Interaction 扩展与框架接入
 
-Interaction v0 已经在标准化 Renderer Input 之上交付选择、多 Node 拖动、Pan 与 Wheel Zoom，并通过 Command/Session/Kernel 的既有写入边界工作。后续仍可独立设计 box selection、edge connect、snapping、pinch/touch、文本编辑或可扩展 Tool Registry。React、Vue 或其他 framework adapter 应保持在 Runtime 与 UI 框架之间，不取得第二份 Document authority。
+Interaction v1 已经在标准化 Renderer Input 之上交付选择、多 Node 拖动、Pan、Wheel Zoom 与 node-level Edge Connection，并通过 Command/Session/Kernel 的既有写入边界工作。后续仍可独立设计 Port-aware Connection、box selection、snapping、pinch/touch、文本编辑或可扩展 Tool Registry。React、Vue 或其他 framework adapter 应保持在 Runtime 与 UI 框架之间，不取得第二份 Document authority。
 
 ## Composition 与示例
 

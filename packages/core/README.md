@@ -61,9 +61,9 @@ to Interaction Plugins. Core does not select or re-export concrete Renderer
 Providers.
 
 `interactionPlugin` interprets normalized Renderer Input as Selection,
-Node Drag, Pan, and Wheel Zoom. It keeps transient Preview in an exclusive
+Node Drag, Pan, Wheel Zoom, and optional Node-level Edge Connection. It keeps transient Preview in an exclusive
 Interaction Projection Binding, writes stable Session state through
-`SessionService`, and commits final Node positions through `moveNodesCommand`.
+`SessionService`, and commits final Node positions or materialized Edges through typed Commands.
 
 `historyPlugin` requires Kernel Service and Command Service, records post-Baseline
 Recordable Commits, and provides a stable `HistoryService` Snapshot. Callers

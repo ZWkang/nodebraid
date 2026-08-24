@@ -17,7 +17,7 @@ The SVG Renderer Provider has now proven a real Target, Document/Session synchro
 
 ## Interaction extensions and framework integration
 
-Interaction v0 now interprets selection, multi-Node dragging, Pan, and Wheel Zoom on top of standardized Renderer Input while using the existing Command/Session/Kernel write boundaries. Box selection, edge connection, snapping, pinch/touch, text editing, and an extensible Tool Registry remain separate future designs. React, Vue, or other framework adapters should remain between the Runtime and UI framework without acquiring a second source of Document authority.
+Interaction v1 now interprets selection, multi-Node dragging, Pan, Wheel Zoom, and node-level Edge Connection on top of standardized Renderer Input while using the existing Command/Session/Kernel write boundaries. Port-aware Connection, box selection, snapping, pinch/touch, text editing, and an extensible Tool Registry remain separate future designs. React, Vue, or other framework adapters should remain between the Runtime and UI framework without acquiring a second source of Document authority.
 
 ## Composition and examples
 

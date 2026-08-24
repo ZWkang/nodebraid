@@ -38,4 +38,4 @@ The package depends only on Node identity and Point from `@cflow/kernel` and Vie
 
 ## Limits and verification
 
-The first version includes only Node Drag and Viewport Pan. It has no hover, box selection, edge connection, snapping, Tool Registry, or backend handle. Type and declaration checks reject Runtime, Renderer, DOM, and concrete Provider leakage; Renderer and SVG tests verify Provider acceptance and copying rules.
+The current contract includes Node Drag, Viewport Pan, and node-level Connection Preview values. It has no Port Registry, hover, box selection, snapping, Tool Registry, or backend handle. Type and declaration checks reject Runtime, Renderer, DOM, and concrete Provider leakage.

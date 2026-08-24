@@ -1,6 +1,6 @@
 ---
 title: Interaction
-description: Interpret Renderer Input and Hit Results as Selection, Drag, Pan, and Zoom while preserving stable write boundaries.
+description: Interpret Renderer Input and Hit Results as Selection, Drag, Pan, Zoom, and Edge Connection while preserving stable write boundaries.
 ---
 
 # Interaction
@@ -11,8 +11,8 @@ The Interaction capability answers how user input becomes semantic canvas behavi
 
 | Layer              | Package                                                       | Responsibility                                                        |
 | ------------------ | ------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Value contract     | [`@cflow/interaction-api`](/en/modules/interaction-api)       | Immutable Node Drag and Viewport Pan Projections                      |
-| Runtime behavior   | [`@cflow/plugin-interaction`](/en/modules/plugin-interaction) | Selection, multi-Node Drag, Pan, Wheel Zoom, and lifecycle            |
+| Value contract     | [`@cflow/interaction-api`](/en/modules/interaction-api)       | Immutable Node Drag, Viewport Pan, and Connection Preview Projections |
+| Runtime behavior   | [`@cflow/plugin-interaction`](/en/modules/plugin-interaction) | Selection, Drag, Pan, Zoom, node-level Connection, and lifecycle      |
 | Projection adapter | [`@cflow/plugin-renderer`](/en/modules/plugin-renderer)       | Exclusive Interaction Projection Binding and Renderer synchronization |
 | Reference backend  | [`@cflow/renderer-svg`](/en/modules/renderer-svg)             | Preview on real SVG geometry with aligned Hit/Input coordinates       |
 
@@ -30,13 +30,14 @@ Interaction Runtime
 
 - Pointer move updates only the Projection; it does not continuously write Kernel or Session.
 - Node Drag executes `interaction.nodes.move` once on pointerup. One Transaction naturally creates at most one History Entry.
+- Mouse Connection uses Renderer-owned Node-level Anchors, an application Edge materializer, and one `interaction.edge.create` Transaction.
 - Primary Canvas, middle button, or Space+primary can establish Pan. Wheel Zoom is anchored to a Screen Point and bounded by explicit configuration.
 - One Activation owns one Gesture Pointer. Additional Pointers, Wheel during a Gesture, pointer cancellation, lost capture, and stale evidence all have explicit semantics and diagnostics.
 - Dependency loss or Plugin unload stops input, clears Preview, releases Capture, clears local state, and unregisters the Command. Recovery creates a fresh idle Activation.
 
 ## Non-goals
 
-The first version does not include box selection, edge connection, a delete shortcut, snapping, pinch/touch tools, HTML overlays, text editing, collaboration presence, product UI, or a generic Tool Registry. The SVG Provider also does not interpret product Node types or data.
+The first Connection version excludes Ports, self-loops, business validation, and Edge Routing. It also has no box selection, delete shortcut, snapping, pinch/touch tools, HTML overlays, text editing, collaboration presence, product UI, or generic Tool Registry.
 
 ## Verification
 

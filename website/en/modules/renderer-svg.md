@@ -29,7 +29,7 @@ If the product needs custom Node DOM, Ports, complex Edges, component mounting, 
 - A synchronous `createSvgRenderer(config)` Factory bound to one existing `SVGSVGElement`;
 - Generic rectangular Nodes, straight Edges, Selection markers, and Viewport projection;
 - A real-DOM bridge for Pointer, Wheel, Keyboard, Focus, and Pointer Capture;
-- Node Drag and Viewport Pan Interaction Projection overrides, baseline invalidation, and compatible-Commit reprojection;
+- Node Drag, Viewport Pan, and Connection Preview Projection plus Node-level source/target Anchor Hit Results;
 - CSS-screen-pixel to SVG-user-space conversion and semantic Hit Testing;
 - Stable classes, `data-cflow-*` attributes, canonical layer order, and keyed DOM identity;
 - Atomic Document/Session updates, continuous revision validation, rollback on failure, and reset recovery;

@@ -21,7 +21,7 @@ A Renderer publishes input facts and Hit Results; it should not decide product b
 - `InteractionError`: `INVALID_CONFIG`, `INVALID_MOVE`, and `STALE_GESTURE`;
 - `interactionDiagnosticEvents`: Pointer/Input rejection, Gesture cancellation, and Command fault events.
 
-The first version includes plain and additive Node, Edge, and Canvas Selection; Port-to-owning-Node selection mapping; multi-Node Drag Preview; Canvas/middle/Space Pan; and Screen-Point-anchored Wheel Zoom.
+The current version also includes optional mouse-only, Node-level Edge Connection. An application materializer owns Edge ID, type, and data; Interaction commits one typed Create Edge Command on pointerup.
 
 ## Dependencies and write direction
 
@@ -41,4 +41,4 @@ One Activation owns one Gesture Pointer. Additional Pointers and Wheel during a 
 
 ## Non-goals and verification
 
-The first version has no box selection, edge connection, delete behavior, snapping, pinch/touch tool, HTML overlay, text editing, collaboration presence, product UI, or generic Tool Registry. Successful behavior is verified through the complete Runtime + SVG seam in real Chromium; Bun tests cover configuration, Commands, diagnostics, recovery, and cleanup failures.
+The current version has no Port-aware Connection, self-loop, business validation, box selection, delete behavior, snapping, pinch/touch tool, HTML overlay, text editing, collaboration presence, product UI, or generic Tool Registry. Successful behavior is verified through the complete Runtime + SVG seam in real Chromium.

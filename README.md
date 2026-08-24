@@ -149,17 +149,19 @@ and is not re-exported as a default through `@cflow/core`.
 
 ## Interaction packages
 
-`@cflow/interaction-api` owns immutable, backend-neutral Node Drag and Viewport
-Pan Projection values. `@cflow/plugin-interaction` consumes normalized Renderer
-Input and Hit Results, implements selection, multi-Node Drag, Canvas/middle/
-Space Pan, and anchored Wheel Zoom, and exposes no state Service.
+`@cflow/interaction-api` owns immutable, backend-neutral Node Drag, Viewport Pan,
+and Connection Preview values. `@cflow/plugin-interaction` consumes normalized
+Renderer Input and Hit Results, implements selection, multi-Node Drag,
+Canvas/middle/Space Pan, anchored Wheel Zoom, and optional mouse-only Node-level
+Edge Connection, and exposes no state Service.
 
 Stable Selection and Viewport changes go through Session; final Node movement
-goes through the typed `interaction.nodes.move` Command and one Kernel
-Transaction. Pointer-move Preview remains in the exclusive Renderer Projection
-Binding. Cancellation, stale evidence, lost capture, dependency recovery, and
-cleanup are explicit and observable. Core re-exports both backend-neutral
-Interaction packages but still does not re-export the concrete SVG Provider.
+and Edge creation use typed Commands and one Kernel Transaction. Applications
+provide complete Edge ID/type/data through a synchronous Connection materializer.
+Pointer-move Preview remains in the exclusive Renderer Projection Binding.
+Cancellation, stale evidence, lost capture, dependency recovery, and cleanup are
+explicit and observable. Core re-exports both backend-neutral Interaction
+packages but still does not re-export the concrete SVG Provider.
 
 ## Command Runtime Plugin
 

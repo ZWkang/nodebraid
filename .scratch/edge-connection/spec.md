@@ -21,7 +21,7 @@ SVG Provider 新增 Anchor 语义 Hit Result、位于 Node layer 之上的 provi
 - Connection Anchor identity 是 `{ nodeId, role: 'source' | 'target' }`，不表达 Port。
 - `HitResult` 新增 `connection-anchor`，Anchor 命中优先于 Node body。
 - source Anchor 在 Node 右侧中点，target Anchor 在左侧中点。
-- 只有 width/height 都严格大于零的 Node 拥有 Anchor。
+- Anchor 只从 SVG 已接受的正尺寸 Node 派生；零尺寸 Node 继续按现有 SVG contract 显式拒绝。
 - SVG `connectionAnchorHitTolerance` 默认 `8 CSS px`，有限且非负，不随 zoom、DPR、viewBox 或 CSS transform 变化。
 - Renderer 始终派生 Anchor；未配置 materializer 时 Anchor 按所属 Node 执行 Selection。
 - `connection-preview` 完整替换值包含 source、Pointer World Point 和 `none | valid | invalid` target。

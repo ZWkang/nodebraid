@@ -29,7 +29,7 @@ description: 将 CFlow Canvas 语义投影到现有 SVG Target 的参考级 Rend
 - 同步 `createSvgRenderer(config)` Factory，一次绑定一个现有 `SVGSVGElement`；
 - 通用矩形 Node、直线 Edge、Selection 标记与 Viewport projection；
 - Pointer、Wheel、Keyboard、Focus 与 Pointer Capture 的真实 DOM bridge；
-- Node Drag 与 Viewport Pan Interaction Projection 覆盖、baseline 失效清理和 compatible Commit 重投影；
+- Node Drag、Viewport Pan 与 Connection Preview Projection，以及 node-level source/target Anchor Hit Result；
 - 从 CSS screen pixel 到 SVG user space 的坐标转换与语义 Hit Test；
 - 稳定 class、`data-cflow-*` 属性、canonical layer order 与 keyed DOM identity；
 - 原子 Document/Session 更新、连续 revision 校验、失败回滚与 reset 恢复；
@@ -61,6 +61,7 @@ if (!target) throw new Error('Missing SVG target.');
 const renderer = createSvgRenderer({
   target,
   edgeHitTolerance: 4,
+  connectionAnchorHitTolerance: 8,
   input: {
     wheel: { preventDefault: true },
   },
@@ -73,7 +74,7 @@ try {
 }
 ```
 
-Factory config 是不可变的 Provider-specific 值：`target` 必填；`edgeHitTolerance` 是非负 CSS pixel；`input` 分别控制 Pointer、Wheel、Keyboard 与 Context Menu 的 `preventDefault` / `stopPropagation` policy。
+Factory config 是不可变的 Provider-specific 值：`target` 必填；`edgeHitTolerance` 与 `connectionAnchorHitTolerance` 是非负 CSS pixel；`input` 分别控制 Pointer、Wheel、Keyboard 与 Context Menu policy。
 
 ## DOM 与样式 seam
 
@@ -86,6 +87,15 @@ Provider 写入 geometry、稳定 class 与 `data-cflow-*` 属性，但不注入
 }
 
 .cflow-renderer-svg__edge {
+  stroke: currentColor;
+}
+
+.cflow-renderer-svg__connection-anchor {
+  r: 4px;
+  fill: currentColor;
+}
+
+.cflow-renderer-svg__connection-preview {
   stroke: currentColor;
 }
 
@@ -112,7 +122,7 @@ Document revision、Session、Input subscriber、Pointer 与 disposed-state 失�
 ## 限制与非目标
 
 - 仅渲染显式 `Size` 的矩形 Node 与有效端点之间的直线 Edge；
-- 不支持 Port、自环、曲线、marker、label、富文本、动画或业务 Node 外观；
+- Connection Anchor 仅是 node-level 语义；不支持 Port、自环、曲线、marker、label、富文本、动画或业务 Node 外观；
 - 不提供默认主题、theme registry、组件插槽或 framework adapter；
 - 不解释 Interaction 行为，也不提供 Command、拖拽状态机、Selection 写入或持久化；它只显示已接受的语义 Projection；
 - 不创建 SVG Target，也不接管调用方已有的 Target 子节点；

@@ -15,10 +15,12 @@ description: Backend-neutral Interaction Projection 纯值契约。
 
 ## 提供的能力
 
-- `InteractionProjection`：`node-drag | viewport-pan` discriminated union；
+- `InteractionProjection`：`node-drag | viewport-pan | connection-preview` discriminated union；
 - `NodeDragInteractionProjection`：规范 Node ID、base position 与绝对 candidate position；
 - `ViewportPanInteractionProjection`：base Viewport 与绝对 candidate Viewport；
 - `NodeDragProjectionNode`：单个拖动 Node 的局部 evidence 与候选位置。
+- `ConnectionAnchorIdentity`：Node ID 与 source/target role 组成的 backend-neutral Anchor 身份；
+- `ConnectionPreviewInteractionProjection`：source、Pointer World Point 与 `none | valid | invalid` target。
 
 ```ts
 import type { InteractionProjection } from '@cflow/interaction-api';
@@ -38,4 +40,4 @@ Package 只依赖 `@cflow/kernel` 的 Node ID/Point 与 `@cflow/session-api` 的
 
 ## 限制与验证
 
-首版只有 Node Drag 与 Viewport Pan，不提供 hover、box selection、edge connection、snapping、Tool Registry 或任意后端 handle。类型/声明检查拒绝 Runtime、Renderer、DOM 与具体 Provider 泄漏；真实 Provider 接受与复制规则由 Renderer/SVG 测试验证。
+当前包含 Node Drag、Viewport Pan 与 node-level Connection Preview，不提供 Port Registry、hover、box selection、snapping、Tool Registry 或任意后端 handle。类型/声明检查拒绝 Runtime、Renderer、DOM 与具体 Provider 泄漏。

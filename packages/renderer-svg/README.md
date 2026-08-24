@@ -9,8 +9,9 @@ The package binds one existing `SVGSVGElement` to a synchronous
 interpret product Node types or data. CFlow does not select it as a default
 Renderer.
 
-The Provider applies Node Drag and Viewport Pan projections over the same keyed
-geometry used by Hit Test and Input coordinate conversion. Reset or incompatible
+The Provider applies Node Drag, Viewport Pan, and Connection Preview projections over the same keyed
+geometry used by Hit Test and Input coordinate conversion. It derives Node-level
+source/target Connection Anchors and uses a CSS-pixel hit tolerance. Reset or incompatible
 Document/Session updates clear stale projections; compatible commits reapply
 Preview atomically. Native `lostpointercapture` is normalized to semantic Pointer
 cancellation without exposing browser event objects.
@@ -25,6 +26,15 @@ runtime theme. A minimal application stylesheet can start with:
 }
 
 .cflow-renderer-svg__edge {
+  stroke: currentColor;
+}
+
+.cflow-renderer-svg__connection-anchor {
+  r: 4px;
+  fill: currentColor;
+}
+
+.cflow-renderer-svg__connection-preview {
   stroke: currentColor;
 }
 

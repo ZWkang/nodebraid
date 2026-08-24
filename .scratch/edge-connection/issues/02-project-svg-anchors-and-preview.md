@@ -6,7 +6,7 @@
 
 **Status:** ready
 
-- [ ] SVG 为正尺寸 Node 派生左/target、右/source Anchor，零尺寸 Node 不伪造 Anchor。
+- [ ] SVG 为已接受的正尺寸 Node 派生左/target、右/source Anchor，零尺寸 Node 保持现有显式拒绝语义。
 - [ ] `connectionAnchorHitTolerance` 以 CSS px 校验并默认为 8，Anchor hit 优先于 Node。
 - [ ] Interaction layer 与 Preview 的 none/valid/invalid 状态通过稳定 DOM seam 可观察。
 - [ ] Projection 接受保持 all-or-throw、defensive copy、baseline 与 rollback 语义。

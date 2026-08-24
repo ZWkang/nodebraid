@@ -31,7 +31,7 @@ Ordinary applications interact with this seam directly only when selecting or im
 - `RendererDocumentUpdate`: `reset` establishes a complete Baseline, while `commit` delivers one complete Canvas Commit;
 - `RendererInput`: a discriminated union of Pointer, Wheel, Keyboard, and Focus input;
 - `ScreenPoint`, `InputModifiers`, `PointerButton`, and `PointerType`;
-- `HitResult`: a semantic Canvas, Node, Edge, or Port target plus a World Point;
+- `HitResult`: a semantic Canvas, Node, Edge, Port, or Node-level Connection Anchor target plus a World Point;
 - `RendererError`: stable error identity for Provider contract failures.
 
 When a Document update call returns, the Renderer's logical state must have accepted the update so a subsequent Hit Test can observe the new state. The Provider may still batch the actual pixel drawing.
