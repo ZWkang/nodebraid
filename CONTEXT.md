@@ -245,7 +245,7 @@ Renderer Target 接收 Keyboard Input 所需的逻辑输入焦点，不等同于
 _Avoid_: DOM Active Element, Native Focus Handle, Selection Focus
 
 **Hit Result**:
-Renderer 按当前已接受的投影 Geometry，对一个 Screen Point 报告的最上层 Canvas、Node、Edge 或 Port 语义目标及其 World Point；Target 外没有 Hit Result，调用方的后端 DOM 或样式不会改变该语义结果。
+Renderer 按当前已接受的投影 Geometry，对一个 Screen Point 报告的最上层 Canvas、Node、Edge、Port 或 Connection Anchor 语义目标及其 World Point；Target 外没有 Hit Result，调用方的后端 DOM 或样式不会改变该语义结果。
 _Avoid_: Native Target, Event Target, Renderer Object
 
 **Renderer Runtime Plugin**:
@@ -260,6 +260,14 @@ _Avoid_: Canvas Renderer Service, Renderer Host, Mutable Renderer
 解释 Renderer Input 与 Hit Result，并据此更新 Session 或执行 Command 的画布行为能力。
 _Avoid_: Renderer Behavior, Native Event Handler, Direct Document Mutation
 
+**Connection Anchor**:
+附着于一个 Node、并以 source 或 target role 参与 Edge Connection 的 Renderer 语义命中目标；它不是 Document 实体，首版也不表达 Port 身份。
+_Avoid_: Port, Endpoint, Renderer Handle, Anchor Object
+
+**Connection Gesture**:
+从 source Connection Anchor 开始、以瞬态 Connection Preview 评估 target Connection Anchor，并以提交一条 Edge 或取消结束的 Active Gesture。
+_Avoid_: Edge, Connection Object, Renderer Drag
+
 **Active Gesture**:
 Interaction 当前正在解释的一段连续行为；它由一个 Gesture Pointer 驱动，并在提交稳定结果或取消时结束。
 _Avoid_: Active Pointer, Drag Session, Primary Gesture
@@ -272,6 +280,10 @@ _Avoid_: Primary Pointer, Selected Pointer, Captured Pointer
 Active Gesture 期间由 Interaction 拥有的瞬态候选视图状态，不是 Document 或 Session 的稳定状态。
 _Avoid_: Session State, Document Draft, Renderer State
 
+**Connection Preview**:
+Connection Gesture 期间表达 source Connection Anchor、当前 Pointer 与可选 target Connection Anchor 有效性的 Gesture Preview；它不是未提交的 Edge。
+_Avoid_: Draft Edge, Preview Edge Entity, Renderer Line
+
 **Interaction Projection**:
 Interaction 为显示 Gesture Preview 产生的不可变、渲染后端无关语义表示；Renderer 可以持有可重建投影，但不因此拥有 Active Gesture。
 _Avoid_: Renderer Snapshot, DOM Overlay, Mutable Gesture State
@@ -281,7 +293,7 @@ _Avoid_: Renderer Snapshot, DOM Overlay, Mutable Gesture State
 _Avoid_: Projection Registry, Renderer Handle, Shared Preview Channel
 
 **Projection Baseline**:
-Interaction Projection 所依赖的最小稳定状态证据；Node Drag 使用每个 Node 的起点 position，Viewport Pan 使用起点 Viewport，而不把无关的全局 revision 当作有效性条件。
+Interaction Projection 所依赖的最小稳定状态证据；Node Drag 使用每个 Node 的起点 position，Viewport Pan 使用起点 Viewport，Connection Preview 只依赖其 source 与可选 target Connection Anchor 所属 Node 的存在性，三者都不把无关的全局 revision 当作有效性条件。
 _Avoid_: Source Revision, Renderer Baseline, Full Session Snapshot
 
 **Effective Renderer State**:
@@ -311,6 +323,10 @@ _Avoid_: Old Pointer, Stale Renderer, Rebased Gesture
 **Move Nodes Command**:
 仅在每个目标 Node 的当前 position 与声明起点一致时，原子提交所有绝对目标 position 的强类型 Command。
 _Avoid_: Move Delta, Drag Commit, Position Patch
+
+**Create Edge Command**:
+仅在完整 Edge 与 source、target Connection Anchor 证据一致，且所需 Node 与 Edge ID 仍可用时，原子提交该 Edge 的强类型 Command。
+_Avoid_: Edge Factory, Direct Edge Write, Connection Commit
 
 **Layout Engine**:
 根据已提交的画布图计算候选布局、但不修改 Document 的能力。
