@@ -15,7 +15,7 @@ const repositoryRoot = resolve(packageRoot, '../..');
 const outputDirectory = resolve(repositoryRoot, '.tmp/renderer-svg-browser');
 const bundlePath = resolve(outputDirectory, 'renderer-contract.js');
 const agentBrowser = resolve(repositoryRoot, 'node_modules/.bin/agent-browser');
-const session = `cflow-renderer-svg-contract-${process.pid}`;
+const session = `nodebraid-renderer-svg-contract-${process.pid}`;
 
 await mkdir(outputDirectory, { recursive: true });
 const build = await Bun.build({
@@ -58,7 +58,7 @@ const server = Bun.serve({
 
 try {
   await runAgentBrowser(['open', server.url.href]);
-  await assertBrowserScenario('globalThis.__cflowBasicCanvasCompositionExample()', {
+  await assertBrowserScenario('globalThis.__nodebraidBasicCanvasCompositionExample()', {
     initialRevision: 1,
     selected: true,
     moved: { revision: 2, x: '80', y: '90' },
@@ -68,7 +68,7 @@ try {
     projectionRemoved: true,
     targetReusable: true,
   });
-  await assertBrowserScenario('globalThis.__cflowBasicCanvasCompositionIsolation()', {
+  await assertBrowserScenario('globalThis.__nodebraidBasicCanvasCompositionIsolation()', {
     firstRevision: 2,
     secondRevision: 1,
     snapshotsDistinct: true,
@@ -77,7 +77,7 @@ try {
     secondNodeCount: 2,
   });
 
-  await evaluateBrowserScenario('globalThis.__cflowBasicCanvasCompositionSetupCapture()');
+  await evaluateBrowserScenario('globalThis.__nodebraidBasicCanvasCompositionSetupCapture()');
   await dispatchMouseDown(20, 30);
   const captureBeforeDisposal = await evaluateBrowserScenario<
     Readonly<{
@@ -85,11 +85,11 @@ try {
       pointerId: number | null;
       captured: boolean;
     }>
-  >('globalThis.__cflowBasicCanvasCompositionReadCapture()');
+  >('globalThis.__nodebraidBasicCanvasCompositionReadCapture()');
   assert.ok(captureBeforeDisposal.inputCount > 0);
   assert.notEqual(captureBeforeDisposal.pointerId, null);
   assert.equal(captureBeforeDisposal.captured, true);
-  await assertBrowserScenario('globalThis.__cflowBasicCanvasCompositionDisposeCapture()', {
+  await assertBrowserScenario('globalThis.__nodebraidBasicCanvasCompositionDisposeCapture()', {
     inputCount: captureBeforeDisposal.inputCount,
     captureReleased: true,
     projectionRemoved: true,
@@ -102,16 +102,20 @@ try {
       pointerId: number | null;
       captured: boolean;
     }>
-  >('globalThis.__cflowBasicCanvasCompositionReadCapture()');
+  >('globalThis.__nodebraidBasicCanvasCompositionReadCapture()');
   assert.equal(captureAfterDisposal.inputCount, captureBeforeDisposal.inputCount);
   assert.equal(captureAfterDisposal.captured, false);
-  await evaluateBrowserScenario('globalThis.__cflowBasicCanvasCompositionTeardownCapture()');
+  await evaluateBrowserScenario('globalThis.__nodebraidBasicCanvasCompositionTeardownCapture()');
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket01()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket01()', {
     callerContentPreserved: true,
     targetChildOrder: ['defs', 'g'],
-    projectionClass: 'cflow-renderer-svg',
-    layerClasses: ['cflow-renderer-svg__edges', 'cflow-renderer-svg__nodes', 'cflow-renderer-svg__interaction'],
+    projectionClass: 'nodebraid-renderer-svg',
+    layerClasses: [
+      'nodebraid-renderer-svg__edges',
+      'nodebraid-renderer-svg__nodes',
+      'nodebraid-renderer-svg__interaction',
+    ],
     node: {
       tagName: 'rect',
       id: 'node-a',
@@ -121,8 +125,12 @@ try {
       height: '40',
     },
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgConnectionAnchors()', {
-    layerClasses: ['cflow-renderer-svg__edges', 'cflow-renderer-svg__nodes', 'cflow-renderer-svg__interaction'],
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgConnectionAnchors()', {
+    layerClasses: [
+      'nodebraid-renderer-svg__edges',
+      'nodebraid-renderer-svg__nodes',
+      'nodebraid-renderer-svg__interaction',
+    ],
     anchors: [
       { nodeId: 'anchor-node', role: 'target', cx: '20', cy: '50' },
       { nodeId: 'anchor-node', role: 'source', cx: '100', cy: '50' },
@@ -134,7 +142,7 @@ try {
       worldPoint: { x: 100, y: 50 },
     },
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgConnectionProjectionRollback()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgConnectionProjectionRollback()', {
     sameErrorIdentity: true,
     receivedName: 'Error',
     receivedMessage: 'injected Connection Preview update failure',
@@ -142,7 +150,7 @@ try {
     x2: '150',
     y2: '140',
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgConnectionProjectionEvidence()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgConnectionProjectionEvidence()', {
     copiedX2: '150',
     baselineError: {
       name: 'RendererError',
@@ -151,24 +159,24 @@ try {
       details: { issue: 'CONNECTION_ANCHOR_UNAVAILABLE' },
     },
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgConnectionAnchorLinearCommit()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgConnectionAnchorLinearCommit()', {
     boundedIdentityReads: true,
     anchorCount: 200,
     edgeCount: 1,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionFirstNode()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionFirstNode()', {
     previewPosition: { x: '80', y: '90' },
     documentPosition: { x: 10, y: 20 },
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionClear()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionClear()', {
     previewX: '80',
     restoredX: '10',
     preservedNodeIdentity: true,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionReplacement()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionReplacement()', {
     afterNodeReplacement: {
       nodeAX: '10',
       nodeBX: '260',
@@ -186,7 +194,7 @@ try {
     },
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionReset()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionReset()', {
     nodeX: '30',
     stableHit: {
       type: 'node',
@@ -196,33 +204,33 @@ try {
     formerPreviewHit: { type: 'canvas', worldPoint: { x: 100, y: 100 } },
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionEdge()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionEdge()', {
     sourceX: '120',
     sourceY: '110',
     targetX: '240',
     targetY: '120',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgViewportInteractionProjection()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgViewportInteractionProjection()', {
     previewTransform: 'matrix(2 0 0 2 40 50)',
     sessionViewport: { x: 10, y: 20, zoom: 2 },
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgViewportInteractionInvalidation()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgViewportInteractionInvalidation()', {
     transform: 'matrix(2 0 0 2 200 100)',
     hit: { type: 'canvas', worldPoint: { x: 0, y: 0 } },
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionHit()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionHit()', {
     hit: { type: 'node', nodeId: 'interaction-hit-node', worldPoint: { x: 100, y: 100 } },
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionIsolation()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionIsolation()', {
     nodeX: '80',
     hit: { type: 'node', nodeId: 'interaction-isolation-node', worldPoint: { x: 100, y: 100 } },
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionBaselineMismatch()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionBaselineMismatch()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -233,7 +241,7 @@ try {
     nodeX: '10',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionDuplicateNode()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionDuplicateNode()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -244,7 +252,7 @@ try {
     nodeX: '10',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionInvalidPosition()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionInvalidPosition()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -255,7 +263,7 @@ try {
     nodeX: '10',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionOrder()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionOrder()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -266,7 +274,7 @@ try {
     nodeX: '10',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionEmpty()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionEmpty()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -276,7 +284,7 @@ try {
     projectionUnchanged: true,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionUnknownType()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionUnknownType()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -286,7 +294,7 @@ try {
     projectionUnchanged: true,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionInvalidViewport()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionInvalidViewport()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -296,7 +304,7 @@ try {
     projectionUnchanged: true,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionMalformedShape()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionMalformedShape()', {
     errors: [
       {
         name: 'RendererError',
@@ -326,7 +334,7 @@ try {
     nodeX: '30',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionRollback()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionRollback()', {
     sameErrorIdentity: true,
     rollbackX: '80',
     rollbackTransform: 'matrix(2 0 0 2 10 20)',
@@ -338,81 +346,81 @@ try {
     clearedX: '10',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgRuntimeInteractionProjection()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgRuntimeInteractionProjection()', {
     previewX: '80',
     restoredX: '10',
   });
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupSelectionInteraction()');
-  await runAgentBrowser(['click', '[data-cflow-node-id="selection-node"]']);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupSelectionInteraction()');
+  await runAgentBrowser(['click', '[data-nodebraid-node-id="selection-node"]']);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadSelectionInteraction()', {
     nodeIds: ['selection-node'],
     edgeIds: [],
   });
-  await runAgentBrowser(['click', '[data-cflow-edge-id="selection-edge"]']);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+  await runAgentBrowser(['click', '[data-nodebraid-edge-id="selection-edge"]']);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadSelectionInteraction()', {
     nodeIds: [],
     edgeIds: ['selection-edge'],
   });
   await runAgentBrowser(['click', '#selection-interaction-target']);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadSelectionInteraction()', {
     nodeIds: [],
     edgeIds: [],
   });
-  await runAgentBrowser(['click', '[data-cflow-node-id="selection-node"]']);
+  await runAgentBrowser(['click', '[data-nodebraid-node-id="selection-node"]']);
   await dispatchShiftClick(340, 120);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadSelectionInteraction()', {
     nodeIds: ['selection-node', 'selection-target-node'],
     edgeIds: [],
   });
   await dispatchMouseDown(160, 120);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadSelectionInteraction()', {
     nodeIds: ['selection-node', 'selection-target-node'],
     edgeIds: [],
   });
   await dispatchMouseUp(160, 120);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadSelectionInteraction()', {
     nodeIds: ['selection-node'],
     edgeIds: [],
   });
   await dispatchShiftClick(250, 120);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadSelectionInteraction()', {
     nodeIds: ['selection-node'],
     edgeIds: ['selection-edge'],
   });
   await dispatchShiftClick(200, 150);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadSelectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadSelectionInteraction()', {
     nodeIds: ['selection-node'],
     edgeIds: ['selection-edge'],
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownSelectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownSelectionInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupNodeDragInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupNodeDragInteraction()');
   await dispatchMouseDown(160, 120);
   await dispatchMouseMove(200, 160);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadNodeDragInteraction()', {
     previewPosition: { x: '160', y: '140' },
     documentPosition: { x: 120, y: 100 },
   });
   await dispatchMouseUp(200, 160);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadNodeDragInteraction()', {
     previewPosition: { x: '160', y: '140' },
     documentPosition: { x: 160, y: 140 },
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgUndoNodeDragInteraction()');
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteraction()', {
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgUndoNodeDragInteraction()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadNodeDragInteraction()', {
     previewPosition: { x: '120', y: '100' },
     documentPosition: { x: 120, y: 100 },
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgRedoNodeDragInteraction()');
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteraction()', {
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgRedoNodeDragInteraction()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadNodeDragInteraction()', {
     previewPosition: { x: '160', y: '140' },
     documentPosition: { x: 160, y: 140 },
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgPrepareMultiNodeDragInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgPrepareMultiNodeDragInteraction()');
   await dispatchMouseDown(200, 160);
   await dispatchMouseMove(240, 200);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadMultiNodeDragInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadMultiNodeDragInteraction()', {
     previewPositions: [
       { id: 'drag-node', x: '200', y: '180' },
       { id: 'drag-node-b', x: '340', y: '140' },
@@ -423,7 +431,7 @@ try {
     ],
   });
   await dispatchMouseUp(240, 200);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadMultiNodeDragInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadMultiNodeDragInteraction()', {
     previewPositions: [
       { id: 'drag-node', x: '200', y: '180' },
       { id: 'drag-node-b', x: '340', y: '140' },
@@ -435,8 +443,8 @@ try {
   });
   await dispatchMouseDown(240, 200);
   await dispatchMouseMove(280, 240);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgUpdateNodeDragDataExternally()');
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadCompatibleNodeDragInteraction()', {
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgUpdateNodeDragDataExternally()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadCompatibleNodeDragInteraction()', {
     previewNode: { x: '240', y: '220', width: '100', height: '60' },
     documentNode: {
       position: { x: 200, y: 180 },
@@ -444,9 +452,9 @@ try {
       data: { label: 'updated' },
     },
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteractionEvents()', []);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadNodeDragInteractionEvents()', []);
   await dispatchMouseUp(280, 240);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadCompatibleNodeDragInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadCompatibleNodeDragInteraction()', {
     previewNode: { x: '240', y: '220', width: '100', height: '60' },
     documentNode: {
       position: { x: 240, y: 220 },
@@ -456,16 +464,16 @@ try {
   });
   await dispatchMouseDown(280, 240);
   await dispatchMouseMove(320, 280);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgMoveNodeDragExternally()');
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteractionEvents()', [
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgMoveNodeDragExternally()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadNodeDragInteractionEvents()', [
     {
-      name: 'cflow.plugin.interaction.gesture.cancelled',
+      name: 'nodebraid.plugin.interaction.gesture.cancelled',
       level: 'info',
       attributes: { gestureType: 'node-drag', reason: 'stale' },
     },
   ]);
   await dispatchMouseUp(280, 240);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadMultiNodeDragInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadMultiNodeDragInteraction()', {
     previewPositions: [
       { id: 'drag-node', x: '260', y: '180' },
       { id: 'drag-node-b', x: '380', y: '180' },
@@ -475,127 +483,127 @@ try {
       { id: 'drag-node-b', x: 380, y: 180 },
     ],
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadNodeDragInteractionEvents()', [
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadNodeDragInteractionEvents()', [
     {
-      name: 'cflow.plugin.interaction.gesture.cancelled',
+      name: 'nodebraid.plugin.interaction.gesture.cancelled',
       level: 'info',
       attributes: { gestureType: 'node-drag', reason: 'stale' },
     },
   ]);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownNodeDragInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownNodeDragInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupConnectionInteraction()');
   await dispatchMouseDown(120, 120);
   await dispatchMouseMove(180, 160);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 1,
     edgeIds: [],
     preview: { x1: '120', y1: '120', x2: '180', y2: '160', target: 'none' },
   });
   await dispatchMouseMove(240, 120);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 1,
     edgeIds: [],
     preview: { x1: '120', y1: '120', x2: '240', y2: '120', target: 'valid' },
   });
   await dispatchMouseUp(240, 120);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 2,
     edgeIds: ['connected-edge'],
     preview: null,
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgUndoConnectionInteraction()');
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgUndoConnectionInteraction()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 3,
     edgeIds: [],
     preview: null,
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgRedoConnectionInteraction()');
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgRedoConnectionInteraction()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 4,
     edgeIds: ['connected-edge'],
     preview: null,
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownConnectionInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupConnectionInteraction()');
   await dispatchMouseDown(120, 120);
   await dispatchMouseMove(40, 120);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 1,
     edgeIds: [],
     preview: { x1: '120', y1: '120', x2: '40', y2: '120', target: 'invalid' },
   });
   await dispatchConnectionEscape();
   await dispatchMouseUp(40, 120);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownConnectionInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupConnectionInteraction()');
   await dispatchMouseDown(120, 120);
   await dispatchMouseMove(180, 160);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgUpdateConnectionGeometry()');
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgUpdateConnectionGeometry()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 2,
     edgeIds: [],
     preview: { x1: '160', y1: '150', x2: '180', y2: '160', target: 'none' },
   });
   await dispatchConnectionEscape();
   await dispatchMouseUp(180, 160);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownConnectionInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction(false)');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupConnectionInteraction(false)');
   await dispatchMouseDown(120, 120);
   await dispatchMouseUp(120, 120);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionSelection()', ['connection-source']);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionSelection()', ['connection-source']);
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownConnectionInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupConnectionInteraction()');
   await dispatchShiftClick(120, 120);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionSelection()', ['connection-source']);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionSelection()', ['connection-source']);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 1,
     edgeIds: [],
     preview: null,
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownConnectionInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupConnectionInteraction()');
   await dispatchConnectionKey('keydown', ' ', 'Space');
   await dispatchMouseDown(120, 120);
   await dispatchMouseMove(180, 160);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 1,
     edgeIds: [],
     preview: null,
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionViewport()', { x: 0, y: 0, zoom: 1 });
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionViewport()', { x: 0, y: 0, zoom: 1 });
   await dispatchMouseUp(180, 160);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionViewport()', { x: 60, y: 40, zoom: 1 });
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionViewport()', { x: 60, y: 40, zoom: 1 });
   await dispatchConnectionKey('keyup', ' ', 'Space');
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownConnectionInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupConnectionInteraction()');
   await dispatchMiddleDown(120, 120);
   await dispatchMiddleMove(180, 160);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 1,
     edgeIds: [],
     preview: null,
   });
   await dispatchMiddleUp(180, 160);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionViewport()', { x: 60, y: 40, zoom: 1 });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionViewport()', { x: 60, y: 40, zoom: 1 });
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownConnectionInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupConnectionInteraction()');
   await dispatchConnectionPointer('pointerdown', 77, 'pen', 120, 120);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 1,
     edgeIds: [],
     preview: null,
   });
   await dispatchConnectionPointer('pointerup', 77, 'pen', 120, 120);
   await dispatchConnectionPointer('pointerdown', 78, 'touch', 120, 120);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 1,
     edgeIds: [],
     preview: null,
@@ -604,7 +612,7 @@ try {
   await dispatchMouseDown(120, 120);
   await dispatchMouseMove(180, 160);
   await dispatchConnectionPointer('pointercancel', 1, 'mouse', 180, 160);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 1,
     edgeIds: [],
     preview: null,
@@ -612,65 +620,65 @@ try {
   await dispatchMouseDown(120, 120);
   await dispatchMouseMove(180, 160);
   await dispatchConnectionLostCapture(1, 180, 160);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 1,
     edgeIds: [],
     preview: null,
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownConnectionInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupConnectionInteraction()');
   await dispatchMouseDown(120, 120);
   await dispatchMouseMove(240, 120);
   await dispatchConnectionEscape();
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 1,
     edgeIds: [],
     preview: null,
   });
   await dispatchMouseUp(240, 120);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownConnectionInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupConnectionInteraction()');
   await dispatchMouseDown(120, 120);
   await dispatchMouseMove(240, 120);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgDeleteConnectionTarget()');
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgDeleteConnectionTarget()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 2,
     edgeIds: [],
     preview: { x1: '120', y1: '120', x2: '240', y2: '120', target: 'none' },
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgDeleteConnectionSource()');
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgDeleteConnectionSource()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 3,
     edgeIds: [],
     preview: null,
   });
   await dispatchMouseUp(240, 120);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownConnectionInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupViewportPanInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupViewportPanInteraction()');
   await dispatchMouseDown(50, 200);
   await dispatchMouseMove(100, 250);
   await dispatchWheel(100, 250, 100);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 50 50)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteractionEvents()', [
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteractionEvents()', [
     {
-      name: 'cflow.plugin.interaction.input.rejected',
+      name: 'nodebraid.plugin.interaction.input.rejected',
       level: 'info',
       attributes: { inputType: 'wheel', gestureType: 'viewport-pan', reason: 'active-gesture' },
     },
   ]);
   await dispatchMouseUp(100, 250);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 50 50)',
     viewport: { x: 50, y: 50, zoom: 1 },
   });
   await dispatchWheel(200, 150, 100);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(0.818730753078 0 0 0.818730753078 77.190387038303 68.126924692202)',
     viewport: {
       x: 77.190387,
@@ -678,183 +686,183 @@ try {
       zoom: 0.818731,
     },
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
   await dispatchSpaceKey('keyDown');
   await dispatchMouseDown(160, 120);
   await dispatchMouseMove(190, 140);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 30 20)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
   await dispatchSpaceKey('keyUp');
   await dispatchMouseUp(190, 140);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 30 20)',
     viewport: { x: 30, y: 20, zoom: 1 },
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
   await dispatchMiddleDown(160, 120);
   await dispatchMiddleMove(190, 140);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 30 20)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
   await dispatchMiddleUp(190, 140);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 30 20)',
     viewport: { x: 30, y: 20, zoom: 1 },
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
   await dispatchMouseDown(50, 200);
   await dispatchMouseMove(100, 250);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 50 50)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
   await dispatchPointerCancel(100, 250);
   await dispatchMouseUp(100, 250);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 0 0)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteractionEvents()', [
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteractionEvents()', [
     {
-      name: 'cflow.plugin.interaction.gesture.cancelled',
+      name: 'nodebraid.plugin.interaction.gesture.cancelled',
       level: 'info',
       attributes: { gestureType: 'viewport-pan', reason: 'pointer-cancel' },
     },
   ]);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
   await dispatchMouseDown(50, 200);
   await dispatchMouseMove(100, 250);
   await releaseViewportPanPointerCapture();
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 0 0)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
   await dispatchMouseUp(100, 250);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteractionEvents()', [
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteractionEvents()', [
     {
-      name: 'cflow.plugin.interaction.gesture.cancelled',
+      name: 'nodebraid.plugin.interaction.gesture.cancelled',
       level: 'info',
       attributes: { gestureType: 'viewport-pan', reason: 'pointer-cancel' },
     },
   ]);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
   await dispatchMouseDown(50, 200);
   await dispatchMouseMove(100, 250);
   assert.equal(await dispatchAdditionalPointerDown(), false);
   await dispatchAdditionalPointerMoveAndUp();
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 50 50)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteractionEvents()', [
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteractionEvents()', [
     {
-      name: 'cflow.plugin.interaction.pointer.rejected',
+      name: 'nodebraid.plugin.interaction.pointer.rejected',
       level: 'info',
       attributes: { inputType: 'pointer.down', gestureType: 'viewport-pan', reason: 'additional-pointer' },
     },
   ]);
   await dispatchMouseMove(130, 280);
   await dispatchMouseUp(130, 280);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 80 80)',
     viewport: { x: 80, y: 80, zoom: 1 },
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
   await dispatchMouseDown(50, 200);
   await dispatchMouseMove(450, 350);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 400 150)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
   await dispatchMouseUp(450, 350);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 400 150)',
     viewport: { x: 400, y: 150, zoom: 1 },
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
   await evaluateBrowserScenario(`document.querySelector('#viewport-pan-interaction-target').focus()`);
   await dispatchSpaceKey('keyDown');
   await evaluateBrowserScenario(`document.querySelector('#viewport-pan-interaction-target').blur()`);
   await dispatchMouseDown(160, 120);
   await dispatchMouseMove(190, 140);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 0 0)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
   await dispatchPointerCancel(190, 140);
   await dispatchMouseUp(190, 140);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
   await dispatchMouseDown(50, 200);
   await dispatchMouseMove(100, 250);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetViewportPanExternally()');
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetViewportPanExternally()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(2 0 0 2 200 100)',
     viewport: { x: 200, y: 100, zoom: 2 },
   });
   await dispatchMouseUp(100, 250);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(2 0 0 2 200 100)',
     viewport: { x: 200, y: 100, zoom: 2 },
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteractionEvents()', [
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteractionEvents()', [
     {
-      name: 'cflow.plugin.interaction.gesture.cancelled',
+      name: 'nodebraid.plugin.interaction.gesture.cancelled',
       level: 'info',
       attributes: { gestureType: 'viewport-pan', reason: 'stale' },
     },
   ]);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
   await dispatchMouseDown(50, 200);
   await dispatchMouseMove(100, 250);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgHasViewportPanPointerCapture()', true);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgDisposeViewportPanInteraction()');
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgHasViewportPanPointerCapture()', true);
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgDisposeViewportPanInteraction()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 0 0)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgHasViewportPanPointerCapture()', false);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgHasViewportPanPointerCapture()', false);
   await dispatchMouseUp(100, 250);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteractionEvents()', [
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteractionEvents()', [
     {
-      name: 'cflow.plugin.interaction.gesture.cancelled',
+      name: 'nodebraid.plugin.interaction.gesture.cancelled',
       level: 'info',
       attributes: { gestureType: 'viewport-pan', reason: 'lifecycle' },
     },
   ]);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownViewportPanInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownViewportPanInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupViewportPanInteraction(true)');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupViewportPanInteraction(true)');
   await dispatchMouseDown(50, 200);
   await dispatchMouseMove(60, 200);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 0 0)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
   await dispatchMouseMove(80, 200);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 30 0)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
   await dispatchMouseUp(80, 200);
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgResetViewportPanInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
   await dispatchWheel(200, 150, 100);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(0.5 0 0 0.5 100 75)',
     viewport: { x: 100, y: 75, zoom: 0.5 },
   });
   await dispatchWheel(200, 150, -1000);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadViewportPanInteraction()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(2 0 0 2 -200 -150)',
     viewport: { x: -200, y: -150, zoom: 2 },
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownViewportPanInteraction()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownViewportPanInteraction()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupInteractionProjectionInput()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupInteractionProjectionInput()');
   await runAgentBrowser(['click', '#interaction-projection-input-target']);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReadInteractionProjectionInput()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadInteractionProjectionInput()', {
     type: 'pointer.down',
     pointerId: 1,
     pointerType: 'mouse',
@@ -864,10 +872,14 @@ try {
     pressedButtons: ['primary'],
     modifiers: { alt: false, control: false, meta: false, shift: false },
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownInteractionProjectionInput()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownInteractionProjectionInput()');
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket02FirstEdge()', {
-    layerClasses: ['cflow-renderer-svg__edges', 'cflow-renderer-svg__nodes', 'cflow-renderer-svg__interaction'],
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket02FirstEdge()', {
+    layerClasses: [
+      'nodebraid-renderer-svg__edges',
+      'nodebraid-renderer-svg__nodes',
+      'nodebraid-renderer-svg__interaction',
+    ],
     edgeIds: ['edge-a', 'edge-b'],
     nodeIds: ['node-a', 'node-b', 'node-c'],
     edge: {
@@ -880,7 +892,7 @@ try {
     },
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket02PortError()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket02PortError()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -895,7 +907,7 @@ try {
     projectionUnchanged: true,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket02SelfLoopError()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket02SelfLoopError()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -908,7 +920,7 @@ try {
     projectionUnchanged: true,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket02MissingSizeError()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket02MissingSizeError()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -921,7 +933,7 @@ try {
     projectionUnchanged: true,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket03FirstCommit()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket03FirstCommit()', {
     preservedNodeIdentity: true,
     node: {
       x: '30',
@@ -931,20 +943,20 @@ try {
     },
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket03AddRemove()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket03AddRemove()', {
     nodeIds: ['node-a', 'node-c', 'node-d'],
     edgeIds: ['edge-a', 'edge-d'],
     preservedNodeIdentity: true,
     preservedEdgeIdentity: true,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket03EdgeReplace()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket03EdgeReplace()', {
     preservedEdgeIdentity: true,
     x2: '320',
     y2: '215',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket03Continuity()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket03Continuity()', {
     withoutBaseline: {
       name: 'RendererError',
       domain: 'renderer',
@@ -967,13 +979,13 @@ try {
     resetX: '40',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket04DerivedEdge()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket04DerivedEdge()', {
     preservedEdgeIdentity: true,
     x1: '150',
     y1: '80',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket04BeforeMismatch()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket04BeforeMismatch()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -988,7 +1000,7 @@ try {
     nodeX: '10',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket04ChangeSetMismatch()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket04ChangeSetMismatch()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -1004,7 +1016,7 @@ try {
     recoveredX: '30',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket04SnapshotOrder()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket04SnapshotOrder()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -1020,14 +1032,14 @@ try {
     recoveredNodeIds: ['node-a', 'node-b'],
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket04BaselineIsolation()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket04BaselineIsolation()', {
     mutableShellWasIsolated: true,
     dataOnlyPreservedIdentity: true,
     dataOnlyPreservedDom: true,
     nextCommitX: '50',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket04SnapshotGraph()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket04SnapshotGraph()', {
     duplicate: {
       name: 'RendererError',
       domain: 'renderer',
@@ -1062,7 +1074,7 @@ try {
     recoveredNodeIds: ['graph-a', 'graph-b'],
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket05RollbackSuccess()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket05RollbackSuccess()', {
     sameErrorIdentity: true,
     errorName: 'Error',
     errorMessage: 'injected attribute failure',
@@ -1070,7 +1082,7 @@ try {
     recoveredX: '30',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket05RollbackFailure()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket05RollbackFailure()', {
     aggregateName: 'AggregateError',
     aggregateMessage: 'SVG Renderer Projection update and DOM rollback both failed.',
     aggregateErrorCount: 3,
@@ -1103,7 +1115,7 @@ try {
     resetX: '30',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket05LayerRollback()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket05LayerRollback()', {
     sameErrorIdentity: true,
     rollbackNodeIds: ['layer-b', 'layer-c'],
     restoredBIdentity: true,
@@ -1111,12 +1123,12 @@ try {
     recoveredNodeIds: ['layer-a', 'layer-c'],
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket06SessionProjection()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket06SessionProjection()', {
     transform: 'matrix(1 0 0 1 10 5)',
     selected: 'true',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket06BeforeBaseline()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket06BeforeBaseline()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -1126,7 +1138,7 @@ try {
     transform: null,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket06SessionValidation()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket06SessionValidation()', {
     dangling: {
       name: 'RendererError',
       domain: 'renderer',
@@ -1156,12 +1168,12 @@ try {
     selectedB: null,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket06ResizeProjection()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket06ResizeProjection()', {
     before: 'matrix(0.5 0 0 0.5 0 0)',
     after: 'matrix(1 0 0 0.5 0 0)',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket06SessionCoherence()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket06SessionCoherence()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
@@ -1178,7 +1190,7 @@ try {
     code: 'TARGET_UNAVAILABLE',
     details: {},
   };
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket06TargetUnavailable()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket06TargetUnavailable()', {
     detached: targetUnavailableError,
     zeroSize: targetUnavailableError,
     singular: targetUnavailableError,
@@ -1186,14 +1198,14 @@ try {
     recoveredTransform: 'matrix(2 0 0 2 5 6)',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket07FirstHits()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket07FirstHits()', {
     node: { type: 'node', nodeId: 'node-c', worldPoint: { x: 10, y: 10 } },
     edge: { type: 'edge', edgeId: 'edge-a', worldPoint: { x: 100, y: 20 } },
     canvas: { type: 'canvas', worldPoint: { x: 100, y: 100 } },
     outside: null,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket07Tolerance()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket07Tolerance()', {
     defaultNear: { type: 'canvas', worldPoint: { x: 100, y: 25 } },
     configuredNear: { type: 'edge', edgeId: 'edge-b', worldPoint: { x: 100, y: 25 } },
     reverseOrder: { type: 'edge', edgeId: 'edge-b', worldPoint: { x: 100, y: 20 } },
@@ -1206,11 +1218,11 @@ try {
   });
 
   await evaluateBrowserScenario<Readonly<{ x: number; y: number }>>(
-    'globalThis.__cflowRendererSvgTicket08SetupPointer()',
+    'globalThis.__nodebraidRendererSvgTicket08SetupPointer()',
   );
   await runAgentBrowser(['click', '#ticket-08-pointer-target']);
   const noModifiers = { alt: false, control: false, meta: false, shift: false };
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket08ReadPointer()', [
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket08ReadPointer()', [
     {
       type: 'pointer.move',
       pointerId: 1,
@@ -1243,9 +1255,9 @@ try {
       modifiers: noModifiers,
     },
   ]);
-  await runAgentBrowser(['eval', 'globalThis.__cflowRendererSvgTicket08TeardownPointer()', '--json']);
+  await runAgentBrowser(['eval', 'globalThis.__nodebraidRendererSvgTicket08TeardownPointer()', '--json']);
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket08WheelKeyboardPolicy()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket08WheelKeyboardPolicy()', {
     inputs: [
       {
         type: 'wheel',
@@ -1294,22 +1306,22 @@ try {
     touchAction: 'pan-x',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket09InputOrder()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket09InputOrder()', {
     order: ['first:pointer.down', 'second:pointer.down', 'first:pointer.move', 'third:pointer.move'],
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket09Focus()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket09Focus()', {
     addedTabIndex: '-1',
     active: true,
     scrollY: 0,
     restoredTabIndex: null,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionFocusInput()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionFocusInput()', {
     inputTypes: ['focus.gained', 'focus.lost'],
   });
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTicket09SetupCapture()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTicket09SetupCapture()');
   await dispatchCapturedPointerSequence();
   const invalidPointer = (pointerId: number) => ({
     name: 'RendererError',
@@ -1317,7 +1329,7 @@ try {
     code: 'INVALID_POINTER',
     details: { pointerId },
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket09ReadCapture()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket09ReadCapture()', {
     unknownBefore: invalidPointer(999),
     sawDown: true,
     sawOutsideMove: true,
@@ -1327,9 +1339,9 @@ try {
     capturedAfterUp: false,
     afterUpError: invalidPointer(1),
   });
-  await runAgentBrowser(['eval', 'globalThis.__cflowRendererSvgTicket09TeardownCapture()', '--json']);
+  await runAgentBrowser(['eval', 'globalThis.__nodebraidRendererSvgTicket09TeardownCapture()', '--json']);
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgReviewSetupPointerCleanup()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgReviewSetupPointerCleanup()');
   await dispatchFaultedPointerCleanupSequence();
   const targetUnavailable = {
     name: 'SvgRendererError',
@@ -1337,7 +1349,7 @@ try {
     code: 'TARGET_UNAVAILABLE',
     details: {},
   };
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReviewReadPointerCleanup()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReviewReadPointerCleanup()', {
     nativeError: targetUnavailable,
     capturedAfterFailedUp: false,
     captureAfterFailedUp: invalidPointer(1),
@@ -1346,11 +1358,11 @@ try {
     capturedAfterNextUp: false,
     captureAfterNextUp: invalidPointer(1),
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgReviewTeardownPointerCleanup()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgReviewTeardownPointerCleanup()');
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgReviewSetupPointerCleanup(true)');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgReviewSetupPointerCleanup(true)');
   await dispatchFaultedPointerCleanupSequence(false);
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReviewFinishPointerDoubleFailure()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReviewFinishPointerDoubleFailure()', {
     aggregateName: 'AggregateError',
     aggregateMessage: 'SVG Renderer Pointer handling and cleanup both failed.',
     aggregateErrorCount: 2,
@@ -1361,7 +1373,7 @@ try {
     reservationReusable: true,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket09InputFaults()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket09InputFaults()', {
     order: [
       'first:pointer.down',
       'second:pointer.down',
@@ -1389,7 +1401,7 @@ try {
     code: 'TARGET_OCCUPIED',
     details: {},
   };
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket10DisposeLifecycle()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket10DisposeLifecycle()', {
     activeDuplicate: targetOccupied,
     cleanupWindowDuplicate: targetOccupied,
     sameDisposePromise: true,
@@ -1403,7 +1415,7 @@ try {
     targetReusable: true,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket10DisposeFailure()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket10DisposeFailure()', {
     aggregateName: 'AggregateError',
     aggregateMessage: 'SVG Renderer cleanup failed.',
     aggregateErrorCount: 2,
@@ -1414,7 +1426,7 @@ try {
     reservationError: targetOccupied,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket11RuntimeIntegration()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket11RuntimeIntegration()', {
     initialNodeCount: 0,
     node: { x: '0', selected: 'true' },
     transform: 'matrix(2 0 0 2 10 20)',
@@ -1439,18 +1451,18 @@ try {
     },
   });
 
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTicket11SetupRuntimeCapture()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTicket11SetupRuntimeCapture()');
   await dispatchCapturedPointerSequence();
-  await assertBrowserScenario('globalThis.__cflowRendererSvgTicket11ReadRuntimeCapture()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket11ReadRuntimeCapture()', {
     capturedThroughService: true,
     sawOutsideMove: true,
     capturedDuringUp: true,
     releasedThroughService: true,
     capturedAfterUp: false,
   });
-  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTicket11TeardownRuntimeCapture()');
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTicket11TeardownRuntimeCapture()');
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReviewTargetAtomicCommit()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReviewTargetAtomicCommit()', {
     error: {
       name: 'SvgRendererError',
       domain: 'renderer.svg',
@@ -1461,15 +1473,15 @@ try {
     recoveredX: '30',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReviewOperationRefresh()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReviewOperationRefresh()', {
     before: 'matrix(1 0 0 1 0 0)',
     afterHitTest: 'matrix(0.5 0 0 0.5 0 0)',
     afterInput: 'matrix(0.25 0 0 0.25 0 0)',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReviewOwnerRealm()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReviewOwnerRealm()', {
     nodeId: 'iframe-node',
-    projectionClass: 'cflow-renderer-svg',
+    projectionClass: 'nodebraid-renderer-svg',
   });
 
   const invalidConfig = (field: string) => ({
@@ -1478,14 +1490,14 @@ try {
     code: 'INVALID_CONFIG',
     details: { field },
   });
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReviewUnknownConfig()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReviewUnknownConfig()', {
     root: invalidConfig('surprise'),
     input: invalidConfig('input.surprise'),
     policy: invalidConfig('input.pointer.surprise'),
     targetUnchanged: true,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReviewMalformedUpdates()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReviewMalformedUpdates()', {
     nullUpdate: {
       name: 'RendererError',
       domain: 'renderer',
@@ -1518,7 +1530,7 @@ try {
     projectionUnchanged: true,
     recoveredX: '30',
   };
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReviewMalformedChangeEvidence()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReviewMalformedChangeEvidence()', {
     nodePosition: rejectedCommitEvidence,
     edgeSource: rejectedCommitEvidence,
     missingNodeData: rejectedCommitEvidence,
@@ -1526,7 +1538,7 @@ try {
     emptyChanges: rejectedCommitEvidence,
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReviewCommitSessionRollback()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReviewCommitSessionRollback()', {
     sameErrorIdentity: true,
     rollbackX: '10',
     rollbackTransform: 'matrix(2 0 0 2 10 20)',
@@ -1534,7 +1546,7 @@ try {
     recoveredTransform: 'matrix(1 0 0 1 5 10)',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReviewResetAtomicity()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReviewResetAtomicity()', {
     layerSameErrorIdentity: true,
     layerNodeIdentityRestored: true,
     layerEdgeIdentityRestored: true,
@@ -1548,14 +1560,14 @@ try {
     sessionRecoveredTransform: 'matrix(1 0 0 1 5 10)',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReviewResizeObserverError()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReviewResizeObserverError()', {
     sameErrorIdentity: true,
     rollbackTransform: 'matrix(0.5 0 0 0.5 0 0)',
     successfulResizeTransform: 'matrix(0.666666666667 0 0 0.5 0 0)',
     recoveredTransform: 'matrix(0.666666666667 0 0 0.5 0 0)',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReviewResizeObserverRollbackFailure()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReviewResizeObserverRollbackFailure()', {
     aggregateName: 'AggregateError',
     aggregateMessage: 'SVG Renderer Projection update and DOM rollback both failed.',
     aggregateErrorCount: 2,
@@ -1570,7 +1582,7 @@ try {
     recoveredTransform: 'matrix(1 0 0 0.5 0 0)',
   });
 
-  await assertBrowserScenario('globalThis.__cflowRendererSvgReviewResizeObserverMultipleErrors()', {
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReviewResizeObserverMultipleErrors()', {
     aggregateName: 'AggregateError',
     aggregateMessage: 'Multiple SVG Renderer ResizeObserver updates failed.',
     aggregateErrorCount: 2,
@@ -1865,7 +1877,7 @@ async function dispatchFaultedPointerCleanupSequence(retryPointer = true): Promi
       buttons: 1,
       clickCount: 1,
     });
-    await evaluateBrowserScenario('globalThis.__cflowRendererSvgReviewMakePointerTargetSingular()');
+    await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgReviewMakePointerTargetSingular()');
     await send('Input.dispatchMouseEvent', {
       type: 'mouseReleased',
       x: 350,
@@ -1874,7 +1886,7 @@ async function dispatchFaultedPointerCleanupSequence(retryPointer = true): Promi
       buttons: 0,
       clickCount: 1,
     });
-    await evaluateBrowserScenario('globalThis.__cflowRendererSvgReviewFinishFaultedPointerUp()');
+    await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgReviewFinishFaultedPointerUp()');
     if (!retryPointer) return;
     await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 100, y: 100, buttons: 0 });
     await send('Input.dispatchMouseEvent', {

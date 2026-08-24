@@ -1,4 +1,4 @@
-import type { DiagnosticSink, FaultReporter, PluginDiagnostics } from '@cflow/diagnostics';
+import type { DiagnosticSink, FaultReporter, PluginDiagnostics } from '@nodebraid/diagnostics';
 
 import type { BoundServices, ServiceBindings, ServiceTokenBase } from './service-token';
 

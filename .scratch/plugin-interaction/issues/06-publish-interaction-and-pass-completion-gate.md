@@ -8,7 +8,7 @@
 
 - [x] Interaction API 与 Plugin Interaction 包具有准确 metadata、构建依赖、类型检查、测试、声明检查和发布内容。
 - [x] Interaction API 声明不泄漏 Runtime、Renderer、DOM 或具体 Provider；Plugin Interaction 不泄漏 DOM、SVG、具体 Provider 或 core 反向依赖。
-- [x] Renderer API 继续只包含 CFlow-owned 值且不泄漏 native events，SVG-specific 类型只存在具体 Provider。
+- [x] Renderer API 继续只包含 NodeBraid-owned 值且不泄漏 native events，SVG-specific 类型只存在具体 Provider。
 - [x] core 精确重导出 Interaction API 与 Plugin Interaction，不将 SVG 变成默认依赖。
 - [x] 所有受影响包的 package-name import probe 与 `bun pm pack --dry-run` 通过，发布内容不包含缓存、临时资源或测试工具。
 - [x] 根验证包含真实 Chromium Interaction 闭环并通过 lint、typecheck、format check、Bun tests、browser tests 与 build。

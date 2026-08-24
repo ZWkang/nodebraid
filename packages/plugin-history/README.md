@@ -1,15 +1,15 @@
-# @cflow/plugin-history
+# @nodebraid/plugin-history
 
-> Documentation: [English](https://zwkang.github.io/cflow/en/modules/plugin-history) · [简体中文](https://zwkang.github.io/cflow/modules/plugin-history)
+> Documentation: [English](https://zwkang.github.io/nodebraid/en/modules/plugin-history) · [简体中文](https://zwkang.github.io/nodebraid/modules/plugin-history)
 
-History Runtime Plugin for CFlow Canvas Runtime instances.
+History Runtime Plugin for NodeBraid Canvas Runtime instances.
 
 ```ts
-import { nodeId } from '@cflow/kernel';
-import { commandPlugin, commandService, type CommandService } from '@cflow/plugin-command';
-import { historyPlugin, historyService, undoCommand, type HistoryService } from '@cflow/plugin-history';
-import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+import { nodeId } from '@nodebraid/kernel';
+import { commandPlugin, commandService, type CommandService } from '@nodebraid/plugin-command';
+import { historyPlugin, historyService, undoCommand, type HistoryService } from '@nodebraid/plugin-history';
+import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 let commands: CommandService | undefined;
 let history: HistoryService | undefined;
@@ -65,7 +65,7 @@ and an invocation made before History observes the current Kernel revision fails
 with `HISTORY_NOT_CAUGHT_UP`. Requests are never queued against a later stack
 top. Subscriber publication waits until History has caught up with Kernel.
 Subscriber failures are isolated through the Host-scoped Fault Reporter with
-the stable `cflow.plugin.history.subscriber.fault` event and never change the
+the stable `nodebraid.plugin.history.subscriber.fault` event and never change the
 History Snapshot or block later subscribers.
 
 The Plugin requires both Kernel Service and Command Service. Losing either
@@ -78,10 +78,10 @@ History Baseline.
 Run package scripts from the monorepo root:
 
 ```bash
-bun run --filter '@cflow/plugin-history' typecheck
-bun run --filter '@cflow/plugin-history' test
-bun run --filter '@cflow/plugin-history' build
-bun run --filter '@cflow/plugin-history' build:dependencies
+bun run --filter '@nodebraid/plugin-history' typecheck
+bun run --filter '@nodebraid/plugin-history' test
+bun run --filter '@nodebraid/plugin-history' build
+bun run --filter '@nodebraid/plugin-history' build:dependencies
 ```
 
 ## License

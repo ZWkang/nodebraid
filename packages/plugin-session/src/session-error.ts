@@ -1,9 +1,9 @@
-import { CFlowError, type DiagnosticAttributes } from '@cflow/diagnostics';
+import { NodeBraidError, type DiagnosticAttributes } from '@nodebraid/diagnostics';
 
 export type SessionErrorCode =
   'INVALID_SELECTION' | 'SELECTION_ENTITY_NOT_FOUND' | 'INVALID_VIEWPORT' | 'INVALID_SUBSCRIBER' | 'SERVICE_DISPOSED';
 
-export class SessionError extends CFlowError<'plugin.session', SessionErrorCode> {
+export class SessionError extends NodeBraidError<'plugin.session', SessionErrorCode> {
   override readonly name = 'SessionError';
 
   constructor(

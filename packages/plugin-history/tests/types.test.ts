@@ -1,8 +1,8 @@
 import { test } from 'bun:test';
 
-import type { CanvasCommit } from '@cflow/kernel';
-import type { Command } from '@cflow/plugin-command';
-import { createPluginHost } from '@cflow/runtime-cordis';
+import type { CanvasCommit } from '@nodebraid/kernel';
+import type { Command } from '@nodebraid/plugin-command';
+import { createPluginHost } from '@nodebraid/runtime-cordis';
 
 import { historyPlugin, redoCommand, undoCommand, type HistoryService, type HistorySnapshot } from '../src';
 

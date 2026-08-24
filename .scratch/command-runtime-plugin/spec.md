@@ -1,4 +1,4 @@
-# CFlow Command Runtime Plugin
+# NodeBraid Command Runtime Plugin
 
 **Status:** ready-for-agent
 
@@ -8,7 +8,7 @@ Plugin Host 已提供 Runtime Service 与 Activation 生命周期，Kernel Plugi
 
 ## Solution
 
-新增可发布的 `@cflow/plugin-command`。`commandPlugin` 在每次 Activation 中提供一个空的 `CommandService`；Feature Plugin 通过强类型 `Command` token 注册 handler，并把返回的 `CommandRegistration` 交给自己的 Activation。调用方通过同一 token 执行并得到 `Promise` 结果。
+新增可发布的 `@nodebraid/plugin-command`。`commandPlugin` 在每次 Activation 中提供一个空的 `CommandService`；Feature Plugin 通过强类型 `Command` token 注册 handler，并把返回的 `CommandRegistration` 交给自己的 Activation。调用方通过同一 token 执行并得到 `Promise` 结果。
 
 Command Service 只拥有注册和执行生命周期，不直接依赖 Kernel 或 Session。Feature Plugin 通过自己的 Required Service 获取 Kernel、Session 或外部能力并闭包到 handler 中。每次执行收到独立 AbortSignal 和规范 Command ID；调用方取消、Command 注销或 Service 释放都会中止对应执行。清理会等待 handler 真正结束，不使用超时或假成功。
 
@@ -22,7 +22,7 @@ Command Service 只拥有注册和执行生命周期，不直接依赖 Kernel �
 - Command 可以并发与重入执行；首版不引入队列、优先级、middleware、重试或串行化。
 - 注销先让 Command 对新调用不可见，再 Abort 并等待全部进行中执行；handler 忽略 AbortSignal 时 dispose 明确保持未完成。
 - Command Service dispose 关闭全部残留注册；旧 Service 后续注册或执行以稳定错误显式失败。
-- `@cflow/plugin-command` 依赖 `@cflow/runtime-cordis`，不依赖 `@cflow/kernel`、`@cflow/plugin-kernel` 或 `@cflow/core`；core 只重导出公开 seam。
+- `@nodebraid/plugin-command` 依赖 `@nodebraid/runtime-cordis`，不依赖 `@nodebraid/kernel`、`@nodebraid/plugin-kernel` 或 `@nodebraid/core`；core 只重导出公开 seam。
 
 ## Behavioral Requirements
 

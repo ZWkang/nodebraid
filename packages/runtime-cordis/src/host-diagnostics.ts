@@ -10,7 +10,7 @@ import {
   type DiagnosticSink,
   type FaultReporter,
   type PluginDiagnostics,
-} from '@cflow/diagnostics';
+} from '@nodebraid/diagnostics';
 
 import type { PluginHostDiagnosticsOptions } from './plugin-contracts';
 
@@ -45,7 +45,7 @@ export class HostDiagnostics {
           : { field: 'hostId', receivedType: options.hostId === null ? 'null' : typeof options.hostId },
       );
     }
-    this.#hostId = options.hostId ?? `cflow.host.${++nextHostId}`;
+    this.#hostId = options.hostId ?? `nodebraid.host.${++nextHostId}`;
     this.#hostScope = Object.freeze({ hostId: this.#hostId });
     this.#sink = options.sink;
     this.#faultReporter = options.faultReporter ?? reportFaultToPlatform;

@@ -1,6 +1,6 @@
 # 02 — 迁移结构性错误与因果树
 
-**What to build:** 让现有七个领域 Error 继承 CFlowError，使用固定 domain 与 JSON-safe details，并统一 cause 和 cleanup AggregateError tree，同时保留外部失败身份。
+**What to build:** 让现有七个领域 Error 继承 NodeBraidError，使用固定 domain 与 JSON-safe details，并统一 cause 和 cleanup AggregateError tree，同时保留外部失败身份。
 
 **Blocked by:** 01 — 建立 Diagnostics deep module
 
@@ -15,4 +15,4 @@
 
 ## Answer
 
-七个领域 Error 已统一继承 CFlowError，并使用固定 domain 与 JSON-safe details；Kernel geometry、Change Set conflict、Plugin Host Token、Layout Proposal、Session Viewport/Selection/subscriber 都迁移为稳定机器字段。Callback、Setup、Handler、Provider 与 Abort reason 的既有 identity 测试继续通过；Runtime cleanup 现在保留 Host、Installation 与 Activation AggregateError 阶段，同时保持每个 leaf 只出现一次。
+七个领域 Error 已统一继承 NodeBraidError，并使用固定 domain 与 JSON-safe details；Kernel geometry、Change Set conflict、Plugin Host Token、Layout Proposal、Session Viewport/Selection/subscriber 都迁移为稳定机器字段。Callback、Setup、Handler、Provider 与 Abort reason 的既有 identity 测试继续通过；Runtime cleanup 现在保留 Host、Installation 与 Activation AggregateError 阶段，同时保持每个 leaf 只出现一次。

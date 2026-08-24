@@ -1,8 +1,8 @@
-# @cflow/core
+# @nodebraid/core
 
-> Documentation: [English](https://zwkang.github.io/cflow/en/modules/core) · [简体中文](https://zwkang.github.io/cflow/modules/core)
+> Documentation: [English](https://zwkang.github.io/nodebraid/en/modules/core) · [简体中文](https://zwkang.github.io/nodebraid/modules/core)
 
-Public CFlow facade for Kernel, Interaction, provider-neutral Layout/Renderer contracts, Runtime Plugins, and Plugin Host APIs.
+Public NodeBraid facade for Kernel, Interaction, provider-neutral Layout/Renderer contracts, Runtime Plugins, and Plugin Host APIs.
 
 ```ts
 import {
@@ -24,22 +24,22 @@ import {
   sessionService,
   redoCommand,
   undoCommand,
-} from '@cflow/core';
+} from '@nodebraid/core';
 ```
 
 The facade re-exports structured errors and Diagnostic Event contracts from
-`@cflow/diagnostics`, the pure graph interface from `@cflow/kernel`, immutable
-Session values from `@cflow/session-api`, backend-neutral Interaction and Renderer
-contracts from `@cflow/interaction-api` and `@cflow/renderer-api`, and the CFlow-owned Plugin Host interface from
-`@cflow/runtime-cordis`. It also re-exports the official Kernel, Command,
+`@nodebraid/diagnostics`, the pure graph interface from `@nodebraid/kernel`, immutable
+Session values from `@nodebraid/session-api`, backend-neutral Interaction and Renderer
+contracts from `@nodebraid/interaction-api` and `@nodebraid/renderer-api`, and the NodeBraid-owned Plugin Host interface from
+`@nodebraid/runtime-cordis`. It also re-exports the official Kernel, Command,
 Session, Renderer, Interaction, and History Runtime Plugins from their corresponding
-`@cflow/plugin-*` packages, plus generic Layout contracts and Runtime
-integration from `@cflow/layout-api` and `@cflow/plugin-layout`.
+`@nodebraid/plugin-*` packages, plus generic Layout contracts and Runtime
+integration from `@nodebraid/layout-api` and `@nodebraid/plugin-layout`.
 Cordis remains an implementation dependency and does not appear in the public
-CFlow types. Advanced consumers can import the narrow packages directly.
+NodeBraid types. Advanced consumers can import the narrow packages directly.
 
 Concrete Layout Providers remain explicit optional packages. Core does not
-depend on or re-export `@cflow/layout-dagre` or `@cflow/layout-elk`.
+depend on or re-export `@nodebraid/layout-dagre` or `@nodebraid/layout-elk`.
 
 `kernelPlugin` composes one fresh Kernel into a Plugin Host Activation through
 the narrow `KernelService` interface. It adds synchronous ordered Canvas Commit
@@ -75,9 +75,9 @@ expose duplicate imperative behavior methods or internal History Entries.
 Run package scripts from the monorepo root so the package uses the shared Bun toolchain and lockfile:
 
 ```bash
-bun run --filter '@cflow/core' typecheck
-bun run --filter '@cflow/core' test
-bun run --filter '@cflow/core' build
+bun run --filter '@nodebraid/core' typecheck
+bun run --filter '@nodebraid/core' test
+bun run --filter '@nodebraid/core' build
 ```
 
 Build output is written to `packages/core/dist/`. Core typecheck and build first

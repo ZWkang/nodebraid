@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 
 import {
-  CFlowError,
+  NodeBraidError,
   diagnosticEvents,
   describeDiagnosticEvent,
   describeError,
@@ -12,8 +12,8 @@ import {
 
 test('the Diagnostics event catalog has stable searchable names', () => {
   expect(diagnosticEvents).toEqual({
-    sinkFault: 'cflow.diagnostics.sink.fault',
-    faultReportingFault: 'cflow.diagnostics.fault-reporting.fault',
+    sinkFault: 'nodebraid.diagnostics.sink.fault',
+    faultReportingFault: 'nodebraid.diagnostics.fault-reporting.fault',
   });
 });
 
@@ -52,7 +52,7 @@ test('describeNonFiniteNumber provides the canonical diagnostic representation',
   expect(() => describeNonFiniteNumber(0)).toThrow('Expected a non-finite number; received 0.');
 });
 
-class ExampleError extends CFlowError<
+class ExampleError extends NodeBraidError<
   'example',
   'BROKEN',
   Readonly<{ field: string; nested: Readonly<{ count: number }> }>
@@ -67,7 +67,7 @@ class ExampleError extends CFlowError<
   }
 }
 
-test('a CFlow structural error exposes stable identity, cause, and immutable details', () => {
+test('a NodeBraid structural error exposes stable identity, cause, and immutable details', () => {
   const cause = new Error('upstream failed');
   const error = new ExampleError(cause);
 
@@ -94,10 +94,10 @@ test('a CFlow structural error exposes stable identity, cause, and immutable det
   });
 });
 
-test('a CFlow structural error rejects an unsafe detail at its exact path', () => {
+test('a NodeBraid structural error rejects an unsafe detail at its exact path', () => {
   expect(
     () =>
-      new (class extends CFlowError<'example', 'UNSAFE'> {
+      new (class extends NodeBraidError<'example', 'UNSAFE'> {
         constructor() {
           super('example', 'UNSAFE', 'Unsafe details.', {
             details: { nested: { callback: () => undefined } } as never,
@@ -107,10 +107,10 @@ test('a CFlow structural error rejects an unsafe detail at its exact path', () =
   ).toThrow('Diagnostic value at details.nested.callback must be JSON-safe; received function.');
 });
 
-test('a CFlow structural error rejects a non-finite numeric detail', () => {
+test('a NodeBraid structural error rejects a non-finite numeric detail', () => {
   expect(
     () =>
-      new (class extends CFlowError<'example', 'NON_FINITE'> {
+      new (class extends NodeBraidError<'example', 'NON_FINITE'> {
         constructor() {
           super('example', 'NON_FINITE', 'Non-finite details.', {
             details: { coordinate: Number.NaN },
@@ -120,14 +120,14 @@ test('a CFlow structural error rejects a non-finite numeric detail', () => {
   ).toThrow('Diagnostic value at details.coordinate must be finite; received NaN.');
 });
 
-test('a CFlow structural error rejects class instances instead of traversing them', () => {
+test('a NodeBraid structural error rejects class instances instead of traversing them', () => {
   class Token {
     readonly name = 'kernel';
   }
 
   expect(
     () =>
-      new (class extends CFlowError<'example', 'INSTANCE'> {
+      new (class extends NodeBraidError<'example', 'INSTANCE'> {
         constructor() {
           super('example', 'INSTANCE', 'Instance details.', {
             details: { token: new Token() } as never,
@@ -137,13 +137,13 @@ test('a CFlow structural error rejects class instances instead of traversing the
   ).toThrow('Diagnostic value at details.token must be a plain record; received Token.');
 });
 
-test('a CFlow structural error rejects a circular detail at the first back-reference', () => {
+test('a NodeBraid structural error rejects a circular detail at the first back-reference', () => {
   const details: Record<string, unknown> = {};
   details.self = details;
 
   expect(
     () =>
-      new (class extends CFlowError<'example', 'CIRCULAR'> {
+      new (class extends NodeBraidError<'example', 'CIRCULAR'> {
         constructor() {
           super('example', 'CIRCULAR', 'Circular details.', { details: details as never });
         }
@@ -151,12 +151,12 @@ test('a CFlow structural error rejects a circular detail at the first back-refer
   ).toThrow('Diagnostic value at details.self must not be circular; first seen at details.');
 });
 
-test('describeError returns a JSON-ready CFlow error with its original cause', () => {
+test('describeError returns a JSON-ready NodeBraid error with its original cause', () => {
   const error = new ExampleError(new Error('upstream failed'));
   const description = describeError(error);
 
   expect(description).toEqual({
-    kind: 'cflow',
+    kind: 'nodebraid',
     name: 'ExampleError',
     message: 'Example failed.',
     stack: expect.any(String),
@@ -237,7 +237,7 @@ test('describeDiagnosticEvent replaces the raw error with its JSON-ready descrip
     id: 'canvas.event.4',
     sequence: 4,
     timestamp: 123,
-    name: 'cflow.runtime.installation.status.changed',
+    name: 'nodebraid.runtime.installation.status.changed',
     level: 'error',
     scope: Object.freeze({ hostId: 'canvas', installationId: 'canvas.installation.2' }),
     attributes: Object.freeze({ from: 'active', to: 'failed' }),
@@ -249,7 +249,7 @@ test('describeDiagnosticEvent replaces the raw error with its JSON-ready descrip
   expect(description).toEqual({
     ...event,
     error: {
-      kind: 'cflow',
+      kind: 'nodebraid',
       name: 'ExampleError',
       message: 'Example failed.',
       stack: expect.any(String),

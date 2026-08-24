@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/plugin-layout",
+  "name": "@nodebraid/plugin-layout",
   "type": "module",
   "version": "0.0.1",
-  "description": "Runtime Command integration for CFlow Layout Engines.",
+  "description": "Runtime Command integration for NodeBraid Layout Engines.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/plugin-layout"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/plugin-layout#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/plugin-layout#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "layout",
     "plugin-runtime",
     "command"
@@ -40,15 +40,15 @@
   ],
   "scripts": {
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts",
-    "build:dependencies": "bun run --filter '@cflow/layout-api' build && bun run --filter '@cflow/plugin-kernel' build && bun run --filter '@cflow/plugin-command' build",
+    "build:dependencies": "bun run --filter '@nodebraid/layout-api' build && bun run --filter '@nodebraid/plugin-kernel' build && bun run --filter '@nodebraid/plugin-command' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/layout-api": "workspace:*",
-    "@cflow/plugin-command": "workspace:*",
-    "@cflow/plugin-kernel": "workspace:*",
-    "@cflow/runtime-cordis": "workspace:*"
+    "@nodebraid/layout-api": "workspace:*",
+    "@nodebraid/plugin-command": "workspace:*",
+    "@nodebraid/plugin-kernel": "workspace:*",
+    "@nodebraid/runtime-cordis": "workspace:*"
   }
 }

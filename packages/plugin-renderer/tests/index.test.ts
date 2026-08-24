@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 
-import type { DiagnosticFault } from '@cflow/diagnostics';
-import type { InteractionProjection } from '@cflow/interaction-api';
-import { nodeId, type CanvasView } from '@cflow/kernel';
-import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
+import type { DiagnosticFault } from '@nodebraid/diagnostics';
+import type { InteractionProjection } from '@nodebraid/interaction-api';
+import { nodeId, type CanvasView } from '@nodebraid/kernel';
+import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
 import {
   RendererError,
   type CanvasRenderer,
@@ -12,9 +12,9 @@ import {
   type RendererInput,
   type RendererInputListener,
   type ScreenPoint,
-} from '@cflow/renderer-api';
-import { sessionPlugin, sessionService, type SessionService, type SessionSnapshot } from '@cflow/plugin-session';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+} from '@nodebraid/renderer-api';
+import { sessionPlugin, sessionService, type SessionService, type SessionSnapshot } from '@nodebraid/plugin-session';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 import {
   createRendererPlugin,
@@ -24,11 +24,11 @@ import {
   type RendererService,
 } from '../src';
 
-describe('@cflow/plugin-renderer', () => {
+describe('@nodebraid/plugin-renderer', () => {
   test('publishes the stable Renderer diagnostic event catalog', () => {
     expect(rendererDiagnosticEvents).toEqual({
-      inputListenerFault: 'cflow.plugin.renderer.input-listener.fault',
-      syncFault: 'cflow.plugin.renderer.sync.fault',
+      inputListenerFault: 'nodebraid.plugin.renderer.input-listener.fault',
+      syncFault: 'nodebraid.plugin.renderer.sync.fault',
     });
   });
 

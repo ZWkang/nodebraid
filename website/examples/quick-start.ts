@@ -1,4 +1,4 @@
-import { createPluginHost, definePlugin, kernelPlugin, kernelService, nodeId } from '@cflow/core';
+import { createPluginHost, definePlugin, kernelPlugin, kernelService, nodeId } from '@nodebraid/core';
 
 const appPlugin = definePlugin({
   name: 'docs.quick-start',

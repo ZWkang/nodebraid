@@ -1,10 +1,10 @@
 import { expect, test } from 'bun:test';
 
-import { edgeId, nodeId, type CanvasCommit } from '@cflow/kernel';
-import { defineLayoutEngine, type LayoutError } from '@cflow/layout-api';
-import { commandPlugin, commandService, defineCommand, type CommandService } from '@cflow/plugin-command';
-import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+import { edgeId, nodeId, type CanvasCommit } from '@nodebraid/kernel';
+import { defineLayoutEngine, type LayoutError } from '@nodebraid/layout-api';
+import { commandPlugin, commandService, defineCommand, type CommandService } from '@nodebraid/plugin-command';
+import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 import { createLayoutPlugin, type LayoutCommandInput } from '../src';
 

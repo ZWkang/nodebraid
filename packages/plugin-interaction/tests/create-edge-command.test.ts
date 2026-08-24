@@ -1,19 +1,19 @@
 import { expect, test } from 'bun:test';
 
-import { edgeId, nodeId } from '@cflow/kernel';
-import { commandPlugin, commandService, type CommandService } from '@cflow/plugin-command';
-import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
-import { createRendererPlugin } from '@cflow/plugin-renderer';
-import { sessionPlugin } from '@cflow/plugin-session';
+import { edgeId, nodeId } from '@nodebraid/kernel';
+import { commandPlugin, commandService, type CommandService } from '@nodebraid/plugin-command';
+import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { createRendererPlugin } from '@nodebraid/plugin-renderer';
+import { sessionPlugin } from '@nodebraid/plugin-session';
 import type {
   CanvasRenderer,
   HitResult,
   RendererDocumentUpdate,
   RendererInputListener,
   ScreenPoint,
-} from '@cflow/renderer-api';
-import type { SessionSnapshot } from '@cflow/session-api';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+} from '@nodebraid/renderer-api';
+import type { SessionSnapshot } from '@nodebraid/session-api';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 import { createEdgeCommand, interactionPlugin } from '../src';
 

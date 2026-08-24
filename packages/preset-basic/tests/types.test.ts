@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 
-import type { CanvasRenderer } from '@cflow/renderer-api';
-import { createPluginHost, type Plugin } from '@cflow/runtime-cordis';
+import type { CanvasRenderer } from '@nodebraid/renderer-api';
+import { createPluginHost, type Plugin } from '@nodebraid/runtime-cordis';
 
 import { createBasicCanvasPlugin } from '../src';
 

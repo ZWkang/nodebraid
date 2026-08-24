@@ -16,13 +16,16 @@ const english = computed(() => lang.value.startsWith('en'));
       <p>
         {{
           english
-            ? 'CFlow does not weld a complete editor into one object. Applications explicitly compose Kernel, Session, Command, History, Layout, and Renderer contracts through the Plugin Host, with clear dependencies and lifecycles.'
-            : 'CFlow 不把完整编辑器焊死在一个对象里。应用通过 Plugin Host 显式组合 Kernel、Session、Command、History、Layout 与 Renderer contract，每项能力都拥有清晰的依赖和生命周期。'
+            ? 'NodeBraid does not weld a complete editor into one object. Applications explicitly compose Kernel, Session, Command, History, Layout, and Renderer contracts through the Plugin Host, with clear dependencies and lifecycles.'
+            : 'NodeBraid 不把完整编辑器焊死在一个对象里。应用通过 Plugin Host 显式组合 Kernel、Session、Command、History、Layout 与 Renderer contract，每项能力都拥有清晰的依赖和生命周期。'
         }}
       </p>
     </div>
 
-    <div class="flow-architecture__map" :aria-label="english ? 'CFlow capability composition' : 'CFlow 能力组合示意'">
+    <div
+      class="flow-architecture__map"
+      :aria-label="english ? 'NodeBraid capability composition' : 'NodeBraid 能力组合示意'"
+    >
       <div class="flow-node flow-node--app">
         <span>Application</span>
         <strong>{{ english ? 'Your product and framework adapter' : '你的产品与框架适配层' }}</strong>

@@ -1,6 +1,6 @@
 # 08 — 发布 GitHub Pages
 
-**What to build:** 让主分支能够使用与本地完全相同的生产构建 seam 生成并发布 CFlow Documentation Site，在仓库子路径下正确加载页面、导航、搜索和静态资源。
+**What to build:** 让主分支能够使用与本地完全相同的生产构建 seam 生成并发布 NodeBraid Documentation Site，在仓库子路径下正确加载页面、导航、搜索和静态资源。
 
 **Blocked by:** 07 — 完成能力导航与仓库入口.
 

@@ -1,6 +1,6 @@
 import { extname, resolve, sep } from 'node:path';
 
-const base = '/cflow/';
+const base = '/nodebraid/';
 const root = resolve(import.meta.dir, '../.vitepress/dist');
 const rootPrefix = `${root}${sep}`;
 const index = Bun.file(resolve(root, 'index.html'));
@@ -10,11 +10,11 @@ if (!(await index.exists())) {
 }
 
 const server = Bun.serve({
-  hostname: process.env.CFLOW_DOCS_PREVIEW_HOST ?? '127.0.0.1',
-  port: Number(process.env.CFLOW_DOCS_PREVIEW_PORT ?? '4173'),
+  hostname: process.env.NODEBRAID_DOCS_PREVIEW_HOST ?? '127.0.0.1',
+  port: Number(process.env.NODEBRAID_DOCS_PREVIEW_PORT ?? '4173'),
   async fetch(request) {
     const url = new URL(request.url);
-    if (url.pathname === '/cflow') return Response.redirect(`${url.origin}${base}`, 308);
+    if (url.pathname === '/nodebraid') return Response.redirect(`${url.origin}${base}`, 308);
     if (url.pathname === '/') return Response.redirect(`${url.origin}${base}`, 308);
     if (!url.pathname.startsWith(base)) return notFound();
 

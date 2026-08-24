@@ -1,18 +1,18 @@
 ---
-title: '@cflow/plugin-kernel'
+title: '@nodebraid/plugin-kernel'
 description: Expose the pure Kernel as a narrow Runtime Service and propagate Canvas Commits in revision order.
 ---
 
-# `@cflow/plugin-kernel`
+# `@nodebraid/plugin-kernel`
 
 ::: warning Package is not publicly released
 This name identifies the current source module boundary; it does not mean the package can be installed from npm. Follow the [Quick Start](/en/guide/quick-start) to verify it from source.
 :::
 
-`@cflow/plugin-kernel` is the delivered Kernel Runtime adapter. It creates an independent Kernel for every Plugin Activation and lets other Plugins use the authoritative Document only through `KernelService`.
+`@nodebraid/plugin-kernel` is the delivered Kernel Runtime adapter. It creates an independent Kernel for every Plugin Activation and lets other Plugins use the authoritative Document only through `KernelService`.
 
 ::: info Current status
-Implemented and re-exported by the `@cflow/core` facade. It is not a placeholder for future work and does not expose a bare `CanvasKernel` to Runtime Consumers.
+Implemented and re-exported by the `@nodebraid/core` facade. It is not a placeholder for future work and does not expose a bare `CanvasKernel` to Runtime Consumers.
 :::
 
 ## The problem it solves
@@ -35,17 +35,17 @@ The pure Kernel should not know about the Plugin Host, but a Canvas Runtime stil
 - `KernelService.transact()`: runs a synchronous Transaction and returns `CanvasCommit | null`.
 - `KernelService.observeCommits()`: observes successful net-change Commits synchronously and returns an unsubscribe function.
 - `KernelPluginError`: a stable `SERVICE_DISPOSED` error for old Service handles.
-- `kernelPluginDiagnosticEvents`: exposes the stable `cflow.plugin.kernel.observer.fault` event name.
+- `kernelPluginDiagnosticEvents`: exposes the stable `nodebraid.plugin.kernel.observer.fault` event name.
 
 ## Dependencies and composition
 
-`@cflow/plugin-kernel` depends directly on:
+`@nodebraid/plugin-kernel` depends directly on:
 
-- `@cflow/kernel` to create and operate the pure Kernel;
-- `@cflow/runtime-cordis` for the CFlow-owned Plugin Host, Service Token, and Activation seam;
-- `@cflow/diagnostics` for the shared Observer-fault diagnostics contract.
+- `@nodebraid/kernel` to create and operate the pure Kernel;
+- `@nodebraid/runtime-cordis` for the NodeBraid-owned Plugin Host, Service Token, and Activation seam;
+- `@nodebraid/diagnostics` for the shared Observer-fault diagnostics contract.
 
-It does not depend on `@cflow/core`. A Consumer receives `KernelService` through a local Service Binding. [`@cflow/plugin-session`](/en/modules/plugin-session) is one official Consumer that statically requires `kernelService`.
+It does not depend on `@nodebraid/core`. A Consumer receives `KernelService` through a local Service Binding. [`@nodebraid/plugin-session`](/en/modules/plugin-session) is one official Consumer that statically requires `kernelService`.
 
 ## Public entry points
 
@@ -57,8 +57,8 @@ import {
   kernelService,
   type CommitObserver,
   type KernelService,
-} from '@cflow/plugin-kernel';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+} from '@nodebraid/plugin-kernel';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 const consumer = definePlugin({
   requires: { kernel: kernelService },
@@ -99,7 +99,7 @@ try {
 
 ## Verification evidence
 
-- [Public exports](https://github.com/ZWkang/cflow/blob/main/packages/plugin-kernel/src/index.ts) confirm that the module currently provides the Plugin, Service Token, error, and diagnostic event.
-- [Runtime implementation](https://github.com/ZWkang/cflow/blob/main/packages/plugin-kernel/src/kernel-plugin.ts) shows that each Activation creates a pure Kernel and owns the Commit queue and Observers inside the adapter.
-- [Public-seam behavior tests](https://github.com/ZWkang/cflow/blob/main/packages/plugin-kernel/tests/index.test.ts) cover the revision-zero Service, net-change filtering, reentrant ordering, Observer Faults, and a fresh Kernel after dependency recovery.
-- ADR-0013 identifies `@cflow/plugin-kernel` as the chosen narrow Kernel Runtime Service seam.
+- [Public exports](https://github.com/ZWkang/nodebraid/blob/main/packages/plugin-kernel/src/index.ts) confirm that the module currently provides the Plugin, Service Token, error, and diagnostic event.
+- [Runtime implementation](https://github.com/ZWkang/nodebraid/blob/main/packages/plugin-kernel/src/kernel-plugin.ts) shows that each Activation creates a pure Kernel and owns the Commit queue and Observers inside the adapter.
+- [Public-seam behavior tests](https://github.com/ZWkang/nodebraid/blob/main/packages/plugin-kernel/tests/index.test.ts) cover the revision-zero Service, net-change filtering, reentrant ordering, Observer Faults, and a fresh Kernel after dependency recovery.
+- ADR-0013 identifies `@nodebraid/plugin-kernel` as the chosen narrow Kernel Runtime Service seam.

@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test';
 
-import { CFlowError, type DiagnosticEvent, type DiagnosticFault } from '@cflow/diagnostics';
-import { nodeId, type CanvasCommit } from '@cflow/kernel';
-import { commandPlugin, commandService, defineCommand, type CommandService } from '@cflow/plugin-command';
-import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+import { NodeBraidError, type DiagnosticEvent, type DiagnosticFault } from '@nodebraid/diagnostics';
+import { nodeId, type CanvasCommit } from '@nodebraid/kernel';
+import { commandPlugin, commandService, defineCommand, type CommandService } from '@nodebraid/plugin-command';
+import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 import {
   HistoryError,
@@ -16,10 +16,10 @@ import {
   type HistoryService,
 } from '../src';
 
-describe('@cflow/plugin-history', () => {
+describe('@nodebraid/plugin-history', () => {
   test('publishes the stable History diagnostic event catalog', () => {
     expect(historyDiagnosticEvents).toEqual({
-      subscriberFault: 'cflow.plugin.history.subscriber.fault',
+      subscriberFault: 'nodebraid.plugin.history.subscriber.fault',
     });
   });
 
@@ -213,7 +213,7 @@ describe('@cflow/plugin-history', () => {
     const initialSnapshot = history.getSnapshot();
 
     await expect(commands.execute(undoCommand, undefined)).rejects.toBeInstanceOf(HistoryError);
-    await expect(commands.execute(undoCommand, undefined)).rejects.toBeInstanceOf(CFlowError);
+    await expect(commands.execute(undoCommand, undefined)).rejects.toBeInstanceOf(NodeBraidError);
     await expect(commands.execute(undoCommand, undefined)).rejects.toMatchObject({
       domain: 'plugin.history',
       code: 'UNDO_EMPTY',
@@ -296,7 +296,7 @@ describe('@cflow/plugin-history', () => {
       expect(faults.map((fault) => fault.error)).toEqual([listenerError, listenerError]);
       expect(
         events
-          .filter((event) => event.name === 'cflow.plugin.history.subscriber.fault')
+          .filter((event) => event.name === 'nodebraid.plugin.history.subscriber.fault')
           .map((event) => ({ scope: event.scope, attributes: event.attributes })),
       ).toEqual([
         {
@@ -304,7 +304,7 @@ describe('@cflow/plugin-history', () => {
             hostId: 'history-host',
             installationId: 'history-host.installation.3',
             activationId: expect.any(String),
-            pluginName: '@cflow/plugin-history',
+            pluginName: '@nodebraid/plugin-history',
           },
           attributes: { canUndo: true, canRedo: false },
         },
@@ -313,7 +313,7 @@ describe('@cflow/plugin-history', () => {
             hostId: 'history-host',
             installationId: 'history-host.installation.3',
             activationId: expect.any(String),
-            pluginName: '@cflow/plugin-history',
+            pluginName: '@nodebraid/plugin-history',
           },
           attributes: { canUndo: false, canRedo: true },
         },

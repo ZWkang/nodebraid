@@ -5,7 +5,7 @@ description: 用显式 Renderer Factory 组装可立即使用的基础 Canvas Ru
 
 # Canvas Composition
 
-CFlow 的 Plugin Host 保持空基座，应用可以逐项安装 Feature Plugin，也可以用 `@cflow/preset-basic` 复用官方 Basic Canvas Composition。两条路径共享同一个 Plugin Graph、Service Token、Activation 与资源释放语义。
+NodeBraid 的 Plugin Host 保持空基座，应用可以逐项安装 Feature Plugin，也可以用 `@nodebraid/preset-basic` 复用官方 Basic Canvas Composition。两条路径共享同一个 Plugin Graph、Service Token、Activation 与资源释放语义。
 
 ## 当前交付
 
@@ -15,7 +15,7 @@ Basic Canvas Composition 固定组合：
 Kernel → Command → Session → Renderer → Interaction → History
 ```
 
-它接收应用显式选择的 Renderer Factory，并把 Installation config 原样交给该 Provider。Composition 不依赖 SVG、DOM 或其他具体后端；真实 SVG 示例由应用另外依赖 `@cflow/renderer-svg`。
+它接收应用显式选择的 Renderer Factory，并把 Installation config 原样交给该 Provider。Composition 不依赖 SVG、DOM 或其他具体后端；真实 SVG 示例由应用另外依赖 `@nodebraid/renderer-svg`。
 
 ## Readiness 与生命周期
 
@@ -37,4 +37,4 @@ Composition 不提供聚合 Service、动态 `getService()`、内部 Child Insta
 
 package tests 使用真实 Plugin Host 与六个真实 Feature Plugins 验证 readiness、Command/History、冲突、失败回滚、Host 隔离和异步清理。完整成功路径由真实 SVG Provider 与 Chromium 验证，包括投影、Selection、Move Commit、Undo/Redo、Wheel Zoom、Host dispose 和 Target reservation 释放。
 
-继续阅读 [`@cflow/preset-basic`](/modules/preset-basic)，或从 [Quick Start](/guide/quick-start) 查看 headless 与真实 SVG 两层示例。
+继续阅读 [`@nodebraid/preset-basic`](/modules/preset-basic)，或从 [Quick Start](/guide/quick-start) 查看 headless 与真实 SVG 两层示例。

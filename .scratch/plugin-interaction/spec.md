@@ -1,18 +1,18 @@
-# CFlow Interaction Runtime Plugin
+# NodeBraid Interaction Runtime Plugin
 
 **Status:** ready-for-agent
 
 ## Problem Statement
 
-CFlow 已经能用 Renderer 把 Document 与 Session 投影为可见画布，并从真实后端发布标准化 Renderer Input 与 Hit Result，但尚没有将这些事实解释为选择、平移、缩放和 Node Drag 的官方 Runtime 能力。调用方目前只能自行处理 Pointer、Wheel、Keyboard、Focus、Hit Test、Pointer Capture、Session 写入和 Command 提交，容易把后端对象、高频 Preview 或第二条 Document 写路径泄漏进入公共架构。
+NodeBraid 已经能用 Renderer 把 Document 与 Session 投影为可见画布，并从真实后端发布标准化 Renderer Input 与 Hit Result，但尚没有将这些事实解释为选择、平移、缩放和 Node Drag 的官方 Runtime 能力。调用方目前只能自行处理 Pointer、Wheel、Keyboard、Focus、Hit Test、Pointer Capture、Session 写入和 Command 提交，容易把后端对象、高频 Preview 或第二条 Document 写路径泄漏进入公共架构。
 
-现有 Renderer 只能接受稳定 Document 与 Session 状态。如果 Node Drag 的每个 pointermove 都写 Kernel，就会制造大量 Commit 与 History Entry；如果写 Session，又会污染只应容纳 Selection 和稳定 Viewport 的本地视图状态。没有 CFlow-owned Interaction Projection 通道时，可见 Preview 只能绕过 Renderer seam 直接操作 DOM、SVG 或其他 Provider 对象。
+现有 Renderer 只能接受稳定 Document 与 Session 状态。如果 Node Drag 的每个 pointermove 都写 Kernel，就会制造大量 Commit 与 History Entry；如果写 Session，又会污染只应容纳 Selection 和稳定 Viewport 的本地视图状态。没有 NodeBraid-owned Interaction Projection 通道时，可见 Preview 只能绕过 Renderer seam 直接操作 DOM、SVG 或其他 Provider 对象。
 
 此外，真实输入还存在单 Gesture Pointer、额外 Pointer、意外丢失 Capture、Focus 丢失导致 keyup 缺失、依赖重载、拖动期间外部 Commit、Projection 与稳定状态交付顺序、同步恢复失败等必须公开定义的语义。这些语义不能依赖 silent ignore、timeout、后端特例或 fake success。
 
 ## Solution
 
-新增 backend-neutral 的 `@cflow/interaction-api` 和 Runtime Feature Plugin `@cflow/plugin-interaction`。Interaction Plugin 静态依赖 Renderer、Session、Command 与 Kernel Service，将 Renderer Input 与 Hit Result 解释为内建 select/pan 状态机。它拥有唯一 Active Gesture 与 Gesture Preview，通过排他的 Interaction Projection Binding 向 Renderer 交付不可变候选几何；Renderer 以 Document、Session 与最新 Projection 合成 Effective Renderer State。
+新增 backend-neutral 的 `@nodebraid/interaction-api` 和 Runtime Feature Plugin `@nodebraid/plugin-interaction`。Interaction Plugin 静态依赖 Renderer、Session、Command 与 Kernel Service，将 Renderer Input 与 Hit Result 解释为内建 select/pan 状态机。它拥有唯一 Active Gesture 与 Gesture Preview，通过排他的 Interaction Projection Binding 向 Renderer 交付不可变候选几何；Renderer 以 Document、Session 与最新 Projection 合成 Effective Renderer State。
 
 首版提供 Node/Edge/Canvas 选择、Additive Modifier 多选、Canvas/middle/Space 平移、按 Screen Point 锚定的 Wheel Zoom，以及单个或多个已选 Node 的 Drag Preview。Node Drag 只在 pointerup 通过强类型 Move Nodes Command 执行一次同步 Kernel Transaction，因而自然形成至多一个可撤销 History Entry。Viewport Pan 只在 pointerup 一次写入 Session；Wheel 则是独立的 Session transition。
 
@@ -65,7 +65,7 @@ Renderer API 增加 Interaction Projection 与逻辑 Focus Input，Renderer Runt
 43. As an Interaction author, I want native pointer cancellation to end the gesture without a stable result, so that platform interruption is safe.
 44. As an Interaction author, I want unexpected lost pointer capture normalized as one semantic cancellation, so that a gesture cannot remain active invisibly.
 45. As an Interaction author, I want normal up, cancel, and explicit release not to emit duplicate cancellation, so that terminal transitions occur once.
-46. As an Interaction author, I want Focus changes represented by CFlow values, so that keyboard state does not depend on DOM objects.
+46. As an Interaction author, I want Focus changes represented by NodeBraid values, so that keyboard state does not depend on DOM objects.
 47. As an Interaction author, I want focus loss to clear pressed-key state, so that a lost Space keyup cannot leave Pan activation stuck.
 48. As an Interaction author, I want focus loss not to cancel an already captured pointer gesture, so that logical focus and Pointer Capture remain distinct.
 49. As an Interaction author, I want Wheel rejected during an Active Gesture, so that stable Viewport cannot invalidate an in-progress Preview silently.
@@ -125,10 +125,10 @@ Renderer API 增加 Interaction Projection 与逻辑 Focus Input，Renderer Runt
 
 ## Implementation Decisions
 
-- Add `@cflow/interaction-api` as a backend-neutral pure-value package for Interaction Projection contracts.
+- Add `@nodebraid/interaction-api` as a backend-neutral pure-value package for Interaction Projection contracts.
 - Let Interaction API depend only on the Kernel and Session value contracts needed for Node IDs, Points, and Viewport.
 - Keep Interaction API independent from Renderer, Runtime, Plugin Host, DOM, and concrete Providers.
-- Add `@cflow/plugin-interaction` as a Runtime Feature Plugin named `@cflow/plugin-interaction`.
+- Add `@nodebraid/plugin-interaction` as a Runtime Feature Plugin named `@nodebraid/plugin-interaction`.
 - Require Renderer, Session, Command, and Kernel Service statically; provide no Interaction Runtime Service.
 - Export the Interaction Plugin, readonly Interaction config, Move Nodes Command, InteractionError, error codes, and stable diagnostic event catalog.
 - Re-export Interaction API and Plugin Interaction from core; do not re-export SVG.

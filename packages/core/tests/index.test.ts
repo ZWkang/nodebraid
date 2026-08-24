@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 
 import {
-  CFlowError,
+  NodeBraidError,
   KernelError,
   RendererError,
   commandPlugin,
@@ -35,20 +35,20 @@ import {
   type SessionService,
 } from '../src';
 
-describe('@cflow/core', () => {
+describe('@nodebraid/core', () => {
   test('publishes the shared Diagnostics seam', () => {
     const error = new KernelError('INVALID_ID', 'Node ID is invalid.', {
       entity: 'node',
       value: '',
     });
 
-    expect(error).toBeInstanceOf(CFlowError);
+    expect(error).toBeInstanceOf(NodeBraidError);
     expect(diagnosticEvents).toEqual({
-      sinkFault: 'cflow.diagnostics.sink.fault',
-      faultReportingFault: 'cflow.diagnostics.fault-reporting.fault',
+      sinkFault: 'nodebraid.diagnostics.sink.fault',
+      faultReportingFault: 'nodebraid.diagnostics.fault-reporting.fault',
     });
     expect(describeError(error)).toMatchObject({
-      kind: 'cflow',
+      kind: 'nodebraid',
       domain: 'kernel',
       code: 'INVALID_ID',
       details: { entity: 'node', value: '' },
@@ -184,7 +184,7 @@ describe('@cflow/core', () => {
       receivedRevision: 3,
     });
 
-    expect(error).toBeInstanceOf(CFlowError);
+    expect(error).toBeInstanceOf(NodeBraidError);
     expect(error.domain).toBe('renderer');
     expect(typeof createRendererPlugin).toBe('function');
     expect(rendererService).toBeDefined();
@@ -200,7 +200,7 @@ describe('@cflow/core', () => {
     expect(projection.type).toBe('viewport-pan');
     expect(interactionPlugin).toBeDefined();
     expect(moveNodesCommand.id).toBe('interaction.nodes.move');
-    expect(interactionDiagnosticEvents.inputRejected).toBe('cflow.plugin.interaction.input.rejected');
+    expect(interactionDiagnosticEvents.inputRejected).toBe('nodebraid.plugin.interaction.input.rejected');
   });
 
   test('composes asynchronous Command preparation with a synchronous Kernel Transaction', async () => {

@@ -3,7 +3,8 @@ import { fileURLToPath } from 'node:url';
 
 import { collectDeclarations } from '../../../scripts/collect-declarations';
 
-const forbiddenImport = /(?:from\s+|import\()["'](?:@cflow\/(?:core|runtime-cordis|renderer-[^"']+)|cordis|rxjs)["']/;
+const forbiddenImport =
+  /(?:from\s+|import\()["'](?:@nodebraid\/(?:core|runtime-cordis|renderer-[^"']+)|cordis|rxjs)["']/;
 const forbiddenPlatformType = /\b(?:HTMLElement|SVGElement|CanvasRenderingContext2D|PointerEvent|MouseEvent)\b/;
 
 const kernelDist = fileURLToPath(new URL('../dist/', import.meta.url));

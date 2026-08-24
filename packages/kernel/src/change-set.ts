@@ -1,4 +1,4 @@
-import { describeNonFiniteNumber, type DiagnosticAttributes } from '@cflow/diagnostics';
+import { describeNonFiniteNumber, type DiagnosticAttributes } from '@nodebraid/diagnostics';
 
 import type { CanvasEdge, CanvasNode, ChangeDirection, ChangeSet, EntityWriter, GraphChange } from './contracts';
 import { canvasEdgesEqual, canvasNodesEqual, isCanvasEdgeValue, isCanvasNodeValue, isRecord } from './entity-values';

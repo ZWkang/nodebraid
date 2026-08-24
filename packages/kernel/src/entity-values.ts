@@ -1,7 +1,7 @@
 import type { CanvasEdge, CanvasNode, EdgeEndpoint, Point, Size } from './contracts';
 
 export function freezeCanvasNode(node: CanvasNode): CanvasNode {
-  // Copy and freeze only CFlow-owned shells. Arbitrary data intentionally keeps its original reference.
+  // Copy and freeze only NodeBraid-owned shells. Arbitrary data intentionally keeps its original reference.
   return Object.freeze({
     id: node.id,
     type: node.type,

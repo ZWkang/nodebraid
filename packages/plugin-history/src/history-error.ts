@@ -1,9 +1,9 @@
-import { CFlowError, type DiagnosticAttributes } from '@cflow/diagnostics';
+import { NodeBraidError, type DiagnosticAttributes } from '@nodebraid/diagnostics';
 
 export type HistoryErrorCode =
   'UNDO_EMPTY' | 'REDO_EMPTY' | 'HISTORY_BUSY' | 'HISTORY_NOT_CAUGHT_UP' | 'SERVICE_DISPOSED';
 
-export class HistoryError extends CFlowError<'plugin.history', HistoryErrorCode> {
+export class HistoryError extends NodeBraidError<'plugin.history', HistoryErrorCode> {
   override readonly name = 'HistoryError';
 
   constructor(

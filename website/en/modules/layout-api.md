@@ -1,9 +1,9 @@
 ---
-title: '@cflow/layout-api'
+title: '@nodebraid/layout-api'
 description: Provider-neutral Layout Input, Engine, Proposal, capability, and validation contracts.
 ---
 
-# `@cflow/layout-api`
+# `@nodebraid/layout-api`
 
 ::: warning Package is not publicly released
 This name describes the current source module boundary; it does not mean the package can be installed from npm. Follow the [Quick Start](/en/guide/quick-start) to verify it from source.
@@ -11,7 +11,7 @@ This name describes the current source module boundary; it does not mean the pac
 
 ## Problem it solves
 
-Layout libraries usually have different configuration, coordinate, and output models. `@cflow/layout-api` defines CFlow's own minimal semantic seam, allowing Dagre, ELK, or third-party Engines to compute candidate Node positions from the same immutable Canvas projection without gaining write access to the Document.
+Layout libraries usually have different configuration, coordinate, and output models. `@nodebraid/layout-api` defines NodeBraid's own minimal semantic seam, allowing Dagre, ELK, or third-party Engines to compute candidate Node positions from the same immutable Canvas projection without gaining write access to the Document.
 
 ## When to use it
 
@@ -20,7 +20,7 @@ Layout libraries usually have different configuration, coordinate, and output mo
 - you want to validate Provider capabilities or an untrusted Proposal;
 - you need shared semantics for full, incremental, and Fixed Node requests.
 
-Applications that only need to execute layout inside a Canvas Runtime will typically use `@cflow/plugin-layout` together with a concrete Provider.
+Applications that only need to execute layout inside a Canvas Runtime will typically use `@nodebraid/plugin-layout` together with a concrete Provider.
 
 ## What it provides
 
@@ -28,16 +28,16 @@ Applications that only need to execute layout inside a Canvas Runtime will typic
 - `LayoutEngine<Config>`: a stable ID, immutable capabilities, and cancellable asynchronous `compute()`;
 - `LayoutProposal`: a source revision and complete Node positions;
 - `defineLayoutEngine()`: capability normalization, cancellation checks, and Proposal validation;
-- `createLayoutInput()`: creates a CFlow-owned immutable input from a committed Canvas View;
+- `createLayoutInput()`: creates a NodeBraid-owned immutable input from a committed Canvas View;
 - `assertLayoutCapabilities()`: rejects requests that the Provider has not declared support for;
 - `validateLayoutProposal()`: validates the revision, complete Node coverage, finite coordinates, and Fixed Nodes;
 - `LayoutError`: stable `layout + code` error identity.
 
 ## Dependencies and composition
 
-This package depends on the identity, geometry, and Canvas View contracts from `@cflow/kernel`, and the structured error contract from `@cflow/diagnostics`. It does not depend on the Plugin Host, Command Service, a concrete Provider, or `@cflow/core`.
+This package depends on the identity, geometry, and Canvas View contracts from `@nodebraid/kernel`, and the structured error contract from `@nodebraid/diagnostics`. It does not depend on the Plugin Host, Command Service, a concrete Provider, or `@nodebraid/core`.
 
-Runtime commits are typically handled by [`@cflow/plugin-layout`](/en/modules/plugin-layout). Both [`@cflow/layout-dagre`](/en/modules/layout-dagre) and [`@cflow/layout-elk`](/en/modules/layout-elk) implement this Engine seam.
+Runtime commits are typically handled by [`@nodebraid/plugin-layout`](/en/modules/plugin-layout). Both [`@nodebraid/layout-dagre`](/en/modules/layout-dagre) and [`@nodebraid/layout-elk`](/en/modules/layout-elk) implement this Engine seam.
 
 ## Public entry point
 
@@ -51,10 +51,10 @@ import {
   type LayoutEngine,
   type LayoutInput,
   type LayoutProposal,
-} from '@cflow/layout-api';
+} from '@nodebraid/layout-api';
 ```
 
-These entry points are also re-exported by `@cflow/core`.
+These entry points are also re-exported by `@nodebraid/core`.
 
 ## Validation and error semantics
 

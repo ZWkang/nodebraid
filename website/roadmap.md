@@ -1,6 +1,6 @@
 ---
 title: Roadmap
-description: 与当前能力严格分离的 CFlow 后续方向。
+description: 与当前能力严格分离的 NodeBraid 后续方向。
 ---
 
 # Roadmap

@@ -6,8 +6,8 @@ import {
   type PointerInput,
   type PointerType,
   type WheelInput,
-} from '@cflow/renderer-api';
-import type { SessionSnapshot } from '@cflow/session-api';
+} from '@nodebraid/renderer-api';
+import type { SessionSnapshot } from '@nodebraid/session-api';
 
 import type { SvgDomEventPolicy } from './contracts';
 

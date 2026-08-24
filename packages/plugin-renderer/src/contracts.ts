@@ -1,5 +1,5 @@
-import type { InteractionProjection } from '@cflow/interaction-api';
-import type { HitResult, RendererInputListener, ScreenPoint } from '@cflow/renderer-api';
+import type { InteractionProjection } from '@nodebraid/interaction-api';
+import type { HitResult, RendererInputListener, ScreenPoint } from '@nodebraid/renderer-api';
 
 export interface InteractionProjectionBinding {
   update(projection: InteractionProjection | null): void;

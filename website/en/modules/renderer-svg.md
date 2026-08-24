@@ -1,9 +1,9 @@
 ---
-title: '@cflow/renderer-svg'
-description: A reference Renderer Provider that projects CFlow Canvas semantics into an existing SVG Target.
+title: '@nodebraid/renderer-svg'
+description: A reference Renderer Provider that projects NodeBraid Canvas semantics into an existing SVG Target.
 ---
 
-# `@cflow/renderer-svg`
+# `@nodebraid/renderer-svg`
 
 ::: warning Package is not publicly released
 This name describes the current source-module boundary; it does not mean the package can be installed from npm. Follow the source-based [Quick Start](/en/guide/quick-start) to verify it.
@@ -11,7 +11,7 @@ This name describes the current source-module boundary; it does not mean the pac
 
 ## Problems it solves
 
-`@cflow/renderer-svg` is the first official concrete Provider for `@cflow/renderer-api`. It projects Document, Session, Hit Testing, and standardized browser input into an application-owned `SVGSVGElement`, validating the Renderer contract against a real DOM without leaking SVG types into Kernel, Session, or the public Renderer API.
+`@nodebraid/renderer-svg` is the first official concrete Provider for `@nodebraid/renderer-api`. It projects Document, Session, Hit Testing, and standardized browser input into an application-owned `SVGSVGElement`, validating the Renderer contract against a real DOM without leaking SVG types into Kernel, Session, or the public Renderer API.
 
 It provides generic rectangular Nodes, straight Edges, and a stable DOM seam. It does not interpret product Node types, business data, or component frameworks.
 
@@ -20,7 +20,7 @@ It provides generic rectangular Nodes, straight Edges, and a stable DOM seam. It
 - You need an official Renderer Provider that integrates with an existing SVG element;
 - You want to verify the complete Renderer path across Document Commits, Selection, Viewport, Hit Testing, and browser input;
 - Your application will define product visuals and editing behavior through CSS and higher-level Interaction;
-- You want to use a named Factory directly or connect it to the Runtime through [`@cflow/plugin-renderer`](/en/modules/plugin-renderer).
+- You want to use a named Factory directly or connect it to the Runtime through [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer).
 
 If the product needs custom Node DOM, Ports, complex Edges, component mounting, or complete editor interaction, this package is not a substitute for those capabilities.
 
@@ -31,7 +31,7 @@ If the product needs custom Node DOM, Ports, complex Edges, component mounting, 
 - A real-DOM bridge for Pointer, Wheel, Keyboard, Focus, and Pointer Capture;
 - Node Drag, Viewport Pan, and Connection Preview Projection plus Node-level source/target Anchor Hit Results;
 - CSS-screen-pixel to SVG-user-space conversion and semantic Hit Testing;
-- Stable classes, `data-cflow-*` attributes, canonical layer order, and keyed DOM identity;
+- Stable classes, `data-nodebraid-*` attributes, canonical layer order, and keyed DOM identity;
 - Atomic Document/Session updates, continuous revision validation, rollback on failure, and reset recovery;
 - Provider-specific `SvgRendererError` values plus the complete structured Renderer contract errors.
 
@@ -39,9 +39,9 @@ The Provider manages only the projection subtree it creates under the Target. Th
 
 ## Dependencies and composition
 
-This package depends on the backend-neutral contract from [`@cflow/renderer-api`](/en/modules/renderer-api) and the Kernel, Session, Interaction Projection, and Diagnostics value contracts used by it. It does not depend on the Plugin Host, a framework adapter, the Interaction state machine, or `@cflow/core`.
+This package depends on the backend-neutral contract from [`@nodebraid/renderer-api`](/en/modules/renderer-api) and the Kernel, Session, Interaction Projection, and Diagnostics value contracts used by it. It does not depend on the Plugin Host, a framework adapter, the Interaction state machine, or `@nodebraid/core`.
 
-Applications can create the Renderer directly. To get Runtime lifecycle and Kernel/Session synchronization, pass `createSvgRenderer` to [`@cflow/plugin-renderer`](/en/modules/plugin-renderer). CFlow does not select this Provider by default, and `@cflow/core` does not re-export it.
+Applications can create the Renderer directly. To get Runtime lifecycle and Kernel/Session synchronization, pass `createSvgRenderer` to [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer). NodeBraid does not select this Provider by default, and `@nodebraid/core` does not re-export it.
 
 ## Public entry points
 
@@ -53,7 +53,7 @@ import {
   type SvgInputPolicies,
   type SvgRendererConfig,
   type SvgRendererErrorCode,
-} from '@cflow/renderer-svg';
+} from '@nodebraid/renderer-svg';
 
 const target = document.querySelector<SVGSVGElement>('#canvas');
 if (!target) throw new Error('Missing SVG target.');
@@ -77,19 +77,19 @@ Factory config is an immutable Provider-specific value. `target` is required; `e
 
 ## DOM and styling seam
 
-The Provider writes geometry, stable classes, and `data-cflow-*` attributes, but it does not inject a runtime theme. Applications can start with minimal styles:
+The Provider writes geometry, stable classes, and `data-nodebraid-*` attributes, but it does not inject a runtime theme. Applications can start with minimal styles:
 
 ```css
-.cflow-renderer-svg__node {
+.nodebraid-renderer-svg__node {
   fill: white;
   stroke: currentColor;
 }
 
-.cflow-renderer-svg__edge {
+.nodebraid-renderer-svg__edge {
   stroke: currentColor;
 }
 
-[data-cflow-selected='true'] {
+[data-nodebraid-selected='true'] {
   stroke-width: 2;
 }
 ```
@@ -107,7 +107,7 @@ An available Target can host only one SVG Renderer Instance at a time. The Facto
 | `TARGET_OCCUPIED`    | Another active or still-cleaning-up Instance owns the Target             |
 | `TARGET_UNAVAILABLE` | The Target is disconnected, has no usable size, or has no invertible CTM |
 
-Document revision, Session, Input subscriber, Pointer, and disposed-state failures continue to use `RendererError` from `@cflow/renderer-api`. The Provider does not swallow failures. Structural validation occurs before projection changes, and a failure that cannot be rolled back safely explicitly requires the next `reset` to rebuild the Baseline.
+Document revision, Session, Input subscriber, Pointer, and disposed-state failures continue to use `RendererError` from `@nodebraid/renderer-api`. The Provider does not swallow failures. Structural validation occurs before projection changes, and a failure that cannot be rolled back safely explicitly requires the next `reset` to rebuild the Baseline.
 
 ## Limitations and non-goals
 

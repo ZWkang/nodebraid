@@ -1,6 +1,6 @@
 # 04 — 用真实 SVG 验证 Composition
 
-**What to build:** 让评估 CFlow 的开发者可以运行一个显式 Host、Basic Canvas Composition 与真实 SVG Provider 的 canonical 示例，并在 Chromium 中看到基础编辑、历史与释放闭环。
+**What to build:** 让评估 NodeBraid 的开发者可以运行一个显式 Host、Basic Canvas Composition 与真实 SVG Provider 的 canonical 示例，并在 Chromium 中看到基础编辑、历史与释放闭环。
 
 **Blocked by:** 01 — 建立首个 Basic Canvas Composition 闭环。
 

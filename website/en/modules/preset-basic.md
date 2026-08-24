@@ -1,11 +1,11 @@
 ---
-title: '@cflow/preset-basic'
+title: '@nodebraid/preset-basic'
 description: Basic Canvas Composition with an explicit Renderer, complete readiness, and one owned lifecycle.
 ---
 
-# `@cflow/preset-basic`
+# `@nodebraid/preset-basic`
 
-`@cflow/preset-basic` is CFlow's official backend-neutral Basic Canvas Composition. It concentrates the stable repeated assembly of Kernel, Command, Session, Renderer, Interaction, and History into one ordinary Plugin while leaving the Plugin Host, Diagnostics, Renderer Provider, and extension choices under application ownership.
+`@nodebraid/preset-basic` is NodeBraid's official backend-neutral Basic Canvas Composition. It concentrates the stable repeated assembly of Kernel, Command, Session, Renderer, Interaction, and History into one ordinary Plugin while leaving the Plugin Host, Diagnostics, Renderer Provider, and extension choices under application ownership.
 
 ::: warning Package is not publicly released
 This name identifies the current source module boundary; it does not mean the package can be installed from npm. Follow the [Quick Start](/en/guide/quick-start) to verify it from source.
@@ -25,8 +25,8 @@ The package has no default export, Runtime Service, Host factory, Renderer Regis
 ## Typical composition
 
 ```ts
-import { createBasicCanvasPlugin, createPluginHost } from '@cflow/core';
-import { createSvgRenderer } from '@cflow/renderer-svg';
+import { createBasicCanvasPlugin, createPluginHost } from '@nodebraid/core';
+import { createSvgRenderer } from '@nodebraid/renderer-svg';
 
 const host = createPluginHost();
 const basicCanvas = createBasicCanvasPlugin(createSvgRenderer);

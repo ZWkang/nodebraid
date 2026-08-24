@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 
-import { createCanvasKernel, nodeId } from '@cflow/kernel';
+import { createCanvasKernel, nodeId } from '@nodebraid/kernel';
 
 import { createLayoutInput, defineLayoutEngine, type LayoutError, type LayoutProposal } from '../src';
 

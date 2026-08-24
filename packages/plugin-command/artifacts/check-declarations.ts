@@ -7,7 +7,7 @@ import { collectDeclarations } from '../../../scripts/collect-declarations';
 import type { CommandService } from '../src/index';
 
 const forbiddenImport =
-  /(?:from\s+|import\()["'](?:@cflow\/(?:core|kernel|plugin-kernel|renderer-[^"']+)|cordis|rxjs)["']/;
+  /(?:from\s+|import\()["'](?:@nodebraid\/(?:core|kernel|plugin-kernel|renderer-[^"']+)|cordis|rxjs)["']/;
 const forbiddenCordisType = /\b(?:CordisError|Effect|Fiber|FiberState)\b/;
 
 const pluginDist = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -21,8 +21,8 @@ for (const declaration of await collectDeclarations(pluginDist)) {
   assert.doesNotMatch(declaration.contents, forbiddenCordisType, declaration.path);
 }
 
-const pluginPackageName = '@cflow/plugin-command';
-const runtimePackageName = '@cflow/runtime-cordis';
+const pluginPackageName = '@nodebraid/plugin-command';
+const runtimePackageName = '@nodebraid/runtime-cordis';
 const pluginPackage = (await import(pluginPackageName)) as typeof import('../src/index');
 const runtimePackage = await import(runtimePackageName);
 const identity = pluginPackage.defineCommand<string, string>('artifact.identity');

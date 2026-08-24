@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 
-import { CFlowError } from '@cflow/diagnostics';
+import { NodeBraidError } from '@nodebraid/diagnostics';
 
-test('@cflow/diagnostics exposes the CFlowError seam by package name', () => {
-  expect(CFlowError.name).toBe('CFlowError');
+test('@nodebraid/diagnostics exposes the NodeBraidError seam by package name', () => {
+  expect(NodeBraidError.name).toBe('NodeBraidError');
 });

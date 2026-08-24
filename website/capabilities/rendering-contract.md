@@ -1,14 +1,14 @@
 ---
 title: Rendering Contract
-description: 用 backend-neutral Renderer 协议连接 Document、Session 与 Interaction，而不把后端对象带入 CFlow 核心。
+description: 用 backend-neutral Renderer 协议连接 Document、Session 与 Interaction，而不把后端对象带入 NodeBraid 核心。
 ---
 
 # Rendering Contract
 
-Rendering Contract 能力族定义“怎样把 CFlow Canvas 语义交给渲染后端”，以及“怎样把后端输入还原为 CFlow 值”。它刻意不选择 SVG、Canvas2D、Konva、Pixi 或任何默认实现：应用持有 concrete Renderer Factory，Runtime adapter 只负责状态同步和生命周期。
+Rendering Contract 能力族定义“怎样把 NodeBraid Canvas 语义交给渲染后端”，以及“怎样把后端输入还原为 NodeBraid 值”。它刻意不选择 SVG、Canvas2D、Konva、Pixi 或任何默认实现：应用持有 concrete Renderer Factory，Runtime adapter 只负责状态同步和生命周期。
 
 ::: info SVG Renderer Provider 已交付
-`@cflow/renderer-svg` 是当前首个参考级官方 Provider：它把通用矩形 Node、直线 Edge、Selection、Viewport 与标准化输入投影到调用方已有的 SVG Target。它不是默认 Renderer，也不解释产品 Node type 或 data。
+`@nodebraid/renderer-svg` 是当前首个参考级官方 Provider：它把通用矩形 Node、直线 Edge、Selection、Viewport 与标准化输入投影到调用方已有的 SVG Target。它不是默认 Renderer，也不解释产品 Node type 或 data。
 :::
 
 ## 解决的问题
@@ -21,21 +21,21 @@ Rendering Contract 能力族定义“怎样把 CFlow Canvas 语义交给渲染�
 
 ## 何时使用
 
-- 你正在实现 CFlow 的 Renderer Provider；
+- 你正在实现 NodeBraid 的 Renderer Provider；
 - 你需要使用当前官方 SVG Provider 投影通用 Canvas 语义；
 - 你要把一个已有 Renderer Factory 接入 Canvas Runtime；
 - 你的 Interaction Plugin 需要订阅标准化输入、Hit Test、Pointer Capture 或 Focus；
-- 你在评估 CFlow 与具体渲染后端之间的责任边界。
+- 你在评估 NodeBraid 与具体渲染后端之间的责任边界。
 
-如果 SVG 的通用 Geometry 与 DOM seam 满足需求，可以直接选择 `@cflow/renderer-svg`；CFlow 已提供独立 Interaction Runtime，但产品节点视觉与 framework adapter 仍由应用显式提供。
+如果 SVG 的通用 Geometry 与 DOM seam 满足需求，可以直接选择 `@nodebraid/renderer-svg`；NodeBraid 已提供独立 Interaction Runtime，但产品节点视觉与 framework adapter 仍由应用显式提供。
 
 ## 提供的能力
 
-| 角色                | Package                                              | 交付内容                                                                                          |
-| ------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Provider contract   | [`@cflow/renderer-api`](/modules/renderer-api)       | `CanvasRenderer`、Factory、Document/Session/Interaction 更新、标准化输入、Hit Result 与结构化错误 |
-| Runtime integration | [`@cflow/plugin-renderer`](/modules/plugin-renderer) | 将 Factory 绑定为 Plugin，协调 Kernel/Session，并提供排他的 Interaction Binding                   |
-| SVG Provider        | [`@cflow/renderer-svg`](/modules/renderer-svg)       | 将通用 Canvas Geometry、Session 与浏览器输入投影到现有 `SVGSVGElement`                            |
+| 角色                | Package                                                  | 交付内容                                                                                          |
+| ------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Provider contract   | [`@nodebraid/renderer-api`](/modules/renderer-api)       | `CanvasRenderer`、Factory、Document/Session/Interaction 更新、标准化输入、Hit Result 与结构化错误 |
+| Runtime integration | [`@nodebraid/plugin-renderer`](/modules/plugin-renderer) | 将 Factory 绑定为 Plugin，协调 Kernel/Session，并提供排他的 Interaction Binding                   |
+| SVG Provider        | [`@nodebraid/renderer-svg`](/modules/renderer-svg)       | 将通用 Canvas Geometry、Session 与浏览器输入投影到现有 `SVGSVGElement`                            |
 
 ```text
 Kernel Commit ───────────────┐
@@ -50,20 +50,20 @@ Renderer 没有 Document、Session 或 Command 写权。它只投影状态并报
 
 ## 依赖与组合
 
-`@cflow/renderer-api` 只依赖 CFlow 的 Kernel、Session、Interaction Projection value contract 与 Diagnostics，不依赖 Plugin Host、具体后端或框架。
+`@nodebraid/renderer-api` 只依赖 NodeBraid 的 Kernel、Session、Interaction Projection value contract 与 Diagnostics，不依赖 Plugin Host、具体后端或框架。
 
-`@cflow/plugin-renderer` 静态要求 `KernelService` 与 `SessionService`。应用从 concrete Provider 获得 `RendererFactory<Config>`，调用 `createRendererPlugin(factory)` 生成一个普通 Runtime Plugin，再用 Provider-specific config 安装。CFlow 不提供 Factory Registry 或默认 Provider。
+`@nodebraid/plugin-renderer` 静态要求 `KernelService` 与 `SessionService`。应用从 concrete Provider 获得 `RendererFactory<Config>`，调用 `createRendererPlugin(factory)` 生成一个普通 Runtime Plugin，再用 Provider-specific config 安装。NodeBraid 不提供 Factory Registry 或默认 Provider。
 
-`@cflow/renderer-svg` 只依赖 Renderer API 及其值契约，不依赖 Plugin Host；应用可以直接使用 Factory，也可以通过 Renderer Plugin 接入 Runtime。
+`@nodebraid/renderer-svg` 只依赖 Renderer API 及其值契约，不依赖 Plugin Host；应用可以直接使用 Factory，也可以通过 Renderer Plugin 接入 Runtime。
 
 ## 公共入口
 
-- [`@cflow/renderer-api`](/modules/renderer-api)：Provider 作者与 Runtime adapter 共享的 backend-neutral contract；
-- [`@cflow/plugin-renderer`](/modules/plugin-renderer)：把已选择的 Factory 接入 Plugin Host；
-- [`@cflow/renderer-svg`](/modules/renderer-svg)：当前官方 SVG Factory、Config 与 Provider-specific error；
-- `@cflow/core`：重导出两者，但不会带入任何 concrete Provider。
+- [`@nodebraid/renderer-api`](/modules/renderer-api)：Provider 作者与 Runtime adapter 共享的 backend-neutral contract；
+- [`@nodebraid/plugin-renderer`](/modules/plugin-renderer)：把已选择的 Factory 接入 Plugin Host；
+- [`@nodebraid/renderer-svg`](/modules/renderer-svg)：当前官方 SVG Factory、Config 与 Provider-specific error；
+- `@nodebraid/core`：重导出两者，但不会带入任何 concrete Provider。
 
-当前 package 尚未以 CFlow 项目身份公开发布；请从源码验证，不要使用 npm 上同名的其他项目 package。
+当前 package 尚未公开发布；请从源码验证，首次 npm 发布前不要使用尚未生效的 package 名安装。
 
 ## 生命周期与错误语义
 

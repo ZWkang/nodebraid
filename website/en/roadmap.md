@@ -1,6 +1,6 @@
 ---
 title: Roadmap
-description: Future CFlow directions kept strictly separate from currently delivered capabilities.
+description: Future NodeBraid directions kept strictly separate from currently delivered capabilities.
 ---
 
 # Roadmap

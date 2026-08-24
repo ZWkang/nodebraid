@@ -1,13 +1,13 @@
 ---
-title: '@cflow/runtime-cordis'
-description: CFlow-owned Plugin Host, Runtime Service, and Installation lifecycle.
+title: '@nodebraid/runtime-cordis'
+description: NodeBraid-owned Plugin Host, Runtime Service, and Installation lifecycle.
 ---
 
-# `@cflow/runtime-cordis`
+# `@nodebraid/runtime-cordis`
 
-`@cflow/runtime-cordis` provides an isolated Plugin Host for each Canvas Runtime. It connects Plugins with strongly typed Service Tokens, drives Activation through Runtime Service availability, and gives every resource a clear, awaitable release boundary.
+`@nodebraid/runtime-cordis` provides an isolated Plugin Host for each Canvas Runtime. It connects Plugins with strongly typed Service Tokens, drives Activation through Runtime Service availability, and gives every resource a clear, awaitable release boundary.
 
-Cordis exists only inside the package implementation. The public entry points use CFlow's own terminology and types exclusively.
+Cordis exists only inside the package implementation. The public entry points use NodeBraid's own terminology and types exclusively.
 
 ::: warning Package is not publicly released
 This name identifies the current source module boundary; it does not mean the package can be installed from npm. Follow the [Quick Start](/en/guide/quick-start) to verify it from source.
@@ -15,7 +15,7 @@ This name identifies the current source module boundary; it does not mean the pa
 
 ## The problem it solves
 
-Canvas capabilities have both dependencies and independent lifecycles. Without introducing a global Service locator, CFlow needs to answer:
+Canvas capabilities have both dependencies and independent lifecycles. Without introducing a global Service locator, NodeBraid needs to answer:
 
 - What state should a consumer be in while a Required Service is unavailable?
 - How should dependents activate, deactivate, and reactivate as a Provider appears or disappears?
@@ -25,7 +25,7 @@ Canvas capabilities have both dependencies and independent lifecycles. Without i
 
 ## When to use it
 
-- Ordinary applications usually use this API through `@cflow/core`.
+- Ordinary applications usually use this API through `@nodebraid/core`.
 - Infrastructure and advanced integrations can depend directly on this narrow package when they need only the Plugin Runtime.
 - New Runtime Plugins use it to declare Required Services, Provided Services, and Owned Resources statically.
 
@@ -55,7 +55,7 @@ Plugins declare Service Bindings statically when they are defined. The first ver
 
 The Plugin Graph must remain acyclic. Dependents deactivate before their Providers. Independent Installations can activate concurrently, but setup and cleanup are serialized within each Installation.
 
-This package depends directly on `@cflow/diagnostics` and uses a pinned Cordis lifecycle implementation internally. It does not depend on `@cflow/core`.
+This package depends directly on `@nodebraid/diagnostics` and uses a pinned Cordis lifecycle implementation internally. It does not depend on `@nodebraid/core`.
 
 ## Public entry points
 
@@ -129,4 +129,4 @@ The Diagnostic Sink is a synchronous, observational outlet. Successfully deliver
 - `packages/runtime-cordis/tests/index.test.ts` covers Service Token identity, static Bindings, `pending`/`active`/`failed`/`disposed`, Provider reservation, dependency ordering, reactivation, Child Installations, concurrent Activation, and idempotent cleanup.
 - The same suite verifies dependency cycles, Provider conflicts, atomic publication of Provided Services, original Setup failures, and aggregation of multiple cleanup failures.
 - `packages/runtime-cordis/tests/diagnostics.test.ts` verifies Host-scoped immutable events, the synchronous Sink, Fault isolation, and ordering between events and Snapshots.
-- `packages/runtime-cordis/tests/error-contract.test.ts` verifies that `PluginHostError` extends the shared `CFlowError` contract.
+- `packages/runtime-cordis/tests/error-contract.test.ts` verifies that `PluginHostError` extends the shared `NodeBraidError` contract.

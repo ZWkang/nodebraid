@@ -1,14 +1,14 @@
-# CFlow Kernel Runtime Plugin
+# NodeBraid Kernel Runtime Plugin
 
 **Status:** ready-for-agent
 
 ## Problem Statement
 
-`@cflow/kernel` 已经提供纯进程内、可逆的 Document 与 Transaction seam，`@cflow/runtime-cordis` 已经提供 CFlow-owned Plugin Host seam，但两者尚未组合成 Canvas Runtime 能力。若 Consumer 直接获得裸 `CanvasKernel`，提交传播、Observer 错误隔离、重入顺序与生命周期释放都会扩散到每个调用方，并可能反向污染纯 Kernel。
+`@nodebraid/kernel` 已经提供纯进程内、可逆的 Document 与 Transaction seam，`@nodebraid/runtime-cordis` 已经提供 NodeBraid-owned Plugin Host seam，但两者尚未组合成 Canvas Runtime 能力。若 Consumer 直接获得裸 `CanvasKernel`，提交传播、Observer 错误隔离、重入顺序与生命周期释放都会扩散到每个调用方，并可能反向污染纯 Kernel。
 
 ## Solution
 
-新增独立发布包 `@cflow/plugin-kernel`。它导出一个 `kernelService` Service Token、一个 `kernelPlugin` 官方 Plugin，以及窄 `KernelService` interface。每次 Plugin Activation 创建一份新的空 revision-zero Kernel；Service 只提供 `read`、同步 `transact` 和 `observeCommits`，不公开裸 `CanvasKernel`、Document、Cordis 类型或内部 Dispatcher。
+新增独立发布包 `@nodebraid/plugin-kernel`。它导出一个 `kernelService` Service Token、一个 `kernelPlugin` 官方 Plugin，以及窄 `KernelService` interface。每次 Plugin Activation 创建一份新的空 revision-zero Kernel；Service 只提供 `read`、同步 `transact` 和 `observeCommits`，不公开裸 `CanvasKernel`、Document、Cordis 类型或内部 Dispatcher。
 
 `transact` 先通过真实 Kernel 同步完成提交。只有返回非空 `CanvasCommit` 时才进入同步分发队列。Dispatcher 按 revision 与 Transaction 完成顺序逐个通知当前 Observer；Observer 内再次 `transact` 产生的后续 Commit 只入队，等所有 Observer 看完当前 revision 后再分发。一个 Observer 抛错不回滚已提交状态，也不阻断其他 Observer；错误沿用 Runtime 既有平台报告语义，通过 `globalThis.reportError` 报告，平台 reporter 自身失败或不存在时在 microtask 中显式抛出。
 
@@ -23,8 +23,8 @@ Plugin Activation 结束时，Plugin Host 先停用依赖该 Service 的 Consume
 - `kernelPlugin` 无配置、无 Required Service，只提供绑定名 `kernel` 的 `kernelService`。
 - Service dispose 后，`read`、`transact` 与 `observeCommits` 抛出带稳定 code 的 `KernelPluginError`。
 - Observer 集合、Commit 队列、分发标志和底层 CanvasKernel 都属于 adapter implementation，不进入 interface。
-- `@cflow/plugin-kernel` 依赖 `@cflow/kernel` 和 `@cflow/runtime-cordis`，不依赖 `@cflow/core`；`@cflow/kernel` 的依赖方向不变。
-- `@cflow/core` 重导出 Plugin 的公共 interface，但内部包不通过 core 相互调用。
+- `@nodebraid/plugin-kernel` 依赖 `@nodebraid/kernel` 和 `@nodebraid/runtime-cordis`，不依赖 `@nodebraid/core`；`@nodebraid/kernel` 的依赖方向不变。
+- `@nodebraid/core` 重导出 Plugin 的公共 interface，但内部包不通过 core 相互调用。
 
 ## Behavioral Requirements
 
@@ -43,7 +43,7 @@ Plugin Activation 结束时，Plugin Host 先停用依赖该 Service 的 Consume
 ## Testing Decisions
 
 - 行为测试只通过 `createPluginHost()`、`kernelPlugin`、`kernelService` 与 Consumer Plugin 使用 `KernelService`。
-- 使用真实 `@cflow/kernel` 与真实 `@cflow/runtime-cordis`，不 mock 内部 Dispatcher、Kernel 或 Cordis。
+- 使用真实 `@nodebraid/kernel` 与真实 `@nodebraid/runtime-cordis`，不 mock 内部 Dispatcher、Kernel 或 Cordis。
 - 每个 vertical slice 遵循 red → green；core 只保留 package-name import 与重导出 smoke test。
 - 类型测试覆盖 Service Token 的 KernelService 类型、同步 transact 参数和只读 Kernel 类型。
 - 声明检查覆盖 Cordis/core 泄漏，包级与全仓验证覆盖 test、typecheck、build、pack 和 diff check。

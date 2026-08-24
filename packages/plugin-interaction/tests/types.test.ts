@@ -1,6 +1,6 @@
 import { test } from 'bun:test';
 
-import type { Plugin } from '@cflow/runtime-cordis';
+import type { Plugin } from '@nodebraid/runtime-cordis';
 
 import {
   createEdgeCommand,

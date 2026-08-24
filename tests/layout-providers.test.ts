@@ -16,9 +16,9 @@ import {
   type LayoutCommandResult,
   type LayoutEngine,
   type NodeId,
-} from '@cflow/core';
-import { dagreLayoutEngine, type DagreLayoutConfig } from '@cflow/layout-dagre';
-import { elkLayoutEngine, type ElkLayoutConfig } from '@cflow/layout-elk';
+} from '@nodebraid/core';
+import { dagreLayoutEngine, type DagreLayoutConfig } from '@nodebraid/layout-dagre';
+import { elkLayoutEngine, type ElkLayoutConfig } from '@nodebraid/layout-elk';
 
 test('Dagre and ELK compose with Provider-specific typed Runtime Commands', async () => {
   const dagre = await runProvider(dagreLayoutEngine, { direction: 'LR', rankSpacing: 50 } satisfies DagreLayoutConfig);

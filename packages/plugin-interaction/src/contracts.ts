@@ -1,5 +1,5 @@
-import type { ConnectionAnchorIdentity } from '@cflow/interaction-api';
-import type { CanvasCommit, CanvasEdge, EdgeEndpoint, NodeId, Point } from '@cflow/kernel';
+import type { ConnectionAnchorIdentity } from '@nodebraid/interaction-api';
+import type { CanvasCommit, CanvasEdge, EdgeEndpoint, NodeId, Point } from '@nodebraid/kernel';
 
 export interface ConnectionMaterializationInput {
   readonly source: EdgeEndpoint;

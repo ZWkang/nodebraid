@@ -1,11 +1,11 @@
 ---
 title: 能力地图
-description: 从开发者问题出发，理解 CFlow 当前七个能力族及其 package 组合。
+description: 从开发者问题出发，理解 NodeBraid 当前七个能力族及其 package 组合。
 ---
 
 # 能力地图
 
-CFlow 的 package 边界用于保持依赖清晰，但评估一个系统时，首先需要回答的是“它能帮我完成什么”。当前 workspace packages 组成七个能力族；每个能力族都连接契约、Runtime integration 与可选 Provider，而不是把单个基础 package 当成孤立卖点。
+NodeBraid 的 package 边界用于保持依赖清晰，但评估一个系统时，首先需要回答的是“它能帮我完成什么”。当前 workspace packages 组成七个能力族；每个能力族都连接契约、Runtime integration 与可选 Provider，而不是把单个基础 package 当成孤立卖点。
 
 | 能力族                                                 | 回答的问题                                        | 当前交付                                             |
 | ------------------------------------------------------ | ------------------------------------------------- | ---------------------------------------------------- |
@@ -33,7 +33,7 @@ Plugin Host
     └── Renderer Plugin ▶ application-provided Renderer Factory
 ```
 
-Plugin Host 不隐式安装这些能力，`@cflow/core` 也只是公共 facade。应用可以显式逐项安装，或显式安装 Basic Canvas Composition；Renderer 与其他 Provider 仍由应用选择。
+Plugin Host 不隐式安装这些能力，`@nodebraid/core` 也只是公共 facade。应用可以显式逐项安装，或显式安装 Basic Canvas Composition；Renderer 与其他 Provider 仍由应用选择。
 
 ## 下一步
 

@@ -1,5 +1,5 @@
-import type { NodeId, Point } from '@cflow/kernel';
-import type { Viewport } from '@cflow/session-api';
+import type { NodeId, Point } from '@nodebraid/kernel';
+import type { Viewport } from '@nodebraid/session-api';
 
 export type ConnectionAnchorRole = 'source' | 'target';
 

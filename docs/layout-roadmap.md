@@ -1,4 +1,4 @@
-# CFlow Layout 范围记录
+# NodeBraid Layout 范围记录
 
 > 状态：首版已实现
 >
@@ -37,7 +37,7 @@
 - 共享投影层验证 Layout Request、Fixed Node ID、Size、嵌套与 Port；Provider 验证配置及算法约束；Runtime 验证 Proposal 和提交时 revision。
 - Layout Command 在输入投影前、Provider 调用前、Provider 返回后及 Transaction 前检查取消；同步 Transaction 开始后不可取消或倒销。
 - 空图与全部 Node 固定的图仍调用 Provider 并要求完整 Proposal，不绕过配置、capability 或 Provider 契约验证；最终可产生 `null` Commit。
-- `@cflow/plugin-layout` 是静态绑定一个 Layout Engine 与一个 typed Command 的 Runtime 集成工厂，不提供 LayoutService；Provider 包仍保持 Runtime-free。
+- `@nodebraid/plugin-layout` 是静态绑定一个 Layout Engine 与一个 typed Command 的 Runtime 集成工厂，不提供 LayoutService；Provider 包仍保持 Runtime-free。
 - Layout Commit 使用 `origin: 'layout'`，并用 Provider Command 诊断 ID 区分具体算法。
 - LayoutError 只稳定 `INVALID_REQUEST`、`INVALID_INPUT`、`UNSUPPORTED_FEATURE`、`INVALID_PROPOSAL` 与 `STALE_PROPOSAL` 五种 code；details 不复制完整图、Provider 配置或不透明 `data`。
 - 并发 Layout Command 可以同时计算，但按 first-commit-wins 提交；不自动取消前一个任务，也不让后返回结果覆盖新 revision。
@@ -45,23 +45,23 @@
 - 首版 Layout Engine 不拥有 `dispose()` 或独立资源生命周期；Command 注销负责取消并等待在途计算。
 - 除自环 capability 外，所有 full Provider 必须支持空图、单 Node、断连分量、平行 Edge 和有向环。
 - Layout Proposal 只包含起点 revision 与 Node positions，不复制 Provider ID、mode、effective config 或 capability。
-- CFlow 复制并冻结 Layout Input、Capability 与验证后的 Proposal；Provider 负责冻结自己定义的 effective config。
+- NodeBraid 复制并冻结 Layout Input、Capability 与验证后的 Proposal；Provider 负责冻结自己定义的 effective config。
 - 同一 Provider 版本对相同规范化输入和 effective config 必须产生确定坐标；需要随机时必须使用显式 seed。
 - Layout 接受 Kernel 合法的显式零宽或零高；它与缺少 Size 是不同语义。
-- `@cflow/layout-api` 只依赖 `@cflow/kernel` 的 ID 与几何类型；Provider 只依赖 `layout-api`；`plugin-layout` 依赖 layout API、Kernel Plugin、Command Plugin 与 Plugin Host seam，内部包不依赖 `@cflow/core`。
+- `@nodebraid/layout-api` 只依赖 `@nodebraid/kernel` 的 ID 与几何类型；Provider 只依赖 `layout-api`；`plugin-layout` 依赖 layout API、Kernel Plugin、Command Plugin 与 Plugin Host seam，内部包不依赖 `@nodebraid/core`。
 
 ## 首版包边界
 
 首版设计包含四个发布包：
 
-- `@cflow/layout-api`：公开 Layout Input、Layout Proposal、Layout Engine、capability、共享验证与结构错误。
-- `@cflow/plugin-layout`：将一个 Engine 与一个 typed Command 静态绑定到 Runtime 提交链路。
-- `@cflow/layout-dagre`：Dagre Layout Provider 与其类型化配置。
-- `@cflow/layout-elk`：ELK Layout Provider 与其类型化配置。
+- `@nodebraid/layout-api`：公开 Layout Input、Layout Proposal、Layout Engine、capability、共享验证与结构错误。
+- `@nodebraid/plugin-layout`：将一个 Engine 与一个 typed Command 静态绑定到 Runtime 提交链路。
+- `@nodebraid/layout-dagre`：Dagre Layout Provider 与其类型化配置。
+- `@nodebraid/layout-elk`：ELK Layout Provider 与其类型化配置。
 
 Dagre 与 ELK 都必须真实验证 `layout-api` seam，两者都支持 full，且至少一个真正支持 incremental 与 Fixed Node。
 
-`@cflow/core` 重导出 `layout-api` 与 `plugin-layout` 的通用能力，但不依赖或重导出 Dagre、ELK。高级消费者可以直接调用低层 Layout Engine 获得未提交 Proposal；官方 Runtime 写入路径仍是 `plugin-layout` Provider Command。
+`@nodebraid/core` 重导出 `layout-api` 与 `plugin-layout` 的通用能力，但不依赖或重导出 Dagre、ELK。高级消费者可以直接调用低层 Layout Engine 获得未提交 Proposal；官方 Runtime 写入路径仍是 `plugin-layout` Provider Command。
 
 ## 后续单独设计与实现
 

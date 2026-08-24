@@ -1,6 +1,6 @@
-import type { CanvasCommit, CanvasEdge, CanvasNode, CanvasSnapshot, CanvasView, NodeId } from '@cflow/kernel';
-import { RendererError, type RendererDocumentUpdate } from '@cflow/renderer-api';
-import type { SessionSnapshot } from '@cflow/session-api';
+import type { CanvasCommit, CanvasEdge, CanvasNode, CanvasSnapshot, CanvasView, NodeId } from '@nodebraid/kernel';
+import { RendererError, type RendererDocumentUpdate } from '@nodebraid/renderer-api';
+import type { SessionSnapshot } from '@nodebraid/session-api';
 
 /** @internal */
 export function cloneCanvasSnapshot(snapshot: CanvasSnapshot): CanvasSnapshot {

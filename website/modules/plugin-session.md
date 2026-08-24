@@ -1,18 +1,18 @@
 ---
-title: '@cflow/plugin-session'
+title: '@nodebraid/plugin-session'
 description: 管理本地 Selection 与 Viewport，并与当前 Kernel View 保持一致的 Session Runtime Plugin。
 ---
 
-# `@cflow/plugin-session`
+# `@nodebraid/plugin-session`
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。
 :::
 
-`@cflow/plugin-session` 为一张活动 Canvas Runtime 提供本地 Session：它不修改 Document，只管理当前 Selection 与 Viewport，并在 Kernel Commit 后移除已经不存在的选择。
+`@nodebraid/plugin-session` 为一张活动 Canvas Runtime 提供本地 Session：它不修改 Document，只管理当前 Selection 与 Viewport，并在 Kernel Commit 后移除已经不存在的选择。
 
 ::: info 当前状态
-已实现，并已由 `@cflow/core` facade 重导出。它依赖当前 Kernel Service，不是独立的全局 UI Store。
+已实现，并已由 `@nodebraid/core` facade 重导出。它依赖当前 Kernel Service，不是独立的全局 UI Store。
 :::
 
 ## 解决什么问题
@@ -35,9 +35,9 @@ Selection 与 Viewport 会频繁变化，但它们不应该进入 Document Histo
 - `SessionService.subscribe()`：订阅状态转换，listener 通过 `getSnapshot()` 读取当前值。
 - `setSelection()` / `clearSelection()`：替换或清空 Selection。
 - `setViewport()`：替换并验证 Viewport。
-- `SelectionInput`：调用方 mutation 输入；Snapshot 值类型从 `@cflow/session-api` 重导出。
+- `SelectionInput`：调用方 mutation 输入；Snapshot 值类型从 `@nodebraid/session-api` 重导出。
 - `SessionError`：稳定的 input、entity、subscriber 与 disposed error code。
-- `sessionDiagnosticEvents`：公开 `cflow.plugin.session.subscriber.fault` 事件名。
+- `sessionDiagnosticEvents`：公开 `nodebraid.plugin.session.subscriber.fault` 事件名。
 
 ## 依赖与组合
 
@@ -50,12 +50,12 @@ kernelPlugin ──provides──▶ kernelService
                             sessionPlugin ──provides──▶ sessionService
 ```
 
-package 直接依赖 `@cflow/session-api`、`@cflow/kernel`、`@cflow/plugin-kernel`、`@cflow/runtime-cordis` 与 `@cflow/diagnostics`；它不依赖 Command、History、Renderer 或 `@cflow/core`。
+package 直接依赖 `@nodebraid/session-api`、`@nodebraid/kernel`、`@nodebraid/plugin-kernel`、`@nodebraid/runtime-cordis` 与 `@nodebraid/diagnostics`；它不依赖 Command、History、Renderer 或 `@nodebraid/core`。
 
 ## 公共入口
 
 ```ts
-import { kernelPlugin } from '@cflow/plugin-kernel';
+import { kernelPlugin } from '@nodebraid/plugin-kernel';
 import {
   sessionDiagnosticEvents,
   SessionError,
@@ -63,8 +63,8 @@ import {
   sessionService,
   type SelectionInput,
   type SessionService,
-} from '@cflow/plugin-session';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+} from '@nodebraid/plugin-session';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 const consumer = definePlugin({
   requires: { session: sessionService },
@@ -108,7 +108,7 @@ try {
 
 ## 验证依据
 
-- [公共导出](https://github.com/ZWkang/cflow/blob/main/packages/plugin-session/src/index.ts)确认 Plugin、Service Token、Snapshot type、错误和诊断事件均已发布。
-- [Session Runtime 实现](https://github.com/ZWkang/cflow/blob/main/packages/plugin-session/src/session-plugin.ts)包含输入校验、Kernel Commit reconciliation、引用稳定性与广度优先 transition queue。
-- [公开 seam 行为测试](https://github.com/ZWkang/cflow/blob/main/packages/plugin-session/tests/index.test.ts)覆盖默认 Session、canonical Selection、Viewport、重入顺序、subscriber fault 与 Provider 恢复。
+- [公共导出](https://github.com/ZWkang/nodebraid/blob/main/packages/plugin-session/src/index.ts)确认 Plugin、Service Token、Snapshot type、错误和诊断事件均已发布。
+- [Session Runtime 实现](https://github.com/ZWkang/nodebraid/blob/main/packages/plugin-session/src/session-plugin.ts)包含输入校验、Kernel Commit reconciliation、引用稳定性与广度优先 transition queue。
+- [公开 seam 行为测试](https://github.com/ZWkang/nodebraid/blob/main/packages/plugin-session/tests/index.test.ts)覆盖默认 Session、canonical Selection、Viewport、重入顺序、subscriber fault 与 Provider 恢复。
 - ADR-0017、0018、0022 与 0035 固定了 Selection 与 Kernel View 绑定、逻辑屏幕单位、广度优先通知和独立值契约。

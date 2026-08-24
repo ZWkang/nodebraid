@@ -1,9 +1,9 @@
 ---
-title: '@cflow/layout-dagre'
+title: '@nodebraid/layout-dagre'
 description: 基于 Dagre 的确定性 whole-canvas full Layout Provider。
 ---
 
-# `@cflow/layout-dagre`
+# `@nodebraid/layout-dagre`
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。
@@ -11,7 +11,7 @@ description: 基于 Dagre 的确定性 whole-canvas full Layout Provider。
 
 ## 解决的问题
 
-`@cflow/layout-dagre` 把 Dagre 的分层有向图布局适配到 CFlow `LayoutEngine` seam。它处理 Dagre 的中心点坐标，将结果规范化为 CFlow Node 边界左上角的绝对 World Position。
+`@nodebraid/layout-dagre` 把 Dagre 的分层有向图布局适配到 NodeBraid `LayoutEngine` seam。它处理 Dagre 的中心点坐标，将结果规范化为 NodeBraid Node 边界左上角的绝对 World Position。
 
 ## 何时使用
 
@@ -20,7 +20,7 @@ description: 基于 Dagre 的确定性 whole-canvas full Layout Provider。
 - 你的请求不需要 incremental stability 或 Fixed Node；
 - 你希望支持空图、断连分量、平行 Edge、有向环和 self-loop input。
 
-如果现有 Node 必须固定在绝对位置，或需要 incremental mode，请选择 [`@cflow/layout-elk`](/modules/layout-elk) 的 Stress algorithm。
+如果现有 Node 必须固定在绝对位置，或需要 incremental mode，请选择 [`@nodebraid/layout-elk`](/modules/layout-elk) 的 Stress algorithm。
 
 ## 提供的能力
 
@@ -42,21 +42,21 @@ description: 基于 Dagre 的确定性 whole-canvas full Layout Provider。
 
 ## 依赖与组合
 
-该 package 只依赖 `@cflow/layout-api` 与 Dagre，不依赖 Plugin Host、Kernel Runtime、Command Service 或 `@cflow/core`。
+该 package 只依赖 `@nodebraid/layout-api` 与 Dagre，不依赖 Plugin Host、Kernel Runtime、Command Service 或 `@nodebraid/core`。
 
-直接调用 Engine 会得到未提交 Proposal；在 Canvas Runtime 中使用时，通过 [`@cflow/plugin-layout`](/modules/plugin-layout) 将 `dagreLayoutEngine` 绑定到应用定义的 Command token。
+直接调用 Engine 会得到未提交 Proposal；在 Canvas Runtime 中使用时，通过 [`@nodebraid/plugin-layout`](/modules/plugin-layout) 将 `dagreLayoutEngine` 绑定到应用定义的 Command token。
 
 ## 公共入口
 
 ```ts
-import { dagreLayoutEngine, type DagreDirection, type DagreLayoutConfig } from '@cflow/layout-dagre';
+import { dagreLayoutEngine, type DagreDirection, type DagreLayoutConfig } from '@nodebraid/layout-dagre';
 ```
 
-`@cflow/core` 不重导出该 Provider，应用必须显式依赖它。
+`@nodebraid/core` 不重导出该 Provider，应用必须显式依赖它。
 
 ## 计算与坐标语义
 
-Provider 为每个 Node 传入 width/height，为每个 Edge 保留独立 ID 以支持 multigraph。Dagre 返回 Node center；adapter 分别减去一半 width 和 height，得到 CFlow top-left World Position。Proposal 的 source revision 始终来自 Layout Input。
+Provider 为每个 Node 传入 width/height，为每个 Edge 保留独立 ID 以支持 multigraph。Dagre 返回 Node center；adapter 分别减去一半 width 和 height，得到 NodeBraid top-left World Position。Proposal 的 source revision 始终来自 Layout Input。
 
 计算前后都会检查 `AbortSignal`。配置错误以原始 `TypeError` 或 `RangeError` 暴露，共享 input/capability/proposal failure 使用 `LayoutError`。
 

@@ -1,6 +1,6 @@
 import { test } from 'bun:test';
 
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 import { kernelPlugin, kernelService, type KernelService } from '../src';
 

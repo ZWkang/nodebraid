@@ -1,4 +1,4 @@
-import { describeNonFiniteNumber, type DiagnosticAttributes } from '@cflow/diagnostics';
+import { describeNonFiniteNumber, type DiagnosticAttributes } from '@nodebraid/diagnostics';
 
 import type { CanvasEdge, CanvasNode, GraphIssue, ParentCycleIssue } from './contracts';
 import type { EdgeId, NodeId } from './identifiers';

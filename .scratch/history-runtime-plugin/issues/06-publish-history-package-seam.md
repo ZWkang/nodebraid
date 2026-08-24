@@ -16,4 +16,4 @@
 
 ## Answer
 
-`@cflow/plugin-history` 已作为独立 workspace 包发布完整 History seam，并由 core facade 显式重导出。类型测试、声明泄漏检查、package-name import、README、changeset 与 workspace 命令均已收口。最终 `bun run check` 以 134 tests、542 assertions 全绿，workspace 依赖构建按拓扑顺序串行执行；History 与 core dry-run pack 都成功，History 发布物包含 27 个预期文件。
+`@nodebraid/plugin-history` 已作为独立 workspace 包发布完整 History seam，并由 core facade 显式重导出。类型测试、声明泄漏检查、package-name import、README、changeset 与 workspace 命令均已收口。最终 `bun run check` 以 134 tests、542 assertions 全绿，workspace 依赖构建按拓扑顺序串行执行；History 与 core dry-run pack 都成功，History 发布物包含 27 个预期文件。

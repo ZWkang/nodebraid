@@ -1,9 +1,9 @@
 ---
-title: '@cflow/plugin-history'
+title: '@nodebraid/plugin-history'
 description: 从 Kernel Commit 建立 Activation-scoped Document History，并通过 Command 执行 Undo/Redo。
 ---
 
-# `@cflow/plugin-history`
+# `@nodebraid/plugin-history`
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。
@@ -11,7 +11,7 @@ description: 从 Kernel Commit 建立 Activation-scoped Document History，并�
 
 ## 解决的问题
 
-Kernel 已能原子提交和反向应用 Change Set，但它不决定哪些变化进入 History、Redo 何时失效，也不提供 UI 可读取的 Undo/Redo 可用性。`@cflow/plugin-history` 在 Runtime 层观察 Canvas Commit，为当前 Activation 建立 History Entry，并通过现有 Command Service 执行 Replay。
+Kernel 已能原子提交和反向应用 Change Set，但它不决定哪些变化进入 History、Redo 何时失效，也不提供 UI 可读取的 Undo/Redo 可用性。`@nodebraid/plugin-history` 在 Runtime 层观察 Canvas Commit，为当前 Activation 建立 History Entry，并通过现有 Command Service 执行 Replay。
 
 History 不复制 Document，也不恢复旧 revision。Undo 和 Redo 都是新的 Kernel Transaction，因此 revision 继续单调递增，所有 Kernel 校验与 Commit observer 仍然生效。
 
@@ -41,10 +41,10 @@ History Entry 只保存源 Commit 的 Change Set。`origin` 和 `commandId` 是�
 `historyPlugin` 静态要求 [`KernelService`](/modules/plugin-kernel) 与 [`CommandService`](/modules/plugin-command)，并提供一份 `HistoryService`。典型 Canvas Runtime 显式安装三个 Provider：
 
 ```ts
-import { commandPlugin } from '@cflow/plugin-command';
-import { historyPlugin } from '@cflow/plugin-history';
-import { kernelPlugin } from '@cflow/plugin-kernel';
-import { createPluginHost } from '@cflow/runtime-cordis';
+import { commandPlugin } from '@nodebraid/plugin-command';
+import { historyPlugin } from '@nodebraid/plugin-history';
+import { kernelPlugin } from '@nodebraid/plugin-kernel';
+import { createPluginHost } from '@nodebraid/runtime-cordis';
 
 const host = createPluginHost();
 const installations = [host.install(kernelPlugin), host.install(commandPlugin), host.install(historyPlugin)];
@@ -73,10 +73,10 @@ import {
   type HistoryErrorCode,
   type HistoryService,
   type HistorySnapshot,
-} from '@cflow/plugin-history';
+} from '@nodebraid/plugin-history';
 ```
 
-这些入口也由 `@cflow/core` 重导出。
+这些入口也由 `@nodebraid/core` 重导出。
 
 ## 生命周期与错误语义
 
@@ -94,7 +94,7 @@ Replay 只在 History 已追平 Kernel 且没有其他 Replay 时开始。请求
 | `HISTORY_NOT_CAUGHT_UP` | History 尚未观察到 Kernel 当前 revision   |
 | `SERVICE_DISPOSED`      | 旧 History Service 所属 Activation 已结束 |
 
-Kernel replay error 保持原始身份，不会被包装为 History 成功。subscriber 抛错通过 `cflow.plugin.history.subscriber.fault` 进入 Host-scoped diagnostics，不阻断后续 subscriber，也不改变 Snapshot。
+Kernel replay error 保持原始身份，不会被包装为 History 成功。subscriber 抛错通过 `nodebraid.plugin.history.subscriber.fault` 进入 Host-scoped diagnostics，不阻断后续 subscriber，也不改变 Snapshot。
 
 ## 限制与非目标
 

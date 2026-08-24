@@ -5,7 +5,7 @@ description: Assemble a ready-to-use basic Canvas Runtime with an explicit Rende
 
 # Canvas Composition
 
-CFlow keeps the Plugin Host as an empty substrate. Applications can install Feature Plugins individually or reuse the official Basic Canvas Composition from `@cflow/preset-basic`. Both paths share the same Plugin Graph, Service Tokens, Activations, and resource-disposal semantics.
+NodeBraid keeps the Plugin Host as an empty substrate. Applications can install Feature Plugins individually or reuse the official Basic Canvas Composition from `@nodebraid/preset-basic`. Both paths share the same Plugin Graph, Service Tokens, Activations, and resource-disposal semantics.
 
 ## Current delivery
 
@@ -15,7 +15,7 @@ The Basic Canvas Composition fixes this member set:
 Kernel → Command → Session → Renderer → Interaction → History
 ```
 
-It accepts an application-selected Renderer Factory and forwards Installation config unchanged to that Provider. The Composition has no SVG, DOM, or concrete-backend dependency. The real SVG example takes a separate explicit dependency on `@cflow/renderer-svg`.
+It accepts an application-selected Renderer Factory and forwards Installation config unchanged to that Provider. The Composition has no SVG, DOM, or concrete-backend dependency. The real SVG example takes a separate explicit dependency on `@nodebraid/renderer-svg`.
 
 ## Readiness and lifecycle
 
@@ -37,4 +37,4 @@ The Composition provides no aggregate Service, dynamic `getService()`, internal 
 
 Package tests use the real Plugin Host and all six real Feature Plugins to verify readiness, Command/History behavior, conflicts, rollback, Host isolation, and asynchronous cleanup. The complete success path uses the real SVG Provider in Chromium to verify projection, Selection, a Move Commit, Undo/Redo, Wheel Zoom, Host disposal, and Target reservation release.
 
-Continue with [`@cflow/preset-basic`](/en/modules/preset-basic), or use the [Quick Start](/en/guide/quick-start) for the headless and real-SVG example layers.
+Continue with [`@nodebraid/preset-basic`](/en/modules/preset-basic), or use the [Quick Start](/en/guide/quick-start) for the headless and real-SVG example layers.

@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 
-import { createCanvasKernel, edgeId, nodeId } from '@cflow/kernel';
-import { createLayoutInput, type LayoutCapabilities, type LayoutEngine } from '@cflow/layout-api';
+import { createCanvasKernel, edgeId, nodeId } from '@nodebraid/kernel';
+import { createLayoutInput, type LayoutCapabilities, type LayoutEngine } from '@nodebraid/layout-api';
 
 export function registerFullLayoutProviderContract<Config>(options: {
   readonly name: string;

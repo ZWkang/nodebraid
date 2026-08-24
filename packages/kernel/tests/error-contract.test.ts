@@ -1,10 +1,10 @@
 import { expect, test } from 'bun:test';
 
-import { CFlowError } from '@cflow/diagnostics';
+import { NodeBraidError } from '@nodebraid/diagnostics';
 
 import { KernelError, createCanvasKernel, nodeId } from '../src';
 
-test('Kernel structural failures expose the shared CFlow error identity', () => {
+test('Kernel structural failures expose the shared NodeBraid error identity', () => {
   let error: unknown;
   try {
     nodeId('');
@@ -13,7 +13,7 @@ test('Kernel structural failures expose the shared CFlow error identity', () => 
   }
 
   expect(error).toBeInstanceOf(KernelError);
-  expect(error).toBeInstanceOf(CFlowError);
+  expect(error).toBeInstanceOf(NodeBraidError);
   expect(error).toMatchObject({
     name: 'KernelError',
     domain: 'kernel',

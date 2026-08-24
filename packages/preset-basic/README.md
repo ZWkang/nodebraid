@@ -1,8 +1,8 @@
-# @cflow/preset-basic
+# @nodebraid/preset-basic
 
-> Documentation: [English](https://zwkang.github.io/cflow/en/modules/preset-basic) · [简体中文](https://zwkang.github.io/cflow/modules/preset-basic)
+> Documentation: [English](https://zwkang.github.io/nodebraid/en/modules/preset-basic) · [简体中文](https://zwkang.github.io/nodebraid/modules/preset-basic)
 
-Backend-neutral Basic Canvas Composition for CFlow. Applications explicitly
+Backend-neutral Basic Canvas Composition for NodeBraid. Applications explicitly
 create a Plugin Host, select a Renderer Factory, and install the returned Plugin
 with Provider-specific configuration. The Composition owns Kernel, Command,
 Session, Renderer, Interaction, and History through one lifecycle.

@@ -19,4 +19,4 @@
 
 ## Answer
 
-已将一个 CFlow Plugin Installation 映射为一个 Cordis Fiber，并在 Cordis 每次 inject/reload 时创建新的 CFlow Activation。Provider 消失会驱动直接与间接 Consumer 先 Abort、逆依赖清理并回到 pending；替代 Provider 会以固定配置和全新 Service、Signal、资源栈重新激活。公开 seam 的 35 个测试、124 个断言和全部 package checks 均通过，未实现 Child Installation。
+已将一个 NodeBraid Plugin Installation 映射为一个 Cordis Fiber，并在 Cordis 每次 inject/reload 时创建新的 NodeBraid Activation。Provider 消失会驱动直接与间接 Consumer 先 Abort、逆依赖清理并回到 pending；替代 Provider 会以固定配置和全新 Service、Signal、资源栈重新激活。公开 seam 的 35 个测试、124 个断言和全部 package checks 均通过，未实现 Child Installation。

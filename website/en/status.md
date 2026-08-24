@@ -1,26 +1,26 @@
 ---
 title: Current Status
-description: What CFlow has delivered, what is explicitly missing, and which capability boundaries are verifiable today.
+description: What NodeBraid has delivered, what is explicitly missing, and which capability boundaries are verifiable today.
 ---
 
 # Current Status
 
-CFlow is at an early implementation stage, but it already has a working headless Canvas Runtime backbone. This page describes only capabilities committed on the current branch; it does not infer completion from the target architecture.
+NodeBraid is at an early implementation stage, but it already has a working headless Canvas Runtime backbone. This page describes only capabilities committed on the current branch; it does not infer completion from the target architecture.
 
 ## Delivered
 
-- CFlow-owned Plugin Host, Runtime Services, Activations, and resource disposal;
+- NodeBraid-owned Plugin Host, Runtime Services, Activations, and resource disposal;
 - Structured errors, Diagnostic Events, Sinks, and the Fault Reporter contract;
 - Renderer-independent Kernel, synchronous Transactions, Canvas Views, Queries, and Change Sets;
 - Kernel, Command, Session, History, and Renderer Runtime Plugins;
 - Selection, Viewport, and backend-neutral Renderer value contracts;
 - Backend-neutral Interaction Projections plus Selection, multi-Node Drag, Pan, Wheel Zoom, and node-level Edge Connection Runtime behavior;
-- The reference-quality `@cflow/renderer-svg` Provider, with real-Chromium verification of SVG projection, input, Hit Testing, and lifecycle;
+- The reference-quality `@nodebraid/renderer-svg` Provider, with real-Chromium verification of SVG projection, input, Hit Testing, and lifecycle;
 - Layout Input/Engine/Proposal contracts and Runtime Command integration;
 - Dagre full Layout Provider;
 - ELK full, incremental, and Fixed Node Layout Providers;
-- The backend-neutral `@cflow/preset-basic` Basic Canvas Composition and a real SVG canonical example;
-- A public facade aggregated through `@cflow/core`.
+- The backend-neutral `@nodebraid/preset-basic` Basic Canvas Composition and a real SVG canonical example;
+- A public facade aggregated through `@nodebraid/core`.
 
 See [All modules](/en/modules/) for the complete inventory.
 
@@ -34,9 +34,9 @@ There is also no Persistence, Collaboration, serialization schema, or remote syn
 
 ## Package publication status
 
-This repository's source declares `@cflow/*` names, but `@cflow/core` in the public npm registry belongs to another project. This project cannot currently provide a safe npm installation command. Use a source checkout through the [Quick Start](/en/guide/quick-start).
+This repository's source declares `@nodebraid/*` names, but those packages have not been publicly released. This project does not currently provide an npm installation command. Use a source checkout through the [Quick Start](/en/guide/quick-start).
 
-When the project migrates to a new npm scope, package identities, site notices, and examples will be updated together. This documentation-site work does not rename or publish packages.
+The initial npm release must verify and update package identities, site notices, and examples together. This rename does not publish packages.
 
 ## Verification level
 

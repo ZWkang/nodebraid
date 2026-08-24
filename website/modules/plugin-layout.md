@@ -1,9 +1,9 @@
 ---
-title: '@cflow/plugin-layout'
+title: '@nodebraid/plugin-layout'
 description: 将一个 Layout Engine 静态绑定为强类型 Runtime Command，并安全提交 Proposal。
 ---
 
-# `@cflow/plugin-layout`
+# `@nodebraid/plugin-layout`
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。
@@ -11,7 +11,7 @@ description: 将一个 Layout Engine 静态绑定为强类型 Runtime Command，
 
 ## 解决的问题
 
-Layout Engine 可以异步计算位置，但不能直接修改权威 Document。`@cflow/plugin-layout` 把一个 concrete Engine 与一个应用持有的强类型 Command 静态绑定，在真实 Canvas Runtime 中完成 Input projection、capability validation、异步计算、stale protection 与原子提交。
+Layout Engine 可以异步计算位置，但不能直接修改权威 Document。`@nodebraid/plugin-layout` 把一个 concrete Engine 与一个应用持有的强类型 Command 静态绑定，在真实 Canvas Runtime 中完成 Input projection、capability validation、异步计算、stale protection 与原子提交。
 
 ## 何时使用
 
@@ -20,7 +20,7 @@ Layout Engine 可以异步计算位置，但不能直接修改权威 Document。
 - 你需要取消和并发 revision 防护；
 - 你希望多个 Provider 以不同 Command token 共存，而不是通过全局 Registry 选择。
 
-如果你只需要离线计算 Proposal、不需要提交 Document，可以直接使用 `@cflow/layout-api` 与 Engine。
+如果你只需要离线计算 Proposal、不需要提交 Document，可以直接使用 `@nodebraid/layout-api` 与 Engine。
 
 ## 提供的能力
 
@@ -35,7 +35,7 @@ Layout Engine 可以异步计算位置，但不能直接修改权威 Document。
 
 ## 依赖与组合
 
-每个生成的 Plugin 静态要求 `KernelService` 和 `CommandService`。它依赖 `@cflow/layout-api`、`@cflow/plugin-kernel`、`@cflow/plugin-command` 与 CFlow Plugin Host seam，不依赖 `@cflow/core`。
+每个生成的 Plugin 静态要求 `KernelService` 和 `CommandService`。它依赖 `@nodebraid/layout-api`、`@nodebraid/plugin-kernel`、`@nodebraid/plugin-command` 与 NodeBraid Plugin Host seam，不依赖 `@nodebraid/core`。
 
 应用需要自行：
 
@@ -54,10 +54,10 @@ import {
   type CreateLayoutPluginOptions,
   type LayoutCommandInput,
   type LayoutCommandResult,
-} from '@cflow/plugin-layout';
+} from '@nodebraid/plugin-layout';
 ```
 
-这些入口也由 `@cflow/core` 重导出；concrete Provider 不会被 core 隐式带入。
+这些入口也由 `@nodebraid/core` 重导出；concrete Provider 不会被 core 隐式带入。
 
 ## 生命周期与提交语义
 

@@ -1,7 +1,7 @@
-import type { EdgeId, NodeId } from '@cflow/kernel';
-import type { SessionSnapshot, Viewport } from '@cflow/session-api';
+import type { EdgeId, NodeId } from '@nodebraid/kernel';
+import type { SessionSnapshot, Viewport } from '@nodebraid/session-api';
 
-export type { SelectionSnapshot, SessionSnapshot, Viewport } from '@cflow/session-api';
+export type { SelectionSnapshot, SessionSnapshot, Viewport } from '@nodebraid/session-api';
 
 export interface SelectionInput {
   readonly nodeIds: readonly NodeId[];

@@ -1,4 +1,4 @@
-import { CFlowError } from './cflow-error';
+import { NodeBraidError } from './nodebraid-error';
 import type { DiagnosticAttributes, DiagnosticValue } from './diagnostic-value';
 
 interface DiagnosticErrorBase {
@@ -8,8 +8,8 @@ interface DiagnosticErrorBase {
   readonly cause?: DiagnosticErrorDescription;
 }
 
-export interface CFlowErrorDescription extends DiagnosticErrorBase {
-  readonly kind: 'cflow';
+export interface NodeBraidErrorDescription extends DiagnosticErrorBase {
+  readonly kind: 'nodebraid';
   readonly domain: string;
   readonly code: string;
   readonly details: DiagnosticAttributes;
@@ -36,7 +36,7 @@ export interface CircularErrorDescription {
 }
 
 export type DiagnosticErrorDescription =
-  | CFlowErrorDescription
+  | NodeBraidErrorDescription
   | AggregateErrorDescription
   | NativeErrorDescription
   | UnknownErrorDescription
@@ -76,9 +76,9 @@ function describeErrorAtPath(error: unknown, path: string, ancestors: Map<object
         ...(error.cause === undefined ? {} : { cause: describeErrorAtPath(error.cause, `${path}.cause`, ancestors) }),
       });
     }
-    if (error instanceof CFlowError) {
+    if (error instanceof NodeBraidError) {
       return Object.freeze({
-        kind: 'cflow',
+        kind: 'nodebraid',
         name: error.name,
         message: error.message,
         ...(typeof error.stack === 'string' ? { stack: error.stack } : {}),

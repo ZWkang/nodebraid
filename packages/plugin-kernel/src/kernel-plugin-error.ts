@@ -1,8 +1,8 @@
-import { CFlowError } from '@cflow/diagnostics';
+import { NodeBraidError } from '@nodebraid/diagnostics';
 
 export type KernelPluginErrorCode = 'SERVICE_DISPOSED';
 
-export class KernelPluginError extends CFlowError<'plugin.kernel', KernelPluginErrorCode> {
+export class KernelPluginError extends NodeBraidError<'plugin.kernel', KernelPluginErrorCode> {
   override readonly name = 'KernelPluginError';
 
   constructor(code: KernelPluginErrorCode, message: string, options?: Readonly<{ cause?: unknown }>) {

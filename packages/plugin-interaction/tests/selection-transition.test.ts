@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 
-import { nodeId } from '@cflow/kernel';
+import { nodeId } from '@nodebraid/kernel';
 
 import { computeClickSelection } from '../src/selection-transition';
 

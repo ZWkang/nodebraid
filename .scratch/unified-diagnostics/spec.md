@@ -1,10 +1,10 @@
-# CFlow Unified Diagnostics and Error Handling
+# NodeBraid Unified Diagnostics and Error Handling
 
 **Status:** ready-for-agent
 
 ## Problem Statement
 
-CFlow 当前没有生产日志 Module。生产代码唯一的未捕获错误出口，是 Runtime、Kernel Plugin、Session Plugin 与 History Plugin 中四份重复的 `globalThis.reportError` / `queueMicrotask throw` 实现。它们只传递原始 `unknown`，不携带 Host、Installation、Activation、Plugin、Command 或 revision 上下文。
+NodeBraid 当前没有生产日志 Module。生产代码唯一的未捕获错误出口，是 Runtime、Kernel Plugin、Session Plugin 与 History Plugin 中四份重复的 `globalThis.reportError` / `queueMicrotask throw` 实现。它们只传递原始 `unknown`，不携带 Host、Installation、Activation、Plugin、Command 或 revision 上下文。
 
 仓库同时公开七个领域 Error 类。它们大多采用 `Error + code + details`，但没有共同基类、全局身份、统一只读规则、安全描述或稳定序列化。相同的 `SERVICE_DISPOSED` 出现在多个包中；cleanup 聚合有时递归拍平、有时保留树；部分 details 还包含 Service Token、函数或任意无效输入。
 
@@ -15,24 +15,24 @@ CFlow 当前没有生产日志 Module。生产代码唯一的未捕获错误出�
 ## Agent-Friendly Success Criteria
 
 1. 一个事件名或错误身份可以在仓库中精确搜索到唯一声明和有限的发射位置。
-2. CFlow 结构性错误都能用 `instanceof CFlowError`、`domain` 与 `code` 判断，不解析 `message`。
+2. NodeBraid 结构性错误都能用 `instanceof NodeBraidError`、`domain` 与 `code` 判断，不解析 `message`。
 3. 同一失败只在拥有并处置它的语义 seam 产生一次 Error-level Diagnostic Event。
 4. 每个 Runtime 事件都带 `hostId`、Host 内 `sequence`，在适用时带 Installation、Activation 与 Plugin scope。
-5. CFlow details、event attributes 和错误描述可以确定性地转成 JSON，不执行任意 `toJSON`，不遍历业务对象。
+5. NodeBraid details、event attributes 和错误描述可以确定性地转成 JSON，不执行任意 `toJSON`，不遍历业务对象。
 6. 原始外部错误、Abort reason 和 Plugin failed snapshot 的对象身份保持不变。
 7. Sink、Fault Reporter 与 Subscriber 自身失败不会递归或改变 Document、Session、History、Command 和 Plugin 生命周期结果。
 8. 测试通过公开 Interface 观察，不需要访问私有 logger、Cordis Context、内部队列或序号器。
 
 ## Solution
 
-新增零运行时依赖、无副作用的 deep module `@cflow/diagnostics`。它在整个 workspace 的依赖图底部，集中实现：
+新增零运行时依赖、无副作用的 deep module `@nodebraid/diagnostics`。它在整个 workspace 的依赖图底部，集中实现：
 
-- CFlow 结构性错误的共同基类与安全 details；
+- NodeBraid 结构性错误的共同基类与安全 details；
 - 不可变 Diagnostic Event、Diagnostic Sink 和 Fault Reporter 契约；
 - 确定性的错误因果树描述；
 - 事件值校验、复制、冻结与 Sink/Reporter 隔离。
 
-`@cflow/runtime-cordis` 在 `createPluginHost()` seam 接受每 Host 的 diagnostics 配置，并通过 `PluginContext.diagnostics` 向 Plugin 暴露只有两个操作的窄 Interface：产生普通事件、上报无法返回给调用者的 Fault。Host 的 Implementation 负责补全 scope、时间、序号和事件 ID。
+`@nodebraid/runtime-cordis` 在 `createPluginHost()` seam 接受每 Host 的 diagnostics 配置，并通过 `PluginContext.diagnostics` 向 Plugin 暴露只有两个操作的窄 Interface：产生普通事件、上报无法返回给调用者的 Fault。Host 的 Implementation 负责补全 scope、时间、序号和事件 ID。
 
 ```text
 Pure Module Failure ──throw/reject──────────────────────▶ Caller
@@ -119,7 +119,7 @@ export function createPluginHost(options?: PluginHostOptions): PluginHost;
 ## Structural Error Interface
 
 ```ts
-export abstract class CFlowError<
+export abstract class NodeBraidError<
   Domain extends string,
   Code extends string,
   Details extends DiagnosticAttributes = DiagnosticAttributes,
@@ -156,28 +156,28 @@ new KernelError(code, message, details?, { cause? });
 
 `domain + '/' + code` 是全局协议身份。`Error.name` 只表达具体 JavaScript 类。severity、retryable、HTTP status、用户文案和恢复策略不进入 Error。
 
-Plugin Setup、Command Handler、Transaction Callback、Layout Provider 原始失败和 Abort reason 不转换为 CFlowError。单一下游失败只有在 CFlow 本来就必须建立新的结构性错误时才放入 `cause`；不能只为增加上下文而包装。
+Plugin Setup、Command Handler、Transaction Callback、Layout Provider 原始失败和 Abort reason 不转换为 NodeBraidError。单一下游失败只有在 NodeBraid 本来就必须建立新的结构性错误时才放入 `cause`；不能只为增加上下文而包装。
 
 多个并列 cleanup failure 使用原生 `AggregateError.errors`。每一层 AggregateError 保留自己的 message 和阶段，删除递归拍平行为。多个错误是 siblings，单一原因是 cause，二者不能互相替代。
 
 ## Error Description
 
-`@cflow/diagnostics` 导出 `describeError(error: unknown): DiagnosticErrorDescription`。返回值只包含 DiagnosticValue，可以直接 JSON 序列化，并按以下 discriminant 保留结构：
+`@nodebraid/diagnostics` 导出 `describeError(error: unknown): DiagnosticErrorDescription`。返回值只包含 DiagnosticValue，可以直接 JSON 序列化，并按以下 discriminant 保留结构：
 
-- `kind: 'cflow'`：name、message、stack、domain、code、details、可选 cause；
+- `kind: 'nodebraid'`：name、message、stack、domain、code、details、可选 cause；
 - `kind: 'aggregate'`：name、message、stack、errors、可选 cause；
 - `kind: 'error'`：name、message、stack、可选 cause；
 - `kind: 'unknown'`：原始值的安全类型和有限表示；
 - `kind: 'circular'`：指回已经访问过的因果节点路径。
 
-该函数不得调用任意 Error 的 `toJSON`，不得展开非 CFlow Error 的自定义属性，也不得把普通对象当业务数据递归遍历。它保留 stack 字符串供本地诊断；网络 Adapter 是否移除或重写 stack 由宿主决定。因果树使用引用检测，不设置静默深度或数量上限。
+该函数不得调用任意 Error 的 `toJSON`，不得展开非 NodeBraid Error 的自定义属性，也不得把普通对象当业务数据递归遍历。它保留 stack 字符串供本地诊断；网络 Adapter 是否移除或重写 stack 由宿主决定。因果树使用引用检测，不设置静默深度或数量上限。
 
 `describeDiagnosticEvent(event)` 将原始 `error` 替换为上述描述，其余 envelope 保持不变，供 console/Sentry/OpenTelemetry Adapter 使用。该函数返回数据而不执行 I/O。
 
 ## Event Identity and Ordering
 
 - Event `version` 首版固定为 `1`。
-- 自动生成的 Host ID 使用 `cflow.host.<process-counter>`；宿主可以显式提供非空 `hostId` 以对齐自己的 Runtime 身份。
+- 自动生成的 Host ID 使用 `nodebraid.host.<process-counter>`；宿主可以显式提供非空 `hostId` 以对齐自己的 Runtime 身份。
 - Installation 与 Activation 使用 Host-local 单调 ID，例如 `<hostId>.installation.3`。
 - `sequence` 从 1 开始，在一个 Host 内对所有 Diagnostic Event 单调递增。
 - `id` 固定为 `<hostId>.event.<sequence>`。
@@ -191,21 +191,21 @@ Plugin Setup、Command Handler、Transaction Callback、Layout Provider 原始�
 
 事件名是低基数稳定协议。每个 emitting package 在单独的 `diagnostic-events.ts` 中声明自己拥有的常量；禁止在 throw/catch site 内散落字符串。
 
-| Event name                                    | Owner          | Level       | Meaning                                                                      |
-| --------------------------------------------- | -------------- | ----------- | ---------------------------------------------------------------------------- |
-| `cflow.runtime.host.created`                  | runtime-cordis | info        | Host 已创建，scope 只有 hostId                                               |
-| `cflow.runtime.host.disposing`                | runtime-cordis | debug       | Host 开始终止，不代表成功                                                    |
-| `cflow.runtime.host.disposed`                 | runtime-cordis | info        | Host 全部清理成功结束                                                        |
-| `cflow.runtime.installation.status.changed`   | runtime-cordis | debug/error | Snapshot 已替换、subscriber 尚未通知；进入 failed 时为 error 并携带原始错误  |
-| `cflow.runtime.installation.dispose.failed`   | runtime-cordis | error       | Installation 已结束但 cleanup rejection 将返回调用者                         |
-| `cflow.runtime.activation.started`            | runtime-cordis | debug       | 一次新的 Activation 开始 setup                                               |
-| `cflow.runtime.activation.ended`              | runtime-cordis | debug       | Activation 完成 cleanup，attributes 包含结束原因                             |
-| `cflow.runtime.installation.subscriber.fault` | runtime-cordis | error       | Installation subscriber 抛错；同时进入 Fault Reporter                        |
-| `cflow.plugin.kernel.observer.fault`          | plugin-kernel  | error       | Commit Observer 抛错；同时进入 Fault Reporter                                |
-| `cflow.plugin.session.subscriber.fault`       | plugin-session | error       | Session subscriber 抛错；同时进入 Fault Reporter                             |
-| `cflow.plugin.history.subscriber.fault`       | plugin-history | error       | History subscriber 抛错；同时进入 Fault Reporter                             |
-| `cflow.diagnostics.sink.fault`                | diagnostics    | error       | Sink 自身失败；只交给 Fault Reporter，不递归交给 Sink                        |
-| `cflow.diagnostics.fault-reporting.fault`     | diagnostics    | error       | `reportFault()` 输入无效；只向最终 Reporter 保留原 Fault 与 contract failure |
+| Event name                                        | Owner          | Level       | Meaning                                                                      |
+| ------------------------------------------------- | -------------- | ----------- | ---------------------------------------------------------------------------- |
+| `nodebraid.runtime.host.created`                  | runtime-cordis | info        | Host 已创建，scope 只有 hostId                                               |
+| `nodebraid.runtime.host.disposing`                | runtime-cordis | debug       | Host 开始终止，不代表成功                                                    |
+| `nodebraid.runtime.host.disposed`                 | runtime-cordis | info        | Host 全部清理成功结束                                                        |
+| `nodebraid.runtime.installation.status.changed`   | runtime-cordis | debug/error | Snapshot 已替换、subscriber 尚未通知；进入 failed 时为 error 并携带原始错误  |
+| `nodebraid.runtime.installation.dispose.failed`   | runtime-cordis | error       | Installation 已结束但 cleanup rejection 将返回调用者                         |
+| `nodebraid.runtime.activation.started`            | runtime-cordis | debug       | 一次新的 Activation 开始 setup                                               |
+| `nodebraid.runtime.activation.ended`              | runtime-cordis | debug       | Activation 完成 cleanup，attributes 包含结束原因                             |
+| `nodebraid.runtime.installation.subscriber.fault` | runtime-cordis | error       | Installation subscriber 抛错；同时进入 Fault Reporter                        |
+| `nodebraid.plugin.kernel.observer.fault`          | plugin-kernel  | error       | Commit Observer 抛错；同时进入 Fault Reporter                                |
+| `nodebraid.plugin.session.subscriber.fault`       | plugin-session | error       | Session subscriber 抛错；同时进入 Fault Reporter                             |
+| `nodebraid.plugin.history.subscriber.fault`       | plugin-history | error       | History subscriber 抛错；同时进入 Fault Reporter                             |
+| `nodebraid.diagnostics.sink.fault`                | diagnostics    | error       | Sink 自身失败；只交给 Fault Reporter，不递归交给 Sink                        |
+| `nodebraid.diagnostics.fault-reporting.fault`     | diagnostics    | error       | `reportFault()` 输入无效；只向最终 Reporter 保留原 Fault 与 contract failure |
 
 `status.changed` attributes 固定使用 `from`、`to`、`missingServiceNames` 和 `phase` 中适用的字段。Service Token 必须先转成稳定 diagnostic name，不能进入 attributes。Activation ended reason 固定为 `dependency-lost`、`installation-disposed`、`setup-failed` 或 `setup-completed`，不接受自由文本。
 
@@ -226,9 +226,9 @@ Error constructor、普通 throw、catch/rethrow、Command Handler rejection、T
 
 ## Sink and Fault Reporter Semantics
 
-Diagnostic Sink 与 Fault Reporter 都是同步 Interface。异步 Adapter 必须在自己的 Implementation 中排队；CFlow 不等待上传、批量或持久化。
+Diagnostic Sink 与 Fault Reporter 都是同步 Interface。异步 Adapter 必须在自己的 Implementation 中排队；NodeBraid 不等待上传、批量或持久化。
 
-- Sink 抛错：原操作继续，使用 `cflow.diagnostics.sink.fault` 直接调用 Fault Reporter，不重新调用 Sink。
+- Sink 抛错：原操作继续，使用 `nodebraid.diagnostics.sink.fault` 直接调用 Fault Reporter，不重新调用 Sink。
 - Sink 返回 PromiseLike：视为违反同步 Interface，通过 Fault Reporter 显式报告 `diagnostics/ASYNC_SINK`；不得留下未观察 rejection。
 - Fault Reporter 成功返回：Fault 已交给宿主，但不改变任何原始 Runtime 状态或返回值。
 - Fault Reporter 抛错：通过一次 `queueMicrotask` 抛出 `AggregateError([originalFault, reporterError])`，不再次调用 Sink 或 Reporter。
@@ -237,7 +237,7 @@ Diagnostic Sink 与 Fault Reporter 都是同步 Interface。异步 Adapter 必�
 
 ## Safe Attributes and Privacy
 
-DiagnosticValue 只允许 finite number、string、boolean、null、array 和 string-key record。内置事件 attributes 只携带状态、阶段、计数、revision、Command diagnostic ID 与 CFlow 自己生成的 scope ID。
+DiagnosticValue 只允许 finite number、string、boolean、null、array 和 string-key record。内置事件 attributes 只携带状态、阶段、计数、revision、Command diagnostic ID 与 NodeBraid 自己生成的 scope ID。
 
 禁止自动放入：
 
@@ -247,18 +247,18 @@ DiagnosticValue 只允许 finite number、string、boolean、null、array 和 st
 - arbitrary Error 自定义属性；
 - authorization、token、header、cookie、环境变量。
 
-CFlowError throw site 必须把非法输入转成安全分类，例如 `receivedType`、`field`、`index`、`issue`，不能把原始函数或对象塞进 details。原始外部 Error 只在 in-process event 的 `error` 字段保持身份；Adapter 使用 `describeError` 得到安全、有限结构。
+NodeBraidError throw site 必须把非法输入转成安全分类，例如 `receivedType`、`field`、`index`、`issue`，不能把原始函数或对象塞进 details。原始外部 Error 只在 in-process event 的 `error` 字段保持身份；Adapter 使用 `describeError` 得到安全、有限结构。
 
 非有限数字使用 `receivedNumber: 'nan' | 'positive-infinity' | 'negative-infinity'` 表达，负零规范化为零；Service Token 使用公开 diagnostic name 字符串表达。不存在通用的“把任意对象变安全”fallback，每个结构性 Error throw site 必须显式选择它拥有的字段。
 
 ## Package and Dependency Decisions
 
-- 新增 `packages/diagnostics`，package name 为 `@cflow/diagnostics`。
+- 新增 `packages/diagnostics`，package name 为 `@nodebraid/diagnostics`。
 - package 标记 `sideEffects: false`。
 - diagnostics 不依赖 Kernel、Runtime、Cordis、RxJS、Renderer、core 或外部 logger。
-- `@cflow/kernel`、`@cflow/layout-api`、`@cflow/runtime-cordis` 和所有 Runtime Plugin 直接依赖 diagnostics。
+- `@nodebraid/kernel`、`@nodebraid/layout-api`、`@nodebraid/runtime-cordis` 和所有 Runtime Plugin 直接依赖 diagnostics。
 - 具体 Layout Provider 继续通过 LayoutError 间接获得共同错误契约，不额外依赖 Runtime。
-- `@cflow/core` 重导出 diagnostics 的公开 Interface，不拥有实现。
+- `@nodebraid/core` 重导出 diagnostics 的公开 Interface，不拥有实现。
 - 内部包不得依赖 core；diagnostics 声明不得引用任何上层 workspace package。
 - workspace build/typecheck dependency scripts必须先生成 diagnostics declarations，再构建依赖它的包。
 
@@ -274,16 +274,16 @@ CFlowError throw site 必须把非法输入转成安全分类，例如 `received
 
 ## Testing Decisions
 
-- diagnostics package 的公开 Interface 是 CFlowError、DiagnosticValue normalization、`describeError` 与描述后的事件；直接测试结果，不测试私有遍历器。
+- diagnostics package 的公开 Interface 是 NodeBraidError、DiagnosticValue normalization、`describeError` 与描述后的事件；直接测试结果，不测试私有遍历器。
 - Runtime 行为测试使用真实 `createPluginHost()`、真实 Plugin 与 in-memory Sink/Fault Reporter adapter。
 - 同一个测试同时证明事件内容、事件顺序和原有 Runtime 结果，避免另建只测 logger mock call 的浅测试层。
 - 使用两个 Host 证明 ID、sequence、Sink 和 Reporter 隔离。
 - 证明事件 sequence 单调、event ID 可推导、Snapshot 已更新后才发事件、subscriber fault 不阻塞后续 subscriber。
 - 证明没有 Sink 时普通事件不输出，Fault 仍走平台 Reporter。
 - 证明 Sink throw、async Sink、Reporter throw、async Reporter 均显式暴露且不递归。
-- 证明所有领域 Error 都是 CFlowError、domain/code 固定、details 深冻结且 JSON-safe。
+- 证明所有领域 Error 都是 NodeBraidError、domain/code 固定、details 深冻结且 JSON-safe。
 - 证明非法 details 报告精确路径，NaN、Infinity、function、token、class instance 和 cycle 不被静默转换。
-- 证明 `describeError` 保留 CFlow cause、AggregateError tree、普通 Error、unknown primitive 和 circular reference。
+- 证明 `describeError` 保留 NodeBraid cause、AggregateError tree、普通 Error、unknown primitive 和 circular reference。
 - 证明 Plugin Setup、Command Handler、Transaction Callback、Provider failure 和 Abort reason 是原对象。
 - 证明 nested cleanup AggregateError 不被拍平，所有 disposer 仍继续执行。
 - 对每个内置 event name 建立唯一性与固定 level 测试；源码检查禁止重新出现 package-local `globalThis.reportError` helper。
@@ -292,7 +292,7 @@ CFlowError throw site 必须把非法输入转成安全分类，例如 `received
 
 ## Implementation Order
 
-1. 建立 diagnostics package、CFlowError 和确定性错误描述。
+1. 建立 diagnostics package、NodeBraidError 和确定性错误描述。
 2. 迁移领域 Error 与 details，统一 cause 和 AggregateError tree。
 3. 在 Plugin Host seam 注入 Sink/Reporter，并向 Plugin Context 提供 scoped diagnostics。
 4. 用 `reportFault()` 替换四份 subscriber/observer error helper。

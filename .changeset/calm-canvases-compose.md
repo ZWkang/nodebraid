@@ -1,6 +1,6 @@
 ---
-'@cflow/runtime-cordis': minor
-'@cflow/core': minor
+'@nodebraid/runtime-cordis': minor
+'@nodebraid/core': minor
 ---
 
-新增 CFlow Plugin Host、Cordis 运行时实现与 core 公共入口。
+新增 NodeBraid Plugin Host、Cordis 运行时实现与 core 公共入口。

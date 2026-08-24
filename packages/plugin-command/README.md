@@ -1,12 +1,12 @@
-# @cflow/plugin-command
+# @nodebraid/plugin-command
 
-> Documentation: [English](https://zwkang.github.io/cflow/en/modules/plugin-command) · [简体中文](https://zwkang.github.io/cflow/modules/plugin-command)
+> Documentation: [English](https://zwkang.github.io/nodebraid/en/modules/plugin-command) · [简体中文](https://zwkang.github.io/nodebraid/modules/plugin-command)
 
-Command Runtime Plugin for CFlow Canvas Runtime instances.
+Command Runtime Plugin for NodeBraid Canvas Runtime instances.
 
 ```ts
-import { commandPlugin, commandService, defineCommand, type CommandService } from '@cflow/plugin-command';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+import { commandPlugin, commandService, defineCommand, type CommandService } from '@nodebraid/plugin-command';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 const greet = defineCommand<string, string>('message.greet');
 let commands: CommandService | undefined;
@@ -31,10 +31,10 @@ await Promise.all([provider.whenActive(), consumer.whenActive()]);
 if (!commands) throw new Error('Expected Command Service to activate.');
 
 const controller = new AbortController();
-const message = await commands.execute(greet, 'CFlow', { signal: controller.signal });
+const message = await commands.execute(greet, 'NodeBraid', { signal: controller.signal });
 console.log(message);
 
-const cancelled = commands.execute(greet, 'CFlow', { signal: controller.signal });
+const cancelled = commands.execute(greet, 'NodeBraid', { signal: controller.signal });
 controller.abort();
 await cancelled.catch((error) => {
   if (error !== controller.signal.reason) throw error;
@@ -80,19 +80,19 @@ Registration failures throw synchronously. Execution failures reject the
 returned Promise; errors thrown or rejected by a handler are not wrapped in a
 `CommandError`.
 
-The package depends on the CFlow-owned Plugin Host seam in
-`@cflow/runtime-cordis`, not on `@cflow/kernel`, `@cflow/plugin-kernel`, or
-`@cflow/core`. It does not expose Cordis types.
+The package depends on the NodeBraid-owned Plugin Host seam in
+`@nodebraid/runtime-cordis`, not on `@nodebraid/kernel`, `@nodebraid/plugin-kernel`, or
+`@nodebraid/core`. It does not expose Cordis types.
 
 ## Development
 
 Run package scripts from the monorepo root:
 
 ```bash
-bun run --filter '@cflow/plugin-command' typecheck
-bun run --filter '@cflow/plugin-command' test
-bun run --filter '@cflow/plugin-command' build
-bun run --filter '@cflow/plugin-command' build:dependencies
+bun run --filter '@nodebraid/plugin-command' typecheck
+bun run --filter '@nodebraid/plugin-command' test
+bun run --filter '@nodebraid/plugin-command' build
+bun run --filter '@nodebraid/plugin-command' build:dependencies
 ```
 
 ## License

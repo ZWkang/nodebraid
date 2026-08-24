@@ -7,7 +7,7 @@
 **Status:** resolved
 
 - [x] Composition creation 接受小而只读的 Interaction options，不接受任意 Plugin、Host 或 Diagnostics 配置。
-- [x] 创建时固定 CFlow-owned Interaction option shell，Provider config 继续遵循 Renderer Factory 的 readonly 值约定。
+- [x] 创建时固定 NodeBraid-owned Interaction option shell，Provider config 继续遵循 Renderer Factory 的 readonly 值约定。
 - [x] 未完成的 async Renderer Factory 使 Composition 保持非 active，全部 Child ready 后才完成 `whenActive()`。
 - [x] 非法 Interaction config 以原始 `InteractionError` 使 Composition failed，不被 preset 包装。
 - [x] 任一 awaited Child 失败会释放全部已创建 Child Installation；失败父级不自重试，恢复使用新的 Installation。

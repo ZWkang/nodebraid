@@ -1,5 +1,5 @@
-import { defineCommand, type CommandHandler } from '@cflow/plugin-command';
-import type { KernelService } from '@cflow/plugin-kernel';
+import { defineCommand, type CommandHandler } from '@nodebraid/plugin-command';
+import type { KernelService } from '@nodebraid/plugin-kernel';
 
 import type { MoveNodesInput, MoveNodesResult } from './contracts';
 import { InteractionError } from './interaction-error';

@@ -1,8 +1,8 @@
-# @cflow/plugin-interaction
+# @nodebraid/plugin-interaction
 
-> Documentation: [English](https://zwkang.github.io/cflow/en/modules/plugin-interaction) · [简体中文](https://zwkang.github.io/cflow/modules/plugin-interaction)
+> Documentation: [English](https://zwkang.github.io/nodebraid/en/modules/plugin-interaction) · [简体中文](https://zwkang.github.io/nodebraid/modules/plugin-interaction)
 
-Interaction Runtime Plugin for CFlow Canvas Runtime instances.
+Interaction Runtime Plugin for NodeBraid Canvas Runtime instances.
 
 The Plugin consumes Renderer Input and Hit Result through the narrow Renderer
 Service and owns one Interaction Projection Binding. It writes stable Selection

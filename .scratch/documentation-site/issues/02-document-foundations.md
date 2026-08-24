@@ -1,6 +1,6 @@
-# 02 — 介绍 CFlow 基础运行能力
+# 02 — 介绍 NodeBraid 基础运行能力
 
-**What to build:** 让评估者从 Foundations 能力族理解公共 facade、Plugin Host 与 Diagnostics 如何共同构成 CFlow 的运行基础，并能进入三个 package 的准确详情页。
+**What to build:** 让评估者从 Foundations 能力族理解公共 facade、Plugin Host 与 Diagnostics 如何共同构成 NodeBraid 的运行基础，并能进入三个 package 的准确详情页。
 
 **Blocked by:** 01 — 交付中文文档站与可运行 Quick Start.
 

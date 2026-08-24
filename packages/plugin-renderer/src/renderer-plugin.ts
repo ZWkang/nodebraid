@@ -1,9 +1,14 @@
-import type { CanvasCommit, CanvasView } from '@cflow/kernel';
-import type { InteractionProjection } from '@cflow/interaction-api';
-import { kernelService } from '@cflow/plugin-kernel';
-import { sessionService, type SessionSnapshot } from '@cflow/plugin-session';
-import { RendererError, type RendererFactory, type RendererInputListener, type ScreenPoint } from '@cflow/renderer-api';
-import { definePlugin, defineService } from '@cflow/runtime-cordis';
+import type { CanvasCommit, CanvasView } from '@nodebraid/kernel';
+import type { InteractionProjection } from '@nodebraid/interaction-api';
+import { kernelService } from '@nodebraid/plugin-kernel';
+import { sessionService, type SessionSnapshot } from '@nodebraid/plugin-session';
+import {
+  RendererError,
+  type RendererFactory,
+  type RendererInputListener,
+  type ScreenPoint,
+} from '@nodebraid/renderer-api';
+import { definePlugin, defineService } from '@nodebraid/runtime-cordis';
 
 import type { InteractionProjectionBinding, RendererService } from './contracts';
 import { rendererDiagnosticEvents } from './diagnostic-events';
@@ -19,7 +24,7 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
   if (typeof factory !== 'function') throw new TypeError('Renderer Factory must be a function.');
 
   return definePlugin({
-    name: '@cflow/plugin-renderer',
+    name: '@nodebraid/plugin-renderer',
     requires: { kernel: kernelService, session: sessionService },
     provides: { renderer: rendererService },
     async setup(context, config: Config) {

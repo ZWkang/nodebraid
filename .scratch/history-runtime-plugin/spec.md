@@ -1,10 +1,10 @@
-# CFlow History Runtime Plugin
+# NodeBraid History Runtime Plugin
 
 **Status:** ready-for-agent
 
 ## Problem Statement
 
-CFlow 已经有可逆的 Kernel、Activation-scoped Kernel Service 和强类型 Command Service，但 Canvas Runtime 还没有一条标准的 Document History 路径。当前 Consumer 虽然可以直接调用 TransactionContext.applyChangeSet，但没有统一的 History Entry 记录、redo 失效、Undo/Redo Command、可用性 Snapshot、observer 重入顺序或 Activation 释放语义。
+NodeBraid 已经有可逆的 Kernel、Activation-scoped Kernel Service 和强类型 Command Service，但 Canvas Runtime 还没有一条标准的 Document History 路径。当前 Consumer 虽然可以直接调用 TransactionContext.applyChangeSet，但没有统一的 History Entry 记录、redo 失效、Undo/Redo Command、可用性 Snapshot、observer 重入顺序或 Activation 释放语义。
 
 如果各个 Interaction 或业务 Plugin 自建历史栈，它们会对哪些 Commit 可记录、怎样识别 replay、何时移动栈、失败后是否保留 Entry，以及 Provider 消失后是否继续接受操作得出不同答案。更危险的是，Kernel Commit Observer 允许同步重入并对后续 Commit 排队，而 Command Service 本身允许并发和重入；一个简单的 replay 布尔标记会误忽略重入生成的 Recordable Commit，而在 transact 返回后才移动栈又会破坏 revision 顺序。
 
@@ -12,7 +12,7 @@ CFlow 已经有可逆的 Kernel、Activation-scoped Kernel Service 和强类型 
 
 ## Solution
 
-新增可发布的 `@cflow/plugin-history`。`historyPlugin` 静态要求 Kernel Service 与 Command Service，并在每次 Activation 中提供一份全新的 History Service。Activation 以 Kernel 当前 revision 作为 History Baseline，不补录早于 Baseline 的 Commit。
+新增可发布的 `@nodebraid/plugin-history`。`historyPlugin` 静态要求 Kernel Service 与 Command Service，并在每次 Activation 中提供一份全新的 History Service。Activation 以 Kernel 当前 revision 作为 History Baseline，不补录早于 Baseline 的 Commit。
 
 History 订阅 Kernel Commit，将当前 Activation 观察到的每个非自身 Replay Commit 记录为 History Entry。每个 Entry 只保存原 Commit 的 Change Set。新 Recordable Commit 进入 undo 栈并清空 redo 栈。History 不按 `origin` 或 `commandId` 过滤 Commit，这两个字段仅用于诊断。
 
@@ -26,12 +26,12 @@ History 仍按 revision 立即处理每个 Commit，但只在已观察 revision 
 
 ## User Stories
 
-1. As a CFlow maintainer, I want History to be a publishable Runtime Plugin, so that undo and redo follow the same composition model as Kernel and Command.
-2. As a CFlow maintainer, I want History to require explicit Kernel and Command Services, so that it has no hidden global dependency.
-3. As a CFlow maintainer, I want History to provide one narrow Runtime Service, so that consumers do not receive internal stacks or replay handles.
-4. As a CFlow maintainer, I want internal packages to avoid depending on the core facade, so that the facade remains an outward aggregation layer.
-5. As a CFlow maintainer, I want History to use Kernel-owned Canvas Commit and Change Set types, so that it does not create a competing change protocol.
-6. As a CFlow maintainer, I want History writes to use Kernel Service transactions, so that no second writable Document authority appears.
+1. As a NodeBraid maintainer, I want History to be a publishable Runtime Plugin, so that undo and redo follow the same composition model as Kernel and Command.
+2. As a NodeBraid maintainer, I want History to require explicit Kernel and Command Services, so that it has no hidden global dependency.
+3. As a NodeBraid maintainer, I want History to provide one narrow Runtime Service, so that consumers do not receive internal stacks or replay handles.
+4. As a NodeBraid maintainer, I want internal packages to avoid depending on the core facade, so that the facade remains an outward aggregation layer.
+5. As a NodeBraid maintainer, I want History to use Kernel-owned Canvas Commit and Change Set types, so that it does not create a competing change protocol.
+6. As a NodeBraid maintainer, I want History writes to use Kernel Service transactions, so that no second writable Document authority appears.
 7. As a Canvas Runtime author, I want each History Activation to own isolated state, so that separate canvases and reinstallations cannot share entries accidentally.
 8. As a Canvas Runtime author, I want a History Activation to start from the current Kernel revision, so that it can attach to an already-active Kernel without inventing prior entries.
 9. As a Canvas Runtime author, I want commits before the History Baseline to remain unavailable to undo, so that missing observer history is never guessed.
@@ -103,8 +103,8 @@ History 仍按 revision 立即处理每个 Commit，但只在已观察 revision 
 
 ## Implementation Decisions
 
-- Add one publishable package named `@cflow/plugin-history` and use the same name for its official Plugin diagnostic identity.
-- The package directly depends on `@cflow/kernel`, `@cflow/plugin-kernel`, `@cflow/plugin-command` and `@cflow/runtime-cordis`; it does not depend on `@cflow/core`.
+- Add one publishable package named `@nodebraid/plugin-history` and use the same name for its official Plugin diagnostic identity.
+- The package directly depends on `@nodebraid/kernel`, `@nodebraid/plugin-kernel`, `@nodebraid/plugin-command` and `@nodebraid/runtime-cordis`; it does not depend on `@nodebraid/core`.
 - The direct Kernel dependency owns Canvas Commit and Change Set types only. All reads, writes and observation still pass through Kernel Service.
 - Export `historyPlugin`, `historyService`, `undoCommand`, `redoCommand`, `HistoryError`, `HistoryService`, `HistorySnapshot` and `HistoryErrorCode`.
 - Keep the official History Plugin configuration-free in the first version.
@@ -144,7 +144,7 @@ History 仍按 revision 立即处理每个 Commit，但只在已观察 revision 
 - Stop Kernel observation, dispose and await both Command registrations, then release retained entries and pending state.
 - Let the Plugin Host withdraw History Service and deactivate downstream consumers according to existing Required Service lifecycle ordering.
 - Reinstallation creates a new empty History at the then-current Kernel revision. No Entry, subscriber or pending replay crosses Activations.
-- Re-export the complete public History seam from `@cflow/core`; internal packages continue to import their direct dependencies rather than core.
+- Re-export the complete public History seam from `@nodebraid/core`; internal packages continue to import their direct dependencies rather than core.
 - Keep opaque Node and Edge data under the existing Kernel immutable-value contract. History does not deep-copy, deep-freeze, traverse or serialize it.
 
 ## Testing Decisions
@@ -172,7 +172,7 @@ History 仍按 revision 立即处理每个 Commit，但只在已观察 revision 
 - Cover deterministic failure precedence when more than one unavailable condition is present.
 - Cover loss and reinstallation of each Required Service, old Service failure, Command unregistration, retained Kernel baseline behavior and fresh History state.
 - Add compile-time tests for readonly History Snapshot, exact Service surface, invariant void-to-CanvasCommit Command types and configuration-free Plugin installation.
-- Add declaration checks that reject raw Cordis, RxJS, Renderer and `@cflow/core` imports or leaked types from the History package.
+- Add declaration checks that reject raw Cordis, RxJS, Renderer and `@nodebraid/core` imports or leaked types from the History package.
 - Add package-name import probes for the narrow History package and a small core facade re-export smoke test instead of duplicating behavior tests through core.
 - Verify package and repository typecheck, tests, formatting, build, declaration checks, package dry-run packing and diff whitespace checks before completion.
 
@@ -202,5 +202,5 @@ History 仍按 revision 立即处理每个 Commit，但只在已观察 revision 
 - Command Service invokes synchronous handler work in the current call stack but exposes a Promise result and permits concurrent or reentrant executions. History deliberately narrows that behavior for replay through accepted single-flight semantics.
 - History Snapshot publication waits for observer catch-up because an earlier Kernel Observer can already have committed a queued later revision while History is still processing the current callback.
 - In a caught-up strict-LIFO History, a stale top Entry is not constructible through supported public behavior: every later Recordable Commit becomes the newer undo Entry or clears redo. Kernel's own public tests remain the source of truth for Change Set conflict and final-graph failure atomicity; History must not introduce a fake dependency merely to duplicate those unreachable paths.
-- The public package name is `@cflow/plugin-history`, matching the implemented Kernel and Command Runtime Plugin naming convention. Older target documentation that mentions `@cflow/history` is not the selected first-version package name.
-- The accepted domain vocabulary is recorded in the CFlow glossary. Single-flight replay and caught-up Snapshot publication are recorded as accepted architectural decisions.
+- The public package name is `@nodebraid/plugin-history`, matching the implemented Kernel and Command Runtime Plugin naming convention. Older target documentation that mentions `@nodebraid/history` is not the selected first-version package name.
+- The accepted domain vocabulary is recorded in the NodeBraid glossary. Single-flight replay and caught-up Snapshot publication are recorded as accepted architectural decisions.

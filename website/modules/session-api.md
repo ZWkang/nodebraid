@@ -1,15 +1,15 @@
 ---
-title: '@cflow/session-api'
+title: '@nodebraid/session-api'
 description: Renderer-independent 的 Selection、Viewport 与 Session Snapshot 值契约。
 ---
 
-# `@cflow/session-api`
+# `@nodebraid/session-api`
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。
 :::
 
-`@cflow/session-api` 只定义 Session 的不可变值形状，让 Runtime Plugin 与 Renderer contract 共享同一种语义，而不把 Plugin Host 或 mutation 能力带进底层 API。
+`@nodebraid/session-api` 只定义 Session 的不可变值形状，让 Runtime Plugin 与 Renderer contract 共享同一种语义，而不把 Plugin Host 或 mutation 能力带进底层 API。
 
 ::: info 当前状态
 已实现。该 package 提供 TypeScript 值契约，不创建 Session、不验证输入，也不拥有任何 Runtime 生命周期。
@@ -17,7 +17,7 @@ description: Renderer-independent 的 Selection、Viewport 与 Session Snapshot 
 
 ## 解决什么问题
 
-Renderer 需要读取 Selection 与 Viewport，但不应该因此依赖 Session Service、Plugin Host 或 Kernel adapter。如果 Renderer API 自己复制一份类型，Selection 与 Viewport 的语义又会逐渐漂移。`@cflow/session-api` 提供双方共同依赖的最小值契约。
+Renderer 需要读取 Selection 与 Viewport，但不应该因此依赖 Session Service、Plugin Host 或 Kernel adapter。如果 Renderer API 自己复制一份类型，Selection 与 Viewport 的语义又会逐渐漂移。`@nodebraid/session-api` 提供双方共同依赖的最小值契约。
 
 ## 适用场景
 
@@ -28,7 +28,7 @@ Renderer 需要读取 Selection 与 Viewport，但不应该因此依赖 Session 
 
 ## 它提供什么
 
-`@cflow/session-api` 只导出三个类型：
+`@nodebraid/session-api` 只导出三个类型：
 
 | 类型                | 语义                                                                               |
 | ------------------- | ---------------------------------------------------------------------------------- |
@@ -38,15 +38,15 @@ Renderer 需要读取 Selection 与 Viewport，但不应该因此依赖 Session 
 
 ## 依赖与组合
 
-该 package 只依赖 `@cflow/kernel` 的 `NodeId` 与 `EdgeId` 类型，不依赖 `@cflow/plugin-kernel`、`@cflow/runtime-cordis` 或 `@cflow/core`。
+该 package 只依赖 `@nodebraid/kernel` 的 `NodeId` 与 `EdgeId` 类型，不依赖 `@nodebraid/plugin-kernel`、`@nodebraid/runtime-cordis` 或 `@nodebraid/core`。
 
-- [`@cflow/plugin-session`](/modules/plugin-session) 使用这些类型提供 mutation、验证、订阅与 Activation 生命周期。
-- `@cflow/renderer-api` 使用同一 Session Snapshot 作为 Renderer 输入契约的一部分，不需要依赖 Runtime Plugin。
+- [`@nodebraid/plugin-session`](/modules/plugin-session) 使用这些类型提供 mutation、验证、订阅与 Activation 生命周期。
+- `@nodebraid/renderer-api` 使用同一 Session Snapshot 作为 Renderer 输入契约的一部分，不需要依赖 Runtime Plugin。
 
 ## 公共入口
 
 ```ts
-import type { SelectionSnapshot, SessionSnapshot, Viewport } from '@cflow/session-api';
+import type { SelectionSnapshot, SessionSnapshot, Viewport } from '@nodebraid/session-api';
 
 const snapshot: SessionSnapshot = {
   selection: { nodeIds: [], edgeIds: [] },
@@ -74,7 +74,7 @@ const snapshot: SessionSnapshot = {
 
 ## 验证依据
 
-- [公共导出](https://github.com/ZWkang/cflow/blob/main/packages/session-api/src/index.ts)只重导出三个 Session 值类型。
-- [值契约源码](https://github.com/ZWkang/cflow/blob/main/packages/session-api/src/contracts.ts)明确 Selection order、逻辑屏幕单位和无 mutation 能力的边界。
-- [package 行为测试](https://github.com/ZWkang/cflow/blob/main/packages/session-api/tests/index.test.ts)通过 Kernel ID 类型构造完整 Session Snapshot，不启动 Runtime。
+- [公共导出](https://github.com/ZWkang/nodebraid/blob/main/packages/session-api/src/index.ts)只重导出三个 Session 值类型。
+- [值契约源码](https://github.com/ZWkang/nodebraid/blob/main/packages/session-api/src/contracts.ts)明确 Selection order、逻辑屏幕单位和无 mutation 能力的边界。
+- [package 行为测试](https://github.com/ZWkang/nodebraid/blob/main/packages/session-api/tests/index.test.ts)通过 Kernel ID 类型构造完整 Session Snapshot，不启动 Runtime。
 - ADR-0035 决定在 Runtime Plugin 之外拥有 Session 值契约，ADR-0017 与 ADR-0018 分别固定 Selection 和 Viewport 语义。

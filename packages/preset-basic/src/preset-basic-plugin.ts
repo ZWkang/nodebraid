@@ -1,11 +1,11 @@
-import { commandPlugin } from '@cflow/plugin-command';
-import { historyPlugin } from '@cflow/plugin-history';
-import { interactionPlugin, type InteractionConfig } from '@cflow/plugin-interaction';
-import { kernelPlugin } from '@cflow/plugin-kernel';
-import { createRendererPlugin } from '@cflow/plugin-renderer';
-import { sessionPlugin } from '@cflow/plugin-session';
-import type { RendererFactory } from '@cflow/renderer-api';
-import { definePlugin } from '@cflow/runtime-cordis';
+import { commandPlugin } from '@nodebraid/plugin-command';
+import { historyPlugin } from '@nodebraid/plugin-history';
+import { interactionPlugin, type InteractionConfig } from '@nodebraid/plugin-interaction';
+import { kernelPlugin } from '@nodebraid/plugin-kernel';
+import { createRendererPlugin } from '@nodebraid/plugin-renderer';
+import { sessionPlugin } from '@nodebraid/plugin-session';
+import type { RendererFactory } from '@nodebraid/renderer-api';
+import { definePlugin } from '@nodebraid/runtime-cordis';
 
 export interface BasicCanvasPluginOptions {
   readonly interaction?: InteractionConfig;
@@ -18,7 +18,7 @@ export function createBasicCanvasPlugin<RendererConfig>(
   const rendererPlugin = createRendererPlugin(factory);
   const interactionConfig = resolveInteractionOptions(options);
   return definePlugin<RendererConfig>({
-    name: '@cflow/preset-basic',
+    name: '@nodebraid/preset-basic',
     async setup(context, config) {
       const installations = [
         context.install(kernelPlugin),

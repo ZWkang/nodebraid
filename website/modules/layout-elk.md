@@ -1,9 +1,9 @@
 ---
-title: '@cflow/layout-elk'
+title: '@nodebraid/layout-elk'
 description: 基于 ELK 的 full Layout Provider，并通过 Stress 支持 incremental 与 Fixed Node。
 ---
 
-# `@cflow/layout-elk`
+# `@nodebraid/layout-elk`
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。
@@ -11,7 +11,7 @@ description: 基于 ELK 的 full Layout Provider，并通过 Stress 支持 incre
 
 ## 解决的问题
 
-`@cflow/layout-elk` 将 ELK 适配到 CFlow `LayoutEngine` seam。它既能执行 Layered full layout，也能使用 Stress algorithm 处理 incremental stability 和 Fixed Node，并把 ELK component-local 结果恢复为 CFlow absolute World Position。
+`@nodebraid/layout-elk` 将 ELK 适配到 NodeBraid `LayoutEngine` seam。它既能执行 Layered full layout，也能使用 Stress algorithm 处理 incremental stability 和 Fixed Node，并把 ELK component-local 结果恢复为 NodeBraid absolute World Position。
 
 ## 何时使用
 
@@ -20,7 +20,7 @@ description: 基于 ELK 的 full Layout Provider，并通过 Stress 支持 incre
 - 你需要一个或多个 Node 保持绝对位置；
 - 你希望通过 deterministic random seed 固定同版本、同输入和同配置的结果。
 
-如果只需要更轻量的确定性 full layout，不需要 incremental 或 Fixed Node，可以选择 [`@cflow/layout-dagre`](/modules/layout-dagre)。
+如果只需要更轻量的确定性 full layout，不需要 incremental 或 Fixed Node，可以选择 [`@nodebraid/layout-dagre`](/modules/layout-dagre)。
 
 ## 提供的能力
 
@@ -43,9 +43,9 @@ description: 基于 ELK 的 full Layout Provider，并通过 Stress 支持 incre
 
 ## 依赖与组合
 
-该 package 只依赖 `@cflow/layout-api` 与 `elkjs`，不依赖 Plugin Host、Kernel Runtime、Command Service 或 `@cflow/core`。
+该 package 只依赖 `@nodebraid/layout-api` 与 `elkjs`，不依赖 Plugin Host、Kernel Runtime、Command Service 或 `@nodebraid/core`。
 
-直接使用 Engine 可计算未提交 Proposal；在 Canvas Runtime 中，通过 [`@cflow/plugin-layout`](/modules/plugin-layout) 将 `elkLayoutEngine` 绑定到强类型 Command。
+直接使用 Engine 可计算未提交 Proposal；在 Canvas Runtime 中，通过 [`@nodebraid/plugin-layout`](/modules/plugin-layout) 将 `elkLayoutEngine` 绑定到强类型 Command。
 
 ## 公共入口
 
@@ -55,14 +55,14 @@ import {
   type ElkLayoutAlgorithm,
   type ElkLayoutConfig,
   type ElkLayoutDirection,
-} from '@cflow/layout-elk';
+} from '@nodebraid/layout-elk';
 ```
 
-`@cflow/core` 不重导出该 Provider，选择 ELK 的应用显式承担其依赖。
+`@nodebraid/core` 不重导出该 Provider，选择 ELK 的应用显式承担其依赖。
 
 ## Fixed Node 与坐标语义
 
-ELK 可能分别平移断连分量。adapter 为每个连接分量计算回到 CFlow World Space 的 translation：
+ELK 可能分别平移断连分量。adapter 为每个连接分量计算回到 NodeBraid World Space 的 translation：
 
 - 有 Fixed Node 时，所有 Fixed Node 必须证明同一个 translation，且最终位置完全不变；
 - incremental 且没有 Fixed Node 时，使用分量平均 translation 保持整体接近原位置；
@@ -72,7 +72,7 @@ ELK 可能分别平移断连分量。adapter 为每个连接分量计算回到 C
 
 ## 生命周期与错误语义
 
-Engine 在加载 ELK、调用布局和返回 Proposal 的异步边界检查取消。algorithm/direction/spacing/padding/seed 配置由 Provider 验证；共享请求与 Proposal 仍由 `@cflow/layout-api` 验证。
+Engine 在加载 ELK、调用布局和返回 Proposal 的异步边界检查取消。algorithm/direction/spacing/padding/seed 配置由 Provider 验证；共享请求与 Proposal 仍由 `@nodebraid/layout-api` 验证。
 
 首版使用 ELK bundled in-process worker implementation，并包含 Bun loader compatibility path。它没有暴露 Worker ownership 或独立 Worker 配置。
 

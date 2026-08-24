@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 
-import { createCanvasKernel, edgeId, nodeId } from '@cflow/kernel';
-import { createLayoutInput, type LayoutError } from '@cflow/layout-api';
+import { createCanvasKernel, edgeId, nodeId } from '@nodebraid/kernel';
+import { createLayoutInput, type LayoutError } from '@nodebraid/layout-api';
 
 import { elkLayoutEngine } from '../src';
 

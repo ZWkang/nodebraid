@@ -1,19 +1,19 @@
 import { expect, test } from 'bun:test';
 
-import type { DiagnosticEvent, DiagnosticFault } from '@cflow/diagnostics';
+import type { DiagnosticEvent, DiagnosticFault } from '@nodebraid/diagnostics';
 
 import { createPluginHost, definePlugin, defineService, runtimeDiagnosticEvents } from '../src';
 
 test('the Runtime diagnostic event catalog has stable searchable names', () => {
   expect(runtimeDiagnosticEvents).toEqual({
-    hostCreated: 'cflow.runtime.host.created',
-    hostDisposing: 'cflow.runtime.host.disposing',
-    hostDisposed: 'cflow.runtime.host.disposed',
-    activationStarted: 'cflow.runtime.activation.started',
-    activationEnded: 'cflow.runtime.activation.ended',
-    installationStatusChanged: 'cflow.runtime.installation.status.changed',
-    installationDisposeFailed: 'cflow.runtime.installation.dispose.failed',
-    installationSubscriberFault: 'cflow.runtime.installation.subscriber.fault',
+    hostCreated: 'nodebraid.runtime.host.created',
+    hostDisposing: 'nodebraid.runtime.host.disposing',
+    hostDisposed: 'nodebraid.runtime.host.disposed',
+    activationStarted: 'nodebraid.runtime.activation.started',
+    activationEnded: 'nodebraid.runtime.activation.ended',
+    installationStatusChanged: 'nodebraid.runtime.installation.status.changed',
+    installationDisposeFailed: 'nodebraid.runtime.installation.dispose.failed',
+    installationSubscriberFault: 'nodebraid.runtime.installation.subscriber.fault',
   });
 });
 
@@ -161,7 +161,7 @@ test('a Diagnostic Sink failure becomes a non-recursive Fault without failing Pl
   expect(faults[0]).toMatchObject({
     error: sinkError,
     event: {
-      name: 'cflow.diagnostics.sink.fault',
+      name: 'nodebraid.diagnostics.sink.fault',
       level: 'error',
       error: sinkError,
       attributes: { eventName: 'example.operation.ready' },
@@ -198,7 +198,7 @@ test('an asynchronous Diagnostic Sink is reported as an explicit contract failur
       details: { eventName: 'example.async-sink' },
     },
     event: {
-      name: 'cflow.diagnostics.sink.fault',
+      name: 'nodebraid.diagnostics.sink.fault',
       level: 'error',
     },
   });
@@ -308,7 +308,7 @@ test('an invalid reportFault input preserves the original Fault through the fina
     }),
   ]);
   expect(faults[0]?.event).toMatchObject({
-    name: 'cflow.diagnostics.fault-reporting.fault',
+    name: 'nodebraid.diagnostics.fault-reporting.fault',
     level: 'error',
     error: reportedError,
     attributes: { attemptedEventName: '', contractCode: 'INVALID_EVENT' },
@@ -421,7 +421,7 @@ test('Installation subscriber Faults use the Host-scoped diagnostics path', asyn
     expect(faults.map((fault) => fault.error)).toEqual([listenerError, listenerError]);
     expect(
       events
-        .filter((event) => event.name === 'cflow.runtime.installation.subscriber.fault')
+        .filter((event) => event.name === 'nodebraid.runtime.installation.subscriber.fault')
         .map((event) => ({ scope: event.scope, status: event.attributes.status })),
     ).toEqual([
       {
@@ -473,21 +473,21 @@ test('an empty Plugin Host emits an ordered lifecycle', async () => {
     {
       id: 'empty-host.event.1',
       sequence: 1,
-      name: 'cflow.runtime.host.created',
+      name: 'nodebraid.runtime.host.created',
       level: 'info',
       scope: { hostId: 'empty-host' },
     },
     {
       id: 'empty-host.event.2',
       sequence: 2,
-      name: 'cflow.runtime.host.disposing',
+      name: 'nodebraid.runtime.host.disposing',
       level: 'debug',
       scope: { hostId: 'empty-host' },
     },
     {
       id: 'empty-host.event.3',
       sequence: 3,
-      name: 'cflow.runtime.host.disposed',
+      name: 'nodebraid.runtime.host.disposed',
       level: 'info',
       scope: { hostId: 'empty-host' },
     },
@@ -507,7 +507,7 @@ test('Installation status events follow Snapshot replacement and precede subscri
   installation.subscribe(() => {
     subscriberObservations.push({
       snapshot: installation.getSnapshot().status,
-      eventStatus: events.filter((event) => event.name === 'cflow.runtime.installation.status.changed').at(-1)
+      eventStatus: events.filter((event) => event.name === 'nodebraid.runtime.installation.status.changed').at(-1)
         ?.attributes.to,
     });
   });
@@ -517,7 +517,7 @@ test('Installation status events follow Snapshot replacement and precede subscri
 
   expect(
     events
-      .filter((event) => event.name === 'cflow.runtime.installation.status.changed')
+      .filter((event) => event.name === 'nodebraid.runtime.installation.status.changed')
       .map((event) => ({ level: event.level, attributes: event.attributes })),
   ).toEqual([
     {
@@ -564,7 +564,7 @@ test('a Plugin Setup failure emits one error status while preserving its identit
   expect(installation.getSnapshot()).toEqual({ status: 'failed', error: setupError });
   expect(
     events
-      .filter((event) => event.name === 'cflow.runtime.installation.status.changed' && event.level === 'error')
+      .filter((event) => event.name === 'nodebraid.runtime.installation.status.changed' && event.level === 'error')
       .map((event) => ({ attributes: event.attributes, error: event.error })),
   ).toEqual([
     {
@@ -585,7 +585,7 @@ test('Activation events surround Plugin setup and completed cleanup', async () =
       hostId: 'activation-host',
       sink: (event) => {
         events.push(event);
-        if (event.name === 'cflow.runtime.activation.ended') {
+        if (event.name === 'nodebraid.runtime.activation.ended') {
           cleanupCompletedWhenEnded = cleanupCompleted;
         }
       },
@@ -610,14 +610,14 @@ test('Activation events surround Plugin setup and completed cleanup', async () =
     events
       .filter(
         (event) =>
-          event.name === 'cflow.runtime.activation.started' ||
+          event.name === 'nodebraid.runtime.activation.started' ||
           event.name === 'example.setup.running' ||
-          event.name === 'cflow.runtime.activation.ended',
+          event.name === 'nodebraid.runtime.activation.ended',
       )
       .map((event) => ({ name: event.name, scope: event.scope, attributes: event.attributes })),
   ).toEqual([
     {
-      name: 'cflow.runtime.activation.started',
+      name: 'nodebraid.runtime.activation.started',
       scope: {
         hostId: 'activation-host',
         installationId: 'activation-host.installation.1',
@@ -637,7 +637,7 @@ test('Activation events surround Plugin setup and completed cleanup', async () =
       attributes: {},
     },
     {
-      name: 'cflow.runtime.activation.ended',
+      name: 'nodebraid.runtime.activation.ended',
       scope: {
         hostId: 'activation-host',
         installationId: 'activation-host.installation.1',
@@ -679,7 +679,7 @@ test('a terminal Installation cleanup failure emits one error event and still di
   expect(installation.getSnapshot()).toEqual({ status: 'disposed' });
   expect(
     events
-      .filter((event) => event.name === 'cflow.runtime.installation.dispose.failed')
+      .filter((event) => event.name === 'nodebraid.runtime.installation.dispose.failed')
       .map((event) => ({ level: event.level, attributes: event.attributes, error: event.error })),
   ).toEqual([
     {
@@ -730,7 +730,7 @@ test('dependency cleanup records one Error-level Event across Consumer and Provi
     events
       .filter((event) => event.level === 'error' && errorTreeContains(event.error, cleanupError))
       .map((event) => event.name),
-  ).toEqual(['cflow.runtime.installation.status.changed']);
+  ).toEqual(['nodebraid.runtime.installation.status.changed']);
 
   await consumerInstallation.dispose();
   await host.dispose();

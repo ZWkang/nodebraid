@@ -16,25 +16,25 @@
 - `bun run docs:build`：生产构建 VitePress Documentation Site。
 - `bun run docs:check`：校验公开内容、执行 Quick Start 并生产构建站点。
 - `bun run docs:preview`：本地预览已经生产构建的 Documentation Site。
-- `bun run build`：构建根入口，再由 `@cflow/core` 先构建其余 workspace 依赖并构建公共 facade。
-- `bun run typecheck`：先构建 workspace package-name 类型解析所需的依赖声明，再检查根 TypeScript project 和所有 `@cflow/*` workspace。
-- `bun run --filter '@cflow/diagnostics' build`：构建零依赖 Diagnostics 契约、运行声明隔离检查并验证 package-name import。
-- `bun run --filter '@cflow/plugin-kernel' build:dependencies`：按 Kernel、Runtime 顺序生成 Kernel Runtime Plugin 构建与类型检查所需的 workspace 声明。
-- `bun run --filter '@cflow/plugin-command' build:dependencies`：生成 Command Runtime Plugin 构建与类型检查所需的 Runtime workspace 声明。
-- `bun run --filter '@cflow/layout-api' build:dependencies`：生成 Layout API 构建与类型检查所需的 Kernel workspace 声明。
-- `bun run --filter '@cflow/plugin-layout' build:dependencies`：生成 Layout Runtime Plugin 构建与类型检查所需的 Layout API、Kernel Plugin 与 Command Plugin workspace 声明。
-- `bun run --filter '@cflow/layout-dagre' build:dependencies`：生成 Dagre Layout Provider 构建与类型检查所需的 Layout API workspace 声明。
-- `bun run --filter '@cflow/layout-elk' build:dependencies`：生成 ELK Layout Provider 构建与类型检查所需的 Layout API workspace 声明。
-- `bun run --filter '@cflow/plugin-session' build:dependencies`：生成 Session Runtime Plugin 构建与类型检查所需的 Kernel、Runtime 与 Kernel Plugin workspace 声明。
-- `bun run --filter '@cflow/session-api' build:dependencies`：生成 Session 值契约所需的 Kernel workspace 声明。
-- `bun run --filter '@cflow/interaction-api' build:dependencies`：生成 Interaction Projection 值契约所需的 Kernel 与 Session API workspace 声明。
-- `bun run --filter '@cflow/renderer-api' build:dependencies`：生成 Renderer 协议所需的 Diagnostics、Kernel 与 Session API workspace 声明。
-- `bun run --filter '@cflow/plugin-renderer' build:dependencies`：生成 Renderer Runtime Plugin 所需的 Renderer API、Kernel Plugin 与 Session Plugin workspace 声明。
-- `bun run --filter '@cflow/plugin-interaction' build:dependencies`：生成 Interaction Runtime Plugin 所需的 Command、Kernel、Session 与 Renderer Plugin workspace 声明。
-- `bun run --filter '@cflow/renderer-svg' build:dependencies`：生成 SVG Renderer Provider 生产构建所需的 Renderer API 及其传递 workspace 声明。
-- `bun run --filter '@cflow/renderer-svg' build:test-dependencies`：生成 Renderer Plugin、Interaction、Basic Canvas Composition 与真实 Runtime 浏览器场景所需的全部 workspace 声明。
-- `bun run --filter '@cflow/plugin-history' build:dependencies`：生成 History Runtime Plugin 构建与类型检查所需的 Command 与 Kernel Plugin workspace 声明。
-- `bun run --filter '@cflow/preset-basic' build:dependencies`：生成 Basic Canvas Composition 所需的 Interaction、History 及其传递 workspace 声明。
+- `bun run build`：构建根入口，再由 `@nodebraid/core` 先构建其余 workspace 依赖并构建公共 facade。
+- `bun run typecheck`：先构建 workspace package-name 类型解析所需的依赖声明，再检查根 TypeScript project 和所有 `@nodebraid/*` workspace。
+- `bun run --filter '@nodebraid/diagnostics' build`：构建零依赖 Diagnostics 契约、运行声明隔离检查并验证 package-name import。
+- `bun run --filter '@nodebraid/plugin-kernel' build:dependencies`：按 Kernel、Runtime 顺序生成 Kernel Runtime Plugin 构建与类型检查所需的 workspace 声明。
+- `bun run --filter '@nodebraid/plugin-command' build:dependencies`：生成 Command Runtime Plugin 构建与类型检查所需的 Runtime workspace 声明。
+- `bun run --filter '@nodebraid/layout-api' build:dependencies`：生成 Layout API 构建与类型检查所需的 Kernel workspace 声明。
+- `bun run --filter '@nodebraid/plugin-layout' build:dependencies`：生成 Layout Runtime Plugin 构建与类型检查所需的 Layout API、Kernel Plugin 与 Command Plugin workspace 声明。
+- `bun run --filter '@nodebraid/layout-dagre' build:dependencies`：生成 Dagre Layout Provider 构建与类型检查所需的 Layout API workspace 声明。
+- `bun run --filter '@nodebraid/layout-elk' build:dependencies`：生成 ELK Layout Provider 构建与类型检查所需的 Layout API workspace 声明。
+- `bun run --filter '@nodebraid/plugin-session' build:dependencies`：生成 Session Runtime Plugin 构建与类型检查所需的 Kernel、Runtime 与 Kernel Plugin workspace 声明。
+- `bun run --filter '@nodebraid/session-api' build:dependencies`：生成 Session 值契约所需的 Kernel workspace 声明。
+- `bun run --filter '@nodebraid/interaction-api' build:dependencies`：生成 Interaction Projection 值契约所需的 Kernel 与 Session API workspace 声明。
+- `bun run --filter '@nodebraid/renderer-api' build:dependencies`：生成 Renderer 协议所需的 Diagnostics、Kernel 与 Session API workspace 声明。
+- `bun run --filter '@nodebraid/plugin-renderer' build:dependencies`：生成 Renderer Runtime Plugin 所需的 Renderer API、Kernel Plugin 与 Session Plugin workspace 声明。
+- `bun run --filter '@nodebraid/plugin-interaction' build:dependencies`：生成 Interaction Runtime Plugin 所需的 Command、Kernel、Session 与 Renderer Plugin workspace 声明。
+- `bun run --filter '@nodebraid/renderer-svg' build:dependencies`：生成 SVG Renderer Provider 生产构建所需的 Renderer API 及其传递 workspace 声明。
+- `bun run --filter '@nodebraid/renderer-svg' build:test-dependencies`：生成 Renderer Plugin、Interaction、Basic Canvas Composition 与真实 Runtime 浏览器场景所需的全部 workspace 声明。
+- `bun run --filter '@nodebraid/plugin-history' build:dependencies`：生成 History Runtime Plugin 构建与类型检查所需的 Command 与 Kernel Plugin workspace 声明。
+- `bun run --filter '@nodebraid/preset-basic' build:dependencies`：生成 Basic Canvas Composition 所需的 Interaction、History 及其传递 workspace 声明。
 - `bun run format`：使用 Prettier 格式化支持的文件。
 - `bun run test`：运行 Bun 测试。
 - `bun run test:browser`：通过仓库锁定的 `agent-browser` 在真实 Chromium 中运行 SVG Renderer 公共 seam 测试。

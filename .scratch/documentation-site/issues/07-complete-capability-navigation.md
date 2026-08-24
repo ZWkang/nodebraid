@@ -2,7 +2,7 @@
 
 **What to build:** 将五个已完成能力族组装成一个可发现、可搜索、诚实反映当前状态的完整产品文档，并让 GitHub 与 package 入口都能把读者引向正确页面。
 
-**Blocked by:** 02 — 介绍 CFlow 基础运行能力; 03 — 介绍 Graph State 与 Session; 04 — 介绍 Command 与 History; 05 — 介绍 Layout 能力族; 06 — 介绍 Renderer 接入契约.
+**Blocked by:** 02 — 介绍 NodeBraid 基础运行能力; 03 — 介绍 Graph State 与 Session; 04 — 介绍 Command 与 History; 05 — 介绍 Layout 能力族; 06 — 介绍 Renderer 接入契约.
 
 **Status:** completed
 

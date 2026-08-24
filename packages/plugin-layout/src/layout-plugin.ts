@@ -1,13 +1,18 @@
-import { assertLayoutCapabilities, createLayoutInput, LayoutError, validateLayoutProposal } from '@cflow/layout-api';
-import { commandService } from '@cflow/plugin-command';
-import { kernelService } from '@cflow/plugin-kernel';
-import { definePlugin } from '@cflow/runtime-cordis';
+import {
+  assertLayoutCapabilities,
+  createLayoutInput,
+  LayoutError,
+  validateLayoutProposal,
+} from '@nodebraid/layout-api';
+import { commandService } from '@nodebraid/plugin-command';
+import { kernelService } from '@nodebraid/plugin-kernel';
+import { definePlugin } from '@nodebraid/runtime-cordis';
 
 import type { CreateLayoutPluginOptions, LayoutCommandInput, LayoutCommandResult } from './contracts';
 
 export function createLayoutPlugin<Config>(options: CreateLayoutPluginOptions<Config>) {
   return definePlugin({
-    name: `@cflow/plugin-layout:${options.engine.id}`,
+    name: `@nodebraid/plugin-layout:${options.engine.id}`,
     requires: { kernel: kernelService, commands: commandService },
     setup(context) {
       const registration = context.services.commands.register(

@@ -1,8 +1,8 @@
 import { expect, test } from 'bun:test';
 
-import { InteractionError } from '@cflow/plugin-interaction';
-import type { CanvasRenderer } from '@cflow/renderer-api';
-import { createPluginHost } from '@cflow/runtime-cordis';
+import { InteractionError } from '@nodebraid/plugin-interaction';
+import type { CanvasRenderer } from '@nodebraid/renderer-api';
+import { createPluginHost } from '@nodebraid/runtime-cordis';
 
 import { createBasicCanvasPlugin } from '../src';
 import { TestCanvasRenderer } from './test-renderer';

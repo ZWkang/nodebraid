@@ -1,26 +1,26 @@
 ---
 title: 当前状态
-description: CFlow 当前已经交付、明确缺失和可验证的能力边界。
+description: NodeBraid 当前已经交付、明确缺失和可验证的能力边界。
 ---
 
 # 当前状态
 
-CFlow 处于早期实现阶段，但已经形成一条可运行的 headless Canvas Runtime 主干。本页只描述当前分支已提交能力，不从目标架构推导完成度。
+NodeBraid 处于早期实现阶段，但已经形成一条可运行的 headless Canvas Runtime 主干。本页只描述当前分支已提交能力，不从目标架构推导完成度。
 
 ## 已交付
 
-- CFlow-owned Plugin Host、Runtime Service、Activation 与资源释放；
+- NodeBraid-owned Plugin Host、Runtime Service、Activation 与资源释放；
 - 结构化错误、Diagnostic Event、Sink 与 Fault Reporter contract；
 - Renderer-independent Kernel、同步 Transaction、Canvas View、Query 与 Change Set；
 - Kernel、Command、Session、History 与 Renderer Runtime Plugin；
 - Selection、Viewport 与 backend-neutral Renderer value contract；
 - Backend-neutral Interaction Projection，以及 Selection、multi-Node Drag、Pan、Wheel Zoom 与 node-level Edge Connection Runtime；
-- 参考级 `@cflow/renderer-svg` Provider，以及真实 Chromium 中的 SVG projection、输入、Hit Test 与 lifecycle 验证；
+- 参考级 `@nodebraid/renderer-svg` Provider，以及真实 Chromium 中的 SVG projection、输入、Hit Test 与 lifecycle 验证；
 - Layout Input/Engine/Proposal contract 与 Runtime Command integration；
 - Dagre full Layout Provider；
 - ELK full、incremental 与 Fixed Node Layout Provider；
-- 后端无关的 `@cflow/preset-basic` Basic Canvas Composition，以及真实 SVG canonical example；
-- 通过 `@cflow/core` 聚合的公共 facade。
+- 后端无关的 `@nodebraid/preset-basic` Basic Canvas Composition，以及真实 SVG canonical example；
+- 通过 `@nodebraid/core` 聚合的公共 facade。
 
 完整清单见 [全部模块](/modules/)。
 
@@ -34,9 +34,9 @@ CFlow 处于早期实现阶段，但已经形成一条可运行的 headless Canv
 
 ## Package 发布状态
 
-本仓库源码声明 `@cflow/*` 名称，但公开 npm registry 中的 `@cflow/core` 属于另一个项目。本项目当前不能提供安全的 npm 安装命令；请从 [Quick Start](/guide/quick-start) 使用源码 checkout。
+本仓库源码声明 `@nodebraid/*` 名称，但这些 package 尚未公开发布。本项目当前不提供 npm 安装命令；请从 [Quick Start](/guide/quick-start) 使用源码 checkout。
 
-未来迁移 npm scope 时，package identity、站点提示和示例会一起更新。本次文档站不执行 package rename 或发布。
+首次 npm 发布时，package identity、站点提示和示例必须一起验证并更新。本次更名不执行 package 发布。
 
 ## 验证等级
 

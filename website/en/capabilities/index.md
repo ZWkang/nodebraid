@@ -1,11 +1,11 @@
 ---
 title: Capability Map
-description: Understand CFlow's seven current capability families and package composition from a developer's perspective.
+description: Understand NodeBraid's seven current capability families and package composition from a developer's perspective.
 ---
 
 # Capability Map
 
-Package boundaries keep dependencies clear, but evaluating a system starts with a different question: “What can it help me build?” CFlow's current workspace packages form seven capability families. Each family connects contracts, Runtime integration, and optional Providers instead of selling infrastructure packages in isolation.
+Package boundaries keep dependencies clear, but evaluating a system starts with a different question: “What can it help me build?” NodeBraid's current workspace packages form seven capability families. Each family connects contracts, Runtime integration, and optional Providers instead of selling infrastructure packages in isolation.
 
 | Capability family                                         | Question it answers                                                          | Current delivery                                         |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------- |
@@ -33,7 +33,7 @@ Plugin Host
     └── Renderer Plugin ▶ application-provided Renderer Factory
 ```
 
-The Plugin Host installs none of these capabilities implicitly, and `@cflow/core` remains a public facade. An application can install each member explicitly or explicitly install the Basic Canvas Composition; Renderer and other Provider choices remain application-owned.
+The Plugin Host installs none of these capabilities implicitly, and `@nodebraid/core` remains a public facade. An application can install each member explicitly or explicitly install the Basic Canvas Composition; Renderer and other Provider choices remain application-owned.
 
 ## Next
 

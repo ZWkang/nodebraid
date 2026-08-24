@@ -1,6 +1,6 @@
-import type { LayoutEngine, LayoutInputOptions, LayoutMode } from '@cflow/layout-api';
-import type { Command } from '@cflow/plugin-command';
-import type { KernelService } from '@cflow/plugin-kernel';
+import type { LayoutEngine, LayoutInputOptions, LayoutMode } from '@nodebraid/layout-api';
+import type { Command } from '@nodebraid/plugin-command';
+import type { KernelService } from '@nodebraid/plugin-kernel';
 
 export type LayoutCommandResult = ReturnType<KernelService['transact']>;
 

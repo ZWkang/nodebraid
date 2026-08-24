@@ -5,7 +5,7 @@ import {
   type LayoutInput,
   type LayoutInputNode,
   type LayoutMode,
-} from '@cflow/layout-api';
+} from '@nodebraid/layout-api';
 
 import type { ElkLayoutConfig } from './contracts';
 import { resolveElkLayoutConfig } from './elk-config';

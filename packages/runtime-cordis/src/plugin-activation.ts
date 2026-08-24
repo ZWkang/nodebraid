@@ -1,4 +1,4 @@
-import type { PluginDiagnostics } from '@cflow/diagnostics';
+import type { PluginDiagnostics } from '@nodebraid/diagnostics';
 
 import { runtimeDiagnosticEvents } from './diagnostic-events';
 import type { ChildInstaller, RuntimeContext, ServicePublisher } from './internal-contracts';

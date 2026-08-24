@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/preset-basic",
+  "name": "@nodebraid/preset-basic",
   "type": "module",
   "version": "0.0.1",
-  "description": "Backend-neutral Basic Canvas Composition for CFlow.",
+  "description": "Backend-neutral Basic Canvas Composition for NodeBraid.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/preset-basic"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/preset-basic#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/preset-basic#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "canvas",
     "composition",
     "plugin-runtime"
@@ -41,20 +41,20 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
-    "build:dependencies": "bun run --filter '@cflow/plugin-interaction' build && bun run --filter '@cflow/plugin-history' build",
+    "build:dependencies": "bun run --filter '@nodebraid/plugin-interaction' build && bun run --filter '@nodebraid/plugin-history' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "test:artifacts": "bun run ./artifacts/check-declarations.ts",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/plugin-command": "workspace:*",
-    "@cflow/plugin-history": "workspace:*",
-    "@cflow/plugin-interaction": "workspace:*",
-    "@cflow/plugin-kernel": "workspace:*",
-    "@cflow/plugin-renderer": "workspace:*",
-    "@cflow/plugin-session": "workspace:*",
-    "@cflow/renderer-api": "workspace:*",
-    "@cflow/runtime-cordis": "workspace:*"
+    "@nodebraid/plugin-command": "workspace:*",
+    "@nodebraid/plugin-history": "workspace:*",
+    "@nodebraid/plugin-interaction": "workspace:*",
+    "@nodebraid/plugin-kernel": "workspace:*",
+    "@nodebraid/plugin-renderer": "workspace:*",
+    "@nodebraid/plugin-session": "workspace:*",
+    "@nodebraid/renderer-api": "workspace:*",
+    "@nodebraid/runtime-cordis": "workspace:*"
   }
 }

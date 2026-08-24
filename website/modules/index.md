@@ -1,6 +1,6 @@
 ---
 title: 全部模块
-description: CFlow 当前已提交的 workspace packages。
+description: NodeBraid 当前已提交的 workspace packages。
 ---
 
 # 全部模块

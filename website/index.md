@@ -3,7 +3,7 @@ layout: home
 titleTemplate: false
 
 hero:
-  name: CFlow
+  name: NodeBraid
   text: 把流程画布拆成可组合能力
   tagline: 一份权威 Document，一组显式 Plugin。按需组合 Kernel、Session、Command、History、Layout 与 Renderer contract，而不是接手一个无法拆分的编辑器黑盒。
   actions:

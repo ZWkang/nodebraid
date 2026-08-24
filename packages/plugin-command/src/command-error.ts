@@ -1,9 +1,9 @@
-import { CFlowError, type DiagnosticAttributes } from '@cflow/diagnostics';
+import { NodeBraidError, type DiagnosticAttributes } from '@nodebraid/diagnostics';
 
 export type CommandErrorCode =
   'INVALID_COMMAND' | 'COMMAND_ALREADY_REGISTERED' | 'COMMAND_NOT_FOUND' | 'SERVICE_DISPOSED';
 
-export class CommandError extends CFlowError<'plugin.command', CommandErrorCode> {
+export class CommandError extends NodeBraidError<'plugin.command', CommandErrorCode> {
   override readonly name = 'CommandError';
 
   constructor(

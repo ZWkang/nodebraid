@@ -16,4 +16,4 @@
 
 ## Answer
 
-真实 Chromium 中的 Plugin Host 现在以官方 Kernel、Session 与 Renderer Runtime Plugins 驱动 `@cflow/renderer-svg`，完成初始 reset/Session、Kernel Commit、Selection/Viewport、Hit Test、Focus、Input forwarding、人为失步后的诊断+reset 恢复与 Host 终态清理。新包保持独立依赖与声明隔离，不经 core 重导出；238 个 Bun tests、root build/typecheck/lint、Chromium gate、package dry-run、本任务格式检查与 Standards/Spec 双轴 review 全部通过。完整 `bun run check` 的唯一阻断是并发 `.scratch/documentation-site/` 的 8 个未格式化文件，本任务未越权修改。
+真实 Chromium 中的 Plugin Host 现在以官方 Kernel、Session 与 Renderer Runtime Plugins 驱动 `@nodebraid/renderer-svg`，完成初始 reset/Session、Kernel Commit、Selection/Viewport、Hit Test、Focus、Input forwarding、人为失步后的诊断+reset 恢复与 Host 终态清理。新包保持独立依赖与声明隔离，不经 core 重导出；238 个 Bun tests、root build/typecheck/lint、Chromium gate、package dry-run、本任务格式检查与 Standards/Spec 双轴 review 全部通过。完整 `bun run check` 的唯一阻断是并发 `.scratch/documentation-site/` 的 8 个未格式化文件，本任务未越权修改。

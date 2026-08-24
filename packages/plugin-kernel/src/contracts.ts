@@ -1,4 +1,4 @@
-import type { CanvasCommit, CanvasView, TransactionContext, TransactionMetadata } from '@cflow/kernel';
+import type { CanvasCommit, CanvasView, TransactionContext, TransactionMetadata } from '@nodebraid/kernel';
 
 export interface KernelService {
   read(): CanvasView;

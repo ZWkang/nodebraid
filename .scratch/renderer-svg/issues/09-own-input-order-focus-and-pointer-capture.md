@@ -1,6 +1,6 @@
 # 09 — 拥有 Input 顺序、Focus 与 Pointer Capture
 
-**What to build:** 让直接 Provider 与 Runtime 使用者都得到确定的 Input Subscription 顺序，并通过 CFlow control methods 安全使用真实 DOM Focus 和 Active Pointer Capture。
+**What to build:** 让直接 Provider 与 Runtime 使用者都得到确定的 Input Subscription 顺序，并通过 NodeBraid control methods 安全使用真实 DOM Focus 和 Active Pointer Capture。
 
 **Blocked by:** 08 — 规范化真实浏览器 Input.
 

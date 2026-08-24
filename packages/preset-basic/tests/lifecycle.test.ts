@@ -1,15 +1,15 @@
 import { expect, test } from 'bun:test';
 
-import type { DiagnosticEvent } from '@cflow/diagnostics';
-import type { InteractionProjection } from '@cflow/interaction-api';
-import { commandPlugin, commandService, type CommandService } from '@cflow/plugin-command';
-import { undoCommand } from '@cflow/plugin-history';
-import { moveNodesCommand } from '@cflow/plugin-interaction';
-import { kernelPlugin } from '@cflow/plugin-kernel';
-import { rendererService, type RendererService } from '@cflow/plugin-renderer';
-import { sessionPlugin } from '@cflow/plugin-session';
-import type { RendererInputListener } from '@cflow/renderer-api';
-import { createPluginHost, definePlugin, PluginHostError } from '@cflow/runtime-cordis';
+import type { DiagnosticEvent } from '@nodebraid/diagnostics';
+import type { InteractionProjection } from '@nodebraid/interaction-api';
+import { commandPlugin, commandService, type CommandService } from '@nodebraid/plugin-command';
+import { undoCommand } from '@nodebraid/plugin-history';
+import { moveNodesCommand } from '@nodebraid/plugin-interaction';
+import { kernelPlugin } from '@nodebraid/plugin-kernel';
+import { rendererService, type RendererService } from '@nodebraid/plugin-renderer';
+import { sessionPlugin } from '@nodebraid/plugin-session';
+import type { RendererInputListener } from '@nodebraid/renderer-api';
+import { createPluginHost, definePlugin, PluginHostError } from '@nodebraid/runtime-cordis';
 
 import { createBasicCanvasPlugin } from '../src';
 import { TestCanvasRenderer } from './test-renderer';
@@ -164,16 +164,17 @@ test('Composition diagnostics expose the complete reverse Child cleanup order', 
   expect(
     events
       .filter(
-        (event) => event.name === 'cflow.runtime.activation.ended' && event.scope.pluginName !== '@cflow/preset-basic',
+        (event) =>
+          event.name === 'nodebraid.runtime.activation.ended' && event.scope.pluginName !== '@nodebraid/preset-basic',
       )
       .map((event) => event.scope.pluginName),
   ).toEqual([
-    '@cflow/plugin-history',
-    '@cflow/plugin-interaction',
-    '@cflow/plugin-renderer',
-    '@cflow/plugin-session',
-    '@cflow/plugin-command',
-    '@cflow/plugin-kernel',
+    '@nodebraid/plugin-history',
+    '@nodebraid/plugin-interaction',
+    '@nodebraid/plugin-renderer',
+    '@nodebraid/plugin-session',
+    '@nodebraid/plugin-command',
+    '@nodebraid/plugin-kernel',
   ]);
 
   await host.dispose();

@@ -1,12 +1,12 @@
-import type { InteractionProjection } from '@cflow/interaction-api';
-import type { SessionSnapshot } from '@cflow/plugin-session';
+import type { InteractionProjection } from '@nodebraid/interaction-api';
+import type { SessionSnapshot } from '@nodebraid/plugin-session';
 import type {
   CanvasRenderer,
   HitResult,
   RendererDocumentUpdate,
   RendererInputListener,
   ScreenPoint,
-} from '@cflow/renderer-api';
+} from '@nodebraid/renderer-api';
 
 export class TestCanvasRenderer implements CanvasRenderer {
   disposed = false;

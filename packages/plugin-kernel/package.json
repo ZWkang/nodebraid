@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/plugin-kernel",
+  "name": "@nodebraid/plugin-kernel",
   "type": "module",
   "version": "0.0.1",
-  "description": "Kernel Runtime Plugin for CFlow.",
+  "description": "Kernel Runtime Plugin for NodeBraid.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/plugin-kernel"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/plugin-kernel#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/plugin-kernel#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "kernel",
     "plugin-runtime"
   ],
@@ -40,14 +40,14 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts",
-    "build:dependencies": "bun run --filter '@cflow/kernel' build && bun run --filter '@cflow/runtime-cordis' build",
+    "build:dependencies": "bun run --filter '@nodebraid/kernel' build && bun run --filter '@nodebraid/runtime-cordis' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/diagnostics": "workspace:*",
-    "@cflow/kernel": "workspace:*",
-    "@cflow/runtime-cordis": "workspace:*"
+    "@nodebraid/diagnostics": "workspace:*",
+    "@nodebraid/kernel": "workspace:*",
+    "@nodebraid/runtime-cordis": "workspace:*"
   }
 }

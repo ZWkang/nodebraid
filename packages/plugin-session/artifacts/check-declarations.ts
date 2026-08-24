@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { collectDeclarations } from '../../../scripts/collect-declarations';
 
 const forbiddenImport =
-  /(?:from\s+|import\()["'](?:@cflow\/core|@cflow\/plugin-command|@cflow\/history|cordis|rxjs|@cflow\/renderer-[^"']+)["']/;
+  /(?:from\s+|import\()["'](?:@nodebraid\/core|@nodebraid\/plugin-command|@nodebraid\/history|cordis|rxjs|@nodebraid\/renderer-[^"']+)["']/;
 const forbiddenCordisType = /\b(?:Context|CordisError|Effect|Fiber|FiberState)\b/;
 
 const pluginDist = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -24,9 +24,9 @@ for (const declaration of await collectDeclarations(pluginDist)) {
   assert.doesNotMatch(declaration.contents, forbiddenCordisType, declaration.path);
 }
 
-const pluginPackageName = '@cflow/plugin-session';
-const kernelPluginPackageName = '@cflow/plugin-kernel';
-const runtimePackageName = '@cflow/runtime-cordis';
+const pluginPackageName = '@nodebraid/plugin-session';
+const kernelPluginPackageName = '@nodebraid/plugin-kernel';
+const runtimePackageName = '@nodebraid/runtime-cordis';
 const pluginPackage = (await import(pluginPackageName)) as typeof import('../src/index');
 const kernelPluginPackage = await import(kernelPluginPackageName);
 const runtimePackage = await import(runtimePackageName);

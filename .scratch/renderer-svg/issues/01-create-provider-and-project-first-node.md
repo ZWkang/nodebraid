@@ -14,4 +14,4 @@
 
 ## Answer
 
-`@cflow/renderer-svg` 现在可以在真实 Chrome 中把调用方已有 SVG Target 绑定为同步 CanvasRenderer，保留 caller-owned `defs`，并从真实 Kernel revision-one View 投影首个带稳定 class、ID 和字面量 Geometry 的矩形 Node。公共类型、声明隔离、package-name import、pack dry-run 与由仓库锁定 `agent-browser` 驱动的 Chromium gate 均已验证通过。
+`@nodebraid/renderer-svg` 现在可以在真实 Chrome 中把调用方已有 SVG Target 绑定为同步 CanvasRenderer，保留 caller-owned `defs`，并从真实 Kernel revision-one View 投影首个带稳定 class、ID 和字面量 Geometry 的矩形 Node。公共类型、声明隔离、package-name import、pack dry-run 与由仓库锁定 `agent-browser` 驱动的 Chromium gate 均已验证通过。

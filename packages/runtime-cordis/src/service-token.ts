@@ -25,7 +25,7 @@ const serviceNames = new WeakMap<object, string>();
 
 export function defineService<Service>(name: string): ServiceToken<Service> {
   const token = Object.freeze({ name }) as ServiceToken<Service>;
-  serviceNames.set(token, `cflow.service.${++nextServiceId}`);
+  serviceNames.set(token, `nodebraid.service.${++nextServiceId}`);
   return token;
 }
 

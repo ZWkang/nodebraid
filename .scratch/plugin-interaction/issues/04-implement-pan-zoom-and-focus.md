@@ -1,6 +1,6 @@
 # 04 — 实现 Pan、Wheel Zoom 与 Focus
 
-**What to build:** 让用户在真实 SVG Canvas 中通过 primary Canvas、middle button 或 Space+primary 预览并提交 Viewport Pan，通过 Wheel 按当前 Screen Point 锚定缩放，并用 CFlow-owned Focus Input 可靠管理按键状态。
+**What to build:** 让用户在真实 SVG Canvas 中通过 primary Canvas、middle button 或 Space+primary 预览并提交 Viewport Pan，通过 Wheel 按当前 Screen Point 锚定缩放，并用 NodeBraid-owned Focus Input 可靠管理按键状态。
 
 **Blocked by:** 02 — 实现完整 Selection 交互。
 

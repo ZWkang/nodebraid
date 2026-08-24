@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/renderer-api",
+  "name": "@nodebraid/renderer-api",
   "type": "module",
   "version": "0.0.1",
-  "description": "Backend-neutral Renderer contracts for CFlow.",
+  "description": "Backend-neutral Renderer contracts for NodeBraid.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/renderer-api"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/renderer-api#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/renderer-api#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "canvas",
     "renderer",
     "provider-api"
@@ -41,16 +41,16 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
-    "build:dependencies": "bun run --filter '@cflow/diagnostics' build && bun run --filter '@cflow/interaction-api' build && bun run --filter '@cflow/session-api' build",
+    "build:dependencies": "bun run --filter '@nodebraid/diagnostics' build && bun run --filter '@nodebraid/interaction-api' build && bun run --filter '@nodebraid/session-api' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "test:artifacts": "bun run ./artifacts/check-declarations.ts",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/diagnostics": "workspace:*",
-    "@cflow/interaction-api": "workspace:*",
-    "@cflow/kernel": "workspace:*",
-    "@cflow/session-api": "workspace:*"
+    "@nodebraid/diagnostics": "workspace:*",
+    "@nodebraid/interaction-api": "workspace:*",
+    "@nodebraid/kernel": "workspace:*",
+    "@nodebraid/session-api": "workspace:*"
   }
 }

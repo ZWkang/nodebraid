@@ -1,18 +1,18 @@
-# CFlow SVG Renderer Provider
+# NodeBraid SVG Renderer Provider
 
 **Status:** ready-for-agent
 
 ## Problem Statement
 
-CFlow 已经有 backend-neutral `@cflow/renderer-api`、拥有 Renderer Instance 与状态同步的 `@cflow/plugin-renderer`，以及可提供 Document 与 Session 的真实 Runtime Plugin。但项目尚无任何官方 Renderer Provider，因此调用方无法选择一个可发布、可测试且真正遵循公共 Renderer seam 的 SVG 实现。
+NodeBraid 已经有 backend-neutral `@nodebraid/renderer-api`、拥有 Renderer Instance 与状态同步的 `@nodebraid/plugin-renderer`，以及可提供 Document 与 Session 的真实 Runtime Plugin。但项目尚无任何官方 Renderer Provider，因此调用方无法选择一个可发布、可测试且真正遵循公共 Renderer seam 的 SVG 实现。
 
-没有参考实现时，每个使用者都需要重新决定 Target 所有权、Document revision 同步、Session 顺序、Viewport 坐标、DOM 层级、命中、原生输入、Pointer Capture、Focus 和释放语义。这些实现容易把 `node.type` 或 `node.data` 错当产品渲染协议，把缺少的 Size 或 Port Geometry 静默猜测出来，或者绕过 CFlow-owned Input 与错误边界直接暴露 DOM Event。
+没有参考实现时，每个使用者都需要重新决定 Target 所有权、Document revision 同步、Session 顺序、Viewport 坐标、DOM 层级、命中、原生输入、Pointer Capture、Focus 和释放语义。这些实现容易把 `node.type` 或 `node.data` 错当产品渲染协议，把缺少的 Size 或 Port Geometry 静默猜测出来，或者绕过 NodeBraid-owned Input 与错误边界直接暴露 DOM Event。
 
-首个官方 Provider 必须是 reference-quality 的通用 Canvas 语义投影，用真实 SVG DOM 和真实浏览器输入证明现有 Renderer 协议完整可行。它不能成为默认 Renderer，也不能把 SVG-specific 假设泄漏到 `@cflow/renderer-api` 或 `@cflow/core`。
+首个官方 Provider 必须是 reference-quality 的通用 Canvas 语义投影，用真实 SVG DOM 和真实浏览器输入证明现有 Renderer 协议完整可行。它不能成为默认 Renderer，也不能把 SVG-specific 假设泄漏到 `@nodebraid/renderer-api` 或 `@nodebraid/core`。
 
 ## Solution
 
-新增可独立发布的 `@cflow/renderer-svg`。它导出同步具名 Factory，把一个已连接、可测量且 CTM 可逆的现有 `SVGSVGElement` 绑定为 SVG Renderer Target，并返回完整实现公共 `CanvasRenderer` interface 的 Renderer Instance。
+新增可独立发布的 `@nodebraid/renderer-svg`。它导出同步具名 Factory，把一个已连接、可测量且 CTM 可逆的现有 `SVGSVGElement` 绑定为 SVG Renderer Target，并返回完整实现公共 `CanvasRenderer` interface 的 Renderer Instance。
 
 Provider 在 Target 末尾追加一个自己拥有的 SVG Projection 子树，用稳定 class 与 `data-*` attributes 暴露 CSS 和测试 seam。首版只投影具有显式 Size 的矩形 Node、两个 Node 中心之间的无 Port 直线 Edge、Selection 和 Viewport。它不解释产品 `type` 或 `data`，不从 DOM 反向推导 Document Geometry，对缺少 Size、Port-qualified Edge 和自环 Edge 显式拒绝。
 
@@ -20,17 +20,17 @@ Provider 在 Target 末尾追加一个自己拥有的 SVG Projection 子树，�
 
 Screen Point 保持 Target-local CSS pixel 语义。Provider 通过 Target 的可逆 `getScreenCTM()` 把该坐标映射到现有 SVG user space，因此不覆写调用方 `viewBox` 或 `preserveAspectRatio`，也不创建嵌套 SVG root。`hitTest` 使用 Provider 已接受的语义 Geometry，不依赖浏览器 element hit testing 或调用方样式。
 
-Provider 直接监听真实 Pointer、Wheel、Keyboard 与 context menu DOM events，把可发布的部分规范化为 CFlow-owned Renderer Input。Factory config 显式决定每类事件是否 `preventDefault` 或 `stopPropagation`，默认均为 false。Pointer Capture 与 Focus 使用浏览器原生能力，却只通过公共 CFlow control methods 对外提供。
+Provider 直接监听真实 Pointer、Wheel、Keyboard 与 context menu DOM events，把可发布的部分规范化为 NodeBraid-owned Renderer Input。Factory config 显式决定每类事件是否 `preventDefault` 或 `stopPropagation`，默认均为 false。Pointer Capture 与 Focus 使用浏览器原生能力，却只通过公共 NodeBraid control methods 对外提供。
 
 Provider 用公共 `RendererError` 表达 Document、Session、Screen Point、Pointer 与 disposed 失败，并用 package-owned `SvgRendererError` 表达 SVG config 与 Target 失败。Target Reservation 从 Factory 接受 Target 持续到 dispose 清理成功，防止两份实例共享同一 Target。
 
 ## User Stories
 
-1. As a CFlow package consumer, I want an official SVG Renderer Provider, so that I can render a Canvas without implementing the backend-neutral protocol myself.
-2. As a CFlow package consumer, I want the SVG Provider independently installable, so that selecting SVG does not pull other concrete Renderer backends into my application.
-3. As a CFlow package consumer, I want SVG to remain one peer Provider, so that CFlow does not impose it as the default Renderer.
-4. As a CFlow maintainer, I want the Provider to depend on narrow CFlow contracts rather than the core facade, so that package dependency direction remains explicit.
-5. As a CFlow maintainer, I want one synchronous named Factory, so that construction does not invent an asynchronous lifecycle without a backend need.
+1. As a NodeBraid package consumer, I want an official SVG Renderer Provider, so that I can render a Canvas without implementing the backend-neutral protocol myself.
+2. As a NodeBraid package consumer, I want the SVG Provider independently installable, so that selecting SVG does not pull other concrete Renderer backends into my application.
+3. As a NodeBraid package consumer, I want SVG to remain one peer Provider, so that NodeBraid does not impose it as the default Renderer.
+4. As a NodeBraid maintainer, I want the Provider to depend on narrow NodeBraid contracts rather than the core facade, so that package dependency direction remains explicit.
+5. As a NodeBraid maintainer, I want one synchronous named Factory, so that construction does not invent an asynchronous lifecycle without a backend need.
 6. As an application author, I want to pass an existing SVG root, so that layout and ownership of the actual Target remain in my application.
 7. As an application author, I want the Provider not to create or remove my SVG Target, so that disposing a Canvas cannot delete application-owned DOM.
 8. As an application author, I want one Renderer Instance bound to one Target, so that remounting cannot leave ambiguous DOM or input ownership.
@@ -69,7 +69,7 @@ Provider 用公共 `RendererError` 表达 Document、Session、Screen Point、Po
 41. As a DOM observer, I want entity elements kept in canonical ID order, so that output is deterministic regardless of transaction operation order.
 42. As a Canvas consumer, I want an Edge recomputed when either endpoint Node moves or resizes, so that derived geometry never becomes stale.
 43. As a Canvas consumer, I want a data-only commit accepted without inventing visual semantics, so that the Renderer Baseline still advances correctly.
-44. As a direct CanvasRenderer caller, I want the Provider to copy CFlow-owned shells on acceptance, so that later mutation of forged input cannot rewrite the Baseline silently.
+44. As a direct CanvasRenderer caller, I want the Provider to copy NodeBraid-owned shells on acceptance, so that later mutation of forged input cannot rewrite the Baseline silently.
 45. As a domain Plugin author, I want opaque data retained only by reference for evidence, so that the Renderer does not traverse, clone or serialize domain values.
 46. As a Runtime author, I want Session rejected before a Document Baseline exists, so that Selection cannot reference an unknown Projection.
 47. As a Runtime author, I want Selection IDs validated against the accepted Document, so that the DOM never contains selected state for missing entities.
@@ -88,9 +88,9 @@ Provider 用公共 `RendererError` 表达 Document、Session、Screen Point、Po
 60. As an Interaction author, I want blank space inside the Target reported as Canvas, so that pan and deselection behavior can distinguish it from outside.
 61. As an Interaction author, I want points outside the Target to return no Hit Result, so that unrelated page space is not treated as Canvas.
 62. As an Interaction author, I want hitTest independent of CSS stroke and fill, so that theming cannot accidentally change interaction semantics.
-63. As an Interaction author, I want caller-owned SVG content ignored by semantic hit testing, so that decorative elements do not leak through the CFlow seam.
+63. As an Interaction author, I want caller-owned SVG content ignored by semantic hit testing, so that decorative elements do not leak through the NodeBraid seam.
 64. As an Interaction author, I want no Port Hit Result before Port Geometry exists, so that unsupported capability is not fabricated.
-65. As an Interaction author, I want native Pointer events normalized to CFlow Pointer Input, so that behavior code has no DOM dependency.
+65. As an Interaction author, I want native Pointer events normalized to NodeBraid Pointer Input, so that behavior code has no DOM dependency.
 66. As an Interaction author, I want Pointer screen and world coordinates based on the accepted Viewport at event time, so that drag calculations use one coherent state.
 67. As an Interaction author, I want standard mouse, pen, touch and unknown pointer kinds preserved, so that interactions can make backend-neutral distinctions.
 68. As an Interaction author, I want button and pressed-button state normalized to the public PointerButton vocabulary, so that native bitmasks do not cross the seam.
@@ -105,7 +105,7 @@ Provider 用公共 `RendererError` 表达 Document、Session、Screen Point、Po
 77. As an application author, I want an absent tabindex temporarily supplied and later restored, so that programmatic focus works without stealing tab order permanently.
 78. As an application author, I want preventDefault and stopPropagation independently configured per native input family, so that browser integration policy is explicit.
 79. As an application author, I want all native default-control policies disabled by default, so that adopting the Provider does not silently suppress page behavior.
-80. As an application author, I want context menu policy configurable without adding a new Renderer Input kind, so that browser behavior and CFlow facts remain separate.
+80. As an application author, I want context menu policy configurable without adding a new Renderer Input kind, so that browser behavior and NodeBraid facts remain separate.
 81. As an application author, I want touch-action left to Target CSS, so that the Provider does not install an undocumented gesture policy.
 82. As a Renderer Input subscriber, I want listeners notified in registration order, so that synchronous behavior is deterministic.
 83. As a Renderer Input subscriber, I want subscribe and unsubscribe during delivery to affect only the next Input, so that one notification has a stable listener set.
@@ -136,8 +136,8 @@ Provider 用公共 `RendererError` 表达 Document、Session、Screen Point、Po
 
 ## Implementation Decisions
 
-- Add one publishable package named `@cflow/renderer-svg`; it is a concrete Provider and does not depend on `@cflow/plugin-renderer`, `@cflow/runtime-cordis` or `@cflow/core`.
-- Depend directly on `@cflow/renderer-api`, `@cflow/kernel`, `@cflow/session-api` and `@cflow/diagnostics` only as required by public types, evidence validation and structured errors.
+- Add one publishable package named `@nodebraid/renderer-svg`; it is a concrete Provider and does not depend on `@nodebraid/plugin-renderer`, `@nodebraid/runtime-cordis` or `@nodebraid/core`.
+- Depend directly on `@nodebraid/renderer-api`, `@nodebraid/kernel`, `@nodebraid/session-api` and `@nodebraid/diagnostics` only as required by public types, evidence validation and structured errors.
 - Export a synchronous named `createSvgRenderer` Factory, `SvgRendererConfig`, the DOM event policy value types, `SvgRendererError` and `SvgRendererErrorCode`. Do not provide a default export.
 - Keep the Factory compatible with `RendererFactory<SvgRendererConfig>` while returning `CanvasRenderer` synchronously.
 - Accept one existing `SVGSVGElement` Target, an optional finite non-negative `edgeHitTolerance` defaulting to four CSS pixels, and optional pointer, wheel, keyboard and context-menu policies containing `preventDefault` and `stopPropagation` booleans.
@@ -145,14 +145,14 @@ Provider 用公共 `RendererError` 表达 Document、Session、Screen Point、Po
 - Validate that Target belongs to an active document, is connected, has a finite non-zero bounding rectangle and exposes a finite invertible screen CTM. Invalid initial Target state fails with `INVALID_TARGET`; equivalent state reached later fails with `TARGET_UNAVAILABLE` on the operation that observes it.
 - Reserve the Target with both a process-local identity reservation and a stable DOM marker. Either marker rejects another Factory with `TARGET_OCCUPIED`.
 - Append one Provider-owned Projection root group to the end of Target. Preserve all caller-owned nodes and never accept an insertion-point option.
-- Use stable classes `cflow-renderer-svg`, `cflow-renderer-svg__edges`, `cflow-renderer-svg__edge`, `cflow-renderer-svg__nodes` and `cflow-renderer-svg__node`.
-- Use stable `data-cflow-edge-id`, `data-cflow-node-id` and `data-cflow-selected` attributes. Selected entities carry the selected marker; unselected entities omit it.
+- Use stable classes `nodebraid-renderer-svg`, `nodebraid-renderer-svg__edges`, `nodebraid-renderer-svg__edge`, `nodebraid-renderer-svg__nodes` and `nodebraid-renderer-svg__node`.
+- Use stable `data-nodebraid-edge-id`, `data-nodebraid-node-id` and `data-nodebraid-selected` attributes. Selected entities carry the selected marker; unselected entities omit it.
 - Put one Edge layer before one Node layer. Keep each layer in canonical ascending entity-ID order. Selection never changes order.
 - Render each Node as an SVG rectangle using absolute World top-left position and explicit width and height. Do not interpret type, data or parentId as presentation.
 - Render each supported Edge as an SVG line between source and target Node centers. Reject either port-qualified Endpoint and reject a self-loop.
 - Supply only geometry, stable classes and stable data attributes. Do not install default colors, strokes, fills, product theme, theme registry or render callback.
 - Treat Canvas Snapshot arrays as the projection input. Do not invoke CanvasQuery during reset, commit planning or hit testing.
-- Copy accepted CFlow-owned shells and nested geometry into an internal Baseline. Retain opaque data references only for evidence equality; do not traverse, clone, freeze or serialize them.
+- Copy accepted NodeBraid-owned shells and nested geometry into an internal Baseline. Retain opaque data references only for evidence equality; do not traverse, clone, freeze or serialize them.
 - Validate runtime-forged values despite TypeScript declarations: View and Commit shape, adjacent safe revisions, canonical unique entity arrays, graph references, entity shells, Change Set entries and exact before/after consistency.
 - Use `RendererError` code `INVALID_DOCUMENT_UPDATE` with safe issue details for malformed evidence, missing Node Size, unsupported Port Geometry and unsupported self-loop.
 - Use `DOCUMENT_OUT_OF_SYNC` for commit without a Baseline, non-contiguous revision, before content that differs from the accepted Baseline, or an instance marked out of sync after rollback failure.
@@ -180,7 +180,7 @@ Provider 用公共 `RendererError` 表达 Document、Session、Screen Point、Po
 - Dispose all input relationships and Pointer Capture, disconnect ResizeObserver, remove only Provider-owned Projection DOM, restore Provider-added Target attributes and release Target Reservation only after every cleanup succeeds.
 - Aggregate cleanup failures and retain Target Reservation when cleanup is incomplete.
 - Keep unknown browser and DOM failures as their original values. Do not wrap them as known config or Renderer failures.
-- Keep `@cflow/core` backend-neutral and do not re-export `@cflow/renderer-svg` from it.
+- Keep `@nodebraid/core` backend-neutral and do not re-export `@nodebraid/renderer-svg` from it.
 - Add accurate package scripts for dependency builds, type checking, tests, declaration isolation and package dry-run verification. Update root workspace scripts and documented commands when the browser-test toolchain is added.
 
 ## Testing Decisions
@@ -208,13 +208,13 @@ Provider 用公共 `RendererError` 表达 Document、Session、Screen Point、Po
 - Dispatch pixel, line and page Wheel events and assert literal CSS-pixel deltas. Prove Viewport zoom and device pixel ratio do not alter normalization.
 - Cover preventDefault and stopPropagation independently for pointer, wheel, keyboard and context menu with real DOM listeners outside the Provider.
 - Cover Input listener ordering, subscribe/unsubscribe during delivery, breadth-first reentrancy, idempotent unsubscribe and post-drain error surfacing through the public subscription seam.
-- Use browser-boundary fault injection only where the real platform does not naturally produce a reachable failure, such as forcing one DOM mutation to throw while verifying rollback through the public Target output. Do not mock CFlow-owned collaborators.
+- Use browser-boundary fault injection only where the real platform does not naturally produce a reachable failure, such as forcing one DOM mutation to throw while verifying rollback through the public Target output. Do not mock NodeBraid-owned collaborators.
 - Cover Target Reservation for active, disposing, successfully disposed and failed-cleanup instances through repeated public Factory calls.
 - Cover dispose cleanup of Projection, listeners, observer effects, capture and Provider-added attributes; prove caller-owned content remains and every stale public method fails.
 - Install the real Renderer Plugin with real Kernel and Session Providers, then prove initial reset-before-Session, incremental Kernel Commit projection, Selection reconciliation, Viewport update, lost-revision reset recovery, input forwarding, Hit Result, Focus/Capture service controls and Activation disposal.
 - Follow existing Kernel, Session and Renderer Plugin tests as prior art for immutable Views, real Runtime composition, reentrant observer ordering, error identity and lifecycle cleanup.
 - Add public type tests for exact Factory config, readonly policies, synchronous CanvasRenderer result, error unions and absence of default export or runtime Plugin exports.
-- Add declaration isolation checks that allow DOM/SVG types only inside the concrete SVG package and reject Cordis, Plugin Host, framework, Canvas2D, Konva, Pixi and `@cflow/core` leakage.
+- Add declaration isolation checks that allow DOM/SVG types only inside the concrete SVG package and reject Cordis, Plugin Host, framework, Canvas2D, Konva, Pixi and `@nodebraid/core` leakage.
 - Add a package-name import probe and package dry-run packing validation.
 - Make real Chromium tests part of the normal repository completion check. Document the browser installation command and keep AGENTS and README command lists accurate.
 - Before completion run package tests, browser tests, package typecheck and build, declaration checks, package dry-run, repository check, formatting, `git diff --check` and final status inspection.
@@ -222,7 +222,7 @@ Provider 用公共 `RendererError` 表达 Document、Session、Screen Point、Po
 ## Out of Scope
 
 - Making SVG the default Renderer or adding a concrete Provider registry.
-- Re-exporting the concrete SVG Provider through `@cflow/core`.
+- Re-exporting the concrete SVG Provider through `@nodebraid/core`.
 - Canvas2D, Konva, Pixi, WebGL, GPU or OffscreenCanvas implementations.
 - HTML Overlay, foreignObject-based application nodes or DOM portal ownership.
 - React, Vue, Svelte or other framework Node components and adapters.
@@ -246,7 +246,7 @@ Provider 用公共 `RendererError` 表达 Document、Session、Screen Point、Po
 ## Further Notes
 
 - The Renderer API, Session value API, Renderer Runtime Plugin and public facade were committed before this design began, and main was clean at that boundary. This spec consumes those final contracts rather than the earlier uncommitted drafts.
-- The accepted CFlow vocabulary is maintained in the single root glossary. SVG-specific architectural decisions are recorded after the existing Renderer ADR sequence.
+- The accepted NodeBraid vocabulary is maintained in the single root glossary. SVG-specific architectural decisions are recorded after the existing Renderer ADR sequence.
 - SVG is reference-quality because it exercises the complete public Renderer protocol and browser lifecycle, not because it contains a product component system or the largest possible feature set.
 - Stable classes and data attributes are a styling and test seam. They do not grant callers ownership of Provider-created elements or permission to mutate the Projection as a second rendering API.
 - Browser rendering and input must use Target's owner document/window rather than assuming one process-global DOM, so iframe-like environments remain representable when the Target itself is valid.

@@ -1,6 +1,6 @@
 ---
 title: All Modules
-description: The workspace packages currently committed in CFlow.
+description: The workspace packages currently committed in NodeBraid.
 ---
 
 # All Modules

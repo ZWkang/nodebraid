@@ -1,12 +1,12 @@
-# CFlow 架构设计
+# NodeBraid 架构设计
 
-CFlow 是一个插件化、渲染器无关的流程画布引擎。它提供稳定的图文档和变更语义，通过 Cordis 组合扩展能力，通过内部响应式数据流分发变化，并允许 Konva、SVG、Canvas 2D、PixiJS 或其他后端实现统一的渲染接口。
+NodeBraid 是一个插件化、渲染器无关的流程画布引擎。它提供稳定的图文档和变更语义，通过 Cordis 组合扩展能力，通过内部响应式数据流分发变化，并允许 Konva、SVG、Canvas 2D、PixiJS 或其他后端实现统一的渲染接口。
 
 本文定义目标架构，不表示其中列出的能力已经实现。
 
 ## 设计目标
 
-CFlow 需要满足以下目标：
+NodeBraid 需要满足以下目标：
 
 - Kernel 只维护图数据及其一致性，不依赖 UI 框架、渲染库和业务节点类型。
 - 所有对图的修改都经过事务，产生可以观察、记录和重放的标准变化。
@@ -16,7 +16,7 @@ CFlow 需要满足以下目标：
 - Vue、React 等框架通过薄适配层接入同一个 Canvas 实例。
 - 业务规则、布局、历史记录、交互和协同等能力通过插件提供。
 
-CFlow 不在 Kernel 中实现以下内容：
+NodeBraid 不在 Kernel 中实现以下内容：
 
 - React、Vue 或其他组件模型。
 - Konva、PixiJS、SVG、DOM 或 WebGL 对象。
@@ -214,11 +214,11 @@ Renderer 测量出的节点尺寸必须通过明确的 measurement 操作回报�
 
 ## Plugin Host 与 Cordis implementation
 
-Plugin Host 是 CFlow 的能力组合层，不参与节点拖动、命中检测和逐帧绘制等高频路径。普通消费者从 `@cflow/core` 使用 CFlow 自己的 Plugin Host interface；`@cflow/core` 将同一份 interface 和实现重导出自 `@cflow/runtime-cordis`。后者是高级消费者可直接导入的窄包，并在内部使用 Cordis，不反向依赖 core，也不公开 Cordis Context、Fiber、Service 或 effect 类型。
+Plugin Host 是 NodeBraid 的能力组合层，不参与节点拖动、命中检测和逐帧绘制等高频路径。普通消费者从 `@nodebraid/core` 使用 NodeBraid 自己的 Plugin Host interface；`@nodebraid/core` 将同一份 interface 和实现重导出自 `@nodebraid/runtime-cordis`。后者是高级消费者可直接导入的窄包，并在内部使用 Cordis，不反向依赖 core，也不公开 Cordis Context、Fiber、Service 或 effect 类型。
 
 ```text
-Application ──▶ @cflow/core ──▶ @cflow/runtime-cordis ──▶ cordis
-Advanced Consumer ────────────▶ @cflow/runtime-cordis
+Application ──▶ @nodebraid/core ──▶ @nodebraid/runtime-cordis ──▶ cordis
+Advanced Consumer ────────────▶ @nodebraid/runtime-cordis
 ```
 
 首版的 “Everything is Plugin” 指 Kernel、Session、Command、Renderer、Interaction、History 等 Canvas 能力都通过 Plugin 和 Runtime Service 组合；最小 Plugin Host substrate 本身不是 Plugin。一个新 Host 不隐式安装任何 Canvas 能力，Canvas Composition 必须用 Child Installation 显式声明所需能力。
@@ -229,10 +229,10 @@ Advanced Consumer ────────────▶ @cflow/runtime-cordis
 - Service Provider：提供具体实现，例如 Konva Renderer 或 Dagre Layout。
 - Consumer Plugin：使用服务增加用户能力，例如自动布局命令。
 
-插件通过 CFlow Plugin Context 注册 Owned Resource。Plugin Installation 结束后，它注册的命令、监听器、节点类型、快捷键和 UI 贡献必须同时消失。
+插件通过 NodeBraid Plugin Context 注册 Owned Resource。Plugin Installation 结束后，它注册的命令、监听器、节点类型、快捷键和 UI 贡献必须同时消失。
 
 ```ts
-import { definePlugin, historyService } from '@cflow/core';
+import { definePlugin, historyService } from '@nodebraid/core';
 
 const historyConsumer = definePlugin({
   requires: { history: historyService },
@@ -261,7 +261,7 @@ const historyConsumer = definePlugin({
 
 ## 诊断与错误
 
-CFlow 将调用失败、无法返回给调用者的 Fault 和普通 Diagnostic Event 分成三条语义不同的路径。成功记录事件不等于处理失败，Diagnostic Sink 不参与 Transaction、Command 或 Plugin 生命周期的控制流。
+NodeBraid 将调用失败、无法返回给调用者的 Fault 和普通 Diagnostic Event 分成三条语义不同的路径。成功记录事件不等于处理失败，Diagnostic Sink 不参与 Transaction、Command 或 Plugin 生命周期的控制流。
 
 ```text
 Structural Failure ──throw/reject──────────────▶ Caller
@@ -270,9 +270,9 @@ Contained Fault ────Diagnostic Event──────────▶ Di
 Lifecycle Event ────Diagnostic Event──────────▶ Diagnostic Sink
 ```
 
-零依赖的 `@cflow/diagnostics` 定义 CFlowError、稳定的 `domain + code` 错误身份、不可变诊断值、事件 envelope 与安全错误描述。Kernel、Layout API 和算法 Provider 只产生结构性错误，不主动记录；Plugin Host 与 Runtime Plugin 在拥有状态转换、监听者隔离或清理聚合的语义 seam 记录一次。每个 Host 独立注入同步 Sink 和 Fault Reporter，并为事件补齐 Host、Installation、Activation、Plugin、单调序号和时间上下文。
+零依赖的 `@nodebraid/diagnostics` 定义 NodeBraidError、稳定的 `domain + code` 错误身份、不可变诊断值、事件 envelope 与安全错误描述。Kernel、Layout API 和算法 Provider 只产生结构性错误，不主动记录；Plugin Host 与 Runtime Plugin 在拥有状态转换、监听者隔离或清理聚合的语义 seam 记录一次。每个 Host 独立注入同步 Sink 和 Fault Reporter，并为事件补齐 Host、Installation、Activation、Plugin、单调序号和时间上下文。
 
-内置事件名和错误身份必须是低基数、可精确搜索的稳定协议。事件属性和 CFlow 错误详情不得包含 Plugin 配置、Command 输入输出、Node/Edge 领域数据、Runtime Service 值或其他任意对象。具体 console、文件、Sentry、OpenTelemetry、过滤、批量、重试和持久化由宿主 Adapter 决定。
+内置事件名和错误身份必须是低基数、可精确搜索的稳定协议。事件属性和 NodeBraid 错误详情不得包含 Plugin 配置、Command 输入输出、Node/Edge 领域数据、Runtime Service 值或其他任意对象。具体 console、文件、Sentry、OpenTelemetry、过滤、批量、重试和持久化由宿主 Adapter 决定。
 
 ## RxJS 内部数据流
 
@@ -322,7 +322,7 @@ interface CanvasObserver {
 
 ## Renderer Provider
 
-Renderer 是可替换能力。`@cflow/renderer-api` 只依赖 CFlow-owned
+Renderer 是可替换能力。`@nodebraid/renderer-api` 只依赖 NodeBraid-owned
 Diagnostics、Kernel 与 Session 值契约，不依赖 Runtime、DOM 或具体渲染后端。
 
 ```ts
@@ -344,27 +344,27 @@ interface CanvasRenderer {
 具体 Provider 通过类型化 Renderer Factory 接收自己的 Target 与配置；
 `CanvasRenderer` 不定义 universal `mount(HTMLElement)`。一个 Renderer Instance
 在创建时绑定一个 Target，切换 Target 或 Provider 需要释放旧实例并创建新实例。
-`@cflow/plugin-renderer` 负责把 Factory 与 Kernel、Session、Plugin Host 生命周期
+`@nodebraid/plugin-renderer` 负责把 Factory 与 Kernel、Session、Plugin Host 生命周期
 组合起来，并只向 Interaction 暴露输入、命中、Pointer Capture 与 Focus。
 
 Renderer Provider 可以包括：
 
 ```text
-@cflow/renderer-konva
-@cflow/renderer-pixi
-@cflow/renderer-svg
-@cflow/renderer-canvas2d
-@cflow/renderer-headless
+@nodebraid/renderer-konva
+@nodebraid/renderer-pixi
+@nodebraid/renderer-svg
+@nodebraid/renderer-canvas2d
+@nodebraid/renderer-headless
 ```
 
 首版不定义 Renderer Capability Registry。HTML Overlay、原生文本编辑、图片导出、
 GPU、可访问性树和动画留给具有真实消费者的后续设计。
 
-渲染接口应表达节点、边、选择和 Viewport 等画布语义，不应抽象成 `drawRect()`、`drawLine()` 等通用绘图 API。后者会迫使 CFlow 重新实现一个只能表达最小公约数的图形库。
+渲染接口应表达节点、边、选择和 Viewport 等画布语义，不应抽象成 `drawRect()`、`drawLine()` 等通用绘图 API。后者会迫使 NodeBraid 重新实现一个只能表达最小公约数的图形库。
 
 ## Konva Renderer
 
-Konva 可以作为 CFlow 官方 Canvas 2D Renderer Provider 的候选之一；首版不选择默认 Renderer。Konva Provider 可以直接承担：
+Konva 可以作为 NodeBraid 官方 Canvas 2D Renderer Provider 的候选之一；首版不选择默认 Renderer。Konva Provider 可以直接承担：
 
 - Stage、Layer、Group 和 Shape 场景树。
 - Canvas 绘制和批量重绘。
@@ -388,7 +388,7 @@ Selection           → Konva.Transformer or selection shape
 Viewport            → Konva.Stage transform
 ```
 
-`Konva.Stage.toJSON()` 不能作为 CFlow 的文档格式。CFlow 保存 CanvasDocument，并在挂载 Renderer 时重新构建 Konva 场景树。
+`Konva.Stage.toJSON()` 不能作为 NodeBraid 的文档格式。NodeBraid 保存 CanvasDocument，并在挂载 Renderer 时重新构建 Konva 场景树。
 
 初始图层可以控制在以下范围：
 

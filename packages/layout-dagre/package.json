@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/layout-dagre",
+  "name": "@nodebraid/layout-dagre",
   "type": "module",
   "version": "0.0.1",
-  "description": "Dagre Layout Provider for CFlow.",
+  "description": "Dagre Layout Provider for NodeBraid.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/layout-dagre"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/layout-dagre#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/layout-dagre#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "dagre",
     "graph",
     "layout"
@@ -40,13 +40,13 @@
   ],
   "scripts": {
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts",
-    "build:dependencies": "bun run --filter '@cflow/layout-api' build",
+    "build:dependencies": "bun run --filter '@nodebraid/layout-api' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/layout-api": "workspace:*",
+    "@nodebraid/layout-api": "workspace:*",
     "@dagrejs/dagre": "^3.1.1"
   }
 }

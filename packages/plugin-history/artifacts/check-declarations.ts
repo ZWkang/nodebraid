@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import { collectDeclarations } from '../../../scripts/collect-declarations';
 
-const forbiddenImport = /(?:from\s+|import\()["'](?:@cflow\/(?:core|renderer-[^"']+)|cordis|rxjs)["']/;
+const forbiddenImport = /(?:from\s+|import\()["'](?:@nodebraid\/(?:core|renderer-[^"']+)|cordis|rxjs)["']/;
 const forbiddenCordisType = /\b(?:CordisError|Effect|Fiber|FiberState)\b/;
 
 const pluginDist = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -21,7 +21,7 @@ for (const declaration of await collectDeclarations(pluginDist)) {
   assert.doesNotMatch(declaration.contents, forbiddenCordisType, declaration.path);
 }
 
-const pluginPackageName = '@cflow/plugin-history';
+const pluginPackageName = '@nodebraid/plugin-history';
 const pluginPackage = (await import(pluginPackageName)) as typeof import('../src/index');
 assert.equal(pluginPackage.undoCommand.id, 'history.undo');
 assert.equal(pluginPackage.redoCommand.id, 'history.redo');

@@ -1,18 +1,18 @@
 ---
-title: '@cflow/plugin-session'
+title: '@nodebraid/plugin-session'
 description: A Session Runtime Plugin that manages local Selection and Viewport while keeping them consistent with the current Kernel View.
 ---
 
-# `@cflow/plugin-session`
+# `@nodebraid/plugin-session`
 
 ::: warning Package is not publicly released
 This name identifies the current source module boundary; it does not mean the package can be installed from npm. Follow the [Quick Start](/en/guide/quick-start) to verify it from source.
 :::
 
-`@cflow/plugin-session` provides a local Session for one active Canvas Runtime. It does not modify the Document; it manages only the current Selection and Viewport and removes selections that no longer exist after a Kernel Commit.
+`@nodebraid/plugin-session` provides a local Session for one active Canvas Runtime. It does not modify the Document; it manages only the current Selection and Viewport and removes selections that no longer exist after a Kernel Commit.
 
 ::: info Current status
-Implemented and re-exported by the `@cflow/core` facade. It depends on the current Kernel Service and is not an independent global UI Store.
+Implemented and re-exported by the `@nodebraid/core` facade. It depends on the current Kernel Service and is not an independent global UI Store.
 :::
 
 ## The problem it solves
@@ -35,9 +35,9 @@ Selection and Viewport change frequently, but they should not enter Document His
 - `SessionService.subscribe()`: subscribes to state transitions; listeners read the current value through `getSnapshot()`.
 - `setSelection()` / `clearSelection()`: replace or clear Selection.
 - `setViewport()`: replaces and validates Viewport.
-- `SelectionInput`: caller mutation input; Snapshot value types are re-exported from `@cflow/session-api`.
+- `SelectionInput`: caller mutation input; Snapshot value types are re-exported from `@nodebraid/session-api`.
 - `SessionError`: stable codes for input, entity, subscriber, and disposed errors.
-- `sessionDiagnosticEvents`: exposes the `cflow.plugin.session.subscriber.fault` event name.
+- `sessionDiagnosticEvents`: exposes the `nodebraid.plugin.session.subscriber.fault` event name.
 
 ## Dependencies and composition
 
@@ -50,12 +50,12 @@ kernelPlugin ──provides──▶ kernelService
                             sessionPlugin ──provides──▶ sessionService
 ```
 
-The package depends directly on `@cflow/session-api`, `@cflow/kernel`, `@cflow/plugin-kernel`, `@cflow/runtime-cordis`, and `@cflow/diagnostics`. It does not depend on Command, History, Renderer, or `@cflow/core`.
+The package depends directly on `@nodebraid/session-api`, `@nodebraid/kernel`, `@nodebraid/plugin-kernel`, `@nodebraid/runtime-cordis`, and `@nodebraid/diagnostics`. It does not depend on Command, History, Renderer, or `@nodebraid/core`.
 
 ## Public entry points
 
 ```ts
-import { kernelPlugin } from '@cflow/plugin-kernel';
+import { kernelPlugin } from '@nodebraid/plugin-kernel';
 import {
   sessionDiagnosticEvents,
   SessionError,
@@ -63,8 +63,8 @@ import {
   sessionService,
   type SelectionInput,
   type SessionService,
-} from '@cflow/plugin-session';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+} from '@nodebraid/plugin-session';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 const consumer = definePlugin({
   requires: { session: sessionService },
@@ -108,7 +108,7 @@ try {
 
 ## Verification evidence
 
-- [Public exports](https://github.com/ZWkang/cflow/blob/main/packages/plugin-session/src/index.ts) confirm that the Plugin, Service Token, Snapshot types, errors, and diagnostic events are all published.
-- [Session Runtime implementation](https://github.com/ZWkang/cflow/blob/main/packages/plugin-session/src/session-plugin.ts) contains input validation, Kernel Commit reconciliation, reference stability, and the breadth-first transition queue.
-- [Public-seam behavior tests](https://github.com/ZWkang/cflow/blob/main/packages/plugin-session/tests/index.test.ts) cover the default Session, canonical Selection, Viewport, reentrant ordering, subscriber Faults, and Provider recovery.
+- [Public exports](https://github.com/ZWkang/nodebraid/blob/main/packages/plugin-session/src/index.ts) confirm that the Plugin, Service Token, Snapshot types, errors, and diagnostic events are all published.
+- [Session Runtime implementation](https://github.com/ZWkang/nodebraid/blob/main/packages/plugin-session/src/session-plugin.ts) contains input validation, Kernel Commit reconciliation, reference stability, and the breadth-first transition queue.
+- [Public-seam behavior tests](https://github.com/ZWkang/nodebraid/blob/main/packages/plugin-session/tests/index.test.ts) cover the default Session, canonical Selection, Viewport, reentrant ordering, subscriber Faults, and Provider recovery.
 - ADR-0017, 0018, 0022, and 0035 establish the binding between Selection and Kernel View, logical screen units, breadth-first notifications, and the independent value contract.

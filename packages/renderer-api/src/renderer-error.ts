@@ -1,4 +1,4 @@
-import { CFlowError, type DiagnosticAttributes } from '@cflow/diagnostics';
+import { NodeBraidError, type DiagnosticAttributes } from '@nodebraid/diagnostics';
 
 export type RendererErrorCode =
   | 'INVALID_DOCUMENT_UPDATE'
@@ -11,7 +11,7 @@ export type RendererErrorCode =
   | 'INVALID_POINTER'
   | 'RENDERER_DISPOSED';
 
-export class RendererError extends CFlowError<'renderer', RendererErrorCode> {
+export class RendererError extends NodeBraidError<'renderer', RendererErrorCode> {
   override readonly name = 'RendererError';
 
   constructor(

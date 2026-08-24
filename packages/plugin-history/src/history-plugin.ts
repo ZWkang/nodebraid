@@ -1,7 +1,7 @@
-import type { CanvasCommit, ChangeSet } from '@cflow/kernel';
-import { commandService, type CommandRegistration } from '@cflow/plugin-command';
-import { kernelService } from '@cflow/plugin-kernel';
-import { definePlugin, defineService } from '@cflow/runtime-cordis';
+import type { CanvasCommit, ChangeSet } from '@nodebraid/kernel';
+import { commandService, type CommandRegistration } from '@nodebraid/plugin-command';
+import { kernelService } from '@nodebraid/plugin-kernel';
+import { definePlugin, defineService } from '@nodebraid/runtime-cordis';
 
 import type { HistoryService, HistorySnapshot } from './contracts';
 import { historyDiagnosticEvents } from './diagnostic-events';
@@ -27,7 +27,7 @@ type PendingReplayState =
 export const historyService = defineService<HistoryService>('history');
 
 export const historyPlugin = definePlugin({
-  name: '@cflow/plugin-history',
+  name: '@nodebraid/plugin-history',
   requires: { commands: commandService, kernel: kernelService },
   provides: { history: historyService },
   setup(context) {

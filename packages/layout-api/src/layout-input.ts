@@ -1,4 +1,4 @@
-import type { CanvasView } from '@cflow/kernel';
+import type { CanvasView } from '@nodebraid/kernel';
 
 import type { LayoutInput, LayoutInputOptions } from './contracts';
 import { LayoutError } from './layout-error';

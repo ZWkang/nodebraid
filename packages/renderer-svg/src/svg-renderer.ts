@@ -1,5 +1,5 @@
-import type { InteractionProjection } from '@cflow/interaction-api';
-import type { CanvasSnapshot } from '@cflow/kernel';
+import type { InteractionProjection } from '@nodebraid/interaction-api';
+import type { CanvasSnapshot } from '@nodebraid/kernel';
 import {
   RendererError,
   type CanvasRenderer,
@@ -7,8 +7,8 @@ import {
   type RendererInput,
   type RendererInputListener,
   type ScreenPoint,
-} from '@cflow/renderer-api';
-import type { SessionSnapshot } from '@cflow/session-api';
+} from '@nodebraid/renderer-api';
+import type { SessionSnapshot } from '@nodebraid/session-api';
 
 import type { SvgRendererConfig } from './contracts';
 import { hitTestProjection } from './hit-test';
@@ -50,7 +50,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
   const connectionAnchorHitTolerance = config.connectionAnchorHitTolerance ?? 8;
   const inputPolicies = normalizeInputPolicies(config.input);
   readTargetMatrix(target, 'INVALID_TARGET');
-  if (targetReservations.has(target) || target.querySelector(':scope > [data-cflow-renderer-svg-root]')) {
+  if (targetReservations.has(target) || target.querySelector(':scope > [data-nodebraid-renderer-svg-root]')) {
     throw new SvgRendererError('TARGET_OCCUPIED', 'SVG Renderer Target is already reserved.');
   }
 
@@ -58,14 +58,14 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
   const addedTabIndex = !target.hasAttribute('tabindex');
   if (addedTabIndex) target.setAttribute('tabindex', '-1');
   const projection = createSvgElement(document, 'g');
-  projection.setAttribute('class', 'cflow-renderer-svg');
-  projection.setAttribute('data-cflow-renderer-svg-root', '');
+  projection.setAttribute('class', 'nodebraid-renderer-svg');
+  projection.setAttribute('data-nodebraid-renderer-svg-root', '');
   const edgesLayer = createSvgElement(document, 'g');
-  edgesLayer.setAttribute('class', 'cflow-renderer-svg__edges');
+  edgesLayer.setAttribute('class', 'nodebraid-renderer-svg__edges');
   const nodesLayer = createSvgElement(document, 'g');
-  nodesLayer.setAttribute('class', 'cflow-renderer-svg__nodes');
+  nodesLayer.setAttribute('class', 'nodebraid-renderer-svg__nodes');
   const interactionLayer = createSvgElement(document, 'g');
-  interactionLayer.setAttribute('class', 'cflow-renderer-svg__interaction');
+  interactionLayer.setAttribute('class', 'nodebraid-renderer-svg__interaction');
   projection.append(edgesLayer, nodesLayer, interactionLayer);
 
   targetReservations.add(target);
@@ -115,11 +115,11 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
     const localToUser = acceptedTargetMatrix ?? readTargetMatrix(target, 'TARGET_UNAVAILABLE');
     const selectedNodeIds = new Set<string>(snapshot.selection.nodeIds);
     const selectedEdgeIds = new Set<string>(snapshot.selection.edgeIds);
-    for (const node of nodesLayer.querySelectorAll<SVGRectElement>('[data-cflow-node-id]')) {
-      setSelected(node, selectedNodeIds.has(node.getAttribute('data-cflow-node-id') ?? ''), journal);
+    for (const node of nodesLayer.querySelectorAll<SVGRectElement>('[data-nodebraid-node-id]')) {
+      setSelected(node, selectedNodeIds.has(node.getAttribute('data-nodebraid-node-id') ?? ''), journal);
     }
-    for (const edge of edgesLayer.querySelectorAll<SVGLineElement>('[data-cflow-edge-id]')) {
-      setSelected(edge, selectedEdgeIds.has(edge.getAttribute('data-cflow-edge-id') ?? ''), journal);
+    for (const edge of edgesLayer.querySelectorAll<SVGLineElement>('[data-nodebraid-edge-id]')) {
+      setSelected(edge, selectedEdgeIds.has(edge.getAttribute('data-nodebraid-edge-id') ?? ''), journal);
     }
     const matrix: AffineMatrix = {
       a: localToUser.a * zoom,

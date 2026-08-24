@@ -2,12 +2,12 @@ import { copyAndFreezeDiagnosticDetails, type DiagnosticAttributes } from './dia
 
 const emptyDetails = Object.freeze({});
 
-export interface CFlowErrorOptions<Details extends DiagnosticAttributes> {
+export interface NodeBraidErrorOptions<Details extends DiagnosticAttributes> {
   readonly details?: Details;
   readonly cause?: unknown;
 }
 
-export abstract class CFlowError<
+export abstract class NodeBraidError<
   Domain extends string,
   Code extends string,
   Details extends DiagnosticAttributes = DiagnosticAttributes,
@@ -19,7 +19,7 @@ export abstract class CFlowError<
     readonly domain: Domain,
     readonly code: Code,
     message: string,
-    options: CFlowErrorOptions<Details> = {},
+    options: NodeBraidErrorOptions<Details> = {},
   ) {
     super(message, options.cause === undefined ? undefined : { cause: options.cause });
     this.cause = options.cause;

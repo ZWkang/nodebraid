@@ -1,9 +1,9 @@
 ---
-title: '@cflow/plugin-layout'
+title: '@nodebraid/plugin-layout'
 description: Statically bind a Layout Engine to a typed Runtime Command and safely commit its Proposal.
 ---
 
-# `@cflow/plugin-layout`
+# `@nodebraid/plugin-layout`
 
 ::: warning Package is not publicly released
 This name describes the current source module boundary; it does not mean the package can be installed from npm. Follow the [Quick Start](/en/guide/quick-start) to verify it from source.
@@ -11,7 +11,7 @@ This name describes the current source module boundary; it does not mean the pac
 
 ## Problem it solves
 
-A Layout Engine can compute positions asynchronously, but it cannot directly modify the authoritative Document. `@cflow/plugin-layout` statically binds a concrete Engine to an application-owned typed Command, handling Input projection, capability validation, asynchronous computation, stale protection, and atomic commits inside a real Canvas Runtime.
+A Layout Engine can compute positions asynchronously, but it cannot directly modify the authoritative Document. `@nodebraid/plugin-layout` statically binds a concrete Engine to an application-owned typed Command, handling Input projection, capability validation, asynchronous computation, stale protection, and atomic commits inside a real Canvas Runtime.
 
 ## When to use it
 
@@ -20,7 +20,7 @@ A Layout Engine can compute positions asynchronously, but it cannot directly mod
 - you need cancellation and concurrent-revision protection;
 - you want multiple Providers to coexist behind separate Command tokens instead of being selected through a global Registry.
 
-If you only need to compute a Proposal offline without committing the Document, you can use `@cflow/layout-api` and an Engine directly.
+If you only need to compute a Proposal offline without committing the Document, you can use `@nodebraid/layout-api` and an Engine directly.
 
 ## What it provides
 
@@ -35,7 +35,7 @@ If you only need to compute a Proposal offline without committing the Document, 
 
 ## Dependencies and composition
 
-Every generated Plugin statically requires `KernelService` and `CommandService`. It depends on `@cflow/layout-api`, `@cflow/plugin-kernel`, `@cflow/plugin-command`, and the CFlow Plugin Host seam, but not on `@cflow/core`.
+Every generated Plugin statically requires `KernelService` and `CommandService`. It depends on `@nodebraid/layout-api`, `@nodebraid/plugin-kernel`, `@nodebraid/plugin-command`, and the NodeBraid Plugin Host seam, but not on `@nodebraid/core`.
 
 The application must:
 
@@ -54,10 +54,10 @@ import {
   type CreateLayoutPluginOptions,
   type LayoutCommandInput,
   type LayoutCommandResult,
-} from '@cflow/plugin-layout';
+} from '@nodebraid/plugin-layout';
 ```
 
-These entry points are also re-exported by `@cflow/core`; concrete Providers are never brought in implicitly by core.
+These entry points are also re-exported by `@nodebraid/core`; concrete Providers are never brought in implicitly by core.
 
 ## Lifecycle and commit semantics
 

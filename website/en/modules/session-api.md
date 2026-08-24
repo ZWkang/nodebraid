@@ -1,15 +1,15 @@
 ---
-title: '@cflow/session-api'
+title: '@nodebraid/session-api'
 description: Renderer-independent Selection, Viewport, and Session Snapshot value contracts.
 ---
 
-# `@cflow/session-api`
+# `@nodebraid/session-api`
 
 ::: warning Package is not publicly released
 This name identifies the current source module boundary; it does not mean the package can be installed from npm. Follow the [Quick Start](/en/guide/quick-start) to verify it from source.
 :::
 
-`@cflow/session-api` defines only the immutable value shapes of a Session. It lets Runtime Plugins and Renderer contracts share the same semantics without pulling the Plugin Host or mutation capabilities into a lower-level API.
+`@nodebraid/session-api` defines only the immutable value shapes of a Session. It lets Runtime Plugins and Renderer contracts share the same semantics without pulling the Plugin Host or mutation capabilities into a lower-level API.
 
 ::: info Current status
 Implemented. This package provides TypeScript value contracts; it does not create a Session, validate input, or own any Runtime lifecycle.
@@ -17,7 +17,7 @@ Implemented. This package provides TypeScript value contracts; it does not creat
 
 ## The problem it solves
 
-A Renderer needs to read Selection and Viewport, but should not therefore depend on the Session Service, Plugin Host, or Kernel adapter. If the Renderer API duplicates these types, Selection and Viewport semantics will drift over time. `@cflow/session-api` provides the smallest value contract that both sides can share.
+A Renderer needs to read Selection and Viewport, but should not therefore depend on the Session Service, Plugin Host, or Kernel adapter. If the Renderer API duplicates these types, Selection and Viewport semantics will drift over time. `@nodebraid/session-api` provides the smallest value contract that both sides can share.
 
 ## When to use it
 
@@ -28,7 +28,7 @@ A Renderer needs to read Selection and Viewport, but should not therefore depend
 
 ## What it provides
 
-`@cflow/session-api` exports only three types:
+`@nodebraid/session-api` exports only three types:
 
 | Type                | Semantics                                                                                                                                  |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -38,15 +38,15 @@ A Renderer needs to read Selection and Viewport, but should not therefore depend
 
 ## Dependencies and composition
 
-This package depends only on the `NodeId` and `EdgeId` types from `@cflow/kernel`. It does not depend on `@cflow/plugin-kernel`, `@cflow/runtime-cordis`, or `@cflow/core`.
+This package depends only on the `NodeId` and `EdgeId` types from `@nodebraid/kernel`. It does not depend on `@nodebraid/plugin-kernel`, `@nodebraid/runtime-cordis`, or `@nodebraid/core`.
 
-- [`@cflow/plugin-session`](/en/modules/plugin-session) uses these types to provide mutation, validation, subscriptions, and Activation lifecycle.
-- `@cflow/renderer-api` uses the same Session Snapshot as part of its Renderer input contract without depending on a Runtime Plugin.
+- [`@nodebraid/plugin-session`](/en/modules/plugin-session) uses these types to provide mutation, validation, subscriptions, and Activation lifecycle.
+- `@nodebraid/renderer-api` uses the same Session Snapshot as part of its Renderer input contract without depending on a Runtime Plugin.
 
 ## Public entry points
 
 ```ts
-import type { SelectionSnapshot, SessionSnapshot, Viewport } from '@cflow/session-api';
+import type { SelectionSnapshot, SessionSnapshot, Viewport } from '@nodebraid/session-api';
 
 const snapshot: SessionSnapshot = {
   selection: { nodeIds: [], edgeIds: [] },
@@ -74,7 +74,7 @@ These are readonly TypeScript interfaces. Constructing an object with the same s
 
 ## Verification evidence
 
-- [Public exports](https://github.com/ZWkang/cflow/blob/main/packages/session-api/src/index.ts) re-export only the three Session value types.
-- [Value-contract source](https://github.com/ZWkang/cflow/blob/main/packages/session-api/src/contracts.ts) establishes Selection ordering, logical screen units, and the absence of mutation capabilities.
-- [Package behavior tests](https://github.com/ZWkang/cflow/blob/main/packages/session-api/tests/index.test.ts) construct a complete Session Snapshot with Kernel ID types without starting a Runtime.
+- [Public exports](https://github.com/ZWkang/nodebraid/blob/main/packages/session-api/src/index.ts) re-export only the three Session value types.
+- [Value-contract source](https://github.com/ZWkang/nodebraid/blob/main/packages/session-api/src/contracts.ts) establishes Selection ordering, logical screen units, and the absence of mutation capabilities.
+- [Package behavior tests](https://github.com/ZWkang/nodebraid/blob/main/packages/session-api/tests/index.test.ts) construct a complete Session Snapshot with Kernel ID types without starting a Runtime.
 - ADR-0035 places Session value contracts outside the Runtime Plugin, while ADR-0017 and ADR-0018 establish Selection and Viewport semantics respectively.

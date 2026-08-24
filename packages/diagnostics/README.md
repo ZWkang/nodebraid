@@ -1,21 +1,21 @@
-# @cflow/diagnostics
+# @nodebraid/diagnostics
 
-> Documentation: [English](https://zwkang.github.io/cflow/en/modules/diagnostics) · [简体中文](https://zwkang.github.io/cflow/modules/diagnostics)
+> Documentation: [English](https://zwkang.github.io/nodebraid/en/modules/diagnostics) · [简体中文](https://zwkang.github.io/nodebraid/modules/diagnostics)
 
-Structured errors and Diagnostic Event contracts for CFlow.
+Structured errors and Diagnostic Event contracts for NodeBraid.
 
 ```ts
 import {
-  CFlowError,
+  NodeBraidError,
   describeDiagnosticEvent,
   describeError,
   describeNonFiniteNumber,
   diagnosticEvents,
   type DiagnosticSink,
-} from '@cflow/diagnostics';
+} from '@nodebraid/diagnostics';
 ```
 
-Every CFlow structural error extends `CFlowError` and exposes a stable
+Every NodeBraid structural error extends `NodeBraidError` and exposes a stable
 `domain + code` identity with recursively immutable JSON-safe details. User
 Callback, Plugin Setup, Command Handler, Provider, and Abort failures remain
 their original values.
@@ -27,16 +27,16 @@ network, retry, batching, or persistence work.
 
 `describeNonFiniteNumber()` owns the canonical `nan` /
 `positive-infinity` / `negative-infinity` diagnostic representation used by
-CFlow packages.
+NodeBraid packages.
 
 ## Development
 
 Run package scripts from the monorepo root:
 
 ```bash
-bun run --filter '@cflow/diagnostics' typecheck
-bun run --filter '@cflow/diagnostics' test
-bun run --filter '@cflow/diagnostics' build
+bun run --filter '@nodebraid/diagnostics' typecheck
+bun run --filter '@nodebraid/diagnostics' test
+bun run --filter '@nodebraid/diagnostics' build
 ```
 
 ## License

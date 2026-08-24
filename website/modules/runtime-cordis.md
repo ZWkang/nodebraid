@@ -1,13 +1,13 @@
 ---
-title: '@cflow/runtime-cordis'
-description: CFlow-owned Plugin Host、Runtime Service 与 Installation 生命周期。
+title: '@nodebraid/runtime-cordis'
+description: NodeBraid-owned Plugin Host、Runtime Service 与 Installation 生命周期。
 ---
 
-# `@cflow/runtime-cordis`
+# `@nodebraid/runtime-cordis`
 
-`@cflow/runtime-cordis` 为每个 Canvas Runtime 提供隔离的 Plugin Host。它使用强类型 Service Token 连接 Plugin，通过 Runtime Service 可用性驱动 Activation，并让所有资源拥有清晰、可等待的释放边界。
+`@nodebraid/runtime-cordis` 为每个 Canvas Runtime 提供隔离的 Plugin Host。它使用强类型 Service Token 连接 Plugin，通过 Runtime Service 可用性驱动 Activation，并让所有资源拥有清晰、可等待的释放边界。
 
-Cordis 只存在于 package 内部实现中。公共入口只使用 CFlow 自己的术语与类型。
+Cordis 只存在于 package 内部实现中。公共入口只使用 NodeBraid 自己的术语与类型。
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。
@@ -15,7 +15,7 @@ Cordis 只存在于 package 内部实现中。公共入口只使用 CFlow 自己
 
 ## 解决的问题
 
-画布能力之间既有依赖，也有独立生命周期。CFlow 需要在不引入全局 Service locator 的前提下，回答这些问题：
+画布能力之间既有依赖，也有独立生命周期。NodeBraid 需要在不引入全局 Service locator 的前提下，回答这些问题：
 
 - Required Service 尚未可用时，消费者应处于什么状态；
 - Provider 出现或消失时，依赖方如何激活、停用与重新激活；
@@ -25,7 +25,7 @@ Cordis 只存在于 package 内部实现中。公共入口只使用 CFlow 自己
 
 ## 何时使用
 
-- 普通应用通常经由 `@cflow/core` 使用这套 API。
+- 普通应用通常经由 `@nodebraid/core` 使用这套 API。
 - 编写基础设施或高级集成，并且只希望依赖 Plugin Runtime 时，可以直接使用这个窄 package。
 - 编写新的 Runtime Plugin，需要静态声明 Required Service、Provided Service 和 Owned Resource 时使用。
 
@@ -55,7 +55,7 @@ Plugin 在定义时静态声明 Service Binding。首版没有 Optional Service�
 
 Plugin Graph 必须保持无环。依赖方会先于 Provider 停用；互不依赖的 Installation 可以并发激活，但单个 Installation 内的 setup 与 cleanup 串行执行。
 
-该 package 直接依赖 `@cflow/diagnostics`，并在内部使用锁定版本的 Cordis 生命周期实现。它不依赖 `@cflow/core`。
+该 package 直接依赖 `@nodebraid/diagnostics`，并在内部使用锁定版本的 Cordis 生命周期实现。它不依赖 `@nodebraid/core`。
 
 ## 公共入口
 
@@ -128,4 +128,4 @@ Diagnostic Sink 是同步、只观察的出口：事件成功送达不能消费 
 - `packages/runtime-cordis/tests/index.test.ts` 覆盖 Service Token 身份、静态 Binding、pending/active/failed/disposed、Provider 保留、依赖顺序、重新激活、Child Installation、并发 Activation 与幂等清理。
 - 同一测试套件验证循环依赖、Provider 冲突、Provided Service 原子发布、Setup 原始失败和多清理错误聚合。
 - `packages/runtime-cordis/tests/diagnostics.test.ts` 验证 Host-scoped 不可变事件、同步 Sink、Fault 隔离及事件与 Snapshot 的先后关系。
-- `packages/runtime-cordis/tests/error-contract.test.ts` 验证 `PluginHostError` 继承共享 `CFlowError` 契约。
+- `packages/runtime-cordis/tests/error-contract.test.ts` 验证 `PluginHostError` 继承共享 `NodeBraidError` 契约。

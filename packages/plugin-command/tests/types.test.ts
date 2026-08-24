@@ -1,6 +1,6 @@
 import { test } from 'bun:test';
 
-import { createPluginHost } from '@cflow/runtime-cordis';
+import { createPluginHost } from '@nodebraid/runtime-cordis';
 
 import { commandPlugin, defineCommand, type Command, type CommandService } from '../src';
 

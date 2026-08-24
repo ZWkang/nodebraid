@@ -21,14 +21,14 @@ This boundary makes cancellation, concurrent results, Provider failures, and His
 
 ## Packages you need
 
-| Role                      | Package                                             | When you need it                                                                              |
-| ------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Provider-neutral contract | [`@cflow/layout-api`](/en/modules/layout-api)       | Define Engines, Input, Proposal, and capabilities, or compute a Proposal outside the Runtime  |
-| Runtime integration       | [`@cflow/plugin-layout`](/en/modules/plugin-layout) | Statically bind an Engine to a typed Command and commit its Proposal to the Kernel            |
-| Dagre Provider            | [`@cflow/layout-dagre`](/en/modules/layout-dagre)   | You need deterministic, whole-canvas layered layout without incremental layout or Fixed Nodes |
-| ELK Provider              | [`@cflow/layout-elk`](/en/modules/layout-elk)       | You need ELK Layered, or Stress for incremental layout and Fixed Nodes                        |
+| Role                      | Package                                                 | When you need it                                                                              |
+| ------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Provider-neutral contract | [`@nodebraid/layout-api`](/en/modules/layout-api)       | Define Engines, Input, Proposal, and capabilities, or compute a Proposal outside the Runtime  |
+| Runtime integration       | [`@nodebraid/plugin-layout`](/en/modules/plugin-layout) | Statically bind an Engine to a typed Command and commit its Proposal to the Kernel            |
+| Dagre Provider            | [`@nodebraid/layout-dagre`](/en/modules/layout-dagre)   | You need deterministic, whole-canvas layered layout without incremental layout or Fixed Nodes |
+| ELK Provider              | [`@nodebraid/layout-elk`](/en/modules/layout-elk)       | You need ELK Layered, or Stress for incremental layout and Fixed Nodes                        |
 
-`@cflow/core` re-exports the provider-neutral API and Runtime integration, but it neither depends on nor re-exports Dagre or ELK. Applications must explicitly select a concrete Provider.
+`@nodebraid/core` re-exports the provider-neutral API and Runtime integration, but it neither depends on nor re-exports Dagre or ELK. Applications must explicitly select a concrete Provider.
 
 ## Choosing a Provider
 
@@ -40,7 +40,7 @@ This boundary makes cancellation, concurrent results, Provider failures, and His
 | Self-loop input    | Supported                                      | Supported                                                          |
 | Main configuration | Direction, node/edge/rank spacing, and margins | Algorithm, direction, node/layer spacing, padding, and random seed |
 
-CFlow specifies neither a default Provider nor a dynamic Layout Registry. A Provider ID is diagnostic information; the real Runtime identity is the Command token that the application creates and owns for that Engine.
+NodeBraid specifies neither a default Provider nor a dynamic Layout Registry. A Provider ID is diagnostic information; the real Runtime identity is the Command token that the application creates and owns for that Engine.
 
 ## Input boundaries
 
@@ -53,7 +53,7 @@ The initial Layout release processes the whole Canvas and requires:
 - `incremental` mode still computes the entire graph, with current positions serving only as stability constraints;
 - Fixed Nodes are a hard constraint that must preserve their absolute World Positions.
 
-Inputs that violate these conditions fail before reaching the Provider. CFlow does not guess sizes, ignore Ports, or lay out only part of the graph.
+Inputs that violate these conditions fail before reaching the Provider. NodeBraid does not guess sizes, ignore Ports, or lay out only part of the graph.
 
 ## Commits and concurrency
 

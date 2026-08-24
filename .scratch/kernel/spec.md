@@ -1,10 +1,10 @@
-# CFlow Kernel
+# NodeBraid Kernel
 
 **Status:** ready-for-agent
 
 ## Problem Statement
 
-CFlow has a completed Plugin Host substrate, but it does not yet have the renderer-independent graph capability that a Canvas Runtime can compose. Without a Kernel, Node and Edge state would have to be owned by Runtime, Renderer, feature Plugins, or ad hoc application stores. That would create multiple writable authorities, spread graph consistency rules across callers, and leave History and Renderer integrations without one standard committed-change contract.
+NodeBraid has a completed Plugin Host substrate, but it does not yet have the renderer-independent graph capability that a Canvas Runtime can compose. Without a Kernel, Node and Edge state would have to be owned by Runtime, Renderer, feature Plugins, or ad hoc application stores. That would create multiple writable authorities, spread graph consistency rules across callers, and leave History and Renderer integrations without one standard committed-change contract.
 
 The Kernel must establish the first real canvas capability while preserving the accepted package direction and “Everything is Plugin” architecture. The pure in-process graph implementation must not depend on Plugin Host, Cordis, RxJS, Renderer, framework adapters, business node types, or the public core facade. A future Kernel Plugin adapter will provide the Kernel as a Runtime Service, but lifecycle composition must not shape or leak into the pure Kernel interface.
 
@@ -12,20 +12,20 @@ The first version needs one reversible behavioral path: create an empty Kernel, 
 
 ## Solution
 
-Build a deep `@cflow/kernel` module with one construction entry point and one stateful `CanvasKernel` interface. Each Kernel exclusively owns one authoritative Document beginning as an empty revision-zero graph. Public reads return a revision-bound Canvas View containing an immutable Canvas Snapshot and a Canvas Query for the same committed revision. Public writes pass through one synchronous `transact` method and a short-lived Transaction Context with strict Node and Edge writers.
+Build a deep `@nodebraid/kernel` module with one construction entry point and one stateful `CanvasKernel` interface. Each Kernel exclusively owns one authoritative Document beginning as an empty revision-zero graph. Public reads return a revision-bound Canvas View containing an immutable Canvas Snapshot and a Canvas Query for the same committed revision. Public writes pass through one synchronous `transact` method and a short-lived Transaction Context with strict Node and Edge writers.
 
 Transactions stage changes in a private Draft, allow temporarily incomplete intermediate states, validate only the final graph, and either commit atomically or expose no change. A successful commit increments revision once and returns the exact before View, after View, and Change Set. A net-zero Transaction returns no commit and preserves all current root references.
 
 Change Sets contain one coalesced before/after entry per changed entity. The Transaction Context can apply a Change Set forward or in reverse after verifying that affected entities still match the expected source side. Replay creates a new monotonically increasing revision; it never restores an old revision number or bypasses Transaction validation.
 
-The Kernel defensively owns and freezes CFlow-defined graph structures while treating arbitrary Node and Edge `data` as caller-owned immutable values. It maintains deterministic ID-based observation ordering and explicit structural errors without exposing Document stores, Drafts, Maps, indexes, validators, or any implementation-specific adapter seam.
+The Kernel defensively owns and freezes NodeBraid-defined graph structures while treating arbitrary Node and Edge `data` as caller-owned immutable values. It maintains deterministic ID-based observation ordering and explicit structural errors without exposing Document stores, Drafts, Maps, indexes, validators, or any implementation-specific adapter seam.
 
 ## User Stories
 
-1. As a CFlow maintainer, I want a publishable renderer-independent Kernel, so that graph consistency has one stable home.
-2. As a CFlow maintainer, I want the Kernel to have no Runtime or Renderer dependency, so that package direction cannot be inverted.
-3. As a CFlow maintainer, I want the public core facade to re-export the Kernel interface, so that common consumers retain one public entry point.
-4. As a CFlow maintainer, I want internal packages to depend on the Kernel package rather than the core facade, so that the facade remains an outward aggregation layer.
+1. As a NodeBraid maintainer, I want a publishable renderer-independent Kernel, so that graph consistency has one stable home.
+2. As a NodeBraid maintainer, I want the Kernel to have no Runtime or Renderer dependency, so that package direction cannot be inverted.
+3. As a NodeBraid maintainer, I want the public core facade to re-export the Kernel interface, so that common consumers retain one public entry point.
+4. As a NodeBraid maintainer, I want internal packages to depend on the Kernel package rather than the core facade, so that the facade remains an outward aggregation layer.
 5. As a Canvas Runtime author, I want one Kernel to own one authoritative Document, so that no second writable graph store can diverge.
 6. As a Canvas Runtime author, I want a newly created Kernel to contain an empty revision-zero Document, so that startup behavior is deterministic.
 7. As a Canvas Runtime author, I want non-empty state to enter through a Transaction, so that every first-version graph change has a Change Set source.
@@ -85,7 +85,7 @@ The Kernel defensively owns and freezes CFlow-defined graph structures while tre
 61. As a History author, I want Change Set source revisions used for diagnostics rather than equality gates, so that undo and redo can create new increasing revisions.
 62. As a History author, I want Change Set application to be atomic inside its containing Transaction, so that conflicts never leave partial staged restoration.
 63. As a History author, I want replay metadata to come from the new Transaction, so that undo and redo are observable as their own commands.
-64. As a maintainer, I want CFlow-owned graph structures defensively copied and frozen, so that caller mutation cannot corrupt committed state.
+64. As a maintainer, I want NodeBraid-owned graph structures defensively copied and frozen, so that caller mutation cannot corrupt committed state.
 65. As a domain Plugin author, I want the Kernel not to deep-copy or freeze arbitrary `data`, so that domain values are not forced into an undocumented serialization model.
 66. As a domain Plugin author, I want `data` compared by reference semantics, so that immutable domain updates remain explicit and predictable.
 67. As a maintainer, I want structural graph failures reported with all detected issues, so that debugging does not require one failing run per invalid reference.
@@ -100,8 +100,8 @@ The Kernel defensively owns and freezes CFlow-defined graph structures while tre
 
 ## Implementation Decisions
 
-- Add a publishable `@cflow/kernel` module containing the pure in-process Kernel implementation and its CFlow-owned public interface.
-- Keep the Kernel module free of runtime dependencies. It must not depend on Plugin Host, Cordis, RxJS, Renderer API, a concrete Renderer, framework adapters, business Plugins, or `@cflow/core`.
+- Add a publishable `@nodebraid/kernel` module containing the pure in-process Kernel implementation and its NodeBraid-owned public interface.
+- Keep the Kernel module free of runtime dependencies. It must not depend on Plugin Host, Cordis, RxJS, Renderer API, a concrete Renderer, framework adapters, business Plugins, or `@nodebraid/core`.
 - Re-export the Kernel public interface from the public core facade. The Kernel package must not depend back on the facade.
 - Do not add the Kernel Plugin adapter in this specification. The future adapter will depend on the Kernel and Plugin Host seams, provide the Kernel as a Runtime Service, and own its reachability for one Plugin Activation.
 - Export one `createCanvasKernel` construction entry point. It creates one stateful CanvasKernel owning one empty revision-zero Document.
@@ -173,7 +173,7 @@ The Kernel defensively owns and freezes CFlow-defined graph structures while tre
 - Treat the source Change Set revision values as diagnostics and structural validation inputs, not as a requirement that the current Kernel revision equal an old revision.
 - Generate a new Change Set and a new increasing revision for undo or redo. Use metadata from the containing Transaction rather than copying the replayed Change Set metadata.
 - Validate the runtime structure of a supplied Change Set and distinguish malformed input from a valid Change Set whose source state conflicts with the current Draft.
-- Defensively copy and freeze CFlow-owned Node, Edge, Point, Size, Endpoint, Canvas Snapshot, Canvas View, Change Set, Graph Change, error-detail, and returned collection structures.
+- Defensively copy and freeze NodeBraid-owned Node, Edge, Point, Size, Endpoint, Canvas Snapshot, Canvas View, Change Set, Graph Change, error-detail, and returned collection structures.
 - Do not recursively copy, traverse, compare, serialize, or freeze arbitrary data. Callers must treat data as an immutable value.
 - Permit unchanged entity objects to be shared between adjacent Canvas Snapshots and Change Set sides.
 - Expose one KernelError class with stable codes for invalid ID, asynchronous Transaction, reentrant Transaction, closed Transaction, existing entity, missing entity, ID mismatch, invalid graph, invalid Change Set, Change Set conflict, and revision overflow.
@@ -248,7 +248,7 @@ The Kernel defensively owns and freezes CFlow-defined graph structures while tre
 - Test that final invalid graph failure returns all detectable issues in one deterministic readonly collection.
 - Test that no failed or net-zero path changes revision, Canvas View identity, or committed Query results.
 - Use a focused internal revision-increment test only for safe-integer overflow, because the public empty revision-zero seam cannot practically execute enough commits to reach that boundary. Do not expose a test-only public constructor or revision setter.
-- Verify generated declarations contain no Cordis, RxJS, Renderer, DOM, framework, or `@cflow/core` imports from the Kernel package.
+- Verify generated declarations contain no Cordis, RxJS, Renderer, DOM, framework, or `@nodebraid/core` imports from the Kernel package.
 - Verify the Kernel package can build, typecheck, test, and pack independently through root-managed workspace scripts.
 - Verify packed output contains only intended public artifacts and package metadata.
 - Run repository lint, typecheck, format check, tests, build, diff whitespace checks, package-name import probes, declaration checks, and package dry-run packing before completion.

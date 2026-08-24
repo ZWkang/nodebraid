@@ -1,9 +1,9 @@
 ---
-title: '@cflow/plugin-history'
+title: '@nodebraid/plugin-history'
 description: Build Activation-scoped Document History from Kernel Commits and execute Undo/Redo through Commands.
 ---
 
-# `@cflow/plugin-history`
+# `@nodebraid/plugin-history`
 
 ::: warning Package is not publicly released
 This name describes the current source-module boundary; it does not mean the package can be installed from npm. Follow the source-based [Quick Start](/en/guide/quick-start) to verify it.
@@ -11,7 +11,7 @@ This name describes the current source-module boundary; it does not mean the pac
 
 ## Problems it solves
 
-The Kernel can already commit and reverse-apply Change Sets atomically, but it does not decide which changes enter History, when Redo becomes invalid, or how UI can read Undo/Redo availability. `@cflow/plugin-history` observes Canvas Commits at the Runtime layer, builds History Entries for the current Activation, and executes Replay through the existing Command Service.
+The Kernel can already commit and reverse-apply Change Sets atomically, but it does not decide which changes enter History, when Redo becomes invalid, or how UI can read Undo/Redo availability. `@nodebraid/plugin-history` observes Canvas Commits at the Runtime layer, builds History Entries for the current Activation, and executes Replay through the existing Command Service.
 
 History does not copy the Document or restore an old revision. Undo and Redo are both new Kernel Transactions, so revisions keep increasing monotonically and every Kernel validation and Commit observer remains active.
 
@@ -41,10 +41,10 @@ A History Entry stores only the source Commit's Change Set. `origin` and `comman
 `historyPlugin` statically requires [`KernelService`](/en/modules/plugin-kernel) and [`CommandService`](/en/modules/plugin-command), and provides one `HistoryService`. A typical Canvas Runtime explicitly installs all three Providers:
 
 ```ts
-import { commandPlugin } from '@cflow/plugin-command';
-import { historyPlugin } from '@cflow/plugin-history';
-import { kernelPlugin } from '@cflow/plugin-kernel';
-import { createPluginHost } from '@cflow/runtime-cordis';
+import { commandPlugin } from '@nodebraid/plugin-command';
+import { historyPlugin } from '@nodebraid/plugin-history';
+import { kernelPlugin } from '@nodebraid/plugin-kernel';
+import { createPluginHost } from '@nodebraid/runtime-cordis';
 
 const host = createPluginHost();
 const installations = [host.install(kernelPlugin), host.install(commandPlugin), host.install(historyPlugin)];
@@ -73,10 +73,10 @@ import {
   type HistoryErrorCode,
   type HistoryService,
   type HistorySnapshot,
-} from '@cflow/plugin-history';
+} from '@nodebraid/plugin-history';
 ```
 
-These entry points are also re-exported by `@cflow/core`.
+These entry points are also re-exported by `@nodebraid/core`.
 
 ## Lifecycle and error semantics
 
@@ -94,7 +94,7 @@ Losing Kernel or Command Service ends the current Activation immediately: the ol
 | `HISTORY_NOT_CAUGHT_UP` | History has not yet observed the Kernel's current revision  |
 | `SERVICE_DISPOSED`      | The Activation that owned the old History Service has ended |
 
-Kernel Replay errors preserve their original identity and are not wrapped as History success. Subscriber errors are reported to Host-scoped diagnostics through `cflow.plugin.history.subscriber.fault`; they do not block later subscribers or change the Snapshot.
+Kernel Replay errors preserve their original identity and are not wrapped as History success. Subscriber errors are reported to Host-scoped diagnostics through `nodebraid.plugin.history.subscriber.fault`; they do not block later subscribers or change the Snapshot.
 
 ## Limitations and non-goals
 

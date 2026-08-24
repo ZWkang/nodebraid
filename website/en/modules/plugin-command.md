@@ -1,9 +1,9 @@
 ---
-title: '@cflow/plugin-command'
+title: '@nodebraid/plugin-command'
 description: Activation-scoped, strongly typed Command registration, execution, cancellation, and cleanup.
 ---
 
-# `@cflow/plugin-command`
+# `@nodebraid/plugin-command`
 
 ::: warning Package is not publicly released
 This name describes the current source-module boundary; it does not mean the package can be installed from npm. Follow the source-based [Quick Start](/en/guide/quick-start) to verify it.
@@ -11,7 +11,7 @@ This name describes the current source-module boundary; it does not mean the pac
 
 ## Problems it solves
 
-Implementing actions as direct callbacks scatters identity, input and output types, cancellation, and resource ownership across callers. `@cflow/plugin-command` provides a CFlow-owned Runtime seam: Feature Plugins register strongly typed Commands, other Consumers execute them through the same token, and every registration and in-flight execution is owned by the current Activation.
+Implementing actions as direct callbacks scatters identity, input and output types, cancellation, and resource ownership across callers. `@nodebraid/plugin-command` provides a NodeBraid-owned Runtime seam: Feature Plugins register strongly typed Commands, other Consumers execute them through the same token, and every registration and in-flight execution is owned by the current Activation.
 
 The Command Service owns only the execution protocol. It does not own Kernel, Session, or domain state, and it does not become a dynamic service locator.
 
@@ -36,13 +36,13 @@ The Command's string ID is used only for diagnostics and to prevent ambiguous re
 
 ## Dependencies and composition
 
-This package depends on the Plugin Host seam from `@cflow/runtime-cordis` and structured errors from `@cflow/diagnostics`. It does not depend on Kernel, Session, History, or `@cflow/core`.
+This package depends on the Plugin Host seam from `@nodebraid/runtime-cordis` and structured errors from `@nodebraid/diagnostics`. It does not depend on Kernel, Session, History, or `@nodebraid/core`.
 
 A Feature Plugin should obtain its dependencies through its own Required Service bindings and own the registration:
 
 ```ts
-import { commandPlugin, commandService, defineCommand, type CommandService } from '@cflow/plugin-command';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+import { commandPlugin, commandService, defineCommand, type CommandService } from '@nodebraid/plugin-command';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 const greet = defineCommand<string, string>('message.greet');
 let commands: CommandService | undefined;
@@ -79,7 +79,7 @@ await Promise.all([
 if (!commands) throw new Error('Expected Command Service to activate.');
 
 try {
-  console.log(await commands.execute(greet, 'CFlow'));
+  console.log(await commands.execute(greet, 'NodeBraid'));
 } finally {
   await host.dispose();
 }
@@ -101,10 +101,10 @@ import {
   type CommandHandler,
   type CommandRegistration,
   type CommandService,
-} from '@cflow/plugin-command';
+} from '@nodebraid/plugin-command';
 ```
 
-These entry points are also re-exported by `@cflow/core`.
+These entry points are also re-exported by `@nodebraid/core`.
 
 ## Lifecycle and error semantics
 

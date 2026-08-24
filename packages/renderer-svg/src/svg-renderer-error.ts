@@ -1,8 +1,8 @@
-import { CFlowError, type DiagnosticAttributes } from '@cflow/diagnostics';
+import { NodeBraidError, type DiagnosticAttributes } from '@nodebraid/diagnostics';
 
 export type SvgRendererErrorCode = 'INVALID_CONFIG' | 'INVALID_TARGET' | 'TARGET_OCCUPIED' | 'TARGET_UNAVAILABLE';
 
-export class SvgRendererError extends CFlowError<'renderer.svg', SvgRendererErrorCode> {
+export class SvgRendererError extends NodeBraidError<'renderer.svg', SvgRendererErrorCode> {
   override readonly name = 'SvgRendererError';
 
   constructor(

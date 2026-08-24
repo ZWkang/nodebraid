@@ -1,4 +1,4 @@
-import type { ConnectionPreviewInteractionProjection, NodeDragInteractionProjection } from '@cflow/interaction-api';
+import type { ConnectionPreviewInteractionProjection, NodeDragInteractionProjection } from '@nodebraid/interaction-api';
 import type {
   CanvasCommit,
   CanvasEdge,
@@ -7,9 +7,9 @@ import type {
   CanvasView,
   GraphChange,
   NodeId,
-} from '@cflow/kernel';
-import { RendererError } from '@cflow/renderer-api';
-import type { SessionSnapshot } from '@cflow/session-api';
+} from '@nodebraid/kernel';
+import { RendererError } from '@nodebraid/renderer-api';
+import type { SessionSnapshot } from '@nodebraid/session-api';
 
 import { validateCanvasView, validateSessionSnapshot } from './renderer-state';
 
@@ -89,15 +89,15 @@ export function applyCommit(
     }
     for (const edge of commit.after.snapshot.edges) {
       if (!changedNodeIds.has(edge.source.nodeId) && !changedNodeIds.has(edge.target.nodeId)) continue;
-      const existing = requireEntityElement(edgesLayer, 'data-cflow-edge-id', edge.id);
+      const existing = requireEntityElement(edgesLayer, 'data-nodebraid-edge-id', edge.id);
       const validated = requireMapValue(validatedEdges, edge.id);
       copyGeometryAttributes(validated, existing, ['x1', 'y1', 'x2', 'y2'], journal);
     }
     nodesLayer.append(
-      ...commit.after.snapshot.nodes.map((node) => requireEntityElement(nodesLayer, 'data-cflow-node-id', node.id)),
+      ...commit.after.snapshot.nodes.map((node) => requireEntityElement(nodesLayer, 'data-nodebraid-node-id', node.id)),
     );
     edgesLayer.append(
-      ...commit.after.snapshot.edges.map((edge) => requireEntityElement(edgesLayer, 'data-cflow-edge-id', edge.id)),
+      ...commit.after.snapshot.edges.map((edge) => requireEntityElement(edgesLayer, 'data-nodebraid-edge-id', edge.id)),
     );
     syncConnectionAnchors(commit.after.snapshot.nodes, document, interactionLayer, journal);
     completeProjection?.(journal);
@@ -118,7 +118,7 @@ function syncConnectionAnchors(
 ): void {
   const ordered: SVGCircleElement[] = [];
   const existingAnchors = Array.from(
-    interactionLayer.querySelectorAll<SVGCircleElement>('[data-cflow-connection-anchor-node-id]'),
+    interactionLayer.querySelectorAll<SVGCircleElement>('[data-nodebraid-connection-anchor-node-id]'),
   );
   const existingAnchorsByKey = new Map(existingAnchors.map((element) => [connectionAnchorKey(element), element]));
   for (const node of nodes) {
@@ -135,7 +135,7 @@ function syncConnectionAnchors(
     }
   }
   for (const element of existingAnchorsByKey.values()) element.remove();
-  interactionLayer.append(...ordered, ...interactionLayer.querySelectorAll('[data-cflow-connection-preview]'));
+  interactionLayer.append(...ordered, ...interactionLayer.querySelectorAll('[data-nodebraid-connection-preview]'));
 }
 
 function createConnectionAnchorElements(document: Document, node: CanvasNode): readonly SVGCircleElement[] {
@@ -143,9 +143,9 @@ function createConnectionAnchorElements(document: Document, node: CanvasNode): r
   if (!size || size.width <= 0 || size.height <= 0) return [];
   return (['target', 'source'] as const).map((role) => {
     const element = createSvgElement(document, 'circle');
-    element.setAttribute('class', 'cflow-renderer-svg__connection-anchor');
-    element.setAttribute('data-cflow-connection-anchor-node-id', node.id);
-    element.setAttribute('data-cflow-connection-anchor-role', role);
+    element.setAttribute('class', 'nodebraid-renderer-svg__connection-anchor');
+    element.setAttribute('data-nodebraid-connection-anchor-node-id', node.id);
+    element.setAttribute('data-nodebraid-connection-anchor-role', role);
     element.setAttribute('cx', String(role === 'source' ? node.position.x + size.width : node.position.x));
     element.setAttribute('cy', String(node.position.y + size.height / 2));
     return element;
@@ -153,7 +153,7 @@ function createConnectionAnchorElements(document: Document, node: CanvasNode): r
 }
 
 function connectionAnchorKey(element: SVGElement): string {
-  return `${element.getAttribute('data-cflow-connection-anchor-node-id')}\u0000${element.getAttribute('data-cflow-connection-anchor-role')}`;
+  return `${element.getAttribute('data-nodebraid-connection-anchor-node-id')}\u0000${element.getAttribute('data-nodebraid-connection-anchor-role')}`;
 }
 
 /** @internal */
@@ -179,23 +179,23 @@ export function applyConnectionPreview(
       y: targetNode.position.y + targetNode.size.height / 2,
     };
   }
-  let element = interactionLayer.querySelector<SVGLineElement>('[data-cflow-connection-preview]');
+  let element = interactionLayer.querySelector<SVGLineElement>('[data-nodebraid-connection-preview]');
   if (!element) {
     element = createSvgElement(interactionLayer.ownerDocument, 'line');
-    element.setAttribute('class', 'cflow-renderer-svg__connection-preview');
-    element.setAttribute('data-cflow-connection-preview', '');
+    element.setAttribute('class', 'nodebraid-renderer-svg__connection-preview');
+    element.setAttribute('data-nodebraid-connection-preview', '');
     interactionLayer.append(element);
   }
   setElementAttribute(element, 'x1', String(source.x), journal);
   setElementAttribute(element, 'y1', String(source.y), journal);
   setElementAttribute(element, 'x2', String(endpoint.x), journal);
   setElementAttribute(element, 'y2', String(endpoint.y), journal);
-  setElementAttribute(element, 'data-cflow-connection-target', preview.target.type, journal);
+  setElementAttribute(element, 'data-nodebraid-connection-target', preview.target.type, journal);
 }
 
 /** @internal */
 export function clearConnectionPreview(interactionLayer: SVGGElement): void {
-  interactionLayer.querySelector('[data-cflow-connection-preview]')?.remove();
+  interactionLayer.querySelector('[data-nodebraid-connection-preview]')?.remove();
 }
 
 /** @internal */
@@ -216,13 +216,13 @@ export function applyNodeDragProjection(
       }),
     );
     for (const candidate of projection.nodes) {
-      const element = requireEntityElement(nodesLayer, 'data-cflow-node-id', candidate.nodeId) as SVGRectElement;
+      const element = requireEntityElement(nodesLayer, 'data-nodebraid-node-id', candidate.nodeId) as SVGRectElement;
       setElementAttribute(element, 'x', String(candidate.position.x), journal);
       setElementAttribute(element, 'y', String(candidate.position.y), journal);
     }
     for (const edge of baselineSnapshot.edges) {
       if (!candidates.has(edge.source.nodeId) && !candidates.has(edge.target.nodeId)) continue;
-      const existing = requireEntityElement(edgesLayer, 'data-cflow-edge-id', edge.id) as SVGLineElement;
+      const existing = requireEntityElement(edgesLayer, 'data-nodebraid-edge-id', edge.id) as SVGLineElement;
       const validated = createEdgeElement(edgesLayer.ownerDocument, edge, effectiveNodes);
       copyGeometryAttributes(validated, existing, ['x1', 'y1', 'x2', 'y2'], journal);
     }
@@ -240,7 +240,7 @@ function applyNodeChange(
   nodesLayer: SVGGElement,
   journal: DomMutationJournal,
 ): void {
-  const existing = findEntityElement<SVGRectElement>(nodesLayer, 'data-cflow-node-id', change.id);
+  const existing = findEntityElement<SVGRectElement>(nodesLayer, 'data-nodebraid-node-id', change.id);
   if (change.before === null && change.after !== null) {
     if (existing) throwBaselineEntityConflict('node', change.id, 'missing', 'present');
     nodesLayer.append(requireMapValue(validatedNodes, change.id));
@@ -261,7 +261,7 @@ function applyEdgeChange(
   edgesLayer: SVGGElement,
   journal: DomMutationJournal,
 ): void {
-  const existing = findEntityElement<SVGLineElement>(edgesLayer, 'data-cflow-edge-id', change.id);
+  const existing = findEntityElement<SVGLineElement>(edgesLayer, 'data-nodebraid-edge-id', change.id);
   if (change.before === null && change.after !== null) {
     if (existing) throwBaselineEntityConflict('edge', change.id, 'missing', 'present');
     edgesLayer.append(requireMapValue(validatedEdges, change.id));
@@ -285,8 +285,8 @@ function createNodeElement(document: Document, node: CanvasNode): SVGRectElement
     });
   }
   const element = createSvgElement(document, 'rect');
-  element.setAttribute('class', 'cflow-renderer-svg__node');
-  element.setAttribute('data-cflow-node-id', node.id);
+  element.setAttribute('class', 'nodebraid-renderer-svg__node');
+  element.setAttribute('data-nodebraid-node-id', node.id);
   updateNodeElement(element, node);
   return element;
 }
@@ -337,8 +337,8 @@ function createEdgeElement(
     });
   }
   const element = createSvgElement(document, 'line');
-  element.setAttribute('class', 'cflow-renderer-svg__edge');
-  element.setAttribute('data-cflow-edge-id', edge.id);
+  element.setAttribute('class', 'nodebraid-renderer-svg__edge');
+  element.setAttribute('data-nodebraid-edge-id', edge.id);
   element.setAttribute('x1', String(source.position.x + source.size.width / 2));
   element.setAttribute('y1', String(source.position.y + source.size.height / 2));
   element.setAttribute('x2', String(target.position.x + target.size.width / 2));
@@ -356,8 +356,8 @@ export function createSvgElement<Name extends keyof SVGElementTagNameMap>(
 
 /** @internal */
 export function setSelected(element: SVGElement, selected: boolean, journal?: DomMutationJournal): void {
-  if (selected) setElementAttribute(element, 'data-cflow-selected', 'true', journal);
-  else removeElementAttribute(element, 'data-cflow-selected', journal);
+  if (selected) setElementAttribute(element, 'data-nodebraid-selected', 'true', journal);
+  else removeElementAttribute(element, 'data-nodebraid-selected', journal);
 }
 
 function findEntityElement<ElementType extends SVGElement>(

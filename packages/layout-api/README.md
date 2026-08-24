@@ -1,8 +1,8 @@
-# @cflow/layout-api
+# @nodebraid/layout-api
 
-> Documentation: [English](https://zwkang.github.io/cflow/en/modules/layout-api) · [简体中文](https://zwkang.github.io/cflow/modules/layout-api)
+> Documentation: [English](https://zwkang.github.io/nodebraid/en/modules/layout-api) · [简体中文](https://zwkang.github.io/nodebraid/modules/layout-api)
 
-Provider-neutral Layout contracts and validation for CFlow.
+Provider-neutral Layout contracts and validation for NodeBraid.
 
 The package projects a committed Canvas View into an immutable Layout Input, defines asynchronous Layout Engines, and validates Layout Proposals before they reach a Runtime Transaction. Node positions use the top-left corner of Node bounds in absolute world coordinates.
 
@@ -11,9 +11,9 @@ The first version supports whole-canvas full and incremental requests, Fixed Nod
 ## Development
 
 ```bash
-bun run --filter '@cflow/layout-api' typecheck
-bun run --filter '@cflow/layout-api' test
-bun run --filter '@cflow/layout-api' build
+bun run --filter '@nodebraid/layout-api' typecheck
+bun run --filter '@nodebraid/layout-api' test
+bun run --filter '@nodebraid/layout-api' build
 ```
 
 ## License

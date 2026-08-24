@@ -1,25 +1,25 @@
 ---
 title: Quick Start
-description: Run a minimal CFlow Canvas Runtime from source.
+description: Run a minimal NodeBraid Canvas Runtime from source.
 ---
 
 # Quick Start
 
-Verify CFlow with a real Canvas Runtime: install the Kernel Plugin, commit a Node through the public `@cflow/core` facade, and then complete the entire Plugin Host lifecycle.
+Verify NodeBraid with a real Canvas Runtime: install the Kernel Plugin, commit a Node through the public `@nodebraid/core` facade, and then complete the entire Plugin Host lifecycle.
 
 ::: warning Packages not yet publicly released
-The `@cflow/*` packages declared by this repository have not yet been published to npm as part of the CFlow project. The existing `@cflow/core` package on npm belongs to another project; do not install that package name from npm. During the initial release phase, run CFlow from source.
+The `@nodebraid/*` packages declared by this repository have not yet been published to npm. Run NodeBraid from source until the initial public release, and do not copy npm installation commands that are not yet active.
 :::
 
 ## 1. Get the source
 
 ```bash
-git clone https://github.com/ZWkang/cflow.git
-cd cflow
+git clone https://github.com/ZWkang/nodebraid.git
+cd nodebraid
 bun install
 ```
 
-CFlow requires Bun 1.2.19 or later.
+NodeBraid requires Bun 1.2.19 or later.
 
 ## 2. Run the example
 
@@ -46,11 +46,11 @@ revision=1 nodes=1
 5. `whenActive()` proves that the application Plugin has acquired all Required Services.
 6. `host.dispose()` ends the lifecycles of the Installation, Activation, and Owned Resources.
 
-This example is deliberately headless: it verifies Document and Runtime composition without creating a visible canvas. The delivered [`@cflow/renderer-svg`](/en/modules/renderer-svg) can project the same Canvas semantics into SVG at the next layer, but it is not part of this minimal Kernel path.
+This example is deliberately headless: it verifies Document and Runtime composition without creating a visible canvas. The delivered [`@nodebraid/renderer-svg`](/en/modules/renderer-svg) can project the same Canvas semantics into SVG at the next layer, but it is not part of this minimal Kernel path.
 
 ## 4. Next layer: Basic Canvas Composition with real SVG
 
-For the complete basic Kernel, Command, Session, Renderer, Interaction, and History composition, select the SVG Provider explicitly and install [`@cflow/preset-basic`](/en/modules/preset-basic). The canonical example below is the same source exercised by the real-Chromium acceptance path:
+For the complete basic Kernel, Command, Session, Renderer, Interaction, and History composition, select the SVG Provider explicitly and install [`@nodebraid/preset-basic`](/en/modules/preset-basic). The canonical example below is the same source exercised by the real-Chromium acceptance path:
 
 <<< ../../examples/basic-canvas-svg.ts{ts}
 

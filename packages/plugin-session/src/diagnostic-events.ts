@@ -1,3 +1,3 @@
 export const sessionDiagnosticEvents = Object.freeze({
-  subscriberFault: 'cflow.plugin.session.subscriber.fault',
+  subscriberFault: 'nodebraid.plugin.session.subscriber.fault',
 });

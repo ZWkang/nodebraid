@@ -1,6 +1,6 @@
-import type { InteractionProjection } from '@cflow/interaction-api';
-import type { CanvasCommit, CanvasView, EdgeId, NodeId, Point } from '@cflow/kernel';
-import type { SessionSnapshot } from '@cflow/session-api';
+import type { InteractionProjection } from '@nodebraid/interaction-api';
+import type { CanvasCommit, CanvasView, EdgeId, NodeId, Point } from '@nodebraid/kernel';
+import type { SessionSnapshot } from '@nodebraid/session-api';
 
 export interface ScreenPoint {
   /** Logical screen coordinates, not device or backing-store pixels. */

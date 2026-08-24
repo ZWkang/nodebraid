@@ -1,9 +1,9 @@
 ---
-title: '@cflow/plugin-interaction'
+title: '@nodebraid/plugin-interaction'
 description: 把 Renderer Input 解释为 Selection、Drag、Pan、Wheel Zoom 与 Edge Connection 的 Runtime Plugin。
 ---
 
-# `@cflow/plugin-interaction`
+# `@nodebraid/plugin-interaction`
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。

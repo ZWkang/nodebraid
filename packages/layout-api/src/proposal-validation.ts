@@ -1,4 +1,4 @@
-import { describeNonFiniteNumber, type DiagnosticAttributes } from '@cflow/diagnostics';
+import { describeNonFiniteNumber, type DiagnosticAttributes } from '@nodebraid/diagnostics';
 
 import type { LayoutInput, LayoutPosition, LayoutProposal } from './contracts';
 import { LayoutError } from './layout-error';

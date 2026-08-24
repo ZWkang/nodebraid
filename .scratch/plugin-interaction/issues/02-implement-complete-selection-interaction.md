@@ -15,4 +15,4 @@
 
 ## Answer
 
-`@cflow/plugin-interaction` 现以四个 Required Service 组合一份无状态 Service 的 Interaction Activation，在真实 Chromium 中按 Hit Test、Focus、Capture 顺序完成 Node、Edge 与 Canvas 的 plain/additive Selection。多选中已选 Node 在 pointerdown 保持集合，只在 click pointerup 折叠；Port 通过纯状态 seam 映射到所属 Node。Selection 失败会先释放 Capture 再通过现有 Input Fault 边界报告，包级声明隔离、类型检查、Bun 测试与真实浏览器链路均已通过。
+`@nodebraid/plugin-interaction` 现以四个 Required Service 组合一份无状态 Service 的 Interaction Activation，在真实 Chromium 中按 Hit Test、Focus、Capture 顺序完成 Node、Edge 与 Canvas 的 plain/additive Selection。多选中已选 Node 在 pointerdown 保持集合，只在 click pointerup 折叠；Port 通过纯状态 seam 映射到所属 Node。Selection 失败会先释放 Capture 再通过现有 Input Fault 边界报告，包级声明隔离、类型检查、Bun 测试与真实浏览器链路均已通过。

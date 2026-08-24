@@ -1,4 +1,4 @@
-import { CFlowError, type DiagnosticAttributes } from '@cflow/diagnostics';
+import { NodeBraidError, type DiagnosticAttributes } from '@nodebraid/diagnostics';
 
 export type KernelErrorCode =
   | 'INVALID_ID'
@@ -14,7 +14,7 @@ export type KernelErrorCode =
   | 'REVISION_OVERFLOW';
 
 /** Structural Kernel failures use stable codes; callback failures are deliberately left untouched. */
-export class KernelError extends CFlowError<'kernel', KernelErrorCode> {
+export class KernelError extends NodeBraidError<'kernel', KernelErrorCode> {
   override readonly name = 'KernelError';
 
   constructor(

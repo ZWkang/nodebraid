@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/interaction-api",
+  "name": "@nodebraid/interaction-api",
   "type": "module",
   "version": "0.0.1",
-  "description": "Backend-neutral Interaction value contracts for CFlow.",
+  "description": "Backend-neutral Interaction value contracts for NodeBraid.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/interaction-api"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/interaction-api#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/interaction-api#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "interaction",
     "gesture",
     "projection"
@@ -41,14 +41,14 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
-    "build:dependencies": "bun run --filter '@cflow/kernel' build && bun run --filter '@cflow/session-api' build",
+    "build:dependencies": "bun run --filter '@nodebraid/kernel' build && bun run --filter '@nodebraid/session-api' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "test:artifacts": "bun run ./artifacts/check-declarations.ts",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/kernel": "workspace:*",
-    "@cflow/session-api": "workspace:*"
+    "@nodebraid/kernel": "workspace:*",
+    "@nodebraid/session-api": "workspace:*"
   }
 }

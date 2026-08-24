@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 
-import { edgeId, nodeId } from '@cflow/kernel';
+import { edgeId, nodeId } from '@nodebraid/kernel';
 
 import type { SessionSnapshot } from '../src';
 

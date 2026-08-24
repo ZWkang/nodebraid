@@ -1,18 +1,18 @@
 import { expect, test } from 'bun:test';
 
-import { commandPlugin } from '@cflow/plugin-command';
-import { kernelPlugin } from '@cflow/plugin-kernel';
-import { createRendererPlugin } from '@cflow/plugin-renderer';
-import { sessionPlugin } from '@cflow/plugin-session';
+import { commandPlugin } from '@nodebraid/plugin-command';
+import { kernelPlugin } from '@nodebraid/plugin-kernel';
+import { createRendererPlugin } from '@nodebraid/plugin-renderer';
+import { sessionPlugin } from '@nodebraid/plugin-session';
 import type {
   CanvasRenderer,
   HitResult,
   RendererDocumentUpdate,
   RendererInputListener,
   ScreenPoint,
-} from '@cflow/renderer-api';
-import type { SessionSnapshot } from '@cflow/session-api';
-import { createPluginHost } from '@cflow/runtime-cordis';
+} from '@nodebraid/renderer-api';
+import type { SessionSnapshot } from '@nodebraid/session-api';
+import { createPluginHost } from '@nodebraid/runtime-cordis';
 
 import { interactionPlugin } from '../src';
 

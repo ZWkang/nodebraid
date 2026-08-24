@@ -1,14 +1,14 @@
 ---
 title: Rendering Contract
-description: Connect Document, Session, and Interaction through a backend-neutral Renderer protocol without leaking backend objects into CFlow core.
+description: Connect Document, Session, and Interaction through a backend-neutral Renderer protocol without leaking backend objects into NodeBraid core.
 ---
 
 # Rendering Contract
 
-The Rendering Contract capability family defines how CFlow Canvas semantics are handed to a rendering backend and how backend input is converted back into CFlow values. It deliberately does not select SVG, Canvas2D, Konva, Pixi, or any default implementation: the application owns the concrete Renderer Factory, while the Runtime adapter handles only state synchronization and lifecycle.
+The Rendering Contract capability family defines how NodeBraid Canvas semantics are handed to a rendering backend and how backend input is converted back into NodeBraid values. It deliberately does not select SVG, Canvas2D, Konva, Pixi, or any default implementation: the application owns the concrete Renderer Factory, while the Runtime adapter handles only state synchronization and lifecycle.
 
 ::: info SVG Renderer Provider delivered
-`@cflow/renderer-svg` is the first reference-quality official Provider. It projects generic rectangular Nodes, straight Edges, Selection, Viewport, and standardized input into an existing application-owned SVG Target. It is not the default Renderer and does not interpret product Node types or data.
+`@nodebraid/renderer-svg` is the first reference-quality official Provider. It projects generic rectangular Nodes, straight Edges, Selection, Viewport, and standardized input into an existing application-owned SVG Target. It is not the default Renderer and does not interpret product Node types or data.
 :::
 
 ## Problems it solves
@@ -21,21 +21,21 @@ The Rendering Contract capability family defines how CFlow Canvas semantics are 
 
 ## When to use it
 
-- You are implementing a CFlow Renderer Provider;
+- You are implementing a NodeBraid Renderer Provider;
 - You want to use the current official SVG Provider for generic Canvas projection;
 - You want to connect an existing Renderer Factory to the Canvas Runtime;
 - Your Interaction Plugin needs standardized input, Hit Testing, Pointer Capture, or Focus;
-- You are evaluating the responsibility boundary between CFlow and a concrete rendering backend.
+- You are evaluating the responsibility boundary between NodeBraid and a concrete rendering backend.
 
-If generic SVG Geometry and the stable DOM seam meet your needs, select `@cflow/renderer-svg` directly. CFlow now provides a separate Interaction Runtime, while product-specific Node visuals and framework adapters remain explicit application responsibilities.
+If generic SVG Geometry and the stable DOM seam meet your needs, select `@nodebraid/renderer-svg` directly. NodeBraid now provides a separate Interaction Runtime, while product-specific Node visuals and framework adapters remain explicit application responsibilities.
 
 ## What it provides
 
-| Role                | Package                                                 | What it delivers                                                                                                       |
-| ------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Provider contract   | [`@cflow/renderer-api`](/en/modules/renderer-api)       | `CanvasRenderer`, Factory, Document/Session/Interaction updates, standardized input, Hit Result, and structured errors |
-| Runtime integration | [`@cflow/plugin-renderer`](/en/modules/plugin-renderer) | Binds a Factory as a Plugin, coordinates Kernel/Session, and provides one exclusive Interaction Binding                |
-| SVG Provider        | [`@cflow/renderer-svg`](/en/modules/renderer-svg)       | Projects generic Canvas Geometry, Session, and browser input into an existing `SVGSVGElement`                          |
+| Role                | Package                                                     | What it delivers                                                                                                       |
+| ------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Provider contract   | [`@nodebraid/renderer-api`](/en/modules/renderer-api)       | `CanvasRenderer`, Factory, Document/Session/Interaction updates, standardized input, Hit Result, and structured errors |
+| Runtime integration | [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer) | Binds a Factory as a Plugin, coordinates Kernel/Session, and provides one exclusive Interaction Binding                |
+| SVG Provider        | [`@nodebraid/renderer-svg`](/en/modules/renderer-svg)       | Projects generic Canvas Geometry, Session, and browser input into an existing `SVGSVGElement`                          |
 
 ```text
 Kernel Commit ───────────────┐
@@ -50,20 +50,20 @@ The Renderer has no write authority over the Document, Session, or Commands. It 
 
 ## Dependencies and composition
 
-`@cflow/renderer-api` depends only on CFlow's Kernel, Session, and Interaction Projection value contracts plus Diagnostics. It does not depend on the Plugin Host, a concrete backend, or a framework.
+`@nodebraid/renderer-api` depends only on NodeBraid's Kernel, Session, and Interaction Projection value contracts plus Diagnostics. It does not depend on the Plugin Host, a concrete backend, or a framework.
 
-`@cflow/plugin-renderer` statically requires `KernelService` and `SessionService`. The application obtains a `RendererFactory<Config>` from a concrete Provider, calls `createRendererPlugin(factory)` to generate a normal Runtime Plugin, then installs it with Provider-specific config. CFlow provides neither a Factory Registry nor a default Provider.
+`@nodebraid/plugin-renderer` statically requires `KernelService` and `SessionService`. The application obtains a `RendererFactory<Config>` from a concrete Provider, calls `createRendererPlugin(factory)` to generate a normal Runtime Plugin, then installs it with Provider-specific config. NodeBraid provides neither a Factory Registry nor a default Provider.
 
-`@cflow/renderer-svg` depends only on the Renderer API and its value contracts, not on the Plugin Host. Applications can use the Factory directly or connect it to the Runtime through the Renderer Plugin.
+`@nodebraid/renderer-svg` depends only on the Renderer API and its value contracts, not on the Plugin Host. Applications can use the Factory directly or connect it to the Runtime through the Renderer Plugin.
 
 ## Public entry points
 
-- [`@cflow/renderer-api`](/en/modules/renderer-api): the backend-neutral contract shared by Provider authors and the Runtime adapter;
-- [`@cflow/plugin-renderer`](/en/modules/plugin-renderer): connects an explicitly selected Factory to the Plugin Host;
-- [`@cflow/renderer-svg`](/en/modules/renderer-svg): the current official SVG Factory, Config, and Provider-specific errors;
-- `@cflow/core`: re-exports both packages without bringing in any concrete Provider.
+- [`@nodebraid/renderer-api`](/en/modules/renderer-api): the backend-neutral contract shared by Provider authors and the Runtime adapter;
+- [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer): connects an explicitly selected Factory to the Plugin Host;
+- [`@nodebraid/renderer-svg`](/en/modules/renderer-svg): the current official SVG Factory, Config, and Provider-specific errors;
+- `@nodebraid/core`: re-exports both packages without bringing in any concrete Provider.
 
-The CFlow packages are not publicly published under this project's identity. Verify them from source, and do not install similarly named packages from npm that belong to another project.
+The NodeBraid packages have not been publicly released. Verify them from source until the initial npm release is available.
 
 ## Lifecycle and error semantics
 

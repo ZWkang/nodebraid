@@ -1,11 +1,11 @@
-import { edgeId, nodeId, type NodeId } from '@cflow/kernel';
-import { commandService, type CommandService } from '@cflow/plugin-command';
-import { kernelService, type KernelService } from '@cflow/plugin-kernel';
-import { rendererService } from '@cflow/plugin-renderer';
-import { sessionService, type SessionService } from '@cflow/plugin-session';
-import { createBasicCanvasPlugin } from '@cflow/preset-basic';
-import { createSvgRenderer } from '@cflow/renderer-svg';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+import { edgeId, nodeId, type NodeId } from '@nodebraid/kernel';
+import { commandService, type CommandService } from '@nodebraid/plugin-command';
+import { kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { rendererService } from '@nodebraid/plugin-renderer';
+import { sessionService, type SessionService } from '@nodebraid/plugin-session';
+import { createBasicCanvasPlugin } from '@nodebraid/preset-basic';
+import { createSvgRenderer } from '@nodebraid/renderer-svg';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 export interface BasicCanvasSvgExample {
   readonly primaryNodeId: NodeId;

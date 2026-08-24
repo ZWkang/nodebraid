@@ -4,7 +4,7 @@ status: accepted
 
 # 将诊断观察与错误传播分离
 
-CFlow 定义宿主可接管的统一诊断事件协议，但不拥有 console、文件、Sentry 或 OpenTelemetry 等具体输出与持久化策略。Plugin Host 与 Runtime Plugin 只在拥有并处置失败的语义边界自动产生一次诊断，例如将失败写入 Installation 状态、隔离外部监听者异常或完成清理错误聚合；错误构造、普通抛出和重新抛出不产生诊断。Kernel、Layout API 与算法 Provider 等纯计算层保持无副作用，由 Runtime adapter 或直接调用者拥有观察边界。
+NodeBraid 定义宿主可接管的统一诊断事件协议，但不拥有 console、文件、Sentry 或 OpenTelemetry 等具体输出与持久化策略。Plugin Host 与 Runtime Plugin 只在拥有并处置失败的语义边界自动产生一次诊断，例如将失败写入 Installation 状态、隔离外部监听者异常或完成清理错误聚合；错误构造、普通抛出和重新抛出不产生诊断。Kernel、Layout API 与算法 Provider 等纯计算层保持无副作用，由 Runtime adapter 或直接调用者拥有观察边界。
 
 调用失败仍通过 throw 或 reject 返回调用者；Observer 与 Subscriber 等外部回调的异常仍在不破坏已提交状态、不阻塞其他监听者的前提下显式上报；诊断事件只负责观察，成功写入诊断出口不能消费、替换或改变原有失败。
 

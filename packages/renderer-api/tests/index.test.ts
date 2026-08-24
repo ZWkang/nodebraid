@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 
-import { CFlowError } from '@cflow/diagnostics';
+import { NodeBraidError } from '@nodebraid/diagnostics';
 
 import { RendererError, type RendererInput } from '../src';
 
@@ -25,7 +25,7 @@ test('identifies Renderer contract failures structurally', () => {
     receivedRevision: 4,
   });
 
-  expect(error).toBeInstanceOf(CFlowError);
+  expect(error).toBeInstanceOf(NodeBraidError);
   expect(error).toMatchObject({
     domain: 'renderer',
     code: 'DOCUMENT_OUT_OF_SYNC',

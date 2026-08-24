@@ -1,12 +1,12 @@
 import { expect, test } from 'bun:test';
 
-import type { DiagnosticFault } from '@cflow/diagnostics';
-import type { InteractionProjection } from '@cflow/interaction-api';
-import { commandPlugin, commandService, type CommandService } from '@cflow/plugin-command';
-import { nodeId } from '@cflow/kernel';
-import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
-import { createRendererPlugin, rendererService, type RendererService } from '@cflow/plugin-renderer';
-import { sessionPlugin } from '@cflow/plugin-session';
+import type { DiagnosticFault } from '@nodebraid/diagnostics';
+import type { InteractionProjection } from '@nodebraid/interaction-api';
+import { commandPlugin, commandService, type CommandService } from '@nodebraid/plugin-command';
+import { nodeId } from '@nodebraid/kernel';
+import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { createRendererPlugin, rendererService, type RendererService } from '@nodebraid/plugin-renderer';
+import { sessionPlugin } from '@nodebraid/plugin-session';
 import type {
   CanvasRenderer,
   HitResult,
@@ -14,9 +14,9 @@ import type {
   RendererInput,
   RendererInputListener,
   ScreenPoint,
-} from '@cflow/renderer-api';
-import type { SessionSnapshot } from '@cflow/session-api';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+} from '@nodebraid/renderer-api';
+import type { SessionSnapshot } from '@nodebraid/session-api';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 import { interactionPlugin, moveNodesCommand } from '../src';
 
@@ -48,7 +48,7 @@ test('Connection materializer failure keeps identity and reports exactly once af
   expect(recording.projectionClearCount).toBe(1);
   expect(recording.releasePointerCount).toBe(1);
   expect(faults).toHaveLength(1);
-  expect(faults[0]?.event.name).toBe('cflow.plugin.interaction.connection-materializer.fault');
+  expect(faults[0]?.event.name).toBe('nodebraid.plugin.interaction.connection-materializer.fault');
   expect(faults[0]?.error).toBe(materializerError);
   await host.dispose();
 });
@@ -288,7 +288,7 @@ test('an input-driven Command rejection is reported exactly once while Interacti
   await nextTask();
 
   expect(faults).toHaveLength(1);
-  expect(faults[0]?.event.name).toBe('cflow.plugin.interaction.command.fault');
+  expect(faults[0]?.event.name).toBe('nodebraid.plugin.interaction.command.fault');
   expect(faults[0]?.error).toMatchObject({ domain: 'interaction', code: 'INVALID_MOVE' });
   await runtime.host.dispose();
 });

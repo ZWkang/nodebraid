@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test';
 
 import { createCanvasKernel, edgeId, nodeId, type EdgeId, type NodeId, type TransactionContext } from '../src';
 
-describe('@cflow/kernel', () => {
+describe('@nodebraid/kernel', () => {
   test('creates one stable revision-zero Canvas View', () => {
     const kernel = createCanvasKernel();
 

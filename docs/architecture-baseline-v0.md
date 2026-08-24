@@ -1,4 +1,4 @@
-# CFlow 阶段性架构基线 v0
+# NodeBraid 阶段性架构基线 v0
 
 > 状态：阶段性设计稿
 >
@@ -22,9 +22,9 @@
 
 ## 2. 当前定位
 
-CFlow 是一个插件化、渲染器无关的流程画布框架。
+NodeBraid 是一个插件化、渲染器无关的流程画布框架。
 
-CFlow 将提供多个相互平级的官方 Renderer 包。使用者通常从官方包中选择 Renderer，而不是自行从零实现。架构允许第三方实现 Renderer，但这不是首版的主要使用路径。
+NodeBraid 将提供多个相互平级的官方 Renderer 包。使用者通常从官方包中选择 Renderer，而不是自行从零实现。架构允许第三方实现 Renderer，但这不是首版的主要使用路径。
 
 当前不指定默认 Renderer，也不把 Konva、SVG、Canvas 2D、PixiJS 或其他实现写入核心依赖。
 
@@ -33,20 +33,20 @@ CFlow 将提供多个相互平级的官方 Renderer 包。使用者通常从官�
 ```mermaid
 flowchart TB
     Application["Application / Framework Adapter"]
-    Core["@cflow/core<br/>公共入口与导出收口"]
+    Core["@nodebraid/core<br/>公共入口与导出收口"]
     Canvas["Canvas Runtime / Composition"]
 
-    subgraph Runtime["@cflow/runtime-cordis / Plugin Host"]
+    subgraph Runtime["@nodebraid/runtime-cordis / Plugin Host"]
         Lifecycle["Cordis Lifecycle"]
         InstallationObservers["Installation Observers"]
     end
 
-    KernelPlugin["@cflow/plugin-kernel<br/>Kernel Service"]
-    CommandPlugin["@cflow/plugin-command<br/>Command Service"]
-    SessionPlugin["@cflow/plugin-session<br/>Session Service"]
+    KernelPlugin["@nodebraid/plugin-kernel<br/>Kernel Service"]
+    CommandPlugin["@nodebraid/plugin-command<br/>Command Service"]
+    SessionPlugin["@nodebraid/plugin-session<br/>Session Service"]
     RendererHost["Renderer Host"]
 
-    subgraph Kernel["@cflow/kernel"]
+    subgraph Kernel["@nodebraid/kernel"]
         Document["Document"]
         Transaction["Transaction"]
         Snapshot["CanvasSnapshot"]
@@ -55,12 +55,12 @@ flowchart TB
         Geometry["Geometry"]
     end
 
-    RendererAPI["@cflow/renderer-api"]
+    RendererAPI["@nodebraid/renderer-api"]
     RendererProvider["Official Renderer Provider"]
 
     subgraph Features["Feature Packages"]
-        Interaction["@cflow/interaction-core"]
-        History["@cflow/plugin-history"]
+        Interaction["@nodebraid/interaction-core"]
+        History["@nodebraid/plugin-history"]
         Optional["Layout / Serialization / Collaboration / Domain ..."]
     end
 
@@ -104,30 +104,30 @@ flowchart TB
 ### 3.2 依赖方向
 
 ```text
-Application / Adapter ────────▶ @cflow/core
+Application / Adapter ────────▶ @nodebraid/core
                                       │ 只做公共收口
                   ┌───────────────────┼────────────────────┐
                   ▼                   ▼                    ▼
-       @cflow/runtime-cordis  @cflow/plugin-kernel  @cflow/plugin-command
+       @nodebraid/runtime-cordis  @nodebraid/plugin-kernel  @nodebraid/plugin-command
                                       │
                                       ▼
-                               @cflow/kernel
+                               @nodebraid/kernel
 
-@cflow/plugin-session ────────▶ @cflow/plugin-kernel
-          │                    ▶ @cflow/kernel
-          └───────────────────▶ @cflow/runtime-cordis
+@nodebraid/plugin-session ────────▶ @nodebraid/plugin-kernel
+          │                    ▶ @nodebraid/kernel
+          └───────────────────▶ @nodebraid/runtime-cordis
 
-@cflow/renderer-* ────────────▶ @cflow/renderer-api
-@cflow/feature-* ─────────────▶ 所需 Runtime Service 的公开协议
+@nodebraid/renderer-* ────────────▶ @nodebraid/renderer-api
+@nodebraid/feature-* ─────────────▶ 所需 Runtime Service 的公开协议
 ```
 
 约束如下：
 
 1. Kernel 不依赖 Runtime、Renderer、框架适配器和业务插件。
-2. `@cflow/runtime-cordis` 只提供 Plugin Host 与生命周期，不直接拥有 Kernel、Command 或 Session。
+2. `@nodebraid/runtime-cordis` 只提供 Plugin Host 与生命周期，不直接拥有 Kernel、Command 或 Session。
 3. Kernel、Command 与 Session 分别由官方 Plugin 提供窄 Runtime Service；Session Plugin 静态依赖 Kernel Service。
 4. Renderer 实现依赖 Renderer API，不向外暴露原生对象。
-5. 内部包不得反向依赖 `@cflow/core`。
+5. 内部包不得反向依赖 `@nodebraid/core`。
 6. 包之间不得通过深层 import 访问其他包的私有文件。
 7. RxJS 即使被 Runtime 使用，也只属于内部传播实现，不成为公共状态 API。
 
@@ -216,7 +216,7 @@ Document + Snapshot + ChangeSet
 - Edge 引用的 Node 存在；
 - `parentId` 引用的 Node 存在；
 - Node 父子关系无环；
-- CFlow 定义的几何数值有效；
+- NodeBraid 定义的几何数值有效；
 - replace 操作不能改变实体 ID。
 
 Kernel 不判断自环、业务连接规则、节点数量限制和业务 Port 是否存在。
@@ -327,7 +327,7 @@ Kernel 对自己定义的 Node、Edge、Point、Size、Endpoint 和公开数组�
 
 **状态：稳定原则。**
 
-Canvas Runtime 通过 Plugin Graph 组合以下职责，而不是由 `@cflow/runtime-cordis` 直接拥有全部能力：
+Canvas Runtime 通过 Plugin Graph 组合以下职责，而不是由 `@nodebraid/runtime-cordis` 直接拥有全部能力：
 
 - Kernel Plugin 创建和持有一个 Kernel；
 - Plugin Host 通过 Cordis 管理插件依赖、配置、生命周期与释放；
@@ -415,11 +415,11 @@ screenY = worldY × zoom + y
 
 **状态：Renderer 协议与 Runtime adapter 已实现；具体 Provider 暂缓。**
 
-Renderer API 与 Renderer Provider 分包。CFlow 可以逐步提供多个官方 Provider：
+Renderer API 与 Renderer Provider 分包。NodeBraid 可以逐步提供多个官方 Provider：
 
 ```text
-@cflow/renderer-api
-@cflow/renderer-*
+@nodebraid/renderer-api
+@nodebraid/renderer-*
 ```
 
 具体 Provider 平级存在，核心架构不指定默认实现。首版只需要选择一个真实 Provider 验证协议，该选择不构成长期默认承诺。
@@ -428,7 +428,7 @@ Renderer API 与 Renderer Provider 分包。CFlow 可以逐步提供多个官方
 
 **状态：稳定原则。**
 
-Renderer 只能接收或输出由 CFlow 定义的数据结构：
+Renderer 只能接收或输出由 NodeBraid 定义的数据结构：
 
 ```text
 Runtime → Renderer
@@ -475,7 +475,7 @@ type RenderDocumentUpdate =
 
 RendererInput 已冻结为 Pointer、Wheel 与 Keyboard 的最小 union；HitResult
 只表达 Canvas、Node、Edge、Port 与 World Point。两者只包含 ID、坐标、按键
-状态和显式 CFlow 语义，不复制完整原生事件或后端对象。
+状态和显式 NodeBraid 语义，不复制完整原生事件或后端对象。
 
 ## 7. Plugin 与副作用
 
@@ -491,7 +491,7 @@ RendererInput 已冻结为 Pointer、Wheel 与 Keyboard 的最小 union；HitRes
 - 读取 Query；
 - 注册与生命周期绑定的 Disposable。
 
-Command Service 由官方 `@cflow/plugin-command` 通过普通 Runtime Service 提供，但不形成独立架构层。定义 handler 的 Feature Plugin 通过自己的静态 Service Binding 获取 Kernel、Session 或其他依赖，Command Service 不提供动态 Service lookup。Node Type Registry、Port Registry、Effect Registry、UI Registry 和 Renderer Contribution Registry 当前都不是必需基础设施。
+Command Service 由官方 `@nodebraid/plugin-command` 通过普通 Runtime Service 提供，但不形成独立架构层。定义 handler 的 Feature Plugin 通过自己的静态 Service Binding 获取 Kernel、Session 或其他依赖，Command Service 不提供动态 Service lookup。Node Type Registry、Port Registry、Effect Registry、UI Registry 和 Renderer Contribution Registry 当前都不是必需基础设施。
 
 ### 7.2 提交后副作用
 
@@ -509,20 +509,20 @@ Transaction 只保证 Document 状态的同步原子提交。Persistence、业�
 
 ```text
 packages/
-├── kernel/             @cflow/kernel
-├── plugin-kernel/      @cflow/plugin-kernel
-├── plugin-command/     @cflow/plugin-command
-├── session-api/        @cflow/session-api
-├── plugin-session/     @cflow/plugin-session
-├── renderer-api/       @cflow/renderer-api
-├── plugin-renderer/    @cflow/plugin-renderer
-├── runtime-cordis/     @cflow/runtime-cordis
-├── interaction-api/    @cflow/interaction-api
-├── plugin-interaction/ @cflow/plugin-interaction
-├── plugin-history/     @cflow/plugin-history
-├── renderer-svg/       @cflow/renderer-svg
-├── preset-basic/       @cflow/preset-basic
-└── core/               @cflow/core，公共收口
+├── kernel/             @nodebraid/kernel
+├── plugin-kernel/      @nodebraid/plugin-kernel
+├── plugin-command/     @nodebraid/plugin-command
+├── session-api/        @nodebraid/session-api
+├── plugin-session/     @nodebraid/plugin-session
+├── renderer-api/       @nodebraid/renderer-api
+├── plugin-renderer/    @nodebraid/plugin-renderer
+├── runtime-cordis/     @nodebraid/runtime-cordis
+├── interaction-api/    @nodebraid/interaction-api
+├── plugin-interaction/ @nodebraid/plugin-interaction
+├── plugin-history/     @nodebraid/plugin-history
+├── renderer-svg/       @nodebraid/renderer-svg
+├── preset-basic/       @nodebraid/preset-basic
+└── core/               @nodebraid/core，公共收口
 ```
 
 `preset-basic` 已在完整 Runtime 组合形成稳定重复证据后进入实现。它接受显式 Renderer Factory，通过 Child Installation 组合 Kernel、Command、Session、Renderer、Interaction 与 History，等待全部 child active，并保持 Host、Diagnostics、Provider 与 sibling Plugin 由应用显式拥有。真实 SVG canonical example 与 Chromium 测试验证完整可视链路，但 preset package 本身不依赖 SVG 或 DOM。

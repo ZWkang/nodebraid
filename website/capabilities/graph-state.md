@@ -5,7 +5,7 @@ description: 用纯 Kernel 与本地 Session 组合一份权威 Document 和可�
 
 # Graph State
 
-CFlow 把“图里有什么”与“当前用户怎么看这张图”分成两套边界清晰的状态：Kernel 维护权威 Document，Session 维护 Selection 与 Viewport。两者通过 Runtime Service 显式组合，但不会混成一个全局 Store。
+NodeBraid 把“图里有什么”与“当前用户怎么看这张图”分成两套边界清晰的状态：Kernel 维护权威 Document，Session 维护 Selection 与 Viewport。两者通过 Runtime Service 显式组合，但不会混成一个全局 Store。
 
 ::: info 当前状态
 Graph State 能力族的四个 package 均已实现并接入公共 facade；当前请从仓库源码使用，尚未以本项目身份发布到 npm。
@@ -30,39 +30,39 @@ Graph State 能力族用两个所有权边界解决这个问题：
 
 ## 它提供什么
 
-| 模块                                               | 角色                   | 关键能力                                                                              |
-| -------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------- |
-| [`@cflow/kernel`](/modules/kernel)                 | 纯图内核               | Document、同步 Transaction、revision-bound Canvas View、Canvas Query、可逆 Change Set |
-| [`@cflow/plugin-kernel`](/modules/plugin-kernel)   | Kernel Runtime adapter | 每次 Activation 一份新 Kernel、窄 `KernelService`、有序 Canvas Commit 观察            |
-| [`@cflow/session-api`](/modules/session-api)       | Session 值契约         | Renderer-independent 的 `SelectionSnapshot`、`Viewport`、`SessionSnapshot`            |
-| [`@cflow/plugin-session`](/modules/plugin-session) | Session Runtime Plugin | Selection/Viewport mutation、订阅、Selection 与 Kernel View 协调                      |
+| 模块                                                   | 角色                   | 关键能力                                                                              |
+| ------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------- |
+| [`@nodebraid/kernel`](/modules/kernel)                 | 纯图内核               | Document、同步 Transaction、revision-bound Canvas View、Canvas Query、可逆 Change Set |
+| [`@nodebraid/plugin-kernel`](/modules/plugin-kernel)   | Kernel Runtime adapter | 每次 Activation 一份新 Kernel、窄 `KernelService`、有序 Canvas Commit 观察            |
+| [`@nodebraid/session-api`](/modules/session-api)       | Session 值契约         | Renderer-independent 的 `SelectionSnapshot`、`Viewport`、`SessionSnapshot`            |
+| [`@nodebraid/plugin-session`](/modules/plugin-session) | Session Runtime Plugin | Selection/Viewport mutation、订阅、Selection 与 Kernel View 协调                      |
 
 四个模块允许调用方按层级选择：纯算法代码可以只使用 Kernel；Renderer Provider 可以只依赖 Session 值契约；Canvas Runtime 则安装两个 Runtime Plugin，获得完整的 Document 与 Session 生命周期。
 
 ## 依赖与组合
 
 ```text
-@cflow/plugin-session ──requires──▶ Kernel Service
+@nodebraid/plugin-session ──requires──▶ Kernel Service
         │                               ▲
-        ├──▶ @cflow/session-api         │ provides
-        ├──▶ @cflow/kernel              │
-        └──▶ @cflow/runtime-cordis   @cflow/plugin-kernel
+        ├──▶ @nodebraid/session-api         │ provides
+        ├──▶ @nodebraid/kernel              │
+        └──▶ @nodebraid/runtime-cordis   @nodebraid/plugin-kernel
                                             │
-                                            ├──▶ @cflow/kernel
-                                            └──▶ @cflow/runtime-cordis
+                                            ├──▶ @nodebraid/kernel
+                                            └──▶ @nodebraid/runtime-cordis
 ```
 
-`@cflow/kernel` 保持纯净；Plugin Host 生命周期只存在于 `plugin-kernel` 和 `plugin-session`。`@cflow/session-api` 把无副作用的 Session 值契约放在 Runtime Plugin 之外，让 Renderer contract 不必传递依赖 Session Service。
+`@nodebraid/kernel` 保持纯净；Plugin Host 生命周期只存在于 `plugin-kernel` 和 `plugin-session`。`@nodebraid/session-api` 把无副作用的 Session 值契约放在 Runtime Plugin 之外，让 Renderer contract 不必传递依赖 Session Service。
 
 ## 公共入口
 
-Graph State 的公共能力可以从各自的窄 package 导入；应用层也可以通过 `@cflow/core` facade 使用同名导出。
+Graph State 的公共能力可以从各自的窄 package 导入；应用层也可以通过 `@nodebraid/core` facade 使用同名导出。
 
 ```ts
-import { createCanvasKernel, edgeId, nodeId } from '@cflow/kernel';
-import { kernelPlugin, kernelService } from '@cflow/plugin-kernel';
-import type { SessionSnapshot, Viewport } from '@cflow/session-api';
-import { sessionPlugin, sessionService } from '@cflow/plugin-session';
+import { createCanvasKernel, edgeId, nodeId } from '@nodebraid/kernel';
+import { kernelPlugin, kernelService } from '@nodebraid/plugin-kernel';
+import type { SessionSnapshot, Viewport } from '@nodebraid/session-api';
+import { sessionPlugin, sessionService } from '@nodebraid/plugin-session';
 ```
 
 这些 import 展示的是仓库当前公共导出，不代表 package 已在 npm 可安装。请先按 [Quick Start](/guide/quick-start) 从源码验证。
@@ -87,7 +87,7 @@ import { sessionPlugin, sessionService } from '@cflow/plugin-session';
 
 ## 验证依据
 
-- 公共导出：[`kernel`](https://github.com/ZWkang/cflow/blob/main/packages/kernel/src/index.ts)、[`plugin-kernel`](https://github.com/ZWkang/cflow/blob/main/packages/plugin-kernel/src/index.ts)、[`session-api`](https://github.com/ZWkang/cflow/blob/main/packages/session-api/src/index.ts)、[`plugin-session`](https://github.com/ZWkang/cflow/blob/main/packages/plugin-session/src/index.ts)。
+- 公共导出：[`kernel`](https://github.com/ZWkang/nodebraid/blob/main/packages/kernel/src/index.ts)、[`plugin-kernel`](https://github.com/ZWkang/nodebraid/blob/main/packages/plugin-kernel/src/index.ts)、[`session-api`](https://github.com/ZWkang/nodebraid/blob/main/packages/session-api/src/index.ts)、[`plugin-session`](https://github.com/ZWkang/nodebraid/blob/main/packages/plugin-session/src/index.ts)。
 - 行为测试：Kernel Transaction 与 Change Set、Kernel Plugin Commit ordering、Session canonical values 与 Session reconciliation 均通过各 package 的公开 seam 验证。
 - 领域边界：仓库 `CONTEXT.md` 对 Document、Canvas Runtime、Kernel Service、Session、Selection 与 Viewport 有规范定义。
 - 架构决策：ADR-0009、0010、0013、0017、0018、0022 与 0035 固定了纯 Kernel、revision-bound View、窄 Runtime Service、Session 协调和独立值契约。

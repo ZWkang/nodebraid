@@ -1,4 +1,4 @@
-import type { EdgeId, NodeId } from '@cflow/kernel';
+import type { EdgeId, NodeId } from '@nodebraid/kernel';
 
 export interface SelectionSnapshot {
   /** Canonical membership only; array order is deterministic and has no primary-selection meaning. */

@@ -9,12 +9,12 @@ The Interaction capability answers how user input becomes semantic canvas behavi
 
 ## Current delivery
 
-| Layer              | Package                                                       | Responsibility                                                        |
-| ------------------ | ------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Value contract     | [`@cflow/interaction-api`](/en/modules/interaction-api)       | Immutable Node Drag, Viewport Pan, and Connection Preview Projections |
-| Runtime behavior   | [`@cflow/plugin-interaction`](/en/modules/plugin-interaction) | Selection, Drag, Pan, Zoom, node-level Connection, and lifecycle      |
-| Projection adapter | [`@cflow/plugin-renderer`](/en/modules/plugin-renderer)       | Exclusive Interaction Projection Binding and Renderer synchronization |
-| Reference backend  | [`@cflow/renderer-svg`](/en/modules/renderer-svg)             | Preview on real SVG geometry with aligned Hit/Input coordinates       |
+| Layer              | Package                                                           | Responsibility                                                        |
+| ------------------ | ----------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Value contract     | [`@nodebraid/interaction-api`](/en/modules/interaction-api)       | Immutable Node Drag, Viewport Pan, and Connection Preview Projections |
+| Runtime behavior   | [`@nodebraid/plugin-interaction`](/en/modules/plugin-interaction) | Selection, Drag, Pan, Zoom, node-level Connection, and lifecycle      |
+| Projection adapter | [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer)       | Exclusive Interaction Projection Binding and Renderer synchronization |
+| Reference backend  | [`@nodebraid/renderer-svg`](/en/modules/renderer-svg)             | Preview on real SVG geometry with aligned Hit/Input coordinates       |
 
 ```text
 Renderer Input + Hit Result

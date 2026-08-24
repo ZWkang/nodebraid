@@ -21,14 +21,14 @@ Layout Input ──▶ Layout Engine ──▶ Layout Proposal
 
 ## 你需要哪些 package
 
-| 角色                      | Package                                          | 何时需要                                                                 |
-| ------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------ |
-| Provider-neutral contract | [`@cflow/layout-api`](/modules/layout-api)       | 定义 Engine、Input、Proposal、capability，或在 Runtime 外只计算 Proposal |
-| Runtime integration       | [`@cflow/plugin-layout`](/modules/plugin-layout) | 把一个 Engine 静态绑定到强类型 Command，并将 Proposal 提交到 Kernel      |
-| Dagre Provider            | [`@cflow/layout-dagre`](/modules/layout-dagre)   | 需要确定性的全量分层布局，不需要 incremental 或 Fixed Node               |
-| ELK Provider              | [`@cflow/layout-elk`](/modules/layout-elk)       | 需要 ELK layered，或使用 Stress 获得 incremental 与 Fixed Node           |
+| 角色                      | Package                                              | 何时需要                                                                 |
+| ------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------ |
+| Provider-neutral contract | [`@nodebraid/layout-api`](/modules/layout-api)       | 定义 Engine、Input、Proposal、capability，或在 Runtime 外只计算 Proposal |
+| Runtime integration       | [`@nodebraid/plugin-layout`](/modules/plugin-layout) | 把一个 Engine 静态绑定到强类型 Command，并将 Proposal 提交到 Kernel      |
+| Dagre Provider            | [`@nodebraid/layout-dagre`](/modules/layout-dagre)   | 需要确定性的全量分层布局，不需要 incremental 或 Fixed Node               |
+| ELK Provider              | [`@nodebraid/layout-elk`](/modules/layout-elk)       | 需要 ELK layered，或使用 Stress 获得 incremental 与 Fixed Node           |
 
-`@cflow/core` 重导出 provider-neutral API 与 Runtime integration，但不依赖或重导出 Dagre、ELK。应用必须显式选择 concrete Provider。
+`@nodebraid/core` 重导出 provider-neutral API 与 Runtime integration，但不依赖或重导出 Dagre、ELK。应用必须显式选择 concrete Provider。
 
 ## Provider 选择
 
@@ -40,7 +40,7 @@ Layout Input ──▶ Layout Engine ──▶ Layout Proposal
 | Self-loop input    | 支持                                      | 支持                                                    |
 | 配置重点           | direction、node/edge/rank spacing、margin | algorithm、direction、node/layer spacing、padding、seed |
 
-CFlow 不指定默认 Provider，也没有动态 Layout Registry。Provider ID 是诊断信息；真正的 Runtime 身份是应用为该 Engine 创建并持有的 Command token。
+NodeBraid 不指定默认 Provider，也没有动态 Layout Registry。Provider ID 是诊断信息；真正的 Runtime 身份是应用为该 Engine 创建并持有的 Command token。
 
 ## 输入边界
 

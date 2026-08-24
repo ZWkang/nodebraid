@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/core",
+  "name": "@nodebraid/core",
   "type": "module",
   "version": "0.0.1",
-  "description": "Public CFlow facade for Kernel and Runtime Plugin APIs.",
+  "description": "Public NodeBraid facade for Kernel and Runtime Plugin APIs.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/core"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/core#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/core#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "core",
     "graph-kernel",
     "plugin-runtime"
@@ -41,7 +41,7 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && bun run build:self",
-    "build:dependencies": "bun run --filter '@cflow/diagnostics' build && bun run --filter '@cflow/kernel' build && bun run --filter '@cflow/session-api' build && bun run --filter '@cflow/interaction-api' build && bun run --filter '@cflow/renderer-api' build && bun run --filter '@cflow/runtime-cordis' build && bun run --filter '@cflow/plugin-command' build && bun run --filter '@cflow/plugin-kernel' build && bun run --filter '@cflow/plugin-session' build && bun run --filter '@cflow/plugin-renderer' build && bun run --filter '@cflow/plugin-interaction' build && bun run --filter '@cflow/plugin-history' build && bun run --filter '@cflow/preset-basic' build && bun run --filter '@cflow/layout-api' build && bun run --filter '@cflow/layout-dagre' build && bun run --filter '@cflow/layout-elk' build && bun run --filter '@cflow/plugin-layout' build",
+    "build:dependencies": "bun run --filter '@nodebraid/diagnostics' build && bun run --filter '@nodebraid/kernel' build && bun run --filter '@nodebraid/session-api' build && bun run --filter '@nodebraid/interaction-api' build && bun run --filter '@nodebraid/renderer-api' build && bun run --filter '@nodebraid/runtime-cordis' build && bun run --filter '@nodebraid/plugin-command' build && bun run --filter '@nodebraid/plugin-kernel' build && bun run --filter '@nodebraid/plugin-session' build && bun run --filter '@nodebraid/plugin-renderer' build && bun run --filter '@nodebraid/plugin-interaction' build && bun run --filter '@nodebraid/plugin-history' build && bun run --filter '@nodebraid/preset-basic' build && bun run --filter '@nodebraid/layout-api' build && bun run --filter '@nodebraid/layout-dagre' build && bun run --filter '@nodebraid/layout-elk' build && bun run --filter '@nodebraid/plugin-layout' build",
     "build:self": "tsgo -p tsconfig.build.json && bun run test:artifacts",
     "prepack": "bun run build",
     "test": "bun test ./tests",
@@ -49,20 +49,20 @@
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/diagnostics": "workspace:*",
-    "@cflow/interaction-api": "workspace:*",
-    "@cflow/kernel": "workspace:*",
-    "@cflow/layout-api": "workspace:*",
-    "@cflow/plugin-command": "workspace:*",
-    "@cflow/plugin-history": "workspace:*",
-    "@cflow/plugin-interaction": "workspace:*",
-    "@cflow/plugin-kernel": "workspace:*",
-    "@cflow/plugin-renderer": "workspace:*",
-    "@cflow/plugin-session": "workspace:*",
-    "@cflow/plugin-layout": "workspace:*",
-    "@cflow/preset-basic": "workspace:*",
-    "@cflow/renderer-api": "workspace:*",
-    "@cflow/runtime-cordis": "workspace:*",
-    "@cflow/session-api": "workspace:*"
+    "@nodebraid/diagnostics": "workspace:*",
+    "@nodebraid/interaction-api": "workspace:*",
+    "@nodebraid/kernel": "workspace:*",
+    "@nodebraid/layout-api": "workspace:*",
+    "@nodebraid/plugin-command": "workspace:*",
+    "@nodebraid/plugin-history": "workspace:*",
+    "@nodebraid/plugin-interaction": "workspace:*",
+    "@nodebraid/plugin-kernel": "workspace:*",
+    "@nodebraid/plugin-renderer": "workspace:*",
+    "@nodebraid/plugin-session": "workspace:*",
+    "@nodebraid/plugin-layout": "workspace:*",
+    "@nodebraid/preset-basic": "workspace:*",
+    "@nodebraid/renderer-api": "workspace:*",
+    "@nodebraid/runtime-cordis": "workspace:*",
+    "@nodebraid/session-api": "workspace:*"
   }
 }

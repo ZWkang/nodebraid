@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { collectDeclarations } from '../../../scripts/collect-declarations';
 
 const forbiddenImport =
-  /(?:from\s+|import\()["'](?:@cflow\/(?:core|runtime-cordis|plugin-[^"']+|renderer-(?!api|svg)[^"']+)|cordis|rxjs|react|vue|svelte)["']/;
+  /(?:from\s+|import\()["'](?:@nodebraid\/(?:core|runtime-cordis|plugin-[^"']+|renderer-(?!api|svg)[^"']+)|cordis|rxjs|react|vue|svelte)["']/;
 const forbiddenLeakedPlatformType =
   /\b(?:PointerEvent|MouseEvent|WheelEvent|KeyboardEvent|CanvasRenderingContext2D|OffscreenCanvas|Konva|Pixi)\b/;
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -21,7 +21,7 @@ for (const declaration of declarations) {
   assert.doesNotMatch(declaration.contents, forbiddenLeakedPlatformType, declaration.path);
 }
 
-const packageName = '@cflow/renderer-svg';
+const packageName = '@nodebraid/renderer-svg';
 const packageExports = await import(packageName);
 assert.equal(typeof packageExports.createSvgRenderer, 'function');
 assert.equal(typeof packageExports.SvgRendererError, 'function');

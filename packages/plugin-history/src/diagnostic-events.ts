@@ -1,3 +1,3 @@
 export const historyDiagnosticEvents = Object.freeze({
-  subscriberFault: 'cflow.plugin.history.subscriber.fault',
+  subscriberFault: 'nodebraid.plugin.history.subscriber.fault',
 });

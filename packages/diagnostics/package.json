@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/diagnostics",
+  "name": "@nodebraid/diagnostics",
   "type": "module",
   "version": "0.0.1",
-  "description": "Structured diagnostics and error contracts for CFlow.",
+  "description": "Structured diagnostics and error contracts for NodeBraid.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/diagnostics"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/diagnostics#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/diagnostics#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "diagnostics",
     "errors"
   ],

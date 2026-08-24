@@ -1,6 +1,6 @@
 # 01 — 注册并执行强类型 Command
 
-**What to build:** 新增 `@cflow/plugin-command`，让 Feature Plugin 在真实 Command Service Activation 中注册一个强类型 Command，并让调用方执行同步或异步 handler、收到输入与原始结果/错误。
+**What to build:** 新增 `@nodebraid/plugin-command`，让 Feature Plugin 在真实 Command Service Activation 中注册一个强类型 Command，并让调用方执行同步或异步 handler、收到输入与原始结果/错误。
 
 **Blocked by:** None — can start immediately.
 

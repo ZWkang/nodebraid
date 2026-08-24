@@ -1,8 +1,8 @@
 import { test } from 'bun:test';
 
-import type { InteractionProjection } from '@cflow/interaction-api';
-import type { CanvasRenderer, RendererFactory } from '@cflow/renderer-api';
-import type { Plugin } from '@cflow/runtime-cordis';
+import type { InteractionProjection } from '@nodebraid/interaction-api';
+import type { CanvasRenderer, RendererFactory } from '@nodebraid/renderer-api';
+import type { Plugin } from '@nodebraid/runtime-cordis';
 
 import { createRendererPlugin, type RendererService } from '../src';
 

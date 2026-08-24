@@ -1,5 +1,5 @@
-import type { HitResult } from '@cflow/renderer-api';
-import type { SelectionInput, SelectionSnapshot } from '@cflow/plugin-session';
+import type { HitResult } from '@nodebraid/renderer-api';
+import type { SelectionInput, SelectionSnapshot } from '@nodebraid/plugin-session';
 
 export function computeClickSelection(current: SelectionSnapshot, hit: HitResult, additive: boolean): SelectionInput {
   if (hit.type === 'canvas') return additive ? current : { nodeIds: [], edgeIds: [] };

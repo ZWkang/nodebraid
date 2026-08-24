@@ -13,4 +13,4 @@
 
 ## Answer
 
-`@cflow/plugin-command` 已作为独立发布包接入 core facade，只依赖 `@cflow/runtime-cordis`。core 组合测试通过 Feature Plugin 的静态 bindings 同时使用 Command 与 Kernel Service，异步准备后同步提交 revision 1，并保留 `node.add-prepared` commandId。删除全部 workspace `dist` 后的 `bun run check` 以 110 tests、447 assertions 全绿；Command/core package-name 声明探针与 dry-run pack 均通过。双轴 review follow-up 最终为 Standards/Spec 同时 PASS，无剩余 finding。
+`@nodebraid/plugin-command` 已作为独立发布包接入 core facade，只依赖 `@nodebraid/runtime-cordis`。core 组合测试通过 Feature Plugin 的静态 bindings 同时使用 Command 与 Kernel Service，异步准备后同步提交 revision 1，并保留 `node.add-prepared` commandId。删除全部 workspace `dist` 后的 `bun run check` 以 110 tests、447 assertions 全绿；Command/core package-name 声明探针与 dry-run pack 均通过。双轴 review follow-up 最终为 Standards/Spec 同时 PASS，无剩余 finding。

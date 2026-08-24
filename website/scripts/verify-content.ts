@@ -1,7 +1,7 @@
 import { capabilityGroups, modules } from '../.vitepress/module-catalog.mts';
 import { tokenizeForSearch } from '../.vitepress/search.mts';
 
-const forbiddenContent = ['bun add @cflow/core'] as const;
+const forbiddenContent = ['bun add @nodebraid/core'] as const;
 const matches: string[] = [];
 const pagePaths: string[] = [];
 let searchCorpus = '';

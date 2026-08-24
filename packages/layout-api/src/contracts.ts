@@ -1,4 +1,4 @@
-import type { EdgeId, NodeId, Point, Size } from '@cflow/kernel';
+import type { EdgeId, NodeId, Point, Size } from '@nodebraid/kernel';
 
 export type LayoutMode = 'full' | 'incremental';
 

@@ -4,15 +4,15 @@
 
 ## Problem Statement
 
-CFlow needs a foundational plugin runtime before Kernel, Session, Command, Renderer, Interaction, History, and future canvas capabilities can be composed consistently. The repository currently has only placeholder package code, while the architecture requires every canvas capability to participate in one explicit lifecycle and dependency model.
+NodeBraid needs a foundational plugin runtime before Kernel, Session, Command, Renderer, Interaction, History, and future canvas capabilities can be composed consistently. The repository currently has only placeholder package code, while the architecture requires every canvas capability to participate in one explicit lifecycle and dependency model.
 
-The user wants Cordis to be the core plugin manager, but does not want Cordis Context, Fiber, Service, effect types, lifecycle states, or version changes to become CFlow's public contract. Without a CFlow-owned seam, every official and third-party Plugin would be coupled to a prerelease dependency whose lifecycle interface has already changed substantially between major versions.
+The user wants Cordis to be the core plugin manager, but does not want Cordis Context, Fiber, Service, effect types, lifecycle states, or version changes to become NodeBraid's public contract. Without a NodeBraid-owned seam, every official and third-party Plugin would be coupled to a prerelease dependency whose lifecycle interface has already changed substantially between major versions.
 
 The plugin runtime must also avoid becoming a loose global registry. Each Canvas Runtime needs an isolated Plugin Host that can explain missing Required Service, reject ambiguous Service Provider combinations, activate and deactivate Plugin Installation instances in dependency order, and release all resources without silent failure.
 
 ## Solution
 
-Build a deep `PluginHost` module backed by Cordis. Cordis remains the in-process lifecycle implementation, while CFlow owns the public Plugin, Plugin Context, Service Token, Plugin Installation, state, and error contracts.
+Build a deep `PluginHost` module backed by Cordis. Cordis remains the in-process lifecycle implementation, while NodeBraid owns the public Plugin, Plugin Context, Service Token, Plugin Installation, state, and error contracts.
 
 The Plugin Host starts empty and belongs to one Canvas Runtime. Canvas capabilities are introduced by Plugin Installation instances that statically declare Required Service and Provided Service bindings. A Canvas Composition is itself a Plugin that owns Child Installation instances. This establishes “Everything is Plugin” without pretending that the Plugin Host substrate can install itself.
 
@@ -20,9 +20,9 @@ Plugin setup receives only its statically declared Required Service values, an A
 
 ## User Stories
 
-1. As a CFlow maintainer, I want Cordis hidden behind a CFlow-owned interface, so that Cordis upgrades do not force changes across every CFlow package.
-2. As a CFlow maintainer, I want one Plugin Host per Canvas Runtime, so that plugins and Runtime Service values do not leak across canvas instances.
-3. As a Plugin author, I want to define a Plugin without importing Cordis types, so that my Plugin depends only on stable CFlow concepts.
+1. As a NodeBraid maintainer, I want Cordis hidden behind a NodeBraid-owned interface, so that Cordis upgrades do not force changes across every NodeBraid package.
+2. As a NodeBraid maintainer, I want one Plugin Host per Canvas Runtime, so that plugins and Runtime Service values do not leak across canvas instances.
+3. As a Plugin author, I want to define a Plugin without importing Cordis types, so that my Plugin depends only on stable NodeBraid concepts.
 4. As a Plugin author, I want to define a strongly typed Service Token, so that consumers receive the correct Runtime Service type without string-key casting.
 5. As a Plugin author, I want Service Token identity to be independent of its diagnostic name, so that equal names from unrelated packages cannot collide silently.
 6. As a Plugin author, I want to declare Required Service bindings statically, so that missing dependencies are known before my setup code runs.
@@ -68,8 +68,8 @@ Plugin setup receives only its statically declared Required Service values, an A
 46. As a Canvas framework author, I want the Kernel Plugin to own its Document lifetime, so that destroying the Kernel does not leave a hidden authoritative state behind.
 47. As a Canvas framework author, I want persistence and restoration to remain explicit Plugin concerns, so that the Host never silently saves or recovers a Document.
 48. As a Canvas framework author, I want official Renderer packages to participate as ordinary Service Provider Plugins, so that no rendering implementation becomes a special core dependency.
-49. As a CFlow package consumer, I want Plugin Host types available through the public core facade, so that common usage has one public import surface.
-50. As an advanced CFlow package consumer, I want the Cordis runtime package available separately, so that narrow package imports remain possible.
+49. As a NodeBraid package consumer, I want Plugin Host types available through the public core facade, so that common usage has one public import surface.
+50. As an advanced NodeBraid package consumer, I want the Cordis runtime package available separately, so that narrow package imports remain possible.
 51. As a test author, I want all lifecycle behavior testable through the public Plugin Host interface, so that tests survive changes to Cordis adaptation internals.
 52. As a test author, I want deterministic observable ordering for dependent activation and cleanup, so that race-condition tests do not rely on implementation timing accidents.
 53. As a test author, I want no fake Plugin Host or mocked Cordis layer required, so that tests exercise the actual runtime used by consumers.
@@ -78,12 +78,12 @@ Plugin setup receives only its statically declared Required Service values, an A
 
 ## Implementation Decisions
 
-- Add a publishable `@cflow/runtime-cordis` module containing the CFlow Plugin Host implementation and its CFlow-owned public interface.
-- Keep `@cflow/core` as the public facade and re-export the Plugin Host interface from `@cflow/runtime-cordis`.
+- Add a publishable `@nodebraid/runtime-cordis` module containing the NodeBraid Plugin Host implementation and its NodeBraid-owned public interface.
+- Keep `@nodebraid/core` as the public facade and re-export the Plugin Host interface from `@nodebraid/runtime-cordis`.
 - Use the npm latest Cordis 4 release available at implementation time and pin it exactly while it remains prerelease. At specification time this is `cordis@4.0.0-rc.8`.
-- Treat Cordis as an in-process implementation dependency of `@cflow/runtime-cordis`, not as a peer dependency and not as a public adapter interface.
+- Treat Cordis as an in-process implementation dependency of `@nodebraid/runtime-cordis`, not as a peer dependency and not as a public adapter interface.
 - Prefer Cordis Context, Fiber, inject, effect, provide, dependency availability, and asynchronous disposal for lifecycle management. Do not implement an independent second scheduler merely to wrap Cordis.
-- Maintain only the CFlow metadata required for typed Service Token mapping, static declaration validation, Provider reservation, cycle diagnostics, atomic publication, stable snapshots, and error translation.
+- Maintain only the NodeBraid metadata required for typed Service Token mapping, static declaration validation, Provider reservation, cycle diagnostics, atomic publication, stable snapshots, and error translation.
 - Export three creation functions: one to define a Service Token, one to define a Plugin, and one to create an empty Plugin Host.
 - Give every Service Token a runtime-unique identity, a TypeScript service type, and a diagnostic name. The diagnostic name does not participate in identity.
 - Represent Plugin `requires` and `provides` as static readonly records whose keys are Plugin-local Service Binding names and whose values are Service Tokens.
@@ -110,7 +110,7 @@ Plugin setup receives only its statically declared Required Service values, an A
 - Let Plugin setup return all declared Provided Service values. Validate the complete result and publish it atomically only after setup succeeds.
 - Permit Plugins with no Provided Service to return no value.
 - Withdraw Provided Service values before their Provider Activation is considered ended, while preserving dependency-safe teardown so consumers clean up before their Providers.
-- Let Plugin Context register synchronous or asynchronous Owned Resource cleanup. Support CFlow disposables without requiring Cordis resource types.
+- Let Plugin Context register synchronous or asynchronous Owned Resource cleanup. Support NodeBraid disposables without requiring Cordis resource types.
 - Release Owned Resource values in reverse registration order.
 - Let Plugin Context create Child Installation instances in the same Plugin Graph and automatically own their disposal at the position where they were installed.
 - Do not automatically propagate a Child Installation failure to its parent. A Canvas Composition that requires child readiness explicitly waits with `whenActive`, causing setup to fail if that wait rejects.
@@ -120,7 +120,7 @@ Plugin setup receives only its statically declared Required Service values, an A
 - Continue running remaining cleanup after a disposer throws or rejects, then reject disposal with an AggregateError containing all cleanup failures.
 - Make Plugin Installation and Plugin Host disposal asynchronous, idempotent, and terminal.
 - Reject new installation once Host disposal has started.
-- Expose one CFlow `PluginHostError` class with a stable error-code union for structural errors such as disposed Host, Provider conflict, dependency cycle, invalid definition, and contract violation.
+- Expose one NodeBraid `PluginHostError` class with a stable error-code union for structural errors such as disposed Host, Provider conflict, dependency cycle, invalid definition, and contract violation.
 - Preserve Plugin setup errors as the failed snapshot error rather than replacing them with Cordis errors.
 - Use native AggregateError for multiple cleanup failures.
 - Translate all Cordis states and errors inside the implementation. No Cordis type may appear in public declarations or generated exports.
@@ -163,7 +163,7 @@ Plugin setup receives only its statically declared Required Service values, an A
 - Test Plugin Installation disposal idempotency, terminal state, and repeated-promise behavior.
 - Test Plugin Host disposal idempotency, dependency-safe ordering, complete cleanup, AggregateError reporting, and rejection of later installation.
 - Test fixed configuration is reused across reactivation and is not silently cloned, merged, or replaced.
-- Inspect generated declarations or package exports to verify that no Cordis import or type crosses the CFlow seam.
+- Inspect generated declarations or package exports to verify that no Cordis import or type crosses the NodeBraid seam.
 - Prefer assertions on observable ordering and outcomes over internal maps, graph nodes, Fiber states, event epochs, or private scheduler calls.
 
 ## Out of Scope
@@ -191,7 +191,7 @@ Plugin setup receives only its statically declared Required Service values, an A
 - The project glossary and accepted ADRs are the source of terminology and architectural intent for this specification.
 - “Everything is Plugin” deliberately excludes the minimum Plugin Host substrate. Something non-plugin must own the first installation and the terminal Host lifecycle.
 - A Canvas Composition becoming active only means its own setup completed. It represents complete canvas readiness only when it explicitly waits for all required Child Installation instances.
-- Cordis should do real lifecycle work. If implementation starts recreating Fiber dependency availability, effect ownership, or asynchronous disposal in a parallel CFlow scheduler, it has crossed the intended seam and should be corrected.
-- CFlow may keep small metadata indexes for static declarations, typed token mapping, diagnostics, atomic publication, and stable public state; these do not replace Cordis as the lifecycle implementation.
+- Cordis should do real lifecycle work. If implementation starts recreating Fiber dependency availability, effect ownership, or asynchronous disposal in a parallel NodeBraid scheduler, it has crossed the intended seam and should be corrected.
+- NodeBraid may keep small metadata indexes for static declarations, typed token mapping, diagnostics, atomic publication, and stable public state; these do not replace Cordis as the lifecycle implementation.
 - The repository has no prior plugin implementation to preserve. Existing tests only demonstrate the Bun test layout and package smoke-test pattern.
 - The working tree contains unrelated and uncommitted user changes. Implementation must limit modifications to the new runtime package, the core facade integration, required workspace metadata, tests, and documentation directly owned by this feature.

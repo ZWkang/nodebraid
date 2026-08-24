@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 
-import { CFlowError } from '@cflow/diagnostics';
-import type { CanvasRenderer } from '@cflow/renderer-api';
+import { NodeBraidError } from '@nodebraid/diagnostics';
+import type { CanvasRenderer } from '@nodebraid/renderer-api';
 
 import { createSvgRenderer, SvgRendererError, type SvgRendererConfig, type SvgRendererErrorCode } from '../src';
 import * as rendererSvgExports from '../src';
@@ -38,7 +38,7 @@ test('identifies SVG Provider failures structurally', () => {
 
   const error = new SvgRendererError('INVALID_TARGET', 'Target is invalid.', { field: 'target' });
   expect(codes).toHaveLength(4);
-  expect(error).toBeInstanceOf(CFlowError);
+  expect(error).toBeInstanceOf(NodeBraidError);
   expect(error).toMatchObject({
     domain: 'renderer.svg',
     code: 'INVALID_TARGET',

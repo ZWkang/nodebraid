@@ -3,7 +3,7 @@ layout: home
 titleTemplate: false
 
 hero:
-  name: CFlow
+  name: NodeBraid
   text: Compose a flow canvas from explicit capabilities
   tagline: One authoritative Document, one explicit Plugin graph. Compose Kernel, Session, Command, History, Layout, and Renderer contracts without inheriting an indivisible editor black box.
   actions:

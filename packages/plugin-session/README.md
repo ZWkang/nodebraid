@@ -1,13 +1,13 @@
-# @cflow/plugin-session
+# @nodebraid/plugin-session
 
-> Documentation: [English](https://zwkang.github.io/cflow/en/modules/plugin-session) · [简体中文](https://zwkang.github.io/cflow/modules/plugin-session)
+> Documentation: [English](https://zwkang.github.io/nodebraid/en/modules/plugin-session) · [简体中文](https://zwkang.github.io/nodebraid/modules/plugin-session)
 
-Session Runtime Plugin for CFlow Canvas Runtime instances.
+Session Runtime Plugin for NodeBraid Canvas Runtime instances.
 
 ```ts
-import { kernelPlugin } from '@cflow/plugin-kernel';
-import { sessionPlugin, sessionService } from '@cflow/plugin-session';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+import { kernelPlugin } from '@nodebraid/plugin-kernel';
+import { sessionPlugin, sessionService } from '@nodebraid/plugin-session';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 const consumer = definePlugin({
   requires: { session: sessionService },
@@ -38,25 +38,25 @@ so every subscriber observes one consistent Snapshot per notification round.
 
 Session subscriber failures are isolated and reported through the current
 Host-scoped Fault Reporter with the stable
-`cflow.plugin.session.subscriber.fault` event. Disposing the Activation closes
+`nodebraid.plugin.session.subscriber.fault` event. Disposing the Activation closes
 old Service handles; restoring the Kernel dependency creates a new default
 Session.
 
 The pure Selection, Viewport, and Session Snapshot contracts come from
-`@cflow/session-api`. The Runtime Plugin additionally depends on
-`@cflow/diagnostics`, `@cflow/kernel`, `@cflow/plugin-kernel`, and the
-CFlow-owned Plugin Host seam from `@cflow/runtime-cordis`. It does not depend
-on Command, History, Renderer, or `@cflow/core`.
+`@nodebraid/session-api`. The Runtime Plugin additionally depends on
+`@nodebraid/diagnostics`, `@nodebraid/kernel`, `@nodebraid/plugin-kernel`, and the
+NodeBraid-owned Plugin Host seam from `@nodebraid/runtime-cordis`. It does not depend
+on Command, History, Renderer, or `@nodebraid/core`.
 
 ## Development
 
 Run package scripts from the monorepo root:
 
 ```bash
-bun run --filter '@cflow/plugin-session' typecheck
-bun run --filter '@cflow/plugin-session' test
-bun run --filter '@cflow/plugin-session' build
-bun run --filter '@cflow/plugin-session' build:dependencies
+bun run --filter '@nodebraid/plugin-session' typecheck
+bun run --filter '@nodebraid/plugin-session' test
+bun run --filter '@nodebraid/plugin-session' build
+bun run --filter '@nodebraid/plugin-session' build:dependencies
 ```
 
 ## License

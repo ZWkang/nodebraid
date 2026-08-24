@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 
-import { createCanvasKernel, edgeId, nodeId } from '@cflow/kernel';
-import { createLayoutInput } from '@cflow/layout-api';
+import { createCanvasKernel, edgeId, nodeId } from '@nodebraid/kernel';
+import { createLayoutInput } from '@nodebraid/layout-api';
 import { registerFullLayoutProviderContract } from '../../../tests/layout-provider-contract';
 
 import { dagreLayoutEngine } from '../src';

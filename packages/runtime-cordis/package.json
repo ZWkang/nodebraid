@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/runtime-cordis",
+  "name": "@nodebraid/runtime-cordis",
   "type": "module",
   "version": "0.0.1",
-  "description": "Cordis-backed plugin runtime for cflow.",
+  "description": "Cordis-backed plugin runtime for nodebraid.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/runtime-cordis"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/runtime-cordis#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/runtime-cordis#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "cordis",
     "plugin-runtime"
   ],
@@ -40,13 +40,13 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json",
-    "build:dependencies": "bun run --filter '@cflow/diagnostics' build",
+    "build:dependencies": "bun run --filter '@nodebraid/diagnostics' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/diagnostics": "workspace:*",
+    "@nodebraid/diagnostics": "workspace:*",
     "cordis": "4.0.0-rc.8"
   }
 }

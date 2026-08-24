@@ -1,4 +1,4 @@
-import { CFlowError, type DiagnosticAttributes } from '@cflow/diagnostics';
+import { NodeBraidError, type DiagnosticAttributes } from '@nodebraid/diagnostics';
 
 export type PluginHostErrorCode =
   | 'HOST_DISPOSED'
@@ -28,7 +28,11 @@ export interface DependencyCycleErrorDetails extends DiagnosticAttributes {
 
 export type PluginHostErrorDetails = ProviderConflictErrorDetails | DependencyCycleErrorDetails;
 
-export class PluginHostError extends CFlowError<'runtime.plugin-host', PluginHostErrorCode, PluginHostErrorDetails> {
+export class PluginHostError extends NodeBraidError<
+  'runtime.plugin-host',
+  PluginHostErrorCode,
+  PluginHostErrorDetails
+> {
   override readonly name = 'PluginHostError';
 
   constructor(

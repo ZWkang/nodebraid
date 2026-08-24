@@ -1,9 +1,9 @@
 ---
-title: '@cflow/plugin-interaction'
+title: '@nodebraid/plugin-interaction'
 description: The Runtime Plugin that interprets Renderer Input as Selection, Drag, Pan, and Wheel Zoom.
 ---
 
-# `@cflow/plugin-interaction`
+# `@nodebraid/plugin-interaction`
 
 ::: warning Package is not publicly released
 This name identifies the current source module boundary; it does not mean the package can be installed from npm. Follow the [Quick Start](/en/guide/quick-start) to verify it from source.

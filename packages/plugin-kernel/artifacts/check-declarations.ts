@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import { collectDeclarations } from '../../../scripts/collect-declarations';
 
-const forbiddenImport = /(?:from\s+|import\()["'](?:@cflow\/core|cordis|rxjs|@cflow\/renderer-[^"']+)["']/;
+const forbiddenImport = /(?:from\s+|import\()["'](?:@nodebraid\/core|cordis|rxjs|@nodebraid\/renderer-[^"']+)["']/;
 const forbiddenCordisType = /\b(?:Context|CordisError|Effect|Fiber|FiberState)\b/;
 
 const pluginDist = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -20,8 +20,8 @@ for (const declaration of await collectDeclarations(pluginDist)) {
   assert.doesNotMatch(declaration.contents, forbiddenCordisType, declaration.path);
 }
 
-const pluginPackageName = '@cflow/plugin-kernel';
-const runtimePackageName = '@cflow/runtime-cordis';
+const pluginPackageName = '@nodebraid/plugin-kernel';
+const runtimePackageName = '@nodebraid/runtime-cordis';
 const pluginPackage = (await import(pluginPackageName)) as typeof import('../src/index');
 const runtimePackage = await import(runtimePackageName);
 let revision: number | undefined;

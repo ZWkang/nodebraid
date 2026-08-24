@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/plugin-interaction",
+  "name": "@nodebraid/plugin-interaction",
   "type": "module",
   "version": "0.0.1",
-  "description": "Interaction Runtime Plugin for CFlow.",
+  "description": "Interaction Runtime Plugin for NodeBraid.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/plugin-interaction"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/plugin-interaction#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/plugin-interaction#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "interaction",
     "plugin-runtime"
   ],
@@ -40,21 +40,21 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
-    "build:dependencies": "bun run --filter '@cflow/plugin-command' build && bun run --filter '@cflow/plugin-kernel' build && bun run --filter '@cflow/plugin-session' build && bun run --filter '@cflow/plugin-renderer' build",
+    "build:dependencies": "bun run --filter '@nodebraid/plugin-command' build && bun run --filter '@nodebraid/plugin-kernel' build && bun run --filter '@nodebraid/plugin-session' build && bun run --filter '@nodebraid/plugin-renderer' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "test:artifacts": "bun run ./artifacts/check-declarations.ts",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/diagnostics": "workspace:*",
-    "@cflow/interaction-api": "workspace:*",
-    "@cflow/kernel": "workspace:*",
-    "@cflow/plugin-command": "workspace:*",
-    "@cflow/plugin-kernel": "workspace:*",
-    "@cflow/plugin-renderer": "workspace:*",
-    "@cflow/plugin-session": "workspace:*",
-    "@cflow/renderer-api": "workspace:*",
-    "@cflow/runtime-cordis": "workspace:*"
+    "@nodebraid/diagnostics": "workspace:*",
+    "@nodebraid/interaction-api": "workspace:*",
+    "@nodebraid/kernel": "workspace:*",
+    "@nodebraid/plugin-command": "workspace:*",
+    "@nodebraid/plugin-kernel": "workspace:*",
+    "@nodebraid/plugin-renderer": "workspace:*",
+    "@nodebraid/plugin-session": "workspace:*",
+    "@nodebraid/renderer-api": "workspace:*",
+    "@nodebraid/runtime-cordis": "workspace:*"
   }
 }

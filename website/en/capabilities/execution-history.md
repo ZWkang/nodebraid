@@ -28,10 +28,10 @@ If a change remains local to one piece of code and does not need its own action 
 
 ## What it provides
 
-| Role             | Package                                               | What it delivers                                                                                                  |
-| ---------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Action execution | [`@cflow/plugin-command`](/en/modules/plugin-command) | Command definition, Activation-scoped registration and execution, cooperative cancellation, and in-flight cleanup |
-| Document History | [`@cflow/plugin-history`](/en/modules/plugin-history) | Commit recording, Undo/Redo Commands, stable History Snapshots, and single-flight Replay                          |
+| Role             | Package                                                   | What it delivers                                                                                                  |
+| ---------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Action execution | [`@nodebraid/plugin-command`](/en/modules/plugin-command) | Command definition, Activation-scoped registration and execution, cooperative cancellation, and in-flight cleanup |
+| Document History | [`@nodebraid/plugin-history`](/en/modules/plugin-history) | Commit recording, Undo/Redo Commands, stable History Snapshots, and single-flight Replay                          |
 
 A typical flow looks like this:
 
@@ -51,7 +51,7 @@ History records Change Sets, not Commands. A Commit without Command metadata can
 
 ## Dependencies and composition
 
-The Runtime composition of `commandPlugin` depends only on the CFlow Plugin Host seam and uses Diagnostics for structured errors. It provides `CommandService` and does not depend on Kernel, Session, History, or `@cflow/core`.
+The Runtime composition of `commandPlugin` depends only on the NodeBraid Plugin Host seam and uses Diagnostics for structured errors. It provides `CommandService` and does not depend on Kernel, Session, History, or `@nodebraid/core`.
 
 `historyPlugin` statically requires `KernelService` and `CommandService`, and provides `HistoryService`. If either Required Service is missing, its Plugin Installation remains pending. `whenActive()` finishes waiting only after the dependencies are available and the Commands have been registered.
 
@@ -59,11 +59,11 @@ An application's Feature Plugin obtains the Runtime Services it needs through `r
 
 ## Public entry points
 
-- [`@cflow/plugin-command`](/en/modules/plugin-command): define and host any strongly typed action;
-- [`@cflow/plugin-history`](/en/modules/plugin-history): provide Document Undo/Redo for Kernel Commits;
-- `@cflow/core`: re-exports the public seams of both packages, while internal packages still depend directly on the capability they own.
+- [`@nodebraid/plugin-command`](/en/modules/plugin-command): define and host any strongly typed action;
+- [`@nodebraid/plugin-history`](/en/modules/plugin-history): provide Document Undo/Redo for Kernel Commits;
+- `@nodebraid/core`: re-exports the public seams of both packages, while internal packages still depend directly on the capability they own.
 
-The CFlow packages are not publicly published under this project's identity. Follow the source-based [Quick Start](/en/guide/quick-start) to verify them, and do not install similarly named packages from npm that belong to another project.
+The NodeBraid packages have not been publicly released. Follow the source-based [Quick Start](/en/guide/quick-start) until the initial npm release is available.
 
 ## Lifecycle and error semantics
 

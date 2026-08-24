@@ -1,4 +1,4 @@
-import { definePlugin, defineService } from '@cflow/runtime-cordis';
+import { definePlugin, defineService } from '@nodebraid/runtime-cordis';
 
 import { getCommandId } from './command-definition';
 import { CommandError } from './command-error';
@@ -30,7 +30,7 @@ interface RegisteredCommand {
 export const commandService = defineService<CommandService>('command');
 
 export const commandPlugin = definePlugin({
-  name: '@cflow/plugin-command',
+  name: '@nodebraid/plugin-command',
   provides: { commands: commandService },
   setup(context) {
     const registrations = new Map<AnyCommand, RegisteredCommand>();

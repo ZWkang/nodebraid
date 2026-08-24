@@ -1,9 +1,9 @@
 ---
-title: '@cflow/layout-api'
+title: '@nodebraid/layout-api'
 description: Provider-neutral Layout Input、Engine、Proposal、capability 与验证契约。
 ---
 
-# `@cflow/layout-api`
+# `@nodebraid/layout-api`
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。
@@ -11,7 +11,7 @@ description: Provider-neutral Layout Input、Engine、Proposal、capability 与�
 
 ## 解决的问题
 
-布局库通常拥有不同的配置、坐标和输出模型。`@cflow/layout-api` 定义 CFlow 自己的最小语义 seam，让 Dagre、ELK 或第三方 Engine 都围绕同一份不可变 Canvas 投影计算候选 Node 位置，而不获得 Document 写权。
+布局库通常拥有不同的配置、坐标和输出模型。`@nodebraid/layout-api` 定义 NodeBraid 自己的最小语义 seam，让 Dagre、ELK 或第三方 Engine 都围绕同一份不可变 Canvas 投影计算候选 Node 位置，而不获得 Document 写权。
 
 ## 何时使用
 
@@ -20,7 +20,7 @@ description: Provider-neutral Layout Input、Engine、Proposal、capability 与�
 - 你要验证 Provider capability 或不可信 Proposal；
 - 你需要共享 full、incremental 与 Fixed Node 请求语义。
 
-一般应用若只想在 Canvas Runtime 中执行布局，会同时使用 `@cflow/plugin-layout` 和一个 concrete Provider。
+一般应用若只想在 Canvas Runtime 中执行布局，会同时使用 `@nodebraid/plugin-layout` 和一个 concrete Provider。
 
 ## 提供的能力
 
@@ -28,16 +28,16 @@ description: Provider-neutral Layout Input、Engine、Proposal、capability 与�
 - `LayoutEngine<Config>`：稳定 ID、不可变 capability 与可取消的异步 `compute()`；
 - `LayoutProposal`：source revision 与完整 Node positions；
 - `defineLayoutEngine()`：规范化 capability、取消检查与 Proposal validation；
-- `createLayoutInput()`：从 committed Canvas View 创建 CFlow-owned immutable input；
+- `createLayoutInput()`：从 committed Canvas View 创建 NodeBraid-owned immutable input；
 - `assertLayoutCapabilities()`：拒绝 Provider 未声明支持的请求；
 - `validateLayoutProposal()`：验证 revision、完整 Node coverage、有限坐标与 Fixed Node；
 - `LayoutError`：稳定 `layout + code` 错误身份。
 
 ## 依赖与组合
 
-该 package 依赖 `@cflow/kernel` 的 identity、geometry 与 Canvas View，以及 `@cflow/diagnostics` 的结构化错误契约。它不依赖 Plugin Host、Command Service、具体 Provider 或 `@cflow/core`。
+该 package 依赖 `@nodebraid/kernel` 的 identity、geometry 与 Canvas View，以及 `@nodebraid/diagnostics` 的结构化错误契约。它不依赖 Plugin Host、Command Service、具体 Provider 或 `@nodebraid/core`。
 
-Runtime 提交通常由 [`@cflow/plugin-layout`](/modules/plugin-layout) 完成；[`@cflow/layout-dagre`](/modules/layout-dagre) 和 [`@cflow/layout-elk`](/modules/layout-elk) 都实现这套 Engine seam。
+Runtime 提交通常由 [`@nodebraid/plugin-layout`](/modules/plugin-layout) 完成；[`@nodebraid/layout-dagre`](/modules/layout-dagre) 和 [`@nodebraid/layout-elk`](/modules/layout-elk) 都实现这套 Engine seam。
 
 ## 公共入口
 
@@ -51,10 +51,10 @@ import {
   type LayoutEngine,
   type LayoutInput,
   type LayoutProposal,
-} from '@cflow/layout-api';
+} from '@nodebraid/layout-api';
 ```
 
-这些入口也由 `@cflow/core` 重导出。
+这些入口也由 `@nodebraid/core` 重导出。
 
 ## 验证与错误语义
 

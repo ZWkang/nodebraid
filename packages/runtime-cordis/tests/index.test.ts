@@ -12,7 +12,7 @@ import {
   type ServiceToken,
 } from '../src';
 
-describe('@cflow/runtime-cordis', () => {
+describe('@nodebraid/runtime-cordis', () => {
   test('keeps Service Token identity separate from its diagnostic name', () => {
     const first = defineService<{ value: string }>('catalog');
     const second = defineService<{ value: string }>('catalog');

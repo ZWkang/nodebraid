@@ -1,9 +1,9 @@
 ---
-title: '@cflow/interaction-api'
+title: '@nodebraid/interaction-api'
 description: Backend-neutral Interaction Projection 纯值契约。
 ---
 
-# `@cflow/interaction-api`
+# `@nodebraid/interaction-api`
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。
@@ -11,7 +11,7 @@ description: Backend-neutral Interaction Projection 纯值契约。
 
 ## 解决的问题
 
-瞬态 Drag/Pan Preview 需要进入 Renderer，但不应把 Runtime 状态机、DOM Event 或具体后端对象写进 Renderer API。该 package 只拥有 CFlow 的不可变 Projection 值，让 Interaction 行为与 Renderer Provider 通过一条稳定值 seam 对接。
+瞬态 Drag/Pan Preview 需要进入 Renderer，但不应把 Runtime 状态机、DOM Event 或具体后端对象写进 Renderer API。该 package 只拥有 NodeBraid 的不可变 Projection 值，让 Interaction 行为与 Renderer Provider 通过一条稳定值 seam 对接。
 
 ## 提供的能力
 
@@ -23,7 +23,7 @@ description: Backend-neutral Interaction Projection 纯值契约。
 - `ConnectionPreviewInteractionProjection`：source、Pointer World Point 与 `none | valid | invalid` target。
 
 ```ts
-import type { InteractionProjection } from '@cflow/interaction-api';
+import type { InteractionProjection } from '@nodebraid/interaction-api';
 
 const preview: InteractionProjection = {
   type: 'viewport-pan',
@@ -34,9 +34,9 @@ const preview: InteractionProjection = {
 
 ## 依赖与边界
 
-Package 只依赖 `@cflow/kernel` 的 Node ID/Point 与 `@cflow/session-api` 的 Viewport。它不依赖 Renderer、Runtime、Plugin Host、DOM、具体 Provider 或 `@cflow/core`，也不拥有 Active Gesture、Command、Selection 或 lifecycle。
+Package 只依赖 `@nodebraid/kernel` 的 Node ID/Point 与 `@nodebraid/session-api` 的 Viewport。它不依赖 Renderer、Runtime、Plugin Host、DOM、具体 Provider 或 `@nodebraid/core`，也不拥有 Active Gesture、Command、Selection 或 lifecycle。
 
-`@cflow/renderer-api` 消费这些值作为 Provider update contract，`@cflow/plugin-interaction` 创建它们，`@cflow/plugin-renderer` 中介唯一写入者。
+`@nodebraid/renderer-api` 消费这些值作为 Provider update contract，`@nodebraid/plugin-interaction` 创建它们，`@nodebraid/plugin-renderer` 中介唯一写入者。
 
 ## 限制与验证
 

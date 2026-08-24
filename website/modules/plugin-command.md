@@ -1,9 +1,9 @@
 ---
-title: '@cflow/plugin-command'
+title: '@nodebraid/plugin-command'
 description: Activation-scoped 的强类型 Command 注册、执行、取消与清理能力。
 ---
 
-# `@cflow/plugin-command`
+# `@nodebraid/plugin-command`
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。
@@ -11,7 +11,7 @@ description: Activation-scoped 的强类型 Command 注册、执行、取消与�
 
 ## 解决的问题
 
-直接把行为写成回调，会让身份、输入输出类型、取消和资源归属散落在调用方。`@cflow/plugin-command` 提供一条 CFlow-owned Runtime seam：Feature Plugin 注册强类型 Command，其他 Consumer 使用同一个 token 执行，而所有 registration 与 in-flight execution 都归当前 Activation 管理。
+直接把行为写成回调，会让身份、输入输出类型、取消和资源归属散落在调用方。`@nodebraid/plugin-command` 提供一条 NodeBraid-owned Runtime seam：Feature Plugin 注册强类型 Command，其他 Consumer 使用同一个 token 执行，而所有 registration 与 in-flight execution 都归当前 Activation 管理。
 
 Command Service 只负责执行协议，不拥有 Kernel、Session 或领域状态，也不会成为动态 Service locator。
 
@@ -36,13 +36,13 @@ Command 的字符串 ID 只用于诊断和阻止歧义注册。执行查找使�
 
 ## 依赖与组合
 
-该 package 依赖 `@cflow/runtime-cordis` 的 Plugin Host seam 与 `@cflow/diagnostics` 的结构化错误，不依赖 Kernel、Session、History 或 `@cflow/core`。
+该 package 依赖 `@nodebraid/runtime-cordis` 的 Plugin Host seam 与 `@nodebraid/diagnostics` 的结构化错误，不依赖 Kernel、Session、History 或 `@nodebraid/core`。
 
 一个 Feature Plugin 应通过自己的 Required Service bindings 获取依赖，并拥有 registration：
 
 ```ts
-import { commandPlugin, commandService, defineCommand, type CommandService } from '@cflow/plugin-command';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+import { commandPlugin, commandService, defineCommand, type CommandService } from '@nodebraid/plugin-command';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 const greet = defineCommand<string, string>('message.greet');
 let commands: CommandService | undefined;
@@ -79,7 +79,7 @@ await Promise.all([
 if (!commands) throw new Error('Expected Command Service to activate.');
 
 try {
-  console.log(await commands.execute(greet, 'CFlow'));
+  console.log(await commands.execute(greet, 'NodeBraid'));
 } finally {
   await host.dispose();
 }
@@ -101,10 +101,10 @@ import {
   type CommandHandler,
   type CommandRegistration,
   type CommandService,
-} from '@cflow/plugin-command';
+} from '@nodebraid/plugin-command';
 ```
 
-这些入口也由 `@cflow/core` 重导出。
+这些入口也由 `@nodebraid/core` 重导出。
 
 ## 生命周期与错误语义
 

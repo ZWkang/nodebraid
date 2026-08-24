@@ -1,3 +1,3 @@
 export const kernelPluginDiagnosticEvents = Object.freeze({
-  observerFault: 'cflow.plugin.kernel.observer.fault',
+  observerFault: 'nodebraid.plugin.kernel.observer.fault',
 });

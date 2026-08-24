@@ -1,6 +1,6 @@
-import { describeNonFiniteNumber, type DiagnosticAttributes } from '@cflow/diagnostics';
-import { kernelService } from '@cflow/plugin-kernel';
-import { definePlugin, defineService } from '@cflow/runtime-cordis';
+import { describeNonFiniteNumber, type DiagnosticAttributes } from '@nodebraid/diagnostics';
+import { kernelService } from '@nodebraid/plugin-kernel';
+import { definePlugin, defineService } from '@nodebraid/runtime-cordis';
 
 import type { SelectionInput, SelectionSnapshot, SessionService, SessionSnapshot, Viewport } from './contracts';
 import { sessionDiagnosticEvents } from './diagnostic-events';
@@ -9,7 +9,7 @@ import { SessionError } from './session-error';
 export const sessionService = defineService<SessionService>('session');
 
 export const sessionPlugin = definePlugin({
-  name: '@cflow/plugin-session',
+  name: '@nodebraid/plugin-session',
   requires: { kernel: kernelService },
   provides: { session: sessionService },
   setup(context) {

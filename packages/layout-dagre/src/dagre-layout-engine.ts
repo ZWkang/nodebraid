@@ -1,5 +1,5 @@
 import { graphlib, layout } from '@dagrejs/dagre';
-import { defineLayoutEngine } from '@cflow/layout-api';
+import { defineLayoutEngine } from '@nodebraid/layout-api';
 
 import type { DagreLayoutConfig } from './contracts';
 import { resolveDagreLayoutConfig } from './dagre-config';

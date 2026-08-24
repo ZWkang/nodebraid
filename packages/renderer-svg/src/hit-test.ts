@@ -1,6 +1,6 @@
-import type { CanvasSnapshot } from '@cflow/kernel';
-import { RendererError, type HitResult, type ScreenPoint } from '@cflow/renderer-api';
-import type { SessionSnapshot } from '@cflow/session-api';
+import type { CanvasSnapshot } from '@nodebraid/kernel';
+import { RendererError, type HitResult, type ScreenPoint } from '@nodebraid/renderer-api';
+import type { SessionSnapshot } from '@nodebraid/session-api';
 
 import { readTargetMatrix } from './target-mapping';
 

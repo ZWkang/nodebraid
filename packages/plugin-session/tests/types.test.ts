@@ -1,7 +1,7 @@
 import { test } from 'bun:test';
 
-import { nodeId } from '@cflow/kernel';
-import { createPluginHost } from '@cflow/runtime-cordis';
+import { nodeId } from '@nodebraid/kernel';
+import { createPluginHost } from '@nodebraid/runtime-cordis';
 
 import { sessionPlugin, type SessionService } from '../src';
 

@@ -1,9 +1,9 @@
-import { CFlowError, type DiagnosticAttributes } from '@cflow/diagnostics';
+import { NodeBraidError, type DiagnosticAttributes } from '@nodebraid/diagnostics';
 
 export type RendererPluginErrorCode =
   'SERVICE_DISPOSED' | 'SYNC_FAILED' | 'INTERACTION_ALREADY_BOUND' | 'INTERACTION_BINDING_DISPOSED';
 
-export class RendererPluginError extends CFlowError<'plugin.renderer', RendererPluginErrorCode> {
+export class RendererPluginError extends NodeBraidError<'plugin.renderer', RendererPluginErrorCode> {
   override readonly name = 'RendererPluginError';
 
   constructor(

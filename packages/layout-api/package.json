@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/layout-api",
+  "name": "@nodebraid/layout-api",
   "type": "module",
   "version": "0.0.1",
-  "description": "Provider-neutral Layout contracts and validation for CFlow.",
+  "description": "Provider-neutral Layout contracts and validation for NodeBraid.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/layout-api"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/layout-api#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/layout-api#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "graph",
     "layout",
     "provider-api"
@@ -40,13 +40,13 @@
   ],
   "scripts": {
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts",
-    "build:dependencies": "bun run --filter '@cflow/kernel' build",
+    "build:dependencies": "bun run --filter '@nodebraid/kernel' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/diagnostics": "workspace:*",
-    "@cflow/kernel": "workspace:*"
+    "@nodebraid/diagnostics": "workspace:*",
+    "@nodebraid/kernel": "workspace:*"
   }
 }

@@ -15,4 +15,4 @@
 
 ## Answer
 
-`@cflow/interaction-api` 现已定义纯值 Node Drag 与 Viewport Pan Projection；CanvasRenderer 以同步、可清除且受 Baseline 保护的 seam 接受它们，Renderer Runtime 则用排他 Binding 授予唯一 writer。SVG 在现有 keyed Node、Edge 和 Viewport transform 上投影候选几何，显示、Hit Test 与真实 Pointer World Point 均使用 Effective Renderer State。真实 Chromium、Runtime、包级声明隔离、类型检查与受影响构建均已验证通过。
+`@nodebraid/interaction-api` 现已定义纯值 Node Drag 与 Viewport Pan Projection；CanvasRenderer 以同步、可清除且受 Baseline 保护的 seam 接受它们，Renderer Runtime 则用排他 Binding 授予唯一 writer。SVG 在现有 keyed Node、Edge 和 Viewport transform 上投影候选几何，显示、Hit Test 与真实 Pointer World Point 均使用 Effective Renderer State。真实 Chromium、Runtime、包级声明隔离、类型检查与受影响构建均已验证通过。

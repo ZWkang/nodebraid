@@ -1,16 +1,16 @@
-# CFlow Interaction v1 Edge Connection
+# NodeBraid Interaction v1 Edge Connection
 
 **Status:** ready-for-agent
 
 ## Problem Statement
 
-CFlow 已有 Selection、multi-Node Drag、Pan、Wheel Zoom、Focus、取消、恢复与 History 闭环，但还不能从真实 Renderer Input 创建 Edge。现有 `HitResult` 虽然预留 Port 形状，SVG Provider 没有 Port Geometry、不产生 Port hit，也会显式拒绝 port-qualified Edge。Kernel 只保存 Edge 内嵌 Endpoint，不生成 Edge ID、不解释 Port，也不判断业务连接规则。
+NodeBraid 已有 Selection、multi-Node Drag、Pan、Wheel Zoom、Focus、取消、恢复与 History 闭环，但还不能从真实 Renderer Input 创建 Edge。现有 `HitResult` 虽然预留 Port 形状，SVG Provider 没有 Port Geometry、不产生 Port hit，也会显式拒绝 port-qualified Edge。Kernel 只保存 Edge 内嵌 Endpoint，不生成 Edge ID、不解释 Port，也不判断业务连接规则。
 
 目标是以一条真实纵向链路确定 Connection、Connection Anchor 与 Port 的 seam：mouse pointer down source Anchor → Connection Gesture → transient Preview → target hit/structural validation → typed Create Edge Command → one synchronous Kernel Transaction → Canvas Commit → SVG projection → History undo/redo。
 
 ## Solution
 
-扩展现有 `@cflow/interaction-api` 与 `@cflow/plugin-interaction`，不新建 Connection package。Connection 使用同一 Active Gesture authority 与排他 Interaction Projection Binding。Renderer 为每个正尺寸 Node 派生 node-level source/target Connection Anchor；Anchor 不是 Document 实体、Port 或 Endpoint。首版 Edge Endpoint 仅保存 `nodeId`，Port 实体与 Registry 继续暂缓。
+扩展现有 `@nodebraid/interaction-api` 与 `@nodebraid/plugin-interaction`，不新建 Connection package。Connection 使用同一 Active Gesture authority 与排他 Interaction Projection Binding。Renderer 为每个正尺寸 Node 派生 node-level source/target Connection Anchor；Anchor 不是 Document 实体、Port 或 Endpoint。首版 Edge Endpoint 仅保存 `nodeId`，Port 实体与 Registry 继续暂缓。
 
 应用通过可选的窄同步 materializer 为已确认 source/target 产生完整 `CanvasEdge`，因而拥有 Edge ID、type 与 opaque data。Interaction 执行公开 typed Create Edge Command；handler 以 Anchor evidence 校验完整 Edge，并在一个同步 Transaction 内重验 Node 存在性、Endpoint、self-loop 与 Edge ID 可用性后提交。
 
@@ -53,7 +53,7 @@ SVG Provider 新增 Anchor 语义 Hit Result、位于 Node layer 之上的 provi
 - SVG Interaction layer 纳入预检、defensive copy、DOM rollback journal 和 projection-out-of-sync 语义。
 - rollback 失败后 Runtime 仅做一次完整 reset；再失败进入 `SYNC_FAILED`。
 - 继续使用 `interaction` error domain，不新建 Connection domain。
-- materializer 外部失败保留原始身份，通过 `cflow.plugin.interaction.connection-materializer.fault` 报告一次。
+- materializer 外部失败保留原始身份，通过 `nodebraid.plugin.interaction.connection-materializer.fault` 报告一次。
 - invalid target 是预期 cancellation，不是 Fault；diagnostics 不携带图 ID、坐标、data 或 config。
 - dependency reactivation 建立全新 idle Activation，不继承 Gesture、Pointer、Preview、key 或 materializer snapshot。
 
@@ -85,7 +85,7 @@ SVG Provider 新增 Anchor 语义 Hit Result、位于 Node layer 之上的 provi
 16. Cleanup failures remain explicit, aggregate all attempted cleanup, and prevent commit.
 17. Dependency recovery starts from a fresh idle Interaction Activation.
 18. SVG Anchor hit tolerance remains stable under zoom, DPR, viewBox, and CSS transform.
-19. Anchor and Preview DOM remain backend-specific implementation behind CFlow values.
+19. Anchor and Preview DOM remain backend-specific implementation behind NodeBraid values.
 20. Public declarations contain no DOM/native types outside the SVG Provider.
 
 ## Out Of Scope
@@ -96,5 +96,5 @@ SVG Provider 新增 Anchor 语义 Hit Result、位于 Node layer 之上的 provi
 - Tool/Gesture Registry、多 Interaction writer 或公开 InteractionService。
 - touch、pen、pinch、pressure、tilt 或 coalesced input。
 - snapping、grid、Edge Routing、协作 presence、framework adapter 或产品 UI。
-- CFlow 默认 Edge ID/type/data generator。
+- NodeBraid 默认 Edge ID/type/data generator。
 - silent fallback、fake success、retry loop 或 timeout cleanup。

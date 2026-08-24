@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 
-import { CFlowError, type DiagnosticEvent, type DiagnosticFault } from '@cflow/diagnostics';
-import { edgeId, nodeId, type CanvasCommit } from '@cflow/kernel';
-import { createPluginHost, definePlugin, type PluginHost } from '@cflow/runtime-cordis';
+import { NodeBraidError, type DiagnosticEvent, type DiagnosticFault } from '@nodebraid/diagnostics';
+import { edgeId, nodeId, type CanvasCommit } from '@nodebraid/kernel';
+import { createPluginHost, definePlugin, type PluginHost } from '@nodebraid/runtime-cordis';
 
 import {
   KernelPluginError,
@@ -12,10 +12,10 @@ import {
   type KernelService,
 } from '../src';
 
-describe('@cflow/plugin-kernel', () => {
+describe('@nodebraid/plugin-kernel', () => {
   test('publishes the stable Kernel Plugin diagnostic event catalog', () => {
     expect(kernelPluginDiagnosticEvents).toEqual({
-      observerFault: 'cflow.plugin.kernel.observer.fault',
+      observerFault: 'nodebraid.plugin.kernel.observer.fault',
     });
   });
 
@@ -118,13 +118,13 @@ describe('@cflow/plugin-kernel', () => {
       expect(service.read().snapshot.revision).toBe(1);
       expect(laterRevisions).toEqual([1]);
       expect(faults.map((fault) => fault.error)).toEqual([observerError]);
-      expect(events.find((event) => event.name === 'cflow.plugin.kernel.observer.fault')).toMatchObject({
+      expect(events.find((event) => event.name === 'nodebraid.plugin.kernel.observer.fault')).toMatchObject({
         level: 'error',
         scope: {
           hostId: 'kernel-host',
           installationId: 'kernel-host.installation.1',
           activationId: 'kernel-host.activation.1',
-          pluginName: '@cflow/plugin-kernel',
+          pluginName: '@nodebraid/plugin-kernel',
         },
         attributes: { revision: 1 },
         error: observerError,
@@ -262,7 +262,7 @@ describe('@cflow/plugin-kernel', () => {
     try {
       firstService.read();
     } catch (error) {
-      expect(error).toBeInstanceOf(CFlowError);
+      expect(error).toBeInstanceOf(NodeBraidError);
       expect(error).toMatchObject({
         domain: 'plugin.kernel',
         code: 'SERVICE_DISPOSED',

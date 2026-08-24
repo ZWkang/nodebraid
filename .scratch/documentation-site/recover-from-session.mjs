@@ -3,8 +3,11 @@ import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 
 const sessionDirectory = '/Users/zhou/.codex/sessions/2026/08/19';
-const oldPaths = ['/private/tmp/cflow-documentation-site', '/Users/zhou/.codex/worktrees/cflow-documentation-site'];
-const destination = '/Users/zhou/.codex/worktrees/cflow-documentation-site';
+const oldPaths = [
+  '/private/tmp/nodebraid-documentation-site',
+  '/Users/zhou/.codex/worktrees/nodebraid-documentation-site',
+];
+const destination = '/Users/zhou/.codex/worktrees/nodebraid-documentation-site';
 const recoveryCutoff = '2026-08-19T14:00:00.000Z';
 const calls = [];
 const outputs = new Map();

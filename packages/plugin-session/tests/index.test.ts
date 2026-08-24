@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 
-import { CFlowError, type DiagnosticEvent, type DiagnosticFault } from '@cflow/diagnostics';
-import { edgeId, nodeId } from '@cflow/kernel';
-import { kernelPlugin, kernelService, type KernelService } from '@cflow/plugin-kernel';
-import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
+import { NodeBraidError, type DiagnosticEvent, type DiagnosticFault } from '@nodebraid/diagnostics';
+import { edgeId, nodeId } from '@nodebraid/kernel';
+import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 import {
   SessionError,
@@ -14,10 +14,10 @@ import {
   type SessionService,
 } from '../src';
 
-describe('@cflow/plugin-session', () => {
+describe('@nodebraid/plugin-session', () => {
   test('publishes the stable Session diagnostic event catalog', () => {
     expect(sessionDiagnosticEvents).toEqual({
-      subscriberFault: 'cflow.plugin.session.subscriber.fault',
+      subscriberFault: 'nodebraid.plugin.session.subscriber.fault',
     });
   });
 
@@ -106,7 +106,7 @@ describe('@cflow/plugin-session', () => {
       throw new Error('Expected missing Selection entities to fail.');
     } catch (error) {
       expect(error).toBeInstanceOf(SessionError);
-      expect(error).toBeInstanceOf(CFlowError);
+      expect(error).toBeInstanceOf(NodeBraidError);
       expect(error).toMatchObject({
         domain: 'plugin.session',
         code: 'SELECTION_ENTITY_NOT_FOUND',
@@ -301,13 +301,13 @@ describe('@cflow/plugin-session', () => {
       expect(laterValues).toEqual([1]);
       expect(platformErrors).toEqual([]);
       expect(faults.map((fault) => fault.error)).toEqual([listenerError]);
-      expect(events.find((event) => event.name === 'cflow.plugin.session.subscriber.fault')).toMatchObject({
+      expect(events.find((event) => event.name === 'nodebraid.plugin.session.subscriber.fault')).toMatchObject({
         level: 'error',
         scope: {
           hostId: 'session-host',
           installationId: 'session-host.installation.2',
           activationId: expect.any(String),
-          pluginName: '@cflow/plugin-session',
+          pluginName: '@nodebraid/plugin-session',
         },
         attributes: {},
         error: listenerError,

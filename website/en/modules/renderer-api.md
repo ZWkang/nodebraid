@@ -1,9 +1,9 @@
 ---
-title: '@cflow/renderer-api'
-description: A CFlow-owned, backend-neutral contract for Renderer Providers.
+title: '@nodebraid/renderer-api'
+description: A NodeBraid-owned, backend-neutral contract for Renderer Providers.
 ---
 
-# `@cflow/renderer-api`
+# `@nodebraid/renderer-api`
 
 ::: warning Package is not publicly released
 This name describes the current source-module boundary; it does not mean the package can be installed from npm. Follow the source-based [Quick Start](/en/guide/quick-start) to verify it.
@@ -11,7 +11,7 @@ This name describes the current source-module boundary; it does not mean the pac
 
 ## Problems it solves
 
-Different rendering backends have different Targets, scene objects, and native events. `@cflow/renderer-api` defines a minimal CFlow seam: a Provider receives Canvas-semantic projections of the Document and Session, then emits standardized Renderer Input and Hit Results without spreading DOM, Canvas Context, Konva/Pixi objects, or a second state-write path to callers.
+Different rendering backends have different Targets, scene objects, and native events. `@nodebraid/renderer-api` defines a minimal NodeBraid seam: a Provider receives Canvas-semantic projections of the Document and Session, then emits standardized Renderer Input and Hit Results without spreading DOM, Canvas Context, Konva/Pixi objects, or a second state-write path to callers.
 
 This package is a contract, not a rendering implementation.
 
@@ -20,7 +20,7 @@ This package is a contract, not a rendering implementation.
 - You want to implement an SVG, Canvas2D, WebGL, Headless, or other Renderer Provider;
 - You need to declare Provider-specific, strongly typed Factory config and Target values;
 - You need continuous revision updates, Session projection, standardized input, and Hit Testing;
-- You want to compose with `@cflow/plugin-renderer` without making the Provider depend on the Plugin Host.
+- You want to compose with `@nodebraid/plugin-renderer` without making the Provider depend on the Plugin Host.
 
 Ordinary applications interact with this seam directly only when selecting or implementing a Provider. Using this package alone will not create a visible canvas.
 
@@ -38,9 +38,9 @@ When a Document update call returns, the Renderer's logical state must have acce
 
 ## Dependencies and composition
 
-This package depends on Canvas View/Commit and entity identity from `@cflow/kernel`, the shared Session Snapshot from `@cflow/session-api`, Projection values from `@cflow/interaction-api`, and structured errors from `@cflow/diagnostics`. It does not depend on Runtime, the Plugin Host, a concrete backend, a framework, or `@cflow/core`.
+This package depends on Canvas View/Commit and entity identity from `@nodebraid/kernel`, the shared Session Snapshot from `@nodebraid/session-api`, Projection values from `@nodebraid/interaction-api`, and structured errors from `@nodebraid/diagnostics`. It does not depend on Runtime, the Plugin Host, a concrete backend, a framework, or `@nodebraid/core`.
 
-A Provider package should depend only on this contract and export a named Factory plus its concrete Config. The current [`@cflow/renderer-svg`](/en/modules/renderer-svg) package is the official implementation of this boundary. An application can then connect the Factory to the Runtime through [`@cflow/plugin-renderer`](/en/modules/plugin-renderer).
+A Provider package should depend only on this contract and export a named Factory plus its concrete Config. The current [`@nodebraid/renderer-svg`](/en/modules/renderer-svg) package is the official implementation of this boundary. An application can then connect the Factory to the Runtime through [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer).
 
 ## Public entry points
 
@@ -62,10 +62,10 @@ import {
   type RendererInputListener,
   type ScreenPoint,
   type WheelInput,
-} from '@cflow/renderer-api';
+} from '@nodebraid/renderer-api';
 ```
 
-These contracts are also re-exported by `@cflow/core`; core does not bring in a concrete Provider implicitly.
+These contracts are also re-exported by `@nodebraid/core`; core does not bring in a concrete Provider implicitly.
 
 ## Lifecycle and error semantics
 

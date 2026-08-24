@@ -1,6 +1,6 @@
 # 01 — 提供 revision-zero Kernel Service
 
-**What to build:** 新建可发布的 `@cflow/plugin-kernel`，通过真实 Plugin Host Activation 提供窄 `KernelService`，让 Consumer 可以读取 revision-zero View 并执行同步 Transaction，而不获得裸 `CanvasKernel`。
+**What to build:** 新建可发布的 `@nodebraid/plugin-kernel`，通过真实 Plugin Host Activation 提供窄 `KernelService`，让 Consumer 可以读取 revision-zero View 并执行同步 Transaction，而不获得裸 `CanvasKernel`。
 
 **Blocked by:** None — can start immediately.
 
@@ -14,4 +14,4 @@
 
 ## Answer
 
-已建立独立 `@cflow/plugin-kernel` package。真实 Plugin Host Activation 现在提供窄 `KernelService`，其首个公开 seam 测试从缺失模块红灯推进到 revision-zero 读取与同步 Transaction green，且包级 typecheck 通过。
+已建立独立 `@nodebraid/plugin-kernel` package。真实 Plugin Host Activation 现在提供窄 `KernelService`，其首个公开 seam 测试从缺失模块红灯推进到 revision-zero 读取与同步 Transaction green，且包级 typecheck 通过。

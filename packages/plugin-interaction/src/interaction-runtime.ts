@@ -1,12 +1,12 @@
-import type { PluginDiagnostics } from '@cflow/diagnostics';
-import type { ConnectionAnchorIdentity, ConnectionPreviewTarget } from '@cflow/interaction-api';
-import type { NodeId, Point } from '@cflow/kernel';
-import { commandService, type CommandRegistration, type CommandService } from '@cflow/plugin-command';
-import { kernelService } from '@cflow/plugin-kernel';
-import { rendererService } from '@cflow/plugin-renderer';
-import { sessionService, type Viewport } from '@cflow/plugin-session';
-import type { HitResult } from '@cflow/renderer-api';
-import type { PluginContext } from '@cflow/runtime-cordis';
+import type { PluginDiagnostics } from '@nodebraid/diagnostics';
+import type { ConnectionAnchorIdentity, ConnectionPreviewTarget } from '@nodebraid/interaction-api';
+import type { NodeId, Point } from '@nodebraid/kernel';
+import { commandService, type CommandRegistration, type CommandService } from '@nodebraid/plugin-command';
+import { kernelService } from '@nodebraid/plugin-kernel';
+import { rendererService } from '@nodebraid/plugin-renderer';
+import { sessionService, type Viewport } from '@nodebraid/plugin-session';
+import type { HitResult } from '@nodebraid/renderer-api';
+import type { PluginContext } from '@nodebraid/runtime-cordis';
 
 import { computeClickSelection } from './selection-transition';
 import type { ConnectionMaterializer, EffectiveInteractionConfig, MoveNodeInput } from './contracts';

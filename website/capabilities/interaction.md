@@ -9,12 +9,12 @@ Interaction 能力回答“用户输入怎样变成画布语义行为”。它�
 
 ## 当前交付
 
-| 层次         | Package                                                    | 职责                                                               |
-| ------------ | ---------------------------------------------------------- | ------------------------------------------------------------------ |
-| 值契约       | [`@cflow/interaction-api`](/modules/interaction-api)       | Node Drag、Viewport Pan 与 Connection Preview 不可变 Projection    |
-| Runtime 行为 | [`@cflow/plugin-interaction`](/modules/plugin-interaction) | Selection、multi-Node Drag、Pan、Wheel Zoom、Connection 与生命周期 |
-| 投影中介     | [`@cflow/plugin-renderer`](/modules/plugin-renderer)       | 排他的 Interaction Projection Binding 与 Renderer 同步             |
-| 参考后端     | [`@cflow/renderer-svg`](/modules/renderer-svg)             | 在真实 SVG Geometry 上显示 Preview，并统一 Hit/Input 坐标          |
+| 层次         | Package                                                        | 职责                                                               |
+| ------------ | -------------------------------------------------------------- | ------------------------------------------------------------------ |
+| 值契约       | [`@nodebraid/interaction-api`](/modules/interaction-api)       | Node Drag、Viewport Pan 与 Connection Preview 不可变 Projection    |
+| Runtime 行为 | [`@nodebraid/plugin-interaction`](/modules/plugin-interaction) | Selection、multi-Node Drag、Pan、Wheel Zoom、Connection 与生命周期 |
+| 投影中介     | [`@nodebraid/plugin-renderer`](/modules/plugin-renderer)       | 排他的 Interaction Projection Binding 与 Renderer 同步             |
+| 参考后端     | [`@nodebraid/renderer-svg`](/modules/renderer-svg)             | 在真实 SVG Geometry 上显示 Preview，并统一 Hit/Input 坐标          |
 
 ```text
 Renderer Input + Hit Result

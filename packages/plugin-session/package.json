@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/plugin-session",
+  "name": "@nodebraid/plugin-session",
   "type": "module",
   "version": "0.0.1",
-  "description": "Session Runtime Plugin for CFlow.",
+  "description": "Session Runtime Plugin for NodeBraid.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/plugin-session"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/plugin-session#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/plugin-session#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "session",
     "plugin-runtime"
   ],
@@ -40,16 +40,16 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts",
-    "build:dependencies": "bun run --filter '@cflow/session-api' build && bun run --filter '@cflow/plugin-kernel' build",
+    "build:dependencies": "bun run --filter '@nodebraid/session-api' build && bun run --filter '@nodebraid/plugin-kernel' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/diagnostics": "workspace:*",
-    "@cflow/kernel": "workspace:*",
-    "@cflow/plugin-kernel": "workspace:*",
-    "@cflow/runtime-cordis": "workspace:*",
-    "@cflow/session-api": "workspace:*"
+    "@nodebraid/diagnostics": "workspace:*",
+    "@nodebraid/kernel": "workspace:*",
+    "@nodebraid/plugin-kernel": "workspace:*",
+    "@nodebraid/runtime-cordis": "workspace:*",
+    "@nodebraid/session-api": "workspace:*"
   }
 }

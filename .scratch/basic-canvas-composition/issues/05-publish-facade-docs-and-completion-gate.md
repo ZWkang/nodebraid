@@ -6,7 +6,7 @@
 
 **Status:** resolved
 
-- [x] `@cflow/core` 重导出 backend-neutral Composition，但仍不重导出 SVG 或其他 concrete Provider。
+- [x] `@nodebraid/core` 重导出 backend-neutral Composition，但仍不重导出 SVG 或其他 concrete Provider。
 - [x] preset 声明不泄漏 core、Cordis、DOM、native event 或 concrete Provider 类型。
 - [x] package-name import、声明隔离、clean dependency build 与 `bun pm pack --dry-run` 通过。
 - [x] 根 typecheck、build、Bun tests、真实 browser tests、docs check 与 `bun run check` 纳入新 package。
@@ -15,4 +15,4 @@
 
 ## Answer
 
-`@cflow/core` 现重导出 backend-neutral Basic Canvas Composition，声明与 artifact checks 明确拒绝 core 反向依赖、Cordis、DOM/native 与 concrete Renderer 泄漏。新 package 已通过 package-name import、从空 `dist` 开始的 clean build 和 `bun pm pack --dry-run`。模块目录、Composition 能力页、Quick Start、status、roadmap、core 文档与中英文页面均已同步。最终 Standards/Spec 双轴 review 的三个发现已修复并复核为零；`bun run check` 无 warning 通过 lint、typecheck、format、269 个 Bun tests、真实 Chromium、build、Quick Start 与文档生产构建。
+`@nodebraid/core` 现重导出 backend-neutral Basic Canvas Composition，声明与 artifact checks 明确拒绝 core 反向依赖、Cordis、DOM/native 与 concrete Renderer 泄漏。新 package 已通过 package-name import、从空 `dist` 开始的 clean build 和 `bun pm pack --dry-run`。模块目录、Composition 能力页、Quick Start、status、roadmap、core 文档与中英文页面均已同步。最终 Standards/Spec 双轴 review 的三个发现已修复并复核为零；`bun run check` 无 warning 通过 lint、typecheck、format、269 个 Bun tests、真实 Chromium、build、Quick Start 与文档生产构建。

@@ -3,8 +3,8 @@ import {
   type CanvasCommit,
   type TransactionContext,
   type TransactionMetadata,
-} from '@cflow/kernel';
-import { definePlugin, defineService } from '@cflow/runtime-cordis';
+} from '@nodebraid/kernel';
+import { definePlugin, defineService } from '@nodebraid/runtime-cordis';
 
 import type { CommitObserver, KernelService } from './contracts';
 import { kernelPluginDiagnosticEvents } from './diagnostic-events';
@@ -13,7 +13,7 @@ import { KernelPluginError } from './kernel-plugin-error';
 export const kernelService = defineService<KernelService>('kernel');
 
 export const kernelPlugin = definePlugin({
-  name: '@cflow/plugin-kernel',
+  name: '@nodebraid/plugin-kernel',
   provides: { kernel: kernelService },
   setup(context) {
     const kernel = createCanvasKernel();

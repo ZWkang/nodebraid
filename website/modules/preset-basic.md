@@ -1,11 +1,11 @@
 ---
-title: '@cflow/preset-basic'
+title: '@nodebraid/preset-basic'
 description: 显式 Renderer、完整 readiness 与统一生命周期的 Basic Canvas Composition。
 ---
 
-# `@cflow/preset-basic`
+# `@nodebraid/preset-basic`
 
-`@cflow/preset-basic` 是后端无关的官方 Basic Canvas Composition。它把已经稳定重复的 Kernel、Command、Session、Renderer、Interaction 与 History 组装收口到一个普通 Plugin，同时保留 Host、Diagnostics、Renderer Provider 与扩展能力的应用所有权。
+`@nodebraid/preset-basic` 是后端无关的官方 Basic Canvas Composition。它把已经稳定重复的 Kernel、Command、Session、Renderer、Interaction 与 History 组装收口到一个普通 Plugin，同时保留 Host、Diagnostics、Renderer Provider 与扩展能力的应用所有权。
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。
@@ -25,8 +25,8 @@ Package 没有默认导出、Runtime Service、Host factory、Renderer Registry 
 ## 典型组合
 
 ```ts
-import { createBasicCanvasPlugin, createPluginHost } from '@cflow/core';
-import { createSvgRenderer } from '@cflow/renderer-svg';
+import { createBasicCanvasPlugin, createPluginHost } from '@nodebraid/core';
+import { createSvgRenderer } from '@nodebraid/renderer-svg';
 
 const host = createPluginHost();
 const basicCanvas = createBasicCanvasPlugin(createSvgRenderer);

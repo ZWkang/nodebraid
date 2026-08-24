@@ -2,8 +2,8 @@ import { describe, expect, test } from 'bun:test';
 
 import { name } from '../src';
 
-describe('cflow', () => {
+describe('nodebraid', () => {
   test('exports the package name', () => {
-    expect(name).toBe('cflow');
+    expect(name).toBe('nodebraid');
   });
 });

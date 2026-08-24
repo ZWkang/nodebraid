@@ -15,4 +15,4 @@
 
 ## Answer
 
-Renderer 现在于任何 DOM 修改前验证 Canvas View 壳、实体顺序/唯一性、父子与 Endpoint 图引用、Commit revision、完整 before 内容与独立推导的 Change Set。Baseline 保留私有 CFlow-owned shell/Geometry 副本和 opaque data 原引用，因此外部后续篡改无效；data-only Commit 可连续推进，Node Geometry 变化则原位更新所有派生 Edge。
+Renderer 现在于任何 DOM 修改前验证 Canvas View 壳、实体顺序/唯一性、父子与 Endpoint 图引用、Commit revision、完整 before 内容与独立推导的 Change Set。Baseline 保留私有 NodeBraid-owned shell/Geometry 副本和 opaque data 原引用，因此外部后续篡改无效；data-only Commit 可连续推进，Node Geometry 变化则原位更新所有派生 Edge。

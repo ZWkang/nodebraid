@@ -1,17 +1,17 @@
 import { describe, expect, test } from 'bun:test';
 
-import { CFlowError } from '@cflow/diagnostics';
-import { createPluginHost, definePlugin, type PluginInstallation } from '@cflow/runtime-cordis';
+import { NodeBraidError } from '@nodebraid/diagnostics';
+import { createPluginHost, definePlugin, type PluginInstallation } from '@nodebraid/runtime-cordis';
 
 import { CommandError, commandPlugin, commandService, defineCommand, type Command, type CommandService } from '../src';
 
-describe('@cflow/plugin-command', () => {
+describe('@nodebraid/plugin-command', () => {
   test('rejects an empty Command ID with a stable structural error', () => {
     expect(() => defineCommand('')).toThrow(CommandError);
     try {
       defineCommand('');
     } catch (error) {
-      expect(error).toBeInstanceOf(CFlowError);
+      expect(error).toBeInstanceOf(NodeBraidError);
       expect(error).toMatchObject({
         domain: 'plugin.command',
         code: 'INVALID_COMMAND',

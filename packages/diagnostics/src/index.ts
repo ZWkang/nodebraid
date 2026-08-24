@@ -1,4 +1,4 @@
-export { CFlowError, type CFlowErrorOptions } from './cflow-error';
+export { NodeBraidError, type NodeBraidErrorOptions } from './nodebraid-error';
 export { diagnosticEvents } from './diagnostic-events';
 export { DiagnosticsError, type DiagnosticsErrorCode } from './diagnostics-error';
 export {
@@ -25,7 +25,7 @@ export {
   describeError,
   type AggregateErrorDescription,
   type CircularErrorDescription,
-  type CFlowErrorDescription,
+  type NodeBraidErrorDescription,
   type DiagnosticErrorDescription,
   type NativeErrorDescription,
   type UnknownErrorDescription,

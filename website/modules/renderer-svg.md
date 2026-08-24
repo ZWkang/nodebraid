@@ -1,9 +1,9 @@
 ---
-title: '@cflow/renderer-svg'
-description: 将 CFlow Canvas 语义投影到现有 SVG Target 的参考级 Renderer Provider。
+title: '@nodebraid/renderer-svg'
+description: 将 NodeBraid Canvas 语义投影到现有 SVG Target 的参考级 Renderer Provider。
 ---
 
-# `@cflow/renderer-svg`
+# `@nodebraid/renderer-svg`
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。
@@ -11,7 +11,7 @@ description: 将 CFlow Canvas 语义投影到现有 SVG Target 的参考级 Rend
 
 ## 解决的问题
 
-`@cflow/renderer-svg` 是 `@cflow/renderer-api` 的首个官方 concrete Provider。它把 Document、Session、Hit Test 与标准化浏览器输入投影到调用方已有的 `SVGSVGElement`，用真实 DOM 验证 Renderer contract，而不让 SVG 类型进入 Kernel、Session 或公共 Renderer API。
+`@nodebraid/renderer-svg` 是 `@nodebraid/renderer-api` 的首个官方 concrete Provider。它把 Document、Session、Hit Test 与标准化浏览器输入投影到调用方已有的 `SVGSVGElement`，用真实 DOM 验证 Renderer contract，而不让 SVG 类型进入 Kernel、Session 或公共 Renderer API。
 
 它提供通用矩形 Node、直线 Edge 与稳定 DOM seam，但不解释产品 Node type、业务 data 或组件框架。
 
@@ -20,7 +20,7 @@ description: 将 CFlow Canvas 语义投影到现有 SVG Target 的参考级 Rend
 - 你需要一个可直接接入已有 SVG 元素的官方 Renderer Provider；
 - 你要验证 Document Commit、Selection、Viewport、Hit Test 与浏览器输入的完整 Renderer 链路；
 - 你愿意由应用通过 CSS 和上层 Interaction 定义产品视觉与编辑行为；
-- 你要直接使用具名 Factory，或通过 [`@cflow/plugin-renderer`](/modules/plugin-renderer) 接入 Runtime。
+- 你要直接使用具名 Factory，或通过 [`@nodebraid/plugin-renderer`](/modules/plugin-renderer) 接入 Runtime。
 
 如果产品需要自定义 Node DOM、Port、复杂 Edge、组件挂载或完整编辑器交互，本 package 不是这些能力的替代品。
 
@@ -31,7 +31,7 @@ description: 将 CFlow Canvas 语义投影到现有 SVG Target 的参考级 Rend
 - Pointer、Wheel、Keyboard、Focus 与 Pointer Capture 的真实 DOM bridge；
 - Node Drag、Viewport Pan 与 Connection Preview Projection，以及 node-level source/target Anchor Hit Result；
 - 从 CSS screen pixel 到 SVG user space 的坐标转换与语义 Hit Test；
-- 稳定 class、`data-cflow-*` 属性、canonical layer order 与 keyed DOM identity；
+- 稳定 class、`data-nodebraid-*` 属性、canonical layer order 与 keyed DOM identity；
 - 原子 Document/Session 更新、连续 revision 校验、失败回滚与 reset 恢复；
 - Provider-specific 的 `SvgRendererError`，以及完整 Renderer contract 的结构化错误。
 
@@ -39,9 +39,9 @@ Provider 只管理自己在 Target 下创建的 projection subtree。调用方�
 
 ## 依赖与组合
 
-该 package 依赖 [`@cflow/renderer-api`](/modules/renderer-api) 的 backend-neutral contract，以及其使用的 Kernel、Session、Interaction Projection 与 Diagnostics 值契约。它不依赖 Plugin Host、framework adapter、Interaction 状态机或 `@cflow/core`。
+该 package 依赖 [`@nodebraid/renderer-api`](/modules/renderer-api) 的 backend-neutral contract，以及其使用的 Kernel、Session、Interaction Projection 与 Diagnostics 值契约。它不依赖 Plugin Host、framework adapter、Interaction 状态机或 `@nodebraid/core`。
 
-应用可以直接创建 Renderer；需要 Runtime 生命周期与 Kernel/Session 同步时，把 `createSvgRenderer` 交给 [`@cflow/plugin-renderer`](/modules/plugin-renderer)。CFlow 不会默认选择该 Provider，`@cflow/core` 也不会重导出它。
+应用可以直接创建 Renderer；需要 Runtime 生命周期与 Kernel/Session 同步时，把 `createSvgRenderer` 交给 [`@nodebraid/plugin-renderer`](/modules/plugin-renderer)。NodeBraid 不会默认选择该 Provider，`@nodebraid/core` 也不会重导出它。
 
 ## 公共入口
 
@@ -53,7 +53,7 @@ import {
   type SvgInputPolicies,
   type SvgRendererConfig,
   type SvgRendererErrorCode,
-} from '@cflow/renderer-svg';
+} from '@nodebraid/renderer-svg';
 
 const target = document.querySelector<SVGSVGElement>('#canvas');
 if (!target) throw new Error('Missing SVG target.');
@@ -78,28 +78,28 @@ Factory config 是不可变的 Provider-specific 值：`target` 必填；`edgeHi
 
 ## DOM 与样式 seam
 
-Provider 写入 geometry、稳定 class 与 `data-cflow-*` 属性，但不注入 runtime theme。应用可以从最小样式开始：
+Provider 写入 geometry、稳定 class 与 `data-nodebraid-*` 属性，但不注入 runtime theme。应用可以从最小样式开始：
 
 ```css
-.cflow-renderer-svg__node {
+.nodebraid-renderer-svg__node {
   fill: white;
   stroke: currentColor;
 }
 
-.cflow-renderer-svg__edge {
+.nodebraid-renderer-svg__edge {
   stroke: currentColor;
 }
 
-.cflow-renderer-svg__connection-anchor {
+.nodebraid-renderer-svg__connection-anchor {
   r: 4px;
   fill: currentColor;
 }
 
-.cflow-renderer-svg__connection-preview {
+.nodebraid-renderer-svg__connection-preview {
   stroke: currentColor;
 }
 
-[data-cflow-selected='true'] {
+[data-nodebraid-selected='true'] {
   stroke-width: 2;
 }
 ```
@@ -117,7 +117,7 @@ Provider 写入 geometry、稳定 class 与 `data-cflow-*` 属性，但不注入
 | `TARGET_OCCUPIED`    | Target 已被另一份活跃或仍在 cleanup 的 Instance 占用 |
 | `TARGET_UNAVAILABLE` | Target 未连接、无可用尺寸或 screen-to-SVG 变换不可逆 |
 
-Document revision、Session、Input subscriber、Pointer 与 disposed-state 失败继续使用 `@cflow/renderer-api` 的 `RendererError`。Provider 不吞掉异常；结构验证发生在投影变更之前，无法安全回滚时会显式要求下一次 `reset` 重建 Baseline。
+Document revision、Session、Input subscriber、Pointer 与 disposed-state 失败继续使用 `@nodebraid/renderer-api` 的 `RendererError`。Provider 不吞掉异常；结构验证发生在投影变更之前，无法安全回滚时会显式要求下一次 `reset` 重建 Baseline。
 
 ## 限制与非目标
 

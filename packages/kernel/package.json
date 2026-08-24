@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/kernel",
+  "name": "@nodebraid/kernel",
   "type": "module",
   "version": "0.0.1",
-  "description": "Renderer-independent graph kernel for CFlow.",
+  "description": "Renderer-independent graph kernel for NodeBraid.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/kernel"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/kernel#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/kernel#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "canvas",
     "graph",
     "kernel"
@@ -41,13 +41,13 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
-    "build:dependencies": "bun run --filter '@cflow/diagnostics' build",
+    "build:dependencies": "bun run --filter '@nodebraid/diagnostics' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "test:artifacts": "bun run ./artifacts/check-declarations.ts",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/diagnostics": "workspace:*"
+    "@nodebraid/diagnostics": "workspace:*"
   }
 }

@@ -1,6 +1,6 @@
 # 01 — 激活 History 并撤销首个 Baseline 后 Commit
 
-**What to build:** 新增 `@cflow/plugin-history`，让它在真实 Kernel 与 Command Service 都可用时从当前 revision 建立空 History Baseline，记录第一个后续 Recordable Commit，并让调用方通过强类型 Undo Command 撤销它。
+**What to build:** 新增 `@nodebraid/plugin-history`，让它在真实 Kernel 与 Command Service 都可用时从当前 revision 建立空 History Baseline，记录第一个后续 Recordable Commit，并让调用方通过强类型 Undo Command 撤销它。
 
 **Blocked by:** None — can start immediately.
 

@@ -26,17 +26,20 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
     },
     modules: [
       {
-        name: '@cflow/core',
+        name: '@nodebraid/core',
         slug: 'core',
         summary: { zh: '当前公共能力的统一 facade。', en: 'The unified facade for current public capabilities.' },
       },
       {
-        name: '@cflow/runtime-cordis',
+        name: '@nodebraid/runtime-cordis',
         slug: 'runtime-cordis',
-        summary: { zh: 'CFlow-owned Plugin Host 与生命周期。', en: 'The CFlow-owned Plugin Host and lifecycle.' },
+        summary: {
+          zh: 'NodeBraid-owned Plugin Host 与生命周期。',
+          en: 'The NodeBraid-owned Plugin Host and lifecycle.',
+        },
       },
       {
-        name: '@cflow/diagnostics',
+        name: '@nodebraid/diagnostics',
         slug: 'diagnostics',
         summary: {
           zh: '结构化错误与 Diagnostic Event 契约。',
@@ -54,7 +57,7 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
     },
     modules: [
       {
-        name: '@cflow/preset-basic',
+        name: '@nodebraid/preset-basic',
         slug: 'preset-basic',
         summary: {
           zh: '后端无关的 Basic Canvas Composition。',
@@ -72,17 +75,17 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
     },
     modules: [
       {
-        name: '@cflow/kernel',
+        name: '@nodebraid/kernel',
         slug: 'kernel',
         summary: { zh: 'Renderer-independent 图内核。', en: 'The renderer-independent graph kernel.' },
       },
       {
-        name: '@cflow/plugin-kernel',
+        name: '@nodebraid/plugin-kernel',
         slug: 'plugin-kernel',
         summary: { zh: 'Kernel Runtime Service adapter。', en: 'The Kernel Runtime Service adapter.' },
       },
       {
-        name: '@cflow/session-api',
+        name: '@nodebraid/session-api',
         slug: 'session-api',
         summary: {
           zh: 'Selection、Viewport 与 Session Snapshot 值契约。',
@@ -90,7 +93,7 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
         },
       },
       {
-        name: '@cflow/plugin-session',
+        name: '@nodebraid/plugin-session',
         slug: 'plugin-session',
         summary: { zh: 'Session Runtime Plugin。', en: 'The Session Runtime Plugin.' },
       },
@@ -105,12 +108,12 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
     },
     modules: [
       {
-        name: '@cflow/plugin-command',
+        name: '@nodebraid/plugin-command',
         slug: 'plugin-command',
         summary: { zh: 'Activation-scoped typed Command Service。', en: 'An Activation-scoped typed Command Service.' },
       },
       {
-        name: '@cflow/plugin-history',
+        name: '@nodebraid/plugin-history',
         slug: 'plugin-history',
         summary: { zh: 'Commit-based History Runtime Plugin。', en: 'A Commit-based History Runtime Plugin.' },
       },
@@ -125,7 +128,7 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
     },
     modules: [
       {
-        name: '@cflow/layout-api',
+        name: '@nodebraid/layout-api',
         slug: 'layout-api',
         summary: {
           zh: 'Layout Input、Engine、Proposal 与 validation。',
@@ -133,12 +136,12 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
         },
       },
       {
-        name: '@cflow/plugin-layout',
+        name: '@nodebraid/plugin-layout',
         slug: 'plugin-layout',
         summary: { zh: 'Layout Runtime Command integration。', en: 'Layout Runtime Command integration.' },
       },
       {
-        name: '@cflow/layout-dagre',
+        name: '@nodebraid/layout-dagre',
         slug: 'layout-dagre',
         summary: {
           zh: 'Dagre whole-canvas full Layout Provider。',
@@ -146,7 +149,7 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
         },
       },
       {
-        name: '@cflow/layout-elk',
+        name: '@nodebraid/layout-elk',
         slug: 'layout-elk',
         summary: {
           zh: 'ELK full、incremental 与 Fixed Node Provider。',
@@ -164,7 +167,7 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
     },
     modules: [
       {
-        name: '@cflow/interaction-api',
+        name: '@nodebraid/interaction-api',
         slug: 'interaction-api',
         summary: {
           zh: 'Node Drag 与 Viewport Pan Projection 值契约。',
@@ -172,7 +175,7 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
         },
       },
       {
-        name: '@cflow/plugin-interaction',
+        name: '@nodebraid/plugin-interaction',
         slug: 'plugin-interaction',
         summary: {
           zh: 'Selection、Drag、Pan 与 Wheel Zoom Runtime。',
@@ -190,17 +193,17 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
     },
     modules: [
       {
-        name: '@cflow/renderer-api',
+        name: '@nodebraid/renderer-api',
         slug: 'renderer-api',
         summary: { zh: 'Renderer Provider contract。', en: 'The Renderer Provider contract.' },
       },
       {
-        name: '@cflow/plugin-renderer',
+        name: '@nodebraid/plugin-renderer',
         slug: 'plugin-renderer',
         summary: { zh: 'Renderer Runtime adapter。', en: 'The Renderer Runtime adapter.' },
       },
       {
-        name: '@cflow/renderer-svg',
+        name: '@nodebraid/renderer-svg',
         slug: 'renderer-svg',
         summary: {
           zh: '参考级官方 SVG Renderer Provider。',

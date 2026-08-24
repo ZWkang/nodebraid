@@ -1,23 +1,23 @@
 ---
-title: '@cflow/kernel'
-description: CFlow's Renderer-independent graph Kernel, synchronous Transactions, and reversible Change Sets.
+title: '@nodebraid/kernel'
+description: NodeBraid's Renderer-independent graph Kernel, synchronous Transactions, and reversible Change Sets.
 ---
 
-# `@cflow/kernel`
+# `@nodebraid/kernel`
 
 ::: warning Package is not publicly released
 This name identifies the current source module boundary; it does not mean the package can be installed from npm. Follow the [Quick Start](/en/guide/quick-start) to verify it from source.
 :::
 
-`@cflow/kernel` is the owner of CFlow's authoritative Document. It handles only Nodes, Edges, Endpoints, relationship indexes, and revisions; it knows nothing about the Plugin Host, Session, Renderer, or frontend frameworks.
+`@nodebraid/kernel` is the owner of NodeBraid's authoritative Document. It handles only Nodes, Edges, Endpoints, relationship indexes, and revisions; it knows nothing about the Plugin Host, Session, Renderer, or frontend frameworks.
 
 ::: info Current status
-Implemented. The pure Kernel and Runtime adapter are already separate, and `@cflow/plugin-kernel` is implemented as well. “Separate” does not mean the Kernel Plugin is still a future plan.
+Implemented. The pure Kernel and Runtime adapter are already separate, and `@nodebraid/plugin-kernel` is implemented as well. “Separate” does not mean the Kernel Plugin is still a future plan.
 :::
 
 ## The problem it solves
 
-Canvas writes must satisfy three requirements at once: the graph structure must remain valid, an operation must either commit completely or roll back completely, and readers must never mix an old Snapshot with a new Query. `@cflow/kernel` concentrates these rules in one small, strict, synchronous transaction boundary.
+Canvas writes must satisfy three requirements at once: the graph structure must remain valid, an operation must either commit completely or roll back completely, and readers must never mix an old Snapshot with a new Query. `@nodebraid/kernel` concentrates these rules in one small, strict, synchronous transaction boundary.
 
 ## When to use it
 
@@ -40,9 +40,9 @@ Canvas writes must satisfy three requirements at once: the graph structure must 
 
 ## Dependencies and composition
 
-The only workspace dependency of `@cflow/kernel` is the leaf package `@cflow/diagnostics`, which supplies the shared structural error contract. It does not depend on `@cflow/core` or on any Runtime or Renderer package.
+The only workspace dependency of `@nodebraid/kernel` is the leaf package `@nodebraid/diagnostics`, which supplies the shared structural error contract. It does not depend on `@nodebraid/core` or on any Runtime or Renderer package.
 
-Inside a Canvas Runtime, do not pass a bare `CanvasKernel` around as a global object. [`@cflow/plugin-kernel`](/en/modules/plugin-kernel) wraps it in a narrow `KernelService` and owns Commit Observers and Activation lifecycle.
+Inside a Canvas Runtime, do not pass a bare `CanvasKernel` around as a global object. [`@nodebraid/plugin-kernel`](/en/modules/plugin-kernel) wraps it in a narrow `KernelService` and owns Commit Observers and Activation lifecycle.
 
 ## Public entry points
 
@@ -57,7 +57,7 @@ import {
   type CanvasView,
   type ChangeSet,
   type TransactionContext,
-} from '@cflow/kernel';
+} from '@nodebraid/kernel';
 ```
 
 Minimal Transaction:
@@ -85,13 +85,13 @@ console.log(commit?.after.snapshot.revision); // 1
 - A Transaction may pass through temporarily incomplete intermediate states; only the final graph is validated when the callback completes.
 - No net change returns `null`. A net change increments the revision monotonically by exactly one and returns `before`, `after`, and a Change Set from that same commit.
 - `applyChangeSet()` still executes inside a new Transaction. Replay preflights whether current entities match the source side; a conflict never partially overwrites current state.
-- Snapshots, Query results, and CFlow-owned values are immutable and ordered by canonical ID. This ordering guarantees determinism only; it does not represent z-index.
+- Snapshots, Query results, and NodeBraid-owned values are immutable and ordered by canonical ID. This ordering guarantees determinism only; it does not represent z-index.
 
 The final graph must satisfy these rules: Node positions are finite numbers; optional sizes are finite and non-negative; every parent exists and parent relationships are acyclic; every Edge Endpoint references an existing Node.
 
 ## Limitations and non-goals
 
-- Does not provide Plugin Installations, Runtime Services, Commit Observers, or resource disposal; those belong to `@cflow/plugin-kernel`.
+- Does not provide Plugin Installations, Runtime Services, Commit Observers, or resource disposal; those belong to `@nodebraid/plugin-kernel`.
 - Does not provide asynchronous Transactions, concurrent merging, persistent revisions, or cross-process consistency.
 - Does not cascade deletion to child Nodes or incident Edges automatically. The caller must preserve a valid final graph explicitly within the same Transaction.
 - Does not interpret Port semantics or forbid self-loops. Upper domain capabilities decide those rules.
@@ -100,7 +100,7 @@ The final graph must satisfy these rules: Node positions are finite numbers; opt
 
 ## Verification evidence
 
-- [Public exports](https://github.com/ZWkang/cflow/blob/main/packages/kernel/src/index.ts) contain only the Kernel contract, ID helpers, and structural errors.
-- [Kernel behavior tests](https://github.com/ZWkang/cflow/blob/main/packages/kernel/tests/index.test.ts) cover atomic commits, rollback, relationship queries, final-graph validation, net-zero Transactions, and Change Set replay.
-- [Error and type tests](https://github.com/ZWkang/cflow/tree/main/packages/kernel/tests) verify stable error identity, readonly Views and Commits, and synchronous Transaction boundaries.
+- [Public exports](https://github.com/ZWkang/nodebraid/blob/main/packages/kernel/src/index.ts) contain only the Kernel contract, ID helpers, and structural errors.
+- [Kernel behavior tests](https://github.com/ZWkang/nodebraid/blob/main/packages/kernel/tests/index.test.ts) cover atomic commits, rollback, relationship queries, final-graph validation, net-zero Transactions, and Change Set replay.
+- [Error and type tests](https://github.com/ZWkang/nodebraid/tree/main/packages/kernel/tests) verify stable error identity, readonly Views and Commits, and synchronous Transaction boundaries.
 - ADR-0009 through ADR-0012 establish the pure Kernel, revision-bound Canvas View, Transaction replay, and opaque domain-data semantics.

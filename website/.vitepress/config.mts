@@ -5,7 +5,7 @@ import { tokenizeForSearch } from './search.mts';
 
 type Locale = 'zh' | 'en';
 
-const base = process.env.CFLOW_DOCS_BASE ?? '/';
+const base = process.env.NODEBRAID_DOCS_BASE ?? '/';
 
 function localizedPath(locale: Locale, path: string): string {
   return locale === 'en' ? `/en${path}` : path;
@@ -21,7 +21,7 @@ function createThemeConfig(locale: Locale): DefaultTheme.Config {
     },
     externalLinkIcon: true,
     footer: {
-      copyright: 'Copyright © 2026 CFlow contributors',
+      copyright: 'Copyright © 2026 NodeBraid contributors',
       message: 'Released under the MIT License.',
     },
     langMenuLabel: english ? 'Change language' : '切换语言',
@@ -105,9 +105,9 @@ function createThemeConfig(locale: Locale): DefaultTheme.Config {
       },
     ],
     sidebarMenuLabel: english ? 'Menu' : '菜单',
-    siteTitle: 'CFlow',
+    siteTitle: 'NodeBraid',
     skipToContentLabel: english ? 'Skip to content' : '跳到正文',
-    socialLinks: [{ icon: 'github', link: 'https://github.com/ZWkang/cflow' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/ZWkang/nodebraid' }],
   };
 }
 
@@ -142,6 +142,6 @@ export default defineConfig({
     },
   },
   themeConfig: createThemeConfig('zh'),
-  title: 'CFlow',
-  titleTemplate: ':title · CFlow',
+  title: 'NodeBraid',
+  titleTemplate: ':title · NodeBraid',
 });

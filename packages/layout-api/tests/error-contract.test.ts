@@ -1,15 +1,15 @@
 import { expect, test } from 'bun:test';
 
-import { CFlowError } from '@cflow/diagnostics';
+import { NodeBraidError } from '@nodebraid/diagnostics';
 
 import { LayoutError } from '../src';
 
-test('Layout structural failures expose the shared CFlow error identity', () => {
+test('Layout structural failures expose the shared NodeBraid error identity', () => {
   const error = new LayoutError('INVALID_REQUEST', 'Layout Request is invalid.', {
     issue: 'INVALID_MODE',
   });
 
-  expect(error).toBeInstanceOf(CFlowError);
+  expect(error).toBeInstanceOf(NodeBraidError);
   expect(error).toMatchObject({
     name: 'LayoutError',
     domain: 'layout',

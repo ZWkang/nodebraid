@@ -1,8 +1,8 @@
 {
-  "name": "@cflow/session-api",
+  "name": "@nodebraid/session-api",
   "type": "module",
   "version": "0.0.1",
-  "description": "Renderer-independent Session value contracts for CFlow.",
+  "description": "Renderer-independent Session value contracts for NodeBraid.",
   "publishConfig": {
     "access": "public"
   },
@@ -13,13 +13,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZWkang/cflow.git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
     "directory": "packages/session-api"
   },
-  "bugs": "https://github.com/ZWkang/cflow/issues",
-  "homepage": "https://github.com/ZWkang/cflow/tree/main/packages/session-api#readme",
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/session-api#readme",
   "keywords": [
-    "cflow",
+    "nodebraid",
     "session",
     "viewport",
     "selection"
@@ -41,13 +41,13 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
-    "build:dependencies": "bun run --filter '@cflow/kernel' build",
+    "build:dependencies": "bun run --filter '@nodebraid/kernel' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "test:artifacts": "bun run ./artifacts/check-declarations.ts",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@cflow/kernel": "workspace:*"
+    "@nodebraid/kernel": "workspace:*"
   }
 }

@@ -15,4 +15,4 @@
 
 ## Answer
 
-`@cflow/diagnostics` 已通过 `@cflow/core` facade 发布，所有内部 workspace 继续依赖窄包。Root/Core build 与 typecheck 顺序、README/AGENTS、声明检查和 package artifacts 已同步。最终 `bun run check` 通过 223 tests、743 assertions、lint、typecheck、format check 与全 workspace build；`bun pm pack --dry-run` 验证 31 个发布文件、31.86KB unpacked size，`git diff --check` 通过。
+`@nodebraid/diagnostics` 已通过 `@nodebraid/core` facade 发布，所有内部 workspace 继续依赖窄包。Root/Core build 与 typecheck 顺序、README/AGENTS、声明检查和 package artifacts 已同步。最终 `bun run check` 通过 223 tests、743 assertions、lint、typecheck、format check 与全 workspace build；`bun pm pack --dry-run` 验证 31 个发布文件、31.86KB unpacked size，`git diff --check` 通过。
