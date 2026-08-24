@@ -1,4 +1,4 @@
-import type { NodeDragInteractionProjection } from '@cflow/interaction-api';
+import type { ConnectionPreviewInteractionProjection, NodeDragInteractionProjection } from '@cflow/interaction-api';
 import type {
   CanvasCommit,
   CanvasEdge,
@@ -21,6 +21,7 @@ export function renderReset(
   document: Document,
   edgesLayer: SVGGElement,
   nodesLayer: SVGGElement,
+  interactionLayer: SVGGElement,
 ): void {
   validateCanvasView(view);
   const nodes = view.snapshot.nodes.map((node) => createNodeElement(document, node));
@@ -28,6 +29,9 @@ export function renderReset(
   const edges = view.snapshot.edges.map((edge) => createEdgeElement(document, edge, nodesById));
   edgesLayer.replaceChildren(...edges);
   nodesLayer.replaceChildren(...nodes);
+  interactionLayer.replaceChildren(
+    ...view.snapshot.nodes.flatMap((node) => createConnectionAnchorElements(document, node)),
+  );
 }
 
 /** @internal */
@@ -38,6 +42,7 @@ export function applyCommit(
   document: Document,
   edgesLayer: SVGGElement,
   nodesLayer: SVGGElement,
+  interactionLayer: SVGGElement,
   completeProjection?: (journal: DomMutationJournal) => void,
 ): void {
   validateCanvasView(commit.before);
@@ -76,7 +81,7 @@ export function applyCommit(
   const changedNodeIds = new Set(
     commit.changeSet.changes.filter((change) => change.entity === 'node').map((change) => change.id),
   );
-  const journal = new DomMutationJournal(edgesLayer, nodesLayer);
+  const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
   try {
     for (const change of commit.changeSet.changes) {
       if (change.entity === 'node') applyNodeChange(change, validatedNodes, nodesLayer, journal);
@@ -94,6 +99,7 @@ export function applyCommit(
     edgesLayer.append(
       ...commit.after.snapshot.edges.map((edge) => requireEntityElement(edgesLayer, 'data-cflow-edge-id', edge.id)),
     );
+    syncConnectionAnchors(commit.after.snapshot.nodes, document, interactionLayer, journal);
     completeProjection?.(journal);
   } catch (error) {
     const rollbackErrors = journal.rollback();
@@ -102,6 +108,96 @@ export function applyCommit(
     }
     throw error;
   }
+}
+
+function syncConnectionAnchors(
+  nodes: readonly CanvasNode[],
+  document: Document,
+  interactionLayer: SVGGElement,
+  journal: DomMutationJournal,
+): void {
+  const expectedKeys = new Set<string>();
+  const ordered: SVGCircleElement[] = [];
+  const existingAnchors = Array.from(
+    interactionLayer.querySelectorAll<SVGCircleElement>('[data-cflow-connection-anchor-node-id]'),
+  );
+  for (const node of nodes) {
+    for (const candidate of createConnectionAnchorElements(document, node)) {
+      const key = connectionAnchorKey(candidate);
+      expectedKeys.add(key);
+      const existing = existingAnchors.find((element) => connectionAnchorKey(element) === key);
+      if (existing) {
+        copyGeometryAttributes(candidate, existing, ['cx', 'cy'], journal);
+        ordered.push(existing);
+      } else {
+        ordered.push(candidate);
+      }
+    }
+  }
+  for (const element of existingAnchors) {
+    if (!expectedKeys.has(connectionAnchorKey(element))) element.remove();
+  }
+  interactionLayer.append(...ordered, ...interactionLayer.querySelectorAll('[data-cflow-connection-preview]'));
+}
+
+function createConnectionAnchorElements(document: Document, node: CanvasNode): readonly SVGCircleElement[] {
+  const size = node.size;
+  if (!size || size.width <= 0 || size.height <= 0) return [];
+  return (['target', 'source'] as const).map((role) => {
+    const element = createSvgElement(document, 'circle');
+    element.setAttribute('class', 'cflow-renderer-svg__connection-anchor');
+    element.setAttribute('data-cflow-connection-anchor-node-id', node.id);
+    element.setAttribute('data-cflow-connection-anchor-role', role);
+    element.setAttribute('cx', String(role === 'source' ? node.position.x + size.width : node.position.x));
+    element.setAttribute('cy', String(node.position.y + size.height / 2));
+    return element;
+  });
+}
+
+function connectionAnchorKey(element: SVGElement): string {
+  return `${element.getAttribute('data-cflow-connection-anchor-node-id')}\u0000${element.getAttribute('data-cflow-connection-anchor-role')}`;
+}
+
+/** @internal */
+export function applyConnectionPreview(
+  preview: ConnectionPreviewInteractionProjection,
+  snapshot: CanvasSnapshot,
+  interactionLayer: SVGGElement,
+  journal: DomMutationJournal,
+): void {
+  const sourceNode = snapshot.nodes.find((node) => node.id === preview.source.nodeId);
+  if (!sourceNode?.size) throw new Error('Validated Connection source Node is unavailable.');
+  const source = {
+    x: sourceNode.position.x + sourceNode.size.width,
+    y: sourceNode.position.y + sourceNode.size.height / 2,
+  };
+  let endpoint = preview.pointerWorldPoint;
+  if (preview.target.type !== 'none') {
+    const targetAnchor = preview.target.anchor;
+    const targetNode = snapshot.nodes.find((node) => node.id === targetAnchor.nodeId);
+    if (!targetNode?.size) throw new Error('Validated Connection target Node is unavailable.');
+    endpoint = {
+      x: targetAnchor.role === 'source' ? targetNode.position.x + targetNode.size.width : targetNode.position.x,
+      y: targetNode.position.y + targetNode.size.height / 2,
+    };
+  }
+  let element = interactionLayer.querySelector<SVGLineElement>('[data-cflow-connection-preview]');
+  if (!element) {
+    element = createSvgElement(interactionLayer.ownerDocument, 'line');
+    element.setAttribute('class', 'cflow-renderer-svg__connection-preview');
+    element.setAttribute('data-cflow-connection-preview', '');
+    interactionLayer.append(element);
+  }
+  setElementAttribute(element, 'x1', String(source.x), journal);
+  setElementAttribute(element, 'y1', String(source.y), journal);
+  setElementAttribute(element, 'x2', String(endpoint.x), journal);
+  setElementAttribute(element, 'y2', String(endpoint.y), journal);
+  setElementAttribute(element, 'data-cflow-connection-target', preview.target.type, journal);
+}
+
+/** @internal */
+export function clearConnectionPreview(interactionLayer: SVGGElement): void {
+  interactionLayer.querySelector('[data-cflow-connection-preview]')?.remove();
 }
 
 /** @internal */
@@ -318,14 +414,17 @@ function throwBaselineEntityConflict(
 export class DomMutationJournal {
   readonly #edgeChildren: readonly Element[];
   readonly #nodeChildren: readonly Element[];
+  readonly #interactionChildren: readonly Element[] | undefined;
   readonly #attributeUndos: (() => void)[] = [];
 
   constructor(
     readonly edgesLayer: SVGGElement,
     readonly nodesLayer: SVGGElement,
+    readonly interactionLayer?: SVGGElement,
   ) {
     this.#edgeChildren = [...edgesLayer.children];
     this.#nodeChildren = [...nodesLayer.children];
+    this.#interactionChildren = interactionLayer ? [...interactionLayer.children] : undefined;
   }
 
   setAttribute(element: SVGElement, name: string, value: string): void {
@@ -354,10 +453,14 @@ export class DomMutationJournal {
         errors.push(error);
       }
     }
-    for (const [layer, children] of [
+    const layers: ReadonlyArray<readonly [SVGGElement, readonly Element[]]> = [
       [this.edgesLayer, this.#edgeChildren],
       [this.nodesLayer, this.#nodeChildren],
-    ] as const) {
+      ...(this.interactionLayer && this.#interactionChildren
+        ? ([[this.interactionLayer, this.#interactionChildren]] as const)
+        : []),
+    ];
+    for (const [layer, children] of layers) {
       try {
         layer.replaceChildren(...children);
       } catch (error) {

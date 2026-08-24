@@ -60,6 +60,17 @@ interface FirstNodeResult {
   }>;
 }
 
+interface ConnectionAnchorResult {
+  readonly layerClasses: readonly (string | null)[];
+  readonly anchors: readonly Readonly<{
+    nodeId: string | null;
+    role: string | null;
+    cx: string | null;
+    cy: string | null;
+  }>[];
+  readonly sourceHit: unknown;
+}
+
 interface FirstInteractionProjectionResult {
   readonly previewPosition: Readonly<{ x: string | null; y: string | null }>;
   readonly documentPosition: Readonly<{ x: number; y: number }>;
@@ -134,6 +145,18 @@ interface SelectionInteractionResult {
 interface NodeDragInteractionResult {
   readonly previewPosition: Readonly<{ x: string | null; y: string | null }>;
   readonly documentPosition: Readonly<{ x: number; y: number }>;
+}
+
+interface ConnectionInteractionResult {
+  readonly revision: number;
+  readonly edgeIds: readonly string[];
+  readonly preview: Readonly<{
+    x1: string | null;
+    y1: string | null;
+    x2: string | null;
+    y2: string | null;
+    target: string | null;
+  }> | null;
 }
 
 interface MultiNodeDragInteractionResult {
@@ -561,6 +584,7 @@ declare global {
   var __cflowBasicCanvasCompositionTeardownCapture: () => void;
   var __cflowBasicCanvasCompositionIsolation: () => Promise<BasicCanvasIsolationResult>;
   var __cflowRendererSvgTicket01: () => Promise<FirstNodeResult>;
+  var __cflowRendererSvgConnectionAnchors: () => Promise<ConnectionAnchorResult>;
   var __cflowRendererSvgInteractionProjectionFirstNode: () => Promise<FirstInteractionProjectionResult>;
   var __cflowRendererSvgInteractionProjectionClear: () => Promise<InteractionProjectionClearResult>;
   var __cflowRendererSvgInteractionProjectionReplacement: () => Promise<InteractionProjectionReplacementResult>;
@@ -598,6 +622,13 @@ declare global {
   }>[];
   var __cflowRendererSvgMoveNodeDragExternally: () => void;
   var __cflowRendererSvgTeardownNodeDragInteraction: () => Promise<void>;
+  var __cflowRendererSvgSetupConnectionInteraction: () => Promise<void>;
+  var __cflowRendererSvgReadConnectionInteraction: () => ConnectionInteractionResult;
+  var __cflowRendererSvgUndoConnectionInteraction: () => Promise<void>;
+  var __cflowRendererSvgRedoConnectionInteraction: () => Promise<void>;
+  var __cflowRendererSvgDeleteConnectionSource: () => void;
+  var __cflowRendererSvgDeleteConnectionTarget: () => void;
+  var __cflowRendererSvgTeardownConnectionInteraction: () => Promise<void>;
   var __cflowRendererSvgSetupViewportPanInteraction: (configured?: boolean) => Promise<void>;
   var __cflowRendererSvgReadViewportPanInteraction: () => ViewportPanInteractionResult;
   var __cflowRendererSvgReadViewportPanInteractionEvents: () => readonly Readonly<{
@@ -875,6 +906,44 @@ globalThis.__cflowRendererSvgTicket01 = async (): Promise<FirstNodeResult> => {
       height: node.getAttribute('height'),
     },
   };
+};
+
+globalThis.__cflowRendererSvgConnectionAnchors = async (): Promise<ConnectionAnchorResult> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  document.body.append(target);
+  const renderer = createSvgRenderer({ target, connectionAnchorHitTolerance: 8 });
+  const kernel = createCanvasKernel();
+  kernel.transact((transaction) => {
+    transaction.nodes.add({
+      id: nodeId('anchor-node'),
+      type: 'task',
+      position: { x: 20, y: 30 },
+      size: { width: 80, height: 40 },
+      data: null,
+    });
+  });
+  renderer.updateDocument({ type: 'reset', view: kernel.read() });
+  renderer.updateSession({ selection: { nodeIds: [], edgeIds: [] }, viewport: { x: 0, y: 0, zoom: 1 } });
+  const root = target.querySelector<SVGGElement>('[data-cflow-renderer-svg-root]');
+  const anchors = Array.from(
+    target.querySelectorAll<SVGCircleElement>('[data-cflow-connection-anchor-node-id="anchor-node"]'),
+    (anchor) => ({
+      nodeId: anchor.getAttribute('data-cflow-connection-anchor-node-id'),
+      role: anchor.getAttribute('data-cflow-connection-anchor-role'),
+      cx: anchor.getAttribute('cx'),
+      cy: anchor.getAttribute('cy'),
+    }),
+  );
+  const result: ConnectionAnchorResult = {
+    layerClasses: root ? Array.from(root.children, (child) => child.getAttribute('class')) : [],
+    anchors,
+    sourceHit: renderer.hitTest({ x: 100, y: 50 }),
+  };
+  await renderer.dispose();
+  target.remove();
+  return result;
 };
 
 globalThis.__cflowRendererSvgInteractionProjectionFirstNode = async (): Promise<FirstInteractionProjectionResult> => {
@@ -3324,6 +3393,10 @@ let nodeDragInteractionKernel: KernelService | undefined;
 let nodeDragInteractionCommands: CommandService | undefined;
 let nodeDragInteractionSession: SessionService | undefined;
 const nodeDragInteractionEvents: DiagnosticEvent[] = [];
+let connectionInteractionHost: ReturnType<typeof createPluginHost> | undefined;
+let connectionInteractionTarget: SVGSVGElement | undefined;
+let connectionInteractionKernel: KernelService | undefined;
+let connectionInteractionCommands: CommandService | undefined;
 let viewportPanInteractionHost: ReturnType<typeof createPluginHost> | undefined;
 let viewportPanInteractionTarget: SVGSVGElement | undefined;
 let viewportPanInteractionSession: SessionService | undefined;
@@ -3505,6 +3578,114 @@ globalThis.__cflowRendererSvgSetupNodeDragInteraction = async (): Promise<void> 
   nodeDragInteractionKernel = kernel;
   nodeDragInteractionCommands = commands;
   nodeDragInteractionSession = session;
+};
+
+globalThis.__cflowRendererSvgSetupConnectionInteraction = async (): Promise<void> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.id = 'connection-interaction-target';
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  target.style.position = 'fixed';
+  target.style.left = '0';
+  target.style.top = '0';
+  target.style.zIndex = '1005';
+  document.body.append(target);
+  const host = createPluginHost();
+  let kernel: KernelService | undefined;
+  let commands: CommandService | undefined;
+  const consumer = definePlugin({
+    requires: { kernel: kernelService, commands: commandService },
+    setup(context) {
+      kernel = context.services.kernel;
+      commands = context.services.commands;
+    },
+  });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(createSvgRenderer), { target }),
+    host.install(interactionPlugin, {
+      connection: {
+        materializeEdge({ source, target: targetEndpoint }) {
+          return { id: edgeId('connected-edge'), type: 'flow', source, target: targetEndpoint, data: null };
+        },
+      },
+    }),
+    host.install(historyPlugin),
+    host.install(consumer),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (!kernel || !commands) throw new Error('Expected Connection Runtime Services.');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({
+      id: nodeId('connection-source'),
+      type: 'task',
+      position: { x: 40, y: 100 },
+      size: { width: 80, height: 40 },
+      data: null,
+    });
+    transaction.nodes.add({
+      id: nodeId('connection-target'),
+      type: 'task',
+      position: { x: 240, y: 100 },
+      size: { width: 80, height: 40 },
+      data: null,
+    });
+  });
+  connectionInteractionHost = host;
+  connectionInteractionTarget = target;
+  connectionInteractionKernel = kernel;
+  connectionInteractionCommands = commands;
+};
+
+globalThis.__cflowRendererSvgReadConnectionInteraction = (): ConnectionInteractionResult => {
+  const target = connectionInteractionTarget;
+  const kernel = connectionInteractionKernel;
+  if (!target || !kernel) throw new Error('Expected the active Connection Runtime.');
+  const preview = target.querySelector<SVGLineElement>('[data-cflow-connection-preview]');
+  return {
+    revision: kernel.read().snapshot.revision,
+    edgeIds: kernel.read().snapshot.edges.map((edge) => edge.id),
+    preview: preview
+      ? {
+          x1: preview.getAttribute('x1'),
+          y1: preview.getAttribute('y1'),
+          x2: preview.getAttribute('x2'),
+          y2: preview.getAttribute('y2'),
+          target: preview.getAttribute('data-cflow-connection-target'),
+        }
+      : null,
+  };
+};
+
+globalThis.__cflowRendererSvgUndoConnectionInteraction = async (): Promise<void> => {
+  if (!connectionInteractionCommands) throw new Error('Expected Connection Commands before Undo.');
+  await connectionInteractionCommands.execute(undoCommand, undefined);
+};
+
+globalThis.__cflowRendererSvgRedoConnectionInteraction = async (): Promise<void> => {
+  if (!connectionInteractionCommands) throw new Error('Expected Connection Commands before Redo.');
+  await connectionInteractionCommands.execute(redoCommand, undefined);
+};
+
+globalThis.__cflowRendererSvgDeleteConnectionSource = (): void => {
+  if (!connectionInteractionKernel) throw new Error('Expected Connection Kernel before source deletion.');
+  connectionInteractionKernel.transact((transaction) => transaction.nodes.remove(nodeId('connection-source')));
+};
+
+globalThis.__cflowRendererSvgDeleteConnectionTarget = (): void => {
+  if (!connectionInteractionKernel) throw new Error('Expected Connection Kernel before target deletion.');
+  connectionInteractionKernel.transact((transaction) => transaction.nodes.remove(nodeId('connection-target')));
+};
+
+globalThis.__cflowRendererSvgTeardownConnectionInteraction = async (): Promise<void> => {
+  await connectionInteractionHost?.dispose();
+  connectionInteractionHost = undefined;
+  connectionInteractionKernel = undefined;
+  connectionInteractionCommands = undefined;
+  connectionInteractionTarget?.remove();
+  connectionInteractionTarget = undefined;
 };
 
 globalThis.__cflowRendererSvgReadNodeDragInteraction = (): NodeDragInteractionResult => {

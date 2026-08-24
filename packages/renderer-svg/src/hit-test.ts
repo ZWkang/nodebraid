@@ -11,6 +11,7 @@ export function hitTestProjection(
   documentSnapshot: CanvasSnapshot,
   sessionSnapshot: SessionSnapshot,
   edgeHitTolerance: number,
+  connectionAnchorHitTolerance: number,
 ): HitResult | null {
   validateScreenPoint(point);
   readTargetMatrix(target, 'TARGET_UNAVAILABLE');
@@ -21,6 +22,23 @@ export function hitTestProjection(
     x: (point.x - viewport.x) / viewport.zoom,
     y: (point.y - viewport.y) / viewport.zoom,
   };
+  for (let index = documentSnapshot.nodes.length - 1; index >= 0; index -= 1) {
+    const node = documentSnapshot.nodes[index];
+    if (!node?.size || node.size.width <= 0 || node.size.height <= 0) continue;
+    for (const role of ['source', 'target'] as const) {
+      const anchorWorldPoint = {
+        x: role === 'source' ? node.position.x + node.size.width : node.position.x,
+        y: node.position.y + node.size.height / 2,
+      };
+      const anchorScreenPoint = {
+        x: anchorWorldPoint.x * viewport.zoom + viewport.x,
+        y: anchorWorldPoint.y * viewport.zoom + viewport.y,
+      };
+      if (Math.hypot(point.x - anchorScreenPoint.x, point.y - anchorScreenPoint.y) <= connectionAnchorHitTolerance) {
+        return { type: 'connection-anchor', nodeId: node.id, role, worldPoint };
+      }
+    }
+  }
   for (let index = documentSnapshot.nodes.length - 1; index >= 0; index -= 1) {
     const node = documentSnapshot.nodes[index];
     if (!node?.size) continue;

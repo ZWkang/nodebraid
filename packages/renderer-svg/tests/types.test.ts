@@ -14,6 +14,8 @@ test('publishes a synchronous typed SVG Renderer Factory', () => {
     createSvgRenderer({ target: html });
     // @ts-expect-error SVG Renderer config is readonly.
     config.edgeHitTolerance = 8;
+    // @ts-expect-error SVG Renderer config is readonly.
+    config.connectionAnchorHitTolerance = 12;
     return [renderer, synchronous];
   };
   void verifyTypes;

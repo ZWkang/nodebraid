@@ -14,7 +14,7 @@ export function validateConfig(config: Readonly<SvgRendererConfig>): SVGSVGEleme
   if (typeof config !== 'object' || config === null) {
     throw new SvgRendererError('INVALID_CONFIG', 'SVG Renderer config must be an object.');
   }
-  assertKnownConfigKeys(config, ['target', 'edgeHitTolerance', 'input'], '');
+  assertKnownConfigKeys(config, ['target', 'edgeHitTolerance', 'connectionAnchorHitTolerance', 'input'], '');
   const target = (config as Readonly<{ target?: unknown }>).target;
   const ownerDocument = isRecord(target) ? Reflect.get(target, 'ownerDocument') : undefined;
   const ownerWindow = isRecord(ownerDocument) ? Reflect.get(ownerDocument, 'defaultView') : undefined;
@@ -31,6 +31,14 @@ export function validateConfig(config: Readonly<SvgRendererConfig>): SVGSVGEleme
   ) {
     throw new SvgRendererError('INVALID_CONFIG', 'edgeHitTolerance must be a finite non-negative number.', {
       field: 'edgeHitTolerance',
+    });
+  }
+  if (
+    config.connectionAnchorHitTolerance !== undefined &&
+    (!Number.isFinite(config.connectionAnchorHitTolerance) || config.connectionAnchorHitTolerance < 0)
+  ) {
+    throw new SvgRendererError('INVALID_CONFIG', 'connectionAnchorHitTolerance must be a finite non-negative number.', {
+      field: 'connectionAnchorHitTolerance',
     });
   }
   return target as SVGSVGElement;

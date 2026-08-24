@@ -14,6 +14,8 @@ assert.match(indexDeclaration, /InteractionError/);
 assert.match(indexDeclaration, /InteractionConfig/);
 assert.match(indexDeclaration, /interactionDiagnosticEvents/);
 assert.match(indexDeclaration, /moveNodesCommand/);
+assert.match(indexDeclaration, /createEdgeCommand/);
+assert.match(indexDeclaration, /ConnectionMaterializer/);
 for (const declaration of await collectDeclarations(dist)) {
   assert.doesNotMatch(declaration.contents, forbiddenImport, declaration.path);
   assert.doesNotMatch(declaration.contents, forbiddenPlatformType, declaration.path);
@@ -24,3 +26,4 @@ assert.equal(typeof packageExports.interactionPlugin, 'object');
 assert.equal(typeof packageExports.InteractionError, 'function');
 assert.equal(typeof packageExports.interactionDiagnosticEvents, 'object');
 assert.equal(typeof packageExports.moveNodesCommand, 'object');
+assert.equal(typeof packageExports.createEdgeCommand, 'object');

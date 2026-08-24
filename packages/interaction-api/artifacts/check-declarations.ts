@@ -13,6 +13,8 @@ const indexDeclaration = await readFile(join(dist, 'index.d.ts'), 'utf8');
 assert.match(indexDeclaration, /InteractionProjection/);
 assert.match(indexDeclaration, /NodeDragInteractionProjection/);
 assert.match(indexDeclaration, /ViewportPanInteractionProjection/);
+assert.match(indexDeclaration, /ConnectionPreviewInteractionProjection/);
+assert.match(indexDeclaration, /ConnectionAnchorIdentity/);
 for (const declaration of await collectDeclarations(dist)) {
   assert.doesNotMatch(declaration.contents, forbiddenImport, declaration.path);
   assert.doesNotMatch(declaration.contents, forbiddenPlatformType, declaration.path);

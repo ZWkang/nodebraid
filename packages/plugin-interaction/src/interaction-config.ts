@@ -1,7 +1,7 @@
 import type { EffectiveInteractionConfig, InteractionConfig } from './contracts';
 import { InteractionError } from './interaction-error';
 
-const configFields = new Set(['dragThreshold', 'wheelZoomSensitivity', 'minZoom', 'maxZoom']);
+const configFields = new Set(['dragThreshold', 'wheelZoomSensitivity', 'minZoom', 'maxZoom', 'connection']);
 
 export function resolveInteractionConfig(config: InteractionConfig | undefined): EffectiveInteractionConfig {
   if (config !== undefined) {
@@ -20,6 +20,7 @@ export function resolveInteractionConfig(config: InteractionConfig | undefined):
     wheelZoomSensitivity: config?.wheelZoomSensitivity ?? 0.002,
     minZoom: config?.minZoom ?? 0.1,
     maxZoom: config?.maxZoom ?? 8,
+    connection: config?.connection,
   };
   if (!Number.isFinite(resolved.dragThreshold) || resolved.dragThreshold < 0) {
     throw new InteractionError('INVALID_CONFIG', 'Interaction dragThreshold must be a finite non-negative number.');
@@ -36,5 +37,23 @@ export function resolveInteractionConfig(config: InteractionConfig | undefined):
   if (resolved.minZoom > resolved.maxZoom) {
     throw new InteractionError('INVALID_CONFIG', 'Interaction minZoom must not exceed maxZoom.');
   }
+  if (resolved.connection !== undefined) {
+    if (!isRecord(resolved.connection)) {
+      throw new InteractionError('INVALID_CONFIG', 'Interaction connection config must be an object.');
+    }
+    for (const field of Reflect.ownKeys(resolved.connection)) {
+      if (field !== 'materializeEdge') {
+        throw new InteractionError('INVALID_CONFIG', 'Interaction connection config contains an unknown field.');
+      }
+    }
+    if (typeof resolved.connection.materializeEdge !== 'function') {
+      throw new InteractionError('INVALID_CONFIG', 'Interaction connection materializeEdge must be a function.');
+    }
+    resolved.connection = Object.freeze({ materializeEdge: resolved.connection.materializeEdge });
+  }
   return Object.freeze(resolved);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

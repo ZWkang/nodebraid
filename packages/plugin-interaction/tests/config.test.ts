@@ -16,6 +16,27 @@ import { createPluginHost } from '@cflow/runtime-cordis';
 
 import { interactionPlugin } from '../src';
 
+test('Interaction accepts an explicit synchronous Connection materializer', async () => {
+  const host = createPluginHost();
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => new ConfigRenderer())),
+  ];
+  const interaction = host.install(interactionPlugin, {
+    connection: {
+      materializeEdge({ source, target }) {
+        return { id: 'connection' as never, type: 'flow', source, target, data: null };
+      },
+    },
+  });
+
+  await Promise.all([...installations, interaction].map((installation) => installation.whenActive()));
+  expect(interaction.getSnapshot()).toEqual({ status: 'active' });
+  await host.dispose();
+});
+
 test('Interaction rejects unknown config fields through Plugin installation', async () => {
   const host = createPluginHost();
   const installations = [
@@ -54,6 +75,10 @@ test('Interaction rejects malformed numeric config without coercion', async () =
     { maxZoom: Number.POSITIVE_INFINITY },
     { minZoom: 2, maxZoom: 1 },
     { dragThreshold: '4' },
+    { connection: null },
+    { connection: {} },
+    { connection: { materializeEdge: 'not-a-function' } },
+    { connection: { materializeEdge: () => undefined, unexpected: true } },
   ];
   for (const config of invalidConfigs) {
     const interaction = host.install(interactionPlugin, config as never);

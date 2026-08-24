@@ -1,13 +1,16 @@
 import type { PluginDiagnostics } from '@cflow/diagnostics';
+import type { ConnectionAnchorIdentity, ConnectionPreviewTarget } from '@cflow/interaction-api';
 import type { NodeId, Point } from '@cflow/kernel';
 import { commandService, type CommandRegistration, type CommandService } from '@cflow/plugin-command';
 import { kernelService } from '@cflow/plugin-kernel';
 import { rendererService } from '@cflow/plugin-renderer';
 import { sessionService, type Viewport } from '@cflow/plugin-session';
+import type { HitResult } from '@cflow/renderer-api';
 import type { PluginContext } from '@cflow/runtime-cordis';
 
 import { computeClickSelection } from './selection-transition';
-import type { EffectiveInteractionConfig, MoveNodeInput } from './contracts';
+import type { ConnectionMaterializer, EffectiveInteractionConfig, MoveNodeInput } from './contracts';
+import { createEdgeCommand, createEdgeHandler } from './create-edge-command';
 import { interactionDiagnosticEvents } from './diagnostic-events';
 import { InteractionError } from './interaction-error';
 import { createMoveNodesHandler, moveNodesCommand } from './move-nodes-command';
@@ -45,8 +48,16 @@ interface ViewportPanGesture {
   viewport?: Viewport;
 }
 
-type ActiveGesture = SelectionGesture | NodeDragGesture | ViewportPanGesture;
-type GestureCancellationReason = 'lifecycle' | 'pointer-cancel' | 'stale';
+interface ConnectionGesture {
+  readonly type: 'connection';
+  readonly pointerId: number;
+  readonly source: ConnectionAnchorIdentity;
+  pointerWorldPoint: Point;
+  target: ConnectionPreviewTarget;
+}
+
+type ActiveGesture = SelectionGesture | NodeDragGesture | ViewportPanGesture | ConnectionGesture;
+type GestureCancellationReason = 'lifecycle' | 'pointer-cancel' | 'stale' | 'escape' | 'invalid-target';
 
 /** @internal */
 export function activateInteractionRuntime(
@@ -62,6 +73,7 @@ export function activateInteractionRuntime(
   let spacePressed = false;
   const rejectedPointerIds = new Set<number>();
   let moveRegistration: CommandRegistration | undefined;
+  let createEdgeRegistration: CommandRegistration | undefined;
   let stopKernel = (): void => undefined;
   let stopSession = (): void => undefined;
   let stopInput = (): void => undefined;
@@ -76,15 +88,32 @@ export function activateInteractionRuntime(
         baseViewport: gesture.baseViewport,
         viewport: gesture.viewport,
       });
+    } else if (gesture.type === 'connection') {
+      projection.update({
+        type: 'connection-preview',
+        source: gesture.source,
+        pointerWorldPoint: gesture.pointerWorldPoint,
+        target: gesture.target,
+      });
     }
   };
 
   const cancelGesture = (gesture: ActiveGesture, reason: GestureCancellationReason, releasePointer: boolean): void => {
     if (activeGesture !== gesture) return;
     activeGesture = undefined;
-    if (hasPreview(gesture)) projection.update(null);
-    if (releasePointer) renderer.releasePointer(gesture.pointerId);
-    emitGestureCancellation(context.diagnostics, gesture.type, reason);
+    const errors: unknown[] = [];
+    const attempt = (operation: () => void): void => {
+      try {
+        operation();
+      } catch (error) {
+        errors.push(error);
+      }
+    };
+    if (hasPreview(gesture)) attempt(() => projection.update(null));
+    if (releasePointer) attempt(() => renderer.releasePointer(gesture.pointerId));
+    attempt(() => emitGestureCancellation(context.diagnostics, gesture.type, reason));
+    if (errors.length === 1) throw errors[0];
+    if (errors.length > 1) throw new AggregateError(errors, 'Interaction Gesture cancellation failed.');
   };
 
   context.signal.addEventListener('abort', () => {
@@ -119,12 +148,20 @@ export function activateInteractionRuntime(
         cleanupErrors.push(error);
       }
     }
+    if (createEdgeRegistration) {
+      try {
+        await createEdgeRegistration.dispose();
+      } catch (error) {
+        cleanupErrors.push(error);
+      }
+    }
     if (cleanupErrors.length > 0) {
       throw new AggregateError(cleanupErrors, 'Interaction Runtime cleanup failed.');
     }
   });
 
   moveRegistration = commands.register(moveNodesCommand, createMoveNodesHandler(kernel));
+  createEdgeRegistration = commands.register(createEdgeCommand, createEdgeHandler(kernel));
   stopKernel = kernel.observeCommits((commit) => {
     if (closing || !activeGesture) return;
     const gesture = activeGesture;
@@ -137,6 +174,16 @@ export function activateInteractionRuntime(
       else reapplyGestureProjection(gesture);
     } else if (gesture.type === 'viewport-pan') {
       reapplyGestureProjection(gesture);
+    } else if (gesture.type === 'connection') {
+      const sourceExists = commit.after.query.getNode(gesture.source.nodeId) !== undefined;
+      if (!sourceExists) {
+        cancelGesture(gesture, 'stale', true);
+      } else {
+        if (gesture.target.type !== 'none' && !commit.after.query.getNode(gesture.target.anchor.nodeId)) {
+          gesture.target = { type: 'none' };
+        }
+        reapplyGestureProjection(gesture);
+      }
     }
   });
   stopSession = session.subscribe(() => {
@@ -148,7 +195,7 @@ export function activateInteractionRuntime(
       } else {
         reapplyGestureProjection(gesture);
       }
-    } else if (gesture.type === 'node-drag') {
+    } else if (gesture.type === 'node-drag' || gesture.type === 'connection') {
       reapplyGestureProjection(gesture);
     }
   });
@@ -156,6 +203,9 @@ export function activateInteractionRuntime(
     if (closing) return;
     if (input.type === 'key.down' || input.type === 'key.up') {
       if (input.code === 'Space') spacePressed = input.type === 'key.down';
+      if (input.type === 'key.down' && input.code === 'Escape' && activeGesture?.type === 'connection') {
+        cancelGesture(activeGesture, 'escape', true);
+      }
       return;
     }
     if (input.type === 'focus.lost') {
@@ -215,6 +265,19 @@ export function activateInteractionRuntime(
       if (input.button !== 'primary' && input.button !== 'auxiliary') return;
       const hit = renderer.hitTest(input.screenPoint);
       if (hit === null) return;
+      if (
+        hit.type === 'connection-anchor' &&
+        hit.role === 'source' &&
+        config.connection &&
+        input.pointerType !== 'mouse'
+      ) {
+        context.diagnostics.emit({
+          name: interactionDiagnosticEvents.inputRejected,
+          level: 'info',
+          attributes: { inputType: 'pointer.down', gestureType: 'connection', reason: 'unsupported-pointer' },
+        });
+        return;
+      }
       renderer.focus();
       renderer.capturePointer(input.pointerId);
       const selectionGesture: SelectionGesture = { type: 'selection', pointerId: input.pointerId };
@@ -228,6 +291,23 @@ export function activateInteractionRuntime(
             baseViewport: session.getSnapshot().viewport,
             active: false,
           };
+          return;
+        }
+        if (
+          hit.type === 'connection-anchor' &&
+          hit.role === 'source' &&
+          config.connection &&
+          input.button === 'primary'
+        ) {
+          const gesture: ConnectionGesture = {
+            type: 'connection',
+            pointerId: input.pointerId,
+            source: { nodeId: hit.nodeId, role: 'source' },
+            pointerWorldPoint: input.worldPoint,
+            target: { type: 'none' },
+          };
+          activeGesture = gesture;
+          reapplyGestureProjection(gesture);
           return;
         }
         const additive = input.modifiers.shift || input.modifiers.meta || input.modifiers.control;
@@ -317,10 +397,34 @@ export function activateInteractionRuntime(
           zoom: gesture.baseViewport.zoom,
         };
         reapplyGestureProjection(gesture);
+      } else if (gesture.type === 'connection') {
+        updateConnectionGesture(gesture, input.worldPoint, renderer.hitTest(input.screenPoint));
+        reapplyGestureProjection(gesture);
       }
       return;
     }
     if (input.type === 'pointer.up' && gesture && input.pointerId === gesture.pointerId) {
+      if (gesture.type === 'connection') {
+        updateConnectionGesture(gesture, input.worldPoint, renderer.hitTest(input.screenPoint));
+        activeGesture = undefined;
+        const cleanupErrors: unknown[] = [];
+        for (const cleanup of [() => projection.update(null), () => renderer.releasePointer(gesture.pointerId)]) {
+          try {
+            cleanup();
+          } catch (error) {
+            cleanupErrors.push(error);
+          }
+        }
+        if (cleanupErrors.length > 0) {
+          throw new AggregateError(cleanupErrors, 'Connection Gesture terminal cleanup failed.');
+        }
+        if (gesture.target.type === 'valid' && config.connection) {
+          executeCreateEdge(commands, context.diagnostics, config.connection.materializeEdge, gesture, () => closing);
+        } else {
+          emitGestureCancellation(context.diagnostics, 'connection', 'invalid-target');
+        }
+        return;
+      }
       activeGesture = undefined;
       if (gesture.type === 'node-drag' && gesture.active) {
         projection.update(null);
@@ -338,7 +442,33 @@ export function activateInteractionRuntime(
 }
 
 function hasPreview(gesture: ActiveGesture): boolean {
-  return gesture.type !== 'selection' && gesture.active;
+  return gesture.type === 'connection' || (gesture.type !== 'selection' && gesture.active);
+}
+
+function updateConnectionGesture(gesture: ConnectionGesture, pointerWorldPoint: Point, hit: HitResult | null): void {
+  gesture.pointerWorldPoint = pointerWorldPoint;
+  if (!isConnectionAnchorHit(hit)) {
+    gesture.target = { type: 'none' };
+    return;
+  }
+  if (hit.role !== 'target') {
+    gesture.target = { type: 'none' };
+    return;
+  }
+  const anchor = { nodeId: hit.nodeId, role: hit.role } as const;
+  gesture.target = hit.nodeId !== gesture.source.nodeId ? { type: 'valid', anchor } : { type: 'invalid', anchor };
+}
+
+function isConnectionAnchorHit(
+  hit: unknown,
+): hit is Readonly<{ type: 'connection-anchor'; nodeId: NodeId; role: 'source' | 'target' }> {
+  return (
+    typeof hit === 'object' &&
+    hit !== null &&
+    Reflect.get(hit, 'type') === 'connection-anchor' &&
+    typeof Reflect.get(hit, 'nodeId') === 'string' &&
+    (Reflect.get(hit, 'role') === 'source' || Reflect.get(hit, 'role') === 'target')
+  );
 }
 
 function emitGestureCancellation(
@@ -370,6 +500,45 @@ function executeMoveNodes(
       attributes: { gestureType: 'node-drag' },
     });
   });
+}
+
+function executeCreateEdge(
+  commands: CommandService,
+  diagnostics: PluginDiagnostics,
+  materializeEdge: ConnectionMaterializer,
+  gesture: ConnectionGesture,
+  isClosing: () => boolean,
+): void {
+  if (gesture.target.type !== 'valid') return;
+  const source = Object.freeze({ nodeId: gesture.source.nodeId });
+  const target = Object.freeze({ nodeId: gesture.target.anchor.nodeId });
+  let edge;
+  try {
+    edge = materializeEdge(Object.freeze({ source, target }));
+  } catch (error) {
+    diagnostics.reportFault(error, {
+      name: interactionDiagnosticEvents.connectionMaterializerFault,
+      attributes: { gestureType: 'connection' },
+    });
+    return;
+  }
+  void commands
+    .execute(createEdgeCommand, {
+      edge,
+      source: gesture.source,
+      target: gesture.target.anchor,
+    })
+    .catch((error) => {
+      if (isClosing()) return;
+      if (error instanceof InteractionError && error.code === 'STALE_GESTURE') {
+        emitGestureCancellation(diagnostics, 'connection', 'stale');
+        return;
+      }
+      diagnostics.reportFault(error, {
+        name: interactionDiagnosticEvents.commandFault,
+        attributes: { gestureType: 'connection' },
+      });
+    });
 }
 
 function viewportsEqual(left: Viewport, right: Viewport): boolean {

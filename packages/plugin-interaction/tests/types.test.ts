@@ -3,8 +3,11 @@ import { test } from 'bun:test';
 import type { Plugin } from '@cflow/runtime-cordis';
 
 import {
+  createEdgeCommand,
   interactionPlugin,
   moveNodesCommand,
+  type CreateEdgeInput,
+  type CreateEdgeResult,
   type InteractionConfig,
   type MoveNodesInput,
   type MoveNodesResult,
@@ -19,8 +22,16 @@ test('publishes Interaction as a Runtime Plugin without a state Service', () => 
   expectCommand(moveNodesCommand.id);
   void plugin;
   void verifyCommand;
+  const verifyCreateEdge = (input: CreateEdgeInput): CreateEdgeResult | PromiseLike<CreateEdgeResult> => {
+    void input;
+    return Promise.reject(new Error('type-only'));
+  };
+  expectCommand(createEdgeCommand.id);
+  void verifyCreateEdge;
 });
 
 function expectCommand(id: string): void {
-  if (id !== 'interaction.nodes.move') throw new Error('Unexpected Move Nodes Command ID.');
+  if (id !== 'interaction.nodes.move' && id !== 'interaction.edge.create') {
+    throw new Error('Unexpected Interaction Command ID.');
+  }
 }

@@ -26,4 +26,11 @@ test('describes backend-neutral Interaction Projection values', () => {
       },
     ],
   });
+  const connection: InteractionProjection = {
+    type: 'connection-preview',
+    source: { nodeId: nodeId('source'), role: 'source' },
+    pointerWorldPoint: { x: 80, y: 40 },
+    target: { type: 'valid', anchor: { nodeId: nodeId('target'), role: 'target' } },
+  };
+  expect(connection.target.type).toBe('valid');
 });

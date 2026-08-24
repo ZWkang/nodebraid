@@ -111,7 +111,7 @@ try {
     callerContentPreserved: true,
     targetChildOrder: ['defs', 'g'],
     projectionClass: 'cflow-renderer-svg',
-    layerClasses: ['cflow-renderer-svg__edges', 'cflow-renderer-svg__nodes'],
+    layerClasses: ['cflow-renderer-svg__edges', 'cflow-renderer-svg__nodes', 'cflow-renderer-svg__interaction'],
     node: {
       tagName: 'rect',
       id: 'node-a',
@@ -119,6 +119,19 @@ try {
       y: '20',
       width: '80',
       height: '40',
+    },
+  });
+  await assertBrowserScenario('globalThis.__cflowRendererSvgConnectionAnchors()', {
+    layerClasses: ['cflow-renderer-svg__edges', 'cflow-renderer-svg__nodes', 'cflow-renderer-svg__interaction'],
+    anchors: [
+      { nodeId: 'anchor-node', role: 'target', cx: '20', cy: '50' },
+      { nodeId: 'anchor-node', role: 'source', cx: '100', cy: '50' },
+    ],
+    sourceHit: {
+      type: 'connection-anchor',
+      nodeId: 'anchor-node',
+      role: 'source',
+      worldPoint: { x: 100, y: 50 },
     },
   });
 
@@ -449,6 +462,70 @@ try {
   ]);
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownNodeDragInteraction()');
 
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await dispatchMouseDown(120, 120);
+  await dispatchMouseMove(180, 160);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
+    preview: { x1: '120', y1: '120', x2: '180', y2: '160', target: 'none' },
+  });
+  await dispatchMouseMove(240, 120);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
+    preview: { x1: '120', y1: '120', x2: '240', y2: '120', target: 'valid' },
+  });
+  await dispatchMouseUp(240, 120);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 2,
+    edgeIds: ['connected-edge'],
+    preview: null,
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgUndoConnectionInteraction()');
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 3,
+    edgeIds: [],
+    preview: null,
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgRedoConnectionInteraction()');
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 4,
+    edgeIds: ['connected-edge'],
+    preview: null,
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await dispatchMouseDown(120, 120);
+  await dispatchMouseMove(240, 120);
+  await dispatchConnectionEscape();
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
+    preview: null,
+  });
+  await dispatchMouseUp(240, 120);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await dispatchMouseDown(120, 120);
+  await dispatchMouseMove(240, 120);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgDeleteConnectionTarget()');
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 2,
+    edgeIds: [],
+    preview: { x1: '120', y1: '120', x2: '240', y2: '120', target: 'none' },
+  });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgDeleteConnectionSource()');
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 3,
+    edgeIds: [],
+    preview: null,
+  });
+  await dispatchMouseUp(240, 120);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupViewportPanInteraction()');
   await dispatchMouseDown(50, 200);
   await dispatchMouseMove(100, 250);
@@ -667,7 +744,7 @@ try {
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownInteractionProjectionInput()');
 
   await assertBrowserScenario('globalThis.__cflowRendererSvgTicket02FirstEdge()', {
-    layerClasses: ['cflow-renderer-svg__edges', 'cflow-renderer-svg__nodes'],
+    layerClasses: ['cflow-renderer-svg__edges', 'cflow-renderer-svg__nodes', 'cflow-renderer-svg__interaction'],
     edgeIds: ['edge-a', 'edge-b'],
     nodeIds: ['node-a', 'node-b', 'node-c'],
     edge: {
@@ -1519,6 +1596,12 @@ async function dispatchSpaceKey(type: 'keyDown' | 'keyUp'): Promise<void> {
   const domType = type === 'keyDown' ? 'keydown' : 'keyup';
   await evaluateBrowserScenario(
     `document.querySelector('#viewport-pan-interaction-target').dispatchEvent(new KeyboardEvent('${domType}', { key: ' ', code: 'Space', bubbles: true }))`,
+  );
+}
+
+async function dispatchConnectionEscape(): Promise<void> {
+  await evaluateBrowserScenario(
+    `document.querySelector('#connection-interaction-target').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }))`,
   );
 }
 

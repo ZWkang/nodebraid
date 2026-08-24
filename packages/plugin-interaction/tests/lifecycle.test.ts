@@ -20,6 +20,46 @@ import { createPluginHost, definePlugin } from '@cflow/runtime-cordis';
 
 import { interactionPlugin, moveNodesCommand } from '../src';
 
+test('Connection Escape attempts every terminal cleanup and never materializes after cleanup failure', async () => {
+  const faults: DiagnosticFault[] = [];
+  const recording = new CleanupFailureRenderer();
+  recording.connectionMode = true;
+  let materialized = 0;
+  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => recording)),
+    host.install(interactionPlugin, {
+      connection: {
+        materializeEdge({ source, target }) {
+          materialized += 1;
+          return { id: 'never' as never, type: 'flow', source, target, data: null };
+        },
+      },
+    }),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+
+  recording.emit(pointerInput('pointer.down', 0));
+  recording.failCleanup = true;
+  recording.emit(escapeInput());
+
+  expect(recording.cleanupCalls).toEqual(['clear-projection', 'release:7']);
+  expect(materialized).toBe(0);
+  expect(faults).toHaveLength(1);
+  const fault = faults[0];
+  if (!fault) throw new Error('Expected the Connection cleanup Fault.');
+  expect(fault.error).toBeInstanceOf(AggregateError);
+  expect((fault.error as AggregateError).errors).toEqual([
+    recording.clearProjectionError,
+    recording.releasePointerError,
+  ]);
+  recording.failCleanup = false;
+  await host.dispose();
+});
+
 test('Interaction cleanup continues after every public Renderer cleanup failure', async () => {
   const recording = new CleanupFailureRenderer();
   let commands: CommandService | undefined;
@@ -258,6 +298,7 @@ class CleanupFailureRenderer implements CanvasRenderer {
   readonly cleanupCalls: string[] = [];
   readonly #listeners = new Set<RendererInputListener>();
   failCleanup = false;
+  connectionMode = false;
 
   updateDocument(_update: RendererDocumentUpdate): void {}
   updateSession(_snapshot: SessionSnapshot): void {}
@@ -276,7 +317,15 @@ class CleanupFailureRenderer implements CanvasRenderer {
       this.#listeners.delete(listener);
     };
   }
-  hitTest(_point: ScreenPoint): HitResult {
+  hitTest(point: ScreenPoint): HitResult {
+    if (this.connectionMode) {
+      return {
+        type: 'connection-anchor',
+        nodeId: nodeId(point.x === 0 ? 'source' : 'target'),
+        role: point.x === 0 ? 'source' : 'target',
+        worldPoint: point,
+      };
+    }
     return { type: 'canvas', worldPoint: { x: 0, y: 0 } };
   }
   capturePointer(_pointerId: number): void {}
@@ -354,6 +403,16 @@ function spaceInput(type: 'key.down' | 'key.up'): RendererInput {
     type,
     key: ' ',
     code: 'Space',
+    repeat: false,
+    modifiers: { alt: false, control: false, meta: false, shift: false },
+  };
+}
+
+function escapeInput(): RendererInput {
+  return {
+    type: 'key.down',
+    key: 'Escape',
+    code: 'Escape',
     repeat: false,
     modifiers: { alt: false, control: false, meta: false, shift: false },
   };

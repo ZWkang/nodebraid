@@ -61,7 +61,13 @@ export type HitResult =
   | { readonly type: 'canvas'; readonly worldPoint: Point }
   | { readonly type: 'node'; readonly nodeId: NodeId; readonly worldPoint: Point }
   | { readonly type: 'edge'; readonly edgeId: EdgeId; readonly worldPoint: Point }
-  | { readonly type: 'port'; readonly nodeId: NodeId; readonly portId: string; readonly worldPoint: Point };
+  | { readonly type: 'port'; readonly nodeId: NodeId; readonly portId: string; readonly worldPoint: Point }
+  | {
+      readonly type: 'connection-anchor';
+      readonly nodeId: NodeId;
+      readonly role: 'source' | 'target';
+      readonly worldPoint: Point;
+    };
 
 export type RendererDocumentUpdate =
   { readonly type: 'reset'; readonly view: CanvasView } | { readonly type: 'commit'; readonly commit: CanvasCommit };

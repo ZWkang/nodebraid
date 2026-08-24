@@ -13,5 +13,6 @@ export interface SvgInputPolicies {
 export interface SvgRendererConfig {
   readonly target: SVGSVGElement;
   readonly edgeHitTolerance?: number;
+  readonly connectionAnchorHitTolerance?: number;
   readonly input?: SvgInputPolicies;
 }
