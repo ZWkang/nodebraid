@@ -1,5 +1,7 @@
 # NodeBraid
 
+English | [简体中文](./README.zh-CN.md)
+
 NodeBraid is a plugin-based, renderer-agnostic flow canvas engine for building
 TypeScript editors without coupling document state, interaction, layout, and
 rendering to one UI framework or graphics backend.
