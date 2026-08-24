@@ -1,20 +1,56 @@
-# CFlow
+# NodeBraid
 
-CFlow is a plugin-based, renderer-agnostic flow canvas engine built as a Bun-powered TypeScript monorepo.
+NodeBraid is a plugin-based, renderer-agnostic flow canvas engine for building
+TypeScript editors without coupling document state, interaction, layout, and
+rendering to one UI framework or graphics backend.
 
-The repository is currently at an early implementation stage. The planned architecture and package boundaries are documented in [ARCHITECTURE.md](./ARCHITECTURE.md); the document describes the target design rather than the currently implemented feature set.
+The current source tree provides a runnable headless Canvas Runtime, an explicit
+Basic Canvas Composition, and a reference-quality SVG Renderer. The implemented
+surface includes atomic graph transactions, Selection and Viewport state, typed
+Commands, Undo/Redo, Selection, multi-Node Drag, Pan, Wheel Zoom, node-level Edge
+Connection, Dagre and ELK Layout Providers, structured diagnostics, and Plugin
+lifecycle ownership.
+
+NodeBraid is still pre-release. It does not yet provide a product-level editor
+shell, framework adapters, persistence, collaboration, or a serialization
+schema. The source packages use the `@nodebraid/*` namespace but have not been
+published to npm.
 
 ## Documentation
 
-The public, Chinese-first Documentation Site explains the currently implemented capability families and workspace packages:
+The Chinese-first Documentation Site separates implemented behavior from target
+architecture and roadmap work:
 
-- [Documentation Site](https://zwkang.github.io/cflow/)
-- [English Documentation](https://zwkang.github.io/cflow/en/)
-- [Quick Start](https://zwkang.github.io/cflow/guide/quick-start)
-- [Capability Map](https://zwkang.github.io/cflow/capabilities/)
-- [Module Index](https://zwkang.github.io/cflow/modules/)
+- [Documentation Site](https://zwkang.github.io/nodebraid/)
+- [Current Status](https://zwkang.github.io/nodebraid/status)
+- [English Documentation](https://zwkang.github.io/nodebraid/en/)
+- [Quick Start](https://zwkang.github.io/nodebraid/guide/quick-start)
+- [Capability Map](https://zwkang.github.io/nodebraid/capabilities/)
+- [Module Index](https://zwkang.github.io/nodebraid/modules/)
+- [Architecture](./ARCHITECTURE.md)
 
-The packages declared under the `@cflow/*` names are not yet published by this project. Do not install the unrelated package currently using the `@cflow/core` name; follow the source-checkout Quick Start instead.
+## Quick Start from source
+
+NodeBraid requires Node.js 22.13.0 or newer and Bun 1.2.19 or newer.
+
+```bash
+git clone https://github.com/ZWkang/nodebraid.git
+cd nodebraid
+bun install
+bun run docs:quick-start
+```
+
+The command builds the public `@nodebraid/core` facade and its workspace
+dependencies, then runs a real Plugin Host and Kernel transaction. Successful
+output is:
+
+```text
+revision=1 nodes=1
+```
+
+The complete example is shared with the Documentation Site at
+[`website/examples/quick-start.ts`](./website/examples/quick-start.ts). Follow
+the source-checkout workflow until the initial npm release is available.
 
 ## Stack
 
@@ -30,25 +66,25 @@ The packages declared under the `@cflow/*` names are not yet published by this p
 ```text
 .
 ├── packages/
-│   ├── core/           # @cflow/core public facade
-│   ├── diagnostics/    # @cflow/diagnostics errors and Diagnostic Events
-│   ├── interaction-api/ # @cflow/interaction-api transient projection values
-│   ├── kernel/         # @cflow/kernel graph state and transactions
-│   ├── layout-api/     # @cflow/layout-api provider-neutral contracts
-│   ├── layout-dagre/   # @cflow/layout-dagre official Provider
-│   ├── layout-elk/     # @cflow/layout-elk official Provider
-│   ├── plugin-command/ # @cflow/plugin-command Runtime Service adapter
-│   ├── plugin-history/ # @cflow/plugin-history History Runtime Plugin
-│   ├── plugin-interaction/ # @cflow/plugin-interaction Interaction Runtime
-│   ├── plugin-kernel/  # @cflow/plugin-kernel Runtime Service adapter
-│   ├── plugin-layout/  # @cflow/plugin-layout Runtime Command integration
-│   ├── plugin-renderer/ # @cflow/plugin-renderer Renderer Runtime adapter
-│   ├── plugin-session/ # @cflow/plugin-session Runtime Service adapter
-│   ├── preset-basic/   # @cflow/preset-basic Basic Canvas Composition
-│   ├── renderer-api/   # @cflow/renderer-api backend-neutral contracts
-│   ├── renderer-svg/   # @cflow/renderer-svg official SVG Provider
-│   ├── session-api/    # @cflow/session-api immutable Session values
-│   └── runtime-cordis/ # @cflow/runtime-cordis implementation package
+│   ├── core/           # @nodebraid/core public facade
+│   ├── diagnostics/    # @nodebraid/diagnostics errors and Diagnostic Events
+│   ├── interaction-api/ # @nodebraid/interaction-api transient projection values
+│   ├── kernel/         # @nodebraid/kernel graph state and transactions
+│   ├── layout-api/     # @nodebraid/layout-api provider-neutral contracts
+│   ├── layout-dagre/   # @nodebraid/layout-dagre official Provider
+│   ├── layout-elk/     # @nodebraid/layout-elk official Provider
+│   ├── plugin-command/ # @nodebraid/plugin-command Runtime Service adapter
+│   ├── plugin-history/ # @nodebraid/plugin-history History Runtime Plugin
+│   ├── plugin-interaction/ # @nodebraid/plugin-interaction Interaction Runtime
+│   ├── plugin-kernel/  # @nodebraid/plugin-kernel Runtime Service adapter
+│   ├── plugin-layout/  # @nodebraid/plugin-layout Runtime Command integration
+│   ├── plugin-renderer/ # @nodebraid/plugin-renderer Renderer Runtime adapter
+│   ├── plugin-session/ # @nodebraid/plugin-session Runtime Service adapter
+│   ├── preset-basic/   # @nodebraid/preset-basic Basic Canvas Composition
+│   ├── renderer-api/   # @nodebraid/renderer-api backend-neutral contracts
+│   ├── renderer-svg/   # @nodebraid/renderer-svg official SVG Provider
+│   ├── session-api/    # @nodebraid/session-api immutable Session values
+│   └── runtime-cordis/ # @nodebraid/runtime-cordis implementation package
 ├── src/               # Root TypeScript source
 ├── tests/             # Root automated tests
 ├── .changeset/        # Changesets configuration
@@ -59,14 +95,14 @@ The packages declared under the `@cflow/*` names are not yet published by this p
 
 ## Plugin Host packages
 
-Most consumers should import the CFlow-owned Plugin Host API from `@cflow/core`:
+Most consumers should import the NodeBraid-owned Plugin Host API from `@nodebraid/core`:
 
 ```ts
-import { createPluginHost, definePlugin, defineService } from '@cflow/core';
+import { createPluginHost, definePlugin, defineService } from '@nodebraid/core';
 ```
 
-`@cflow/core` is the public facade. It delegates the implementation to
-`@cflow/runtime-cordis`; advanced consumers can import that narrow package
+`@nodebraid/core` is the public facade. It delegates the implementation to
+`@nodebraid/runtime-cordis`; advanced consumers can import that narrow package
 directly, but Cordis types remain internal to it.
 
 The first version implements the empty Plugin Host substrate, Runtime Service
@@ -77,7 +113,7 @@ substrate is the boundary that owns the first installation and final disposal.
 
 ## Diagnostics package
 
-`@cflow/diagnostics` provides the shared `CFlowError`, stable `domain + code`
+`@nodebraid/diagnostics` provides the shared `NodeBraidError`, stable `domain + code`
 identity, immutable Diagnostic Event contracts, safe error description, and
 package-owned event catalogs. It has no runtime or logging dependency.
 
@@ -89,31 +125,31 @@ application-owned adapters.
 
 ## Kernel package
 
-`@cflow/kernel` now implements the renderer-independent graph core: Node and
+`@nodebraid/kernel` now implements the renderer-independent graph core: Node and
 Edge state, synchronous atomic Transactions, revision-bound Canvas Views,
 Canvas Query, and reversible before/after Change Sets.
 
-Most consumers can import the same interface from `@cflow/core`. The pure
+Most consumers can import the same interface from `@nodebraid/core`. The pure
 Kernel does not depend on Plugin Host, Cordis, RxJS, a Renderer, DOM objects, or
 framework adapters.
 
 ## Kernel Runtime Plugin
 
-`@cflow/plugin-kernel` now provides one fresh Kernel per Plugin Activation
+`@nodebraid/plugin-kernel` now provides one fresh Kernel per Plugin Activation
 through a narrow `KernelService`. Consumers can read revision-bound Views, run
 synchronous Transactions, and observe successful net-changing Canvas Commits
 in revision order. Observer failures are reported without rolling back Kernel
 state or blocking later Observers, and reentrant Transactions queue later
 Commits until the current revision reaches every Observer.
 
-The adapter depends directly on the CFlow-owned seams in `@cflow/kernel` and
-`@cflow/runtime-cordis`; it does not introduce a speculative plugin-api package.
+The adapter depends directly on the NodeBraid-owned seams in `@nodebraid/kernel` and
+`@nodebraid/runtime-cordis`; it does not introduce a speculative plugin-api package.
 Concrete Renderer Providers, Persistence, initial Document import, and
 asynchronous Transactions remain future Runtime work.
 
 ## Session Runtime Plugin
 
-`@cflow/plugin-session` provides one fresh `SessionService` per Plugin
+`@nodebraid/plugin-session` provides one fresh `SessionService` per Plugin
 Activation. It owns immutable Selection and Viewport Snapshots outside the
 Document and requires the narrow Kernel Service so external Selection updates
 can accept only entities from the current Canvas View.
@@ -126,31 +162,31 @@ Snapshot per notification round.
 
 ## Renderer packages
 
-`@cflow/renderer-api` defines the backend-neutral `CanvasRenderer` protocol:
+`@nodebraid/renderer-api` defines the backend-neutral `CanvasRenderer` protocol:
 reset-or-commit Document updates, independent Session Snapshots, transient
 Interaction Projections, normalized Pointer/Wheel/Keyboard/Focus input,
 semantic Hit Results, input control, and structured Renderer errors. It
 contains no DOM, Canvas Context, native Event, Konva, Pixi, Cordis, or framework
 types.
 
-`@cflow/plugin-renderer` binds one typed Renderer Factory to Kernel and Session
+`@nodebraid/plugin-renderer` binds one typed Renderer Factory to Kernel and Session
 Services. Each Activation owns one target-bound Renderer Instance, delivers a
 Document reset before Session state, preserves resolvable Selection ordering,
 and exposes input, hit testing, Pointer Capture, Focus, and one exclusive
 Interaction Projection Binding through the narrow `RendererService`. Concrete
-Renderer Providers remain separate, explicit packages; CFlow does not select a
+Renderer Providers remain separate, explicit packages; NodeBraid does not select a
 default Provider or registry.
 
-`@cflow/renderer-svg` is the first reference-quality official Provider. It
+`@nodebraid/renderer-svg` is the first reference-quality official Provider. It
 binds one existing `SVGSVGElement`, projects generic rectangular Nodes and
 straight Edges, and exposes stable SVG classes and data attributes without
 interpreting product Node types or data. It remains an explicit peer Provider
-and is not re-exported as a default through `@cflow/core`.
+and is not re-exported as a default through `@nodebraid/core`.
 
 ## Interaction packages
 
-`@cflow/interaction-api` owns immutable, backend-neutral Node Drag, Viewport Pan,
-and Connection Preview values. `@cflow/plugin-interaction` consumes normalized
+`@nodebraid/interaction-api` owns immutable, backend-neutral Node Drag, Viewport Pan,
+and Connection Preview values. `@nodebraid/plugin-interaction` consumes normalized
 Renderer Input and Hit Results, implements selection, multi-Node Drag,
 Canvas/middle/Space Pan, anchored Wheel Zoom, and optional mouse-only Node-level
 Edge Connection, and exposes no state Service.
@@ -165,19 +201,19 @@ packages but still does not re-export the concrete SVG Provider.
 
 ## Command Runtime Plugin
 
-`@cflow/plugin-command` provides one empty `CommandService` per Plugin
+`@nodebraid/plugin-command` provides one empty `CommandService` per Plugin
 Activation. Feature Plugins register strongly typed Command tokens and own the
 returned registrations; callers execute the same tokens through a Promise
 seam that supports synchronous or asynchronous handlers.
 
 Registration or Service disposal first removes Commands from lookup, then
 aborts and awaits in-flight handlers. The Command package depends only on the
-CFlow-owned Plugin Host seam. Feature Plugins acquire Kernel, Session, or
+NodeBraid-owned Plugin Host seam. Feature Plugins acquire Kernel, Session, or
 external capabilities through their own static Service Bindings.
 
 ## History Runtime Plugin
 
-`@cflow/plugin-history` records each post-Baseline non-replay Canvas Commit as
+`@nodebraid/plugin-history` records each post-Baseline non-replay Canvas Commit as
 one History Entry and exposes strongly typed Undo/Redo Commands. Replay applies
 the stored Change Set through Kernel Service Transactions, creates a new
 increasing revision, and returns the resulting Canvas Commit.
@@ -190,7 +226,7 @@ current History Activation; reactivation starts from a fresh empty Baseline.
 
 ## Basic Canvas Composition
 
-`@cflow/preset-basic` exposes `createBasicCanvasPlugin(rendererFactory,
+`@nodebraid/preset-basic` exposes `createBasicCanvasPlugin(rendererFactory,
 options?)`, a backend-neutral ordinary Plugin that owns Kernel, Command,
 Session, Renderer, Interaction, and History through Child Installations. The
 Composition waits for every child to become active and releases them in reverse
@@ -199,18 +235,18 @@ dependency-safe order.
 Applications still create the Plugin Host, configure Diagnostics, select a
 concrete Renderer Factory, and install Layout or domain capabilities as sibling
 Plugins. Core re-exports the Composition factory but does not re-export or
-select `@cflow/renderer-svg` or another concrete Provider.
+select `@nodebraid/renderer-svg` or another concrete Provider.
 
 ## Layout packages
 
-`@cflow/layout-api` defines immutable Layout Inputs, asynchronous Layout
+`@nodebraid/layout-api` defines immutable Layout Inputs, asynchronous Layout
 Engines, explicit capabilities, and strict Layout Proposal validation.
-`@cflow/plugin-layout` binds one Engine to one typed Command and commits a valid
+`@nodebraid/plugin-layout` binds one Engine to one typed Command and commits a valid
 Proposal through one synchronous Kernel Transaction with cancellation and stale
 revision protection.
 
-`@cflow/layout-dagre` and `@cflow/layout-elk` are explicit optional Providers;
-they are not re-exported by `@cflow/core`. Dagre provides deterministic full
+`@nodebraid/layout-dagre` and `@nodebraid/layout-elk` are explicit optional Providers;
+they are not re-exported by `@nodebraid/core`. Dagre provides deterministic full
 layout. ELK provides full layout and uses its Stress algorithm for incremental
 and Fixed Node requests.
 
@@ -252,7 +288,7 @@ Preview the built documentation site:
 bun run docs:preview
 ```
 
-Build the root entry and every `@cflow/*` workspace package:
+Build the root entry and every `@nodebraid/*` workspace package:
 
 ```bash
 bun run build
@@ -281,62 +317,62 @@ without pre-existing `dist` directories.
 Build and verify only the standalone Diagnostics package:
 
 ```bash
-bun run --filter '@cflow/diagnostics' build
+bun run --filter '@nodebraid/diagnostics' build
 ```
 
-Build only the declarations required by `@cflow/plugin-kernel`:
+Build only the declarations required by `@nodebraid/plugin-kernel`:
 
 ```bash
-bun run --filter '@cflow/plugin-kernel' build:dependencies
+bun run --filter '@nodebraid/plugin-kernel' build:dependencies
 ```
 
-Build only the declaration required by `@cflow/plugin-command`:
+Build only the declaration required by `@nodebraid/plugin-command`:
 
 ```bash
-bun run --filter '@cflow/plugin-command' build:dependencies
+bun run --filter '@nodebraid/plugin-command' build:dependencies
 ```
 
 Build the declarations required by the Layout packages:
 
 ```bash
-bun run --filter '@cflow/layout-api' build:dependencies
-bun run --filter '@cflow/plugin-layout' build:dependencies
-bun run --filter '@cflow/layout-dagre' build:dependencies
-bun run --filter '@cflow/layout-elk' build:dependencies
+bun run --filter '@nodebraid/layout-api' build:dependencies
+bun run --filter '@nodebraid/plugin-layout' build:dependencies
+bun run --filter '@nodebraid/layout-dagre' build:dependencies
+bun run --filter '@nodebraid/layout-elk' build:dependencies
 ```
 
-Build the declarations required by `@cflow/plugin-session`:
+Build the declarations required by `@nodebraid/plugin-session`:
 
 ```bash
-bun run --filter '@cflow/plugin-session' build:dependencies
+bun run --filter '@nodebraid/plugin-session' build:dependencies
 ```
 
-Build the declarations required by `@cflow/plugin-history`:
+Build the declarations required by `@nodebraid/plugin-history`:
 
 ```bash
-bun run --filter '@cflow/plugin-history' build:dependencies
+bun run --filter '@nodebraid/plugin-history' build:dependencies
 ```
 
 Build the declarations required by the SVG Renderer Provider and run its real
 browser seam tests:
 
 ```bash
-bun run --filter '@cflow/renderer-svg' build:dependencies
-bun run --filter '@cflow/renderer-svg' build:test-dependencies
-bun run --filter '@cflow/renderer-svg' test:browser
+bun run --filter '@nodebraid/renderer-svg' build:dependencies
+bun run --filter '@nodebraid/renderer-svg' build:test-dependencies
+bun run --filter '@nodebraid/renderer-svg' test:browser
 ```
 
 Build the Interaction value and Runtime packages independently:
 
 ```bash
-bun run --filter '@cflow/interaction-api' build:dependencies
-bun run --filter '@cflow/plugin-interaction' build:dependencies
+bun run --filter '@nodebraid/interaction-api' build:dependencies
+bun run --filter '@nodebraid/plugin-interaction' build:dependencies
 ```
 
 Build the dependencies required by the Basic Canvas Composition:
 
 ```bash
-bun run --filter '@cflow/preset-basic' build:dependencies
+bun run --filter '@nodebraid/preset-basic' build:dependencies
 ```
 
 Format supported files:
@@ -373,8 +409,8 @@ Each workspace package can define its own build and publish behavior while shari
 Run a script for one workspace package from the repository root:
 
 ```bash
-bun run --filter '@cflow/core' build
-bun run --filter '@cflow/core' test
+bun run --filter '@nodebraid/core' build
+bun run --filter '@nodebraid/core' test
 ```
 
 ## License
