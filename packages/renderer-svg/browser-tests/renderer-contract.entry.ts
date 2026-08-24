@@ -85,6 +85,12 @@ interface ConnectionProjectionEvidenceResult {
   readonly baselineError: GeometryErrorResult['error'];
 }
 
+interface ConnectionAnchorLinearCommitResult {
+  readonly boundedIdentityReads: boolean;
+  readonly anchorCount: number;
+  readonly edgeCount: number;
+}
+
 interface FirstInteractionProjectionResult {
   readonly previewPosition: Readonly<{ x: string | null; y: string | null }>;
   readonly documentPosition: Readonly<{ x: number; y: number }>;
@@ -601,6 +607,7 @@ declare global {
   var __cflowRendererSvgConnectionAnchors: () => Promise<ConnectionAnchorResult>;
   var __cflowRendererSvgConnectionProjectionRollback: () => Promise<ConnectionProjectionRollbackResult>;
   var __cflowRendererSvgConnectionProjectionEvidence: () => Promise<ConnectionProjectionEvidenceResult>;
+  var __cflowRendererSvgConnectionAnchorLinearCommit: () => Promise<ConnectionAnchorLinearCommitResult>;
   var __cflowRendererSvgInteractionProjectionFirstNode: () => Promise<FirstInteractionProjectionResult>;
   var __cflowRendererSvgInteractionProjectionClear: () => Promise<InteractionProjectionClearResult>;
   var __cflowRendererSvgInteractionProjectionReplacement: () => Promise<InteractionProjectionReplacementResult>;
@@ -1065,6 +1072,57 @@ globalThis.__cflowRendererSvgConnectionProjectionEvidence = async (): Promise<Co
   await renderer.dispose();
   target.remove();
   return { copiedX2, baselineError };
+};
+
+globalThis.__cflowRendererSvgConnectionAnchorLinearCommit = async (): Promise<ConnectionAnchorLinearCommitResult> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.setAttribute('width', '1200');
+  target.setAttribute('height', '800');
+  document.body.append(target);
+  const renderer = createSvgRenderer({ target });
+  const kernel = createCanvasKernel();
+  kernel.transact((transaction) => {
+    for (let index = 0; index < 100; index += 1) {
+      transaction.nodes.add({
+        id: nodeId(`linear-node-${String(index).padStart(3, '0')}`),
+        type: 'task',
+        position: { x: (index % 10) * 100, y: Math.floor(index / 10) * 60 },
+        size: { width: 80, height: 40 },
+        data: null,
+      });
+    }
+  });
+  renderer.updateDocument({ type: 'reset', view: kernel.read() });
+  renderer.updateSession({ selection: { nodeIds: [], edgeIds: [] }, viewport: { x: 0, y: 0, zoom: 1 } });
+  let identityReads = 0;
+  for (const anchor of target.querySelectorAll<SVGCircleElement>('[data-cflow-connection-anchor-node-id]')) {
+    const originalGetAttribute = anchor.getAttribute.bind(anchor);
+    anchor.getAttribute = (name: string): string | null => {
+      if (name === 'data-cflow-connection-anchor-node-id' || name === 'data-cflow-connection-anchor-role') {
+        identityReads += 1;
+      }
+      return originalGetAttribute(name);
+    };
+  }
+  const commit = kernel.transact((transaction) => {
+    transaction.edges.add({
+      id: edgeId('linear-edge'),
+      type: 'flow',
+      source: { nodeId: nodeId('linear-node-000') },
+      target: { nodeId: nodeId('linear-node-001') },
+      data: null,
+    });
+  });
+  if (!commit) throw new Error('Expected the Anchor linearity Edge Commit.');
+  renderer.updateDocument({ type: 'commit', commit });
+  const result = {
+    boundedIdentityReads: identityReads <= 800,
+    anchorCount: target.querySelectorAll('[data-cflow-connection-anchor-node-id]').length,
+    edgeCount: target.querySelectorAll('[data-cflow-edge-id]').length,
+  };
+  await renderer.dispose();
+  target.remove();
+  return result;
 };
 
 globalThis.__cflowRendererSvgInteractionProjectionFirstNode = async (): Promise<FirstInteractionProjectionResult> => {

@@ -116,27 +116,25 @@ function syncConnectionAnchors(
   interactionLayer: SVGGElement,
   journal: DomMutationJournal,
 ): void {
-  const expectedKeys = new Set<string>();
   const ordered: SVGCircleElement[] = [];
   const existingAnchors = Array.from(
     interactionLayer.querySelectorAll<SVGCircleElement>('[data-cflow-connection-anchor-node-id]'),
   );
+  const existingAnchorsByKey = new Map(existingAnchors.map((element) => [connectionAnchorKey(element), element]));
   for (const node of nodes) {
     for (const candidate of createConnectionAnchorElements(document, node)) {
       const key = connectionAnchorKey(candidate);
-      expectedKeys.add(key);
-      const existing = existingAnchors.find((element) => connectionAnchorKey(element) === key);
+      const existing = existingAnchorsByKey.get(key);
       if (existing) {
         copyGeometryAttributes(candidate, existing, ['cx', 'cy'], journal);
         ordered.push(existing);
+        existingAnchorsByKey.delete(key);
       } else {
         ordered.push(candidate);
       }
     }
   }
-  for (const element of existingAnchors) {
-    if (!expectedKeys.has(connectionAnchorKey(element))) element.remove();
-  }
+  for (const element of existingAnchorsByKey.values()) element.remove();
   interactionLayer.append(...ordered, ...interactionLayer.querySelectorAll('[data-cflow-connection-preview]'));
 }
 

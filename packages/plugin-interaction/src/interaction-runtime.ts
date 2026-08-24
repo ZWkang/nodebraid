@@ -265,10 +265,12 @@ export function activateInteractionRuntime(
       if (input.button !== 'primary' && input.button !== 'auxiliary') return;
       const hit = renderer.hitTest(input.screenPoint);
       if (hit === null) return;
+      const additive = input.modifiers.shift || input.modifiers.meta || input.modifiers.control;
       if (
         hit.type === 'connection-anchor' &&
         hit.role === 'source' &&
         config.connection &&
+        !additive &&
         input.pointerType !== 'mouse'
       ) {
         context.diagnostics.emit({
@@ -297,6 +299,7 @@ export function activateInteractionRuntime(
           hit.type === 'connection-anchor' &&
           hit.role === 'source' &&
           config.connection &&
+          !additive &&
           input.button === 'primary'
         ) {
           const gesture: ConnectionGesture = {
@@ -310,7 +313,6 @@ export function activateInteractionRuntime(
           reapplyGestureProjection(gesture);
           return;
         }
-        const additive = input.modifiers.shift || input.modifiers.meta || input.modifiers.control;
         if (additive) {
           selectionGesture.completeClick = () =>
             session.setSelection(computeClickSelection(session.getSnapshot().selection, hit, true));

@@ -151,6 +151,11 @@ try {
       details: { issue: 'CONNECTION_ANCHOR_UNAVAILABLE' },
     },
   });
+  await assertBrowserScenario('globalThis.__cflowRendererSvgConnectionAnchorLinearCommit()', {
+    boundedIdentityReads: true,
+    anchorCount: 200,
+    edgeCount: 1,
+  });
 
   await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionFirstNode()', {
     previewPosition: { x: '80', y: '90' },
@@ -542,6 +547,16 @@ try {
   await dispatchMouseDown(120, 120);
   await dispatchMouseUp(120, 120);
   await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionSelection()', ['connection-source']);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await dispatchShiftClick(120, 120);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionSelection()', ['connection-source']);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
+    preview: null,
+  });
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
 
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');

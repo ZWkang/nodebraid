@@ -44,6 +44,34 @@ test('Composition snapshots Interaction options when the Plugin is created', asy
   }
 });
 
+test('Composition snapshots nested Connection options when the Plugin is created', async () => {
+  const connection = {
+    materializeEdge() {
+      return {
+        id: 'snapshotted-edge' as never,
+        type: 'flow',
+        source: { nodeId: 'source' as never },
+        target: { nodeId: 'target' as never },
+        data: null,
+      };
+    },
+  };
+  const plugin = createBasicCanvasPlugin(
+    (_config: Readonly<{ readonly targetId: string }>) => new TestCanvasRenderer(),
+    { interaction: { connection } },
+  );
+  connection.materializeEdge = null as never;
+  const host = createPluginHost();
+  const composition = host.install(plugin, { targetId: 'snapshotted-connection' });
+
+  try {
+    await expect(composition.whenActive()).resolves.toBeUndefined();
+    expect(composition.getSnapshot()).toEqual({ status: 'active' });
+  } finally {
+    await host.dispose();
+  }
+});
+
 test('Composition creation rejects malformed or unknown top-level options', () => {
   const factory = (_config: Readonly<{ readonly targetId: string }>) => new TestCanvasRenderer();
 
