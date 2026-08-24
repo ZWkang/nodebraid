@@ -59,7 +59,6 @@ the source-checkout workflow until the initial npm release is available.
 - oxlint for linting.
 - Prettier for formatting.
 - agent-browser for real Chromium Renderer seam tests.
-- Changesets for versioning and publishing.
 
 ## Structure
 
@@ -87,7 +86,6 @@ the source-checkout workflow until the initial npm release is available.
 │   └── runtime-cordis/ # @nodebraid/runtime-cordis implementation package
 ├── src/               # Root TypeScript source
 ├── tests/             # Root automated tests
-├── .changeset/        # Changesets configuration
 ├── bun.lock           # Bun lockfile
 ├── tsconfig.base.json # Shared TypeScript compiler options
 └── tsconfig.json      # Root TypeScript project
@@ -380,17 +378,6 @@ Format supported files:
 ```bash
 bun run format
 ```
-
-Create release metadata for a publishable package change:
-
-```bash
-bun run changeset
-```
-
-The release workflow runs on `main` and requires these GitHub Actions secrets:
-
-- `NPM_TOKEN` for npm publishing.
-- `TOKEN` for the Changesets release pull request.
 
 ## Creating a Package
 

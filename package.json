@@ -25,7 +25,6 @@
   ],
   "sideEffects": false,
   "devDependencies": {
-    "@changesets/cli": "^2.31.0",
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
     "@types/bun": "^1.2.19",
@@ -42,7 +41,6 @@
   },
   "scripts": {
     "check": "bun run lint && bun run typecheck && bun run format:check && bun run test && bun run test:browser && bun run build && bun run docs:check",
-    "changeset": "changeset",
     "dev": "bun build ./src/index.ts --outdir ./dist --target bun --watch",
     "docs:build": "NODEBRAID_DOCS_BASE=/nodebraid/ vitepress build website",
     "docs:check": "bun run docs:verify && bun run docs:quick-start && bun run docs:build",
@@ -58,8 +56,6 @@
     "test": "bun test",
     "test:browser": "bun run --filter '@nodebraid/renderer-svg' test:browser",
     "typecheck": "bun run --filter '@nodebraid/core' build && tsgo --noEmit -p tsconfig.json && tsgo --noEmit -p packages/diagnostics/tsconfig.json && tsgo --noEmit -p packages/kernel/tsconfig.json && tsgo --noEmit -p packages/session-api/tsconfig.json && tsgo --noEmit -p packages/interaction-api/tsconfig.json && tsgo --noEmit -p packages/renderer-api/tsconfig.json && tsgo --noEmit -p packages/renderer-svg/tsconfig.json && tsgo --noEmit -p packages/runtime-cordis/tsconfig.json && tsgo --noEmit -p packages/plugin-command/tsconfig.json && tsgo --noEmit -p packages/plugin-kernel/tsconfig.json && tsgo --noEmit -p packages/plugin-session/tsconfig.json && tsgo --noEmit -p packages/plugin-renderer/tsconfig.json && tsgo --noEmit -p packages/plugin-interaction/tsconfig.json && tsgo --noEmit -p packages/plugin-history/tsconfig.json && tsgo --noEmit -p packages/preset-basic/tsconfig.json && tsgo --noEmit -p packages/layout-api/tsconfig.json && tsgo --noEmit -p packages/layout-dagre/tsconfig.json && tsgo --noEmit -p packages/layout-elk/tsconfig.json && tsgo --noEmit -p packages/plugin-layout/tsconfig.json && tsgo --noEmit -p packages/core/tsconfig.json",
-    "release:version": "changeset version",
-    "release": "changeset publish",
     "update-deps": "bun update --latest",
     "setup": "bun install"
   },
