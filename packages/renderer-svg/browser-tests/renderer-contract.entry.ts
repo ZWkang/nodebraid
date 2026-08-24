@@ -80,6 +80,11 @@ interface ConnectionProjectionRollbackResult {
   readonly y2: string | null;
 }
 
+interface ConnectionProjectionEvidenceResult {
+  readonly copiedX2: string | null;
+  readonly baselineError: GeometryErrorResult['error'];
+}
+
 interface FirstInteractionProjectionResult {
   readonly previewPosition: Readonly<{ x: string | null; y: string | null }>;
   readonly documentPosition: Readonly<{ x: number; y: number }>;
@@ -595,6 +600,7 @@ declare global {
   var __cflowRendererSvgTicket01: () => Promise<FirstNodeResult>;
   var __cflowRendererSvgConnectionAnchors: () => Promise<ConnectionAnchorResult>;
   var __cflowRendererSvgConnectionProjectionRollback: () => Promise<ConnectionProjectionRollbackResult>;
+  var __cflowRendererSvgConnectionProjectionEvidence: () => Promise<ConnectionProjectionEvidenceResult>;
   var __cflowRendererSvgInteractionProjectionFirstNode: () => Promise<FirstInteractionProjectionResult>;
   var __cflowRendererSvgInteractionProjectionClear: () => Promise<InteractionProjectionClearResult>;
   var __cflowRendererSvgInteractionProjectionReplacement: () => Promise<InteractionProjectionReplacementResult>;
@@ -640,6 +646,7 @@ declare global {
   var __cflowRendererSvgRedoConnectionInteraction: () => Promise<void>;
   var __cflowRendererSvgDeleteConnectionSource: () => void;
   var __cflowRendererSvgDeleteConnectionTarget: () => void;
+  var __cflowRendererSvgUpdateConnectionGeometry: () => void;
   var __cflowRendererSvgTeardownConnectionInteraction: () => Promise<void>;
   var __cflowRendererSvgSetupViewportPanInteraction: (configured?: boolean) => Promise<void>;
   var __cflowRendererSvgReadViewportPanInteraction: () => ViewportPanInteractionResult;
@@ -1017,6 +1024,47 @@ globalThis.__cflowRendererSvgConnectionProjectionRollback = async (): Promise<Co
   await renderer.dispose();
   target.remove();
   return result;
+};
+
+globalThis.__cflowRendererSvgConnectionProjectionEvidence = async (): Promise<ConnectionProjectionEvidenceResult> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  document.body.append(target);
+  const renderer = createSvgRenderer({ target });
+  const kernel = createCanvasKernel();
+  const sourceNodeId = nodeId('evidence-source');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({
+      id: sourceNodeId,
+      type: 'task',
+      position: { x: 40, y: 100 },
+      size: { width: 80, height: 40 },
+      data: null,
+    });
+  });
+  renderer.updateDocument({ type: 'reset', view: kernel.read() });
+  renderer.updateSession({ selection: { nodeIds: [], edgeIds: [] }, viewport: { x: 0, y: 0, zoom: 1 } });
+  const projection = {
+    type: 'connection-preview' as const,
+    source: { nodeId: sourceNodeId, role: 'source' as const },
+    pointerWorldPoint: { x: 150, y: 140 },
+    target: { type: 'none' as const },
+  };
+  renderer.updateInteraction(projection);
+  projection.pointerWorldPoint.x = 999;
+  const copiedX2 = target.querySelector('[data-cflow-connection-preview]')?.getAttribute('x2') ?? null;
+  const baselineError = captureRendererError(() =>
+    renderer.updateInteraction({
+      type: 'connection-preview',
+      source: { nodeId: nodeId('missing-source'), role: 'source' },
+      pointerWorldPoint: { x: 200, y: 140 },
+      target: { type: 'none' },
+    }),
+  );
+  await renderer.dispose();
+  target.remove();
+  return { copiedX2, baselineError };
 };
 
 globalThis.__cflowRendererSvgInteractionProjectionFirstNode = async (): Promise<FirstInteractionProjectionResult> => {
@@ -3767,6 +3815,28 @@ globalThis.__cflowRendererSvgDeleteConnectionSource = (): void => {
 globalThis.__cflowRendererSvgDeleteConnectionTarget = (): void => {
   if (!connectionInteractionKernel) throw new Error('Expected Connection Kernel before target deletion.');
   connectionInteractionKernel.transact((transaction) => transaction.nodes.remove(nodeId('connection-target')));
+};
+
+globalThis.__cflowRendererSvgUpdateConnectionGeometry = (): void => {
+  if (!connectionInteractionKernel) throw new Error('Expected Connection Kernel before Geometry update.');
+  connectionInteractionKernel.transact((transaction) => {
+    const sourceId = nodeId('connection-source');
+    const source = transaction.query.getNode(sourceId);
+    if (!source) throw new Error('Expected Connection source before Geometry update.');
+    transaction.nodes.replace(sourceId, {
+      ...source,
+      position: { x: 60, y: 120 },
+      size: { width: 100, height: 60 },
+      data: { label: 'updated' },
+    });
+    transaction.nodes.add({
+      id: nodeId('connection-unrelated'),
+      type: 'task',
+      position: { x: 40, y: 240 },
+      size: { width: 40, height: 40 },
+      data: null,
+    });
+  });
 };
 
 globalThis.__cflowRendererSvgTeardownConnectionInteraction = async (): Promise<void> => {

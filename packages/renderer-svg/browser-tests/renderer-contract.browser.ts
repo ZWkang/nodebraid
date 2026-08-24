@@ -142,6 +142,15 @@ try {
     x2: '150',
     y2: '140',
   });
+  await assertBrowserScenario('globalThis.__cflowRendererSvgConnectionProjectionEvidence()', {
+    copiedX2: '150',
+    baselineError: {
+      name: 'RendererError',
+      domain: 'renderer',
+      code: 'INTERACTION_OUT_OF_SYNC',
+      details: { issue: 'CONNECTION_ANCHOR_UNAVAILABLE' },
+    },
+  });
 
   await assertBrowserScenario('globalThis.__cflowRendererSvgInteractionProjectionFirstNode()', {
     previewPosition: { x: '80', y: '90' },
@@ -504,6 +513,31 @@ try {
   });
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
 
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await dispatchMouseDown(120, 120);
+  await dispatchMouseMove(40, 120);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
+    preview: { x1: '120', y1: '120', x2: '40', y2: '120', target: 'invalid' },
+  });
+  await dispatchConnectionEscape();
+  await dispatchMouseUp(40, 120);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await dispatchMouseDown(120, 120);
+  await dispatchMouseMove(180, 160);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgUpdateConnectionGeometry()');
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 2,
+    edgeIds: [],
+    preview: { x1: '160', y1: '150', x2: '180', y2: '160', target: 'none' },
+  });
+  await dispatchConnectionEscape();
+  await dispatchMouseUp(180, 160);
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction(false)');
   await dispatchMouseDown(120, 120);
   await dispatchMouseUp(120, 120);
@@ -526,6 +560,18 @@ try {
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
 
   await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
+  await dispatchMiddleDown(120, 120);
+  await dispatchMiddleMove(180, 160);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
+    preview: null,
+  });
+  await dispatchMiddleUp(180, 160);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionViewport()', { x: 60, y: 40, zoom: 1 });
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgTeardownConnectionInteraction()');
+
+  await evaluateBrowserScenario('globalThis.__cflowRendererSvgSetupConnectionInteraction()');
   await dispatchConnectionPointer('pointerdown', 77, 'pen', 120, 120);
   await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
     revision: 1,
@@ -533,6 +579,13 @@ try {
     preview: null,
   });
   await dispatchConnectionPointer('pointerup', 77, 'pen', 120, 120);
+  await dispatchConnectionPointer('pointerdown', 78, 'touch', 120, 120);
+  await assertBrowserScenario('globalThis.__cflowRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
+    preview: null,
+  });
+  await dispatchConnectionPointer('pointerup', 78, 'touch', 120, 120);
   await dispatchMouseDown(120, 120);
   await dispatchMouseMove(180, 160);
   await dispatchConnectionPointer('pointercancel', 1, 'mouse', 180, 160);
@@ -1669,7 +1722,7 @@ async function dispatchConnectionKey(type: 'keydown' | 'keyup', key: string, cod
 async function dispatchConnectionPointer(
   type: 'pointerdown' | 'pointerup' | 'pointercancel',
   pointerId: number,
-  pointerType: 'mouse' | 'pen',
+  pointerType: 'mouse' | 'pen' | 'touch',
   x: number,
   y: number,
 ): Promise<void> {

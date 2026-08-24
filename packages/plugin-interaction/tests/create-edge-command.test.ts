@@ -121,6 +121,19 @@ test('Create Edge commits one complete Node-level Edge', async () => {
       target: { nodeId: targetNodeId, role: 'target' },
     }),
   ).rejects.toMatchObject({ domain: 'interaction', code: 'STALE_GESTURE' });
+  await expect(
+    commands.execute(createEdgeCommand, {
+      edge: {
+        id: edgeId('missing-target-edge'),
+        type: 'flow',
+        source: { nodeId: sourceNodeId },
+        target: { nodeId: nodeId('missing-target') },
+        data: null,
+      },
+      source: { nodeId: sourceNodeId, role: 'source' },
+      target: { nodeId: nodeId('missing-target'), role: 'target' },
+    }),
+  ).rejects.toMatchObject({ domain: 'interaction', code: 'STALE_GESTURE' });
   expect(kernel.read()).toBe(beforeRejected);
   await host.dispose();
 });
