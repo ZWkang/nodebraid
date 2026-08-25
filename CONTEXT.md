@@ -316,6 +316,14 @@ _Avoid_: Temporary Renderer Error, Retry State, Interaction Cancellation
 Interaction 中表示成员资格切换的输入修饰语义；Shift、Meta 或 Control 任一按下时成立，Alt 不属于该语义。
 _Avoid_: Platform Command Key, Range Selection Modifier, Alt Modifier
 
+**World Rect**:
+世界坐标中的方向无关轴对齐矩形，以左上角位置和正宽高表达，不携带 DOM、SVG 或其他 Renderer handle。
+_Avoid_: DOMRect, SVG Rect Element, Drag Bounds
+
+**Box Selection**:
+从空白 Canvas 开始、以瞬态 World Rect 表达候选范围，并在结束时选择与该范围相交 Node 的 Active Gesture；它不选择 Edge、Port 或 Connection Anchor。
+_Avoid_: Lasso, Marquee State, Preselection
+
 **Node Drag**:
 为一个或多个已选 Node 产生绝对候选 World position，并以稳定 Document 结果或取消结束的 Active Gesture。
 _Avoid_: Node Transaction, Renderer Drag, Position Stream
