@@ -10,6 +10,9 @@ Composition，以及参考级 SVG Renderer。已实现能力包括原子图事�
 Viewport 状态、类型化 Command、Undo/Redo、Selection、多节点拖拽、Pan、Wheel
 Zoom、节点级连边、Dagre 与 ELK Layout Provider、结构化诊断和 Plugin 生命周期所有权。
 
+私有 React Examples Application 已把这些公共 interface 组合成可单独启动的 Basic SVG
+开发者参考应用，包含统一导航、实时 Runtime 状态、连边、Viewport 控制与 History 操作。
+
 NodeBraid 仍处于预发布阶段，尚未提供产品级编辑器外壳、框架适配器、持久化、协作或序列化
 schema。源码 package 使用 `@nodebraid/*` 命名空间，但尚未发布到 npm。
 
@@ -21,9 +24,14 @@ schema。源码 package 使用 `@nodebraid/*` 命名空间，但尚未发布到 
 - [当前状态](https://zwkang.github.io/nodebraid/status)
 - [English Documentation](https://zwkang.github.io/nodebraid/en/)
 - [Quick Start](https://zwkang.github.io/nodebraid/guide/quick-start)
+- [Interactive Example](https://zwkang.github.io/nodebraid/guide/interactive-example)
 - [能力地图](https://zwkang.github.io/nodebraid/capabilities/)
 - [模块索引](https://zwkang.github.io/nodebraid/modules/)
 - [架构设计](./ARCHITECTURE.md)
+
+推送到 `main` 后，`.github/workflows/docs.yml` 会构建并部署 Documentation Site。
+仓库 Settings → Pages 中的 Source 必须设置为 **GitHub Actions**；项目站点地址为
+`https://zwkang.github.io/nodebraid/`。
 
 ## 从源码快速开始
 
@@ -54,6 +62,7 @@ revision=1 nodes=1
 - oxlint：代码检查。
 - Prettier：格式化。
 - agent-browser：真实 Chromium Renderer seam 测试。
+- React、TanStack Router、shadcn Base UI、Tailwind CSS 与 Vite：私有 Examples Application。
 
 ## 目录结构
 
@@ -79,6 +88,8 @@ revision=1 nodes=1
 │   ├── renderer-svg/   # @nodebraid/renderer-svg 官方 SVG Provider
 │   ├── session-api/    # @nodebraid/session-api 不可变 Session 值
 │   └── runtime-cordis/ # @nodebraid/runtime-cordis 实现 package
+├── examples/
+│   └── app/            # 私有 @nodebraid/examples React 应用
 ├── src/               # 根 TypeScript 源码
 ├── tests/             # 根自动化测试
 ├── bun.lock           # Bun 锁文件
@@ -235,6 +246,20 @@ bunx agent-browser install
 
 ```bash
 bun run dev
+```
+
+单独启动私有 Examples Application：
+
+```bash
+bun run example:dev
+```
+
+独立构建或验证 Examples Application：
+
+```bash
+bun run example:build
+bun run example:test
+bun run example:check
 ```
 
 启动本地文档站：

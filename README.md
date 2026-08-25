@@ -13,6 +13,10 @@ Commands, Undo/Redo, Selection, multi-Node Drag, Pan, Wheel Zoom, node-level Edg
 Connection, Dagre and ELK Layout Providers, structured diagnostics, and Plugin
 lifecycle ownership.
 
+A private React Examples Application now turns those public interfaces into a
+runnable Basic SVG developer reference with unified navigation, live Runtime
+state, Edge Connection, viewport controls, and History actions.
+
 NodeBraid is still pre-release. It does not yet provide a product-level editor
 shell, framework adapters, persistence, collaboration, or a serialization
 schema. The source packages use the `@nodebraid/*` namespace but have not been
@@ -27,9 +31,15 @@ architecture and roadmap work:
 - [Current Status](https://zwkang.github.io/nodebraid/status)
 - [English Documentation](https://zwkang.github.io/nodebraid/en/)
 - [Quick Start](https://zwkang.github.io/nodebraid/guide/quick-start)
+- [Interactive Example](https://zwkang.github.io/nodebraid/guide/interactive-example)
 - [Capability Map](https://zwkang.github.io/nodebraid/capabilities/)
 - [Module Index](https://zwkang.github.io/nodebraid/modules/)
 - [Architecture](./ARCHITECTURE.md)
+
+Pushes to `main` build and deploy the Documentation Site through
+`.github/workflows/docs.yml`. The repository's Pages source must be configured
+as **GitHub Actions** in Settings → Pages; the deployed project URL is
+`https://zwkang.github.io/nodebraid/`.
 
 ## Quick Start from source
 
@@ -61,6 +71,7 @@ the source-checkout workflow until the initial npm release is available.
 - oxlint for linting.
 - Prettier for formatting.
 - agent-browser for real Chromium Renderer seam tests.
+- React, TanStack Router, shadcn with Base UI, Tailwind CSS, and Vite for the private Examples Application.
 
 ## Structure
 
@@ -86,6 +97,8 @@ the source-checkout workflow until the initial npm release is available.
 │   ├── renderer-svg/   # @nodebraid/renderer-svg official SVG Provider
 │   ├── session-api/    # @nodebraid/session-api immutable Session values
 │   └── runtime-cordis/ # @nodebraid/runtime-cordis implementation package
+├── examples/
+│   └── app/            # private @nodebraid/examples React application
 ├── src/               # Root TypeScript source
 ├── tests/             # Root automated tests
 ├── bun.lock           # Bun lockfile
@@ -268,6 +281,20 @@ Start a watch build for local development:
 
 ```bash
 bun run dev
+```
+
+Start the private Examples Application:
+
+```bash
+bun run example:dev
+```
+
+Build or verify the Examples Application independently:
+
+```bash
+bun run example:build
+bun run example:test
+bun run example:check
 ```
 
 Start the documentation site locally:

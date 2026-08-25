@@ -20,6 +20,7 @@ NodeBraid 处于早期实现阶段，但已经形成一条可运行的 headless 
 - Dagre full Layout Provider；
 - ELK full、incremental 与 Fixed Node Layout Provider；
 - 后端无关的 `@nodebraid/preset-basic` Basic Canvas Composition，以及真实 SVG canonical example；
+- 私有 `@nodebraid/examples` React/TanStack Router Examples Application，以及真实 UI + Canvas Chromium 验收；
 - 通过 `@nodebraid/core` 聚合的公共 facade。
 
 完整清单见 [全部模块](/modules/)。
@@ -27,7 +28,7 @@ NodeBraid 处于早期实现阶段，但已经形成一条可运行的 headless 
 ## 当前缺口
 
 ::: warning 尚无产品级编辑器外壳
-当前分支已经交付 Basic Canvas Composition、Interaction v1 Node-level Edge Connection 与 SVG Renderer 闭环，但仍没有 framework adapter 或产品级编辑器外壳。首版不包含 Port-aware Connection、box selection、snapping、pinch/touch 工具、文本编辑、产品节点 UI 或可扩展 Tool Registry。
+当前分支已经交付 Basic Canvas Composition、Interaction v1 Node-level Edge Connection、SVG Renderer 闭环与开发者参考 Examples Application，但仍没有公开 framework adapter 或产品级编辑器外壳。首版不包含 Port-aware Connection、box selection、snapping、pinch/touch 工具、文本编辑、产品节点 UI 或可扩展 Tool Registry。
 :::
 
 当前也没有 Persistence、Collaboration、序列化 schema 或远程同步能力。目标架构中出现某个名称，不代表它已经成为公共 package。

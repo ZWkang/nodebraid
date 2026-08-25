@@ -1,7 +1,7 @@
 // Public-seam browser scenarios for the complete SVG Renderer contract.
 import { createCanvasKernel, edgeId, nodeId, type EdgeEndpoint } from '@nodebraid/kernel';
 import type { DiagnosticEvent, DiagnosticFault } from '@nodebraid/diagnostics';
-import { interactionPlugin, moveNodesCommand } from '@nodebraid/plugin-interaction';
+import { interactionPlugin } from '@nodebraid/plugin-interaction';
 import { commandPlugin, commandService, type CommandService } from '@nodebraid/plugin-command';
 import { historyPlugin, redoCommand, undoCommand } from '@nodebraid/plugin-history';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
@@ -10,40 +10,7 @@ import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/p
 import type { CanvasRenderer, RendererInput } from '@nodebraid/renderer-api';
 import { createPluginHost, definePlugin, type PluginInstallation } from '@nodebraid/runtime-cordis';
 
-import { createBasicCanvasSvgExample, type BasicCanvasSvgExample } from '../../../website/examples/basic-canvas-svg';
 import { createSvgRenderer, type SvgRendererConfig } from '../src';
-
-interface BasicCanvasCompositionResult {
-  readonly initialRevision: number;
-  readonly selected: boolean;
-  readonly moved: Readonly<{ revision: number; x: string | null; y: string | null }>;
-  readonly undone: Readonly<{ revision: number; x: string | null; y: string | null }>;
-  readonly redone: Readonly<{ revision: number; x: string | null; y: string | null }>;
-  readonly viewportTransform: string | null;
-  readonly projectionRemoved: boolean;
-  readonly targetReusable: boolean;
-}
-
-interface BasicCanvasCaptureResult {
-  readonly inputCount: number;
-  readonly pointerId: number | null;
-  readonly captured: boolean;
-}
-
-interface BasicCanvasCaptureDisposalResult {
-  readonly inputCount: number;
-  readonly captureReleased: boolean;
-  readonly projectionRemoved: boolean;
-}
-
-interface BasicCanvasIsolationResult {
-  readonly firstRevision: number;
-  readonly secondRevision: number;
-  readonly snapshotsDistinct: boolean;
-  readonly projectionsDistinct: boolean;
-  readonly firstNodeCount: number;
-  readonly secondNodeCount: number;
-}
 
 interface FirstNodeResult {
   readonly callerContentPreserved: boolean;
@@ -597,12 +564,6 @@ interface ResizeObserverMultipleErrorsResult {
 }
 
 declare global {
-  var __nodebraidBasicCanvasCompositionExample: () => Promise<BasicCanvasCompositionResult>;
-  var __nodebraidBasicCanvasCompositionSetupCapture: () => Promise<void>;
-  var __nodebraidBasicCanvasCompositionReadCapture: () => BasicCanvasCaptureResult;
-  var __nodebraidBasicCanvasCompositionDisposeCapture: () => Promise<BasicCanvasCaptureDisposalResult>;
-  var __nodebraidBasicCanvasCompositionTeardownCapture: () => void;
-  var __nodebraidBasicCanvasCompositionIsolation: () => Promise<BasicCanvasIsolationResult>;
   var __nodebraidRendererSvgTicket01: () => Promise<FirstNodeResult>;
   var __nodebraidRendererSvgConnectionAnchors: () => Promise<ConnectionAnchorResult>;
   var __nodebraidRendererSvgConnectionProjectionRollback: () => Promise<ConnectionProjectionRollbackResult>;
@@ -730,165 +691,6 @@ declare global {
   var __nodebraidRendererSvgReviewResizeObserverRollbackFailure: () => Promise<ResizeObserverRollbackFailureResult>;
   var __nodebraidRendererSvgReviewResizeObserverMultipleErrors: () => Promise<ResizeObserverMultipleErrorsResult>;
 }
-
-let basicCanvasCaptureExample: BasicCanvasSvgExample | undefined;
-let basicCanvasCaptureTarget: SVGSVGElement | undefined;
-
-globalThis.__nodebraidBasicCanvasCompositionExample = async (): Promise<BasicCanvasCompositionResult> => {
-  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  target.setAttribute('width', '400');
-  target.setAttribute('height', '300');
-  document.body.append(target);
-  const example = await createBasicCanvasSvgExample(target);
-  const nodeSelector = `[data-nodebraid-node-id="${example.primaryNodeId}"]`;
-  const node = target.querySelector<SVGRectElement>(nodeSelector);
-  if (!node) throw new Error('Expected the Basic Canvas Composition to project its primary Node.');
-
-  const initialRevision = example.kernel.read().snapshot.revision;
-  example.session.setSelection({ nodeIds: [example.primaryNodeId], edgeIds: [] });
-  const selected = node.getAttribute('data-nodebraid-selected') === 'true';
-  const movedCommit = await example.commands.execute(moveNodesCommand, {
-    moves: [
-      {
-        nodeId: example.primaryNodeId,
-        basePosition: { x: 10, y: 20 },
-        position: { x: 80, y: 90 },
-      },
-    ],
-  });
-  const moved = {
-    revision: movedCommit?.after.snapshot.revision ?? -1,
-    x: node.getAttribute('x'),
-    y: node.getAttribute('y'),
-  };
-  const undoCommit = await example.commands.execute(undoCommand, undefined);
-  const undone = {
-    revision: undoCommit.after.snapshot.revision,
-    x: node.getAttribute('x'),
-    y: node.getAttribute('y'),
-  };
-  const redoCommit = await example.commands.execute(redoCommand, undefined);
-  const redone = {
-    revision: redoCommit.after.snapshot.revision,
-    x: node.getAttribute('x'),
-    y: node.getAttribute('y'),
-  };
-  const bounds = target.getBoundingClientRect();
-  target.dispatchEvent(
-    new WheelEvent('wheel', {
-      clientX: bounds.left,
-      clientY: bounds.top,
-      deltaY: -100,
-      deltaMode: WheelEvent.DOM_DELTA_PIXEL,
-      bubbles: true,
-      cancelable: true,
-    }),
-  );
-  const viewportTransform =
-    target.querySelector<SVGGElement>('[data-nodebraid-renderer-svg-root]')?.getAttribute('transform') ?? null;
-
-  await example.dispose();
-  const projectionRemoved = target.querySelector('[data-nodebraid-renderer-svg-root]') === null;
-  const replacement = createSvgRenderer({ target });
-  const targetReusable = target.querySelector('[data-nodebraid-renderer-svg-root]') !== null;
-  await replacement.dispose();
-  target.remove();
-
-  return {
-    initialRevision,
-    selected,
-    moved,
-    undone,
-    redone,
-    viewportTransform,
-    projectionRemoved,
-    targetReusable,
-  };
-};
-
-globalThis.__nodebraidBasicCanvasCompositionSetupCapture = async (): Promise<void> => {
-  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  target.id = 'basic-canvas-composition-capture-target';
-  target.setAttribute('width', '400');
-  target.setAttribute('height', '300');
-  target.style.position = 'fixed';
-  target.style.left = '0';
-  target.style.top = '0';
-  target.style.zIndex = '2000';
-  document.body.append(target);
-  basicCanvasCaptureTarget = target;
-  basicCanvasCaptureExample = await createBasicCanvasSvgExample(target);
-};
-
-globalThis.__nodebraidBasicCanvasCompositionReadCapture = (): BasicCanvasCaptureResult => {
-  const example = basicCanvasCaptureExample;
-  const target = basicCanvasCaptureTarget;
-  if (!example || !target) throw new Error('Expected the Basic Canvas Capture example.');
-  const pointerId = example.getLastPointerId();
-  return {
-    inputCount: example.getInputCount(),
-    pointerId: pointerId ?? null,
-    captured: pointerId !== undefined && target.hasPointerCapture(pointerId),
-  };
-};
-
-globalThis.__nodebraidBasicCanvasCompositionDisposeCapture = async (): Promise<BasicCanvasCaptureDisposalResult> => {
-  const example = basicCanvasCaptureExample;
-  const target = basicCanvasCaptureTarget;
-  if (!example || !target) throw new Error('Expected the Basic Canvas Capture example.');
-  const pointerId = example.getLastPointerId();
-  await example.dispose();
-  return {
-    inputCount: example.getInputCount(),
-    captureReleased: pointerId === undefined || !target.hasPointerCapture(pointerId),
-    projectionRemoved: target.querySelector('[data-nodebraid-renderer-svg-root]') === null,
-  };
-};
-
-globalThis.__nodebraidBasicCanvasCompositionTeardownCapture = (): void => {
-  basicCanvasCaptureTarget?.remove();
-  basicCanvasCaptureTarget = undefined;
-  basicCanvasCaptureExample = undefined;
-};
-
-globalThis.__nodebraidBasicCanvasCompositionIsolation = async (): Promise<BasicCanvasIsolationResult> => {
-  const firstTarget = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  const secondTarget = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  for (const target of [firstTarget, secondTarget]) {
-    target.setAttribute('width', '400');
-    target.setAttribute('height', '300');
-  }
-  document.body.append(firstTarget, secondTarget);
-  const first = await createBasicCanvasSvgExample(firstTarget);
-  const second = await createBasicCanvasSvgExample(secondTarget);
-
-  try {
-    first.kernel.transact((transaction) => {
-      transaction.nodes.add({
-        id: nodeId('basic-isolation-extra'),
-        type: 'task',
-        position: { x: 120, y: 220 },
-        size: { width: 80, height: 40 },
-        data: null,
-      });
-    });
-    const firstProjection = firstTarget.querySelector('[data-nodebraid-renderer-svg-root]');
-    const secondProjection = secondTarget.querySelector('[data-nodebraid-renderer-svg-root]');
-    return {
-      firstRevision: first.kernel.read().snapshot.revision,
-      secondRevision: second.kernel.read().snapshot.revision,
-      snapshotsDistinct: first.session.getSnapshot() !== second.session.getSnapshot(),
-      projectionsDistinct:
-        firstProjection !== null && secondProjection !== null && firstProjection !== secondProjection,
-      firstNodeCount: firstTarget.querySelectorAll('[data-nodebraid-node-id]').length,
-      secondNodeCount: secondTarget.querySelectorAll('[data-nodebraid-node-id]').length,
-    };
-  } finally {
-    await Promise.all([first.dispose(), second.dispose()]);
-    firstTarget.remove();
-    secondTarget.remove();
-  }
-};
 
 globalThis.__nodebraidRendererSvgTicket01 = async (): Promise<FirstNodeResult> => {
   const target = document.querySelector<SVGSVGElement>('#target');

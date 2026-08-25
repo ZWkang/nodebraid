@@ -7,3 +7,6 @@
 
 # Browser test bundles and reports are generated during verification.
 .tmp/
+
+# TanStack Router owns generated route trees.
+**/routeTree.gen.ts

@@ -5,5 +5,7 @@ reference/
 .playwright-cli/
 website/.vitepress/cache/
 website/.vitepress/dist/
+examples/*/dist/
+examples/*/.tanstack/
 
 .env

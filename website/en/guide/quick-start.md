@@ -50,8 +50,8 @@ This example is deliberately headless: it verifies Document and Runtime composit
 
 ## 4. Next layer: Basic Canvas Composition with real SVG
 
-For the complete basic Kernel, Command, Session, Renderer, Interaction, and History composition, select the SVG Provider explicitly and install [`@nodebraid/preset-basic`](/en/modules/preset-basic). The canonical example below is the same source exercised by the real-Chromium acceptance path:
+For the complete basic Kernel, Command, Session, Renderer, Interaction, and History composition, select the SVG Provider explicitly and install [`@nodebraid/preset-basic`](/en/modules/preset-basic). The Runtime creator below is shared by the private [Interactive Example](/en/guide/interactive-example) and the real-Chromium acceptance path:
 
-<<< ../../examples/basic-canvas-svg.ts{ts}
+<<< ../../../examples/app/src/example-runtime/create-example-runtime.ts{ts}
 
 The application still creates the Host, passes an existing SVG Target, and consumes capabilities through static Required Service Bindings. The preset creates no default Renderer and does not turn SVG or DOM into generic dependencies.
