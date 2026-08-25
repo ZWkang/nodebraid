@@ -157,6 +157,41 @@ try {
   await runAgentBrowser(['click', '[aria-label="Reset view"]']);
   assert.deepEqual(await waitForMetrics({ zoom: '1.00×' }), { zoom: '1.00×' });
 
+  const boxStart = await readCanvasPoint(40, 40);
+  const boxEnd = await readCanvasPoint(550, 370);
+  await dispatchMouseDown(boxStart.x, boxStart.y);
+  await dispatchMouseMove(boxEnd.x, boxEnd.y);
+  assert.deepEqual(
+    await evaluateBrowserScenario(`(() => {
+      const marquee = document.querySelector('[data-nodebraid-box-selection]');
+      return marquee ? {
+        x: marquee.getAttribute('x'),
+        y: marquee.getAttribute('y'),
+        width: marquee.getAttribute('width'),
+        height: marquee.getAttribute('height'),
+      } : null;
+    })()`),
+    { x: '40', y: '40', width: '510', height: '330' },
+  );
+  assert.deepEqual(await waitForMetrics({ revision: '1', selection: 'None' }), {
+    revision: '1',
+    selection: 'None',
+  });
+  await dispatchMouseUp(boxEnd.x, boxEnd.y);
+  assert.deepEqual(
+    await waitForMetrics({
+      revision: '1',
+      selection: 'example-compose, example-discover',
+      history: 'Undo / —',
+    }),
+    {
+      revision: '1',
+      selection: 'example-compose, example-discover',
+      history: 'Undo / —',
+    },
+  );
+  assert.equal(await evaluateBrowserScenario(`document.querySelector('[data-nodebraid-box-selection]')`), null);
+
   await runAgentBrowser(['click', '[data-nodebraid-node-id="example-discover"]']);
   assert.deepEqual(await waitForMetrics({ selection: 'example-discover' }), { selection: 'example-discover' });
 
@@ -215,6 +250,15 @@ async function readElementCenter(selector: string): Promise<Readonly<{ x: number
     if (!element) throw new Error('Missing browser-test element: ' + ${JSON.stringify(selector)});
     const bounds = element.getBoundingClientRect();
     return { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 };
+  })()`);
+}
+
+async function readCanvasPoint(x: number, y: number): Promise<Readonly<{ x: number; y: number }>> {
+  return evaluateBrowserScenario(`(() => {
+    const target = document.querySelector('.canvas-target');
+    if (!target) throw new Error('Missing Examples Application Canvas Target.');
+    const bounds = target.getBoundingClientRect();
+    return { x: bounds.left + ${x}, y: bounds.top + ${y} };
   })()`);
 }
 

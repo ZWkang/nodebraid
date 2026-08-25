@@ -325,6 +325,14 @@ h1 {
   stroke-width: 2;
 }
 
+.nodebraid-renderer-svg__box-selection {
+  fill: rgb(66 99 235 / 12%);
+  stroke: #4263eb;
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+  pointer-events: none;
+}
+
 .nodebraid-renderer-svg__connection-anchor {
   fill: #3156d3;
   stroke: #fff;
@@ -371,6 +379,11 @@ h1 {
   .nodebraid-renderer-svg__edge,
   .nodebraid-renderer-svg__connection-preview {
     stroke: #8f9bb7;
+  }
+
+  .nodebraid-renderer-svg__box-selection {
+    fill: rgb(138 164 255 / 14%);
+    stroke: #8aa4ff;
   }
 }
 

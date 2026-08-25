@@ -332,7 +332,7 @@ interface Copy {
 const translations: Readonly<Record<Language, Copy>> = {
   en: {
     title: 'Basic SVG Canvas',
-    description: 'Select, drag, pan, zoom, and connect one node anchor to another.',
+    description: 'Select, box-select, drag, pan, zoom, and connect one node anchor to another.',
     canvasLabel: 'Interactive canvas',
     toolbar: 'Canvas controls',
     undo: 'Undo',
@@ -358,6 +358,7 @@ const translations: Readonly<Record<Language, Copy>> = {
     instructionsDescription: 'Every stable graph change becomes a Kernel Commit.',
     steps: [
       'Click a node to select it.',
+      'Drag across empty canvas space to box-select intersecting nodes.',
       'Drag a selected node.',
       'Drag from a source anchor to a target anchor.',
       'Pan the canvas or use the mouse wheel to zoom.',
@@ -366,7 +367,7 @@ const translations: Readonly<Record<Language, Copy>> = {
   },
   zh: {
     title: '基础 SVG 画布',
-    description: '选择、拖动、平移、缩放，并从一个连接锚点拖到另一个锚点。',
+    description: '选择、框选、拖动、平移、缩放，并从一个连接锚点拖到另一个锚点。',
     canvasLabel: '交互画布',
     toolbar: '画布控制',
     undo: '撤销',
@@ -392,6 +393,7 @@ const translations: Readonly<Record<Language, Copy>> = {
     instructionsDescription: '每次稳定图变化都会成为一个 Kernel Commit。',
     steps: [
       '点击 Node 完成选择。',
+      '从画布空白处拖动，框选相交的 Node。',
       '拖动已选择的 Node。',
       '从 source anchor 拖向 target anchor。',
       '拖动画布或使用滚轮缩放。',
