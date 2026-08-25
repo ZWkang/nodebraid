@@ -25,36 +25,7 @@ import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 import { deleteSelectionCommand, interactionPlugin } from '../src';
 
 test('Delete Selection removes a selected Node and its incident Edge as one undoable Commit', async () => {
-  let commands: CommandService | undefined;
-  let history: HistoryService | undefined;
-  let kernel: KernelService | undefined;
-  let session: SessionService | undefined;
-  const consumer = definePlugin({
-    requires: {
-      commands: commandService,
-      history: historyService,
-      kernel: kernelService,
-      session: sessionService,
-    },
-    setup(context) {
-      commands = context.services.commands;
-      history = context.services.history;
-      kernel = context.services.kernel;
-      session = context.services.session;
-    },
-  });
-  const host = createPluginHost();
-  const installations = [
-    host.install(kernelPlugin),
-    host.install(commandPlugin),
-    host.install(sessionPlugin),
-    host.install(createRendererPlugin(() => new CommandRenderer())),
-    host.install(interactionPlugin),
-    host.install(historyPlugin),
-    host.install(consumer),
-  ];
-  await Promise.all(installations.map((installation) => installation.whenActive()));
-  if (!commands || !history || !kernel || !session) throw new Error('Expected Delete Selection Runtime Services.');
+  const { commands, history, host, kernel, session } = await activateDeleteCommandRuntime();
 
   const selectedNodeId = nodeId('selected');
   const retainedNodeId = nodeId('retained');
