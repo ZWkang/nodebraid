@@ -11,6 +11,10 @@
 - `bun install`：安装依赖并启用 Git hooks。
 - `bunx agent-browser install`：安装 SVG Renderer 真实浏览器测试所需的 Chromium；Linux CI 使用 `bunx agent-browser install --with-deps`。
 - `bun run dev`：监听根入口并持续构建到 `dist/`。
+- `bun run example:dev`：构建公共依赖并单独启动 React/TanStack Router Examples Application。
+- `bun run example:build`：生产构建私有 `@nodebraid/examples` Workspace Application。
+- `bun run example:test`：构建并通过真实 Chromium 验收 Basic SVG Example 的页面与 Canvas 交互。
+- `bun run example:check`：执行 Examples Application 类型检查、生产构建和浏览器验收。
 - `bun run docs:dev`：启动中文默认、English 可切换的 Documentation Site 本地开发服务器。
 - `bun run docs:quick-start`：构建公共 facade 依赖并执行站点展示的真实 Quick Start。
 - `bun run docs:build`：生产构建 VitePress Documentation Site。
@@ -32,13 +36,13 @@
 - `bun run --filter '@nodebraid/plugin-renderer' build:dependencies`：生成 Renderer Runtime Plugin 所需的 Renderer API、Kernel Plugin 与 Session Plugin workspace 声明。
 - `bun run --filter '@nodebraid/plugin-interaction' build:dependencies`：生成 Interaction Runtime Plugin 所需的 Command、Kernel、Session 与 Renderer Plugin workspace 声明。
 - `bun run --filter '@nodebraid/renderer-svg' build:dependencies`：生成 SVG Renderer Provider 生产构建所需的 Renderer API 及其传递 workspace 声明。
-- `bun run --filter '@nodebraid/renderer-svg' build:test-dependencies`：生成 Renderer Plugin、Interaction、Basic Canvas Composition 与真实 Runtime 浏览器场景所需的全部 workspace 声明。
+- `bun run --filter '@nodebraid/renderer-svg' build:test-dependencies`：生成 Renderer Plugin、Interaction、History 与 Renderer 公共 seam 浏览器场景所需的全部 workspace 声明。
 - `bun run --filter '@nodebraid/plugin-history' build:dependencies`：生成 History Runtime Plugin 构建与类型检查所需的 Command 与 Kernel Plugin workspace 声明。
 - `bun run --filter '@nodebraid/preset-basic' build:dependencies`：生成 Basic Canvas Composition 所需的 Interaction、History 及其传递 workspace 声明。
 - `bun run format`：使用 Prettier 格式化支持的文件。
 - `bun run test`：运行 Bun 测试。
 - `bun run test:browser`：通过仓库锁定的 `agent-browser` 在真实 Chromium 中运行 SVG Renderer 公共 seam 测试。
-- `bun run check`：依次运行 lint、类型检查、格式检查、Bun 测试、真实浏览器测试、构建和 Documentation Site 检查。
+- `bun run check`：依次运行 lint、类型检查、格式检查、Bun 测试、Renderer 与 Example 真实浏览器测试、构建和 Documentation Site 检查。
 
 提交前至少运行：
 

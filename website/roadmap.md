@@ -21,7 +21,7 @@ Interaction v1 已经在标准化 Renderer Input 之上交付选择、多 Node �
 
 ## Composition 与示例
 
-后端无关的 Basic Canvas Composition 与真实 SVG canonical example 已经交付，并通过 Chromium 验证 Selection、Move、History、Wheel 与 dispose。后续 framework adapter 或产品示例仍保持显式应用层能力；Plugin Host 不会隐式安装 preset，preset 也不会选择默认 Renderer。
+后端无关的 Basic Canvas Composition 与私有 Examples Application 已经交付，并通过 Chromium 验证真实 Router 页面、Selection、Move、Connection、History、Viewport 控制与 Runtime Reset。后续 framework adapter 或产品示例仍保持显式应用层能力；Plugin Host 不会隐式安装 preset，preset 也不会选择默认 Renderer。
 
 ## 更后面的探索
 

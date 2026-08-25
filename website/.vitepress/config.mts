@@ -2,6 +2,7 @@ import { defineConfig, type DefaultTheme } from 'vitepress';
 
 import { capabilityGroups } from './module-catalog.mts';
 import { tokenizeForSearch } from './search.mts';
+import { localizeDocumentationPath, siteNavigationItems } from '../shared/navigation';
 
 type Locale = 'zh' | 'en';
 
@@ -28,12 +29,10 @@ function createThemeConfig(locale: Locale): DefaultTheme.Config {
     lastUpdated: {
       text: english ? 'Last updated' : '最后更新',
     },
-    nav: [
-      { text: english ? 'Get Started' : '开始使用', link: localizedPath(locale, '/guide/quick-start') },
-      { text: english ? 'Capabilities' : '能力地图', link: localizedPath(locale, '/capabilities/') },
-      { text: english ? 'Modules' : '模块', link: localizedPath(locale, '/modules/') },
-      { text: english ? 'Status' : '状态', link: localizedPath(locale, '/status') },
-    ],
+    nav: siteNavigationItems.map((item) => ({
+      text: item.labels[locale],
+      link: 'externalHref' in item ? item.externalHref : localizeDocumentationPath(locale, item.documentationPath),
+    })),
     outline: {
       label: english ? 'On this page' : '本页内容',
       level: [2, 3],

@@ -1,0 +1,14 @@
+:root {
+  --nodebraid-brand: #066b78;
+  --nodebraid-brand-strong: #064e5c;
+  --nodebraid-brand-soft: rgb(8 127 140 / 14%);
+  --nodebraid-navigation-height: 64px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --nodebraid-brand: #4fd1c5;
+    --nodebraid-brand-strong: #8be3da;
+    --nodebraid-brand-soft: rgb(79 209 197 / 14%);
+  }
+}

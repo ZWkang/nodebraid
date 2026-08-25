@@ -3,7 +3,8 @@
   "private": true,
   "packageManager": "bun@1.2.19",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "examples/*"
   ],
   "description": "A Bun-powered TypeScript monorepo for nodebraid.",
   "publishConfig": {
@@ -40,7 +41,7 @@
     "zwkang-prettier-config": "^0.0.3"
   },
   "scripts": {
-    "check": "bun run lint && bun run typecheck && bun run format:check && bun run test && bun run test:browser && bun run build && bun run docs:check",
+    "check": "bun run lint && bun run typecheck && bun run format:check && bun run test && bun run test:browser && bun run example:check && bun run build && bun run docs:check",
     "dev": "bun build ./src/index.ts --outdir ./dist --target bun --watch",
     "docs:build": "NODEBRAID_DOCS_BASE=/nodebraid/ vitepress build website",
     "docs:check": "bun run docs:verify && bun run docs:quick-start && bun run docs:build",
@@ -48,6 +49,10 @@
     "docs:preview": "bun run website/scripts/preview.ts",
     "docs:quick-start": "bun run --filter '@nodebraid/core' build && bun run website/examples/quick-start.ts",
     "docs:verify": "bun run website/scripts/verify-content.ts",
+    "example:build": "bun run --cwd examples/app build",
+    "example:check": "bun run --cwd examples/app check",
+    "example:dev": "bun run --cwd examples/app dev",
+    "example:test": "bun run --cwd examples/app test",
     "build": "bun run build:root && bun run --filter '@nodebraid/core' build && bun run --filter '@nodebraid/renderer-svg' build",
     "build:root": "bun build ./src/index.ts --outdir ./dist --target bun",
     "format": "prettier --write --ignore-unknown .",
@@ -55,7 +60,7 @@
     "lint": "oxlint .",
     "test": "bun test",
     "test:browser": "bun run --filter '@nodebraid/renderer-svg' test:browser",
-    "typecheck": "bun run --filter '@nodebraid/core' build && bun run --filter '@nodebraid/renderer-svg' build && tsgo --noEmit -p tsconfig.json && tsgo --noEmit -p packages/diagnostics/tsconfig.json && tsgo --noEmit -p packages/kernel/tsconfig.json && tsgo --noEmit -p packages/session-api/tsconfig.json && tsgo --noEmit -p packages/interaction-api/tsconfig.json && tsgo --noEmit -p packages/renderer-api/tsconfig.json && tsgo --noEmit -p packages/renderer-svg/tsconfig.json && tsgo --noEmit -p packages/runtime-cordis/tsconfig.json && tsgo --noEmit -p packages/plugin-command/tsconfig.json && tsgo --noEmit -p packages/plugin-kernel/tsconfig.json && tsgo --noEmit -p packages/plugin-session/tsconfig.json && tsgo --noEmit -p packages/plugin-renderer/tsconfig.json && tsgo --noEmit -p packages/plugin-interaction/tsconfig.json && tsgo --noEmit -p packages/plugin-history/tsconfig.json && tsgo --noEmit -p packages/preset-basic/tsconfig.json && tsgo --noEmit -p packages/layout-api/tsconfig.json && tsgo --noEmit -p packages/layout-dagre/tsconfig.json && tsgo --noEmit -p packages/layout-elk/tsconfig.json && tsgo --noEmit -p packages/plugin-layout/tsconfig.json && tsgo --noEmit -p packages/core/tsconfig.json",
+    "typecheck": "bun run --filter '@nodebraid/core' build && bun run --filter '@nodebraid/renderer-svg' build && tsgo --noEmit -p tsconfig.json && tsgo --noEmit -p packages/diagnostics/tsconfig.json && tsgo --noEmit -p packages/kernel/tsconfig.json && tsgo --noEmit -p packages/session-api/tsconfig.json && tsgo --noEmit -p packages/interaction-api/tsconfig.json && tsgo --noEmit -p packages/renderer-api/tsconfig.json && tsgo --noEmit -p packages/renderer-svg/tsconfig.json && tsgo --noEmit -p packages/runtime-cordis/tsconfig.json && tsgo --noEmit -p packages/plugin-command/tsconfig.json && tsgo --noEmit -p packages/plugin-kernel/tsconfig.json && tsgo --noEmit -p packages/plugin-session/tsconfig.json && tsgo --noEmit -p packages/plugin-renderer/tsconfig.json && tsgo --noEmit -p packages/plugin-interaction/tsconfig.json && tsgo --noEmit -p packages/plugin-history/tsconfig.json && tsgo --noEmit -p packages/preset-basic/tsconfig.json && tsgo --noEmit -p packages/layout-api/tsconfig.json && tsgo --noEmit -p packages/layout-dagre/tsconfig.json && tsgo --noEmit -p packages/layout-elk/tsconfig.json && tsgo --noEmit -p packages/plugin-layout/tsconfig.json && tsgo --noEmit -p packages/core/tsconfig.json && tsgo --noEmit -p examples/app/tsconfig.json",
     "update-deps": "bun update --latest",
     "setup": "bun install"
   },

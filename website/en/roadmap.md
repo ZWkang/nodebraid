@@ -21,7 +21,7 @@ Interaction v1 now interprets selection, multi-Node dragging, Pan, Wheel Zoom, a
 
 ## Composition and examples
 
-The backend-neutral Basic Canvas Composition and a real SVG canonical example are now delivered, with Chromium verification of Selection, Move, History, Wheel input, and disposal. Future framework adapters or product examples remain explicit application-layer capabilities. The Plugin Host will not install the preset implicitly, and the preset will not choose a default Renderer.
+The backend-neutral Basic Canvas Composition and private Examples Application are now delivered, with Chromium verification of the real Router page, Selection, Move, Connection, History, viewport controls, and Runtime Reset. Future framework adapters or product examples remain explicit application-layer capabilities. The Plugin Host will not install the preset implicitly, and the preset will not choose a default Renderer.
 
 ## Later exploration
 

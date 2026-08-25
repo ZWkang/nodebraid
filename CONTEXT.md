@@ -104,6 +104,14 @@ _Avoid_: Default Canvas, SVG Canvas, Basic Runtime Class
 面向正在评估或采用 NodeBraid 的外部 TypeScript 开发者，介绍当前已交付的 Plugin、Runtime Service、Provider 与 package 组合关系的公开知识入口；不参与 Canvas Runtime 的能力发现或选择。
 _Avoid_: Runtime Registry, Capability Registry, Architecture Roadmap
 
+**Interactive Example**:
+面向 NodeBraid 开发者、以可运行交互和可阅读源码展示公共 interface 组合方式的参考应用；它不是产品级编辑器外壳，也不定义产品 UI。
+_Avoid_: Product Demo, Example Site, Editor Shell
+
+**Examples Application**:
+承载一个或多个 Interactive Example、并拥有统一导航及独立开发、构建与测试入口的私有 Workspace Application；它不是可发布的 NodeBraid 框架模块。
+_Avoid_: Public Examples Package, Framework Module, Documentation Fixture
+
 **Child Installation**:
 由父 Plugin 的 Activation 安装并拥有、随父 Activation 结束而释放的 Plugin Installation。
 _Avoid_: Nested Runtime, Detached Plugin

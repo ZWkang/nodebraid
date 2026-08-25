@@ -58,55 +58,6 @@ const server = Bun.serve({
 
 try {
   await runAgentBrowser(['open', server.url.href]);
-  await assertBrowserScenario('globalThis.__nodebraidBasicCanvasCompositionExample()', {
-    initialRevision: 1,
-    selected: true,
-    moved: { revision: 2, x: '80', y: '90' },
-    undone: { revision: 3, x: '10', y: '20' },
-    redone: { revision: 4, x: '80', y: '90' },
-    viewportTransform: 'matrix(2 0 0 2 0 0)',
-    projectionRemoved: true,
-    targetReusable: true,
-  });
-  await assertBrowserScenario('globalThis.__nodebraidBasicCanvasCompositionIsolation()', {
-    firstRevision: 2,
-    secondRevision: 1,
-    snapshotsDistinct: true,
-    projectionsDistinct: true,
-    firstNodeCount: 3,
-    secondNodeCount: 2,
-  });
-
-  await evaluateBrowserScenario('globalThis.__nodebraidBasicCanvasCompositionSetupCapture()');
-  await dispatchMouseDown(20, 30);
-  const captureBeforeDisposal = await evaluateBrowserScenario<
-    Readonly<{
-      inputCount: number;
-      pointerId: number | null;
-      captured: boolean;
-    }>
-  >('globalThis.__nodebraidBasicCanvasCompositionReadCapture()');
-  assert.ok(captureBeforeDisposal.inputCount > 0);
-  assert.notEqual(captureBeforeDisposal.pointerId, null);
-  assert.equal(captureBeforeDisposal.captured, true);
-  await assertBrowserScenario('globalThis.__nodebraidBasicCanvasCompositionDisposeCapture()', {
-    inputCount: captureBeforeDisposal.inputCount,
-    captureReleased: true,
-    projectionRemoved: true,
-  });
-  await dispatchMouseMove(40, 50);
-  await dispatchMouseUp(40, 50);
-  const captureAfterDisposal = await evaluateBrowserScenario<
-    Readonly<{
-      inputCount: number;
-      pointerId: number | null;
-      captured: boolean;
-    }>
-  >('globalThis.__nodebraidBasicCanvasCompositionReadCapture()');
-  assert.equal(captureAfterDisposal.inputCount, captureBeforeDisposal.inputCount);
-  assert.equal(captureAfterDisposal.captured, false);
-  await evaluateBrowserScenario('globalThis.__nodebraidBasicCanvasCompositionTeardownCapture()');
-
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket01()', {
     callerContentPreserved: true,
     targetChildOrder: ['defs', 'g'],

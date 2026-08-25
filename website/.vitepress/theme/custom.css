@@ -1,8 +1,10 @@
+@import '../../shared/site-tokens.css';
+
 :root {
-  --vp-c-brand-1: #066b78;
+  --vp-c-brand-1: var(--nodebraid-brand);
   --vp-c-brand-2: #075f6b;
-  --vp-c-brand-3: #064e5c;
-  --vp-c-brand-soft: rgba(8, 127, 140, 0.14);
+  --vp-c-brand-3: var(--nodebraid-brand-strong);
+  --vp-c-brand-soft: var(--nodebraid-brand-soft);
   --vp-home-hero-name-color: transparent;
   --vp-home-hero-name-background: linear-gradient(120deg, #0a7f8d 8%, #3657d6 58%, #7c3aed 100%);
   --vp-home-hero-image-background-image: radial-gradient(circle at center, rgba(8, 127, 140, 0.2), transparent 68%);
