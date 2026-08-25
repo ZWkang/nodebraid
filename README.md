@@ -9,7 +9,7 @@ rendering to one UI framework or graphics backend.
 The current source tree provides a runnable headless Canvas Runtime, an explicit
 Basic Canvas Composition, and a reference-quality SVG Renderer. The implemented
 surface includes atomic graph transactions, Selection and Viewport state, typed
-Commands, Undo/Redo, Selection, multi-Node Drag, Pan, Wheel Zoom, node-level Edge
+Commands, Undo/Redo, Selection, Box Selection, multi-Node Drag, Pan, Wheel Zoom, node-level Edge
 Connection, Dagre and ELK Layout Providers, structured diagnostics, and Plugin
 lifecycle ownership.
 
@@ -199,9 +199,9 @@ and is not re-exported as a default through `@nodebraid/core`.
 ## Interaction packages
 
 `@nodebraid/interaction-api` owns immutable, backend-neutral Node Drag, Viewport Pan,
-and Connection Preview values. `@nodebraid/plugin-interaction` consumes normalized
-Renderer Input and Hit Results, implements selection, multi-Node Drag,
-Canvas/middle/Space Pan, anchored Wheel Zoom, and optional mouse-only Node-level
+Box Selection, and Connection Preview values. `@nodebraid/plugin-interaction` consumes normalized
+Renderer Input and Hit Results, implements selection, Box Selection, multi-Node Drag,
+middle/Space Pan, anchored Wheel Zoom, and optional mouse-only Node-level
 Edge Connection, and exposes no state Service.
 
 Stable Selection and Viewport changes go through Session; final Node movement

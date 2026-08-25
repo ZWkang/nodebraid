@@ -35,6 +35,6 @@ The Composition provides no aggregate Service, dynamic `getService()`, internal 
 
 ## Real verification
 
-Package tests use the real Plugin Host and all six real Feature Plugins to verify readiness, Command/History behavior, conflicts, rollback, Host isolation, and asynchronous cleanup. The complete success path uses the real SVG Provider in Chromium to verify projection, Selection, a Move Commit, Undo/Redo, Wheel Zoom, Host disposal, and Target reservation release.
+Package tests use the real Plugin Host and all six real Feature Plugins to verify readiness, Command/History behavior, conflicts, rollback, Host isolation, and asynchronous cleanup. The complete success path uses the real SVG Provider in Chromium to verify projection, Selection, Box Selection, a Move Commit, Undo/Redo, Wheel Zoom, Host disposal, and Target reservation release.
 
 Continue with [`@nodebraid/preset-basic`](/en/modules/preset-basic), or use the [Quick Start](/en/guide/quick-start) for the headless and real-SVG example layers.

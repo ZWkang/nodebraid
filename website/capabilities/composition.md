@@ -35,6 +35,6 @@ Composition 不提供聚合 Service、动态 `getService()`、内部 Child Insta
 
 ## 真实验证
 
-package tests 使用真实 Plugin Host 与六个真实 Feature Plugins 验证 readiness、Command/History、冲突、失败回滚、Host 隔离和异步清理。完整成功路径由真实 SVG Provider 与 Chromium 验证，包括投影、Selection、Move Commit、Undo/Redo、Wheel Zoom、Host dispose 和 Target reservation 释放。
+package tests 使用真实 Plugin Host 与六个真实 Feature Plugins 验证 readiness、Command/History、冲突、失败回滚、Host 隔离和异步清理。完整成功路径由真实 SVG Provider 与 Chromium 验证，包括投影、Selection、Box Selection、Move Commit、Undo/Redo、Wheel Zoom、Host dispose 和 Target reservation 释放。
 
 继续阅读 [`@nodebraid/preset-basic`](/modules/preset-basic)，或从 [Quick Start](/guide/quick-start) 查看 headless 与真实 SVG 两层示例。

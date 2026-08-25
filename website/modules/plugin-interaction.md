@@ -1,6 +1,6 @@
 ---
 title: '@nodebraid/plugin-interaction'
-description: 把 Renderer Input 解释为 Selection、Drag、Pan、Wheel Zoom 与 Edge Connection 的 Runtime Plugin。
+description: 把 Renderer Input 解释为 Selection、Box Selection、Drag、Pan、Wheel Zoom 与 Edge Connection 的 Runtime Plugin。
 ---
 
 # `@nodebraid/plugin-interaction`
@@ -24,6 +24,8 @@ Renderer 只发布输入事实和 Hit Result，不应决定产品行为。该 Pl
 
 当前行为还包括 mouse-only Node-level Edge Connection：Renderer 提供 source/target Anchor，应用 materializer 拥有 Edge ID/type/data，Interaction 只在 pointerup 提交一次 typed Command。
 
+Primary pointer 从空白 Canvas 拖动超过 threshold 后进入 Box Selection；Preview 只包含 World Rect，pointerup 才按当前 Kernel View 的 Node position/size 相交结果更新 Session。Shift、Control 或 Meta 与既有 Additive Modifier 语义一致，合并已有 Selection；中键和 Space Pan 优先。
+
 ## 依赖与写入方向
 
 Plugin 静态要求 Renderer、Session、Command 与 Kernel Service，不提供自己的状态 Service。
@@ -34,7 +36,7 @@ SessionService  ◀─ Selection / Viewport
 CommandService  ◀─ Move Nodes Command ─▶ KernelService
 ```
 
-Pointermove 只替换 Interaction Projection。pointerup 先清 Preview 并回到 idle，再把 Viewport 写入 Session，或执行一次 Move Nodes Command。Command 读取当前完整 Node，只替换 position，并用每个 Node 的 base position 拒绝竞争写。
+Pointermove 只替换 Interaction Projection。pointerup 先清 Preview 并回到 idle，再把 Box Selection/Viewport 写入 Session，或执行一次 Move Nodes Command。Command 读取当前完整 Node，只替换 position，并用每个 Node 的 base position 拒绝竞争写。
 
 ## 生命周期与错误
 
@@ -42,4 +44,4 @@ Pointermove 只替换 Interaction Projection。pointerup 先清 Preview 并回�
 
 ## 非目标与验证
 
-当前不包含 Port-aware Connection、self-loop、业务 validation、box selection、delete、snapping、pinch/touch tool、HTML overlay、文本编辑、协作 presence、产品 UI 或通用 Tool Registry。成功行为由真实 Chromium 中的完整 Runtime + SVG seam 验证。
+当前不包含 Port-aware Connection、self-loop、业务 validation、Edge/Port 框选、lasso、delete、snapping、pinch/touch tool、HTML overlay、文本编辑、协作 presence、产品 UI 或通用 Tool Registry。成功行为由真实 Chromium 中的完整 Runtime + SVG seam 验证。

@@ -15,10 +15,12 @@ Transient Drag and Pan Preview must reach a Renderer without placing Runtime sta
 
 ## What it provides
 
-- `InteractionProjection`: the `node-drag | viewport-pan` discriminated union;
+- `InteractionProjection`: the `node-drag | viewport-pan | box-selection | connection-preview` discriminated union;
 - `NodeDragInteractionProjection`: canonical Node IDs, base positions, and absolute candidate positions;
 - `ViewportPanInteractionProjection`: a base Viewport and absolute candidate Viewport;
 - `NodeDragProjectionNode`: local evidence and a candidate position for one dragged Node.
+- `WorldRect` and `BoxSelectionInteractionProjection`: a direction-independent world-space selection rectangle;
+- `ConnectionAnchorIdentity` and `ConnectionPreviewInteractionProjection`: backend-neutral node-level connection preview values.
 
 ```ts
 import type { InteractionProjection } from '@nodebraid/interaction-api';
@@ -38,4 +40,4 @@ The package depends only on Node identity and Point from `@nodebraid/kernel` and
 
 ## Limits and verification
 
-The current contract includes Node Drag, Viewport Pan, and node-level Connection Preview values. It has no Port Registry, hover, box selection, snapping, Tool Registry, or backend handle. Type and declaration checks reject Runtime, Renderer, DOM, and concrete Provider leakage.
+The current contract includes Node Drag, Viewport Pan, Box Selection, and node-level Connection Preview values. It has no Port Registry, hover, lasso, snapping, Tool Registry, or backend handle. Type and declaration checks reject Runtime, Renderer, DOM, and concrete Provider leakage.

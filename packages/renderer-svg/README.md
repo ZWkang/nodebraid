@@ -9,7 +9,7 @@ The package binds one existing `SVGSVGElement` to a synchronous
 interpret product Node types or data. NodeBraid does not select it as a default
 Renderer.
 
-The Provider applies Node Drag, Viewport Pan, and Connection Preview projections over the same keyed
+The Provider applies Node Drag, Viewport Pan, Box Selection, and Connection Preview projections over the same keyed
 geometry used by Hit Test and Input coordinate conversion. It derives Node-level
 source/target Connection Anchors and uses a CSS-pixel hit tolerance. Reset or incompatible
 Document/Session updates clear stale projections; compatible commits reapply
@@ -35,6 +35,11 @@ runtime theme. A minimal application stylesheet can start with:
 }
 
 .nodebraid-renderer-svg__connection-preview {
+  stroke: currentColor;
+}
+
+.nodebraid-renderer-svg__box-selection {
+  fill: color-mix(in srgb, currentColor 12%, transparent);
   stroke: currentColor;
 }
 

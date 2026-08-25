@@ -66,5 +66,5 @@ Applications consume the basic capabilities through static Required Service Bind
 - Package public-seam tests use the real Host and real Feature Plugins.
 - Type tests lock down Renderer config inference, readonly options, and the empty Service surface.
 - Lifecycle tests cover readiness, failure identity, rollback, conflicts, isolation, and asynchronous cleanup.
-- A real SVG and Chromium tracer covers projection, Selection, Move, Undo/Redo, Wheel input, and disposal.
+- A real SVG and Chromium tracer covers projection, Selection, Box Selection, Move, Undo/Redo, Wheel input, and disposal.
 - Declaration isolation, package-name import, pack preview, and repository gates verify the publication boundary.

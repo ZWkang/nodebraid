@@ -15,9 +15,10 @@ description: Backend-neutral Interaction Projection 纯值契约。
 
 ## 提供的能力
 
-- `InteractionProjection`：`node-drag | viewport-pan | connection-preview` discriminated union；
+- `InteractionProjection`：`node-drag | viewport-pan | box-selection | connection-preview` discriminated union；
 - `NodeDragInteractionProjection`：规范 Node ID、base position 与绝对 candidate position；
 - `ViewportPanInteractionProjection`：base Viewport 与绝对 candidate Viewport；
+- `WorldRect` 与 `BoxSelectionInteractionProjection`：方向无关的 World-space 框选矩形；
 - `NodeDragProjectionNode`：单个拖动 Node 的局部 evidence 与候选位置。
 - `ConnectionAnchorIdentity`：Node ID 与 source/target role 组成的 backend-neutral Anchor 身份；
 - `ConnectionPreviewInteractionProjection`：source、Pointer World Point 与 `none | valid | invalid` target。
@@ -40,4 +41,4 @@ Package 只依赖 `@nodebraid/kernel` 的 Node ID/Point 与 `@nodebraid/session-
 
 ## 限制与验证
 
-当前包含 Node Drag、Viewport Pan 与 node-level Connection Preview，不提供 Port Registry、hover、box selection、snapping、Tool Registry 或任意后端 handle。类型/声明检查拒绝 Runtime、Renderer、DOM 与具体 Provider 泄漏。
+当前包含 Node Drag、Viewport Pan、Box Selection 与 node-level Connection Preview，不提供 Port Registry、hover、lasso、snapping、Tool Registry 或任意后端 handle。类型/声明检查拒绝 Runtime、Renderer、DOM 与具体 Provider 泄漏。

@@ -4,7 +4,7 @@
 
 Backend-neutral Interaction Projection value contracts for NodeBraid.
 
-The package owns immutable Node Drag, Viewport Pan, and Connection Preview candidate values without
+The package owns immutable Node Drag, Viewport Pan, Box Selection, and Connection Preview candidate values without
 depending on Renderer, Plugin Host, DOM, or a concrete Provider. Runtime
 gesture ownership remains in `@nodebraid/plugin-interaction`.
 

@@ -29,7 +29,7 @@ description: 将 NodeBraid Canvas 语义投影到现有 SVG Target 的参考级 
 - 同步 `createSvgRenderer(config)` Factory，一次绑定一个现有 `SVGSVGElement`；
 - 通用矩形 Node、直线 Edge、Selection 标记与 Viewport projection；
 - Pointer、Wheel、Keyboard、Focus 与 Pointer Capture 的真实 DOM bridge；
-- Node Drag、Viewport Pan 与 Connection Preview Projection，以及 node-level source/target Anchor Hit Result；
+- Node Drag、Viewport Pan、Box Selection marquee 与 Connection Preview Projection，以及 node-level source/target Anchor Hit Result；
 - 从 CSS screen pixel 到 SVG user space 的坐标转换与语义 Hit Test；
 - 稳定 class、`data-nodebraid-*` 属性、canonical layer order 与 keyed DOM identity；
 - 原子 Document/Session 更新、连续 revision 校验、失败回滚与 reset 恢复；

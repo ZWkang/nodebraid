@@ -66,5 +66,5 @@ Failed Composition Installation 不会自重试；恢复需要新 Installation�
 - package public-seam tests 使用真实 Host 与真实 Feature Plugins；
 - 类型测试锁定 Renderer config 推导、readonly options 与无 Service 表面；
 - lifecycle tests 覆盖 readiness、失败身份、回滚、冲突、隔离与异步 cleanup；
-- 真实 SVG + Chromium tracer 覆盖投影、Selection、Move、Undo/Redo、Wheel 与 dispose；
+- 真实 SVG + Chromium tracer 覆盖投影、Selection、Box Selection、Move、Undo/Redo、Wheel 与 dispose；
 - declaration isolation、package-name import、pack preview 与根仓库门禁验证发布边界。

@@ -17,11 +17,11 @@ SVG Renderer Provider 已经通过真实 Target、Document/Session 同步、输�
 
 ## Interaction 扩展与框架接入
 
-Interaction v1 已经在标准化 Renderer Input 之上交付选择、多 Node 拖动、Pan、Wheel Zoom 与 node-level Edge Connection，并通过 Command/Session/Kernel 的既有写入边界工作。后续仍可独立设计 Port-aware Connection、box selection、snapping、pinch/touch、文本编辑或可扩展 Tool Registry。React、Vue 或其他 framework adapter 应保持在 Runtime 与 UI 框架之间，不取得第二份 Document authority。
+Interaction v2 已经在标准化 Renderer Input 之上交付选择、Box Selection、多 Node 拖动、Pan、Wheel Zoom 与 node-level Edge Connection，并通过 Command/Session/Kernel 的既有写入边界工作。后续仍可独立设计 Port-aware Connection、Edge/Port 框选、lasso、snapping、pinch/touch、文本编辑或可扩展 Tool Registry。React、Vue 或其他 framework adapter 应保持在 Runtime 与 UI 框架之间，不取得第二份 Document authority。
 
 ## Composition 与示例
 
-后端无关的 Basic Canvas Composition 与私有 Examples Application 已经交付，并通过 Chromium 验证真实 Router 页面、Selection、Move、Connection、History、Viewport 控制与 Runtime Reset。后续 framework adapter 或产品示例仍保持显式应用层能力；Plugin Host 不会隐式安装 preset，preset 也不会选择默认 Renderer。
+后端无关的 Basic Canvas Composition 与私有 Examples Application 已经交付，并通过 Chromium 验证真实 Router 页面、Selection、Box Selection、Move、Connection、History、Viewport 控制与 Runtime Reset。后续 framework adapter 或产品示例仍保持显式应用层能力；Plugin Host 不会隐式安装 preset，preset 也不会选择默认 Renderer。
 
 ## 更后面的探索
 

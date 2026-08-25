@@ -1,6 +1,6 @@
 ---
 title: '@nodebraid/plugin-interaction'
-description: The Runtime Plugin that interprets Renderer Input as Selection, Drag, Pan, and Wheel Zoom.
+description: The Runtime Plugin that interprets Renderer Input as Selection, Box Selection, Drag, Pan, Wheel Zoom, and Edge Connection.
 ---
 
 # `@nodebraid/plugin-interaction`
@@ -23,6 +23,8 @@ A Renderer publishes input facts and Hit Results; it should not decide product b
 
 The current version also includes optional mouse-only, Node-level Edge Connection. An application materializer owns Edge ID, type, and data; Interaction commits one typed Create Edge Command on pointerup.
 
+A primary-pointer drag from empty Canvas space enters Box Selection after the threshold. Its Preview contains only a World Rect; pointerup intersects that rect with Node position/size from the current Kernel View and writes Session Selection. Shift, Control, or Meta merges with the existing Selection, while middle-button and Space Pan keep priority.
+
 ## Dependencies and write direction
 
 The Plugin statically requires Renderer, Session, Command, and Kernel Services and provides no state Service of its own.
@@ -33,7 +35,7 @@ SessionService  ◀─ Selection / Viewport
 CommandService  ◀─ Move Nodes Command ─▶ KernelService
 ```
 
-Pointer move only replaces the Interaction Projection. Pointerup clears Preview and returns to idle before writing Viewport to Session or executing one Move Nodes Command. The Command reads the current complete Node, replaces only its position, and rejects competing writes using each Node's base position.
+Pointer move only replaces the Interaction Projection. Pointerup clears Preview and returns to idle before writing Box Selection/Viewport to Session or executing one Move Nodes Command. The Command reads the current complete Node, replaces only its position, and rejects competing writes using each Node's base position.
 
 ## Lifecycle and errors
 
@@ -41,4 +43,4 @@ One Activation owns one Gesture Pointer. Additional Pointers and Wheel during a 
 
 ## Non-goals and verification
 
-The current version has no Port-aware Connection, self-loop, business validation, box selection, delete behavior, snapping, pinch/touch tool, HTML overlay, text editing, collaboration presence, product UI, or generic Tool Registry. Successful behavior is verified through the complete Runtime + SVG seam in real Chromium.
+The current version has no Port-aware Connection, self-loop, business validation, Edge/Port box selection, lasso, delete behavior, snapping, pinch/touch tool, HTML overlay, text editing, collaboration presence, product UI, or generic Tool Registry. Successful behavior is verified through the complete Runtime + SVG seam in real Chromium.

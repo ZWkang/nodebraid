@@ -14,6 +14,6 @@ bun install
 bun run example:dev
 ```
 
-打开终端输出的 `/basic-svg` 地址，即可体验 Selection、Node Drag、Pan、Zoom、Edge Connection、Undo、Redo、Fit View 与完整 Runtime Reset。
+打开终端输出的 `/basic-svg` 地址，即可体验 Selection、Box Selection、Node Drag、Pan、Zoom、Edge Connection、Undo、Redo、Fit View 与完整 Runtime Reset。
 
 示例只依赖 `@nodebraid/core` 和显式选择的 `@nodebraid/renderer-svg` 公共入口。当前示例暂不独立部署；本页始终提供有效的能力说明和本地启动入口。
