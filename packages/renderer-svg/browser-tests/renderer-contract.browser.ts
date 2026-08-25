@@ -255,6 +255,16 @@ try {
     projectionUnchanged: true,
   });
 
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionInvalidBoxSelection()', {
+    error: {
+      name: 'RendererError',
+      domain: 'renderer',
+      code: 'INVALID_INTERACTION_PROJECTION',
+      details: { issue: 'INVALID_BOX_SELECTION_RECT', field: 'rect.width' },
+    },
+    projectionUnchanged: true,
+  });
+
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgInteractionProjectionMalformedShape()', {
     errors: [
       {
@@ -344,6 +354,124 @@ try {
     nodeIds: ['selection-node'],
     edgeIds: ['selection-edge'],
   });
+  await dispatchMouseDown(40, 40);
+  await dispatchMouseMove(390, 160);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 1,
+    selection: { nodeIds: ['selection-node'], edgeIds: ['selection-edge'] },
+    marquee: { x: '40', y: '40', width: '350', height: '120' },
+  });
+  await dispatchMouseUp(390, 160);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 1,
+    selection: { nodeIds: ['selection-node', 'selection-target-node'], edgeIds: [] },
+    marquee: null,
+  });
+  for (const modifiers of [2, 4]) {
+    await dispatchMouseDown(20, 280);
+    await dispatchMouseUp(20, 280);
+    await dispatchMouseDown(160, 120);
+    await dispatchMouseUp(160, 120);
+    await dispatchModifiedMouseDrag(390, 160, 280, 80, modifiers);
+    await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+      revision: 1,
+      selection: { nodeIds: ['selection-node', 'selection-target-node'], edgeIds: [] },
+      marquee: null,
+    });
+  }
+  await dispatchMouseDown(20, 280);
+  await dispatchMouseUp(20, 280);
+  await dispatchMouseDown(40, 40);
+  await dispatchMouseMove(200, 80);
+  await dispatchMouseUp(390, 160);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 1,
+    selection: { nodeIds: ['selection-node', 'selection-target-node'], edgeIds: [] },
+    marquee: null,
+  });
+  await dispatchMouseDown(20, 280);
+  await dispatchMouseMove(22, 282);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 1,
+    selection: { nodeIds: ['selection-node', 'selection-target-node'], edgeIds: [] },
+    marquee: null,
+  });
+  await dispatchSelectionPointerCancel(22, 282);
+  await dispatchMouseDown(20, 40);
+  await dispatchMouseMove(200, 40);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 1,
+    selection: { nodeIds: ['selection-node', 'selection-target-node'], edgeIds: [] },
+    marquee: null,
+  });
+  await dispatchSelectionPointerCancel(200, 40);
+  await dispatchMouseDown(40, 40);
+  await dispatchMouseMove(250, 160);
+  await dispatchSelectionEscape();
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 1,
+    selection: { nodeIds: ['selection-node', 'selection-target-node'], edgeIds: [] },
+    marquee: null,
+  });
+  await dispatchMouseUp(250, 160);
+  await dispatchMouseDown(20, 280);
+  await dispatchMouseUp(20, 280);
+  await dispatchMouseDown(160, 120);
+  await dispatchMouseUp(160, 120);
+  await dispatchModifiedMouseDrag(390, 160, 280, 80, 8);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 1,
+    selection: { nodeIds: ['selection-node', 'selection-target-node'], edgeIds: [] },
+    marquee: null,
+  });
+  await dispatchMouseDown(20, 280);
+  await dispatchMouseUp(20, 280);
+  await dispatchMouseDown(40, 40);
+  await dispatchMouseMove(250, 160);
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgMoveSelectionTarget(220, 100)');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 2,
+    selection: { nodeIds: [], edgeIds: [] },
+    marquee: { x: '40', y: '40', width: '210', height: '120' },
+  });
+  await dispatchMouseUp(250, 160);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 2,
+    selection: { nodeIds: ['selection-node', 'selection-target-node'], edgeIds: [] },
+    marquee: null,
+  });
+  await dispatchMouseDown(40, 40);
+  await dispatchMouseMove(400, 160);
+  await evaluateBrowserScenario(`globalThis.__nodebraidRendererSvgDeleteSelectionNode('selection-node')`);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 3,
+    selection: { nodeIds: ['selection-target-node'], edgeIds: [] },
+    marquee: { x: '40', y: '40', width: '360', height: '120' },
+  });
+  await dispatchMouseUp(400, 160);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 3,
+    selection: { nodeIds: ['selection-target-node'], edgeIds: [] },
+    marquee: null,
+  });
+  await dispatchMouseDown(40, 40);
+  await dispatchMouseMove(400, 200);
+  await dispatchSelectionPointerCancel(400, 200);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 3,
+    selection: { nodeIds: ['selection-target-node'], edgeIds: [] },
+    marquee: null,
+  });
+  await dispatchMouseUp(400, 200);
+  await dispatchMouseDown(40, 40);
+  await dispatchMouseMove(400, 200);
+  await releaseSelectionPointerCapture();
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 3,
+    selection: { nodeIds: ['selection-target-node'], edgeIds: [] },
+    marquee: null,
+  });
+  await dispatchMouseUp(400, 200);
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownSelectionInteraction()');
 
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupNodeDragInteraction()');
@@ -609,8 +737,8 @@ try {
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownConnectionInteraction()');
 
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupViewportPanInteraction()');
-  await dispatchMouseDown(50, 200);
-  await dispatchMouseMove(100, 250);
+  await dispatchMiddleDown(50, 200);
+  await dispatchMiddleMove(100, 250);
   await dispatchWheel(100, 250, 100);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 50 50)',
@@ -623,7 +751,7 @@ try {
       attributes: { inputType: 'wheel', gestureType: 'viewport-pan', reason: 'active-gesture' },
     },
   ]);
-  await dispatchMouseUp(100, 250);
+  await dispatchMiddleUp(100, 250);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 50 50)',
     viewport: { x: 50, y: 50, zoom: 1 },
@@ -664,14 +792,14 @@ try {
     viewport: { x: 30, y: 20, zoom: 1 },
   });
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
-  await dispatchMouseDown(50, 200);
-  await dispatchMouseMove(100, 250);
+  await dispatchMiddleDown(50, 200);
+  await dispatchMiddleMove(100, 250);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 50 50)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
   await dispatchPointerCancel(100, 250);
-  await dispatchMouseUp(100, 250);
+  await dispatchMiddleUp(100, 250);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 0 0)',
     viewport: { x: 0, y: 0, zoom: 1 },
@@ -684,14 +812,14 @@ try {
     },
   ]);
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
-  await dispatchMouseDown(50, 200);
-  await dispatchMouseMove(100, 250);
+  await dispatchMiddleDown(50, 200);
+  await dispatchMiddleMove(100, 250);
   await releaseViewportPanPointerCapture();
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 0 0)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
-  await dispatchMouseUp(100, 250);
+  await dispatchMiddleUp(100, 250);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteractionEvents()', [
     {
       name: 'nodebraid.plugin.interaction.gesture.cancelled',
@@ -700,8 +828,8 @@ try {
     },
   ]);
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
-  await dispatchMouseDown(50, 200);
-  await dispatchMouseMove(100, 250);
+  await dispatchMiddleDown(50, 200);
+  await dispatchMiddleMove(100, 250);
   assert.equal(await dispatchAdditionalPointerDown(), false);
   await dispatchAdditionalPointerMoveAndUp();
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
@@ -715,20 +843,20 @@ try {
       attributes: { inputType: 'pointer.down', gestureType: 'viewport-pan', reason: 'additional-pointer' },
     },
   ]);
-  await dispatchMouseMove(130, 280);
-  await dispatchMouseUp(130, 280);
+  await dispatchMiddleMove(130, 280);
+  await dispatchMiddleUp(130, 280);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 80 80)',
     viewport: { x: 80, y: 80, zoom: 1 },
   });
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
-  await dispatchMouseDown(50, 200);
-  await dispatchMouseMove(450, 350);
+  await dispatchMiddleDown(50, 200);
+  await dispatchMiddleMove(450, 350);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 400 150)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
-  await dispatchMouseUp(450, 350);
+  await dispatchMiddleUp(450, 350);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 400 150)',
     viewport: { x: 400, y: 150, zoom: 1 },
@@ -746,14 +874,14 @@ try {
   await dispatchPointerCancel(190, 140);
   await dispatchMouseUp(190, 140);
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
-  await dispatchMouseDown(50, 200);
-  await dispatchMouseMove(100, 250);
+  await dispatchMiddleDown(50, 200);
+  await dispatchMiddleMove(100, 250);
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetViewportPanExternally()');
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(2 0 0 2 200 100)',
     viewport: { x: 200, y: 100, zoom: 2 },
   });
-  await dispatchMouseUp(100, 250);
+  await dispatchMiddleUp(100, 250);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(2 0 0 2 200 100)',
     viewport: { x: 200, y: 100, zoom: 2 },
@@ -766,8 +894,8 @@ try {
     },
   ]);
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
-  await dispatchMouseDown(50, 200);
-  await dispatchMouseMove(100, 250);
+  await dispatchMiddleDown(50, 200);
+  await dispatchMiddleMove(100, 250);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgHasViewportPanPointerCapture()', true);
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgDisposeViewportPanInteraction()');
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
@@ -775,7 +903,7 @@ try {
     viewport: { x: 0, y: 0, zoom: 1 },
   });
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgHasViewportPanPointerCapture()', false);
-  await dispatchMouseUp(100, 250);
+  await dispatchMiddleUp(100, 250);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteractionEvents()', [
     {
       name: 'nodebraid.plugin.interaction.gesture.cancelled',
@@ -786,18 +914,18 @@ try {
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownViewportPanInteraction()');
 
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupViewportPanInteraction(true)');
-  await dispatchMouseDown(50, 200);
-  await dispatchMouseMove(60, 200);
+  await dispatchMiddleDown(50, 200);
+  await dispatchMiddleMove(60, 200);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 0 0)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
-  await dispatchMouseMove(80, 200);
+  await dispatchMiddleMove(80, 200);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
     transform: 'matrix(1 0 0 1 30 0)',
     viewport: { x: 0, y: 0, zoom: 1 },
   });
-  await dispatchMouseUp(80, 200);
+  await dispatchMiddleUp(80, 200);
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgResetViewportPanInteraction()');
   await dispatchWheel(200, 150, 100);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadViewportPanInteraction()', {
@@ -1625,6 +1753,67 @@ async function dispatchShiftClick(x: number, y: number): Promise<void> {
       modifiers: 8,
     });
   });
+}
+
+async function dispatchModifiedMouseDrag(
+  startX: number,
+  startY: number,
+  endX: number,
+  endY: number,
+  modifiers: number,
+): Promise<void> {
+  await withRendererPageCdp(async (send) => {
+    await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: startX, y: startY, buttons: 0, modifiers });
+    await send('Input.dispatchMouseEvent', {
+      type: 'mousePressed',
+      x: startX,
+      y: startY,
+      button: 'left',
+      buttons: 1,
+      clickCount: 1,
+      modifiers,
+    });
+    await send('Input.dispatchMouseEvent', {
+      type: 'mouseMoved',
+      x: endX,
+      y: endY,
+      button: 'left',
+      buttons: 1,
+      modifiers,
+    });
+    await send('Input.dispatchMouseEvent', {
+      type: 'mouseReleased',
+      x: endX,
+      y: endY,
+      button: 'left',
+      buttons: 0,
+      clickCount: 1,
+      modifiers,
+    });
+  });
+}
+
+async function dispatchSelectionEscape(): Promise<void> {
+  await evaluateBrowserScenario(
+    `document.querySelector('#selection-interaction-target').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }))`,
+  );
+}
+
+async function dispatchSelectionPointerCancel(x: number, y: number): Promise<void> {
+  await evaluateBrowserScenario(
+    `document.querySelector('#selection-interaction-target').dispatchEvent(new PointerEvent('pointercancel', { pointerId: 1, pointerType: 'mouse', clientX: ${x}, clientY: ${y}, bubbles: true }))`,
+  );
+}
+
+async function releaseSelectionPointerCapture(): Promise<void> {
+  await evaluateBrowserScenario(
+    `new Promise((resolve) => {
+      const target = document.querySelector('#selection-interaction-target');
+      target.releasePointerCapture(1);
+      target.dispatchEvent(new PointerEvent('lostpointercapture', { pointerId: 1, pointerType: 'mouse' }));
+      requestAnimationFrame(() => resolve(true));
+    })`,
+  );
 }
 
 async function dispatchMouseDown(x: number, y: number): Promise<void> {

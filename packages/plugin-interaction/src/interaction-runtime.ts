@@ -1,5 +1,5 @@
 import type { PluginDiagnostics } from '@nodebraid/diagnostics';
-import type { ConnectionAnchorIdentity, ConnectionPreviewTarget } from '@nodebraid/interaction-api';
+import type { ConnectionAnchorIdentity, ConnectionPreviewTarget, WorldRect } from '@nodebraid/interaction-api';
 import type { NodeId, Point } from '@nodebraid/kernel';
 import { commandService, type CommandRegistration, type CommandService } from '@nodebraid/plugin-command';
 import { kernelService } from '@nodebraid/plugin-kernel';
@@ -9,6 +9,7 @@ import type { HitResult } from '@nodebraid/renderer-api';
 import type { PluginContext } from '@nodebraid/runtime-cordis';
 
 import { computeClickSelection } from './selection-transition';
+import { computeBoxSelection, worldRectBetween } from './box-selection';
 import type { ConnectionMaterializer, EffectiveInteractionConfig, MoveNodeInput } from './contracts';
 import { createEdgeCommand, createEdgeHandler } from './create-edge-command';
 import { interactionDiagnosticEvents } from './diagnostic-events';
@@ -48,6 +49,17 @@ interface ViewportPanGesture {
   viewport?: Viewport;
 }
 
+interface BoxSelectionGesture {
+  readonly type: 'box-selection';
+  readonly pointerId: number;
+  readonly startScreenPoint: Point;
+  readonly startWorldPoint: Point;
+  readonly additive: boolean;
+  active: boolean;
+  rect?: WorldRect;
+  completeClick: () => void;
+}
+
 interface ConnectionGesture {
   readonly type: 'connection';
   readonly pointerId: number;
@@ -56,7 +68,7 @@ interface ConnectionGesture {
   target: ConnectionPreviewTarget;
 }
 
-type ActiveGesture = SelectionGesture | NodeDragGesture | ViewportPanGesture | ConnectionGesture;
+type ActiveGesture = SelectionGesture | NodeDragGesture | ViewportPanGesture | BoxSelectionGesture | ConnectionGesture;
 type GestureCancellationReason = 'lifecycle' | 'pointer-cancel' | 'stale' | 'escape' | 'invalid-target';
 
 /** @internal */
@@ -95,6 +107,8 @@ export function activateInteractionRuntime(
         pointerWorldPoint: gesture.pointerWorldPoint,
         target: gesture.target,
       });
+    } else if (gesture.type === 'box-selection' && gesture.active && gesture.rect) {
+      projection.update({ type: 'box-selection', rect: gesture.rect });
     }
   };
 
@@ -184,6 +198,8 @@ export function activateInteractionRuntime(
         }
         reapplyGestureProjection(gesture);
       }
+    } else if (gesture.type === 'box-selection') {
+      reapplyGestureProjection(gesture);
     }
   });
   stopSession = session.subscribe(() => {
@@ -195,7 +211,7 @@ export function activateInteractionRuntime(
       } else {
         reapplyGestureProjection(gesture);
       }
-    } else if (gesture.type === 'node-drag' || gesture.type === 'connection') {
+    } else if (gesture.type === 'node-drag' || gesture.type === 'connection' || gesture.type === 'box-selection') {
       reapplyGestureProjection(gesture);
     }
   });
@@ -203,7 +219,11 @@ export function activateInteractionRuntime(
     if (closing) return;
     if (input.type === 'key.down' || input.type === 'key.up') {
       if (input.code === 'Space') spacePressed = input.type === 'key.down';
-      if (input.type === 'key.down' && input.code === 'Escape' && activeGesture?.type === 'connection') {
+      if (
+        input.type === 'key.down' &&
+        input.code === 'Escape' &&
+        (activeGesture?.type === 'connection' || activeGesture?.type === 'box-selection')
+      ) {
         cancelGesture(activeGesture, 'escape', true);
       }
       return;
@@ -313,6 +333,19 @@ export function activateInteractionRuntime(
           reapplyGestureProjection(gesture);
           return;
         }
+        if (hit.type === 'canvas') {
+          activeGesture = {
+            type: 'box-selection',
+            pointerId: input.pointerId,
+            startScreenPoint: input.screenPoint,
+            startWorldPoint: input.worldPoint,
+            additive,
+            active: false,
+            completeClick: () =>
+              session.setSelection(computeClickSelection(session.getSnapshot().selection, hit, additive)),
+          };
+          return;
+        }
         if (additive) {
           selectionGesture.completeClick = () =>
             session.setSelection(computeClickSelection(session.getSnapshot().selection, hit, true));
@@ -332,14 +365,6 @@ export function activateInteractionRuntime(
               if (!node) throw new Error('Node Drag candidate must exist in the current Canvas View.');
               return { nodeId, basePosition: node.position };
             }),
-            active: false,
-          };
-        } else if (hit.type === 'canvas') {
-          activeGesture = {
-            type: 'viewport-pan',
-            pointerId: input.pointerId,
-            startScreenPoint: input.screenPoint,
-            baseViewport: session.getSnapshot().viewport,
             active: false,
           };
         }
@@ -402,6 +427,20 @@ export function activateInteractionRuntime(
       } else if (gesture.type === 'connection') {
         updateConnectionGesture(gesture, input.worldPoint, renderer.hitTest(input.screenPoint));
         reapplyGestureProjection(gesture);
+      } else if (gesture.type === 'box-selection') {
+        const screenDeltaX = input.screenPoint.x - gesture.startScreenPoint.x;
+        const screenDeltaY = input.screenPoint.y - gesture.startScreenPoint.y;
+        if (!gesture.active && Math.hypot(screenDeltaX, screenDeltaY) < config.dragThreshold) return;
+        const rect = worldRectBetween(gesture.startWorldPoint, input.worldPoint);
+        if (rect.width === 0 || rect.height === 0) {
+          if (gesture.active) projection.update(null);
+          gesture.active = false;
+          gesture.rect = undefined;
+          return;
+        }
+        gesture.active = true;
+        gesture.rect = rect;
+        reapplyGestureProjection(gesture);
       }
       return;
     }
@@ -437,6 +476,16 @@ export function activateInteractionRuntime(
       } else if (gesture.type === 'viewport-pan' && gesture.active) {
         projection.update(null);
         if (gesture.viewport) session.setViewport(gesture.viewport);
+      } else if (gesture.type === 'box-selection' && gesture.active) {
+        projection.update(null);
+        const rect = worldRectBetween(gesture.startWorldPoint, input.worldPoint);
+        if (rect.width > 0 && rect.height > 0) {
+          session.setSelection(
+            computeBoxSelection(session.getSnapshot().selection, kernel.read().snapshot.nodes, rect, gesture.additive),
+          );
+        } else {
+          gesture.completeClick();
+        }
       } else if (gesture.type !== 'viewport-pan') {
         gesture.completeClick?.();
       }

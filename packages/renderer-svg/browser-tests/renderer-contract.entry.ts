@@ -129,6 +129,17 @@ interface SelectionInteractionResult {
   readonly edgeIds: readonly string[];
 }
 
+interface BoxSelectionInteractionResult {
+  readonly revision: number;
+  readonly selection: SelectionInteractionResult;
+  readonly marquee: Readonly<{
+    x: string | null;
+    y: string | null;
+    width: string | null;
+    height: string | null;
+  }> | null;
+}
+
 interface NodeDragInteractionResult {
   readonly previewPosition: Readonly<{ x: string | null; y: string | null }>;
   readonly documentPosition: Readonly<{ x: number; y: number }>;
@@ -585,11 +596,15 @@ declare global {
   var __nodebraidRendererSvgInteractionProjectionEmpty: () => Promise<GeometryErrorResult>;
   var __nodebraidRendererSvgInteractionProjectionUnknownType: () => Promise<GeometryErrorResult>;
   var __nodebraidRendererSvgInteractionProjectionInvalidViewport: () => Promise<GeometryErrorResult>;
+  var __nodebraidRendererSvgInteractionProjectionInvalidBoxSelection: () => Promise<GeometryErrorResult>;
   var __nodebraidRendererSvgInteractionProjectionMalformedShape: () => Promise<MalformedInteractionProjectionResult>;
   var __nodebraidRendererSvgInteractionProjectionRollback: () => Promise<InteractionProjectionRollbackResult>;
   var __nodebraidRendererSvgRuntimeInteractionProjection: () => Promise<RuntimeInteractionProjectionResult>;
   var __nodebraidRendererSvgSetupSelectionInteraction: () => Promise<void>;
   var __nodebraidRendererSvgReadSelectionInteraction: () => SelectionInteractionResult;
+  var __nodebraidRendererSvgReadBoxSelectionInteraction: () => BoxSelectionInteractionResult;
+  var __nodebraidRendererSvgMoveSelectionTarget: (x: number, y: number) => void;
+  var __nodebraidRendererSvgDeleteSelectionNode: (id: string) => void;
   var __nodebraidRendererSvgTeardownSelectionInteraction: () => Promise<void>;
   var __nodebraidRendererSvgSetupNodeDragInteraction: () => Promise<void>;
   var __nodebraidRendererSvgReadNodeDragInteraction: () => NodeDragInteractionResult;
@@ -1637,6 +1652,32 @@ globalThis.__nodebraidRendererSvgInteractionProjectionInvalidViewport = async ()
   const result: GeometryErrorResult = {
     error,
     projectionUnchanged: projection?.getAttribute('transform') === beforeTransform,
+  };
+  await renderer.dispose();
+  target.remove();
+  return result;
+};
+
+globalThis.__nodebraidRendererSvgInteractionProjectionInvalidBoxSelection = async (): Promise<GeometryErrorResult> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  document.body.append(target);
+  const renderer = createSvgRenderer({ target });
+  const kernel = createCanvasKernel();
+  renderer.updateDocument({ type: 'reset', view: kernel.read() });
+  renderer.updateSession({
+    selection: { nodeIds: [], edgeIds: [] },
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  const root = target.querySelector<SVGGElement>('[data-nodebraid-renderer-svg-root]');
+  const beforeChildren = root?.innerHTML ?? null;
+  const error = captureRendererError(() =>
+    renderer.updateInteraction({ type: 'box-selection', rect: { x: 10, y: 20, width: 0, height: 40 } }),
+  );
+  const result: GeometryErrorResult = {
+    error,
+    projectionUnchanged: root?.innerHTML === beforeChildren,
   };
   await renderer.dispose();
   target.remove();
@@ -3378,6 +3419,7 @@ let stopInteractionProjectionInput: (() => void) | undefined;
 const interactionProjectionInputs: RendererInput[] = [];
 let selectionInteractionHost: ReturnType<typeof createPluginHost> | undefined;
 let selectionInteractionTarget: SVGSVGElement | undefined;
+let selectionInteractionKernel: KernelService | undefined;
 let selectionInteractionSession: SessionService | undefined;
 let nodeDragInteractionHost: ReturnType<typeof createPluginHost> | undefined;
 let nodeDragInteractionTarget: SVGSVGElement | undefined;
@@ -3893,6 +3935,7 @@ globalThis.__nodebraidRendererSvgSetupSelectionInteraction = async (): Promise<v
   });
   selectionInteractionHost = host;
   selectionInteractionTarget = target;
+  selectionInteractionKernel = kernel;
   selectionInteractionSession = session;
 };
 
@@ -3902,9 +3945,49 @@ globalThis.__nodebraidRendererSvgReadSelectionInteraction = (): SelectionInterac
   return selection;
 };
 
+globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction = (): BoxSelectionInteractionResult => {
+  const target = selectionInteractionTarget;
+  const kernel = selectionInteractionKernel;
+  const selection = selectionInteractionSession?.getSnapshot().selection;
+  if (!target || !kernel || !selection) throw new Error('Expected the Box Selection Interaction Runtime.');
+  const marquee = target.querySelector<SVGRectElement>('[data-nodebraid-box-selection]');
+  return {
+    revision: kernel.read().snapshot.revision,
+    selection,
+    marquee: marquee
+      ? {
+          x: marquee.getAttribute('x'),
+          y: marquee.getAttribute('y'),
+          width: marquee.getAttribute('width'),
+          height: marquee.getAttribute('height'),
+        }
+      : null,
+  };
+};
+
+globalThis.__nodebraidRendererSvgMoveSelectionTarget = (x: number, y: number): void => {
+  if (!selectionInteractionKernel) throw new Error('Expected the Selection Kernel before moving a Node.');
+  selectionInteractionKernel.transact((transaction) => {
+    const id = nodeId('selection-target-node');
+    const node = transaction.query.getNode(id);
+    if (!node) throw new Error('Expected the Selection target Node before moving it.');
+    transaction.nodes.replace(id, { ...node, position: { x, y } });
+  });
+};
+
+globalThis.__nodebraidRendererSvgDeleteSelectionNode = (id: string): void => {
+  if (!selectionInteractionKernel) throw new Error('Expected the Selection Kernel before deleting a Node.');
+  selectionInteractionKernel.transact((transaction) => {
+    const targetId = nodeId(id);
+    for (const edge of transaction.query.getIncidentEdges(targetId)) transaction.edges.remove(edge.id);
+    transaction.nodes.remove(targetId);
+  });
+};
+
 globalThis.__nodebraidRendererSvgTeardownSelectionInteraction = async (): Promise<void> => {
   await selectionInteractionHost?.dispose();
   selectionInteractionHost = undefined;
+  selectionInteractionKernel = undefined;
   selectionInteractionSession = undefined;
   selectionInteractionTarget?.remove();
   selectionInteractionTarget = undefined;

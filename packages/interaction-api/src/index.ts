@@ -1,4 +1,5 @@
 export type {
+  BoxSelectionInteractionProjection,
   ConnectionAnchorIdentity,
   ConnectionAnchorRole,
   ConnectionPreviewInteractionProjection,
@@ -7,4 +8,5 @@ export type {
   NodeDragInteractionProjection,
   NodeDragProjectionNode,
   ViewportPanInteractionProjection,
+  WorldRect,
 } from './contracts';

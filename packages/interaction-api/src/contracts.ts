@@ -22,6 +22,18 @@ export interface ConnectionPreviewInteractionProjection {
   readonly target: ConnectionPreviewTarget;
 }
 
+export interface WorldRect {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+export interface BoxSelectionInteractionProjection {
+  readonly type: 'box-selection';
+  readonly rect: WorldRect;
+}
+
 export interface NodeDragProjectionNode {
   readonly nodeId: NodeId;
   readonly basePosition: Point;
@@ -40,4 +52,7 @@ export interface ViewportPanInteractionProjection {
 }
 
 export type InteractionProjection =
-  NodeDragInteractionProjection | ViewportPanInteractionProjection | ConnectionPreviewInteractionProjection;
+  | NodeDragInteractionProjection
+  | ViewportPanInteractionProjection
+  | ConnectionPreviewInteractionProjection
+  | BoxSelectionInteractionProjection;

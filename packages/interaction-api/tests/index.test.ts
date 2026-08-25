@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test';
 
 import { nodeId } from '@nodebraid/kernel';
 
-import type { InteractionProjection } from '../src';
+import type { InteractionProjection, WorldRect } from '../src';
 
 test('describes backend-neutral Interaction Projection values', () => {
   const projection: InteractionProjection = {
@@ -33,4 +33,11 @@ test('describes backend-neutral Interaction Projection values', () => {
     target: { type: 'valid', anchor: { nodeId: nodeId('target'), role: 'target' } },
   };
   expect(connection.target.type).toBe('valid');
+
+  const rect: WorldRect = { x: 10, y: 20, width: 30, height: 40 };
+  const boxSelection: InteractionProjection = { type: 'box-selection', rect };
+  expect(boxSelection).toEqual({
+    type: 'box-selection',
+    rect: { x: 10, y: 20, width: 30, height: 40 },
+  });
 });

@@ -1,4 +1,8 @@
-import type { ConnectionPreviewInteractionProjection, NodeDragInteractionProjection } from '@nodebraid/interaction-api';
+import type {
+  BoxSelectionInteractionProjection,
+  ConnectionPreviewInteractionProjection,
+  NodeDragInteractionProjection,
+} from '@nodebraid/interaction-api';
 import type {
   CanvasCommit,
   CanvasEdge,
@@ -196,6 +200,30 @@ export function applyConnectionPreview(
 /** @internal */
 export function clearConnectionPreview(interactionLayer: SVGGElement): void {
   interactionLayer.querySelector('[data-nodebraid-connection-preview]')?.remove();
+}
+
+/** @internal */
+export function applyBoxSelection(
+  projection: BoxSelectionInteractionProjection,
+  interactionLayer: SVGGElement,
+  journal: DomMutationJournal,
+): void {
+  let element = interactionLayer.querySelector<SVGRectElement>('[data-nodebraid-box-selection]');
+  if (!element) {
+    element = createSvgElement(interactionLayer.ownerDocument, 'rect');
+    element.setAttribute('class', 'nodebraid-renderer-svg__box-selection');
+    element.setAttribute('data-nodebraid-box-selection', '');
+    interactionLayer.append(element);
+  }
+  setElementAttribute(element, 'x', String(projection.rect.x), journal);
+  setElementAttribute(element, 'y', String(projection.rect.y), journal);
+  setElementAttribute(element, 'width', String(projection.rect.width), journal);
+  setElementAttribute(element, 'height', String(projection.rect.height), journal);
+}
+
+/** @internal */
+export function clearBoxSelection(interactionLayer: SVGGElement): void {
+  interactionLayer.querySelector('[data-nodebraid-box-selection]')?.remove();
 }
 
 /** @internal */

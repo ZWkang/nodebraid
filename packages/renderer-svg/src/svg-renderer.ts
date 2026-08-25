@@ -29,9 +29,11 @@ import {
 import { normalizeInputPolicies, validateConfig } from './svg-config';
 import {
   applyCommit,
+  applyBoxSelection,
   applyConnectionPreview,
   applyNodeDragProjection,
   clearConnectionPreview,
+  clearBoxSelection,
   createSvgElement,
   DomMutationJournal,
   ProjectionRollbackError,
@@ -410,6 +412,10 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
                 );
               } else if (acceptedInteraction?.type === 'connection-preview') {
                 clearConnectionPreview(interactionLayer);
+              } else if (nextInteraction?.type === 'box-selection') {
+                applyBoxSelection(nextInteraction, interactionLayer, journal);
+              } else if (acceptedInteraction?.type === 'box-selection') {
+                clearBoxSelection(interactionLayer);
               }
             },
           );
@@ -490,6 +496,8 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
           applySession(acceptedSession, journal);
         } else if (acceptedInteraction?.type === 'connection-preview' && accepted?.type !== 'connection-preview') {
           clearConnectionPreview(interactionLayer);
+        } else if (acceptedInteraction?.type === 'box-selection' && accepted?.type !== 'box-selection') {
+          clearBoxSelection(interactionLayer);
         }
         if (accepted?.type === 'viewport-pan') {
           applySession({ selection: acceptedSession.selection, viewport: accepted.viewport }, journal);
@@ -497,6 +505,8 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
           applyNodeDragProjection(accepted, baselineSnapshot, edgesLayer, nodesLayer, journal);
         } else if (accepted?.type === 'connection-preview') {
           applyConnectionPreview(accepted, baselineSnapshot, interactionLayer, journal);
+        } else if (accepted?.type === 'box-selection') {
+          applyBoxSelection(accepted, interactionLayer, journal);
         }
       } catch (error) {
         const rollbackErrors = journal.rollback();
@@ -659,6 +669,9 @@ function cloneInteractionProjection(projection: InteractionProjection): Interact
             }),
     });
   }
+  if (projection.type === 'box-selection') {
+    return Object.freeze({ type: 'box-selection', rect: Object.freeze({ ...projection.rect }) });
+  }
   return Object.freeze({
     type: 'node-drag',
     nodes: Object.freeze(
@@ -691,6 +704,17 @@ function assertInteractionProjectionBaseline(
     assertConnectionAnchorBaseline(projection.source, 'source', document);
     if (projection.target.type !== 'none') {
       assertConnectionAnchorBaseline(projection.target.anchor, 'target', document);
+    }
+    return;
+  }
+  if (projection.type === 'box-selection') {
+    for (const field of ['x', 'y', 'width', 'height'] as const) {
+      const value = projection.rect[field];
+      if (Number.isFinite(value) && ((field !== 'width' && field !== 'height') || value > 0)) continue;
+      throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Box Selection rect must be finite and non-empty.', {
+        issue: 'INVALID_BOX_SELECTION_RECT',
+        field: `rect.${field}`,
+      });
     }
     return;
   }
@@ -784,7 +808,10 @@ function assertInteractionViewport(prefix: 'baseViewport' | 'viewport', viewport
 function assertInteractionProjectionType(value: unknown): asserts value is InteractionProjection {
   if (
     !isRecord(value) ||
-    (value.type !== 'node-drag' && value.type !== 'viewport-pan' && value.type !== 'connection-preview')
+    (value.type !== 'node-drag' &&
+      value.type !== 'viewport-pan' &&
+      value.type !== 'connection-preview' &&
+      value.type !== 'box-selection')
   ) {
     throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Interaction Projection type is invalid.', {
       issue: 'INVALID_PROJECTION_TYPE',
@@ -800,6 +827,10 @@ function assertInteractionProjectionType(value: unknown): asserts value is Inter
     ) {
       throwInvalidInteractionProjectionStructure('target');
     }
+    return;
+  }
+  if (value.type === 'box-selection') {
+    if (!isRecord(value.rect)) throwInvalidInteractionProjectionStructure('rect');
     return;
   }
   if (value.type === 'node-drag') {
