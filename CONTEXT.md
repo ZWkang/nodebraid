@@ -344,6 +344,14 @@ _Avoid_: Move Delta, Drag Commit, Position Patch
 仅在完整 Edge 与 source、target Connection Anchor 证据一致，且所需 Node 与 Edge ID 仍可用时，原子提交该 Edge 的强类型 Command。
 _Avoid_: Edge Factory, Direct Edge Write, Connection Commit
 
+**Delete Selection Command**:
+将一份 Selection 中显式选中的 Edge，以及显式选中 Node 与其全部 incident Edge，作为一个原子、可撤销的 Document 变化提交。
+_Avoid_: Direct Delete, Soft Delete, Cascade Tool
+
+**Stale Selection**:
+Delete Selection Command 的目标实体或 incident Edge 闭包已不再与发起删除时的证据一致，因而不能把原意图安全应用到当前 Document。
+_Avoid_: Stale Gesture, Global Revision Conflict, Missing Selection
+
 **Layout Engine**:
 根据已提交的画布图计算候选布局、但不修改 Document 的能力。
 _Avoid_: Layout Writer, Auto-layout Transaction, Graph Mutator
