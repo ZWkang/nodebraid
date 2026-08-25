@@ -2,6 +2,7 @@ import { defineCommand, type CommandHandler } from '@nodebraid/plugin-command';
 import type { KernelService } from '@nodebraid/plugin-kernel';
 
 import type { CreateEdgeInput, CreateEdgeResult } from './contracts';
+import { isCanvasEdge, isRecord } from './canvas-value-validation';
 import { InteractionError } from './interaction-error';
 
 export const createEdgeCommand = defineCommand<CreateEdgeInput, CreateEdgeResult>('interaction.edge.create');
@@ -49,27 +50,6 @@ function assertCreateEdgeInput(value: unknown): asserts value is CreateEdgeInput
   }
 }
 
-function isCanvasEdge(value: unknown): value is CreateEdgeInput['edge'] {
-  return (
-    isRecord(value) &&
-    typeof value.id === 'string' &&
-    value.id.length > 0 &&
-    typeof value.type === 'string' &&
-    'data' in value &&
-    isEndpoint(value.source) &&
-    isEndpoint(value.target)
-  );
-}
-
-function isEndpoint(value: unknown): value is CreateEdgeInput['edge']['source'] {
-  return (
-    isRecord(value) &&
-    typeof value.nodeId === 'string' &&
-    value.nodeId.length > 0 &&
-    (value.portId === undefined || typeof value.portId === 'string')
-  );
-}
-
 function isConnectionAnchor(value: unknown): value is CreateEdgeInput['source'] {
   return (
     isRecord(value) &&
@@ -77,10 +57,6 @@ function isConnectionAnchor(value: unknown): value is CreateEdgeInput['source'] 
     value.nodeId.length > 0 &&
     (value.role === 'source' || value.role === 'target')
   );
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
 }
 
 function throwInvalidConnection(): never {

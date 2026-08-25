@@ -27,7 +27,7 @@ Renderer 只发布输入事实和 Hit Result，不应决定产品行为。该 Pl
 
 Primary pointer 从空白 Canvas 拖动超过 threshold 后进入 Box Selection；Preview 只包含 World Rect，pointerup 才按当前 Kernel View 的 Node position/size 相交结果更新 Session。Shift、Control 或 Meta 与既有 Additive Modifier 语义一致，合并已有 Selection；中键和 Space Pan 优先。
 
-Renderer 拥有 Focus 且没有 Active Gesture 时，logical `key` 或 physical `code` 任一为 Delete 都会删除当前 Selection。显式选中 Edge 与选中 Node 的全部 incident Edge 先删，再删 Node；目标证据只拒绝竞争目标变化，不拒绝无关 Commit。空 Selection 不建立 revision/History Entry，Backspace 不触发删除，Active Gesture 期间则使用 Input Rejection 且不取消 Gesture。
+Renderer 拥有 Focus 且没有 Active Gesture 时，logical `key` 或 physical `code` 任一为 Delete 都会删除当前 Selection。显式选中 Edge 与选中 Node 的全部 incident Edge 先删，再删 Node；精确 source Snapshot 的目标 identity 证据会拒绝竞争目标变化与同值 ABA replacement，但不拒绝无关 Commit。空 Selection 不建立 revision/History Entry，Backspace 不触发删除，Active Gesture 期间则使用 Input Rejection 且不取消 Gesture。
 
 ## 依赖与写入方向
 

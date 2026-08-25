@@ -51,6 +51,7 @@ export type CreateEdgeResult = CanvasCommit;
 
 export interface DeleteSelectionInput {
   readonly selection: SelectionSnapshot;
+  /** Exact source Snapshot; unchanged target entity roots retain identity across unrelated Commits. */
   readonly evidence: CanvasSnapshot;
 }
 

@@ -3,6 +3,7 @@ import { defineCommand, type CommandHandler } from '@nodebraid/plugin-command';
 import type { KernelService } from '@nodebraid/plugin-kernel';
 
 import type { DeleteSelectionInput, DeleteSelectionResult } from './contracts';
+import { isCanvasEdge, isCanvasNode, isId, isRecord } from './canvas-value-validation';
 import { InteractionError } from './interaction-error';
 
 export const deleteSelectionCommand = defineCommand<DeleteSelectionInput, DeleteSelectionResult>(
@@ -39,7 +40,7 @@ export function createDeleteSelectionHandler(
     return kernel.transact(
       (transaction) => {
         for (const node of selectedNodes) {
-          if (!canvasNodesEqual(transaction.query.getNode(node.id), node)) throwStaleSelection();
+          if (transaction.query.getNode(node.id) !== node) throwStaleSelection();
           const currentIncidentIds = transaction.query.getIncidentEdges(node.id).map((edge) => edge.id);
           const evidenceIncidentIds = input.evidence.edges
             .filter((edge) => edge.source.nodeId === node.id || edge.target.nodeId === node.id)
@@ -48,7 +49,7 @@ export function createDeleteSelectionHandler(
           if (!arraysEqual(currentIncidentIds, evidenceIncidentIds)) throwStaleSelection();
         }
         for (const edge of edges) {
-          if (!canvasEdgesEqual(transaction.query.getEdge(edge.id), edge)) throwStaleSelection();
+          if (transaction.query.getEdge(edge.id) !== edge) throwStaleSelection();
         }
         for (const edge of edges) transaction.edges.remove(edge.id);
         for (const node of selectedNodes) transaction.nodes.remove(node.id);
@@ -81,81 +82,14 @@ function isSnapshot(value: unknown): value is DeleteSelectionInput['evidence'] {
   );
 }
 
-function isCanvasNode(value: unknown): value is CanvasNode {
-  return (
-    isRecord(value) &&
-    isId(value.id) &&
-    typeof value.type === 'string' &&
-    isPoint(value.position) &&
-    (value.size === undefined ||
-      (isRecord(value.size) && typeof value.size.width === 'number' && typeof value.size.height === 'number')) &&
-    (value.parentId === undefined || isId(value.parentId)) &&
-    'data' in value
-  );
-}
-
-function isCanvasEdge(value: unknown): value is CanvasEdge {
-  return (
-    isRecord(value) &&
-    isId(value.id) &&
-    typeof value.type === 'string' &&
-    isEndpoint(value.source) &&
-    isEndpoint(value.target) &&
-    'data' in value
-  );
-}
-
-function isEndpoint(value: unknown): value is CanvasEdge['source'] {
-  return isRecord(value) && isId(value.nodeId) && (value.portId === undefined || typeof value.portId === 'string');
-}
-
-function isPoint(value: unknown): value is CanvasNode['position'] {
-  return isRecord(value) && typeof value.x === 'number' && typeof value.y === 'number';
-}
-
 function isIdArray(value: unknown): value is readonly string[] {
   return Array.isArray(value) && value.every(isId);
-}
-
-function isId(value: unknown): value is string {
-  return typeof value === 'string' && value.length > 0;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
 }
 
 function requireEvidenceNode(nodes: ReadonlyMap<NodeId, CanvasNode>, id: NodeId): CanvasNode {
   const node = nodes.get(id);
   if (!node) throwInvalidDelete('Delete Selection evidence does not contain a selected Node.');
   return node;
-}
-
-function canvasNodesEqual(left: CanvasNode | undefined, right: CanvasNode): boolean {
-  return (
-    left !== undefined &&
-    left.id === right.id &&
-    left.type === right.type &&
-    left.position.x === right.position.x &&
-    left.position.y === right.position.y &&
-    left.size?.width === right.size?.width &&
-    left.size?.height === right.size?.height &&
-    left.parentId === right.parentId &&
-    Object.is(left.data, right.data)
-  );
-}
-
-function canvasEdgesEqual(left: CanvasEdge | undefined, right: CanvasEdge): boolean {
-  return (
-    left !== undefined &&
-    left.id === right.id &&
-    left.type === right.type &&
-    left.source.nodeId === right.source.nodeId &&
-    left.source.portId === right.source.portId &&
-    left.target.nodeId === right.target.nodeId &&
-    left.target.portId === right.target.portId &&
-    Object.is(left.data, right.data)
-  );
 }
 
 function canonicalIds<Id extends string>(ids: readonly Id[]): readonly Id[] {

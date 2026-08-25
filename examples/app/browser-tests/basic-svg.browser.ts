@@ -257,7 +257,21 @@ try {
     true,
     'Expected the SVG Renderer Target to own Focus before Delete.',
   );
+  await evaluateBrowserScenario(`(() => {
+    globalThis.__nodebraidDeleteKeyTrusted = false;
+    document.querySelector('.canvas-target')?.addEventListener('keydown', (event) => {
+      if (event.key === 'Delete' || event.code === 'Delete') {
+        globalThis.__nodebraidDeleteKeyTrusted = event.isTrusted;
+      }
+    }, { once: true });
+    return true;
+  })()`);
   await dispatchDeleteKey();
+  assert.equal(
+    await evaluateBrowserScenario('globalThis.__nodebraidDeleteKeyTrusted'),
+    true,
+    'Expected Chromium to deliver a trusted Delete key event to the focused SVG Target.',
+  );
   assert.deepEqual(
     await waitForMetrics({ revision: '4', nodes: '1', edges: '0', selection: 'None', history: 'Undo / —' }),
     { revision: '4', nodes: '1', edges: '0', selection: 'None', history: 'Undo / —' },
@@ -330,23 +344,20 @@ async function dispatchMouseUp(x: number, y: number): Promise<void> {
 }
 
 async function dispatchDeleteKey(): Promise<void> {
-  await evaluateBrowserScenario(`(() => {
-    const target = document.querySelector('.canvas-target');
-    if (!target || document.activeElement !== target) throw new Error('SVG Renderer Target is not focused.');
-    target.dispatchEvent(new KeyboardEvent('keydown', {
+  await withExamplePageCdp(async (send) => {
+    await send('Input.dispatchKeyEvent', {
+      type: 'keyDown',
       key: 'Delete',
       code: 'Delete',
-      bubbles: true,
-      cancelable: true,
-    }));
-    target.dispatchEvent(new KeyboardEvent('keyup', {
+      windowsVirtualKeyCode: 46,
+    });
+    await send('Input.dispatchKeyEvent', {
+      type: 'keyUp',
       key: 'Delete',
       code: 'Delete',
-      bubbles: true,
-      cancelable: true,
-    }));
-    return true;
-  })()`);
+      windowsVirtualKeyCode: 46,
+    });
+  });
 }
 
 async function clickExampleControl(label: string): Promise<void> {

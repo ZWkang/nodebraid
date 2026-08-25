@@ -2,6 +2,7 @@ import { defineCommand, type CommandHandler } from '@nodebraid/plugin-command';
 import type { KernelService } from '@nodebraid/plugin-kernel';
 
 import type { MoveNodesInput, MoveNodesResult } from './contracts';
+import { isPoint, isRecord } from './canvas-value-validation';
 import { InteractionError } from './interaction-error';
 
 export const moveNodesCommand = defineCommand<MoveNodesInput, MoveNodesResult>('interaction.nodes.move');
@@ -66,14 +67,6 @@ function assertMoveNodesInput(value: unknown): asserts value is MoveNodesInput {
       throwInvalidMoveInput();
     }
   }
-}
-
-function isPoint(value: unknown): value is Readonly<{ x: number; y: number }> {
-  return isRecord(value) && typeof value.x === 'number' && typeof value.y === 'number';
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
 }
 
 function throwInvalidMoveInput(): never {

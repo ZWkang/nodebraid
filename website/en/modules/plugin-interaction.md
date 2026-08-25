@@ -27,7 +27,7 @@ The current version also includes optional mouse-only, Node-level Edge Connectio
 
 A primary-pointer drag from empty Canvas space enters Box Selection after the threshold. Its Preview contains only a World Rect; pointerup intersects that rect with Node position/size from the current Kernel View and writes Session Selection. Shift, Control, or Meta merges with the existing Selection, while middle-button and Space Pan keep priority.
 
-When the Renderer owns Focus and no Active Gesture exists, either logical `key` or physical `code` Delete removes the current Selection. Explicit Edges and every incident Edge of selected Nodes are removed before the Nodes. Per-target evidence rejects competing target changes without blocking unrelated Commits. Empty Selection creates no revision or History Entry, Backspace is not an alias, and Delete during an Active Gesture uses Input Rejection without cancelling it.
+When the Renderer owns Focus and no Active Gesture exists, either logical `key` or physical `code` Delete removes the current Selection. Explicit Edges and every incident Edge of selected Nodes are removed before the Nodes. Target identity evidence from the exact source Snapshot rejects competing changes and same-value ABA replacement without blocking unrelated Commits. Empty Selection creates no revision or History Entry, Backspace is not an alias, and Delete during an Active Gesture uses Input Rejection without cancelling it.
 
 ## Dependencies and write direction
 

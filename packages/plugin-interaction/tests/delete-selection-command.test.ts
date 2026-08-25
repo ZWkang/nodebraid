@@ -296,6 +296,66 @@ test('Delete Selection rejects missing targets and replaced or removed explicit 
   }
 });
 
+test('Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges', async () => {
+  for (const scenario of ['selected-node', 'explicit-edge', 'incident-edge'] as const) {
+    const runtime = await activateDeleteCommandRuntime();
+    const selectedId = nodeId(`${scenario}-aba-selected`);
+    const targetId = nodeId(`${scenario}-aba-target`);
+    const targetEdgeId = edgeId(`${scenario}-aba-edge`);
+    const sharedNodeData = Object.freeze({ label: 'same Node data reference' });
+    const sharedEdgeData = Object.freeze({ label: 'same Edge data reference' });
+    runtime.kernel.transact((transaction) => {
+      transaction.nodes.add({
+        id: selectedId,
+        type: 'task',
+        position: { x: 0, y: 0 },
+        data: sharedNodeData,
+      });
+      transaction.nodes.add({ id: targetId, type: 'task', position: { x: 100, y: 0 }, data: null });
+      transaction.edges.add({
+        id: targetEdgeId,
+        type: 'flow',
+        source: { nodeId: selectedId },
+        target: { nodeId: targetId },
+        data: sharedEdgeData,
+      });
+    });
+    runtime.session.setSelection({
+      nodeIds: scenario === 'explicit-edge' ? [] : [selectedId],
+      edgeIds: scenario === 'explicit-edge' ? [targetEdgeId] : [],
+    });
+    const input = {
+      selection: runtime.session.getSnapshot().selection,
+      evidence: runtime.kernel.read().snapshot,
+    };
+    const evidenceNode = input.evidence.nodes.find((node) => node.id === selectedId);
+    const evidenceEdge = input.evidence.edges.find((edge) => edge.id === targetEdgeId);
+    if (!evidenceNode || !evidenceEdge) throw new Error('Expected Delete ABA evidence.');
+
+    if (scenario === 'selected-node') {
+      runtime.kernel.transact((transaction) => {
+        transaction.edges.remove(targetEdgeId);
+        transaction.nodes.remove(selectedId);
+      });
+      runtime.kernel.transact((transaction) => {
+        transaction.nodes.add(evidenceNode);
+        transaction.edges.add(evidenceEdge);
+      });
+    } else {
+      runtime.kernel.transact((transaction) => transaction.edges.remove(targetEdgeId));
+      runtime.kernel.transact((transaction) => transaction.edges.add(evidenceEdge));
+    }
+    const beforeDelete = runtime.kernel.read();
+
+    await expect(runtime.commands.execute(deleteSelectionCommand, input)).rejects.toMatchObject({
+      domain: 'interaction',
+      code: 'STALE_SELECTION',
+    });
+    expect(runtime.kernel.read()).toBe(beforeDelete);
+    await runtime.host.dispose();
+  }
+});
+
 test('Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction', async () => {
   const runtime = await activateDeleteCommandRuntime();
   const parentId = nodeId('parent');
