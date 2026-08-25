@@ -7,11 +7,11 @@ NodeBraid 是一个插件化、渲染器无关的流程画布引擎，用于构�
 
 当前源码已经提供一条可运行的 headless Canvas Runtime、显式的 Basic Canvas
 Composition，以及参考级 SVG Renderer。已实现能力包括原子图事务、Selection 与
-Viewport 状态、类型化 Command、Undo/Redo、Selection、多节点拖拽、Pan、Wheel
+Viewport 状态、类型化 Command、Undo/Redo、Selection、Box Selection、多节点拖拽、Pan、Wheel
 Zoom、节点级连边、Dagre 与 ELK Layout Provider、结构化诊断和 Plugin 生命周期所有权。
 
 私有 React Examples Application 已把这些公共 interface 组合成可单独启动的 Basic SVG
-开发者参考应用，包含统一导航、实时 Runtime 状态、连边、Viewport 控制与 History 操作。
+开发者参考应用，包含统一导航、实时 Runtime 状态、框选、连边、Viewport 控制与 History 操作。
 
 NodeBraid 仍处于预发布阶段，尚未提供产品级编辑器外壳、框架适配器、持久化、协作或序列化
 schema。源码 package 使用 `@nodebraid/*` 命名空间，但尚未发布到 npm。
@@ -174,9 +174,9 @@ attribute，而不解释产品 Node type 或 data。它仍是显式的同级 Pro
 
 ## Interaction packages
 
-`@nodebraid/interaction-api` 持有不可变、后端无关的 Node Drag、Viewport Pan 和
+`@nodebraid/interaction-api` 持有不可变、后端无关的 Node Drag、Viewport Pan、Box Selection 和
 Connection Preview 值。`@nodebraid/plugin-interaction` 消费标准化 Renderer
-Input 与 Hit Result，实现 Selection、多节点拖拽、Canvas/middle/Space Pan、锚定
+Input 与 Hit Result，实现 Selection、Box Selection、多节点拖拽、middle/Space Pan、锚定
 Wheel Zoom，以及可选的纯鼠标节点级连边，并且不暴露状态 Service。
 
 稳定 Selection 与 Viewport 变化通过 Session；最终 Node 移动和 Edge 创建使用类型化

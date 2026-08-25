@@ -54,6 +54,7 @@ interface BoxSelectionGesture {
   readonly pointerId: number;
   readonly startScreenPoint: Point;
   readonly startWorldPoint: Point;
+  readonly baseViewport: Viewport;
   readonly additive: boolean;
   active: boolean;
   rect?: WorldRect;
@@ -211,7 +212,13 @@ export function activateInteractionRuntime(
       } else {
         reapplyGestureProjection(gesture);
       }
-    } else if (gesture.type === 'node-drag' || gesture.type === 'connection' || gesture.type === 'box-selection') {
+    } else if (gesture.type === 'box-selection') {
+      if (!viewportsEqual(session.getSnapshot().viewport, gesture.baseViewport)) {
+        cancelGesture(gesture, 'stale', true);
+      } else {
+        reapplyGestureProjection(gesture);
+      }
+    } else if (gesture.type === 'node-drag' || gesture.type === 'connection') {
       reapplyGestureProjection(gesture);
     }
   });
@@ -339,6 +346,7 @@ export function activateInteractionRuntime(
             pointerId: input.pointerId,
             startScreenPoint: input.screenPoint,
             startWorldPoint: input.worldPoint,
+            baseViewport: session.getSnapshot().viewport,
             additive,
             active: false,
             completeClick: () =>
@@ -432,12 +440,6 @@ export function activateInteractionRuntime(
         const screenDeltaY = input.screenPoint.y - gesture.startScreenPoint.y;
         if (!gesture.active && Math.hypot(screenDeltaX, screenDeltaY) < config.dragThreshold) return;
         const rect = worldRectBetween(gesture.startWorldPoint, input.worldPoint);
-        if (rect.width === 0 || rect.height === 0) {
-          if (gesture.active) projection.update(null);
-          gesture.active = false;
-          gesture.rect = undefined;
-          return;
-        }
         gesture.active = true;
         gesture.rect = rect;
         reapplyGestureProjection(gesture);
@@ -479,13 +481,9 @@ export function activateInteractionRuntime(
       } else if (gesture.type === 'box-selection' && gesture.active) {
         projection.update(null);
         const rect = worldRectBetween(gesture.startWorldPoint, input.worldPoint);
-        if (rect.width > 0 && rect.height > 0) {
-          session.setSelection(
-            computeBoxSelection(session.getSnapshot().selection, kernel.read().snapshot.nodes, rect, gesture.additive),
-          );
-        } else {
-          gesture.completeClick();
-        }
+        session.setSelection(
+          computeBoxSelection(session.getSnapshot().selection, kernel.read().snapshot.nodes, rect, gesture.additive),
+        );
       } else if (gesture.type !== 'viewport-pan') {
         gesture.completeClick?.();
       }

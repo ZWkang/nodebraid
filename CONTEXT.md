@@ -317,7 +317,7 @@ Interaction 中表示成员资格切换的输入修饰语义；Shift、Meta 或 
 _Avoid_: Platform Command Key, Range Selection Modifier, Alt Modifier
 
 **World Rect**:
-世界坐标中的方向无关轴对齐矩形，以左上角位置和正宽高表达，不携带 DOM、SVG 或其他 Renderer handle。
+世界坐标中的方向无关轴对齐矩形，以左上角位置和非负宽高表达，不携带 DOM、SVG 或其他 Renderer handle。
 _Avoid_: DOMRect, SVG Rect Element, Drag Bounds
 
 **Box Selection**:

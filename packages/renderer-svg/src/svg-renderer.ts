@@ -710,8 +710,8 @@ function assertInteractionProjectionBaseline(
   if (projection.type === 'box-selection') {
     for (const field of ['x', 'y', 'width', 'height'] as const) {
       const value = projection.rect[field];
-      if (Number.isFinite(value) && ((field !== 'width' && field !== 'height') || value > 0)) continue;
-      throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Box Selection rect must be finite and non-empty.', {
+      if (Number.isFinite(value) && ((field !== 'width' && field !== 'height') || value >= 0)) continue;
+      throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Box Selection rect must be finite and non-negative.', {
         issue: 'INVALID_BOX_SELECTION_RECT',
         field: `rect.${field}`,
       });

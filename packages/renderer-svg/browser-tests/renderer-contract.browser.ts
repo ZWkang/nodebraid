@@ -367,7 +367,9 @@ try {
     selection: { nodeIds: ['selection-node', 'selection-target-node'], edgeIds: [] },
     marquee: null,
   });
-  for (const modifiers of [2, 4]) {
+  const controlModifier = 2;
+  const metaModifier = 4;
+  for (const modifiers of [controlModifier, metaModifier]) {
     await dispatchMouseDown(20, 280);
     await dispatchMouseUp(20, 280);
     await dispatchMouseDown(160, 120);
@@ -397,14 +399,22 @@ try {
     marquee: null,
   });
   await dispatchSelectionPointerCancel(22, 282);
-  await dispatchMouseDown(20, 40);
-  await dispatchMouseMove(200, 40);
+  await dispatchMouseDown(20, 120);
+  await dispatchMouseMove(200, 120);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
     revision: 1,
     selection: { nodeIds: ['selection-node', 'selection-target-node'], edgeIds: [] },
+    marquee: { x: '20', y: '120', width: '180', height: '0' },
+  });
+  await dispatchMouseUp(200, 120);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 1,
+    selection: { nodeIds: ['selection-node'], edgeIds: [] },
     marquee: null,
   });
-  await dispatchSelectionPointerCancel(200, 40);
+  await dispatchMouseDown(160, 120);
+  await dispatchMouseUp(160, 120);
+  await dispatchShiftClick(340, 120);
   await dispatchMouseDown(40, 40);
   await dispatchMouseMove(250, 160);
   await dispatchSelectionEscape();
@@ -414,11 +424,29 @@ try {
     marquee: null,
   });
   await dispatchMouseUp(250, 160);
+  await dispatchMouseDown(40, 40);
+  await dispatchMouseMove(250, 160);
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetSelectionViewport(50, 20, 2)');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 1,
+    selection: { nodeIds: ['selection-node', 'selection-target-node'], edgeIds: [] },
+    marquee: null,
+  });
+  await dispatchMouseUp(250, 160);
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetSelectionViewport(0, 0, 1)');
   await dispatchMouseDown(20, 280);
   await dispatchMouseUp(20, 280);
   await dispatchMouseDown(160, 120);
   await dispatchMouseUp(160, 120);
-  await dispatchModifiedMouseDrag(390, 160, 280, 80, 8);
+  const shiftModifier = 8;
+  await dispatchModifiedMouseDown(390, 160, shiftModifier);
+  await dispatchModifiedMouseMove(280, 80, shiftModifier);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
+    revision: 1,
+    selection: { nodeIds: ['selection-node'], edgeIds: [] },
+    marquee: { x: '280', y: '80', width: '110', height: '80' },
+  });
+  await dispatchModifiedMouseUp(280, 80, shiftModifier);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadBoxSelectionInteraction()', {
     revision: 1,
     selection: { nodeIds: ['selection-node', 'selection-target-node'], edgeIds: [] },
@@ -472,6 +500,25 @@ try {
     marquee: null,
   });
   await dispatchMouseUp(400, 200);
+  await dispatchMouseDown(40, 40);
+  await dispatchMouseMove(400, 200);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgDisposeSelectionInteraction()', {
+    installationStatus: 'disposed',
+    rootPresent: true,
+    marqueePresent: false,
+    pointerCaptured: false,
+  });
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownSelectionInteraction()');
+
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupSelectionInteraction()');
+  await dispatchMouseDown(40, 40);
+  await dispatchMouseMove(390, 160);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgLoseSelectionRenderer()', {
+    installationStatus: 'pending',
+    rootPresent: false,
+    marqueePresent: false,
+    pointerCaptured: false,
+  });
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownSelectionInteraction()');
 
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupNodeDragInteraction()');
@@ -1785,6 +1832,48 @@ async function dispatchModifiedMouseDrag(
       type: 'mouseReleased',
       x: endX,
       y: endY,
+      button: 'left',
+      buttons: 0,
+      clickCount: 1,
+      modifiers,
+    });
+  });
+}
+
+async function dispatchModifiedMouseDown(x: number, y: number, modifiers: number): Promise<void> {
+  await withRendererPageCdp(async (send) => {
+    await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y, buttons: 0, modifiers });
+    await send('Input.dispatchMouseEvent', {
+      type: 'mousePressed',
+      x,
+      y,
+      button: 'left',
+      buttons: 1,
+      clickCount: 1,
+      modifiers,
+    });
+  });
+}
+
+async function dispatchModifiedMouseMove(x: number, y: number, modifiers: number): Promise<void> {
+  await withRendererPageCdp(async (send) => {
+    await send('Input.dispatchMouseEvent', {
+      type: 'mouseMoved',
+      x,
+      y,
+      button: 'left',
+      buttons: 1,
+      modifiers,
+    });
+  });
+}
+
+async function dispatchModifiedMouseUp(x: number, y: number, modifiers: number): Promise<void> {
+  await withRendererPageCdp(async (send) => {
+    await send('Input.dispatchMouseEvent', {
+      type: 'mouseReleased',
+      x,
+      y,
       button: 'left',
       buttons: 0,
       clickCount: 1,
