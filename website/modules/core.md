@@ -63,18 +63,18 @@ Application
 
 Package 只有一个公开子路径：`@nodebraid/core`。代表性的公共入口包括：
 
-| 能力        | 代表入口                                                                       |
-| ----------- | ------------------------------------------------------------------------------ |
-| Plugin Host | `createPluginHost`、`definePlugin`、`defineService`                            |
-| Kernel      | `createCanvasKernel`、`kernelPlugin`、`kernelService`                          |
-| Command     | `defineCommand`、`commandPlugin`、`commandService`                             |
-| Session     | `sessionPlugin`、`sessionService`                                              |
-| History     | `historyPlugin`、`historyService`、`undoCommand`、`redoCommand`                |
-| Layout      | `createLayoutInput`、`defineLayoutEngine`、`createLayoutPlugin`、`LayoutError` |
-| Renderer    | `createRendererPlugin`、`rendererService`、`RendererError`                     |
-| Interaction | `interactionPlugin`、`moveNodesCommand`、`interactionDiagnosticEvents`         |
-| Composition | `createBasicCanvasPlugin`、`BasicCanvasPluginOptions`                          |
-| Diagnostics | `NodeBraidError`、`diagnosticEvents`、`describeError`                          |
+| 能力        | 代表入口                                                                                                              |
+| ----------- | --------------------------------------------------------------------------------------------------------------------- |
+| Plugin Host | `createPluginHost`、`definePlugin`、`defineService`                                                                   |
+| Kernel      | `createCanvasKernel`、`kernelPlugin`、`kernelService`                                                                 |
+| Command     | `defineCommand`、`commandPlugin`、`commandService`                                                                    |
+| Session     | `sessionPlugin`、`sessionService`                                                                                     |
+| History     | `historyPlugin`、`historyService`、`undoCommand`、`redoCommand`                                                       |
+| Layout      | `createLayoutInput`、`defineLayoutEngine`、`createLayoutPlugin`、`LayoutError`                                        |
+| Renderer    | `createRendererPlugin`、`rendererService`、`RendererError`                                                            |
+| Interaction | `interactionPlugin`、`moveNodesCommand`、`createEdgeCommand`、`deleteSelectionCommand`、`interactionDiagnosticEvents` |
+| Composition | `createBasicCanvasPlugin`、`BasicCanvasPluginOptions`                                                                 |
+| Diagnostics | `NodeBraidError`、`diagnosticEvents`、`describeError`                                                                 |
 
 完整导出等于 facade 源码中各 public package 的显式 `export *`；没有额外的隐藏子路径。
 

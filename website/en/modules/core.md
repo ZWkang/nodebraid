@@ -63,18 +63,18 @@ Advanced consumers can bypass the facade and depend directly on `@nodebraid/kern
 
 The package has one public subpath: `@nodebraid/core`. Representative public entry points include:
 
-| Capability  | Representative entry points                                                    |
-| ----------- | ------------------------------------------------------------------------------ |
-| Plugin Host | `createPluginHost`, `definePlugin`, `defineService`                            |
-| Kernel      | `createCanvasKernel`, `kernelPlugin`, `kernelService`                          |
-| Command     | `defineCommand`, `commandPlugin`, `commandService`                             |
-| Session     | `sessionPlugin`, `sessionService`                                              |
-| History     | `historyPlugin`, `historyService`, `undoCommand`, `redoCommand`                |
-| Layout      | `createLayoutInput`, `defineLayoutEngine`, `createLayoutPlugin`, `LayoutError` |
-| Renderer    | `createRendererPlugin`, `rendererService`, `RendererError`                     |
-| Interaction | `interactionPlugin`, `moveNodesCommand`, `interactionDiagnosticEvents`         |
-| Composition | `createBasicCanvasPlugin`, `BasicCanvasPluginOptions`                          |
-| Diagnostics | `NodeBraidError`, `diagnosticEvents`, `describeError`                          |
+| Capability  | Representative entry points                                                                                           |
+| ----------- | --------------------------------------------------------------------------------------------------------------------- |
+| Plugin Host | `createPluginHost`, `definePlugin`, `defineService`                                                                   |
+| Kernel      | `createCanvasKernel`, `kernelPlugin`, `kernelService`                                                                 |
+| Command     | `defineCommand`, `commandPlugin`, `commandService`                                                                    |
+| Session     | `sessionPlugin`, `sessionService`                                                                                     |
+| History     | `historyPlugin`, `historyService`, `undoCommand`, `redoCommand`                                                       |
+| Layout      | `createLayoutInput`, `defineLayoutEngine`, `createLayoutPlugin`, `LayoutError`                                        |
+| Renderer    | `createRendererPlugin`, `rendererService`, `RendererError`                                                            |
+| Interaction | `interactionPlugin`, `moveNodesCommand`, `createEdgeCommand`, `deleteSelectionCommand`, `interactionDiagnosticEvents` |
+| Composition | `createBasicCanvasPlugin`, `BasicCanvasPluginOptions`                                                                 |
+| Diagnostics | `NodeBraidError`, `diagnosticEvents`, `describeError`                                                                 |
 
 The complete export surface is the facade source's explicit `export *` declarations for public packages. There are no additional hidden subpaths.
 

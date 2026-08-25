@@ -19,12 +19,32 @@ Session until pointerup. Primary dragging from empty Canvas space publishes a
 backend-neutral World Rect and selects intersecting Nodes from the current Kernel
 View only when the Gesture ends.
 
+While the Renderer owns Focus and no Gesture is active, logical or physical
+Delete keydown executes `interaction.selection.delete`. The Command removes
+explicitly selected Edges plus every incident Edge of selected Nodes before
+removing the Nodes, all in one synchronous Transaction. Selection and source
+Canvas Snapshot evidence reject competing target changes without blocking
+unrelated Commits. Empty Selection is a no-op; Backspace is not a Delete alias.
+
 Each Activation owns one primary Gesture Pointer. Additional Pointers and Wheel
 input during a Gesture are rejected through stable diagnostics. Pointer cancel,
 lost capture, stale Document or Viewport evidence, unload, and dependency loss
 all end the Gesture without committing Preview state. Cleanup releases Input,
-Projection, Capture, local state, and both Command registrations as one
+Projection, Capture, local state, and all three Command registrations as one
 failure-preserving lifecycle operation.
+
+## Development
+
+Run package scripts from the monorepo root. Public-seam tests also build History
+because they verify Delete Undo/Redo with the real Runtime plugins.
+
+```bash
+bun run --filter '@nodebraid/plugin-interaction' build:dependencies
+bun run --filter '@nodebraid/plugin-interaction' build:test-dependencies
+bun run --filter '@nodebraid/plugin-interaction' typecheck
+bun run --filter '@nodebraid/plugin-interaction' test
+bun run --filter '@nodebraid/plugin-interaction' build
+```
 
 ## License
 

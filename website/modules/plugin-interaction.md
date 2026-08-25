@@ -1,6 +1,6 @@
 ---
 title: '@nodebraid/plugin-interaction'
-description: 把 Renderer Input 解释为 Selection、Box Selection、Drag、Pan、Wheel Zoom 与 Edge Connection 的 Runtime Plugin。
+description: 把 Renderer Input 解释为 Selection、Box Selection、Delete、Drag、Pan、Wheel Zoom 与 Edge Connection 的 Runtime Plugin。
 ---
 
 # `@nodebraid/plugin-interaction`
@@ -19,12 +19,15 @@ Renderer 只发布输入事实和 Hit Result，不应决定产品行为。该 Pl
 - `InteractionConfig`：Drag/Zoom 策略与可选同步 Connection materializer；
 - `moveNodesCommand`：ID 为 `interaction.nodes.move`，一次同步 Transaction 更新全部目标 Node；
 - `createEdgeCommand`：ID 为 `interaction.edge.create`，一次同步 Transaction 创建完整 Edge；
-- `InteractionError`：`INVALID_CONFIG`、`INVALID_MOVE`、`INVALID_CONNECTION`、`STALE_GESTURE`；
+- `deleteSelectionCommand`：ID 为 `interaction.selection.delete`，一次同步 Transaction 删除规范目标闭包；
+- `InteractionError`：`INVALID_CONFIG`、`INVALID_MOVE`、`INVALID_CONNECTION`、`INVALID_DELETE`、`STALE_GESTURE`、`STALE_SELECTION`；
 - `interactionDiagnosticEvents`：Pointer/Input rejection、Gesture cancellation 与 Command fault。
 
 当前行为还包括 mouse-only Node-level Edge Connection：Renderer 提供 source/target Anchor，应用 materializer 拥有 Edge ID/type/data，Interaction 只在 pointerup 提交一次 typed Command。
 
 Primary pointer 从空白 Canvas 拖动超过 threshold 后进入 Box Selection；Preview 只包含 World Rect，pointerup 才按当前 Kernel View 的 Node position/size 相交结果更新 Session。Shift、Control 或 Meta 与既有 Additive Modifier 语义一致，合并已有 Selection；中键和 Space Pan 优先。
+
+Renderer 拥有 Focus 且没有 Active Gesture 时，logical `key` 或 physical `code` 任一为 Delete 都会删除当前 Selection。显式选中 Edge 与选中 Node 的全部 incident Edge 先删，再删 Node；目标证据只拒绝竞争目标变化，不拒绝无关 Commit。空 Selection 不建立 revision/History Entry，Backspace 不触发删除，Active Gesture 期间则使用 Input Rejection 且不取消 Gesture。
 
 ## 依赖与写入方向
 
@@ -33,7 +36,7 @@ Plugin 静态要求 Renderer、Session、Command 与 Kernel Service，不提供�
 ```text
 RendererService ─▶ Input / Hit / Capture / Projection
 SessionService  ◀─ Selection / Viewport
-CommandService  ◀─ Move Nodes Command ─▶ KernelService
+CommandService  ◀─ Move/Create/Delete Commands ─▶ KernelService
 ```
 
 Pointermove 只替换 Interaction Projection。pointerup 先清 Preview 并回到 idle，再把 Box Selection/Viewport 写入 Session，或执行一次 Move Nodes Command。Command 读取当前完整 Node，只替换 position，并用每个 Node 的 base position 拒绝竞争写。
@@ -44,4 +47,4 @@ Pointermove 只替换 Interaction Projection。pointerup 先清 Preview 并回�
 
 ## 非目标与验证
 
-当前不包含 Port-aware Connection、self-loop、业务 validation、Edge/Port 框选、lasso、delete、snapping、pinch/touch tool、HTML overlay、文本编辑、协作 presence、产品 UI 或通用 Tool Registry。成功行为由真实 Chromium 中的完整 Runtime + SVG seam 验证。
+当前不包含 Port-aware Connection、self-loop、业务 validation、Edge/Port 框选、lasso、Backspace、Clipboard、确认弹窗、soft delete、snapping、pinch/touch tool、HTML overlay、文本编辑、协作 presence、产品 UI 或通用 Tool Registry。成功行为由真实 Chromium 中的完整 Runtime + SVG seam 验证。
