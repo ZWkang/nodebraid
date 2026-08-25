@@ -59,16 +59,31 @@ test('Delete Selection removes a selected Node and its incident Edge as one undo
   const selectedNodeId = nodeId('selected');
   const retainedNodeId = nodeId('retained');
   const incidentEdgeId = edgeId('incident');
+  const selectedNode = {
+    id: selectedNodeId,
+    type: 'task',
+    position: { x: 0, y: 0 },
+    size: { width: 80, height: 40 },
+    data: Object.freeze({ label: 'Selected' }),
+  };
+  const retainedNode = {
+    id: retainedNodeId,
+    type: 'task',
+    position: { x: 100, y: 0 },
+    size: { width: 90, height: 50 },
+    data: Object.freeze({ label: 'Retained' }),
+  };
+  const incidentEdge = {
+    id: incidentEdgeId,
+    type: 'flow',
+    source: { nodeId: selectedNodeId, portId: 'output' },
+    target: { nodeId: retainedNodeId, portId: 'input' },
+    data: Object.freeze({ label: 'Complete edge evidence' }),
+  };
   kernel.transact((transaction) => {
-    transaction.nodes.add({ id: selectedNodeId, type: 'task', position: { x: 0, y: 0 }, data: null });
-    transaction.nodes.add({ id: retainedNodeId, type: 'task', position: { x: 100, y: 0 }, data: null });
-    transaction.edges.add({
-      id: incidentEdgeId,
-      type: 'flow',
-      source: { nodeId: selectedNodeId },
-      target: { nodeId: retainedNodeId },
-      data: null,
-    });
+    transaction.nodes.add(selectedNode);
+    transaction.nodes.add(retainedNode);
+    transaction.edges.add(incidentEdge);
   });
   session.setSelection({ nodeIds: [selectedNodeId], edgeIds: [] });
   const evidence = kernel.read().snapshot;
@@ -86,22 +101,22 @@ test('Delete Selection removes a selected Node and its incident Edge as one undo
   });
   expect(kernel.read().snapshot).toEqual({
     revision: 2,
-    nodes: [expect.objectContaining({ id: retainedNodeId })],
+    nodes: [retainedNode],
     edges: [],
   });
   expect(session.getSnapshot().selection).toEqual({ nodeIds: [], edgeIds: [] });
   expect(history.getSnapshot()).toEqual({ canUndo: true, canRedo: false });
 
   await commands.execute(undoCommand, undefined);
-  expect(kernel.read().snapshot).toMatchObject({
+  expect(kernel.read().snapshot).toEqual({
     revision: 3,
-    nodes: [expect.objectContaining({ id: retainedNodeId }), expect.objectContaining({ id: selectedNodeId })],
-    edges: [expect.objectContaining({ id: incidentEdgeId })],
+    nodes: [retainedNode, selectedNode],
+    edges: [incidentEdge],
   });
   await commands.execute(redoCommand, undefined);
-  expect(kernel.read().snapshot).toMatchObject({
+  expect(kernel.read().snapshot).toEqual({
     revision: 4,
-    nodes: [expect.objectContaining({ id: retainedNodeId })],
+    nodes: [retainedNode],
     edges: [],
   });
 
@@ -253,6 +268,61 @@ test('Delete Selection allows unrelated Commits but rejects changed targets and 
   });
   expect(incident.kernel.read()).toBe(beforeIncidentDelete);
   await incident.host.dispose();
+});
+
+test('Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically', async () => {
+  for (const scenario of [
+    'missing-node',
+    'replaced-explicit-edge',
+    'removed-explicit-edge',
+    'replaced-incident-edge',
+    'removed-incident-edge',
+  ] as const) {
+    const runtime = await activateDeleteCommandRuntime();
+    const selectedId = nodeId(`${scenario}-selected`);
+    const targetId = nodeId(`${scenario}-target`);
+    const targetEdgeId = edgeId(`${scenario}-edge`);
+    runtime.kernel.transact((transaction) => {
+      transaction.nodes.add({ id: selectedId, type: 'task', position: { x: 0, y: 0 }, data: null });
+      transaction.nodes.add({ id: targetId, type: 'task', position: { x: 100, y: 0 }, data: null });
+      transaction.edges.add({
+        id: targetEdgeId,
+        type: 'flow',
+        source: { nodeId: selectedId },
+        target: { nodeId: targetId },
+        data: Object.freeze({ scenario }),
+      });
+    });
+    const selectsNode = scenario === 'missing-node' || scenario.includes('incident');
+    runtime.session.setSelection({
+      nodeIds: selectsNode ? [selectedId] : [],
+      edgeIds: selectsNode ? [] : [targetEdgeId],
+    });
+    const input = {
+      selection: runtime.session.getSnapshot().selection,
+      evidence: runtime.kernel.read().snapshot,
+    };
+    runtime.kernel.transact((transaction) => {
+      if (scenario === 'missing-node') {
+        transaction.edges.remove(targetEdgeId);
+        transaction.nodes.remove(selectedId);
+      } else if (scenario === 'replaced-explicit-edge' || scenario === 'replaced-incident-edge') {
+        const edge = transaction.query.getEdge(targetEdgeId);
+        if (!edge) throw new Error('Expected stale Delete Edge target.');
+        transaction.edges.replace(targetEdgeId, { ...edge, type: 'updated-flow' });
+      } else {
+        transaction.edges.remove(targetEdgeId);
+      }
+    });
+    const beforeDelete = runtime.kernel.read();
+
+    await expect(runtime.commands.execute(deleteSelectionCommand, input)).rejects.toMatchObject({
+      domain: 'interaction',
+      code: 'STALE_SELECTION',
+    });
+    expect(runtime.kernel.read()).toBe(beforeDelete);
+    await runtime.host.dispose();
+  }
 });
 
 test('Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction', async () => {

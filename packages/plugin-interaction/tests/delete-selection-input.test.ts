@@ -17,33 +17,12 @@ import type {
   ScreenPoint,
 } from '@nodebraid/renderer-api';
 import type { SessionSnapshot } from '@nodebraid/session-api';
-import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
+import { createPluginHost, definePlugin, type PluginHostOptions } from '@nodebraid/runtime-cordis';
 
-import { interactionPlugin } from '../src';
+import { interactionPlugin, type InteractionConfig } from '../src';
 
 test('logical Delete key removes the current Selection through the public Renderer Input seam', async () => {
-  let kernel: KernelService | undefined;
-  let session: SessionService | undefined;
-  const renderer = new InputRenderer();
-  const consumer = definePlugin({
-    requires: { kernel: kernelService, session: sessionService },
-    setup(context) {
-      kernel = context.services.kernel;
-      session = context.services.session;
-    },
-  });
-  const host = createPluginHost();
-  const installations = [
-    host.install(kernelPlugin),
-    host.install(commandPlugin),
-    host.install(sessionPlugin),
-    host.install(createRendererPlugin(() => renderer)),
-    host.install(interactionPlugin),
-    host.install(historyPlugin),
-    host.install(consumer),
-  ];
-  await Promise.all(installations.map((installation) => installation.whenActive()));
-  if (!kernel || !session) throw new Error('Expected Delete Selection Input Runtime Services.');
+  const { host, kernel, renderer, session } = await activateInputRuntime();
 
   const sourceId = nodeId('source');
   const targetId = nodeId('target');
@@ -76,30 +55,7 @@ test('logical Delete key removes the current Selection through the public Render
 });
 
 test('physical Delete accepts modifiers and repeat while empty Selection and Backspace remain no-ops', async () => {
-  let history: HistoryService | undefined;
-  let kernel: KernelService | undefined;
-  let session: SessionService | undefined;
-  const renderer = new InputRenderer();
-  const consumer = definePlugin({
-    requires: { history: historyService, kernel: kernelService, session: sessionService },
-    setup(context) {
-      history = context.services.history;
-      kernel = context.services.kernel;
-      session = context.services.session;
-    },
-  });
-  const host = createPluginHost();
-  const installations = [
-    host.install(kernelPlugin),
-    host.install(commandPlugin),
-    host.install(sessionPlugin),
-    host.install(createRendererPlugin(() => renderer)),
-    host.install(interactionPlugin),
-    host.install(historyPlugin),
-    host.install(consumer),
-  ];
-  await Promise.all(installations.map((installation) => installation.whenActive()));
-  if (!history || !kernel || !session) throw new Error('Expected Delete Selection repeat Runtime Services.');
+  const { history, host, kernel, renderer, session } = await activateInputRuntime();
   const selectedId = nodeId('selected-for-repeat');
   kernel.transact((transaction) => {
     transaction.nodes.add({ id: selectedId, type: 'task', position: { x: 0, y: 0 }, data: null });
@@ -124,26 +80,11 @@ test('physical Delete accepts modifiers and repeat while empty Selection and Bac
 test('Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connection without cancelling them', async () => {
   for (const gesture of ['box-selection', 'node-drag', 'viewport-pan', 'connection'] as const) {
     const events: DiagnosticEvent[] = [];
-    let kernel: KernelService | undefined;
-    let session: SessionService | undefined;
-    const renderer = new InputRenderer();
     const selectedId = nodeId(`${gesture}-selected`);
     const targetId = nodeId(`${gesture}-target`);
-    const consumer = definePlugin({
-      requires: { kernel: kernelService, session: sessionService },
-      setup(context) {
-        kernel = context.services.kernel;
-        session = context.services.session;
-      },
-    });
-    const host = createPluginHost({ diagnostics: { sink: (event) => events.push(event) } });
-    const installations = [
-      host.install(kernelPlugin),
-      host.install(commandPlugin),
-      host.install(sessionPlugin),
-      host.install(createRendererPlugin(() => renderer)),
-      host.install(
-        interactionPlugin,
+    const { host, kernel, renderer, session } = await activateInputRuntime({
+      host: { diagnostics: { sink: (event) => events.push(event) } },
+      interaction:
         gesture === 'connection'
           ? {
               connection: {
@@ -153,12 +94,7 @@ test('Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connecti
               },
             }
           : undefined,
-      ),
-      host.install(historyPlugin),
-      host.install(consumer),
-    ];
-    await Promise.all(installations.map((installation) => installation.whenActive()));
-    if (!kernel || !session) throw new Error('Expected Active Gesture Delete Runtime Services.');
+    });
     kernel.transact((transaction) => {
       transaction.nodes.add({ id: selectedId, type: 'task', position: { x: 0, y: 0 }, data: null });
       if (gesture === 'connection') {
@@ -177,7 +113,9 @@ test('Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connecti
     renderer.emit(pointerInput('pointer.move', button, 10));
     const projectionBeforeDelete = renderer.interactions.at(-1);
 
-    renderer.emit(keyInput('Delete', 'Delete', false));
+    renderer.emit(
+      keyInput('Delete', gesture === 'box-selection' || gesture === 'connection' ? 'Escape' : 'Space', false),
+    );
     await nextTask();
 
     expect(kernel.read().snapshot.revision).toBe(1);
@@ -189,34 +127,22 @@ test('Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connecti
         .map((event) => event.attributes),
     ).toEqual([{ inputType: 'key.down', gestureType: gesture, reason: 'active-gesture' }]);
     renderer.emit(pointerInput('pointer.cancel', button, 10));
+    if (gesture === 'node-drag' || gesture === 'viewport-pan') {
+      renderer.hit = { type: 'node', nodeId: selectedId, worldPoint: { x: 0, y: 0 } };
+      renderer.emit(pointerInput('pointer.down', 'primary', 0));
+      renderer.emit(pointerInput('pointer.move', 'primary', 10));
+      expect(renderer.interactions.at(-1)?.type).toBe('node-drag');
+      renderer.emit(pointerInput('pointer.cancel', 'primary', 10));
+    }
     await host.dispose();
   }
 });
 
 test('Delete Transaction failure preserves state and reports the original diagnostic identity exactly once', async () => {
   const faults: DiagnosticFault[] = [];
-  let kernel: KernelService | undefined;
-  let session: SessionService | undefined;
-  const renderer = new InputRenderer();
-  const consumer = definePlugin({
-    requires: { kernel: kernelService, session: sessionService },
-    setup(context) {
-      kernel = context.services.kernel;
-      session = context.services.session;
-    },
+  const { host, kernel, renderer, session } = await activateInputRuntime({
+    host: { diagnostics: { faultReporter: (fault) => faults.push(fault) } },
   });
-  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
-  const installations = [
-    host.install(kernelPlugin),
-    host.install(commandPlugin),
-    host.install(sessionPlugin),
-    host.install(createRendererPlugin(() => renderer)),
-    host.install(interactionPlugin),
-    host.install(historyPlugin),
-    host.install(consumer),
-  ];
-  await Promise.all(installations.map((installation) => installation.whenActive()));
-  if (!kernel || !session) throw new Error('Expected failed Delete Runtime Services.');
   const parentId = nodeId('input-parent');
   const childId = nodeId('input-child');
   kernel.transact((transaction) => {
@@ -241,6 +167,42 @@ test('Delete Transaction failure preserves state and reports the original diagno
   });
   await host.dispose();
 });
+
+async function activateInputRuntime(
+  options: Readonly<{ host?: PluginHostOptions; interaction?: InteractionConfig }> = {},
+): Promise<{
+  readonly history: HistoryService;
+  readonly host: ReturnType<typeof createPluginHost>;
+  readonly kernel: KernelService;
+  readonly renderer: InputRenderer;
+  readonly session: SessionService;
+}> {
+  let history: HistoryService | undefined;
+  let kernel: KernelService | undefined;
+  let session: SessionService | undefined;
+  const renderer = new InputRenderer();
+  const consumer = definePlugin({
+    requires: { history: historyService, kernel: kernelService, session: sessionService },
+    setup(context) {
+      history = context.services.history;
+      kernel = context.services.kernel;
+      session = context.services.session;
+    },
+  });
+  const host = createPluginHost(options.host);
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => renderer)),
+    host.install(interactionPlugin, options.interaction),
+    host.install(historyPlugin),
+    host.install(consumer),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (!history || !kernel || !session) throw new Error('Expected Delete Selection Input Runtime Services.');
+  return { history, host, kernel, renderer, session };
+}
 
 class InputRenderer implements CanvasRenderer {
   readonly #listeners = new Set<RendererInputListener>();

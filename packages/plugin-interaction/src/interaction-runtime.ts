@@ -239,14 +239,6 @@ export function activateInteractionRuntime(
   stopInput = renderer.subscribeInput((input) => {
     if (closing) return;
     if (input.type === 'key.down' || input.type === 'key.up') {
-      if (input.code === 'Space') spacePressed = input.type === 'key.down';
-      if (
-        input.type === 'key.down' &&
-        input.code === 'Escape' &&
-        (activeGesture?.type === 'connection' || activeGesture?.type === 'box-selection')
-      ) {
-        cancelGesture(activeGesture, 'escape', true);
-      }
       if (input.type === 'key.down' && (input.key === 'Delete' || input.code === 'Delete')) {
         if (activeGesture) {
           context.diagnostics.emit({
@@ -268,6 +260,15 @@ export function activateInteractionRuntime(
           { selection, evidence: kernel.read().snapshot },
           () => closing,
         );
+        return;
+      }
+      if (input.code === 'Space') spacePressed = input.type === 'key.down';
+      if (
+        input.type === 'key.down' &&
+        input.code === 'Escape' &&
+        (activeGesture?.type === 'connection' || activeGesture?.type === 'box-selection')
+      ) {
+        cancelGesture(activeGesture, 'escape', true);
       }
       return;
     }

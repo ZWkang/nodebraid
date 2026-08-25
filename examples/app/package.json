@@ -32,7 +32,7 @@
     "check": "bun run build && tsgo --noEmit -p tsconfig.json && bun run test:browser",
     "dev": "bun run build:dependencies && vite --host 127.0.0.1",
     "test": "bun run build && bun run test:browser",
-    "test:browser": "bun run ./tests/basic-svg.browser.ts",
+    "test:browser": "bun run ./browser-tests/basic-svg.browser.ts",
     "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
   }
 }
