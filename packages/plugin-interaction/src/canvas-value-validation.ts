@@ -24,7 +24,7 @@ export function isCanvasEdge(value: unknown): value is CanvasEdge {
   );
 }
 
-export function isEndpoint(value: unknown): value is CanvasEdge['source'] {
+function isEndpoint(value: unknown): value is CanvasEdge['source'] {
   return isRecord(value) && isId(value.nodeId) && (value.portId === undefined || typeof value.portId === 'string');
 }
 
@@ -32,7 +32,11 @@ export function isPoint(value: unknown): value is CanvasNode['position'] {
   return isRecord(value) && typeof value.x === 'number' && typeof value.y === 'number';
 }
 
-export function isId(value: unknown): value is string {
+export function isIdArray(value: unknown): value is readonly string[] {
+  return Array.isArray(value) && value.every(isId);
+}
+
+function isId(value: unknown): value is string {
   return typeof value === 'string' && value.length > 0;
 }
 

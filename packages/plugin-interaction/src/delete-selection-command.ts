@@ -3,7 +3,7 @@ import { defineCommand, type CommandHandler } from '@nodebraid/plugin-command';
 import type { KernelService } from '@nodebraid/plugin-kernel';
 
 import type { DeleteSelectionInput, DeleteSelectionResult } from './contracts';
-import { isCanvasEdge, isCanvasNode, isId, isRecord } from './canvas-value-validation';
+import { isCanvasEdge, isCanvasNode, isIdArray, isRecord } from './canvas-value-validation';
 import { InteractionError } from './interaction-error';
 
 export const deleteSelectionCommand = defineCommand<DeleteSelectionInput, DeleteSelectionResult>(
@@ -80,10 +80,6 @@ function isSnapshot(value: unknown): value is DeleteSelectionInput['evidence'] {
     Array.isArray(value.edges) &&
     value.edges.every(isCanvasEdge)
   );
-}
-
-function isIdArray(value: unknown): value is readonly string[] {
-  return Array.isArray(value) && value.every(isId);
 }
 
 function requireEvidenceNode(nodes: ReadonlyMap<NodeId, CanvasNode>, id: NodeId): CanvasNode {
