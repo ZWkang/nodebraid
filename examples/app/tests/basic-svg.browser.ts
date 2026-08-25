@@ -239,6 +239,40 @@ try {
     nodes: '3',
     edges: '2',
   });
+
+  const deleteBoxStart = await readCanvasPoint(40, 40);
+  const deleteBoxEnd = await readCanvasPoint(550, 370);
+  await dispatchMouseDown(deleteBoxStart.x, deleteBoxStart.y);
+  await dispatchMouseMove(deleteBoxEnd.x, deleteBoxEnd.y);
+  await dispatchMouseUp(deleteBoxEnd.x, deleteBoxEnd.y);
+  assert.deepEqual(await waitForMetrics({ selection: 'example-compose, example-discover' }), {
+    selection: 'example-compose, example-discover',
+  });
+  assert.equal(
+    await evaluateBrowserScenario(`(() => {
+      const target = document.querySelector('.canvas-target');
+      target?.focus();
+      return document.activeElement === target;
+    })()`),
+    true,
+    'Expected the SVG Renderer Target to own Focus before Delete.',
+  );
+  await dispatchDeleteKey();
+  assert.deepEqual(
+    await waitForMetrics({ revision: '4', nodes: '1', edges: '0', selection: 'None', history: 'Undo / —' }),
+    { revision: '4', nodes: '1', edges: '0', selection: 'None', history: 'Undo / —' },
+  );
+
+  await clickExampleControl('Undo');
+  assert.deepEqual(
+    await waitForMetrics({ revision: '5', nodes: '3', edges: '2', selection: 'None', history: 'Undo / Redo' }),
+    { revision: '5', nodes: '3', edges: '2', selection: 'None', history: 'Undo / Redo' },
+  );
+  await clickExampleControl('Redo');
+  assert.deepEqual(
+    await waitForMetrics({ revision: '6', nodes: '1', edges: '0', selection: 'None', history: 'Undo / —' }),
+    { revision: '6', nodes: '1', edges: '0', selection: 'None', history: 'Undo / —' },
+  );
 } finally {
   await runAgentBrowser(['close']);
   await server.stop(true);
@@ -293,6 +327,35 @@ async function dispatchMouseUp(x: number, y: number): Promise<void> {
       clickCount: 1,
     });
   });
+}
+
+async function dispatchDeleteKey(): Promise<void> {
+  await evaluateBrowserScenario(`(() => {
+    const target = document.querySelector('.canvas-target');
+    if (!target || document.activeElement !== target) throw new Error('SVG Renderer Target is not focused.');
+    target.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'Delete',
+      code: 'Delete',
+      bubbles: true,
+      cancelable: true,
+    }));
+    target.dispatchEvent(new KeyboardEvent('keyup', {
+      key: 'Delete',
+      code: 'Delete',
+      bubbles: true,
+      cancelable: true,
+    }));
+    return true;
+  })()`);
+}
+
+async function clickExampleControl(label: string): Promise<void> {
+  await evaluateBrowserScenario(`(() => {
+    const control = document.querySelector('[aria-label="${label}"]');
+    if (!(control instanceof HTMLButtonElement)) throw new Error('Missing Example control: ${label}');
+    control.click();
+    return true;
+  })()`);
 }
 
 type PageCdpSend = (method: string, params?: Readonly<Record<string, unknown>>) => Promise<unknown>;
@@ -415,7 +478,13 @@ async function waitForMetrics(expected: Readonly<Record<string, string>>): Promi
           return;
         }
         if (Date.now() >= deadline) {
-          reject(new Error('Metrics did not reach ' + JSON.stringify(expected) + '; actual=' + JSON.stringify(actual)));
+          reject(new Error(
+            'Metrics did not reach ' + JSON.stringify(expected) +
+            '; actual=' + JSON.stringify(actual) +
+            '; url=' + location.href +
+            '; status=' + document.querySelector('main')?.getAttribute('data-example-status') +
+            '; body=' + document.body.innerText.slice(0, 1000)
+          ));
           return;
         }
         setTimeout(read, 25);
