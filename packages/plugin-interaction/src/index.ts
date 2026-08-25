@@ -11,7 +11,6 @@ export type {
   MoveNodesResult,
 } from './contracts';
 export { createEdgeCommand } from './create-edge-command';
-export { computeBoxSelection, createWorldRect } from './box-selection';
 export { interactionDiagnosticEvents } from './diagnostic-events';
 export { interactionPlugin } from './interaction-plugin';
 export { InteractionError, type InteractionErrorCode } from './interaction-error';

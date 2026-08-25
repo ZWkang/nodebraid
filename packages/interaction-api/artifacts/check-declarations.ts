@@ -15,10 +15,12 @@ assert.match(indexDeclaration, /NodeDragInteractionProjection/);
 assert.match(indexDeclaration, /ViewportPanInteractionProjection/);
 assert.match(indexDeclaration, /ConnectionPreviewInteractionProjection/);
 assert.match(indexDeclaration, /ConnectionAnchorIdentity/);
+assert.match(indexDeclaration, /createWorldRect/);
 for (const declaration of await collectDeclarations(dist)) {
   assert.doesNotMatch(declaration.contents, forbiddenImport, declaration.path);
   assert.doesNotMatch(declaration.contents, forbiddenPlatformType, declaration.path);
 }
 
 const packageExports = await import('@nodebraid/interaction-api');
-assert.deepEqual(Object.keys(packageExports), []);
+assert.deepEqual(Object.keys(packageExports), ['createWorldRect']);
+assert.equal(typeof packageExports.createWorldRect, 'function');

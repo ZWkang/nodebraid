@@ -8,6 +8,9 @@ The package owns immutable Node Drag, Viewport Pan, Box Selection, and Connectio
 depending on Renderer, Plugin Host, DOM, or a concrete Provider. Runtime
 gesture ownership remains in `@nodebraid/plugin-interaction`.
 
+`createWorldRect` constructs a frozen direction-independent World Rect from two
+World Points, including horizontal or vertical zero-area rectangles.
+
 ## License
 
 [MIT](./LICENSE)

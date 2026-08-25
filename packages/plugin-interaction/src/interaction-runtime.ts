@@ -1,5 +1,10 @@
 import type { PluginDiagnostics } from '@nodebraid/diagnostics';
-import type { ConnectionAnchorIdentity, ConnectionPreviewTarget, WorldRect } from '@nodebraid/interaction-api';
+import {
+  createWorldRect,
+  type ConnectionAnchorIdentity,
+  type ConnectionPreviewTarget,
+  type WorldRect,
+} from '@nodebraid/interaction-api';
 import type { NodeId, Point } from '@nodebraid/kernel';
 import { commandService, type CommandRegistration, type CommandService } from '@nodebraid/plugin-command';
 import { kernelService } from '@nodebraid/plugin-kernel';
@@ -9,7 +14,7 @@ import type { HitResult } from '@nodebraid/renderer-api';
 import type { PluginContext } from '@nodebraid/runtime-cordis';
 
 import { computeClickSelection } from './selection-transition';
-import { computeBoxSelection, createWorldRect } from './box-selection';
+import { computeBoxSelection } from './box-selection';
 import type { ConnectionMaterializer, EffectiveInteractionConfig, MoveNodeInput } from './contracts';
 import { createEdgeCommand, createEdgeHandler } from './create-edge-command';
 import { interactionDiagnosticEvents } from './diagnostic-events';
@@ -399,9 +404,12 @@ export function activateInteractionRuntime(
     const gesture = activeGesture;
     if (input.type === 'pointer.move' && gesture && input.pointerId === gesture.pointerId) {
       if (gesture.type === 'node-drag') {
-        const screenDeltaX = input.screenPoint.x - gesture.startScreenPoint.x;
-        const screenDeltaY = input.screenPoint.y - gesture.startScreenPoint.y;
-        if (!gesture.active && Math.hypot(screenDeltaX, screenDeltaY) < config.dragThreshold) return;
+        if (
+          !gesture.active &&
+          isBelowDragThreshold(gesture.startScreenPoint, input.screenPoint, config.dragThreshold)
+        ) {
+          return;
+        }
         gesture.active = true;
         gesture.completeClick = undefined;
         const worldDeltaX = input.worldPoint.x - gesture.startWorldPoint.x;
@@ -418,7 +426,12 @@ export function activateInteractionRuntime(
       } else if (gesture.type === 'viewport-pan') {
         const deltaX = input.screenPoint.x - gesture.startScreenPoint.x;
         const deltaY = input.screenPoint.y - gesture.startScreenPoint.y;
-        if (!gesture.active && Math.hypot(deltaX, deltaY) < config.dragThreshold) return;
+        if (
+          !gesture.active &&
+          isBelowDragThreshold(gesture.startScreenPoint, input.screenPoint, config.dragThreshold)
+        ) {
+          return;
+        }
         gesture.active = true;
         gesture.viewport = {
           x: gesture.baseViewport.x + deltaX,
@@ -430,9 +443,12 @@ export function activateInteractionRuntime(
         updateConnectionGesture(gesture, input.worldPoint, renderer.hitTest(input.screenPoint));
         reapplyGestureProjection(gesture);
       } else if (gesture.type === 'box-selection') {
-        const screenDeltaX = input.screenPoint.x - gesture.startScreenPoint.x;
-        const screenDeltaY = input.screenPoint.y - gesture.startScreenPoint.y;
-        if (!gesture.active && Math.hypot(screenDeltaX, screenDeltaY) < config.dragThreshold) return;
+        if (
+          !gesture.active &&
+          isBelowDragThreshold(gesture.startScreenPoint, input.screenPoint, config.dragThreshold)
+        ) {
+          return;
+        }
         const rect = createWorldRect(gesture.startWorldPoint, input.worldPoint);
         gesture.active = true;
         gesture.rect = rect;
@@ -489,6 +505,10 @@ export function activateInteractionRuntime(
 
 function hasPreview(gesture: ActiveGesture): boolean {
   return gesture.type === 'connection' || (gesture.type !== 'selection' && gesture.active);
+}
+
+function isBelowDragThreshold(start: Point, current: Point, threshold: number): boolean {
+  return Math.hypot(current.x - start.x, current.y - start.y) < threshold;
 }
 
 function updateConnectionGesture(gesture: ConnectionGesture, pointerWorldPoint: Point, hit: HitResult | null): void {

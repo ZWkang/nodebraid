@@ -20,7 +20,6 @@ A Renderer publishes input facts and Hit Results; it should not decide product b
 - `moveNodesCommand`: ID `interaction.nodes.move`, updating all target Nodes in one synchronous Transaction;
 - `InteractionError`: `INVALID_CONFIG`, `INVALID_MOVE`, and `STALE_GESTURE`;
 - `interactionDiagnosticEvents`: Pointer/Input rejection, Gesture cancellation, and Command fault events.
-- `createWorldRect` / `computeBoxSelection`: stateless direction normalization, Node intersection, and replace/additive Selection transition helpers.
 
 The current version also includes optional mouse-only, Node-level Edge Connection. An application materializer owns Edge ID, type, and data; Interaction commits one typed Create Edge Command on pointerup.
 

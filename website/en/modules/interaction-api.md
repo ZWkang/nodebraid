@@ -20,6 +20,7 @@ Transient Drag and Pan Preview must reach a Renderer without placing Runtime sta
 - `ViewportPanInteractionProjection`: a base Viewport and absolute candidate Viewport;
 - `NodeDragProjectionNode`: local evidence and a candidate position for one dragged Node.
 - `WorldRect` and `BoxSelectionInteractionProjection`: a direction-independent world-space selection rectangle;
+- `createWorldRect`: constructs a frozen direction-independent World Rect from two World Points, preserving horizontal or vertical zero-area semantics;
 - `ConnectionAnchorIdentity` and `ConnectionPreviewInteractionProjection`: backend-neutral node-level connection preview values.
 
 ```ts

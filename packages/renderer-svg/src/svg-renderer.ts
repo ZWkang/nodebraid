@@ -41,6 +41,7 @@ import {
   setElementAttribute,
   setSelected,
 } from './svg-projection';
+import { acceptInteractionProjection, isInteractionCompatibleWithDocument } from './interaction-projection';
 import { SvgRendererError } from './svg-renderer-error';
 import { type AffineMatrix, formatSvgMatrix, readTargetMatrix } from './target-mapping';
 
@@ -132,6 +133,53 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
       f: localToUser.b * x + localToUser.d * y + localToUser.f,
     };
     setElementAttribute(projection, 'transform', formatSvgMatrix(matrix), journal);
+  };
+
+  const applyInteractionProjection = (
+    previous: InteractionProjection | null,
+    next: InteractionProjection | null,
+    baseline: CanvasSnapshot,
+    session: SessionSnapshot,
+    journal: DomMutationJournal,
+    targetMatrix?: AffineMatrix,
+  ): void => {
+    applySession(session, journal, targetMatrix);
+    if (previous?.type === 'node-drag') {
+      applyNodeDragProjection(
+        {
+          type: 'node-drag',
+          nodes: baseline.nodes.map((node) => ({
+            nodeId: node.id,
+            basePosition: node.position,
+            position: node.position,
+          })),
+        },
+        baseline,
+        edgesLayer,
+        nodesLayer,
+        journal,
+      );
+    }
+    if (previous?.type === 'connection-preview' && next?.type !== 'connection-preview') {
+      clearConnectionPreview(interactionLayer);
+    }
+    if (previous?.type === 'box-selection' && next?.type !== 'box-selection') {
+      clearBoxSelection(interactionLayer);
+    }
+    switch (next?.type) {
+      case 'node-drag':
+        applyNodeDragProjection(next, baseline, edgesLayer, nodesLayer, journal);
+        break;
+      case 'viewport-pan':
+        applySession({ selection: session.selection, viewport: next.viewport }, journal, targetMatrix);
+        break;
+      case 'connection-preview':
+        applyConnectionPreview(next, baseline, interactionLayer, journal);
+        break;
+      case 'box-selection':
+        applyBoxSelection(next, interactionLayer, journal);
+        break;
+    }
   };
 
   const refreshProjectionMapping = (): AffineMatrix => {
@@ -378,44 +426,15 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
             nodesLayer,
             interactionLayer,
             (journal) => {
-              if (session) applySession(createEffectiveSession(session, nextInteraction), journal, targetMatrix);
-              if (acceptedInteraction?.type === 'node-drag' && nextInteraction === null) {
-                applyNodeDragProjection(
-                  {
-                    type: 'node-drag',
-                    nodes: acceptedUpdate.commit.after.snapshot.nodes.map((node) => ({
-                      nodeId: node.id,
-                      basePosition: node.position,
-                      position: node.position,
-                    })),
-                  },
-                  acceptedUpdate.commit.after.snapshot,
-                  edgesLayer,
-                  nodesLayer,
-                  journal,
-                );
-              }
-              if (nextInteraction?.type === 'node-drag') {
-                applyNodeDragProjection(
+              if (session) {
+                applyInteractionProjection(
+                  acceptedInteraction,
                   nextInteraction,
                   acceptedUpdate.commit.after.snapshot,
-                  edgesLayer,
-                  nodesLayer,
+                  session,
                   journal,
+                  targetMatrix,
                 );
-              } else if (nextInteraction?.type === 'connection-preview') {
-                applyConnectionPreview(
-                  nextInteraction,
-                  acceptedUpdate.commit.after.snapshot,
-                  interactionLayer,
-                  journal,
-                );
-              } else if (acceptedInteraction?.type === 'connection-preview') {
-                clearConnectionPreview(interactionLayer);
-              } else if (nextInteraction?.type === 'box-selection') {
-                applyBoxSelection(nextInteraction, interactionLayer, journal);
-              } else if (acceptedInteraction?.type === 'box-selection') {
-                clearBoxSelection(interactionLayer);
               }
             },
           );
@@ -447,7 +466,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
           : acceptedInteraction;
       const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
       try {
-        applySession(createEffectiveSession(accepted, nextInteraction), journal);
+        applyInteractionProjection(acceptedInteraction, nextInteraction, baselineSnapshot, accepted, journal);
       } catch (error) {
         const rollbackErrors = journal.rollback();
         if (rollbackErrors.length > 0) {
@@ -470,44 +489,11 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
           { issue: 'RENDERER_STATE_INCOMPLETE' },
         );
       }
-      if (projection !== null) {
-        assertInteractionProjectionType(projection);
-        assertInteractionProjectionBaseline(projection, baselineSnapshot, acceptedSession);
-      }
-      const accepted = projection === null ? null : cloneInteractionProjection(projection);
+      const accepted =
+        projection === null ? null : acceptInteractionProjection(projection, baselineSnapshot, acceptedSession);
       const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
       try {
-        if (acceptedInteraction?.type === 'node-drag') {
-          applyNodeDragProjection(
-            {
-              type: 'node-drag',
-              nodes: baselineSnapshot.nodes.map((node) => ({
-                nodeId: node.id,
-                basePosition: node.position,
-                position: node.position,
-              })),
-            },
-            baselineSnapshot,
-            edgesLayer,
-            nodesLayer,
-            journal,
-          );
-        } else if (acceptedInteraction?.type === 'viewport-pan') {
-          applySession(acceptedSession, journal);
-        } else if (acceptedInteraction?.type === 'connection-preview' && accepted?.type !== 'connection-preview') {
-          clearConnectionPreview(interactionLayer);
-        } else if (acceptedInteraction?.type === 'box-selection' && accepted?.type !== 'box-selection') {
-          clearBoxSelection(interactionLayer);
-        }
-        if (accepted?.type === 'viewport-pan') {
-          applySession({ selection: acceptedSession.selection, viewport: accepted.viewport }, journal);
-        } else if (accepted?.type === 'node-drag') {
-          applyNodeDragProjection(accepted, baselineSnapshot, edgesLayer, nodesLayer, journal);
-        } else if (accepted?.type === 'connection-preview') {
-          applyConnectionPreview(accepted, baselineSnapshot, interactionLayer, journal);
-        } else if (accepted?.type === 'box-selection') {
-          applyBoxSelection(accepted, interactionLayer, journal);
-        }
+        applyInteractionProjection(acceptedInteraction, accepted, baselineSnapshot, acceptedSession, journal);
       } catch (error) {
         const rollbackErrors = journal.rollback();
         if (rollbackErrors.length > 0) {
@@ -645,262 +631,4 @@ function createEffectiveSession(session: SessionSnapshot, interaction: Interacti
   return interaction?.type === 'viewport-pan'
     ? { selection: session.selection, viewport: interaction.viewport }
     : session;
-}
-
-function cloneInteractionProjection(projection: InteractionProjection): InteractionProjection {
-  if (projection.type === 'viewport-pan') {
-    return Object.freeze({
-      type: 'viewport-pan',
-      baseViewport: Object.freeze({ ...projection.baseViewport }),
-      viewport: Object.freeze({ ...projection.viewport }),
-    });
-  }
-  if (projection.type === 'connection-preview') {
-    return Object.freeze({
-      type: 'connection-preview',
-      source: Object.freeze({ ...projection.source }),
-      pointerWorldPoint: Object.freeze({ ...projection.pointerWorldPoint }),
-      target:
-        projection.target.type === 'none'
-          ? Object.freeze({ type: 'none' as const })
-          : Object.freeze({
-              type: projection.target.type,
-              anchor: Object.freeze({ ...projection.target.anchor }),
-            }),
-    });
-  }
-  if (projection.type === 'box-selection') {
-    return Object.freeze({ type: 'box-selection', rect: Object.freeze({ ...projection.rect }) });
-  }
-  return Object.freeze({
-    type: 'node-drag',
-    nodes: Object.freeze(
-      projection.nodes.map((candidate) =>
-        Object.freeze({
-          nodeId: candidate.nodeId,
-          basePosition: Object.freeze({ ...candidate.basePosition }),
-          position: Object.freeze({ ...candidate.position }),
-        }),
-      ),
-    ),
-  });
-}
-
-function assertInteractionProjectionBaseline(
-  projection: InteractionProjection,
-  document: CanvasSnapshot,
-  session: SessionSnapshot,
-): void {
-  if (projection.type === 'viewport-pan') {
-    assertInteractionViewport('baseViewport', projection.baseViewport);
-    assertInteractionViewport('viewport', projection.viewport);
-    if (viewportsEqual(projection.baseViewport, session.viewport)) return;
-    throw new RendererError('INTERACTION_OUT_OF_SYNC', 'Interaction Projection Viewport Baseline is stale.', {
-      issue: 'VIEWPORT_MISMATCH',
-    });
-  }
-  if (projection.type === 'connection-preview') {
-    assertInteractionPoint('pointerWorldPoint', projection.pointerWorldPoint);
-    assertConnectionAnchorBaseline(projection.source, 'source', document);
-    if (projection.target.type !== 'none') {
-      assertConnectionAnchorBaseline(projection.target.anchor, 'target', document);
-    }
-    return;
-  }
-  if (projection.type === 'box-selection') {
-    for (const field of ['x', 'y', 'width', 'height'] as const) {
-      const value = projection.rect[field];
-      if (Number.isFinite(value) && ((field !== 'width' && field !== 'height') || value >= 0)) continue;
-      throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Box Selection rect must be finite and non-negative.', {
-        issue: 'INVALID_BOX_SELECTION_RECT',
-        field: `rect.${field}`,
-      });
-    }
-    return;
-  }
-  if (projection.nodes.length === 0) {
-    throw new RendererError(
-      'INVALID_INTERACTION_PROJECTION',
-      'Node Drag Interaction Projection requires at least one Node.',
-      { issue: 'EMPTY_NODE_DRAG' },
-    );
-  }
-  const nodes = new Map(document.nodes.map((node) => [node.id, node]));
-  const seenNodeIds = new Set<string>();
-  let previousNodeId: string | undefined;
-  for (const candidate of projection.nodes) {
-    if (seenNodeIds.has(candidate.nodeId)) {
-      throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Interaction Projection Node IDs must be unique.', {
-        issue: 'DUPLICATE_NODE',
-      });
-    }
-    seenNodeIds.add(candidate.nodeId);
-    if (previousNodeId !== undefined && previousNodeId > candidate.nodeId) {
-      throw new RendererError(
-        'INVALID_INTERACTION_PROJECTION',
-        'Interaction Projection Node IDs must use canonical order.',
-        { issue: 'NON_CANONICAL_NODE_ORDER' },
-      );
-    }
-    previousNodeId = candidate.nodeId;
-    for (const [field, value] of [
-      ['basePosition.x', candidate.basePosition.x],
-      ['basePosition.y', candidate.basePosition.y],
-      ['position.x', candidate.position.x],
-      ['position.y', candidate.position.y],
-    ] as const) {
-      if (Number.isFinite(value)) continue;
-      throw new RendererError(
-        'INVALID_INTERACTION_PROJECTION',
-        'Interaction Projection Node positions must be finite.',
-        { issue: 'INVALID_NODE_POSITION', field },
-      );
-    }
-    const node = nodes.get(candidate.nodeId);
-    if (node && node.position.x === candidate.basePosition.x && node.position.y === candidate.basePosition.y) {
-      continue;
-    }
-    throw new RendererError('INTERACTION_OUT_OF_SYNC', 'Interaction Projection Node Baseline is stale.', {
-      issue: 'NODE_POSITION_MISMATCH',
-    });
-  }
-}
-
-function assertConnectionAnchorBaseline(
-  anchor: Readonly<{ nodeId: string; role: 'source' | 'target' }>,
-  role: 'source' | 'target',
-  document: CanvasSnapshot,
-): void {
-  if (anchor.role !== role) {
-    throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Connection Anchor role is invalid.', {
-      issue: 'INVALID_CONNECTION_ANCHOR_ROLE',
-    });
-  }
-  const node = document.nodes.find((candidate) => candidate.id === anchor.nodeId);
-  if (node?.size && node.size.width > 0 && node.size.height > 0) return;
-  throw new RendererError('INTERACTION_OUT_OF_SYNC', 'Connection Anchor Node is unavailable.', {
-    issue: 'CONNECTION_ANCHOR_UNAVAILABLE',
-  });
-}
-
-function assertInteractionPoint(field: string, point: Readonly<{ x: number; y: number }>): void {
-  for (const coordinate of ['x', 'y'] as const) {
-    if (Number.isFinite(point[coordinate])) continue;
-    throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Interaction Projection Point must be finite.', {
-      issue: 'INVALID_POINT',
-      field: `${field}.${coordinate}`,
-    });
-  }
-}
-
-function assertInteractionViewport(prefix: 'baseViewport' | 'viewport', viewport: SessionSnapshot['viewport']): void {
-  for (const field of ['x', 'y', 'zoom'] as const) {
-    const value = viewport[field];
-    if (Number.isFinite(value) && (field !== 'zoom' || value > 0)) continue;
-    throw new RendererError(
-      'INVALID_INTERACTION_PROJECTION',
-      'Interaction Projection Viewport values must be finite with positive zoom.',
-      { issue: 'INVALID_VIEWPORT', field: `${prefix}.${field}` },
-    );
-  }
-}
-
-function assertInteractionProjectionType(value: unknown): asserts value is InteractionProjection {
-  if (
-    !isRecord(value) ||
-    (value.type !== 'node-drag' &&
-      value.type !== 'viewport-pan' &&
-      value.type !== 'connection-preview' &&
-      value.type !== 'box-selection')
-  ) {
-    throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Interaction Projection type is invalid.', {
-      issue: 'INVALID_PROJECTION_TYPE',
-    });
-  }
-  if (value.type === 'connection-preview') {
-    if (!isConnectionAnchor(value.source) || !isRecord(value.pointerWorldPoint) || !isRecord(value.target)) {
-      throwInvalidInteractionProjectionStructure('connection-preview');
-    }
-    if (
-      value.target.type !== 'none' &&
-      ((value.target.type !== 'valid' && value.target.type !== 'invalid') || !isConnectionAnchor(value.target.anchor))
-    ) {
-      throwInvalidInteractionProjectionStructure('target');
-    }
-    return;
-  }
-  if (value.type === 'box-selection') {
-    if (!isRecord(value.rect)) throwInvalidInteractionProjectionStructure('rect');
-    return;
-  }
-  if (value.type === 'node-drag') {
-    if (!Array.isArray(value.nodes)) throwInvalidInteractionProjectionStructure('nodes');
-    for (let index = 0; index < value.nodes.length; index += 1) {
-      const candidate = value.nodes[index];
-      if (!isRecord(candidate)) throwInvalidInteractionProjectionStructure(`nodes[${index}]`);
-      if (typeof candidate.nodeId !== 'string' || candidate.nodeId.length === 0) {
-        throwInvalidInteractionProjectionStructure(`nodes[${index}].nodeId`);
-      }
-      if (!isRecord(candidate.basePosition)) {
-        throwInvalidInteractionProjectionStructure(`nodes[${index}].basePosition`);
-      }
-      if (!isRecord(candidate.position)) {
-        throwInvalidInteractionProjectionStructure(`nodes[${index}].position`);
-      }
-    }
-    return;
-  }
-  if (!isRecord(value.baseViewport)) throwInvalidInteractionProjectionStructure('baseViewport');
-  if (!isRecord(value.viewport)) throwInvalidInteractionProjectionStructure('viewport');
-}
-
-function isConnectionAnchor(value: unknown): value is Readonly<{
-  nodeId: string;
-  role: 'source' | 'target';
-}> {
-  return (
-    isRecord(value) &&
-    typeof value.nodeId === 'string' &&
-    value.nodeId.length > 0 &&
-    (value.role === 'source' || value.role === 'target')
-  );
-}
-
-function throwInvalidInteractionProjectionStructure(field: string): never {
-  throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Interaction Projection structure is invalid.', {
-    issue: 'INVALID_PROJECTION_STRUCTURE',
-    field,
-  });
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
-function viewportsEqual(left: SessionSnapshot['viewport'], right: SessionSnapshot['viewport']): boolean {
-  return left.x === right.x && left.y === right.y && left.zoom === right.zoom;
-}
-
-function isInteractionCompatibleWithDocument(
-  interaction: InteractionProjection | null,
-  document: CanvasSnapshot,
-): boolean {
-  if (interaction?.type === 'connection-preview') {
-    const referencedNodeIds = [
-      interaction.source.nodeId,
-      ...(interaction.target.type === 'none' ? [] : [interaction.target.anchor.nodeId]),
-    ];
-    return referencedNodeIds.every((nodeId) => {
-      const node = document.nodes.find((candidate) => candidate.id === nodeId);
-      return node?.size !== undefined && node.size.width > 0 && node.size.height > 0;
-    });
-  }
-  if (interaction?.type !== 'node-drag') return true;
-  const nodes = new Map(document.nodes.map((node) => [node.id, node]));
-  return interaction.nodes.every((candidate) => {
-    const node = nodes.get(candidate.nodeId);
-    return (
-      node !== undefined && node.position.x === candidate.basePosition.x && node.position.y === candidate.basePosition.y
-    );
-  });
 }

@@ -165,7 +165,7 @@ test('Connection Escape attempts every terminal cleanup and never materializes a
   await host.dispose();
 });
 
-test('Interaction cleanup continues after every public Renderer cleanup failure', async () => {
+test('Box Selection disposal continues after every public Renderer cleanup failure', async () => {
   const recording = new CleanupFailureRenderer();
   let commands: CommandService | undefined;
   let renderer: RendererService | undefined;
@@ -220,6 +220,35 @@ test('Interaction cleanup continues after every public Renderer cleanup failure'
 
   await host.dispose();
 });
+
+for (const terminal of ['escape', 'pointer-cancel'] as const) {
+  test(`Box Selection ${terminal} exposes every terminal cleanup failure`, async () => {
+    const faults: DiagnosticFault[] = [];
+    const recording = new CleanupFailureRenderer();
+    const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
+    const installations = [
+      host.install(kernelPlugin),
+      host.install(commandPlugin),
+      host.install(sessionPlugin),
+      host.install(createRendererPlugin(() => recording)),
+      host.install(interactionPlugin),
+    ];
+    await Promise.all(installations.map((installation) => installation.whenActive()));
+
+    recording.emit(pointerInput('pointer.down', 0));
+    recording.emit(pointerInput('pointer.move', 10));
+    recording.failCleanup = true;
+    recording.emit(terminal === 'escape' ? escapeInput() : pointerInput('pointer.cancel', 10));
+
+    expect(recording.cleanupCalls).toEqual(['clear-projection', 'release:7']);
+    expect(faults).toHaveLength(1);
+    const failure = faults[0]?.error;
+    expect(failure).toBeInstanceOf(AggregateError);
+    expect((failure as AggregateError).errors).toEqual([recording.clearProjectionError, recording.releasePointerError]);
+    recording.failCleanup = false;
+    await host.dispose();
+  });
+}
 
 test('Interaction dependency recovery creates a fresh idle Activation', async () => {
   const first = new LifecycleRenderer();
@@ -506,7 +535,10 @@ class LifecycleRenderer implements CanvasRenderer {
   }
 }
 
-function pointerInput(type: 'pointer.down' | 'pointer.move' | 'pointer.up', coordinate: number): RendererInput {
+function pointerInput(
+  type: 'pointer.down' | 'pointer.move' | 'pointer.up' | 'pointer.cancel',
+  coordinate: number,
+): RendererInput {
   return {
     type,
     pointerId: 7,
@@ -514,7 +546,7 @@ function pointerInput(type: 'pointer.down' | 'pointer.move' | 'pointer.up', coor
     screenPoint: { x: coordinate, y: coordinate },
     worldPoint: { x: coordinate, y: coordinate },
     button: type === 'pointer.move' ? null : 'primary',
-    pressedButtons: type === 'pointer.up' ? [] : ['primary'],
+    pressedButtons: type === 'pointer.up' || type === 'pointer.cancel' ? [] : ['primary'],
     modifiers: { alt: false, control: false, meta: false, shift: false },
   };
 }

@@ -19,6 +19,7 @@ description: Backend-neutral Interaction Projection 纯值契约。
 - `NodeDragInteractionProjection`：规范 Node ID、base position 与绝对 candidate position；
 - `ViewportPanInteractionProjection`：base Viewport 与绝对 candidate Viewport；
 - `WorldRect` 与 `BoxSelectionInteractionProjection`：方向无关的 World-space 框选矩形；
+- `createWorldRect`：从两个 World Point 构造冻结的方向无关 World Rect，保留水平或垂直零面积语义；
 - `NodeDragProjectionNode`：单个拖动 Node 的局部 evidence 与候选位置。
 - `ConnectionAnchorIdentity`：Node ID 与 source/target role 组成的 backend-neutral Anchor 身份；
 - `ConnectionPreviewInteractionProjection`：source、Pointer World Point 与 `none | valid | invalid` target。

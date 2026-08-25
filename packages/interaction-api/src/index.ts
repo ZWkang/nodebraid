@@ -10,3 +10,4 @@ export type {
   ViewportPanInteractionProjection,
   WorldRect,
 } from './contracts';
+export { createWorldRect } from './world-rect';
