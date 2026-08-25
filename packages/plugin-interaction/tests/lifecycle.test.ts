@@ -6,7 +6,7 @@ import { commandPlugin, commandService, type CommandService } from '@nodebraid/p
 import { nodeId } from '@nodebraid/kernel';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
 import { createRendererPlugin, rendererService, type RendererService } from '@nodebraid/plugin-renderer';
-import { sessionPlugin } from '@nodebraid/plugin-session';
+import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/plugin-session';
 import type {
   CanvasRenderer,
   HitResult,
@@ -18,7 +18,62 @@ import type {
 import type { SessionSnapshot } from '@nodebraid/session-api';
 import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
-import { interactionPlugin, moveNodesCommand } from '../src';
+import { deleteSelectionCommand, interactionPlugin, moveNodesCommand } from '../src';
+
+test('Delete Selection registration follows dependency reactivation and disposal lifecycle', async () => {
+  const first = new LifecycleRenderer();
+  const second = new LifecycleRenderer();
+  let commands: CommandService | undefined;
+  let kernel: KernelService | undefined;
+  let session: SessionService | undefined;
+  const consumer = definePlugin({
+    requires: { commands: commandService, kernel: kernelService, session: sessionService },
+    setup(context) {
+      commands = context.services.commands;
+      kernel = context.services.kernel;
+      session = context.services.session;
+    },
+  });
+  const host = createPluginHost();
+  const rendererInstallation = host.install(createRendererPlugin(() => first));
+  const interaction = host.install(interactionPlugin);
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    rendererInstallation,
+    interaction,
+    host.install(consumer),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (!commands || !kernel || !session) throw new Error('Expected Delete Selection lifecycle Runtime Services.');
+  const selectedId = nodeId('delete-lifecycle-node');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({ id: selectedId, type: 'task', position: { x: 0, y: 0 }, data: null });
+  });
+  session.setSelection({ nodeIds: [selectedId], edgeIds: [] });
+  const input = { selection: session.getSnapshot().selection, evidence: kernel.read().snapshot };
+
+  await rendererInstallation.dispose();
+  expect(interaction.getSnapshot().status).toBe('pending');
+  await expect(commands.execute(deleteSelectionCommand, input)).rejects.toMatchObject({
+    domain: 'plugin.command',
+    code: 'COMMAND_NOT_FOUND',
+  });
+
+  const replacement = host.install(createRendererPlugin(() => second));
+  await Promise.all([replacement.whenActive(), interaction.whenActive()]);
+  await expect(commands.execute(deleteSelectionCommand, input)).resolves.toMatchObject({
+    changeSet: { commandId: 'interaction.selection.delete' },
+  });
+
+  await interaction.dispose();
+  await expect(commands.execute(deleteSelectionCommand, input)).rejects.toMatchObject({
+    domain: 'plugin.command',
+    code: 'COMMAND_NOT_FOUND',
+  });
+  await host.dispose();
+});
 
 test('Connection materializer failure keeps identity and reports exactly once after terminal cleanup', async () => {
   const faults: DiagnosticFault[] = [];

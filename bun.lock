@@ -143,6 +143,9 @@
         "@nodebraid/renderer-api": "workspace:*",
         "@nodebraid/runtime-cordis": "workspace:*",
       },
+      "devDependencies": {
+        "@nodebraid/plugin-history": "workspace:*",
+      },
     },
     "packages/plugin-kernel": {
       "name": "@nodebraid/plugin-kernel",

@@ -41,10 +41,11 @@
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
     "build:dependencies": "bun run --filter '@nodebraid/plugin-command' build && bun run --filter '@nodebraid/plugin-kernel' build && bun run --filter '@nodebraid/plugin-session' build && bun run --filter '@nodebraid/plugin-renderer' build",
+    "build:test-dependencies": "bun run build:dependencies && bun run --filter '@nodebraid/plugin-history' build",
     "prepack": "bun run build",
-    "test": "bun test ./tests",
+    "test": "bun run build:test-dependencies && bun test ./tests",
     "test:artifacts": "bun run ./artifacts/check-declarations.ts",
-    "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
+    "typecheck": "bun run build:test-dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@nodebraid/diagnostics": "workspace:*",
@@ -56,5 +57,8 @@
     "@nodebraid/plugin-session": "workspace:*",
     "@nodebraid/renderer-api": "workspace:*",
     "@nodebraid/runtime-cordis": "workspace:*"
+  },
+  "devDependencies": {
+    "@nodebraid/plugin-history": "workspace:*"
   }
 }

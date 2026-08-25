@@ -35,6 +35,7 @@
 - `bun run --filter '@nodebraid/renderer-api' build:dependencies`：生成 Renderer 协议所需的 Diagnostics、Kernel 与 Session API workspace 声明。
 - `bun run --filter '@nodebraid/plugin-renderer' build:dependencies`：生成 Renderer Runtime Plugin 所需的 Renderer API、Kernel Plugin 与 Session Plugin workspace 声明。
 - `bun run --filter '@nodebraid/plugin-interaction' build:dependencies`：生成 Interaction Runtime Plugin 所需的 Command、Kernel、Session 与 Renderer Plugin workspace 声明。
+- `bun run --filter '@nodebraid/plugin-interaction' build:test-dependencies`：在生产依赖之外生成 Interaction 公共 seam 测试所需的 History Plugin workspace 声明。
 - `bun run --filter '@nodebraid/renderer-svg' build:dependencies`：生成 SVG Renderer Provider 生产构建所需的 Renderer API 及其传递 workspace 声明。
 - `bun run --filter '@nodebraid/renderer-svg' build:test-dependencies`：生成 Renderer Plugin、Interaction、History 与 Renderer 公共 seam 浏览器场景所需的全部 workspace 声明。
 - `bun run --filter '@nodebraid/plugin-history' build:dependencies`：生成 History Runtime Plugin 构建与类型检查所需的 Command 与 Kernel Plugin workspace 声明。

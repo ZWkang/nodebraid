@@ -1,5 +1,6 @@
 import type { ConnectionAnchorIdentity } from '@nodebraid/interaction-api';
-import type { CanvasCommit, CanvasEdge, EdgeEndpoint, NodeId, Point } from '@nodebraid/kernel';
+import type { CanvasCommit, CanvasEdge, CanvasSnapshot, EdgeEndpoint, NodeId, Point } from '@nodebraid/kernel';
+import type { SelectionSnapshot } from '@nodebraid/plugin-session';
 
 export interface ConnectionMaterializationInput {
   readonly source: EdgeEndpoint;
@@ -47,3 +48,10 @@ export interface CreateEdgeInput {
 }
 
 export type CreateEdgeResult = CanvasCommit;
+
+export interface DeleteSelectionInput {
+  readonly selection: SelectionSnapshot;
+  readonly evidence: CanvasSnapshot;
+}
+
+export type DeleteSelectionResult = CanvasCommit | null;

@@ -4,10 +4,13 @@ import type { Plugin } from '@nodebraid/runtime-cordis';
 
 import {
   createEdgeCommand,
+  deleteSelectionCommand,
   interactionPlugin,
   moveNodesCommand,
   type CreateEdgeInput,
   type CreateEdgeResult,
+  type DeleteSelectionInput,
+  type DeleteSelectionResult,
   type InteractionConfig,
   type MoveNodesInput,
   type MoveNodesResult,
@@ -28,10 +31,18 @@ test('publishes Interaction as a Runtime Plugin without a state Service', () => 
   };
   expectCommand(createEdgeCommand.id);
   void verifyCreateEdge;
+  const verifyDeleteSelection = (
+    input: DeleteSelectionInput,
+  ): DeleteSelectionResult | PromiseLike<DeleteSelectionResult> => {
+    void input;
+    return Promise.resolve(null);
+  };
+  expectCommand(deleteSelectionCommand.id);
+  void verifyDeleteSelection;
 });
 
 function expectCommand(id: string): void {
-  if (id !== 'interaction.nodes.move' && id !== 'interaction.edge.create') {
+  if (id !== 'interaction.nodes.move' && id !== 'interaction.edge.create' && id !== 'interaction.selection.delete') {
     throw new Error('Unexpected Interaction Command ID.');
   }
 }

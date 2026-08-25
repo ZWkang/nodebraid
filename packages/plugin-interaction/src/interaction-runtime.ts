@@ -15,8 +15,14 @@ import type { PluginContext } from '@nodebraid/runtime-cordis';
 
 import { computeClickSelection } from './selection-transition';
 import { computeBoxSelection } from './box-selection';
-import type { ConnectionMaterializer, EffectiveInteractionConfig, MoveNodeInput } from './contracts';
+import type {
+  ConnectionMaterializer,
+  DeleteSelectionInput,
+  EffectiveInteractionConfig,
+  MoveNodeInput,
+} from './contracts';
 import { createEdgeCommand, createEdgeHandler } from './create-edge-command';
+import { createDeleteSelectionHandler, deleteSelectionCommand } from './delete-selection-command';
 import { interactionDiagnosticEvents } from './diagnostic-events';
 import { InteractionError } from './interaction-error';
 import { createMoveNodesHandler, moveNodesCommand } from './move-nodes-command';
@@ -92,6 +98,7 @@ export function activateInteractionRuntime(
   const rejectedPointerIds = new Set<number>();
   let moveRegistration: CommandRegistration | undefined;
   let createEdgeRegistration: CommandRegistration | undefined;
+  let deleteSelectionRegistration: CommandRegistration | undefined;
   let stopKernel = (): void => undefined;
   let stopSession = (): void => undefined;
   let stopInput = (): void => undefined;
@@ -175,6 +182,13 @@ export function activateInteractionRuntime(
         cleanupErrors.push(error);
       }
     }
+    if (deleteSelectionRegistration) {
+      try {
+        await deleteSelectionRegistration.dispose();
+      } catch (error) {
+        cleanupErrors.push(error);
+      }
+    }
     if (cleanupErrors.length > 0) {
       throw new AggregateError(cleanupErrors, 'Interaction Runtime cleanup failed.');
     }
@@ -182,6 +196,7 @@ export function activateInteractionRuntime(
 
   moveRegistration = commands.register(moveNodesCommand, createMoveNodesHandler(kernel));
   createEdgeRegistration = commands.register(createEdgeCommand, createEdgeHandler(kernel));
+  deleteSelectionRegistration = commands.register(deleteSelectionCommand, createDeleteSelectionHandler(kernel));
   stopKernel = kernel.observeCommits((commit) => {
     if (closing || !activeGesture) return;
     const gesture = activeGesture;
@@ -231,6 +246,28 @@ export function activateInteractionRuntime(
         (activeGesture?.type === 'connection' || activeGesture?.type === 'box-selection')
       ) {
         cancelGesture(activeGesture, 'escape', true);
+      }
+      if (input.type === 'key.down' && (input.key === 'Delete' || input.code === 'Delete')) {
+        if (activeGesture) {
+          context.diagnostics.emit({
+            name: interactionDiagnosticEvents.inputRejected,
+            level: 'info',
+            attributes: {
+              inputType: 'key.down',
+              gestureType: activeGesture.type,
+              reason: 'active-gesture',
+            },
+          });
+          return;
+        }
+        const selection = session.getSnapshot().selection;
+        if (selection.nodeIds.length === 0 && selection.edgeIds.length === 0) return;
+        executeDeleteSelection(
+          commands,
+          context.diagnostics,
+          { selection, evidence: kernel.read().snapshot },
+          () => closing,
+        );
       }
       return;
     }
@@ -605,6 +642,21 @@ function executeCreateEdge(
         attributes: { gestureType: 'connection' },
       });
     });
+}
+
+function executeDeleteSelection(
+  commands: CommandService,
+  diagnostics: PluginDiagnostics,
+  input: DeleteSelectionInput,
+  isClosing: () => boolean,
+): void {
+  void commands.execute(deleteSelectionCommand, input).catch((error) => {
+    if (isClosing()) return;
+    diagnostics.reportFault(error, {
+      name: interactionDiagnosticEvents.commandFault,
+      attributes: { commandId: deleteSelectionCommand.id },
+    });
+  });
 }
 
 function viewportsEqual(left: Viewport, right: Viewport): boolean {
