@@ -2,7 +2,7 @@ import type { WorldRect } from '@nodebraid/interaction-api';
 import type { CanvasNode, Point } from '@nodebraid/kernel';
 import type { SelectionInput, SelectionSnapshot } from '@nodebraid/plugin-session';
 
-export function worldRectBetween(start: Point, end: Point): WorldRect {
+export function createWorldRect(start: Point, end: Point): WorldRect {
   return Object.freeze({
     x: Math.min(start.x, end.x),
     y: Math.min(start.y, end.y),
@@ -19,12 +19,17 @@ export function computeBoxSelection(
 ): SelectionInput {
   const intersectingNodeIds = nodes
     .filter((node) => node.size && rectanglesIntersect(rect, { ...node.position, ...node.size }))
-    .map((node) => node.id);
+    .map((node) => node.id)
+    .sort(compareIds);
   if (!additive) return { nodeIds: intersectingNodeIds, edgeIds: [] };
   return {
-    nodeIds: [...new Set([...current.nodeIds, ...intersectingNodeIds])],
+    nodeIds: [...new Set([...current.nodeIds, ...intersectingNodeIds])].sort(compareIds),
     edgeIds: current.edgeIds,
   };
+}
+
+function compareIds(left: string, right: string): number {
+  return left < right ? -1 : left > right ? 1 : 0;
 }
 
 function rectanglesIntersect(left: WorldRect, right: WorldRect): boolean {

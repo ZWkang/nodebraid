@@ -301,7 +301,7 @@ _Avoid_: Renderer Snapshot, DOM Overlay, Mutable Gesture State
 _Avoid_: Projection Registry, Renderer Handle, Shared Preview Channel
 
 **Projection Baseline**:
-Interaction Projection 所依赖的最小稳定状态证据；Node Drag 使用每个 Node 的起点 position，Viewport Pan 使用起点 Viewport，Connection Preview 只依赖其 source 与可选 target Connection Anchor 所属 Node 的存在性，三者都不把无关的全局 revision 当作有效性条件。
+Interaction Projection 所依赖的最小稳定状态证据；Node Drag 使用每个 Node 的起点 position，Viewport Pan 与 Box Selection 使用起点 Viewport，Connection Preview 只依赖其 source 与可选 target Connection Anchor 所属 Node 的存在性，四者都不把无关的全局 revision 当作有效性条件。
 _Avoid_: Source Revision, Renderer Baseline, Full Session Snapshot
 
 **Effective Renderer State**:

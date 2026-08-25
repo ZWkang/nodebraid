@@ -9,7 +9,7 @@ import type { HitResult } from '@nodebraid/renderer-api';
 import type { PluginContext } from '@nodebraid/runtime-cordis';
 
 import { computeClickSelection } from './selection-transition';
-import { computeBoxSelection, worldRectBetween } from './box-selection';
+import { computeBoxSelection, createWorldRect } from './box-selection';
 import type { ConnectionMaterializer, EffectiveInteractionConfig, MoveNodeInput } from './contracts';
 import { createEdgeCommand, createEdgeHandler } from './create-edge-command';
 import { interactionDiagnosticEvents } from './diagnostic-events';
@@ -206,13 +206,7 @@ export function activateInteractionRuntime(
   stopSession = session.subscribe(() => {
     if (closing || !activeGesture) return;
     const gesture = activeGesture;
-    if (gesture.type === 'viewport-pan') {
-      if (!viewportsEqual(session.getSnapshot().viewport, gesture.baseViewport)) {
-        cancelGesture(gesture, 'stale', true);
-      } else {
-        reapplyGestureProjection(gesture);
-      }
-    } else if (gesture.type === 'box-selection') {
+    if (gesture.type === 'viewport-pan' || gesture.type === 'box-selection') {
       if (!viewportsEqual(session.getSnapshot().viewport, gesture.baseViewport)) {
         cancelGesture(gesture, 'stale', true);
       } else {
@@ -439,7 +433,7 @@ export function activateInteractionRuntime(
         const screenDeltaX = input.screenPoint.x - gesture.startScreenPoint.x;
         const screenDeltaY = input.screenPoint.y - gesture.startScreenPoint.y;
         if (!gesture.active && Math.hypot(screenDeltaX, screenDeltaY) < config.dragThreshold) return;
-        const rect = worldRectBetween(gesture.startWorldPoint, input.worldPoint);
+        const rect = createWorldRect(gesture.startWorldPoint, input.worldPoint);
         gesture.active = true;
         gesture.rect = rect;
         reapplyGestureProjection(gesture);
@@ -480,7 +474,7 @@ export function activateInteractionRuntime(
         if (gesture.viewport) session.setViewport(gesture.viewport);
       } else if (gesture.type === 'box-selection' && gesture.active) {
         projection.update(null);
-        const rect = worldRectBetween(gesture.startWorldPoint, input.worldPoint);
+        const rect = createWorldRect(gesture.startWorldPoint, input.worldPoint);
         session.setSelection(
           computeBoxSelection(session.getSnapshot().selection, kernel.read().snapshot.nodes, rect, gesture.additive),
         );

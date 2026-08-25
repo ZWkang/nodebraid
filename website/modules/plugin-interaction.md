@@ -21,6 +21,7 @@ Renderer 只发布输入事实和 Hit Result，不应决定产品行为。该 Pl
 - `createEdgeCommand`：ID 为 `interaction.edge.create`，一次同步 Transaction 创建完整 Edge；
 - `InteractionError`：`INVALID_CONFIG`、`INVALID_MOVE`、`INVALID_CONNECTION`、`STALE_GESTURE`；
 - `interactionDiagnosticEvents`：Pointer/Input rejection、Gesture cancellation 与 Command fault。
+- `createWorldRect` / `computeBoxSelection`：无状态的方向归一化、Node 相交与 replace/additive Selection transition。
 
 当前行为还包括 mouse-only Node-level Edge Connection：Renderer 提供 source/target Anchor，应用 materializer 拥有 Edge ID/type/data，Interaction 只在 pointerup 提交一次 typed Command。
 

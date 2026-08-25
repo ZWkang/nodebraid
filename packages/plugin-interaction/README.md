@@ -19,6 +19,10 @@ Session until pointerup. Primary dragging from empty Canvas space publishes a
 backend-neutral World Rect and selects intersecting Nodes from the current Kernel
 View only when the Gesture ends.
 
+The public pure helpers `createWorldRect` and `computeBoxSelection` expose the
+same direction normalization and replace/additive transition semantics without
+acquiring Session or Kernel write authority.
+
 Each Activation owns one primary Gesture Pointer. Additional Pointers and Wheel
 input during a Gesture are rejected through stable diagnostics. Pointer cancel,
 lost capture, stale Document or Viewport evidence, unload, and dependency loss

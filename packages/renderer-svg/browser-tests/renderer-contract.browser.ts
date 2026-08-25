@@ -1809,35 +1809,9 @@ async function dispatchModifiedMouseDrag(
   endY: number,
   modifiers: number,
 ): Promise<void> {
-  await withRendererPageCdp(async (send) => {
-    await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: startX, y: startY, buttons: 0, modifiers });
-    await send('Input.dispatchMouseEvent', {
-      type: 'mousePressed',
-      x: startX,
-      y: startY,
-      button: 'left',
-      buttons: 1,
-      clickCount: 1,
-      modifiers,
-    });
-    await send('Input.dispatchMouseEvent', {
-      type: 'mouseMoved',
-      x: endX,
-      y: endY,
-      button: 'left',
-      buttons: 1,
-      modifiers,
-    });
-    await send('Input.dispatchMouseEvent', {
-      type: 'mouseReleased',
-      x: endX,
-      y: endY,
-      button: 'left',
-      buttons: 0,
-      clickCount: 1,
-      modifiers,
-    });
-  });
+  await dispatchModifiedMouseDown(startX, startY, modifiers);
+  await dispatchModifiedMouseMove(endX, endY, modifiers);
+  await dispatchModifiedMouseUp(endX, endY, modifiers);
 }
 
 async function dispatchModifiedMouseDown(x: number, y: number, modifiers: number): Promise<void> {
