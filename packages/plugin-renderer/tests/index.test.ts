@@ -10,6 +10,7 @@ import {
   type HitResult,
   type RendererDocumentUpdate,
   type RendererInput,
+  type RendererInputDispositionListener,
   type RendererInputListener,
   type ScreenPoint,
 } from '@nodebraid/renderer-api';
@@ -108,9 +109,14 @@ describe('@nodebraid/plugin-renderer', () => {
     const plugin = createRendererPlugin(() => recording);
     const runtime = await activateRenderer(plugin);
     const inputs: string[] = [];
-    const stop = runtime.renderer.subscribeInput((input) => inputs.push(input.type));
+    const stop = runtime.renderer.subscribeInput(
+      (input) => {
+        inputs.push(input.type);
+      },
+      () => ({ defaultAction: 'prevent' }),
+    );
 
-    recording.emit(createPointerInput('pointer.down'));
+    expect(recording.emit(createPointerInput('pointer.down'))).toEqual({ defaultAction: 'prevent' });
     runtime.renderer.capturePointer(7);
     runtime.renderer.releasePointer(7);
     runtime.renderer.focus();
@@ -164,7 +170,9 @@ describe('@nodebraid/plugin-renderer', () => {
     runtime.renderer.subscribeInput(() => {
       throw new Error('listener failed');
     });
-    runtime.renderer.subscribeInput((input) => seen.push(input.type));
+    runtime.renderer.subscribeInput((input) => {
+      seen.push(input.type);
+    });
 
     recording.emit(createPointerInput('pointer.down'));
 
@@ -227,7 +235,9 @@ describe('@nodebraid/plugin-renderer', () => {
       faults,
     );
     const inputs: string[] = [];
-    runtime.renderer.subscribeInput((input) => inputs.push(input.type));
+    runtime.renderer.subscribeInput((input) => {
+      inputs.push(input.type);
+    });
     const binding = runtime.renderer.bindInteractionProjection();
     const syncError = new Error('injected synchronization failure');
     const recoveryError = new Error('injected recovery failure');
@@ -354,6 +364,7 @@ class RecordingRenderer implements CanvasRenderer {
   readonly deliveries: string[] = [];
   readonly controls: string[] = [];
   readonly inputListeners: RendererInputListener[] = [];
+  readonly dispositionListeners: RendererInputDispositionListener[] = [];
   readonly interactions: Array<InteractionProjection | null> = [];
   disposeCalls = 0;
   hit: HitResult | null = null;
@@ -398,19 +409,27 @@ class RecordingRenderer implements CanvasRenderer {
     this.interactions.push(projection);
   }
 
-  subscribeInput(listener: RendererInputListener): () => void {
+  subscribeInput(listener: RendererInputListener, decideDisposition?: RendererInputDispositionListener): () => void {
     this.inputListeners.push(listener);
+    if (decideDisposition) this.dispositionListeners.push(decideDisposition);
     let active = true;
     return () => {
       if (!active) return;
       active = false;
       const index = this.inputListeners.indexOf(listener);
       if (index >= 0) this.inputListeners.splice(index, 1);
+      if (decideDisposition) {
+        const dispositionIndex = this.dispositionListeners.indexOf(decideDisposition);
+        if (dispositionIndex >= 0) this.dispositionListeners.splice(dispositionIndex, 1);
+      }
     };
   }
 
-  emit(input: RendererInput): void {
+  emit(input: RendererInput) {
+    let disposition;
+    for (const decide of Array.from(this.dispositionListeners)) disposition = decide(input) ?? disposition;
     for (const listener of Array.from(this.inputListeners)) listener(input);
+    return disposition;
   }
 
   hitTest(_point: ScreenPoint): HitResult | null {
@@ -432,6 +451,7 @@ class RecordingRenderer implements CanvasRenderer {
   async dispose(): Promise<void> {
     this.disposeCalls += 1;
     this.inputListeners.length = 0;
+    this.dispositionListeners.length = 0;
   }
 }
 

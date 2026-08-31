@@ -3,7 +3,7 @@ import { expect, test } from 'bun:test';
 import type { DiagnosticEvent, DiagnosticFault } from '@nodebraid/diagnostics';
 import type { InteractionProjection } from '@nodebraid/interaction-api';
 import { edgeId, nodeId } from '@nodebraid/kernel';
-import { commandPlugin } from '@nodebraid/plugin-command';
+import { commandPlugin, commandService, defineCommand } from '@nodebraid/plugin-command';
 import { historyPlugin, historyService, type HistoryService } from '@nodebraid/plugin-history';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
 import { createRendererPlugin } from '@nodebraid/plugin-renderer';
@@ -19,7 +19,99 @@ import type {
 import type { SessionSnapshot } from '@nodebraid/session-api';
 import { createPluginHost, definePlugin, type PluginHostOptions } from '@nodebraid/runtime-cordis';
 
-import { interactionPlugin, type InteractionConfig } from '../src';
+import { interactionPlugin, interactionShortcutService, type InteractionConfig } from '../src';
+
+test('a live Interaction Shortcut Binding executes its Command and prevents the matched input default', async () => {
+  const events: DiagnosticEvent[] = [];
+  const renderer = new InputRenderer();
+  const command = defineCommand<void, void>('test.shortcut.execute');
+  let executions = 0;
+  const commandProvider = definePlugin({
+    requires: { commands: commandService },
+    setup(context) {
+      const registration = context.services.commands.register(command, () => {
+        executions += 1;
+      });
+      context.own(() => registration.dispose());
+    },
+  });
+  const shortcutProvider = definePlugin({
+    requires: { shortcuts: interactionShortcutService },
+    setup(context) {
+      const registration = context.services.shortcuts.register({
+        shortcut: {
+          code: 'KeyD',
+          modifierAlternatives: [{ alt: false, control: true, meta: false, shift: false }],
+        },
+        command,
+      });
+      context.own(() => registration.dispose());
+    },
+  });
+  const host = createPluginHost({ diagnostics: { sink: (event) => events.push(event) } });
+  const commandInstallation = host.install(commandProvider);
+  const shortcutInstallation = host.install(shortcutProvider);
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => renderer)),
+    host.install(interactionPlugin),
+    commandInstallation,
+    shortcutInstallation,
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+
+  expect(renderer.emit(keyInput('d', 'KeyD', false, { alt: false, control: true, meta: false, shift: false }))).toEqual(
+    {
+      defaultAction: 'prevent',
+    },
+  );
+  await nextTask();
+  expect(executions).toBe(1);
+
+  const conflictingShortcut = host.install(shortcutProvider);
+  await expect(conflictingShortcut.whenActive()).rejects.toMatchObject({
+    domain: 'interaction',
+    code: 'SHORTCUT_ALREADY_REGISTERED',
+  });
+  await conflictingShortcut.dispose();
+
+  expect(renderer.emit(keyInput('d', 'KeyD', true, { alt: false, control: true, meta: false, shift: false }))).toEqual({
+    defaultAction: 'prevent',
+  });
+  renderer.emit(pointerInput('pointer.down', 'primary', 0));
+  expect(renderer.emit(keyInput('d', 'KeyD', false, { alt: false, control: true, meta: false, shift: false }))).toEqual(
+    {
+      defaultAction: 'prevent',
+    },
+  );
+  renderer.emit(pointerInput('pointer.cancel', 'primary', 0));
+  expect(executions).toBe(1);
+
+  await commandInstallation.dispose();
+  expect(renderer.emit(keyInput('d', 'KeyD', false, { alt: false, control: true, meta: false, shift: false }))).toEqual(
+    {
+      defaultAction: 'prevent',
+    },
+  );
+  await nextTask();
+  expect(
+    events
+      .filter((event) => event.name === 'nodebraid.plugin.interaction.input.rejected')
+      .map((event) => event.attributes),
+  ).toEqual([
+    { inputType: 'key.down', reason: 'repeat' },
+    { inputType: 'key.down', gestureType: 'box-selection', reason: 'active-gesture' },
+    { inputType: 'key.down', reason: 'capability-unavailable' },
+  ]);
+
+  await shortcutInstallation.dispose();
+  expect(
+    renderer.emit(keyInput('d', 'KeyD', false, { alt: false, control: true, meta: false, shift: false })),
+  ).toBeUndefined();
+  await host.dispose();
+});
 
 test('logical Delete key removes the current Selection through the public Renderer Input seam', async () => {
   const { host, kernel, renderer, session } = await activateInputRuntime();
@@ -228,8 +320,10 @@ class InputRenderer implements CanvasRenderer {
     this.#listeners.clear();
     return Promise.resolve();
   }
-  emit(input: RendererInput): void {
-    for (const listener of this.#listeners) listener(input);
+  emit(input: RendererInput) {
+    let disposition;
+    for (const listener of this.#listeners) disposition = listener(input) ?? disposition;
+    return disposition;
   }
 }
 

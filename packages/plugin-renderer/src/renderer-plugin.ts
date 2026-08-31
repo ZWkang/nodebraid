@@ -5,6 +5,7 @@ import { sessionService, type SessionSnapshot } from '@nodebraid/plugin-session'
 import {
   RendererError,
   type RendererFactory,
+  type RendererInputDispositionListener,
   type RendererInputListener,
   type ScreenPoint,
 } from '@nodebraid/renderer-api';
@@ -245,7 +246,10 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
             },
           });
         },
-        subscribeInput(listener: RendererInputListener): () => void {
+        subscribeInput(
+          listener: RendererInputListener,
+          decideDisposition?: RendererInputDispositionListener,
+        ): () => void {
           assertOperational();
           if (typeof listener !== 'function') {
             throw new RendererError('INVALID_INPUT_SUBSCRIBER', 'Renderer Input listener must be a function.', {
@@ -253,17 +257,25 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
             });
           }
           let active = true;
-          const stopRenderer = renderer.subscribeInput((input) => {
-            if (!active || disposed || syncFailure) return;
-            try {
-              listener(input);
-            } catch (error) {
-              context.diagnostics.reportFault(error, {
-                name: rendererDiagnosticEvents.inputListenerFault,
-                attributes: { inputType: input.type },
-              });
-            }
-          });
+          const stopRenderer = renderer.subscribeInput(
+            (input) => {
+              if (!active || disposed || syncFailure) return;
+              try {
+                return listener(input);
+              } catch (error) {
+                context.diagnostics.reportFault(error, {
+                  name: rendererDiagnosticEvents.inputListenerFault,
+                  attributes: { inputType: input.type },
+                });
+              }
+            },
+            decideDisposition === undefined
+              ? undefined
+              : (input) => {
+                  if (!active || disposed || syncFailure) return;
+                  return decideDisposition(input);
+                },
+          );
           const stop = (): void => {
             if (!active) return;
             active = false;

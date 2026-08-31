@@ -16,6 +16,9 @@ assert.match(indexDeclaration, /interactionDiagnosticEvents/);
 assert.match(indexDeclaration, /moveNodesCommand/);
 assert.match(indexDeclaration, /createEdgeCommand/);
 assert.match(indexDeclaration, /ConnectionMaterializer/);
+assert.match(indexDeclaration, /interactionShortcutService/);
+assert.match(indexDeclaration, /InteractionShortcutService/);
+assert.match(indexDeclaration, /defineInteractionShortcut/);
 for (const declaration of await collectDeclarations(dist)) {
   assert.doesNotMatch(declaration.contents, forbiddenImport, declaration.path);
   assert.doesNotMatch(declaration.contents, forbiddenPlatformType, declaration.path);
@@ -25,5 +28,6 @@ const packageExports = await import('@nodebraid/plugin-interaction');
 assert.equal(typeof packageExports.interactionPlugin, 'object');
 assert.equal(typeof packageExports.InteractionError, 'function');
 assert.equal(typeof packageExports.interactionDiagnosticEvents, 'object');
+assert.equal(typeof packageExports.interactionShortcutService, 'object');
 assert.equal(typeof packageExports.moveNodesCommand, 'object');
 assert.equal(typeof packageExports.createEdgeCommand, 'object');

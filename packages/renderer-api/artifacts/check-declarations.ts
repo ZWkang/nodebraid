@@ -13,6 +13,8 @@ const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const indexDeclaration = await readFile(join(dist, 'index.d.ts'), 'utf8');
 assert.match(indexDeclaration, /CanvasRenderer/);
 assert.match(indexDeclaration, /RendererFactory/);
+assert.match(indexDeclaration, /InputDisposition/);
+assert.match(indexDeclaration, /RendererInputDispositionListener/);
 assert.match(indexDeclaration, /RendererError/);
 for (const declaration of await collectDeclarations(dist)) {
   assert.doesNotMatch(declaration.contents, forbiddenImport, declaration.path);

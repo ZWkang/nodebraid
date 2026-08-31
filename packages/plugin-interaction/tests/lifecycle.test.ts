@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test';
 
 import type { DiagnosticFault } from '@nodebraid/diagnostics';
 import type { InteractionProjection } from '@nodebraid/interaction-api';
-import { commandPlugin, commandService, type CommandService } from '@nodebraid/plugin-command';
+import { commandPlugin, commandService, defineCommand, type CommandService } from '@nodebraid/plugin-command';
 import { nodeId } from '@nodebraid/kernel';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
 import { createRendererPlugin, rendererService, type RendererService } from '@nodebraid/plugin-renderer';
@@ -18,7 +18,94 @@ import type {
 import type { SessionSnapshot } from '@nodebraid/session-api';
 import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
-import { deleteSelectionCommand, interactionPlugin, moveNodesCommand } from '../src';
+import { deleteSelectionCommand, interactionPlugin, interactionShortcutService, moveNodesCommand } from '../src';
+
+test('Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh', async () => {
+  const renderer = new LifecycleRenderer();
+  const command = defineCommand<void, void>('test.shortcut.lifecycle');
+  let abortObserved = false;
+  let releaseAbort!: () => void;
+  let shortcutActivations = 0;
+  const commandProvider = definePlugin({
+    requires: { commands: commandService },
+    setup(context) {
+      const registration = context.services.commands.register(command, (_input, execution) => {
+        return new Promise<void>((_resolve, reject) => {
+          execution.signal.addEventListener(
+            'abort',
+            () => {
+              abortObserved = true;
+              releaseAbort = () => reject(execution.signal.reason);
+            },
+            { once: true },
+          );
+        });
+      });
+      context.own(() => registration.dispose());
+    },
+  });
+  const shortcutProvider = definePlugin({
+    requires: { shortcuts: interactionShortcutService },
+    setup(context) {
+      const registration = context.services.shortcuts.register({
+        shortcut: {
+          code: 'KeyL',
+          modifierAlternatives: [{ alt: false, control: true, meta: false, shift: false }],
+        },
+        command,
+      });
+      shortcutActivations += 1;
+      context.own(() => registration.dispose());
+    },
+  });
+  const host = createPluginHost();
+  const rendererInstallation = host.install(createRendererPlugin(() => renderer));
+  const interaction = host.install(interactionPlugin);
+  const shortcut = host.install(shortcutProvider);
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    rendererInstallation,
+    interaction,
+    host.install(commandProvider),
+    shortcut,
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  const input: RendererInput = {
+    type: 'key.down',
+    key: 'l',
+    code: 'KeyL',
+    repeat: false,
+    modifiers: { alt: false, control: true, meta: false, shift: false },
+  };
+  expect(renderer.emit(input)).toEqual({ defaultAction: 'prevent' });
+
+  let disposed = false;
+  const disposal = shortcut.dispose().then(() => {
+    disposed = true;
+  });
+  await Promise.resolve();
+  expect(abortObserved).toBeTrue();
+  expect(disposed).toBeFalse();
+  expect(renderer.emit(input)).toEqual({ defaultAction: 'prevent' });
+  const conflict = host.install(shortcutProvider);
+  await expect(conflict.whenActive()).rejects.toMatchObject({ code: 'SHORTCUT_ALREADY_REGISTERED' });
+  await conflict.dispose();
+
+  releaseAbort();
+  await disposal;
+  const replacementShortcut = host.install(shortcutProvider);
+  await replacementShortcut.whenActive();
+
+  await rendererInstallation.dispose();
+  expect(interaction.getSnapshot().status).toBe('pending');
+  expect(replacementShortcut.getSnapshot().status).toBe('pending');
+  const replacementRenderer = host.install(createRendererPlugin(() => new LifecycleRenderer()));
+  await Promise.all([replacementRenderer.whenActive(), interaction.whenActive(), replacementShortcut.whenActive()]);
+  expect(shortcutActivations).toBe(3);
+  await host.dispose();
+});
 
 test('Delete Selection registration follows dependency reactivation and disposal lifecycle', async () => {
   const first = new LifecycleRenderer();
@@ -535,8 +622,10 @@ class CleanupFailureRenderer implements CanvasRenderer {
     this.#listeners.clear();
     return Promise.resolve();
   }
-  emit(input: RendererInput): void {
-    for (const listener of this.#listeners) listener(input);
+  emit(input: RendererInput) {
+    let disposition;
+    for (const listener of this.#listeners) disposition = listener(input) ?? disposition;
+    return disposition;
   }
 }
 
@@ -585,8 +674,10 @@ class LifecycleRenderer implements CanvasRenderer {
     this.#listeners.clear();
     return Promise.resolve();
   }
-  emit(input: RendererInput): void {
-    for (const listener of this.#listeners) listener(input);
+  emit(input: RendererInput) {
+    let disposition;
+    for (const listener of this.#listeners) disposition = listener(input) ?? disposition;
+    return disposition;
   }
 }
 

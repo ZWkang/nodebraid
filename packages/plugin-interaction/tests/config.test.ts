@@ -86,6 +86,7 @@ test('Interaction rejects malformed numeric config without coercion', async () =
       domain: 'interaction',
       code: 'INVALID_CONFIG',
     });
+    await interaction.dispose();
   }
 
   await host.dispose();

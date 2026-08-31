@@ -3,8 +3,10 @@ import type { CanvasSnapshot } from '@nodebraid/kernel';
 import {
   RendererError,
   type CanvasRenderer,
+  type InputDisposition,
   type RendererDocumentUpdate,
   type RendererInput,
+  type RendererInputDispositionListener,
   type RendererInputListener,
   type ScreenPoint,
 } from '@nodebraid/renderer-api';
@@ -87,8 +89,14 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
   let projectionOutOfSync = false;
   let observedResizeError: unknown;
   let disposePromise: Promise<void> | undefined;
-  const inputListeners = new Set<RendererInputListener>();
-  const inputQueue: RendererInput[] = [];
+  const inputListeners = new Set<{
+    readonly listener: RendererInputListener;
+    readonly decideDisposition?: RendererInputDispositionListener;
+  }>();
+  const inputQueue: Array<{
+    readonly input: RendererInput;
+    readonly applyDisposition?: (disposition: InputDisposition) => void;
+  }> = [];
   const activePointerIds = new Set<number>();
   const capturedPointerIds = new Set<number>();
   let inputDraining = false;
@@ -244,22 +252,55 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
     throw error;
   };
 
-  const emitInput = (input: RendererInput): void => {
-    inputQueue.push(input);
+  const emitInput = (input: RendererInput, applyDisposition?: (disposition: InputDisposition) => void): void => {
+    if (applyDisposition) {
+      let immediateDisposition: InputDisposition | undefined;
+      const immediateErrors: unknown[] = [];
+      for (const subscription of Array.from(inputListeners)) {
+        if (!subscription.decideDisposition) continue;
+        try {
+          const received = subscription.decideDisposition(input);
+          if (received === undefined) continue;
+          if (!isInputDisposition(received)) {
+            throw new RendererError('INVALID_INPUT_DISPOSITION', 'Renderer Input disposition is malformed.', {
+              receivedType: typeof received,
+            });
+          }
+          immediateDisposition = received;
+        } catch (error) {
+          immediateErrors.push(error);
+        }
+      }
+      if (immediateDisposition) applyDisposition(immediateDisposition);
+      if (immediateErrors.length === 1) throw immediateErrors[0];
+      if (immediateErrors.length > 1) {
+        throw new AggregateError(immediateErrors, 'SVG Renderer Input disposition listeners failed.');
+      }
+    }
+    inputQueue.push({ input, applyDisposition });
     if (inputDraining) return;
     inputDraining = true;
     const errors: unknown[] = [];
     try {
       while (inputQueue.length > 0) {
-        const next = inputQueue.shift();
-        if (!next) continue;
-        for (const listener of Array.from(inputListeners)) {
+        const queued = inputQueue.shift();
+        if (!queued) continue;
+        let disposition: InputDisposition | undefined;
+        for (const subscription of Array.from(inputListeners)) {
           try {
-            listener(next);
+            const received = subscription.listener(queued.input);
+            if (received === undefined) continue;
+            if (!isInputDisposition(received)) {
+              throw new RendererError('INVALID_INPUT_DISPOSITION', 'Renderer Input disposition is malformed.', {
+                receivedType: typeof received,
+              });
+            }
+            disposition = received;
           } catch (error) {
             errors.push(error);
           }
         }
+        if (disposition) queued.applyDisposition?.(disposition);
       }
     } finally {
       inputDraining = false;
@@ -283,7 +324,10 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
       }
       refreshProjectionMapping();
       if (event.type === 'pointerdown') activePointerIds.add(event.pointerId);
-      emitInput(normalizePointerInput(event, target, createEffectiveSession(acceptedSession, acceptedInteraction)));
+      emitInput(
+        normalizePointerInput(event, target, createEffectiveSession(acceptedSession, acceptedInteraction)),
+        () => event.preventDefault(),
+      );
     } catch (error) {
       handlingFailed = true;
       handlingError = error;
@@ -346,7 +390,9 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
       });
     }
     refreshProjectionMapping();
-    emitInput(normalizeWheelInput(event, target, createEffectiveSession(acceptedSession, acceptedInteraction)));
+    emitInput(normalizeWheelInput(event, target, createEffectiveSession(acceptedSession, acceptedInteraction)), () =>
+      event.preventDefault(),
+    );
   };
   const handleKeyboard = (event: KeyboardEvent): void => {
     if (disposed) return;
@@ -360,7 +406,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
       });
     }
     refreshProjectionMapping();
-    emitInput(normalizeKeyboardInput(event));
+    emitInput(normalizeKeyboardInput(event), () => event.preventDefault());
   };
   const handleContextMenu = (event: MouseEvent): void => {
     if (disposed) return;
@@ -504,19 +550,23 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
       }
       acceptedInteraction = accepted;
     },
-    subscribeInput(listener: RendererInputListener): () => void {
+    subscribeInput(listener: RendererInputListener, decideDisposition?: RendererInputDispositionListener): () => void {
       assertActive();
       assertNoObservedResizeError();
       assertProjectionSynchronized();
       if (typeof listener !== 'function') {
         throw new RendererError('INVALID_INPUT_SUBSCRIBER', 'SVG Renderer Input listener must be a function.');
       }
-      inputListeners.add(listener);
+      if (decideDisposition !== undefined && typeof decideDisposition !== 'function') {
+        throw new RendererError('INVALID_INPUT_SUBSCRIBER', 'SVG Renderer disposition listener must be a function.');
+      }
+      const subscription = { listener, decideDisposition };
+      inputListeners.add(subscription);
       let subscribed = true;
       return () => {
         if (!subscribed) return;
         subscribed = false;
-        inputListeners.delete(listener);
+        inputListeners.delete(subscription);
       };
     },
     hitTest(point: ScreenPoint) {
@@ -612,6 +662,12 @@ function attemptCleanup(errors: unknown[], cleanup: () => void): void {
 
 function isTargetUnavailableError(error: unknown): error is SvgRendererError {
   return error instanceof SvgRendererError && error.code === 'TARGET_UNAVAILABLE';
+}
+
+function isInputDisposition(value: unknown): value is InputDisposition {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const keys = Reflect.ownKeys(value);
+  return keys.length === 1 && keys[0] === 'defaultAction' && Reflect.get(value, 'defaultAction') === 'prevent';
 }
 
 function createEffectiveSnapshot(baseline: CanvasSnapshot, interaction: InteractionProjection | null): CanvasSnapshot {

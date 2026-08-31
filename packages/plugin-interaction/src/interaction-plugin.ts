@@ -7,6 +7,7 @@ import { definePlugin } from '@nodebraid/runtime-cordis';
 import type { InteractionConfig } from './contracts';
 import { resolveInteractionConfig } from './interaction-config';
 import { activateInteractionRuntime } from './interaction-runtime';
+import { interactionShortcutService } from './shortcut-service';
 
 export const interactionPlugin = definePlugin({
   name: '@nodebraid/plugin-interaction',
@@ -16,7 +17,8 @@ export const interactionPlugin = definePlugin({
     commands: commandService,
     kernel: kernelService,
   },
+  provides: { shortcuts: interactionShortcutService },
   setup(context, providedConfig: InteractionConfig | undefined) {
-    activateInteractionRuntime(context, resolveInteractionConfig(providedConfig));
+    return { shortcuts: activateInteractionRuntime(context, resolveInteractionConfig(providedConfig)) };
   },
 });

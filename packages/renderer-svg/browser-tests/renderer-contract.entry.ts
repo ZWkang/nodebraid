@@ -7,7 +7,7 @@ import { historyPlugin, redoCommand, undoCommand } from '@nodebraid/plugin-histo
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
 import { createRendererPlugin, rendererService, type RendererService } from '@nodebraid/plugin-renderer';
 import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/plugin-session';
-import type { CanvasRenderer, RendererInput } from '@nodebraid/renderer-api';
+import { RendererError, type CanvasRenderer, type RendererInput } from '@nodebraid/renderer-api';
 import { createPluginHost, definePlugin, type PluginInstallation } from '@nodebraid/runtime-cordis';
 
 import { createSvgRenderer, type SvgRendererConfig } from '../src';
@@ -432,11 +432,14 @@ interface PointerDoubleFailureResult {
 
 interface InputFaultResult {
   readonly order: readonly string[];
+  readonly dispatchResult: boolean;
+  readonly reentrantDispatchResult: boolean;
   readonly errorEventCount: number;
   readonly aggregateName: string | null;
   readonly aggregateErrorCount: number;
   readonly includesFirstError: boolean;
   readonly includesSecondError: boolean;
+  readonly includesDispositionError: boolean;
 }
 
 interface DisposeLifecycleResult {
@@ -4066,7 +4069,9 @@ globalThis.__nodebraidRendererSvgSetupInteractionProjectionInput = async (): Pro
     viewport: { x: 40, y: 50, zoom: 2 },
   });
   interactionProjectionInputs.length = 0;
-  stopInteractionProjectionInput = renderer.subscribeInput((input) => interactionProjectionInputs.push(input));
+  stopInteractionProjectionInput = renderer.subscribeInput((input) => {
+    interactionProjectionInputs.push(input);
+  });
   interactionProjectionInputRenderer = renderer;
   interactionProjectionInputTarget = target;
 };
@@ -4101,7 +4106,9 @@ globalThis.__nodebraidRendererSvgTicket08SetupPointer = async (): Promise<Readon
     viewport: { x: 10, y: 20, zoom: 2 },
   });
   ticket08Inputs.length = 0;
-  stopTicket08Input = renderer.subscribeInput((input) => ticket08Inputs.push(input));
+  stopTicket08Input = renderer.subscribeInput((input) => {
+    ticket08Inputs.push(input);
+  });
   ticket08Renderer = renderer;
   ticket08Target = target;
   const bounds = target.getBoundingClientRect();
@@ -4144,7 +4151,10 @@ globalThis.__nodebraidRendererSvgTicket08WheelKeyboardPolicy = async (): Promise
     viewport: { x: 10, y: 20, zoom: 2 },
   });
   const inputs: RendererInput[] = [];
-  const stop = renderer.subscribeInput((input) => inputs.push(input));
+  const stop = renderer.subscribeInput((input) => {
+    inputs.push(input);
+    return input.type === 'key.down' ? { defaultAction: 'prevent' as const } : undefined;
+  });
   const bubbled = { wheel: 0, keyboard: 0, contextMenu: 0 };
   const countWheel = (): void => {
     bubbled.wheel += 1;
@@ -4247,11 +4257,14 @@ globalThis.__nodebraidRendererSvgTicket09InputOrder = async (): Promise<InputOrd
     viewport: { x: 0, y: 0, zoom: 1 },
   });
   const order: string[] = [];
+  let reentrantDispatchResult = true;
   let stopSecond = (): void => undefined;
   const stopFirst = renderer.subscribeInput((input) => {
     order.push(`first:${input.type}`);
     if (input.type !== 'pointer.down') return;
-    renderer.subscribeInput((nested) => order.push(`third:${nested.type}`));
+    renderer.subscribeInput((nested) => {
+      order.push(`third:${nested.type}`);
+    });
     stopSecond();
     target.dispatchEvent(
       new PointerEvent('pointermove', {
@@ -4264,7 +4277,9 @@ globalThis.__nodebraidRendererSvgTicket09InputOrder = async (): Promise<InputOrd
       }),
     );
   });
-  stopSecond = renderer.subscribeInput((input) => order.push(`second:${input.type}`));
+  stopSecond = renderer.subscribeInput((input) => {
+    order.push(`second:${input.type}`);
+  });
   target.dispatchEvent(
     new PointerEvent('pointerdown', {
       pointerId: 7,
@@ -4326,7 +4341,9 @@ globalThis.__nodebraidRendererSvgInteractionFocusInput = async (): Promise<Focus
     viewport: { x: 0, y: 0, zoom: 1 },
   });
   const inputs: RendererInput[] = [];
-  const stop = renderer.subscribeInput((input) => inputs.push(input));
+  const stop = renderer.subscribeInput((input) => {
+    inputs.push(input);
+  });
   renderer.focus();
   const nextFocus = document.createElement('button');
   document.body.append(nextFocus);
@@ -4622,13 +4639,14 @@ globalThis.__nodebraidRendererSvgTicket09InputFaults = async (): Promise<InputFa
     renderer.subscribeInput((input) => {
       order.push(`first:${input.type}`);
       if (input.type !== 'pointer.down') return;
-      target.dispatchEvent(
+      reentrantDispatchResult = target.dispatchEvent(
         new PointerEvent('pointermove', {
           pointerId: input.pointerId,
           pointerType: 'mouse',
           clientX: 20,
           clientY: 30,
           bubbles: true,
+          cancelable: true,
         }),
       );
       throw firstError;
@@ -4637,9 +4655,21 @@ globalThis.__nodebraidRendererSvgTicket09InputFaults = async (): Promise<InputFa
       order.push(`second:${input.type}`);
       if (input.type === 'pointer.down') throw secondError;
     }),
-    renderer.subscribeInput((input) => order.push(`third:${input.type}`)),
+    renderer.subscribeInput(
+      (input) => {
+        order.push(`third:${input.type}`);
+      },
+      (input) =>
+        input.type === 'pointer.down' || input.type === 'pointer.move'
+          ? { defaultAction: 'prevent' as const }
+          : undefined,
+    ),
+    renderer.subscribeInput((input) => {
+      order.push(`fourth:${input.type}`);
+      return input.type === 'pointer.down' ? (42 as never) : undefined;
+    }),
   ];
-  target.dispatchEvent(
+  const dispatchResult = target.dispatchEvent(
     new PointerEvent('pointerdown', {
       pointerId: 8,
       pointerType: 'mouse',
@@ -4648,6 +4678,7 @@ globalThis.__nodebraidRendererSvgTicket09InputFaults = async (): Promise<InputFa
       button: 0,
       buttons: 1,
       bubbles: true,
+      cancelable: true,
     }),
   );
   await Promise.resolve();
@@ -4659,11 +4690,16 @@ globalThis.__nodebraidRendererSvgTicket09InputFaults = async (): Promise<InputFa
   const aggregateErrors = browserError instanceof AggregateError ? browserError.errors : [];
   const result: InputFaultResult = {
     order,
+    dispatchResult,
+    reentrantDispatchResult,
     errorEventCount,
     aggregateName: browserError instanceof Error ? browserError.name : null,
     aggregateErrorCount: aggregateErrors.length,
     includesFirstError: aggregateErrors.includes(firstError),
     includesSecondError: aggregateErrors.includes(secondError),
+    includesDispositionError: aggregateErrors.some(
+      (error) => error instanceof RendererError && error.code === 'INVALID_INPUT_DISPOSITION',
+    ),
   };
   await renderer.dispose();
   target.remove();
@@ -4832,7 +4868,9 @@ globalThis.__nodebraidRendererSvgTicket11RuntimeIntegration = async (): Promise<
   if (!node) throw new Error('Expected Runtime-projected Node.');
   runtimeRenderer.focus();
   const forwardedInputs: RendererInput[] = [];
-  const stopInput = runtimeRenderer.subscribeInput((input) => forwardedInputs.push(input));
+  const stopInput = runtimeRenderer.subscribeInput((input) => {
+    forwardedInputs.push(input);
+  });
   const targetBounds = target.getBoundingClientRect();
   target.dispatchEvent(
     new WheelEvent('wheel', {

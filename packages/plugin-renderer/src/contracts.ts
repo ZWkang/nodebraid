@@ -1,5 +1,10 @@
 import type { InteractionProjection } from '@nodebraid/interaction-api';
-import type { HitResult, RendererInputListener, ScreenPoint } from '@nodebraid/renderer-api';
+import type {
+  HitResult,
+  RendererInputDispositionListener,
+  RendererInputListener,
+  ScreenPoint,
+} from '@nodebraid/renderer-api';
 
 export interface InteractionProjectionBinding {
   update(projection: InteractionProjection | null): void;
@@ -9,7 +14,7 @@ export interface InteractionProjectionBinding {
 export interface RendererService {
   /** Interaction-facing seam; Document projection and Renderer disposal stay private to the Runtime Plugin. */
   bindInteractionProjection(): InteractionProjectionBinding;
-  subscribeInput(listener: RendererInputListener): () => void;
+  subscribeInput(listener: RendererInputListener, decideDisposition?: RendererInputDispositionListener): () => void;
   hitTest(point: ScreenPoint): HitResult | null;
   capturePointer(pointerId: number): void;
   releasePointer(pointerId: number): void;

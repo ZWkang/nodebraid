@@ -26,6 +26,8 @@ import { createDeleteSelectionHandler, deleteSelectionCommand } from './delete-s
 import { interactionDiagnosticEvents } from './diagnostic-events';
 import { InteractionError } from './interaction-error';
 import { createMoveNodesHandler, moveNodesCommand } from './move-nodes-command';
+import type { InteractionShortcutService } from './shortcut-contracts';
+import { createShortcutRuntime } from './shortcut-runtime';
 
 type InteractionRequirements = {
   readonly renderer: typeof rendererService;
@@ -87,7 +89,7 @@ type GestureCancellationReason = 'lifecycle' | 'pointer-cancel' | 'stale' | 'esc
 export function activateInteractionRuntime(
   context: PluginContext<InteractionRequirements>,
   config: EffectiveInteractionConfig,
-): void {
+): InteractionShortcutService {
   const renderer = context.services.renderer;
   const session = context.services.session;
   const kernel = context.services.kernel;
@@ -103,6 +105,12 @@ export function activateInteractionRuntime(
   let stopSession = (): void => undefined;
   let stopInput = (): void => undefined;
   const projection = renderer.bindInteractionProjection();
+  const shortcutRuntime = createShortcutRuntime({
+    commands,
+    diagnostics: context.diagnostics,
+    getActiveGestureType: () => activeGesture?.type,
+  });
+  context.own(() => shortcutRuntime.dispose());
 
   const reapplyGestureProjection = (gesture: ActiveGesture): void => {
     if (gesture.type === 'node-drag' && gesture.active && gesture.moves) {
@@ -236,309 +244,317 @@ export function activateInteractionRuntime(
       reapplyGestureProjection(gesture);
     }
   });
-  stopInput = renderer.subscribeInput((input) => {
-    if (closing) return;
-    if (input.type === 'key.down' || input.type === 'key.up') {
-      if (input.type === 'key.down' && (input.key === 'Delete' || input.code === 'Delete')) {
+  stopInput = renderer.subscribeInput(
+    (input) => {
+      if (closing) return;
+      if (input.type === 'key.down' || input.type === 'key.up') {
+        const shortcutDisposition = shortcutRuntime.handleInput(input);
+        if (shortcutDisposition) return shortcutDisposition;
+        if (input.type === 'key.down' && (input.key === 'Delete' || input.code === 'Delete')) {
+          if (activeGesture) {
+            context.diagnostics.emit({
+              name: interactionDiagnosticEvents.inputRejected,
+              level: 'info',
+              attributes: {
+                inputType: 'key.down',
+                gestureType: activeGesture.type,
+                reason: 'active-gesture',
+              },
+            });
+            return;
+          }
+          const selection = session.getSnapshot().selection;
+          if (selection.nodeIds.length === 0 && selection.edgeIds.length === 0) return;
+          executeDeleteSelection(
+            commands,
+            context.diagnostics,
+            { selection, evidence: kernel.read().snapshot },
+            () => closing,
+          );
+          return;
+        }
+        if (input.code === 'Space') spacePressed = input.type === 'key.down';
+        if (
+          input.type === 'key.down' &&
+          input.code === 'Escape' &&
+          (activeGesture?.type === 'connection' || activeGesture?.type === 'box-selection')
+        ) {
+          cancelGesture(activeGesture, 'escape', true);
+        }
+        return;
+      }
+      if (input.type === 'focus.lost') {
+        spacePressed = false;
+        return;
+      }
+      if (input.type === 'focus.gained') return;
+      if (input.type === 'wheel') {
         if (activeGesture) {
           context.diagnostics.emit({
             name: interactionDiagnosticEvents.inputRejected,
             level: 'info',
             attributes: {
-              inputType: 'key.down',
+              inputType: 'wheel',
               gestureType: activeGesture.type,
               reason: 'active-gesture',
             },
           });
           return;
         }
-        const selection = session.getSnapshot().selection;
-        if (selection.nodeIds.length === 0 && selection.edgeIds.length === 0) return;
-        executeDeleteSelection(
-          commands,
-          context.diagnostics,
-          { selection, evidence: kernel.read().snapshot },
-          () => closing,
+        const current = session.getSnapshot().viewport;
+        const zoom = Math.max(
+          config.minZoom,
+          Math.min(config.maxZoom, current.zoom * Math.exp(-input.deltaY * config.wheelZoomSensitivity)),
         );
-        return;
-      }
-      if (input.code === 'Space') spacePressed = input.type === 'key.down';
-      if (
-        input.type === 'key.down' &&
-        input.code === 'Escape' &&
-        (activeGesture?.type === 'connection' || activeGesture?.type === 'box-selection')
-      ) {
-        cancelGesture(activeGesture, 'escape', true);
-      }
-      return;
-    }
-    if (input.type === 'focus.lost') {
-      spacePressed = false;
-      return;
-    }
-    if (input.type === 'focus.gained') return;
-    if (input.type === 'wheel') {
-      if (activeGesture) {
-        context.diagnostics.emit({
-          name: interactionDiagnosticEvents.inputRejected,
-          level: 'info',
-          attributes: {
-            inputType: 'wheel',
-            gestureType: activeGesture.type,
-            reason: 'active-gesture',
-          },
+        if (zoom === current.zoom) return;
+        session.setViewport({
+          x: input.screenPoint.x - input.worldPoint.x * zoom,
+          y: input.screenPoint.y - input.worldPoint.y * zoom,
+          zoom,
         });
         return;
       }
-      const current = session.getSnapshot().viewport;
-      const zoom = Math.max(
-        config.minZoom,
-        Math.min(config.maxZoom, current.zoom * Math.exp(-input.deltaY * config.wheelZoomSensitivity)),
-      );
-      if (zoom === current.zoom) return;
-      session.setViewport({
-        x: input.screenPoint.x - input.worldPoint.x * zoom,
-        y: input.screenPoint.y - input.worldPoint.y * zoom,
-        zoom,
-      });
-      return;
-    }
-    if (input.type === 'pointer.move' && rejectedPointerIds.has(input.pointerId)) return;
-    if (
-      (input.type === 'pointer.up' || input.type === 'pointer.cancel') &&
-      rejectedPointerIds.delete(input.pointerId)
-    ) {
-      return;
-    }
-    if (input.type === 'pointer.down') {
-      if (activeGesture) {
-        if (input.pointerId !== activeGesture.pointerId && !rejectedPointerIds.has(input.pointerId)) {
-          rejectedPointerIds.add(input.pointerId);
-          context.diagnostics.emit({
-            name: interactionDiagnosticEvents.pointerRejected,
-            level: 'info',
-            attributes: {
-              inputType: 'pointer.down',
-              gestureType: activeGesture.type,
-              reason: 'additional-pointer',
-            },
-          });
-        }
-        return;
-      }
-      if (input.button !== 'primary' && input.button !== 'auxiliary') return;
-      const hit = renderer.hitTest(input.screenPoint);
-      if (hit === null) return;
-      const additive = input.modifiers.shift || input.modifiers.meta || input.modifiers.control;
+      if (input.type === 'pointer.move' && rejectedPointerIds.has(input.pointerId)) return;
       if (
-        hit.type === 'connection-anchor' &&
-        hit.role === 'source' &&
-        config.connection &&
-        !additive &&
-        input.pointerType !== 'mouse'
+        (input.type === 'pointer.up' || input.type === 'pointer.cancel') &&
+        rejectedPointerIds.delete(input.pointerId)
       ) {
-        context.diagnostics.emit({
-          name: interactionDiagnosticEvents.inputRejected,
-          level: 'info',
-          attributes: { inputType: 'pointer.down', gestureType: 'connection', reason: 'unsupported-pointer' },
-        });
         return;
       }
-      renderer.focus();
-      renderer.capturePointer(input.pointerId);
-      const selectionGesture: SelectionGesture = { type: 'selection', pointerId: input.pointerId };
-      activeGesture = selectionGesture;
-      try {
-        if (input.button === 'auxiliary' || spacePressed) {
-          activeGesture = {
-            type: 'viewport-pan',
-            pointerId: input.pointerId,
-            startScreenPoint: input.screenPoint,
-            baseViewport: session.getSnapshot().viewport,
-            active: false,
-          };
+      if (input.type === 'pointer.down') {
+        if (activeGesture) {
+          if (input.pointerId !== activeGesture.pointerId && !rejectedPointerIds.has(input.pointerId)) {
+            rejectedPointerIds.add(input.pointerId);
+            context.diagnostics.emit({
+              name: interactionDiagnosticEvents.pointerRejected,
+              level: 'info',
+              attributes: {
+                inputType: 'pointer.down',
+                gestureType: activeGesture.type,
+                reason: 'additional-pointer',
+              },
+            });
+          }
           return;
         }
+        if (input.button !== 'primary' && input.button !== 'auxiliary') return;
+        const hit = renderer.hitTest(input.screenPoint);
+        if (hit === null) return;
+        const additive = input.modifiers.shift || input.modifiers.meta || input.modifiers.control;
         if (
           hit.type === 'connection-anchor' &&
           hit.role === 'source' &&
           config.connection &&
           !additive &&
-          input.button === 'primary'
+          input.pointerType !== 'mouse'
         ) {
-          const gesture: ConnectionGesture = {
-            type: 'connection',
-            pointerId: input.pointerId,
-            source: { nodeId: hit.nodeId, role: 'source' },
-            pointerWorldPoint: input.worldPoint,
-            target: { type: 'none' },
-          };
-          activeGesture = gesture;
-          reapplyGestureProjection(gesture);
+          context.diagnostics.emit({
+            name: interactionDiagnosticEvents.inputRejected,
+            level: 'info',
+            attributes: { inputType: 'pointer.down', gestureType: 'connection', reason: 'unsupported-pointer' },
+          });
           return;
         }
-        if (hit.type === 'canvas') {
-          activeGesture = {
-            type: 'box-selection',
-            pointerId: input.pointerId,
-            startScreenPoint: input.screenPoint,
-            startWorldPoint: input.worldPoint,
-            baseViewport: session.getSnapshot().viewport,
-            additive,
-            active: false,
-            completeClick: () =>
-              session.setSelection(computeClickSelection(session.getSnapshot().selection, hit, additive)),
-          };
-          return;
-        }
-        if (additive) {
-          selectionGesture.completeClick = () =>
-            session.setSelection(computeClickSelection(session.getSnapshot().selection, hit, true));
-          return;
-        }
-        if (hit.type === 'node') {
-          const selection = session.getSnapshot().selection;
-          const nodeIds = selection.nodeIds.includes(hit.nodeId) ? selection.nodeIds : [hit.nodeId];
-          const view = kernel.read();
-          activeGesture = {
-            type: 'node-drag',
-            pointerId: input.pointerId,
-            startScreenPoint: input.screenPoint,
-            startWorldPoint: input.worldPoint,
-            nodes: nodeIds.map((nodeId) => {
-              const node = view.query.getNode(nodeId);
-              if (!node) throw new Error('Node Drag candidate must exist in the current Canvas View.');
-              return { nodeId, basePosition: node.position };
-            }),
-            active: false,
-          };
-        }
-        if (hit.type === 'node' || hit.type === 'port') {
-          const selection = session.getSnapshot().selection;
-          if (
-            selection.nodeIds.includes(hit.nodeId) &&
-            (selection.nodeIds.length > 1 || selection.edgeIds.length > 0)
-          ) {
-            const completeClick = () =>
-              session.setSelection(computeClickSelection(session.getSnapshot().selection, hit, false));
-            if (activeGesture.type === 'node-drag' || activeGesture.type === 'selection') {
-              activeGesture.completeClick = completeClick;
-            }
+        renderer.focus();
+        renderer.capturePointer(input.pointerId);
+        const selectionGesture: SelectionGesture = { type: 'selection', pointerId: input.pointerId };
+        activeGesture = selectionGesture;
+        try {
+          if (input.button === 'auxiliary' || spacePressed) {
+            activeGesture = {
+              type: 'viewport-pan',
+              pointerId: input.pointerId,
+              startScreenPoint: input.screenPoint,
+              baseViewport: session.getSnapshot().viewport,
+              active: false,
+            };
             return;
           }
-        }
-        session.setSelection(computeClickSelection(session.getSnapshot().selection, hit, false));
-      } catch (error) {
-        activeGesture = undefined;
-        try {
-          renderer.releasePointer(input.pointerId);
-        } catch (cleanupError) {
-          throw new AggregateError([error, cleanupError], 'Interaction Input handling and cleanup both failed.');
-        }
-        throw error;
-      }
-      return;
-    }
-    const gesture = activeGesture;
-    if (input.type === 'pointer.move' && gesture && input.pointerId === gesture.pointerId) {
-      if (gesture.type === 'node-drag') {
-        if (
-          !gesture.active &&
-          isBelowDragThreshold(gesture.startScreenPoint, input.screenPoint, config.dragThreshold)
-        ) {
-          return;
-        }
-        gesture.active = true;
-        gesture.completeClick = undefined;
-        const worldDeltaX = input.worldPoint.x - gesture.startWorldPoint.x;
-        const worldDeltaY = input.worldPoint.y - gesture.startWorldPoint.y;
-        gesture.moves = gesture.nodes.map((node) => ({
-          nodeId: node.nodeId,
-          basePosition: node.basePosition,
-          position: {
-            x: node.basePosition.x + worldDeltaX,
-            y: node.basePosition.y + worldDeltaY,
-          },
-        }));
-        reapplyGestureProjection(gesture);
-      } else if (gesture.type === 'viewport-pan') {
-        const deltaX = input.screenPoint.x - gesture.startScreenPoint.x;
-        const deltaY = input.screenPoint.y - gesture.startScreenPoint.y;
-        if (
-          !gesture.active &&
-          isBelowDragThreshold(gesture.startScreenPoint, input.screenPoint, config.dragThreshold)
-        ) {
-          return;
-        }
-        gesture.active = true;
-        gesture.viewport = {
-          x: gesture.baseViewport.x + deltaX,
-          y: gesture.baseViewport.y + deltaY,
-          zoom: gesture.baseViewport.zoom,
-        };
-        reapplyGestureProjection(gesture);
-      } else if (gesture.type === 'connection') {
-        updateConnectionGesture(gesture, input.worldPoint, renderer.hitTest(input.screenPoint));
-        reapplyGestureProjection(gesture);
-      } else if (gesture.type === 'box-selection') {
-        if (
-          !gesture.active &&
-          isBelowDragThreshold(gesture.startScreenPoint, input.screenPoint, config.dragThreshold)
-        ) {
-          return;
-        }
-        const rect = createWorldRect(gesture.startWorldPoint, input.worldPoint);
-        gesture.active = true;
-        gesture.rect = rect;
-        reapplyGestureProjection(gesture);
-      }
-      return;
-    }
-    if (input.type === 'pointer.up' && gesture && input.pointerId === gesture.pointerId) {
-      if (gesture.type === 'connection') {
-        activeGesture = undefined;
-        const terminalErrors: unknown[] = [];
-        try {
-          updateConnectionGesture(gesture, input.worldPoint, renderer.hitTest(input.screenPoint));
-        } catch (error) {
-          terminalErrors.push(error);
-        }
-        for (const cleanup of [() => projection.update(null), () => renderer.releasePointer(gesture.pointerId)]) {
-          try {
-            cleanup();
-          } catch (error) {
-            terminalErrors.push(error);
+          if (
+            hit.type === 'connection-anchor' &&
+            hit.role === 'source' &&
+            config.connection &&
+            !additive &&
+            input.button === 'primary'
+          ) {
+            const gesture: ConnectionGesture = {
+              type: 'connection',
+              pointerId: input.pointerId,
+              source: { nodeId: hit.nodeId, role: 'source' },
+              pointerWorldPoint: input.worldPoint,
+              target: { type: 'none' },
+            };
+            activeGesture = gesture;
+            reapplyGestureProjection(gesture);
+            return;
           }
-        }
-        if (terminalErrors.length === 1) throw terminalErrors[0];
-        if (terminalErrors.length > 1) throw new AggregateError(terminalErrors, 'Connection Gesture terminal failed.');
-        if (gesture.target.type === 'valid' && config.connection) {
-          executeCreateEdge(commands, context.diagnostics, config.connection.materializeEdge, gesture, () => closing);
-        } else {
-          emitGestureCancellation(context.diagnostics, 'connection', 'invalid-target');
+          if (hit.type === 'canvas') {
+            activeGesture = {
+              type: 'box-selection',
+              pointerId: input.pointerId,
+              startScreenPoint: input.screenPoint,
+              startWorldPoint: input.worldPoint,
+              baseViewport: session.getSnapshot().viewport,
+              additive,
+              active: false,
+              completeClick: () =>
+                session.setSelection(computeClickSelection(session.getSnapshot().selection, hit, additive)),
+            };
+            return;
+          }
+          if (additive) {
+            selectionGesture.completeClick = () =>
+              session.setSelection(computeClickSelection(session.getSnapshot().selection, hit, true));
+            return;
+          }
+          if (hit.type === 'node') {
+            const selection = session.getSnapshot().selection;
+            const nodeIds = selection.nodeIds.includes(hit.nodeId) ? selection.nodeIds : [hit.nodeId];
+            const view = kernel.read();
+            activeGesture = {
+              type: 'node-drag',
+              pointerId: input.pointerId,
+              startScreenPoint: input.screenPoint,
+              startWorldPoint: input.worldPoint,
+              nodes: nodeIds.map((nodeId) => {
+                const node = view.query.getNode(nodeId);
+                if (!node) throw new Error('Node Drag candidate must exist in the current Canvas View.');
+                return { nodeId, basePosition: node.position };
+              }),
+              active: false,
+            };
+          }
+          if (hit.type === 'node' || hit.type === 'port') {
+            const selection = session.getSnapshot().selection;
+            if (
+              selection.nodeIds.includes(hit.nodeId) &&
+              (selection.nodeIds.length > 1 || selection.edgeIds.length > 0)
+            ) {
+              const completeClick = () =>
+                session.setSelection(computeClickSelection(session.getSnapshot().selection, hit, false));
+              if (activeGesture.type === 'node-drag' || activeGesture.type === 'selection') {
+                activeGesture.completeClick = completeClick;
+              }
+              return;
+            }
+          }
+          session.setSelection(computeClickSelection(session.getSnapshot().selection, hit, false));
+        } catch (error) {
+          activeGesture = undefined;
+          try {
+            renderer.releasePointer(input.pointerId);
+          } catch (cleanupError) {
+            throw new AggregateError([error, cleanupError], 'Interaction Input handling and cleanup both failed.');
+          }
+          throw error;
         }
         return;
       }
-      activeGesture = undefined;
-      if (gesture.type === 'node-drag' && gesture.active) {
-        projection.update(null);
-        if (gesture.moves) executeMoveNodes(commands, context.diagnostics, gesture.moves, () => closing);
-      } else if (gesture.type === 'viewport-pan' && gesture.active) {
-        projection.update(null);
-        if (gesture.viewport) session.setViewport(gesture.viewport);
-      } else if (gesture.type === 'box-selection' && gesture.active) {
-        projection.update(null);
-        const rect = createWorldRect(gesture.startWorldPoint, input.worldPoint);
-        session.setSelection(
-          computeBoxSelection(session.getSnapshot().selection, kernel.read().snapshot.nodes, rect, gesture.additive),
-        );
-      } else if (gesture.type !== 'viewport-pan') {
-        gesture.completeClick?.();
+      const gesture = activeGesture;
+      if (input.type === 'pointer.move' && gesture && input.pointerId === gesture.pointerId) {
+        if (gesture.type === 'node-drag') {
+          if (
+            !gesture.active &&
+            isBelowDragThreshold(gesture.startScreenPoint, input.screenPoint, config.dragThreshold)
+          ) {
+            return;
+          }
+          gesture.active = true;
+          gesture.completeClick = undefined;
+          const worldDeltaX = input.worldPoint.x - gesture.startWorldPoint.x;
+          const worldDeltaY = input.worldPoint.y - gesture.startWorldPoint.y;
+          gesture.moves = gesture.nodes.map((node) => ({
+            nodeId: node.nodeId,
+            basePosition: node.basePosition,
+            position: {
+              x: node.basePosition.x + worldDeltaX,
+              y: node.basePosition.y + worldDeltaY,
+            },
+          }));
+          reapplyGestureProjection(gesture);
+        } else if (gesture.type === 'viewport-pan') {
+          const deltaX = input.screenPoint.x - gesture.startScreenPoint.x;
+          const deltaY = input.screenPoint.y - gesture.startScreenPoint.y;
+          if (
+            !gesture.active &&
+            isBelowDragThreshold(gesture.startScreenPoint, input.screenPoint, config.dragThreshold)
+          ) {
+            return;
+          }
+          gesture.active = true;
+          gesture.viewport = {
+            x: gesture.baseViewport.x + deltaX,
+            y: gesture.baseViewport.y + deltaY,
+            zoom: gesture.baseViewport.zoom,
+          };
+          reapplyGestureProjection(gesture);
+        } else if (gesture.type === 'connection') {
+          updateConnectionGesture(gesture, input.worldPoint, renderer.hitTest(input.screenPoint));
+          reapplyGestureProjection(gesture);
+        } else if (gesture.type === 'box-selection') {
+          if (
+            !gesture.active &&
+            isBelowDragThreshold(gesture.startScreenPoint, input.screenPoint, config.dragThreshold)
+          ) {
+            return;
+          }
+          const rect = createWorldRect(gesture.startWorldPoint, input.worldPoint);
+          gesture.active = true;
+          gesture.rect = rect;
+          reapplyGestureProjection(gesture);
+        }
+        return;
       }
-    } else if (input.type === 'pointer.cancel' && gesture && input.pointerId === gesture.pointerId) {
-      cancelGesture(gesture, 'pointer-cancel', true);
-    }
-  });
+      if (input.type === 'pointer.up' && gesture && input.pointerId === gesture.pointerId) {
+        if (gesture.type === 'connection') {
+          activeGesture = undefined;
+          const terminalErrors: unknown[] = [];
+          try {
+            updateConnectionGesture(gesture, input.worldPoint, renderer.hitTest(input.screenPoint));
+          } catch (error) {
+            terminalErrors.push(error);
+          }
+          for (const cleanup of [() => projection.update(null), () => renderer.releasePointer(gesture.pointerId)]) {
+            try {
+              cleanup();
+            } catch (error) {
+              terminalErrors.push(error);
+            }
+          }
+          if (terminalErrors.length === 1) throw terminalErrors[0];
+          if (terminalErrors.length > 1)
+            throw new AggregateError(terminalErrors, 'Connection Gesture terminal failed.');
+          if (gesture.target.type === 'valid' && config.connection) {
+            executeCreateEdge(commands, context.diagnostics, config.connection.materializeEdge, gesture, () => closing);
+          } else {
+            emitGestureCancellation(context.diagnostics, 'connection', 'invalid-target');
+          }
+          return;
+        }
+        activeGesture = undefined;
+        if (gesture.type === 'node-drag' && gesture.active) {
+          projection.update(null);
+          if (gesture.moves) executeMoveNodes(commands, context.diagnostics, gesture.moves, () => closing);
+        } else if (gesture.type === 'viewport-pan' && gesture.active) {
+          projection.update(null);
+          if (gesture.viewport) session.setViewport(gesture.viewport);
+        } else if (gesture.type === 'box-selection' && gesture.active) {
+          projection.update(null);
+          const rect = createWorldRect(gesture.startWorldPoint, input.worldPoint);
+          session.setSelection(
+            computeBoxSelection(session.getSnapshot().selection, kernel.read().snapshot.nodes, rect, gesture.additive),
+          );
+        } else if (gesture.type !== 'viewport-pan') {
+          gesture.completeClick?.();
+        }
+      } else if (input.type === 'pointer.cancel' && gesture && input.pointerId === gesture.pointerId) {
+        cancelGesture(gesture, 'pointer-cancel', true);
+      }
+    },
+    (input) =>
+      input.type === 'key.down' || input.type === 'key.up' ? shortcutRuntime.decideDisposition(input) : undefined,
+  );
+  return shortcutRuntime.service;
 }
 
 function hasPreview(gesture: ActiveGesture): boolean {

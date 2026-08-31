@@ -6,24 +6,30 @@ import {
   createEdgeCommand,
   deleteSelectionCommand,
   interactionPlugin,
+  interactionShortcutService,
   moveNodesCommand,
   type CreateEdgeInput,
   type CreateEdgeResult,
   type DeleteSelectionInput,
   type DeleteSelectionResult,
   type InteractionConfig,
+  type InteractionShortcutService,
   type MoveNodesInput,
   type MoveNodesResult,
 } from '../src';
 
-test('publishes Interaction as a Runtime Plugin without a state Service', () => {
+test('publishes Interaction as a Runtime Plugin with a narrow Shortcut contribution Service', () => {
   const plugin: Plugin<InteractionConfig | undefined> = interactionPlugin;
+  const shortcutService: typeof interactionShortcutService = interactionShortcutService;
+  const verifyShortcutService = (service: InteractionShortcutService) => service;
   const verifyCommand = (input: MoveNodesInput): MoveNodesResult | PromiseLike<MoveNodesResult> => {
     void input;
     return Promise.resolve(null);
   };
   expectCommand(moveNodesCommand.id);
   void plugin;
+  void shortcutService;
+  void verifyShortcutService;
   void verifyCommand;
   const verifyCreateEdge = (input: CreateEdgeInput): CreateEdgeResult | PromiseLike<CreateEdgeResult> => {
     void input;

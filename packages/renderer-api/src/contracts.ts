@@ -55,7 +55,12 @@ export interface FocusInput {
 
 export type RendererInput = PointerInput | WheelInput | KeyboardInput | FocusInput;
 
-export type RendererInputListener = (input: RendererInput) => void;
+export interface InputDisposition {
+  readonly defaultAction: 'prevent';
+}
+
+export type RendererInputListener = (input: RendererInput) => void | InputDisposition;
+export type RendererInputDispositionListener = (input: RendererInput) => void | InputDisposition;
 
 export type HitResult =
   | { readonly type: 'canvas'; readonly worldPoint: Point }
@@ -78,7 +83,7 @@ export interface CanvasRenderer {
   updateDocument(update: RendererDocumentUpdate): void;
   updateSession(snapshot: SessionSnapshot): void;
   updateInteraction(projection: InteractionProjection | null): void;
-  subscribeInput(listener: RendererInputListener): () => void;
+  subscribeInput(listener: RendererInputListener, decideDisposition?: RendererInputDispositionListener): () => void;
   hitTest(point: ScreenPoint): HitResult | null;
   capturePointer(pointerId: number): void;
   releasePointer(pointerId: number): void;
