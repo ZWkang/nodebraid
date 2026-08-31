@@ -135,6 +135,7 @@
         "@nodebraid/runtime-cordis": "workspace:*",
       },
       "devDependencies": {
+        "@nodebraid/plugin-duplicate-selection": "workspace:*",
         "@nodebraid/plugin-history": "workspace:*",
       },
     },

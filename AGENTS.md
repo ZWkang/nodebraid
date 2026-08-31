@@ -40,7 +40,7 @@
 - `bun run --filter '@nodebraid/plugin-duplicate-selection' build:dependencies`：生成 Duplicate Selection Behavior 与 Shortcut Plugin 构建所需的 Command、Kernel、Session 与 Interaction workspace 声明。
 - `bun run --filter '@nodebraid/plugin-duplicate-selection' build:test-dependencies`：在生产依赖之外生成 Duplicate Selection 公共 seam 测试所需的 History Plugin workspace 声明。
 - `bun run --filter '@nodebraid/plugin-clipboard' build:dependencies`：生成 Clipboard Behavior 与 Shortcut Plugin 构建所需的 Fragment、Command、Kernel、Session 与 Interaction workspace 声明。
-- `bun run --filter '@nodebraid/plugin-clipboard' build:test-dependencies`：在生产依赖之外生成 Clipboard 公共 seam 测试所需的 History Plugin workspace 声明。
+- `bun run --filter '@nodebraid/plugin-clipboard' build:test-dependencies`：在生产依赖之外生成 Clipboard 联合公共 seam 测试所需的 Duplicate Selection 与 History Plugin workspace 声明。
 - `bun run --filter '@nodebraid/renderer-svg' build:dependencies`：生成 SVG Renderer Provider 生产构建所需的 Renderer API 及其传递 workspace 声明。
 - `bun run --filter '@nodebraid/renderer-svg' build:test-dependencies`：生成 Renderer Plugin、Interaction、History 与 Renderer 公共 seam 浏览器场景所需的全部 workspace 声明。
 - `bun run --filter '@nodebraid/plugin-history' build:dependencies`：生成 History Runtime Plugin 构建与类型检查所需的 Command 与 Kernel Plugin workspace 声明。
