@@ -9,7 +9,7 @@ rendering to one UI framework or graphics backend.
 The current source tree provides a runnable headless Canvas Runtime, an explicit
 Basic Canvas Composition, and a reference-quality SVG Renderer. The implemented
 surface includes atomic graph transactions, Selection and Viewport state, typed
-Commands, Undo/Redo, Selection, Box Selection, Delete Selection, multi-Node Drag, Pan, Wheel Zoom, node-level Edge
+Commands, Undo/Redo, Selection, Box Selection, Delete Selection, Duplicate Selection, multi-Node Drag, Pan, Wheel Zoom, node-level Edge
 Connection, Dagre and ELK Layout Providers, structured diagnostics, and Plugin
 lifecycle ownership.
 
@@ -88,6 +88,7 @@ the source-checkout workflow until the initial npm release is available.
 │   ├── plugin-command/ # @nodebraid/plugin-command Runtime Service adapter
 │   ├── plugin-history/ # @nodebraid/plugin-history History Runtime Plugin
 │   ├── plugin-interaction/ # @nodebraid/plugin-interaction Interaction Runtime
+│   ├── plugin-duplicate-selection/ # Independent Duplicate Selection Behavior
 │   ├── plugin-kernel/  # @nodebraid/plugin-kernel Runtime Service adapter
 │   ├── plugin-layout/  # @nodebraid/plugin-layout Runtime Command integration
 │   ├── plugin-renderer/ # @nodebraid/plugin-renderer Renderer Runtime adapter
@@ -202,7 +203,8 @@ and is not re-exported as a default through `@nodebraid/core`.
 Box Selection, and Connection Preview values. `@nodebraid/plugin-interaction` consumes normalized
 Renderer Input and Hit Results, implements selection, Box Selection, multi-Node Drag,
 middle/Space Pan, anchored Wheel Zoom, and optional mouse-only Node-level
-Edge Connection plus focused Delete Selection, and exposes no state Service.
+Edge Connection plus focused Delete Selection, and provides a narrow Shortcut
+contribution Service without exposing Interaction state.
 
 Stable Selection and Viewport changes go through Session; final Node movement,
 Edge creation, and Selection deletion use typed Commands and one Kernel Transaction. Applications
@@ -211,6 +213,13 @@ Pointer-move Preview remains in the exclusive Renderer Projection Binding.
 Cancellation, stale evidence, lost capture, dependency recovery, and cleanup are
 explicit and observable. Core re-exports both backend-neutral Interaction
 packages but still does not re-export the concrete SVG Provider.
+
+`@nodebraid/plugin-duplicate-selection` is an explicit sibling Plugin. It owns
+the input-free `selection.duplicate` Command, selected-Node induced-subgraph
+copying, exact stale/ABA evidence, one Transaction, and the resulting Selection.
+Applications synchronously provide only complete Node/Edge ID mappings. Its
+independent Shortcut Plugin contributes focused Ctrl/Cmd+D through the single
+Interaction input authority.
 
 ## Command Runtime Plugin
 
@@ -395,6 +404,8 @@ Build the Interaction value and Runtime packages independently:
 bun run --filter '@nodebraid/interaction-api' build:dependencies
 bun run --filter '@nodebraid/plugin-interaction' build:dependencies
 bun run --filter '@nodebraid/plugin-interaction' build:test-dependencies
+bun run --filter '@nodebraid/plugin-duplicate-selection' build:dependencies
+bun run --filter '@nodebraid/plugin-duplicate-selection' build:test-dependencies
 ```
 
 Build the dependencies required by the Basic Canvas Composition:

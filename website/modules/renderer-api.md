@@ -30,6 +30,7 @@ description: NodeBraid-owned、backend-neutral 的 Renderer Provider contract。
 - `RendererFactory<Config>`：用 Provider-specific immutable config 创建一份 Renderer Instance；
 - `RendererDocumentUpdate`：`reset` 完整建立 Baseline，`commit` 交付一个完整 Canvas Commit；
 - `RendererInput`：Pointer、Wheel、Keyboard 与 Focus discriminated union；
+- `InputDisposition`：独立控制 listener 可在行为入队前同步请求阻止当前输入的后端默认动作，而不接触 native Event；
 - `ScreenPoint`、`InputModifiers`、`PointerButton` 与 `PointerType`；
 - `HitResult`：Canvas、Node、Edge、Port 或 node-level Connection Anchor 语义目标与 World Point；
 - `RendererError`：Provider contract failure 的稳定错误身份。
@@ -50,6 +51,7 @@ import {
   type CanvasRenderer,
   type FocusInput,
   type HitResult,
+  type InputDisposition,
   type InputModifiers,
   type KeyboardInput,
   type PointerButton,
@@ -59,6 +61,7 @@ import {
   type RendererErrorCode,
   type RendererFactory,
   type RendererInput,
+  type RendererInputDispositionListener,
   type RendererInputListener,
   type ScreenPoint,
   type WheelInput,
@@ -73,7 +76,7 @@ import {
 
 Provider 必须把 `reset` 视为完整 Baseline；后续 `commit.before` revision 必须与已接受 Baseline 连续，并在完整验证后一次性接受。重复、stale、跳号或内部证据不一致的 Commit 不能被忽略或部分应用。
 
-Renderer Input 订阅按标准化后的真实顺序同步发布。listener 集合在每条 Input 开始时固定，重入 Input 采用 FIFO 广度优先顺序，取消幂等。`dispose()` 是 terminal、异步且幂等的；开始释放后，更新、命中和新增订阅应以 `RENDERER_DISPOSED` 显式失败。
+Renderer Input Subscription 先同步运行 Disposition 控制 listener，再把行为 Input 放入 FIFO 广度优先队列。这个两阶段 seam 让重入原生事件在自己的 handler 返回前决定默认动作，同时保持所有行为 listener 先观察 N 再观察 N+1。任一有效 prevent Disposition 成为最终结果，listener 错误或 malformed disposition 不会吞掉它；Provider 先应用结果再暴露错误。`dispose()` 是 terminal、异步且幂等的；开始释放后，更新、命中和新增订阅应以 `RENDERER_DISPOSED` 显式失败。
 
 | Code                             | 适用失败                                      |
 | -------------------------------- | --------------------------------------------- |
@@ -82,6 +85,7 @@ Renderer Input 订阅按标准化后的真实顺序同步发布。listener 集�
 | `INVALID_SESSION_SNAPSHOT`       | Session 值无效或无法由当前 Document 解析      |
 | `INVALID_SCREEN_POINT`           | Hit Test 输入坐标无效                         |
 | `INVALID_INPUT_SUBSCRIBER`       | Input listener 无效                           |
+| `INVALID_INPUT_DISPOSITION`      | listener 返回的 Input Disposition 无效        |
 | `INVALID_POINTER`                | Pointer capture/release 请求无效              |
 | `INVALID_INTERACTION_PROJECTION` | Interaction Projection 结构无效               |
 | `INTERACTION_OUT_OF_SYNC`        | Projection 的 Document/Viewport evidence 失效 |

@@ -9,12 +9,13 @@ The Interaction capability answers how user input becomes semantic canvas behavi
 
 ## Current delivery
 
-| Layer              | Package                                                           | Responsibility                                                                                    |
-| ------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Value contract     | [`@nodebraid/interaction-api`](/en/modules/interaction-api)       | Immutable Node Drag, Viewport Pan, Box Selection, and Connection Preview Projections              |
-| Runtime behavior   | [`@nodebraid/plugin-interaction`](/en/modules/plugin-interaction) | Selection, Box Selection, Delete Selection, Drag, Pan, Zoom, node-level Connection, and lifecycle |
-| Projection adapter | [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer)       | Exclusive Interaction Projection Binding and Renderer synchronization                             |
-| Reference backend  | [`@nodebraid/renderer-svg`](/en/modules/renderer-svg)             | Preview on real SVG geometry with aligned Hit/Input coordinates                                   |
+| Layer              | Package                                                                           | Responsibility                                                                                    |
+| ------------------ | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Value contract     | [`@nodebraid/interaction-api`](/en/modules/interaction-api)                       | Immutable Node Drag, Viewport Pan, Box Selection, and Connection Preview Projections              |
+| Runtime behavior   | [`@nodebraid/plugin-interaction`](/en/modules/plugin-interaction)                 | Selection, Box Selection, Delete Selection, Drag, Pan, Zoom, node-level Connection, and lifecycle |
+| Duplicate behavior | [`@nodebraid/plugin-duplicate-selection`](/en/modules/plugin-duplicate-selection) | Independent Duplicate Command, ID materialization, subgraph copy, and Ctrl/Cmd+D Binding          |
+| Projection adapter | [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer)                       | Exclusive Interaction Projection Binding and Renderer synchronization                             |
+| Reference backend  | [`@nodebraid/renderer-svg`](/en/modules/renderer-svg)                             | Preview on real SVG geometry with aligned Hit/Input coordinates                                   |
 
 ```text
 Renderer Input + Hit Result
@@ -33,6 +34,7 @@ Interaction Runtime
 - Node Drag executes `interaction.nodes.move` once on pointerup. One Transaction naturally creates at most one History Entry.
 - Mouse Connection uses Renderer-owned Node-level Anchors, an application Edge materializer, and one `interaction.edge.create` Transaction.
 - When the Renderer owns Focus and no Active Gesture exists, Delete executes `interaction.selection.delete`: explicit and incident Edges are removed before selected Nodes, naturally forming one undoable and redoable History Entry.
+- The independent Duplicate Selection Plugin executes `selection.duplicate` over the selected-Node induced subgraph. The application provides only a complete ID mapping, while Ctrl/Cmd+D reaches the same Command through an Interaction Shortcut Binding.
 - Middle button or Space+primary can establish Pan. Wheel Zoom is anchored to a Screen Point and bounded by explicit configuration.
 - One Activation owns one Gesture Pointer. Additional Pointers, Wheel during a Gesture, pointer cancellation, lost capture, and stale evidence all have explicit semantics and diagnostics.
 - Dependency loss or Plugin unload stops input, clears Preview, releases Capture, clears local state, and unregisters the Command. Recovery creates a fresh idle Activation.

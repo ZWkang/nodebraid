@@ -15,13 +15,15 @@ A Renderer publishes input facts and Hit Results; it should not decide product b
 
 ## What it provides
 
-- `interactionPlugin`: a Feature Plugin with no Runtime Service;
+- `interactionPlugin`: the single input authority, providing the narrow `interactionShortcutService`;
 - `InteractionConfig`: `dragThreshold`, `wheelZoomSensitivity`, `minZoom`, and `maxZoom`;
 - `moveNodesCommand`: ID `interaction.nodes.move`, updating all target Nodes in one synchronous Transaction;
 - `createEdgeCommand`: ID `interaction.edge.create`, creating one complete Edge in a synchronous Transaction;
 - `deleteSelectionCommand`: ID `interaction.selection.delete`, deleting one canonical target closure in a synchronous Transaction;
 - `InteractionError`: `INVALID_CONFIG`, `INVALID_MOVE`, `INVALID_CONNECTION`, `INVALID_DELETE`, `STALE_GESTURE`, and `STALE_SELECTION`;
 - `interactionDiagnosticEvents`: Pointer/Input rejection, Gesture cancellation, and Command fault events.
+
+Shortcut consumer Plugins register an immutable physical-code/modifier-alternatives value and an input-free typed Command. Interaction owns conflicts, repeat, Active Gesture arbitration, capability unavailability, execution abort, and Input Disposition; consumers never subscribe to Renderer Input directly.
 
 The current version also includes optional mouse-only, Node-level Edge Connection. An application materializer owns Edge ID, type, and data; Interaction commits one typed Create Edge Command on pointerup.
 
@@ -31,7 +33,7 @@ When the Renderer owns Focus and no Active Gesture exists, either logical `key` 
 
 ## Dependencies and write direction
 
-The Plugin statically requires Renderer, Session, Command, and Kernel Services and provides no state Service of its own.
+The Plugin statically requires Renderer, Session, Command, and Kernel Services. It provides only the Shortcut contribution Service and does not expose Active Gesture state.
 
 ```text
 RendererService ─▶ Input / Hit / Capture / Projection

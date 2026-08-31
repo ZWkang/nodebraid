@@ -30,6 +30,7 @@ Ordinary applications interact with this seam directly only when selecting or im
 - `RendererFactory<Config>`: creates one Renderer Instance from immutable Provider-specific config;
 - `RendererDocumentUpdate`: `reset` establishes a complete Baseline, while `commit` delivers one complete Canvas Commit;
 - `RendererInput`: a discriminated union of Pointer, Wheel, Keyboard, and Focus input;
+- `InputDisposition`: lets a dedicated control listener synchronously prevent the current backend default action before behavior is queued, without receiving a native Event;
 - `ScreenPoint`, `InputModifiers`, `PointerButton`, and `PointerType`;
 - `HitResult`: a semantic Canvas, Node, Edge, Port, or Node-level Connection Anchor target plus a World Point;
 - `RendererError`: stable error identity for Provider contract failures.
@@ -50,6 +51,7 @@ import {
   type CanvasRenderer,
   type FocusInput,
   type HitResult,
+  type InputDisposition,
   type InputModifiers,
   type KeyboardInput,
   type PointerButton,
@@ -59,6 +61,7 @@ import {
   type RendererErrorCode,
   type RendererFactory,
   type RendererInput,
+  type RendererInputDispositionListener,
   type RendererInputListener,
   type ScreenPoint,
   type WheelInput,
@@ -73,7 +76,7 @@ A Renderer Instance is bound to one fixed Target when its Factory creates it. Th
 
 The Provider must treat `reset` as a complete Baseline. For every later `commit`, `commit.before` must be continuous with the accepted Baseline, and the Commit must be accepted atomically after complete validation. Duplicate, stale, skipped, or internally inconsistent Commits cannot be ignored or partially applied.
 
-Renderer Input subscriptions publish standardized input synchronously in actual order. The listener set is fixed when each Input begins, reentrant Input uses FIFO breadth-first ordering, and cancellation is idempotent. `dispose()` is terminal, asynchronous, and idempotent. Once disposal starts, updates, Hit Tests, and new subscriptions must fail explicitly with `RENDERER_DISPOSED`.
+Renderer Input Subscription first runs synchronous Disposition control listeners, then queues behavior Input in FIFO breadth-first order. This two-phase seam controls reentrant native events before their own handler returns while preserving the rule that every behavior listener observes N before N+1. Any valid prevent Disposition becomes the final result; listener failures or malformed dispositions cannot erase it, and the Provider applies it before exposing errors. `dispose()` is terminal, asynchronous, and idempotent. Once disposal starts, updates, Hit Tests, and new subscriptions must fail explicitly with `RENDERER_DISPOSED`.
 
 | Code                             | Applicable failure                                                       |
 | -------------------------------- | ------------------------------------------------------------------------ |
@@ -82,6 +85,7 @@ Renderer Input subscriptions publish standardized input synchronously in actual 
 | `INVALID_SESSION_SNAPSHOT`       | Session values are invalid or cannot be resolved by the current Document |
 | `INVALID_SCREEN_POINT`           | Invalid Hit Test input coordinates                                       |
 | `INVALID_INPUT_SUBSCRIBER`       | Invalid Input listener                                                   |
+| `INVALID_INPUT_DISPOSITION`      | Invalid Input Disposition returned by a listener                         |
 | `INVALID_POINTER`                | Invalid Pointer capture/release request                                  |
 | `INVALID_INTERACTION_PROJECTION` | Invalid Interaction Projection structure                                 |
 | `INTERACTION_OUT_OF_SYNC`        | Stale Document or Viewport evidence for a Projection                     |

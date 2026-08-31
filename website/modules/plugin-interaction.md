@@ -15,13 +15,15 @@ Renderer 只发布输入事实和 Hit Result，不应决定产品行为。该 Pl
 
 ## 提供的能力
 
-- `interactionPlugin`：无 Runtime Service 的 Feature Plugin；
+- `interactionPlugin`：拥有单一输入 authority，并提供窄 `interactionShortcutService`；
 - `InteractionConfig`：Drag/Zoom 策略与可选同步 Connection materializer；
 - `moveNodesCommand`：ID 为 `interaction.nodes.move`，一次同步 Transaction 更新全部目标 Node；
 - `createEdgeCommand`：ID 为 `interaction.edge.create`，一次同步 Transaction 创建完整 Edge；
 - `deleteSelectionCommand`：ID 为 `interaction.selection.delete`，一次同步 Transaction 删除规范目标闭包；
 - `InteractionError`：`INVALID_CONFIG`、`INVALID_MOVE`、`INVALID_CONNECTION`、`INVALID_DELETE`、`STALE_GESTURE`、`STALE_SELECTION`；
 - `interactionDiagnosticEvents`：Pointer/Input rejection、Gesture cancellation 与 Command fault。
+
+Shortcut consumer Plugin 可以注册不可变 physical-code + modifier alternatives 与无输入 typed Command。Interaction 统一处理 Binding 冲突、repeat、Active Gesture、capability unavailable、execution abort 与 Input Disposition；consumer 不直接订阅 Renderer。
 
 当前行为还包括 mouse-only Node-level Edge Connection：Renderer 提供 source/target Anchor，应用 materializer 拥有 Edge ID/type/data，Interaction 只在 pointerup 提交一次 typed Command。
 
@@ -31,7 +33,7 @@ Renderer 拥有 Focus 且没有 Active Gesture 时，logical `key` 或 physical 
 
 ## 依赖与写入方向
 
-Plugin 静态要求 Renderer、Session、Command 与 Kernel Service，不提供自己的状态 Service。
+Plugin 静态要求 Renderer、Session、Command 与 Kernel Service，只提供 Shortcut contribution Service，不公开 Active Gesture 状态。
 
 ```text
 RendererService ─▶ Input / Hit / Capture / Projection

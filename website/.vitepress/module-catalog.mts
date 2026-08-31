@@ -182,6 +182,14 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
           en: 'The Selection, Drag, Pan, and Wheel Zoom Runtime.',
         },
       },
+      {
+        name: '@nodebraid/plugin-duplicate-selection',
+        slug: 'plugin-duplicate-selection',
+        summary: {
+          zh: '独立 Duplicate Selection Behavior 与 Shortcut Plugin。',
+          en: 'Independent Duplicate Selection Behavior and Shortcut Plugins.',
+        },
+      },
     ],
   },
   {

@@ -2,7 +2,7 @@
 
 > Documentation: [English](https://zwkang.github.io/nodebraid/en/modules/core) · [简体中文](https://zwkang.github.io/nodebraid/modules/core)
 
-Public NodeBraid facade for Kernel, Interaction, provider-neutral Layout/Renderer contracts, Runtime Plugins, and Plugin Host APIs.
+Public NodeBraid facade for Kernel, Interaction, Duplicate Selection, provider-neutral Layout/Renderer contracts, Runtime Plugins, and Plugin Host APIs.
 
 ```ts
 import {
@@ -61,7 +61,7 @@ to Interaction Plugins. Core does not select or re-export concrete Renderer
 Providers.
 
 `interactionPlugin` interprets normalized Renderer Input as Selection,
-Node Drag, Pan, Wheel Zoom, focused Delete Selection, and optional Node-level Edge Connection. It keeps transient Preview in an exclusive
+Node Drag, Pan, Wheel Zoom, focused Delete Selection, independent Duplicate Selection, and optional Node-level Edge Connection. It keeps transient Preview in an exclusive
 Interaction Projection Binding, writes stable Session state through
 `SessionService`, and commits final Node positions, materialized Edges, or deletion closure through typed Commands.
 
