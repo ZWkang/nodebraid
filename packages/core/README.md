@@ -2,7 +2,7 @@
 
 > Documentation: [English](https://zwkang.github.io/nodebraid/en/modules/core) · [简体中文](https://zwkang.github.io/nodebraid/modules/core)
 
-Public NodeBraid facade for Kernel, Interaction, Duplicate Selection, provider-neutral Layout/Renderer contracts, Runtime Plugins, and Plugin Host APIs.
+Public NodeBraid facade for Kernel, Canvas Fragment, Interaction, Duplicate Selection, Clipboard Copy/Paste, provider-neutral Layout/Renderer contracts, Runtime Plugins, and Plugin Host APIs.
 
 ```ts
 import {
@@ -35,6 +35,9 @@ contracts from `@nodebraid/interaction-api` and `@nodebraid/renderer-api`, and t
 Session, Renderer, Interaction, and History Runtime Plugins from their corresponding
 `@nodebraid/plugin-*` packages, plus generic Layout contracts and Runtime
 integration from `@nodebraid/layout-api` and `@nodebraid/plugin-layout`.
+The facade also publishes the pure `@nodebraid/canvas-fragment` value seam and
+the explicit `@nodebraid/plugin-clipboard` Behavior/Shortcut factories without
+selecting a text codec or browser transport.
 Cordis remains an implementation dependency and does not appear in the public
 NodeBraid types. Advanced consumers can import the narrow packages directly.
 

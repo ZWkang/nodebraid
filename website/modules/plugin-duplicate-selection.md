@@ -29,4 +29,4 @@ Shortcut Plugin 不订阅 Renderer。它通过 [`@nodebraid/plugin-interaction`]
 
 ## 非目标
 
-不包含 Clipboard、Copy/Paste、Serialization、Persistence、deep clone、业务实体 factory、跨 Canvas、async Transaction、协同 Duplicate、Canvas Fragment 或 Tool Registry。
+不包含 Clipboard transport/codec、Serialization、Persistence、deep clone、业务实体 factory、async Transaction、协同 Duplicate 或 Tool Registry；子图 capture/materialization 现由共用的纯 `@nodebraid/canvas-fragment` 提供。

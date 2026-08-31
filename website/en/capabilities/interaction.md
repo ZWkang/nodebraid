@@ -14,6 +14,7 @@ The Interaction capability answers how user input becomes semantic canvas behavi
 | Value contract     | [`@nodebraid/interaction-api`](/en/modules/interaction-api)                       | Immutable Node Drag, Viewport Pan, Box Selection, and Connection Preview Projections              |
 | Runtime behavior   | [`@nodebraid/plugin-interaction`](/en/modules/plugin-interaction)                 | Selection, Box Selection, Delete Selection, Drag, Pan, Zoom, node-level Connection, and lifecycle |
 | Duplicate behavior | [`@nodebraid/plugin-duplicate-selection`](/en/modules/plugin-duplicate-selection) | Independent Duplicate Command, ID materialization, subgraph copy, and Ctrl/Cmd+D Binding          |
+| Clipboard behavior | [`@nodebraid/plugin-clipboard`](/en/modules/plugin-clipboard)                     | Copy/Paste Commands with application-owned codec/transport and Ctrl/Cmd+C / Ctrl/Cmd+V Bindings   |
 | Projection adapter | [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer)                       | Exclusive Interaction Projection Binding and Renderer synchronization                             |
 | Reference backend  | [`@nodebraid/renderer-svg`](/en/modules/renderer-svg)                             | Preview on real SVG geometry with aligned Hit/Input coordinates                                   |
 
@@ -35,13 +36,14 @@ Interaction Runtime
 - Mouse Connection uses Renderer-owned Node-level Anchors, an application Edge materializer, and one `interaction.edge.create` Transaction.
 - When the Renderer owns Focus and no Active Gesture exists, Delete executes `interaction.selection.delete`: explicit and incident Edges are removed before selected Nodes, naturally forming one undoable and redoable History Entry.
 - The independent Duplicate Selection Plugin executes `selection.duplicate` over the selected-Node induced subgraph. The application provides only a complete ID mapping, while Ctrl/Cmd+D reaches the same Command through an Interaction Shortcut Binding.
+- The Clipboard Plugin reuses the same subgraph semantics through [`@nodebraid/canvas-fragment`](/en/modules/canvas-fragment). Copy captures one committed Fragment; Paste materializes it in one Transaction and then updates Selection. The application explicitly owns the text codec, `navigator.clipboard` Adapter, and opaque data rules.
 - Middle button or Space+primary can establish Pan. Wheel Zoom is anchored to a Screen Point and bounded by explicit configuration.
 - One Activation owns one Gesture Pointer. Additional Pointers, Wheel during a Gesture, pointer cancellation, lost capture, and stale evidence all have explicit semantics and diagnostics.
 - Dependency loss or Plugin unload stops input, clears Preview, releases Capture, clears local state, and unregisters the Command. Recovery creates a fresh idle Activation.
 
 ## Non-goals
 
-The first Connection version excludes Ports, self-loops, business validation, and Edge Routing. Box Selection excludes Edges, Ports, Connection Anchors, lasso, direction-dependent containment, autoscroll, and snapping. Delete Selection excludes Backspace, Clipboard, confirmation UI, soft delete, and business permissions. Pinch/touch tools, HTML overlays, text editing, collaboration presence, product UI, and a generic Tool Registry also remain out of scope.
+The first Clipboard version excludes Serialized Document, Persistence, cross-version text promises, HTML/image formats, rich text, and a generic JSON codec. Existing Connection, Box Selection, and Delete Selection non-goals remain unchanged. Pinch/touch tools, HTML overlays, text editing, collaboration presence, product UI, and a generic Tool Registry also remain out of scope.
 
 ## Verification
 

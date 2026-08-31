@@ -7,7 +7,7 @@ NodeBraid 是一个插件化、渲染器无关的流程画布引擎，用于构�
 
 当前源码已经提供一条可运行的 headless Canvas Runtime、显式的 Basic Canvas
 Composition，以及参考级 SVG Renderer。已实现能力包括原子图事务、Selection 与
-Viewport 状态、类型化 Command、Undo/Redo、Selection、Box Selection、多节点拖拽、Pan、Wheel
+Viewport 状态、类型化 Command、Undo/Redo、Selection、Box Selection、Delete Selection、Duplicate Selection、Clipboard Copy/Paste、多节点拖拽、Pan、Wheel
 Zoom、节点级连边、Dagre 与 ELK Layout Provider、结构化诊断和 Plugin 生命周期所有权。
 
 私有 React Examples Application 已把这些公共 interface 组合成可单独启动的 Basic SVG
@@ -70,6 +70,7 @@ revision=1 nodes=1
 .
 ├── packages/
 │   ├── core/           # @nodebraid/core 公共 facade
+│   ├── canvas-fragment/ # 纯内存 Canvas Fragment 值契约
 │   ├── diagnostics/    # @nodebraid/diagnostics 错误与 Diagnostic Event
 │   ├── interaction-api/ # @nodebraid/interaction-api 瞬态 Projection 值
 │   ├── kernel/         # @nodebraid/kernel 图状态与 Transaction
@@ -77,8 +78,10 @@ revision=1 nodes=1
 │   ├── layout-dagre/   # @nodebraid/layout-dagre 官方 Provider
 │   ├── layout-elk/     # @nodebraid/layout-elk 官方 Provider
 │   ├── plugin-command/ # @nodebraid/plugin-command Runtime Service 适配器
+│   ├── plugin-clipboard/ # 显式 Clipboard Copy/Paste Behavior
 │   ├── plugin-history/ # @nodebraid/plugin-history History Runtime Plugin
 │   ├── plugin-interaction/ # @nodebraid/plugin-interaction Interaction Runtime
+│   ├── plugin-duplicate-selection/ # 独立 Duplicate Selection Behavior
 │   ├── plugin-kernel/  # @nodebraid/plugin-kernel Runtime Service 适配器
 │   ├── plugin-layout/  # @nodebraid/plugin-layout Runtime Command 集成
 │   ├── plugin-renderer/ # @nodebraid/plugin-renderer Renderer Runtime 适配器
@@ -184,6 +187,13 @@ Command 与一次 Kernel Transaction。应用通过同步 Connection materialize
 Edge ID/type/data。Pointer move Preview 保留在唯一 Renderer Projection
 Binding 中。取消、过期证据、Capture 丢失、依赖恢复和清理都显式且可观测。Core 会重导出两个后端无关
 Interaction package，但仍不会重导出具体 SVG Provider。
+
+`@nodebraid/canvas-fragment` 提供 Duplicate 与 Clipboard 共用的纯内存
+selected-Node 子图契约；它保留 opaque `data` 引用，但不是 Serialized Document。
+`@nodebraid/plugin-clipboard` 拥有 `clipboard.copy` / `clipboard.paste`、应用注入的
+abort-aware 文本 transport、应用拥有的 codec 与 fresh-ID mapping、一个 Paste
+Transaction、结果 Selection，以及 Ctrl/Cmd+C / Ctrl/Cmd+V。通用 package 不直接访问
+`navigator.clipboard`，不提供 fallback store，也不声称任意 `unknown` 是 JSON-safe。
 
 ## Command Runtime Plugin
 
@@ -357,6 +367,10 @@ bun run --filter '@nodebraid/renderer-svg' test:browser
 ```bash
 bun run --filter '@nodebraid/interaction-api' build:dependencies
 bun run --filter '@nodebraid/plugin-interaction' build:dependencies
+bun run --filter '@nodebraid/canvas-fragment' build:dependencies
+bun run --filter '@nodebraid/plugin-duplicate-selection' build:dependencies
+bun run --filter '@nodebraid/plugin-clipboard' build:dependencies
+bun run --filter '@nodebraid/plugin-clipboard' build:test-dependencies
 ```
 
 构建 Basic Canvas Composition 所需依赖：

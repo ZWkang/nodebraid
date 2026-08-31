@@ -9,7 +9,7 @@ rendering to one UI framework or graphics backend.
 The current source tree provides a runnable headless Canvas Runtime, an explicit
 Basic Canvas Composition, and a reference-quality SVG Renderer. The implemented
 surface includes atomic graph transactions, Selection and Viewport state, typed
-Commands, Undo/Redo, Selection, Box Selection, Delete Selection, Duplicate Selection, multi-Node Drag, Pan, Wheel Zoom, node-level Edge
+Commands, Undo/Redo, Selection, Box Selection, Delete Selection, Duplicate Selection, Clipboard Copy/Paste, multi-Node Drag, Pan, Wheel Zoom, node-level Edge
 Connection, Dagre and ELK Layout Providers, structured diagnostics, and Plugin
 lifecycle ownership.
 
@@ -79,6 +79,7 @@ the source-checkout workflow until the initial npm release is available.
 .
 ├── packages/
 │   ├── core/           # @nodebraid/core public facade
+│   ├── canvas-fragment/ # Pure in-memory Canvas Fragment values
 │   ├── diagnostics/    # @nodebraid/diagnostics errors and Diagnostic Events
 │   ├── interaction-api/ # @nodebraid/interaction-api transient projection values
 │   ├── kernel/         # @nodebraid/kernel graph state and transactions
@@ -86,6 +87,7 @@ the source-checkout workflow until the initial npm release is available.
 │   ├── layout-dagre/   # @nodebraid/layout-dagre official Provider
 │   ├── layout-elk/     # @nodebraid/layout-elk official Provider
 │   ├── plugin-command/ # @nodebraid/plugin-command Runtime Service adapter
+│   ├── plugin-clipboard/ # Explicit Clipboard Copy/Paste Behavior
 │   ├── plugin-history/ # @nodebraid/plugin-history History Runtime Plugin
 │   ├── plugin-interaction/ # @nodebraid/plugin-interaction Interaction Runtime
 │   ├── plugin-duplicate-selection/ # Independent Duplicate Selection Behavior
@@ -220,6 +222,15 @@ copying, exact stale/ABA evidence, one Transaction, and the resulting Selection.
 Applications synchronously provide only complete Node/Edge ID mappings. Its
 independent Shortcut Plugin contributes focused Ctrl/Cmd+D through the single
 Interaction input authority.
+
+`@nodebraid/canvas-fragment` now supplies the shared in-memory selected-Node
+subgraph contract used by Duplicate and Clipboard. It preserves opaque `data`
+references and is explicitly not a Serialized Document. The sibling
+`@nodebraid/plugin-clipboard` owns `clipboard.copy` / `clipboard.paste`, injected
+abort-aware text transport, application-owned text codec and fresh-ID mapping,
+one Paste Transaction, resulting Selection, and focused Ctrl/Cmd+C / Ctrl/Cmd+V.
+Generic packages do not access `navigator.clipboard`, provide a fallback store,
+or claim arbitrary `unknown` is JSON-safe.
 
 ## Command Runtime Plugin
 
@@ -406,6 +417,9 @@ bun run --filter '@nodebraid/plugin-interaction' build:dependencies
 bun run --filter '@nodebraid/plugin-interaction' build:test-dependencies
 bun run --filter '@nodebraid/plugin-duplicate-selection' build:dependencies
 bun run --filter '@nodebraid/plugin-duplicate-selection' build:test-dependencies
+bun run --filter '@nodebraid/canvas-fragment' build:dependencies
+bun run --filter '@nodebraid/plugin-clipboard' build:dependencies
+bun run --filter '@nodebraid/plugin-clipboard' build:test-dependencies
 ```
 
 Build the dependencies required by the Basic Canvas Composition:

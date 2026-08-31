@@ -31,11 +31,12 @@ description: NodeBraid 当前已交付公共能力的统一 facade。
 
 - `@nodebraid/diagnostics` 的结构化错误与 Diagnostic Event 契约；
 - `@nodebraid/kernel` 的纯图模型、Transaction、Canvas View、Canvas Query 与 Change Set；
+- `@nodebraid/canvas-fragment` 的纯内存 selected-Node 子图值；
 - `@nodebraid/session-api` 的不可变 Session 值；
 - `@nodebraid/renderer-api` 的后端中立 Renderer contract；
 - `@nodebraid/interaction-api` 的后端中立 Interaction Projection 值；
 - `@nodebraid/runtime-cordis` 的 NodeBraid-owned Plugin Host API；
-- Kernel、Command、Session、Renderer、Interaction 与 History Runtime Plugin；
+- Kernel、Command、Session、Renderer、Interaction、Duplicate Selection、Clipboard 与 History Runtime Plugin；
 - `@nodebraid/preset-basic` 的后端中立 Basic Canvas Composition；
 - 通用 Layout API 与 Layout Runtime Plugin。
 
@@ -73,6 +74,7 @@ Package 只有一个公开子路径：`@nodebraid/core`。代表性的公共入�
 | Layout      | `createLayoutInput`、`defineLayoutEngine`、`createLayoutPlugin`、`LayoutError`                                        |
 | Renderer    | `createRendererPlugin`、`rendererService`、`RendererError`                                                            |
 | Interaction | `interactionPlugin`、`moveNodesCommand`、`createEdgeCommand`、`deleteSelectionCommand`、`interactionDiagnosticEvents` |
+| Clipboard   | `captureCanvasFragment`、`createClipboardPlugin`、`copySelectionToClipboardCommand`、`pasteClipboardCommand`          |
 | Composition | `createBasicCanvasPlugin`、`BasicCanvasPluginOptions`                                                                 |
 | Diagnostics | `NodeBraidError`、`diagnosticEvents`、`describeError`                                                                 |
 

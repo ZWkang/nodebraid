@@ -15,6 +15,7 @@ NodeBraid 处于早期实现阶段，但已经形成一条可运行的 headless 
 - Kernel、Command、Session、History 与 Renderer Runtime Plugin；
 - Selection、Viewport 与 backend-neutral Renderer value contract；
 - Backend-neutral Interaction Projection，以及 Selection、Box Selection、Delete Selection、独立 Duplicate Selection、multi-Node Drag、Pan、Wheel Zoom 与 node-level Edge Connection Runtime；
+- 纯内存 `@nodebraid/canvas-fragment`，以及应用拥有 codec/transport 的显式 Clipboard Copy/Paste Behavior；
 - 参考级 `@nodebraid/renderer-svg` Provider，以及真实 Chromium 中的 SVG projection、输入、Hit Test 与 lifecycle 验证；
 - Layout Input/Engine/Proposal contract 与 Runtime Command integration；
 - Dagre full Layout Provider；
@@ -28,7 +29,7 @@ NodeBraid 处于早期实现阶段，但已经形成一条可运行的 headless 
 ## 当前缺口
 
 ::: warning 尚无产品级编辑器外壳
-当前分支已经交付 Basic Canvas Composition、Interaction v4 Duplicate Selection、Interaction v3 Delete Selection、Node-level Edge Connection、SVG Renderer 闭环与开发者参考 Examples Application，但仍没有公开 framework adapter 或产品级编辑器外壳。当前不包含 Clipboard、Copy/Paste、Serialization/Persistence、Port-aware Connection、Edge/Port 框选、lasso、snapping、pinch/touch 工具、文本编辑、产品节点 UI 或可扩展 Tool Registry。
+当前分支已经交付 Basic Canvas Composition、Duplicate/Delete Selection、显式 Clipboard Copy/Paste、Node-level Edge Connection、SVG Renderer 闭环与开发者参考 Examples Application，但仍没有公开 framework adapter 或产品级编辑器外壳。当前不包含 Document Serialization/Persistence、跨版本 Clipboard 格式、Port-aware Connection、Edge/Port 框选、lasso、snapping、pinch/touch 工具、文本编辑、产品节点 UI 或可扩展 Tool Registry。
 :::
 
 当前也没有 Persistence、Collaboration、序列化 schema 或远程同步能力。目标架构中出现某个名称，不代表它已经成为公共 package。

@@ -15,6 +15,7 @@ NodeBraid is at an early implementation stage, but it already has a working head
 - Kernel, Command, Session, History, and Renderer Runtime Plugins;
 - Selection, Viewport, and backend-neutral Renderer value contracts;
 - Backend-neutral Interaction Projections plus Selection, Box Selection, Delete Selection, independent Duplicate Selection, multi-Node Drag, Pan, Wheel Zoom, and node-level Edge Connection Runtime behavior;
+- Pure in-memory `@nodebraid/canvas-fragment` values and explicit Clipboard Copy/Paste with application-owned codec and transport;
 - The reference-quality `@nodebraid/renderer-svg` Provider, with real-Chromium verification of SVG projection, input, Hit Testing, and lifecycle;
 - Layout Input/Engine/Proposal contracts and Runtime Command integration;
 - Dagre full Layout Provider;
@@ -28,7 +29,7 @@ See [All modules](/en/modules/) for the complete inventory.
 ## Current gaps
 
 ::: warning No product-level editor shell yet
-The current branch delivers the Basic Canvas Composition, Interaction v4 Duplicate Selection, Interaction v3 Delete Selection, node-level Edge Connection, the SVG Renderer loop, and a developer-reference Examples Application, but it still has no public framework adapter or product-level editor shell. It does not include Clipboard, Copy/Paste, Serialization/Persistence, Port-aware Connection, Edge/Port box selection, lasso, snapping, pinch/touch tools, text editing, product Node UI, or an extensible Tool Registry.
+The current branch delivers the Basic Canvas Composition, Duplicate/Delete Selection, explicit Clipboard Copy/Paste, node-level Edge Connection, the SVG Renderer loop, and a developer-reference Examples Application, but it still has no public framework adapter or product-level editor shell. It does not include Document Serialization/Persistence, a cross-version Clipboard format, Port-aware Connection, Edge/Port box selection, lasso, snapping, pinch/touch tools, text editing, product Node UI, or an extensible Tool Registry.
 :::
 
 There is also no Persistence, Collaboration, serialization schema, or remote synchronization capability. A name appearing in the target architecture does not mean it has become a public package.

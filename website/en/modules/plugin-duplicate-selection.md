@@ -29,4 +29,4 @@ The Shortcut Plugin does not subscribe to Renderer Input. It registers through t
 
 ## Non-goals
 
-Clipboard, Copy/Paste, Serialization, Persistence, deep cloning, business entity factories, cross-Canvas transfer, async Transactions, collaborative duplication, Canvas Fragment, and Tool Registry remain out of scope.
+Clipboard transport/codec, Serialization, Persistence, deep cloning, business entity factories, async Transactions, collaborative duplication, and Tool Registry remain out of scope. Shared subgraph capture/materialization now comes from the pure `@nodebraid/canvas-fragment` package.

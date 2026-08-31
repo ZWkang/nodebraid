@@ -31,11 +31,12 @@ If you are building an internal NodeBraid package or need only one narrow low-le
 
 - structured errors and Diagnostic Event contracts from `@nodebraid/diagnostics`;
 - the pure graph model, Transactions, Canvas View, Canvas Query, and Change Set from `@nodebraid/kernel`;
+- pure in-memory selected-Node subgraph values from `@nodebraid/canvas-fragment`;
 - immutable Session values from `@nodebraid/session-api`;
 - backend-neutral Renderer contracts from `@nodebraid/renderer-api`;
 - backend-neutral Interaction Projection values from `@nodebraid/interaction-api`;
 - the NodeBraid-owned Plugin Host API from `@nodebraid/runtime-cordis`;
-- the Kernel, Command, Session, Renderer, Interaction, and History Runtime Plugins;
+- the Kernel, Command, Session, Renderer, Interaction, Duplicate Selection, Clipboard, and History Runtime Plugins;
 - the backend-neutral Basic Canvas Composition from `@nodebraid/preset-basic`;
 - the generic Layout API and Layout Runtime Plugin.
 
@@ -73,6 +74,7 @@ The package has one public subpath: `@nodebraid/core`. Representative public ent
 | Layout      | `createLayoutInput`, `defineLayoutEngine`, `createLayoutPlugin`, `LayoutError`                                        |
 | Renderer    | `createRendererPlugin`, `rendererService`, `RendererError`                                                            |
 | Interaction | `interactionPlugin`, `moveNodesCommand`, `createEdgeCommand`, `deleteSelectionCommand`, `interactionDiagnosticEvents` |
+| Clipboard   | `captureCanvasFragment`, `createClipboardPlugin`, `copySelectionToClipboardCommand`, `pasteClipboardCommand`          |
 | Composition | `createBasicCanvasPlugin`, `BasicCanvasPluginOptions`                                                                 |
 | Diagnostics | `NodeBraidError`, `diagnosticEvents`, `describeError`                                                                 |
 

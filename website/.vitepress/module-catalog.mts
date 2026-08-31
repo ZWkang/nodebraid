@@ -80,6 +80,14 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
         summary: { zh: 'Renderer-independent 图内核。', en: 'The renderer-independent graph kernel.' },
       },
       {
+        name: '@nodebraid/canvas-fragment',
+        slug: 'canvas-fragment',
+        summary: {
+          zh: '纯内存 selected-Node 子图值契约。',
+          en: 'Pure in-memory selected-Node subgraph values.',
+        },
+      },
+      {
         name: '@nodebraid/plugin-kernel',
         slug: 'plugin-kernel',
         summary: { zh: 'Kernel Runtime Service adapter。', en: 'The Kernel Runtime Service adapter.' },
@@ -188,6 +196,14 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
         summary: {
           zh: '独立 Duplicate Selection Behavior 与 Shortcut Plugin。',
           en: 'Independent Duplicate Selection Behavior and Shortcut Plugins.',
+        },
+      },
+      {
+        name: '@nodebraid/plugin-clipboard',
+        slug: 'plugin-clipboard',
+        summary: {
+          zh: '显式 Clipboard Copy/Paste Behavior 与 Shortcut Plugin。',
+          en: 'Explicit Clipboard Copy/Paste Behavior and Shortcut Plugins.',
         },
       },
     ],

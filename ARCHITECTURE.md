@@ -259,6 +259,13 @@ const historyConsumer = definePlugin({
 - Collaboration、Comments 和 Presence。
 - BPMN、DAG、AI Workflow 等领域能力。
 
+当前 Clipboard 能力由显式 `@nodebraid/plugin-clipboard` Behavior/Shortcut Plugin
+交付，并与 Duplicate Selection 共用纯 `@nodebraid/canvas-fragment` 内存值 seam。
+Fragment 不是 Serialized Document；应用注入 abort-aware 文本 Transport、具体
+Fragment Text Codec 与 fresh-ID materializer。NodeBraid 不直接访问
+`navigator.clipboard`，不提供静默内存 fallback，也不把 opaque `data` 声明为
+JSON-safe。Copy/Paste 快捷键继续通过唯一 Interaction input authority 组合。
+
 ## 诊断与错误
 
 NodeBraid 将调用失败、无法返回给调用者的 Fault 和普通 Diagnostic Event 分成三条语义不同的路径。成功记录事件不等于处理失败，Diagnostic Sink 不参与 Transaction、Command 或 Plugin 生命周期的控制流。

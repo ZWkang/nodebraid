@@ -14,6 +14,7 @@ Interaction 能力回答“用户输入怎样变成画布语义行为”。它�
 | 值契约       | [`@nodebraid/interaction-api`](/modules/interaction-api)                       | Node Drag、Viewport Pan、Box Selection 与 Connection Preview 不可变 Projection                      |
 | Runtime 行为 | [`@nodebraid/plugin-interaction`](/modules/plugin-interaction)                 | Selection、Box Selection、Delete Selection、multi-Node Drag、Pan、Wheel Zoom、Connection 与生命周期 |
 | 复制行为     | [`@nodebraid/plugin-duplicate-selection`](/modules/plugin-duplicate-selection) | 独立 Duplicate Command、ID materialization、子图复制与 Ctrl/Cmd+D Binding                           |
+| 剪贴板行为   | [`@nodebraid/plugin-clipboard`](/modules/plugin-clipboard)                     | 应用拥有 codec/transport 的 Copy/Paste Command 与 Ctrl/Cmd+C / Ctrl/Cmd+V Binding                   |
 | 投影中介     | [`@nodebraid/plugin-renderer`](/modules/plugin-renderer)                       | 排他的 Interaction Projection Binding 与 Renderer 同步                                              |
 | 参考后端     | [`@nodebraid/renderer-svg`](/modules/renderer-svg)                             | 在真实 SVG Geometry 上显示 Preview，并统一 Hit/Input 坐标                                           |
 
@@ -35,13 +36,14 @@ Interaction Runtime
 - mouse 可从 Node-level source Anchor 建立 Connection Preview，应用 materializer 提供完整 Edge，`interaction.edge.create` 以一次 Transaction 提交。
 - Renderer 拥有 Focus 且没有 Active Gesture 时，Delete 执行 `interaction.selection.delete`：先删除显式或 incident Edge，再删除选中 Node，并自然形成一个可 Undo/Redo 的 History Entry。
 - 独立 Duplicate Selection Plugin 通过 `selection.duplicate` 复制 selected-Node induced subgraph；应用只提供完整 ID mapping，Ctrl/Cmd+D 通过 Interaction Shortcut Binding 接入同一 Command。
+- Clipboard Plugin 通过 [`@nodebraid/canvas-fragment`](/modules/canvas-fragment) 复用同一子图语义；Copy 捕获 committed Fragment，Paste 在一个 Transaction 中 materialize 后更新 Selection。文本 codec、`navigator.clipboard` Adapter 与 opaque data 规则由应用显式提供。
 - Middle button 或 Space+primary 可建立 Pan；Wheel Zoom 按 Screen Point 锚定并受显式配置约束。
 - 同一 Activation 只有一个 Gesture Pointer；额外 Pointer、Gesture 中的 Wheel、pointercancel、lost capture 与 stale evidence 都有明确语义和诊断。
 - 依赖消失或 Plugin unload 会停止输入、清 Preview、释放 Capture、清本地状态并注销 Command；恢复后创建全新 idle Activation。
 
 ## 非目标
 
-首版 Connection 不包含 Port、self-loop、业务 validation 或 Edge Routing；Box Selection 不包含 Edge、Port、Connection Anchor、lasso、方向相关 containment、autoscroll 或 snapping。Delete Selection 不包含 Backspace、Clipboard、确认弹窗、soft delete 或业务权限。pinch/touch 工具、HTML overlay、文本编辑、协作 presence、产品 UI 与通用 Tool Registry 仍不在当前范围。
+首版 Clipboard 不包含 Serialized Document、Persistence、跨版本文本承诺、HTML/image format、rich text 或通用 JSON codec。Connection、Box Selection 与 Delete Selection 的既有非目标保持不变；pinch/touch、HTML overlay、文本编辑、协作 presence、产品 UI 与通用 Tool Registry 仍不在当前范围。
 
 ## 验证
 
