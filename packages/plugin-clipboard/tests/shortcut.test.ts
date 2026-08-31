@@ -27,6 +27,7 @@ test('default Clipboard Shortcuts route exact Mod+C and Mod+V through Interactio
   const renderer = new InputRenderer();
   let text = '';
   let fragment: CanvasFragment | undefined;
+  let encodeCount = 0;
   const sourceId = nodeId('shortcut-source');
   const pastedId = nodeId('shortcut-pasted');
   let kernel: KernelService | undefined;
@@ -57,6 +58,7 @@ test('default Clipboard Shortcuts route exact Mod+C and Mod+V through Interactio
         },
         codec: {
           encode(value) {
+            encodeCount += 1;
             fragment = value;
             return 'nodebraid:test';
           },
@@ -89,6 +91,15 @@ test('default Clipboard Shortcuts route exact Mod+C and Mod+V through Interactio
   expect(
     renderer.emit({ ...modInput('KeyC'), modifiers: { ...modInput('KeyC').modifiers, shift: true } }),
   ).toBeUndefined();
+  expect(
+    renderer.emit({ ...modInput('KeyC'), modifiers: { ...modInput('KeyC').modifiers, alt: true } }),
+  ).toBeUndefined();
+  expect(renderer.emit({ ...modInput('KeyC'), repeat: true })).toEqual({ defaultAction: 'prevent' });
+  renderer.emit(pointerInput('pointer.down'));
+  expect(renderer.emit(modInput('KeyC'))).toEqual({ defaultAction: 'prevent' });
+  renderer.emit(pointerInput('pointer.cancel'));
+  await nextTask();
+  expect(encodeCount).toBe(1);
   await host.dispose();
 });
 
@@ -131,4 +142,17 @@ function modInput(code: 'KeyC' | 'KeyV'): KeyboardInput {
 
 function nextTask(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+function pointerInput(type: 'pointer.down' | 'pointer.cancel'): RendererInput {
+  return {
+    type,
+    pointerId: 7,
+    pointerType: 'mouse',
+    screenPoint: { x: 10, y: 10 },
+    worldPoint: { x: 10, y: 10 },
+    button: type === 'pointer.down' ? 'primary' : null,
+    pressedButtons: type === 'pointer.down' ? ['primary'] : [],
+    modifiers: { alt: false, control: false, meta: false, shift: false },
+  };
 }

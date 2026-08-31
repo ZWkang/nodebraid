@@ -16,16 +16,15 @@ export function materializeCanvasFragment(
   offset: Point,
 ): MaterializedCanvasFragment {
   const fragment = acceptCanvasFragment(fragmentValue);
-  if (!Number.isFinite(offset?.x) || !Number.isFinite(offset?.y)) {
-    throwInvalid('Canvas Fragment materialization offset must be finite.');
-  }
+  const acceptedOffset = acceptOffset(offset);
+  const materialization = acceptMaterializationRecord(materializationValue);
   const nodeMappings = acceptMappings<NodeId, CanvasFragmentNodeIdMapping>(
-    materializationValue?.nodes,
+    materialization.nodes,
     fragment.nodes.map((node) => node.id),
     'Node',
   );
   const edgeMappings = acceptMappings<EdgeId, CanvasFragmentEdgeIdMapping>(
-    materializationValue?.edges,
+    materialization.edges,
     fragment.edges.map((edge) => edge.id),
     'Edge',
   );
@@ -38,7 +37,7 @@ export function materializeCanvasFragment(
       return Object.freeze({
         id,
         type: node.type,
-        position: Object.freeze({ x: node.position.x + offset.x, y: node.position.y + offset.y }),
+        position: Object.freeze({ x: node.position.x + acceptedOffset.x, y: node.position.y + acceptedOffset.y }),
         ...(node.size === undefined ? {} : { size: Object.freeze({ ...node.size }) }),
         ...(parentId === undefined ? {} : { parentId }),
         data: node.data,
@@ -74,6 +73,30 @@ export function materializeCanvasFragment(
       ),
     }),
   });
+}
+
+function acceptOffset(value: unknown): Point {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    throwInvalid('Canvas Fragment materialization offset must be finite.');
+  }
+  const x = Object.getOwnPropertyDescriptor(value, 'x');
+  const y = Object.getOwnPropertyDescriptor(value, 'y');
+  if (!x || !('value' in x) || !y || !('value' in y) || !Number.isFinite(x.value) || !Number.isFinite(y.value)) {
+    throwInvalid('Canvas Fragment materialization offset must be finite data properties.');
+  }
+  return Object.freeze({ x: x.value as number, y: y.value as number });
+}
+
+function acceptMaterializationRecord(value: unknown): Readonly<{ nodes: unknown; edges: unknown }> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    throwInvalid('Canvas Fragment ID materialization is malformed.');
+  }
+  const nodes = Object.getOwnPropertyDescriptor(value, 'nodes');
+  const edges = Object.getOwnPropertyDescriptor(value, 'edges');
+  if (!nodes || !('value' in nodes) || !edges || !('value' in edges)) {
+    throwInvalid('Canvas Fragment ID materialization fields must be data properties.');
+  }
+  return { nodes: nodes.value, edges: edges.value };
 }
 
 function acceptMappings<Id extends string, Mapping extends { readonly sourceId: Id; readonly materializedId: Id }>(

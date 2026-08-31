@@ -89,6 +89,79 @@ test('History Undo removes a Paste and Redo restores only the Document', async (
   await harness.host.dispose();
 });
 
+test('Clipboard preserves nested parents, ports, self-loops, parallel Edges, and boundary scope', async () => {
+  const clipboard = createTokenClipboard();
+  const parent = nodeId('scope-parent');
+  const child = nodeId('scope-child');
+  const outside = nodeId('scope-outside');
+  const firstLoop = edgeId('scope-loop-a');
+  const secondLoop = edgeId('scope-loop-b');
+  const boundary = edgeId('scope-boundary');
+  const parentCopy = nodeId('scope-parent-copy');
+  const childCopy = nodeId('scope-child-copy');
+  const firstLoopCopy = edgeId('scope-loop-a-copy');
+  const secondLoopCopy = edgeId('scope-loop-b-copy');
+  const harness = await createHarness({
+    transport: clipboard.transport,
+    codec: clipboard.codec,
+    materializeIds: ({ nodeIds, edgeIds }) => ({
+      nodes: nodeIds.map((sourceId) => ({
+        sourceId,
+        materializedId: sourceId === parent ? parentCopy : childCopy,
+      })),
+      edges: edgeIds.map((sourceId) => ({
+        sourceId,
+        materializedId: sourceId === firstLoop ? firstLoopCopy : secondLoopCopy,
+      })),
+    }),
+  });
+  harness.kernel.transact((transaction) => {
+    transaction.nodes.add({ id: parent, type: 'group', position: { x: 0, y: 0 }, data: null });
+    transaction.nodes.add({ id: child, type: 'task', position: { x: 10, y: 10 }, parentId: parent, data: null });
+    transaction.nodes.add({ id: outside, type: 'task', position: { x: 100, y: 100 }, data: null });
+    transaction.edges.add({
+      id: firstLoop,
+      type: 'flow',
+      source: { nodeId: child, portId: 'out-a' },
+      target: { nodeId: child, portId: 'in-a' },
+      data: null,
+    });
+    transaction.edges.add({
+      id: secondLoop,
+      type: 'flow',
+      source: { nodeId: child, portId: 'out-b' },
+      target: { nodeId: child, portId: 'in-b' },
+      data: null,
+    });
+    transaction.edges.add({
+      id: boundary,
+      type: 'flow',
+      source: { nodeId: child },
+      target: { nodeId: outside },
+      data: null,
+    });
+  });
+  harness.session.setSelection({ nodeIds: [parent, child], edgeIds: [firstLoop, boundary] });
+  await harness.commands.execute(copySelectionToClipboardCommand, undefined);
+  await harness.commands.execute(pasteClipboardCommand, undefined);
+
+  expect(harness.kernel.read().query.getNode(childCopy)?.parentId).toBe(parentCopy);
+  expect(harness.kernel.read().query.getEdge(firstLoopCopy)).toMatchObject({
+    source: { nodeId: childCopy, portId: 'out-a' },
+    target: { nodeId: childCopy, portId: 'in-a' },
+  });
+  expect(harness.kernel.read().query.getEdge(secondLoopCopy)).toMatchObject({
+    source: { nodeId: childCopy, portId: 'out-b' },
+    target: { nodeId: childCopy, portId: 'in-b' },
+  });
+  expect(harness.kernel.read().snapshot.edges).toHaveLength(5);
+  expect(harness.session.getSnapshot().selection).toEqual({
+    nodeIds: [childCopy, parentCopy],
+    edgeIds: [firstLoopCopy],
+  });
+  await harness.host.dispose();
+});
+
 test('Paste rejects a missing external parent immediately before commit', async () => {
   const clipboard = createTokenClipboard();
   const parent = nodeId('external-parent');
@@ -208,6 +281,79 @@ test('concurrent Paste Commands are independent and repeated Paste keeps one det
   await expect(firstPaste).resolves.toMatchObject({ changeSet: { revision: 3 } });
   expect(harness.kernel.read().query.getNode(nodeId('concurrent-paste-1'))?.position).toEqual({ x: 29, y: 31 });
   expect(harness.kernel.read().query.getNode(nodeId('concurrent-paste-2'))?.position).toEqual({ x: 29, y: 31 });
+  await harness.host.dispose();
+});
+
+test('Copy and Paste execute independently without queuing or rewriting the captured Fragment', async () => {
+  let clipboardText = '';
+  let sequence = 0;
+  let delayWrites = false;
+  let releaseWrite: (() => void) | undefined;
+  const fragments = new Map<string, CanvasFragment>();
+  const first = nodeId('copy-paste-first');
+  const second = nodeId('copy-paste-second');
+  const pasted = nodeId('copy-paste-result');
+  const harness = await createHarness({
+    transport: {
+      async readText() {
+        return clipboardText;
+      },
+      writeText(text) {
+        if (!delayWrites) {
+          clipboardText = text;
+          return Promise.resolve();
+        }
+        return new Promise<void>((resolve) => {
+          releaseWrite = () => {
+            clipboardText = text;
+            resolve();
+          };
+        });
+      },
+    },
+    codec: {
+      encode(fragment) {
+        const text = `copy-paste:${sequence}`;
+        sequence += 1;
+        fragments.set(text, fragment);
+        return text;
+      },
+      decode(text) {
+        return fragments.get(text);
+      },
+    },
+    materializeIds: ({ nodeIds }) => ({
+      nodes: nodeIds.map((sourceId) => ({ sourceId, materializedId: pasted })),
+      edges: [],
+    }),
+  });
+  harness.kernel.transact((transaction) => {
+    transaction.nodes.add({ id: first, type: 'task', position: { x: 1, y: 2 }, data: null });
+    transaction.nodes.add({ id: second, type: 'task', position: { x: 50, y: 60 }, data: null });
+  });
+  harness.session.setSelection({ nodeIds: [first], edgeIds: [] });
+  await harness.commands.execute(copySelectionToClipboardCommand, undefined);
+  harness.session.setSelection({ nodeIds: [second], edgeIds: [] });
+  delayWrites = true;
+  let copySettled = false;
+  const pendingCopy = harness.commands.execute(copySelectionToClipboardCommand, undefined).then(() => {
+    copySettled = true;
+  });
+  harness.kernel.transact((transaction) => {
+    const node = transaction.query.getNode(second);
+    if (!node) throw new Error('Expected concurrent Copy source Node.');
+    transaction.nodes.replace(second, { ...node, position: { x: 70, y: 80 } });
+  });
+
+  await expect(harness.commands.execute(pasteClipboardCommand, undefined)).resolves.toMatchObject({
+    changeSet: { revision: 3 },
+  });
+  expect(copySettled).toBeFalse();
+  expect(harness.kernel.read().query.getNode(pasted)?.position).toEqual({ x: 25, y: 26 });
+  releaseWrite?.();
+  await pendingCopy;
+  expect(fragments.get(clipboardText)?.selection.nodeIds).toEqual([second]);
+  expect(fragments.get(clipboardText)?.nodes[0]?.position).toEqual({ x: 50, y: 60 });
   await harness.host.dispose();
 });
 

@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { extname, resolve, sep } from 'node:path';
 
+import { CdpClient, createAgentBrowserRunner, readAgentBrowserCdpUrl } from './browser-test-harness';
+
 const applicationRoot = resolve(import.meta.dir, '..');
 const repositoryRoot = resolve(applicationRoot, '../..');
 const distributionRoot = resolve(applicationRoot, 'dist');
@@ -8,6 +10,7 @@ const distributionPrefix = `${distributionRoot}${sep}`;
 const index = Bun.file(resolve(distributionRoot, 'index.html'));
 const agentBrowser = resolve(repositoryRoot, 'node_modules/.bin/agent-browser');
 const session = `nodebraid-clipboard-example-${process.pid}`;
+const runAgentBrowser = createAgentBrowserRunner(agentBrowser, repositoryRoot, session);
 
 assert.equal(await index.exists(), true, 'Expected the Examples Application production build.');
 
@@ -28,9 +31,10 @@ const server = Bun.serve({
 
 let client: CdpClient | undefined;
 let browserContextId: string | undefined;
+let scenarioFailure: unknown;
 try {
   await runAgentBrowser(['open', 'about:blank']);
-  const cdpUrl = await readCdpUrl();
+  const cdpUrl = await readAgentBrowserCdpUrl(runAgentBrowser);
   client = await CdpClient.connect(cdpUrl);
   const context = (await client.send('Target.createBrowserContext', {
     disposeOnDetach: true,
@@ -88,7 +92,38 @@ try {
     defaultPrevented: true,
   });
   const copiedText = await evaluate(client, page, 'navigator.clipboard.readText()');
-  assert.equal(JSON.parse(String(copiedText)).type, 'nodebraid.examples/canvas-fragment');
+  const copiedEnvelope = JSON.parse(String(copiedText)) as Readonly<{
+    type: string;
+    version: number;
+    fragment: Readonly<{
+      nodes: readonly Readonly<{
+        id: string;
+        type: string;
+        position: Readonly<{ x: number; y: number }>;
+        data: null;
+      }>[];
+      edges: readonly unknown[];
+      selection: Readonly<{ nodeIds: readonly string[]; edgeIds: readonly string[] }>;
+    }>;
+  }>;
+  assert.deepEqual(copiedEnvelope, {
+    type: 'nodebraid.examples/canvas-fragment',
+    version: 1,
+    fragment: {
+      type: 'nodebraid.canvas-fragment',
+      nodes: [
+        {
+          id: 'example-discover',
+          type: 'step',
+          position: { x: 80, y: 100 },
+          size: { width: 160, height: 88 },
+          data: null,
+        },
+      ],
+      edges: [],
+      selection: { nodeIds: ['example-discover'], edgeIds: [] },
+    },
+  });
 
   await installKeyObservation(client, page, 'paste', 'KeyV');
   await dispatchModKey(client, page, 'v');
@@ -112,6 +147,17 @@ try {
     trusted: true,
     defaultPrevented: true,
   });
+  assert.deepEqual(
+    await evaluate(
+      client,
+      page,
+      `(() => {
+        const node = document.querySelector('[data-nodebraid-node-id="example-clipboard-node-1"]');
+        return { x: node?.getAttribute('x'), y: node?.getAttribute('y') };
+      })()`,
+    ),
+    { x: '104', y: '124' },
+  );
 
   await clickControl(client, page, 'Undo');
   assert.deepEqual(await readMetrics(client, page, { revision: '3', nodes: '3', selection: 'None' }), {
@@ -126,13 +172,23 @@ try {
     selection: 'None',
   });
 
+  await evaluate(client, page, `document.querySelector('.canvas-target')?.focus()`);
   await evaluate(client, page, `navigator.clipboard.writeText('foreign clipboard text')`);
   await dispatchModKey(client, page, 'v');
-  assert.deepEqual(await readMetrics(client, page, { revision: '4', nodes: '4', selection: 'None' }), {
-    revision: '4',
-    nodes: '4',
-    selection: 'None',
-  });
+  assert.deepEqual(
+    await readMetrics(client, page, {
+      revision: '4',
+      nodes: '4',
+      selection: 'None',
+      'clipboard-failure': 'CODEC_DECODE_FAILED:SyntaxError',
+    }),
+    {
+      revision: '4',
+      nodes: '4',
+      selection: 'None',
+      'clipboard-failure': 'CODEC_DECODE_FAILED:SyntaxError',
+    },
+  );
 
   await setClipboardPermission(client, browserContextId, 'denied');
   await installKeyObservation(client, page, 'denied', 'KeyV');
@@ -141,11 +197,20 @@ try {
     trusted: true,
     defaultPrevented: true,
   });
-  assert.deepEqual(await readMetrics(client, page, { revision: '4', nodes: '4', selection: 'None' }), {
-    revision: '4',
-    nodes: '4',
-    selection: 'None',
-  });
+  assert.deepEqual(
+    await readMetrics(client, page, {
+      revision: '4',
+      nodes: '4',
+      selection: 'None',
+      'clipboard-failure': 'TRANSPORT_READ_FAILED:NotAllowedError',
+    }),
+    {
+      revision: '4',
+      nodes: '4',
+      selection: 'None',
+      'clipboard-failure': 'TRANSPORT_READ_FAILED:NotAllowedError',
+    },
+  );
   await setClipboardPermission(client, browserContextId, 'granted');
 
   await clickControl(client, page, 'Disable clipboard shortcuts');
@@ -169,13 +234,34 @@ try {
     trusted: true,
     defaultPrevented: false,
   });
+} catch (error) {
+  scenarioFailure = error;
 } finally {
+  const failures: unknown[] = scenarioFailure === undefined ? [] : [scenarioFailure];
   if (client && browserContextId) {
-    await client.send('Target.disposeBrowserContext', { browserContextId }).catch(() => undefined);
+    try {
+      await client.send('Target.disposeBrowserContext', { browserContextId });
+    } catch (error) {
+      failures.push(error);
+    }
   }
-  client?.close();
-  await runAgentBrowser(['close']);
-  await server.stop(true);
+  try {
+    client?.close();
+  } catch (error) {
+    failures.push(error);
+  }
+  try {
+    await runAgentBrowser(['close']);
+  } catch (error) {
+    failures.push(error);
+  }
+  try {
+    await server.stop(true);
+  } catch (error) {
+    failures.push(error);
+  }
+  if (failures.length === 1) throw failures[0];
+  if (failures.length > 1) throw new AggregateError(failures, 'Clipboard browser scenario and cleanup failed.');
 }
 
 async function setClipboardPermission(
@@ -300,86 +386,4 @@ async function evaluate(client: CdpClient, page: string, expression: string): Pr
     );
   }
   return response.result.value;
-}
-
-async function readCdpUrl(): Promise<string> {
-  const output = await runAgentBrowser(['get', 'cdp-url', '--json']);
-  const response = JSON.parse(output) as Readonly<{
-    success: boolean;
-    data: Readonly<{ cdpUrl: string }> | null;
-    error: unknown;
-  }>;
-  assert.equal(response.success, true, JSON.stringify(response.error));
-  assert.ok(response.data?.cdpUrl);
-  return response.data.cdpUrl;
-}
-
-class CdpClient {
-  readonly #socket: WebSocket;
-  readonly #pending = new Map<
-    number,
-    Readonly<{ resolve: (result: unknown) => void; reject: (error: Error) => void }>
-  >();
-  #nextId = 1;
-
-  private constructor(socket: WebSocket) {
-    this.#socket = socket;
-    socket.addEventListener('message', (event) => {
-      if (typeof event.data !== 'string') return;
-      const message = JSON.parse(event.data) as Readonly<{
-        id?: number;
-        result?: unknown;
-        error?: Readonly<{ message?: string }>;
-      }>;
-      if (message.id === undefined) return;
-      const pending = this.#pending.get(message.id);
-      if (!pending) return;
-      this.#pending.delete(message.id);
-      if (message.error) pending.reject(new Error(message.error.message ?? 'CDP command failed.'));
-      else pending.resolve(message.result);
-    });
-  }
-
-  static async connect(url: string): Promise<CdpClient> {
-    const socket = new WebSocket(url);
-    await new Promise<void>((resolve, reject) => {
-      socket.addEventListener('open', () => resolve(), { once: true });
-      socket.addEventListener('error', () => reject(new Error('Failed to connect to Clipboard CDP.')), { once: true });
-    });
-    return new CdpClient(socket);
-  }
-
-  send(method: string, params: Readonly<Record<string, unknown>> = {}, sessionId?: string): Promise<unknown> {
-    const id = this.#nextId;
-    this.#nextId += 1;
-    const result = new Promise<unknown>((resolve, reject) => this.#pending.set(id, { resolve, reject }));
-    this.#socket.send(JSON.stringify({ id, method, params, ...(sessionId === undefined ? {} : { sessionId }) }));
-    return result;
-  }
-
-  close(): void {
-    this.#socket.close();
-  }
-}
-
-async function runAgentBrowser(arguments_: readonly string[]): Promise<string> {
-  const process = Bun.spawn([agentBrowser, '--session', session, ...arguments_], {
-    cwd: repositoryRoot,
-    env: processEnv(),
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  const [stdout, stderr, exitCode] = await Promise.all([
-    new Response(process.stdout).text(),
-    new Response(process.stderr).text(),
-    process.exited,
-  ]);
-  assert.equal(exitCode, 0, stderr || stdout);
-  return stdout.trim();
-}
-
-function processEnv(): Record<string, string> {
-  return Object.fromEntries(
-    Object.entries(process.env).filter((entry): entry is [string, string] => entry[1] !== undefined),
-  );
 }

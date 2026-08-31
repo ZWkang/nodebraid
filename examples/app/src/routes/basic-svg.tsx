@@ -23,6 +23,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { type ExampleRuntime } from '@/example-runtime/create-example-runtime';
 import { runtimeMountCoordinator } from '@/example-runtime/runtime-mount-coordinator';
 import {
+  useClipboardFailure,
   useHistorySnapshot,
   useKernelView,
   useOptionalHistorySnapshot,
@@ -233,6 +234,7 @@ function RuntimeStatus({ copy, runtime }: Readonly<{ copy: Copy; runtime: Exampl
   const view = useKernelView(runtime);
   const session = useSessionSnapshot(runtime);
   const history = useHistorySnapshot(runtime);
+  const clipboardFailure = useClipboardFailure(runtime);
   const selected = [...session.selection.nodeIds, ...session.selection.edgeIds];
 
   return (
@@ -260,6 +262,11 @@ function RuntimeStatus({ copy, runtime }: Readonly<{ copy: Copy; runtime: Exampl
             name="history"
             value={`${history.canUndo ? copy.undo : '—'} / ${history.canRedo ? copy.redo : '—'}`}
             icon={<HistoryIcon />}
+          />
+          <Metric
+            label={copy.clipboardFailure}
+            name="clipboard-failure"
+            value={clipboardFailure ? `${clipboardFailure.code}:${clipboardFailure.causeName}` : copy.none}
           />
         </dl>
       </CardContent>
@@ -363,6 +370,7 @@ interface Copy {
   readonly selection: string;
   readonly zoom: string;
   readonly history: string;
+  readonly clipboardFailure: string;
   readonly none: string;
   readonly instructions: string;
   readonly instructionsDescription: string;
@@ -397,6 +405,7 @@ const translations: Readonly<Record<Language, Copy>> = {
     selection: 'Selection',
     zoom: 'Zoom',
     history: 'History',
+    clipboardFailure: 'Clipboard failure',
     none: 'None',
     instructions: 'Try the interaction loop',
     instructionsDescription: 'Every stable graph change becomes a Kernel Commit.',
@@ -437,6 +446,7 @@ const translations: Readonly<Record<Language, Copy>> = {
     selection: 'Selection',
     zoom: '缩放',
     history: 'History',
+    clipboardFailure: 'Clipboard failure',
     none: '无',
     instructions: '体验完整交互闭环',
     instructionsDescription: '每次稳定图变化都会成为一个 Kernel Commit。',

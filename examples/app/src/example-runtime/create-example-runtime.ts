@@ -13,6 +13,7 @@ import {
   nodeId,
   rendererService,
   sessionService,
+  type ClipboardErrorCode,
   type CommandService,
   type HistoryService,
   type KernelService,
@@ -22,18 +23,44 @@ import { createSvgRenderer } from '@nodebraid/renderer-svg';
 
 import { createNavigatorClipboardTransport, exampleCanvasFragmentTextCodec } from './clipboard-adapters';
 
+export interface ClipboardFailureSnapshot {
+  readonly code: ClipboardErrorCode;
+  readonly causeName: string;
+}
+
 export interface ExampleRuntime {
   readonly commands: CommandService;
   readonly history: HistoryService;
   readonly kernel: KernelService;
   readonly session: SessionService;
+  getClipboardFailure(): ClipboardFailureSnapshot | undefined;
+  subscribeClipboardFailure(listener: () => void): () => void;
   disposeClipboardShortcuts(): Promise<void>;
   disposeDuplicateShortcut(): Promise<void>;
   dispose(): Promise<void>;
 }
 
 export async function createExampleRuntime(target: SVGSVGElement): Promise<ExampleRuntime> {
-  const host = createPluginHost();
+  let clipboardFailure: ClipboardFailureSnapshot | undefined;
+  const clipboardFailureListeners = new Set<() => void>();
+  const host = createPluginHost({
+    diagnostics: {
+      faultReporter(fault) {
+        const clipboardError = findClipboardError(fault.error);
+        if (!clipboardError) {
+          queueMicrotask(() => {
+            throw fault.error;
+          });
+          return;
+        }
+        clipboardFailure = Object.freeze({
+          code: clipboardError.code,
+          causeName: describeCauseName(clipboardError.cause),
+        });
+        for (const listener of [...clipboardFailureListeners]) listener();
+      },
+    },
+  });
   let nextEdgeSequence = 1;
   let nextDuplicateNodeSequence = 1;
   let nextDuplicateEdgeSequence = 1;
@@ -170,12 +197,51 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       history,
       kernel,
       session,
+      getClipboardFailure: () => clipboardFailure,
+      subscribeClipboardFailure(listener: () => void) {
+        clipboardFailureListeners.add(listener);
+        return () => clipboardFailureListeners.delete(listener);
+      },
       disposeClipboardShortcuts: () => clipboardShortcuts.dispose(),
       disposeDuplicateShortcut: () => duplicateSelectionShortcut.dispose(),
-      dispose: () => host.dispose(),
+      async dispose() {
+        try {
+          await host.dispose();
+        } finally {
+          clipboardFailureListeners.clear();
+        }
+      },
     });
   } catch (error) {
     await host.dispose();
     throw error;
   }
+}
+
+function describeCauseName(cause: unknown): string {
+  if (cause instanceof Error) return cause.name;
+  return cause === undefined ? 'None' : typeof cause;
+}
+
+function findClipboardError(
+  error: unknown,
+  seen = new Set<object>(),
+): (Error & Readonly<{ domain: 'plugin.clipboard'; code: ClipboardErrorCode; cause?: unknown }>) | undefined {
+  if (typeof error !== 'object' || error === null || seen.has(error)) return undefined;
+  seen.add(error);
+  if (error instanceof Error && Reflect.get(error, 'domain') === 'plugin.clipboard') {
+    return error as Error &
+      Readonly<{
+        domain: 'plugin.clipboard';
+        code: ClipboardErrorCode;
+        cause?: unknown;
+      }>;
+  }
+  if (error instanceof AggregateError) {
+    for (const nested of error.errors) {
+      const found = findClipboardError(nested, seen);
+      if (found) return found;
+    }
+  }
+  return error instanceof Error ? findClipboardError(error.cause, seen) : undefined;
 }

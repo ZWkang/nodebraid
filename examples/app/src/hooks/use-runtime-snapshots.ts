@@ -22,6 +22,12 @@ export function useHistorySnapshot(runtime: ExampleRuntime) {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
 
+export function useClipboardFailure(runtime: ExampleRuntime) {
+  const subscribe = useCallback((listener: () => void) => runtime.subscribeClipboardFailure(listener), [runtime]);
+  const getSnapshot = useCallback(() => runtime.getClipboardFailure(), [runtime]);
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+}
+
 export function useOptionalHistorySnapshot(runtime: ExampleRuntime | undefined) {
   const subscribe = useCallback(
     (listener: () => void) => runtime?.history.subscribe(listener) ?? (() => {}),

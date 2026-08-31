@@ -1,16 +1,15 @@
-import { captureCanvasFragment, materializeCanvasFragment } from '@nodebraid/canvas-fragment';
-import type { CanvasEdge, CanvasNode, EdgeId, NodeId } from '@nodebraid/kernel';
+import {
+  CanvasFragmentError,
+  captureCanvasFragment,
+  materializeCanvasFragment,
+  type CanvasFragmentIdMaterialization,
+} from '@nodebraid/canvas-fragment';
+import type { CanvasEdge, EdgeId, NodeId } from '@nodebraid/kernel';
 import { defineCommand, type CommandHandler } from '@nodebraid/plugin-command';
 import type { KernelService } from '@nodebraid/plugin-kernel';
 import type { SessionService } from '@nodebraid/plugin-session';
 
-import type {
-  CreateDuplicateSelectionPluginOptions,
-  DuplicateEdgeIdMapping,
-  DuplicateIdMaterialization,
-  DuplicateNodeIdMapping,
-  DuplicateSelectionResult,
-} from './contracts';
+import type { CreateDuplicateSelectionPluginOptions, DuplicateSelectionResult } from './contracts';
 import { DuplicateSelectionError } from './duplicate-selection-error';
 
 export const duplicateSelectionCommand = defineCommand<void, DuplicateSelectionResult>('selection.duplicate');
@@ -35,21 +34,15 @@ export function createDuplicateSelectionHandler(
     });
     const rawMaterialization = options.materializeIds(materializerInput);
     if (isThenable(rawMaterialization)) throwInvalidMaterialization('Duplicate ID Materializer must be synchronous.');
-    const materialization = acceptMaterialization(rawMaterialization, sourceNodes, sourceEdges);
-    const duplicates = materializeCanvasFragment(
-      fragment,
-      {
-        nodes: materialization.nodes.map((mapping) => ({
-          sourceId: mapping.sourceId,
-          materializedId: mapping.duplicateId,
-        })),
-        edges: materialization.edges.map((mapping) => ({
-          sourceId: mapping.sourceId,
-          materializedId: mapping.duplicateId,
-        })),
-      },
-      options.offset,
-    );
+    let duplicates;
+    try {
+      duplicates = materializeCanvasFragment(fragment, translateMaterialization(rawMaterialization), options.offset);
+    } catch (error) {
+      if (error instanceof CanvasFragmentError && error.code === 'INVALID_MATERIALIZATION') {
+        throwInvalidMaterialization(error.message);
+      }
+      throw error;
+    }
     execution.signal.throwIfAborted();
     if (session.getSnapshot().selection !== selection) throwStaleDuplicate();
 
@@ -98,64 +91,32 @@ export function createDuplicateSelectionHandler(
   };
 }
 
-function acceptMaterialization(
-  value: unknown,
-  sourceNodes: readonly CanvasNode[],
-  sourceEdges: readonly CanvasEdge[],
-): DuplicateIdMaterialization {
+function translateMaterialization(value: unknown): CanvasFragmentIdMaterialization {
   if (!isRecord(value) || !Array.isArray(value.nodes) || !Array.isArray(value.edges)) {
     throwInvalidMaterialization('Duplicate ID Materialization is malformed.');
   }
-  const nodes = acceptMappings(
-    value.nodes,
-    sourceNodes.map((node) => node.id),
-    'node',
-  );
-  const edges = acceptMappings(
-    value.edges,
-    sourceEdges.map((edge) => edge.id),
-    'edge',
-  );
-  return Object.freeze({ nodes, edges });
+  return Object.freeze({
+    nodes: Object.freeze(value.nodes.map((mapping) => translateMapping<NodeId>(mapping, 'Node'))),
+    edges: Object.freeze(value.edges.map((mapping) => translateMapping<EdgeId>(mapping, 'Edge'))),
+  });
 }
 
-function acceptMappings<Id extends NodeId | EdgeId>(
-  values: readonly unknown[],
-  sourceIds: readonly Id[],
-  entity: 'node',
-): readonly DuplicateNodeIdMapping[];
-function acceptMappings<Id extends NodeId | EdgeId>(
-  values: readonly unknown[],
-  sourceIds: readonly Id[],
-  entity: 'edge',
-): readonly DuplicateEdgeIdMapping[];
-function acceptMappings(
-  values: readonly unknown[],
-  sourceIds: readonly string[],
-  entity: 'node' | 'edge',
-): readonly Readonly<{ sourceId: string; duplicateId: string }>[] {
-  const expected = new Set(sourceIds);
-  const seenSources = new Set<string>();
-  const seenDuplicates = new Set<string>();
-  const accepted = values.map((value) => {
-    if (
-      !isRecord(value) ||
-      typeof value.sourceId !== 'string' ||
-      typeof value.duplicateId !== 'string' ||
-      value.duplicateId.length === 0 ||
-      !expected.has(value.sourceId) ||
-      seenSources.has(value.sourceId) ||
-      seenDuplicates.has(value.duplicateId)
-    ) {
-      throwInvalidMaterialization(`Duplicate ${entity} ID mapping is invalid.`);
-    }
-    seenSources.add(value.sourceId);
-    seenDuplicates.add(value.duplicateId);
-    return Object.freeze({ sourceId: value.sourceId, duplicateId: value.duplicateId });
-  });
-  if (seenSources.size !== sourceIds.length)
-    throwInvalidMaterialization(`Duplicate ${entity} ID mapping is incomplete.`);
-  return Object.freeze(accepted.sort((left, right) => compareIds(left.sourceId, right.sourceId)));
+function translateMapping<Id extends string>(
+  value: unknown,
+  entity: 'Node' | 'Edge',
+): Readonly<{ sourceId: Id; materializedId: Id }> {
+  if (!isRecord(value)) throwInvalidMaterialization(`Duplicate ${entity} ID mapping is malformed.`);
+  const sourceId = readDataProperty(value, 'sourceId', entity);
+  const materializedId = readDataProperty(value, 'duplicateId', entity);
+  return Object.freeze({ sourceId, materializedId }) as Readonly<{ sourceId: Id; materializedId: Id }>;
+}
+
+function readDataProperty(record: object, key: string, entity: 'Node' | 'Edge'): unknown {
+  const descriptor = Object.getOwnPropertyDescriptor(record, key);
+  if (!descriptor || !('value' in descriptor)) {
+    throwInvalidMaterialization(`Duplicate ${entity} ID mapping fields must be data properties.`);
+  }
+  return descriptor.value;
 }
 
 function collectInternalEdges(

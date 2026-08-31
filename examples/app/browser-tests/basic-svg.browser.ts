@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { extname, resolve, sep } from 'node:path';
 
+import { CdpClient, createAgentBrowserRunner, readAgentBrowserCdpUrl, type CdpSend } from './browser-test-harness';
+
 interface AgentBrowserJson<Result> {
   readonly success: boolean;
   readonly data: Readonly<{ result: Result }> | null;
@@ -14,6 +16,7 @@ const distributionPrefix = `${distributionRoot}${sep}`;
 const index = Bun.file(resolve(distributionRoot, 'index.html'));
 const agentBrowser = resolve(repositoryRoot, 'node_modules/.bin/agent-browser');
 const session = `nodebraid-basic-svg-example-${process.pid}`;
+const runAgentBrowser = createAgentBrowserRunner(agentBrowser, repositoryRoot, session);
 
 assert.equal(await index.exists(), true, 'Expected the Examples Application production build.');
 
@@ -87,6 +90,7 @@ try {
       selection: 'None',
       zoom: '1.00×',
       history: 'Undo / —',
+      'clipboard-failure': 'None',
     },
   });
 
@@ -487,73 +491,23 @@ async function waitForControlDisabled(label: string): Promise<void> {
   `);
 }
 
-type CdpSend = (method: string, params?: Readonly<Record<string, unknown>>) => Promise<unknown>;
-
 async function withExamplePageCdp(run: (sendPage: CdpSend) => Promise<void>): Promise<void> {
-  const cdpOutput = await runAgentBrowser(['get', 'cdp-url', '--json']);
-  const cdpResponse = JSON.parse(cdpOutput) as Readonly<{
-    success: boolean;
-    data: Readonly<{ cdpUrl: string }> | null;
-    error: unknown;
-  }>;
-  assert.equal(cdpResponse.success, true, JSON.stringify(cdpResponse.error));
-  const cdpUrl = cdpResponse.data?.cdpUrl;
-  assert.ok(cdpUrl);
-  const socket = new WebSocket(cdpUrl);
-  await new Promise<void>((resolve, reject) => {
-    socket.addEventListener('open', () => resolve(), { once: true });
-    socket.addEventListener('error', () => reject(new Error('Failed to connect to agent-browser CDP.')), {
-      once: true,
-    });
-  });
-  let nextId = 1;
-  const pending = new Map<
-    number,
-    Readonly<{
-      resolve: (result: unknown) => void;
-      reject: (error: Error) => void;
-    }>
-  >();
-  socket.addEventListener('message', (event) => {
-    if (typeof event.data !== 'string') return;
-    const message = JSON.parse(event.data) as Readonly<{
-      id?: number;
-      result?: unknown;
-      error?: Readonly<{ message?: string }>;
-    }>;
-    if (message.id === undefined) return;
-    const waiter = pending.get(message.id);
-    if (!waiter) return;
-    pending.delete(message.id);
-    if (message.error) waiter.reject(new Error(message.error.message ?? 'CDP command failed.'));
-    else waiter.resolve(message.result);
-  });
-  const send = (
-    method: string,
-    params: Readonly<Record<string, unknown>> = {},
-    sessionId?: string,
-  ): Promise<unknown> => {
-    const id = nextId;
-    nextId += 1;
-    const result = new Promise<unknown>((resolve, reject) => pending.set(id, { resolve, reject }));
-    socket.send(JSON.stringify({ id, method, params, ...(sessionId === undefined ? {} : { sessionId }) }));
-    return result;
-  };
+  const client = await CdpClient.connect(await readAgentBrowserCdpUrl(runAgentBrowser));
   try {
-    const targetResult = (await send('Target.getTargets')) as Readonly<{
+    const targetResult = (await client.send('Target.getTargets')) as Readonly<{
       targetInfos: readonly Readonly<{ targetId: string; type: string; url: string; browserContextId?: string }>[];
     }>;
     const page = targetResult.targetInfos.find(
       (targetInfo) => targetInfo.type === 'page' && targetInfo.url.startsWith(server.url.origin),
     );
     assert.ok(page, 'Expected the Examples Application CDP page target.');
-    const attachment = (await send('Target.attachToTarget', {
+    const attachment = (await client.send('Target.attachToTarget', {
       targetId: page.targetId,
       flatten: true,
     })) as Readonly<{ sessionId: string }>;
-    await run((method, params = {}) => send(method, params, attachment.sessionId));
+    await run((method, params = {}) => client.send(method, params, attachment.sessionId));
   } finally {
-    socket.close();
+    client.close();
   }
 }
 
@@ -629,26 +583,4 @@ async function evaluateBrowserScenario<Result = unknown>(expression: string): Pr
   assert.equal(response.success, true, JSON.stringify(response.error));
   assert.ok(response.data, `Browser scenario returned no data: ${expression}`);
   return response.data.result;
-}
-
-async function runAgentBrowser(arguments_: readonly string[]): Promise<string> {
-  const process = Bun.spawn([agentBrowser, '--session', session, ...arguments_], {
-    cwd: repositoryRoot,
-    env: processEnv(),
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  const [stdout, stderr, exitCode] = await Promise.all([
-    new Response(process.stdout).text(),
-    new Response(process.stderr).text(),
-    process.exited,
-  ]);
-  assert.equal(exitCode, 0, stderr || stdout);
-  return stdout.trim();
-}
-
-function processEnv(): Record<string, string> {
-  return Object.fromEntries(
-    Object.entries(process.env).filter((entry): entry is [string, string] => entry[1] !== undefined),
-  );
 }

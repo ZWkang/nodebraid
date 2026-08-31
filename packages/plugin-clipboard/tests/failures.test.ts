@@ -49,6 +49,42 @@ test('Clipboard external transport and codec failures keep stable identities and
     cause: readFailure,
   });
   await readHarness.host.dispose();
+
+  const writeFailure = new DOMException('write denied', 'NotAllowedError');
+  const writeHarness = await createHarness({
+    transport: {
+      readText: async () => '',
+      writeText: async () => {
+        throw writeFailure;
+      },
+    },
+    codec: { encode: () => 'fragment', decode: () => undefined },
+    materializeIds: () => ({ nodes: [], edges: [] }),
+  });
+  await expect(writeHarness.commands.execute(copySelectionToClipboardCommand, undefined)).rejects.toMatchObject({
+    domain: 'plugin.clipboard',
+    code: 'TRANSPORT_WRITE_FAILED',
+    cause: writeFailure,
+  });
+  await writeHarness.host.dispose();
+
+  const decodeFailure = new Error('decode failed');
+  const decodeHarness = await createHarness({
+    transport: { readText: async () => 'fragment', writeText: async () => undefined },
+    codec: {
+      encode: () => '',
+      decode() {
+        throw decodeFailure;
+      },
+    },
+    materializeIds: () => ({ nodes: [], edges: [] }),
+  });
+  await expect(decodeHarness.commands.execute(pasteClipboardCommand, undefined)).rejects.toMatchObject({
+    domain: 'plugin.clipboard',
+    code: 'CODEC_DECODE_FAILED',
+    cause: decodeFailure,
+  });
+  await decodeHarness.host.dispose();
 });
 
 test('Paste rejects foreign decoded values and incomplete mapping without a Commit', async () => {
@@ -84,6 +120,33 @@ test('Paste rejects foreign decoded values and incomplete mapping without a Comm
   });
   expect(mappingHarness.kernel.read().snapshot.revision).toBe(mappingRevision);
   await mappingHarness.host.dispose();
+});
+
+test('Paste wraps a Kernel validation rejection as COMMIT_FAILED without partial state', async () => {
+  const source = nodeId('overflow-source');
+  const pasted = nodeId('overflow-pasted');
+  const fragment = {
+    type: 'nodebraid.canvas-fragment' as const,
+    nodes: [{ id: source, type: 'task', position: { x: Number.MAX_VALUE, y: 0 }, data: null }],
+    edges: [],
+    selection: { nodeIds: [source], edgeIds: [] },
+  };
+  const harness = await createHarness({
+    transport: { readText: async () => 'fragment', writeText: async () => undefined },
+    codec: { encode: () => '', decode: () => fragment },
+    materializeIds: () => ({ nodes: [{ sourceId: source, materializedId: pasted }], edges: [] }),
+    offset: { x: Number.MAX_VALUE, y: 0 },
+  });
+  const revision = harness.kernel.read().snapshot.revision;
+
+  await expect(harness.commands.execute(pasteClipboardCommand, undefined)).rejects.toMatchObject({
+    domain: 'plugin.clipboard',
+    code: 'COMMIT_FAILED',
+    cause: expect.objectContaining({ domain: 'kernel', code: 'INVALID_GRAPH' }),
+  });
+  expect(harness.kernel.read().snapshot.revision).toBe(revision);
+  expect(harness.kernel.read().query.getNode(pasted)).toBeUndefined();
+  await harness.host.dispose();
 });
 
 async function createHarness(options: CreateClipboardPluginOptions): Promise<{
