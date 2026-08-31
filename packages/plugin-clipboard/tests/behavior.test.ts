@@ -53,6 +53,8 @@ test('Copy keeps empty and edge-only Selection as no-ops without codec or transp
       data: null,
     });
   });
+
+  await expect(harness.commands.execute(copySelectionToClipboardCommand, undefined)).resolves.toBeNull();
   harness.session.setSelection({ nodeIds: [], edgeIds: [edge] });
 
   await expect(harness.commands.execute(copySelectionToClipboardCommand, undefined)).resolves.toBeNull();

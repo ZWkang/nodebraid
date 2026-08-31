@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 
-import { nodeId } from '@nodebraid/kernel';
+import { edgeId, nodeId } from '@nodebraid/kernel';
 import { commandPlugin, commandService, type CommandService } from '@nodebraid/plugin-command';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
 import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/plugin-session';
@@ -178,6 +178,91 @@ test('Paste wraps a Kernel validation rejection as COMMIT_FAILED without partial
   expect(harness.kernel.read().snapshot.revision).toBe(revision);
   expect(harness.kernel.read().query.getNode(pasted)).toBeUndefined();
   await harness.host.dispose();
+});
+
+test('Paste rejects occupied materialized Node and Edge IDs atomically', async () => {
+  const fragmentNode = nodeId('conflict-fragment-node');
+  const occupiedNode = nodeId('selected');
+  const nodeFragment = {
+    type: 'nodebraid.canvas-fragment' as const,
+    nodes: [{ id: fragmentNode, type: 'task', position: { x: 10, y: 10 }, data: null }],
+    edges: [],
+    selection: { nodeIds: [fragmentNode], edgeIds: [] },
+  };
+  const nodeConflictHarness = await createHarness({
+    transport: { readText: async () => 'node-conflict', writeText: async () => undefined },
+    codec: { encode: () => '', decode: () => nodeFragment },
+    materializeIds: () => ({
+      nodes: [{ sourceId: fragmentNode, materializedId: occupiedNode }],
+      edges: [],
+    }),
+  });
+  const nodeRevision = nodeConflictHarness.kernel.read().snapshot.revision;
+
+  await expect(nodeConflictHarness.commands.execute(pasteClipboardCommand, undefined)).rejects.toMatchObject({
+    domain: 'plugin.clipboard',
+    code: 'TARGET_CONFLICT',
+  });
+  expect(nodeConflictHarness.kernel.read().snapshot.revision).toBe(nodeRevision);
+  expect(nodeConflictHarness.kernel.read().snapshot.nodes).toHaveLength(1);
+  await nodeConflictHarness.host.dispose();
+
+  const occupiedTarget = nodeId('conflict-occupied-target');
+  const occupiedEdge = edgeId('conflict-occupied-edge');
+  const fragmentA = nodeId('conflict-fragment-a');
+  const fragmentB = nodeId('conflict-fragment-b');
+  const fragmentEdge = edgeId('conflict-fragment-edge');
+  const materializedA = nodeId('conflict-materialized-a');
+  const materializedB = nodeId('conflict-materialized-b');
+  const edgeFragment = {
+    type: 'nodebraid.canvas-fragment' as const,
+    nodes: [
+      { id: fragmentA, type: 'task', position: { x: 0, y: 0 }, data: null },
+      { id: fragmentB, type: 'task', position: { x: 20, y: 20 }, data: null },
+    ],
+    edges: [
+      {
+        id: fragmentEdge,
+        type: 'flow',
+        source: { nodeId: fragmentA },
+        target: { nodeId: fragmentB },
+        data: null,
+      },
+    ],
+    selection: { nodeIds: [fragmentA, fragmentB], edgeIds: [fragmentEdge] },
+  };
+  const edgeConflictHarness = await createHarness({
+    transport: { readText: async () => 'edge-conflict', writeText: async () => undefined },
+    codec: { encode: () => '', decode: () => edgeFragment },
+    materializeIds: () => ({
+      nodes: [
+        { sourceId: fragmentA, materializedId: materializedA },
+        { sourceId: fragmentB, materializedId: materializedB },
+      ],
+      edges: [{ sourceId: fragmentEdge, materializedId: occupiedEdge }],
+    }),
+  });
+  edgeConflictHarness.kernel.transact((transaction) => {
+    transaction.nodes.add({ id: occupiedTarget, type: 'task', position: { x: 50, y: 50 }, data: null });
+    transaction.edges.add({
+      id: occupiedEdge,
+      type: 'flow',
+      source: { nodeId: occupiedNode },
+      target: { nodeId: occupiedTarget },
+      data: null,
+    });
+  });
+  const edgeRevision = edgeConflictHarness.kernel.read().snapshot.revision;
+
+  await expect(edgeConflictHarness.commands.execute(pasteClipboardCommand, undefined)).rejects.toMatchObject({
+    domain: 'plugin.clipboard',
+    code: 'TARGET_CONFLICT',
+  });
+  expect(edgeConflictHarness.kernel.read().snapshot.revision).toBe(edgeRevision);
+  expect(edgeConflictHarness.kernel.read().query.getNode(materializedA)).toBeUndefined();
+  expect(edgeConflictHarness.kernel.read().query.getNode(materializedB)).toBeUndefined();
+  expect(edgeConflictHarness.kernel.read().query.getEdge(occupiedEdge)).toBeDefined();
+  await edgeConflictHarness.host.dispose();
 });
 
 async function createHarness(options: CreateClipboardPluginOptions): Promise<{
