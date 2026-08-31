@@ -77,6 +77,7 @@ try {
       'Fit view',
       'Reset view',
       'Reset example',
+      'Disable clipboard shortcuts',
       'Disable duplicate shortcut',
     ],
     metrics: {
@@ -486,9 +487,9 @@ async function waitForControlDisabled(label: string): Promise<void> {
   `);
 }
 
-type PageCdpSend = (method: string, params?: Readonly<Record<string, unknown>>) => Promise<unknown>;
+type CdpSend = (method: string, params?: Readonly<Record<string, unknown>>) => Promise<unknown>;
 
-async function withExamplePageCdp(run: (send: PageCdpSend) => Promise<void>): Promise<void> {
+async function withExamplePageCdp(run: (sendPage: CdpSend) => Promise<void>): Promise<void> {
   const cdpOutput = await runAgentBrowser(['get', 'cdp-url', '--json']);
   const cdpResponse = JSON.parse(cdpOutput) as Readonly<{
     success: boolean;
@@ -540,7 +541,7 @@ async function withExamplePageCdp(run: (send: PageCdpSend) => Promise<void>): Pr
   };
   try {
     const targetResult = (await send('Target.getTargets')) as Readonly<{
-      targetInfos: readonly Readonly<{ targetId: string; type: string; url: string }>[];
+      targetInfos: readonly Readonly<{ targetId: string; type: string; url: string; browserContextId?: string }>[];
     }>;
     const page = targetResult.targetInfos.find(
       (targetInfo) => targetInfo.type === 'page' && targetInfo.url.startsWith(server.url.origin),

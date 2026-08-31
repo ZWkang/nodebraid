@@ -1,6 +1,8 @@
 import {
   commandService,
   createBasicCanvasPlugin,
+  createClipboardPlugin,
+  createClipboardShortcutPlugin,
   createDuplicateSelectionPlugin,
   createDuplicateSelectionShortcutPlugin,
   createPluginHost,
@@ -18,11 +20,14 @@ import {
 } from '@nodebraid/core';
 import { createSvgRenderer } from '@nodebraid/renderer-svg';
 
+import { createNavigatorClipboardTransport, exampleCanvasFragmentTextCodec } from './clipboard-adapters';
+
 export interface ExampleRuntime {
   readonly commands: CommandService;
   readonly history: HistoryService;
   readonly kernel: KernelService;
   readonly session: SessionService;
+  disposeClipboardShortcuts(): Promise<void>;
   disposeDuplicateShortcut(): Promise<void>;
   dispose(): Promise<void>;
 }
@@ -32,6 +37,8 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
   let nextEdgeSequence = 1;
   let nextDuplicateNodeSequence = 1;
   let nextDuplicateEdgeSequence = 1;
+  let nextClipboardNodeSequence = 1;
+  let nextClipboardEdgeSequence = 1;
   const basicCanvasPlugin = createBasicCanvasPlugin(createSvgRenderer, {
     interaction: {
       minZoom: 0.25,
@@ -63,6 +70,25 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
     },
   });
   const duplicateSelectionShortcutPlugin = createDuplicateSelectionShortcutPlugin();
+  const clipboardPlugin = createClipboardPlugin({
+    transport: createNavigatorClipboardTransport(),
+    codec: exampleCanvasFragmentTextCodec,
+    materializeIds({ nodeIds, edgeIds }) {
+      return {
+        nodes: nodeIds.map((sourceId) => {
+          const materializedId = nodeId(`example-clipboard-node-${nextClipboardNodeSequence}`);
+          nextClipboardNodeSequence += 1;
+          return { sourceId, materializedId };
+        }),
+        edges: edgeIds.map((sourceId) => {
+          const materializedId = edgeId(`example-clipboard-edge-${nextClipboardEdgeSequence}`);
+          nextClipboardEdgeSequence += 1;
+          return { sourceId, materializedId };
+        }),
+      };
+    },
+  });
+  const clipboardShortcutPlugin = createClipboardShortcutPlugin();
   let commands: CommandService | undefined;
   let history: HistoryService | undefined;
   let kernel: KernelService | undefined;
@@ -86,6 +112,8 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
   const composition = host.install(basicCanvasPlugin, { target, connectionAnchorHitTolerance: 12 });
   const duplicateSelection = host.install(duplicateSelectionPlugin);
   const duplicateSelectionShortcut = host.install(duplicateSelectionShortcutPlugin);
+  const clipboard = host.install(clipboardPlugin);
+  const clipboardShortcuts = host.install(clipboardShortcutPlugin);
   const application = host.install(applicationPlugin);
 
   try {
@@ -93,6 +121,8 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       composition.whenActive(),
       duplicateSelection.whenActive(),
       duplicateSelectionShortcut.whenActive(),
+      clipboard.whenActive(),
+      clipboardShortcuts.whenActive(),
       application.whenActive(),
     ]);
     if (!commands || !history || !kernel || !session) {
@@ -140,6 +170,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       history,
       kernel,
       session,
+      disposeClipboardShortcuts: () => clipboardShortcuts.dispose(),
       disposeDuplicateShortcut: () => duplicateSelectionShortcut.dispose(),
       dispose: () => host.dispose(),
     });
