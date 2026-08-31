@@ -41,7 +41,7 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && bun run build:self",
-    "build:dependencies": "bun run --filter '@nodebraid/diagnostics' build && bun run --filter '@nodebraid/kernel' build && bun run --filter '@nodebraid/session-api' build && bun run --filter '@nodebraid/interaction-api' build && bun run --filter '@nodebraid/renderer-api' build && bun run --filter '@nodebraid/runtime-cordis' build && bun run --filter '@nodebraid/plugin-command' build && bun run --filter '@nodebraid/plugin-kernel' build && bun run --filter '@nodebraid/plugin-session' build && bun run --filter '@nodebraid/plugin-renderer' build && bun run --filter '@nodebraid/plugin-interaction' build && bun run --filter '@nodebraid/plugin-history' build && bun run --filter '@nodebraid/preset-basic' build && bun run --filter '@nodebraid/layout-api' build && bun run --filter '@nodebraid/layout-dagre' build && bun run --filter '@nodebraid/layout-elk' build && bun run --filter '@nodebraid/plugin-layout' build",
+    "build:dependencies": "bun run --filter '@nodebraid/diagnostics' build && bun run --filter '@nodebraid/kernel' build && bun run --filter '@nodebraid/session-api' build && bun run --filter '@nodebraid/interaction-api' build && bun run --filter '@nodebraid/renderer-api' build && bun run --filter '@nodebraid/runtime-cordis' build && bun run --filter '@nodebraid/plugin-command' build && bun run --filter '@nodebraid/plugin-kernel' build && bun run --filter '@nodebraid/plugin-session' build && bun run --filter '@nodebraid/plugin-renderer' build && bun run --filter '@nodebraid/plugin-interaction' build && bun run --filter '@nodebraid/plugin-duplicate-selection' build && bun run --filter '@nodebraid/plugin-history' build && bun run --filter '@nodebraid/preset-basic' build && bun run --filter '@nodebraid/layout-api' build && bun run --filter '@nodebraid/layout-dagre' build && bun run --filter '@nodebraid/layout-elk' build && bun run --filter '@nodebraid/plugin-layout' build",
     "build:self": "tsgo -p tsconfig.build.json && bun run test:artifacts",
     "prepack": "bun run build",
     "test": "bun test ./tests",
@@ -54,6 +54,7 @@
     "@nodebraid/kernel": "workspace:*",
     "@nodebraid/layout-api": "workspace:*",
     "@nodebraid/plugin-command": "workspace:*",
+    "@nodebraid/plugin-duplicate-selection": "workspace:*",
     "@nodebraid/plugin-history": "workspace:*",
     "@nodebraid/plugin-interaction": "workspace:*",
     "@nodebraid/plugin-kernel": "workspace:*",

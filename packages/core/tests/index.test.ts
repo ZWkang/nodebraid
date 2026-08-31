@@ -7,6 +7,8 @@ import {
   commandPlugin,
   commandService,
   createCanvasKernel,
+  createDuplicateSelectionPlugin,
+  createDuplicateSelectionShortcutPlugin,
   createRendererPlugin,
   createPluginHost,
   defineCommand,
@@ -14,6 +16,7 @@ import {
   defineService,
   describeError,
   diagnosticEvents,
+  duplicateSelectionCommand,
   edgeId,
   historyPlugin,
   historyService,
@@ -36,6 +39,12 @@ import {
 } from '../src';
 
 describe('@nodebraid/core', () => {
+  test('publishes Duplicate Selection through the public facade', () => {
+    expect(duplicateSelectionCommand.id).toBe('selection.duplicate');
+    expect(typeof createDuplicateSelectionPlugin).toBe('function');
+    expect(typeof createDuplicateSelectionShortcutPlugin).toBe('function');
+  });
+
   test('publishes the shared Diagnostics seam', () => {
     const error = new KernelError('INVALID_ID', 'Node ID is invalid.', {
       entity: 'node',

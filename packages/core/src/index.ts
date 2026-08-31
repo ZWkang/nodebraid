@@ -3,6 +3,7 @@ export * from '@nodebraid/interaction-api';
 export * from '@nodebraid/kernel';
 export * from '@nodebraid/layout-api';
 export * from '@nodebraid/plugin-command';
+export * from '@nodebraid/plugin-duplicate-selection';
 export * from '@nodebraid/plugin-history';
 export * from '@nodebraid/plugin-interaction';
 export * from '@nodebraid/plugin-kernel';

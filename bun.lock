@@ -55,6 +55,7 @@
         "@nodebraid/kernel": "workspace:*",
         "@nodebraid/layout-api": "workspace:*",
         "@nodebraid/plugin-command": "workspace:*",
+        "@nodebraid/plugin-duplicate-selection": "workspace:*",
         "@nodebraid/plugin-history": "workspace:*",
         "@nodebraid/plugin-interaction": "workspace:*",
         "@nodebraid/plugin-kernel": "workspace:*",
@@ -116,6 +117,22 @@
       "dependencies": {
         "@nodebraid/diagnostics": "workspace:*",
         "@nodebraid/runtime-cordis": "workspace:*",
+      },
+    },
+    "packages/plugin-duplicate-selection": {
+      "name": "@nodebraid/plugin-duplicate-selection",
+      "version": "0.0.1",
+      "dependencies": {
+        "@nodebraid/diagnostics": "workspace:*",
+        "@nodebraid/kernel": "workspace:*",
+        "@nodebraid/plugin-command": "workspace:*",
+        "@nodebraid/plugin-interaction": "workspace:*",
+        "@nodebraid/plugin-kernel": "workspace:*",
+        "@nodebraid/plugin-session": "workspace:*",
+        "@nodebraid/runtime-cordis": "workspace:*",
+      },
+      "devDependencies": {
+        "@nodebraid/plugin-history": "workspace:*",
       },
     },
     "packages/plugin-history": {
@@ -488,6 +505,8 @@
     "@nodebraid/layout-elk": ["@nodebraid/layout-elk@workspace:packages/layout-elk"],
 
     "@nodebraid/plugin-command": ["@nodebraid/plugin-command@workspace:packages/plugin-command"],
+
+    "@nodebraid/plugin-duplicate-selection": ["@nodebraid/plugin-duplicate-selection@workspace:packages/plugin-duplicate-selection"],
 
     "@nodebraid/plugin-history": ["@nodebraid/plugin-history@workspace:packages/plugin-history"],
 

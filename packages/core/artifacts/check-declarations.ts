@@ -14,6 +14,7 @@ const interactionApiDist = fileURLToPath(new URL('../../interaction-api/dist/', 
 const kernelDist = fileURLToPath(new URL('../../kernel/dist/', import.meta.url));
 const layoutApiDist = fileURLToPath(new URL('../../layout-api/dist/', import.meta.url));
 const pluginCommandDist = fileURLToPath(new URL('../../plugin-command/dist/', import.meta.url));
+const pluginDuplicateSelectionDist = fileURLToPath(new URL('../../plugin-duplicate-selection/dist/', import.meta.url));
 const pluginHistoryDist = fileURLToPath(new URL('../../plugin-history/dist/', import.meta.url));
 const pluginInteractionDist = fileURLToPath(new URL('../../plugin-interaction/dist/', import.meta.url));
 const pluginKernelDist = fileURLToPath(new URL('../../plugin-kernel/dist/', import.meta.url));
@@ -32,6 +33,7 @@ const declarationFiles = await Promise.all([
   collectDeclarations(kernelDist),
   collectDeclarations(layoutApiDist),
   collectDeclarations(pluginCommandDist),
+  collectDeclarations(pluginDuplicateSelectionDist),
   collectDeclarations(pluginHistoryDist),
   collectDeclarations(pluginInteractionDist),
   collectDeclarations(pluginKernelDist),
@@ -49,6 +51,7 @@ assert.match(coreDeclaration, /export \* from '@nodebraid\/interaction-api';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/kernel';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/layout-api';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-command';/);
+assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-duplicate-selection';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-history';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-interaction';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-kernel';/);
@@ -77,6 +80,9 @@ assert.ok(corePackage.kernelPlugin);
 assert.ok(corePackage.kernelService);
 assert.ok(corePackage.commandPlugin);
 assert.ok(corePackage.commandService);
+assert.equal(corePackage.duplicateSelectionCommand.id, 'selection.duplicate');
+assert.equal(typeof corePackage.createDuplicateSelectionPlugin, 'function');
+assert.equal(typeof corePackage.createDuplicateSelectionShortcutPlugin, 'function');
 assert.ok(corePackage.sessionPlugin);
 assert.ok(corePackage.sessionService);
 assert.equal(typeof corePackage.RendererError, 'function');
