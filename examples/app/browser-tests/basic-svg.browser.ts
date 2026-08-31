@@ -69,7 +69,16 @@ try {
     heading: 'Basic SVG Canvas',
     status: 'ready',
     nodeCount: 3,
-    controls: ['Undo', 'Redo', 'Zoom in', 'Zoom out', 'Fit view', 'Reset view', 'Reset example'],
+    controls: [
+      'Undo',
+      'Redo',
+      'Zoom in',
+      'Zoom out',
+      'Fit view',
+      'Reset view',
+      'Reset example',
+      'Disable duplicate shortcut',
+    ],
     metrics: {
       revision: '1',
       nodes: '3',
@@ -141,6 +150,74 @@ try {
     history: 'Undo / —',
   });
   assert.equal(await evaluateBrowserScenario(`document.querySelectorAll('[data-nodebraid-node-id]').length`), 3);
+
+  await runAgentBrowser(['click', '[data-nodebraid-node-id="example-discover"]']);
+  await evaluateBrowserScenario(`(() => {
+    globalThis.__nodebraidDuplicateKey = { trusted: false, defaultPrevented: false };
+    document.querySelector('.canvas-target')?.addEventListener('keydown', (event) => {
+      if (event.code === 'KeyD' && event.metaKey) {
+        globalThis.__nodebraidDuplicateKey = {
+          trusted: event.isTrusted,
+          defaultPrevented: event.defaultPrevented,
+        };
+      }
+    }, { once: true });
+    return true;
+  })()`);
+  await dispatchDuplicateKey();
+  assert.deepEqual(await evaluateBrowserScenario('globalThis.__nodebraidDuplicateKey'), {
+    trusted: true,
+    defaultPrevented: true,
+  });
+  assert.deepEqual(
+    await waitForMetrics({ revision: '2', nodes: '4', edges: '1', selection: 'example-duplicate-node-1' }),
+    { revision: '2', nodes: '4', edges: '1', selection: 'example-duplicate-node-1' },
+  );
+  await clickExampleControl('Undo');
+  assert.deepEqual(await waitForMetrics({ revision: '3', nodes: '3', selection: 'None' }), {
+    revision: '3',
+    nodes: '3',
+    selection: 'None',
+  });
+  await clickExampleControl('Redo');
+  assert.deepEqual(await waitForMetrics({ revision: '4', nodes: '4', selection: 'None' }), {
+    revision: '4',
+    nodes: '4',
+    selection: 'None',
+  });
+  await clickExampleControl('Disable duplicate shortcut');
+  await waitForControlDisabled('Disable duplicate shortcut');
+  await evaluateBrowserScenario(`(() => {
+    globalThis.__nodebraidReleasedDuplicateKey = { trusted: false, defaultPrevented: true };
+    const target = document.querySelector('.canvas-target');
+    target?.focus();
+    target?.addEventListener('keydown', (event) => {
+      if (event.code === 'KeyD' && event.metaKey) {
+        globalThis.__nodebraidReleasedDuplicateKey = {
+          trusted: event.isTrusted,
+          defaultPrevented: event.defaultPrevented,
+        };
+      }
+    }, { once: true });
+    return true;
+  })()`);
+  await dispatchDuplicateKey();
+  assert.deepEqual(await evaluateBrowserScenario('globalThis.__nodebraidReleasedDuplicateKey'), {
+    trusted: true,
+    defaultPrevented: false,
+  });
+  assert.deepEqual(await waitForMetrics({ revision: '4', nodes: '4', selection: 'None' }), {
+    revision: '4',
+    nodes: '4',
+    selection: 'None',
+  });
+  await runAgentBrowser(['click', '[aria-label="Reset example"]']);
+  assert.deepEqual(await waitForMetrics({ revision: '1', nodes: '3', edges: '1', selection: 'None' }), {
+    revision: '1',
+    nodes: '3',
+    edges: '1',
+    selection: 'None',
+  });
 
   await runAgentBrowser(['click', '[aria-label="Fit view"]']);
   assert.equal(
@@ -360,6 +437,25 @@ async function dispatchDeleteKey(): Promise<void> {
   });
 }
 
+async function dispatchDuplicateKey(): Promise<void> {
+  await withExamplePageCdp(async (send) => {
+    await send('Input.dispatchKeyEvent', {
+      type: 'keyDown',
+      key: 'd',
+      code: 'KeyD',
+      modifiers: 4,
+      windowsVirtualKeyCode: 68,
+    });
+    await send('Input.dispatchKeyEvent', {
+      type: 'keyUp',
+      key: 'd',
+      code: 'KeyD',
+      modifiers: 4,
+      windowsVirtualKeyCode: 68,
+    });
+  });
+}
+
 async function clickExampleControl(label: string): Promise<void> {
   await evaluateBrowserScenario(`(() => {
     const control = document.querySelector('[aria-label="${label}"]');
@@ -367,6 +463,27 @@ async function clickExampleControl(label: string): Promise<void> {
     control.click();
     return true;
   })()`);
+}
+
+async function waitForControlDisabled(label: string): Promise<void> {
+  await evaluateBrowserScenario(`
+    new Promise((resolve, reject) => {
+      const deadline = Date.now() + 5000;
+      const read = () => {
+        const control = document.querySelector('[aria-label="${label}"]');
+        if (control instanceof HTMLButtonElement && control.disabled) {
+          resolve(true);
+          return;
+        }
+        if (Date.now() >= deadline) {
+          reject(new Error('Example control did not become disabled: ${label}'));
+          return;
+        }
+        setTimeout(read, 25);
+      };
+      read();
+    })
+  `);
 }
 
 type PageCdpSend = (method: string, params?: Readonly<Record<string, unknown>>) => Promise<unknown>;

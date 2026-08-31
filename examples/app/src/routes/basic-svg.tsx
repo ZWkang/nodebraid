@@ -1,5 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Focus, History as HistoryIcon, Maximize2, Minus, Plus, Redo2, RotateCcw, Undo2 } from 'lucide-react';
+import {
+  Focus,
+  History as HistoryIcon,
+  KeyboardOff,
+  Maximize2,
+  Minus,
+  Plus,
+  Redo2,
+  RotateCcw,
+  Undo2,
+} from 'lucide-react';
 import { useEffect, useRef, useState, type ComponentProps, type ReactNode, type RefObject } from 'react';
 
 import { describeError, redoCommand, undoCommand, type Viewport } from '@nodebraid/core';
@@ -121,6 +131,8 @@ interface CanvasToolbarProps {
 
 function CanvasToolbar({ copy, runtime, target, onResetExample, onError }: CanvasToolbarProps) {
   const disabled = runtime === undefined;
+  const [duplicateShortcutEnabled, setDuplicateShortcutEnabled] = useState(true);
+  useEffect(() => setDuplicateShortcutEnabled(true), [runtime]);
   const history = useOptionalHistorySnapshot(runtime);
   const run = (operation: () => void | Promise<void>) => {
     try {
@@ -171,6 +183,18 @@ function CanvasToolbar({ copy, runtime, target, onResetExample, onError }: Canva
       />
       <Separator orientation="vertical" className="toolbar-separator" />
       <ToolbarButton label={copy.resetExample} icon={<RotateCcw />} disabled={disabled} onClick={onResetExample} />
+      <ToolbarButton
+        label={copy.disableDuplicateShortcut}
+        icon={<KeyboardOff />}
+        disabled={disabled || !duplicateShortcutEnabled}
+        onClick={() =>
+          run(async () => {
+            await runtime?.disposeDuplicateShortcut();
+            setDuplicateShortcutEnabled(false);
+            target.current?.focus();
+          })
+        }
+      />
     </div>
   );
 }
@@ -311,6 +335,7 @@ interface Copy {
   readonly fitView: string;
   readonly resetView: string;
   readonly resetExample: string;
+  readonly disableDuplicateShortcut: string;
   readonly runtime: string;
   readonly runtimeDescription: string;
   readonly ready: string;
@@ -332,7 +357,7 @@ interface Copy {
 const translations: Readonly<Record<Language, Copy>> = {
   en: {
     title: 'Basic SVG Canvas',
-    description: 'Select, box-select, delete, drag, pan, zoom, and connect one node anchor to another.',
+    description: 'Select, box-select, duplicate, delete, drag, pan, zoom, and connect one node anchor to another.',
     canvasLabel: 'Interactive canvas',
     toolbar: 'Canvas controls',
     undo: 'Undo',
@@ -342,6 +367,7 @@ const translations: Readonly<Record<Language, Copy>> = {
     fitView: 'Fit view',
     resetView: 'Reset view',
     resetExample: 'Reset example',
+    disableDuplicateShortcut: 'Disable duplicate shortcut',
     runtime: 'Runtime state',
     runtimeDescription: 'Observed only through public NodeBraid services.',
     ready: 'Ready',
@@ -359,6 +385,7 @@ const translations: Readonly<Record<Language, Copy>> = {
     steps: [
       'Click a node to select it.',
       'Drag across empty canvas space to box-select intersecting nodes.',
+      'Press Ctrl/Cmd+D while the canvas is focused to duplicate the Selection.',
       'Press Delete while the canvas is focused to remove the Selection.',
       'Drag a selected node.',
       'Drag from a source anchor to a target anchor.',
@@ -368,7 +395,7 @@ const translations: Readonly<Record<Language, Copy>> = {
   },
   zh: {
     title: '基础 SVG 画布',
-    description: '选择、框选、删除、拖动、平移、缩放，并从一个连接锚点拖到另一个锚点。',
+    description: '选择、框选、复制、删除、拖动、平移、缩放，并从一个连接锚点拖到另一个锚点。',
     canvasLabel: '交互画布',
     toolbar: '画布控制',
     undo: '撤销',
@@ -378,6 +405,7 @@ const translations: Readonly<Record<Language, Copy>> = {
     fitView: '适应画布',
     resetView: '重置视图',
     resetExample: '重置示例',
+    disableDuplicateShortcut: '停用复制快捷键',
     runtime: 'Runtime 状态',
     runtimeDescription: '只通过 NodeBraid 公共 Service 观察。',
     ready: '已就绪',
@@ -395,6 +423,7 @@ const translations: Readonly<Record<Language, Copy>> = {
     steps: [
       '点击 Node 完成选择。',
       '从画布空白处拖动，框选相交的 Node。',
+      '画布获得焦点后按 Ctrl/Cmd+D，复制当前 Selection。',
       '画布获得焦点后按 Delete，删除当前 Selection。',
       '拖动已选择的 Node。',
       '从 source anchor 拖向 target anchor。',
