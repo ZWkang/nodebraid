@@ -376,6 +376,18 @@ _Avoid_: ID Factory, Entity Factory, Canvas Fragment Materializer
 Duplicate Selection 捕获的 Selection、源 Node identity、内部 Edge identity 或内部 Edge 闭包已不再与当前稳定状态一致，因而不能安全创建副本或覆盖较新的 Selection；无关 Commit 与外部 incident Edge 不属于该冲突。
 _Avoid_: Stale Gesture, Stale Selection, Global Revision Conflict
 
+**Canvas Fragment**:
+从一份已提交 Document 捕获的不可变内存子图，包含精确 Node 集合、内部 Edge 闭包与原 Selection 成员；它保留不透明领域 data 值，但不是持久化或跨版本兼容的 Serialized Document。
+_Avoid_: Serialized Document, Clipboard Text, Deep-cloned Graph
+
+**Clipboard Copy**:
+把 Command 开始时捕获的一份 Canvas Fragment 交给应用拥有的文本表示并写入外部 Clipboard 的行为；之后的 Document 或 Selection 变化不会改写已经捕获的内容。
+_Avoid_: Duplicate Selection, Live Selection Export, In-memory Fallback
+
+**Clipboard Paste**:
+从外部 Clipboard 读取一份应用解释后的 Canvas Fragment，以应用提供的新 ID 在当前 Document 中创建副本，并选择对应的新实体的行为。
+_Avoid_: Document Import, History Replay, Clipboard Restore
+
 **Layout Engine**:
 根据已提交的画布图计算候选布局、但不修改 Document 的能力。
 _Avoid_: Layout Writer, Auto-layout Transaction, Graph Mutator
