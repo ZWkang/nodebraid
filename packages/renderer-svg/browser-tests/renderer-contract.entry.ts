@@ -4257,7 +4257,6 @@ globalThis.__nodebraidRendererSvgTicket09InputOrder = async (): Promise<InputOrd
     viewport: { x: 0, y: 0, zoom: 1 },
   });
   const order: string[] = [];
-  let reentrantDispatchResult = true;
   let stopSecond = (): void => undefined;
   const stopFirst = renderer.subscribeInput((input) => {
     order.push(`first:${input.type}`);
@@ -4627,6 +4626,7 @@ globalThis.__nodebraidRendererSvgTicket09InputFaults = async (): Promise<InputFa
   const firstError = new Error('first input listener failed');
   const secondError = new Error('second input listener failed');
   const order: string[] = [];
+  let reentrantDispatchResult = true;
   let browserError: unknown;
   let errorEventCount = 0;
   const handleError = (event: ErrorEvent): void => {
