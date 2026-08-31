@@ -1,33 +1,20 @@
 import assert from 'node:assert/strict';
-import { extname, resolve, sep } from 'node:path';
+import { resolve } from 'node:path';
 
-import { CdpClient, createAgentBrowserRunner, readAgentBrowserCdpUrl } from './browser-test-harness';
+import {
+  CdpClient,
+  createAgentBrowserRunner,
+  createProductionAppServer,
+  readAgentBrowserCdpUrl,
+} from './browser-test-harness';
 
 const applicationRoot = resolve(import.meta.dir, '..');
 const repositoryRoot = resolve(applicationRoot, '../..');
-const distributionRoot = resolve(applicationRoot, 'dist');
-const distributionPrefix = `${distributionRoot}${sep}`;
-const index = Bun.file(resolve(distributionRoot, 'index.html'));
 const agentBrowser = resolve(repositoryRoot, 'node_modules/.bin/agent-browser');
 const session = `nodebraid-clipboard-example-${process.pid}`;
 const runAgentBrowser = createAgentBrowserRunner(agentBrowser, repositoryRoot, session);
 
-assert.equal(await index.exists(), true, 'Expected the Examples Application production build.');
-
-const server = Bun.serve({
-  hostname: '127.0.0.1',
-  port: 0,
-  async fetch(request) {
-    const url = new URL(request.url);
-    const relativePath = decodeURIComponent(url.pathname.replace(/^\//, ''));
-    const candidate = resolve(distributionRoot, relativePath);
-    if (candidate !== distributionRoot && candidate.startsWith(distributionPrefix) && extname(candidate)) {
-      const file = Bun.file(candidate);
-      if (await file.exists()) return new Response(file);
-    }
-    return new Response(index, { headers: { 'content-type': 'text/html; charset=utf-8' } });
-  },
-});
+const server = await createProductionAppServer(applicationRoot);
 
 let client: CdpClient | undefined;
 let browserContextId: string | undefined;

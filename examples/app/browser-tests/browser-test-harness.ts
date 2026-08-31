@@ -1,6 +1,28 @@
 import assert from 'node:assert/strict';
+import { extname, resolve, sep } from 'node:path';
 
 export type CdpSend = (method: string, params?: Readonly<Record<string, unknown>>) => Promise<unknown>;
+
+export async function createProductionAppServer(applicationRoot: string): Promise<ReturnType<typeof Bun.serve>> {
+  const distributionRoot = resolve(applicationRoot, 'dist');
+  const distributionPrefix = `${distributionRoot}${sep}`;
+  const index = Bun.file(resolve(distributionRoot, 'index.html'));
+  assert.equal(await index.exists(), true, 'Expected the Examples Application production build.');
+  return Bun.serve({
+    hostname: '127.0.0.1',
+    port: 0,
+    async fetch(request) {
+      const url = new URL(request.url);
+      const relativePath = decodeURIComponent(url.pathname.replace(/^\//, ''));
+      const candidate = resolve(distributionRoot, relativePath);
+      if (candidate !== distributionRoot && candidate.startsWith(distributionPrefix) && extname(candidate)) {
+        const file = Bun.file(candidate);
+        if (await file.exists()) return new Response(file);
+      }
+      return new Response(index, { headers: { 'content-type': 'text/html; charset=utf-8' } });
+    },
+  });
+}
 
 export function createAgentBrowserRunner(
   executable: string,

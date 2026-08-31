@@ -86,11 +86,15 @@ test('caller cancellation keeps its reason and dependency recovery creates fresh
     },
   });
   let blockRead = true;
+  let readCalls = 0;
+  let settleRead: ((text: string) => void) | undefined;
   const clipboardPlugin = createClipboardPlugin({
     transport: {
       readText(signal) {
+        readCalls += 1;
         if (!blockRead) return Promise.resolve(clipboardText);
-        return new Promise<string>((_resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
+          settleRead = resolve;
           signal.addEventListener('abort', () => reject(signal.reason), { once: true });
         });
       },
@@ -129,8 +133,26 @@ test('caller cancellation keeps its reason and dependency recovery creates fresh
     transaction.nodes.add({ id: source, type: 'task', position: { x: 0, y: 0 }, data: null });
   });
   sessions[0].setSelection({ nodeIds: [source], edgeIds: [] });
+
+  const beforeIoReason = new Error('cancelled before Clipboard read');
+  const beforeIoController = new AbortController();
+  beforeIoController.abort(beforeIoReason);
+  await expect(commands.execute(pasteClipboardCommand, undefined, { signal: beforeIoController.signal })).rejects.toBe(
+    beforeIoReason,
+  );
+  expect(readCalls).toBe(0);
+
+  const afterIoReason = new Error('cancelled after Clipboard read settled');
+  const afterIoController = new AbortController();
+  const afterIo = commands.execute(pasteClipboardCommand, undefined, { signal: afterIoController.signal });
+  expect(readCalls).toBe(1);
+  settleRead?.(clipboardText);
+  afterIoController.abort(afterIoReason);
+  await expect(afterIo).rejects.toBe(afterIoReason);
+
   const controller = new AbortController();
   const cancelled = commands.execute(pasteClipboardCommand, undefined, { signal: controller.signal });
+  expect(readCalls).toBe(2);
   controller.abort(cancellationReason);
   await expect(cancelled).rejects.toBe(cancellationReason);
 

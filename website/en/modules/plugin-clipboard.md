@@ -5,7 +5,7 @@ description: Explicit Clipboard Copy/Paste Behavior and Shortcut Plugins.
 
 # `@nodebraid/plugin-clipboard`
 
-::: warning Package not publicly released
+::: warning Package is not publicly released
 This name describes the current source module boundary; it is not an npm installation claim.
 :::
 

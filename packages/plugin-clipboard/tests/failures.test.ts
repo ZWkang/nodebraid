@@ -88,6 +88,37 @@ test('Clipboard external transport and codec failures keep stable identities and
 });
 
 test('Paste rejects foreign decoded values and incomplete mapping without a Commit', async () => {
+  const emptyClipboardHarness = await createHarness({
+    transport: { readText: async () => '', writeText: async () => undefined },
+    codec: { encode: () => '', decode: (text) => JSON.parse(text) },
+    materializeIds: () => ({ nodes: [], edges: [] }),
+  });
+  await expect(emptyClipboardHarness.commands.execute(pasteClipboardCommand, undefined)).rejects.toMatchObject({
+    domain: 'plugin.clipboard',
+    code: 'CODEC_DECODE_FAILED',
+    cause: expect.objectContaining({ name: 'SyntaxError' }),
+  });
+  await emptyClipboardHarness.host.dispose();
+
+  const emptyFragmentHarness = await createHarness({
+    transport: { readText: async () => 'empty-fragment', writeText: async () => undefined },
+    codec: {
+      encode: () => '',
+      decode: () => ({
+        type: 'nodebraid.canvas-fragment',
+        nodes: [],
+        edges: [],
+        selection: { nodeIds: [], edgeIds: [] },
+      }),
+    },
+    materializeIds: () => ({ nodes: [], edges: [] }),
+  });
+  await expect(emptyFragmentHarness.commands.execute(pasteClipboardCommand, undefined)).rejects.toMatchObject({
+    domain: 'plugin.clipboard',
+    code: 'INVALID_FRAGMENT',
+  });
+  await emptyFragmentHarness.host.dispose();
+
   const invalidHarness = await createHarness({
     transport: { readText: async () => 'foreign', writeText: async () => undefined },
     codec: { encode: () => '', decode: () => ({ type: 'foreign' }) },

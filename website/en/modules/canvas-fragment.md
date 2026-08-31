@@ -5,7 +5,7 @@ description: Pure in-memory Canvas Fragment values shared by Duplicate and Clipb
 
 # `@nodebraid/canvas-fragment`
 
-::: warning Package not publicly released
+::: warning Package is not publicly released
 This name describes the current source module boundary; it is not an npm installation claim.
 :::
 
