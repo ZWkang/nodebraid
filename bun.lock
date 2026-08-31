@@ -46,14 +46,24 @@
         "vite": "^8.2.2",
       },
     },
+    "packages/canvas-fragment": {
+      "name": "@nodebraid/canvas-fragment",
+      "version": "0.0.1",
+      "dependencies": {
+        "@nodebraid/diagnostics": "workspace:*",
+        "@nodebraid/kernel": "workspace:*",
+      },
+    },
     "packages/core": {
       "name": "@nodebraid/core",
       "version": "0.0.1",
       "dependencies": {
+        "@nodebraid/canvas-fragment": "workspace:*",
         "@nodebraid/diagnostics": "workspace:*",
         "@nodebraid/interaction-api": "workspace:*",
         "@nodebraid/kernel": "workspace:*",
         "@nodebraid/layout-api": "workspace:*",
+        "@nodebraid/plugin-clipboard": "workspace:*",
         "@nodebraid/plugin-command": "workspace:*",
         "@nodebraid/plugin-duplicate-selection": "workspace:*",
         "@nodebraid/plugin-history": "workspace:*",
@@ -111,6 +121,23 @@
         "elkjs": "^0.12.0",
       },
     },
+    "packages/plugin-clipboard": {
+      "name": "@nodebraid/plugin-clipboard",
+      "version": "0.0.1",
+      "dependencies": {
+        "@nodebraid/canvas-fragment": "workspace:*",
+        "@nodebraid/diagnostics": "workspace:*",
+        "@nodebraid/kernel": "workspace:*",
+        "@nodebraid/plugin-command": "workspace:*",
+        "@nodebraid/plugin-interaction": "workspace:*",
+        "@nodebraid/plugin-kernel": "workspace:*",
+        "@nodebraid/plugin-session": "workspace:*",
+        "@nodebraid/runtime-cordis": "workspace:*",
+      },
+      "devDependencies": {
+        "@nodebraid/plugin-history": "workspace:*",
+      },
+    },
     "packages/plugin-command": {
       "name": "@nodebraid/plugin-command",
       "version": "0.0.1",
@@ -123,6 +150,7 @@
       "name": "@nodebraid/plugin-duplicate-selection",
       "version": "0.0.1",
       "dependencies": {
+        "@nodebraid/canvas-fragment": "workspace:*",
         "@nodebraid/diagnostics": "workspace:*",
         "@nodebraid/kernel": "workspace:*",
         "@nodebraid/plugin-command": "workspace:*",
@@ -488,6 +516,8 @@
 
     "@napi-rs/lzma-linux-x64-gnu": ["@napi-rs/lzma-linux-x64-gnu@1.5.1", "", { "os": "linux", "cpu": "x64" }, "sha512-oTXEIha4SsuXdTA4Iyskj0kpdx2yVXdhd75c2v3xGrHFfVMsbhTPZU/nMPL4sWKo4pBHm3aucLaqGlF696dTyQ=="],
 
+    "@nodebraid/canvas-fragment": ["@nodebraid/canvas-fragment@workspace:packages/canvas-fragment"],
+
     "@nodebraid/core": ["@nodebraid/core@workspace:packages/core"],
 
     "@nodebraid/diagnostics": ["@nodebraid/diagnostics@workspace:packages/diagnostics"],
@@ -503,6 +533,8 @@
     "@nodebraid/layout-dagre": ["@nodebraid/layout-dagre@workspace:packages/layout-dagre"],
 
     "@nodebraid/layout-elk": ["@nodebraid/layout-elk@workspace:packages/layout-elk"],
+
+    "@nodebraid/plugin-clipboard": ["@nodebraid/plugin-clipboard@workspace:packages/plugin-clipboard"],
 
     "@nodebraid/plugin-command": ["@nodebraid/plugin-command@workspace:packages/plugin-command"],
 

@@ -1,0 +1,52 @@
+{
+  "name": "@nodebraid/canvas-fragment",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "In-memory Canvas Fragment value contracts for NodeBraid.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "zwkang",
+    "email": "kang95630@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
+    "directory": "packages/canvas-fragment"
+  },
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/canvas-fragment#readme",
+  "keywords": [
+    "nodebraid",
+    "canvas-fragment",
+    "subgraph"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
+    "build:dependencies": "bun run --filter '@nodebraid/diagnostics' build && bun run --filter '@nodebraid/kernel' build",
+    "prepack": "bun run build",
+    "test": "bun run build:dependencies && bun test ./tests",
+    "test:artifacts": "bun run ./artifacts/check-declarations.ts",
+    "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@nodebraid/diagnostics": "workspace:*",
+    "@nodebraid/kernel": "workspace:*"
+  }
+}

@@ -6,6 +6,9 @@ import {
   RendererError,
   commandPlugin,
   commandService,
+  copySelectionToClipboardCommand,
+  createClipboardPlugin,
+  createClipboardShortcutPlugin,
   createCanvasKernel,
   createDuplicateSelectionPlugin,
   createDuplicateSelectionShortcutPlugin,
@@ -26,6 +29,7 @@ import {
   kernelService,
   nodeId,
   moveNodesCommand,
+  pasteClipboardCommand,
   sessionPlugin,
   sessionService,
   rendererService,
@@ -39,6 +43,13 @@ import {
 } from '../src';
 
 describe('@nodebraid/core', () => {
+  test('publishes Canvas Fragment and Clipboard through the public facade', () => {
+    expect(copySelectionToClipboardCommand.id).toBe('clipboard.copy');
+    expect(pasteClipboardCommand.id).toBe('clipboard.paste');
+    expect(typeof createClipboardPlugin).toBe('function');
+    expect(typeof createClipboardShortcutPlugin).toBe('function');
+  });
+
   test('publishes Duplicate Selection through the public facade', () => {
     expect(duplicateSelectionCommand.id).toBe('selection.duplicate');
     expect(typeof createDuplicateSelectionPlugin).toBe('function');

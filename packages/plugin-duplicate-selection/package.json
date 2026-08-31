@@ -39,7 +39,7 @@
   ],
   "scripts": {
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
-    "build:dependencies": "bun run --filter '@nodebraid/plugin-command' build && bun run --filter '@nodebraid/plugin-kernel' build && bun run --filter '@nodebraid/plugin-session' build && bun run --filter '@nodebraid/plugin-interaction' build",
+    "build:dependencies": "bun run --filter '@nodebraid/canvas-fragment' build && bun run --filter '@nodebraid/plugin-command' build && bun run --filter '@nodebraid/plugin-kernel' build && bun run --filter '@nodebraid/plugin-session' build && bun run --filter '@nodebraid/plugin-interaction' build",
     "build:test-dependencies": "bun run build:dependencies && bun run --filter '@nodebraid/plugin-history' build",
     "prepack": "bun run build",
     "test": "bun run build:test-dependencies && bun test ./tests",
@@ -47,6 +47,7 @@
     "typecheck": "bun run build:test-dependencies && tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@nodebraid/canvas-fragment": "workspace:*",
     "@nodebraid/diagnostics": "workspace:*",
     "@nodebraid/kernel": "workspace:*",
     "@nodebraid/plugin-command": "workspace:*",

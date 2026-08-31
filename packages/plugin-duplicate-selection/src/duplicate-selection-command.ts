@@ -1,3 +1,4 @@
+import { captureCanvasFragment, materializeCanvasFragment } from '@nodebraid/canvas-fragment';
 import type { CanvasEdge, CanvasNode, EdgeId, NodeId } from '@nodebraid/kernel';
 import { defineCommand, type CommandHandler } from '@nodebraid/plugin-command';
 import type { KernelService } from '@nodebraid/plugin-kernel';
@@ -22,11 +23,12 @@ export function createDuplicateSelectionHandler(
   return (_input, execution) => {
     execution.signal.throwIfAborted();
     const selection = session.getSnapshot().selection;
-    const nodeIds = [...selection.nodeIds];
-    if (nodeIds.length === 0) return null;
     const sourceView = kernel.read();
-    const sourceNodes = nodeIds.map((id) => requireNode(sourceView.query.getNode(id)));
-    const sourceEdges = collectInternalEdges(sourceView.query, nodeIds);
+    const fragment = captureCanvasFragment(sourceView, selection);
+    if (!fragment) return null;
+    const nodeIds = fragment.selection.nodeIds;
+    const sourceNodes = fragment.nodes;
+    const sourceEdges = fragment.edges;
     const materializerInput = Object.freeze({
       nodeIds: Object.freeze(nodeIds),
       edgeIds: Object.freeze(sourceEdges.map((edge) => edge.id)),
@@ -34,25 +36,22 @@ export function createDuplicateSelectionHandler(
     const rawMaterialization = options.materializeIds(materializerInput);
     if (isThenable(rawMaterialization)) throwInvalidMaterialization('Duplicate ID Materializer must be synchronous.');
     const materialization = acceptMaterialization(rawMaterialization, sourceNodes, sourceEdges);
+    const duplicates = materializeCanvasFragment(
+      fragment,
+      {
+        nodes: materialization.nodes.map((mapping) => ({
+          sourceId: mapping.sourceId,
+          materializedId: mapping.duplicateId,
+        })),
+        edges: materialization.edges.map((mapping) => ({
+          sourceId: mapping.sourceId,
+          materializedId: mapping.duplicateId,
+        })),
+      },
+      options.offset,
+    );
     execution.signal.throwIfAborted();
     if (session.getSnapshot().selection !== selection) throwStaleDuplicate();
-
-    const nodeIdsBySource = new Map(materialization.nodes.map((mapping) => [mapping.sourceId, mapping.duplicateId]));
-    const edgeIdsBySource = new Map(materialization.edges.map((mapping) => [mapping.sourceId, mapping.duplicateId]));
-    const duplicateNodes = sourceNodes.map((node): CanvasNode => ({
-      ...node,
-      id: requireMappedNodeId(nodeIdsBySource, node.id),
-      position: { x: node.position.x + options.offset.x, y: node.position.y + options.offset.y },
-      ...(node.parentId !== undefined && nodeIdsBySource.has(node.parentId)
-        ? { parentId: requireMappedNodeId(nodeIdsBySource, node.parentId) }
-        : {}),
-    }));
-    const duplicateEdges = sourceEdges.map((edge): CanvasEdge => ({
-      ...edge,
-      id: requireMappedEdgeId(edgeIdsBySource, edge.id),
-      source: { ...edge.source, nodeId: requireMappedNodeId(nodeIdsBySource, edge.source.nodeId) },
-      target: { ...edge.target, nodeId: requireMappedNodeId(nodeIdsBySource, edge.target.nodeId) },
-    }));
 
     const commit = kernel.transact(
       (transaction) => {
@@ -71,11 +70,11 @@ export function createDuplicateSelectionHandler(
         for (const edge of sourceEdges) {
           if (transaction.query.getEdge(edge.id) !== edge) throwStaleDuplicate();
         }
-        for (const node of duplicateNodes) {
+        for (const node of duplicates.nodes) {
           if (transaction.query.getNode(node.id)) throwInvalidMaterialization('Duplicate Node ID is unavailable.');
           transaction.nodes.add(node);
         }
-        for (const edge of duplicateEdges) {
+        for (const edge of duplicates.edges) {
           if (transaction.query.getEdge(edge.id)) throwInvalidMaterialization('Duplicate Edge ID is unavailable.');
           transaction.edges.add(edge);
         }
@@ -90,15 +89,8 @@ export function createDuplicateSelectionHandler(
       throwSelectionUpdateFailed(commit.changeSet.revision, error);
     }
     if (currentSelection !== selection) throwSelectionUpdateFailed(commit.changeSet.revision);
-    const nextSelection = {
-      nodeIds: selection.nodeIds.map((id) => requireMappedNodeId(nodeIdsBySource, id)),
-      edgeIds: selection.edgeIds.flatMap((id) => {
-        const duplicateId = edgeIdsBySource.get(id);
-        return duplicateId ? [duplicateId] : [];
-      }),
-    };
     try {
-      session.setSelection(nextSelection);
+      session.setSelection(duplicates.selection);
     } catch (error) {
       throwSelectionUpdateFailed(commit.changeSet.revision, error);
     }
@@ -178,23 +170,6 @@ function collectInternalEdges(
     }
   }
   return [...edges.values()].sort((left, right) => compareIds(left.id, right.id));
-}
-
-function requireNode(node: CanvasNode | undefined): CanvasNode {
-  if (!node) throwStaleDuplicate();
-  return node;
-}
-
-function requireMappedNodeId(mapping: ReadonlyMap<NodeId, NodeId>, sourceId: NodeId): NodeId {
-  const id = mapping.get(sourceId);
-  if (!id) throwInvalidMaterialization('Duplicate Node mapping is incomplete.');
-  return id;
-}
-
-function requireMappedEdgeId(mapping: ReadonlyMap<EdgeId, EdgeId>, sourceId: EdgeId): EdgeId {
-  const id = mapping.get(sourceId);
-  if (!id) throwInvalidMaterialization('Duplicate Edge mapping is incomplete.');
-  return id;
 }
 
 function arraysEqual(left: readonly string[], right: readonly string[]): boolean {

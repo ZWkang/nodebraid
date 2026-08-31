@@ -9,11 +9,13 @@ const forbiddenCordisImport = /(?:from\s+|import\()["']cordis["']/;
 const forbiddenCordisType = /\b(?:Context|CordisError|Effect|Fiber|FiberState)\b/;
 
 const coreDist = fileURLToPath(new URL('../dist/', import.meta.url));
+const canvasFragmentDist = fileURLToPath(new URL('../../canvas-fragment/dist/', import.meta.url));
 const diagnosticsDist = fileURLToPath(new URL('../../diagnostics/dist/', import.meta.url));
 const interactionApiDist = fileURLToPath(new URL('../../interaction-api/dist/', import.meta.url));
 const kernelDist = fileURLToPath(new URL('../../kernel/dist/', import.meta.url));
 const layoutApiDist = fileURLToPath(new URL('../../layout-api/dist/', import.meta.url));
 const pluginCommandDist = fileURLToPath(new URL('../../plugin-command/dist/', import.meta.url));
+const pluginClipboardDist = fileURLToPath(new URL('../../plugin-clipboard/dist/', import.meta.url));
 const pluginDuplicateSelectionDist = fileURLToPath(new URL('../../plugin-duplicate-selection/dist/', import.meta.url));
 const pluginHistoryDist = fileURLToPath(new URL('../../plugin-history/dist/', import.meta.url));
 const pluginInteractionDist = fileURLToPath(new URL('../../plugin-interaction/dist/', import.meta.url));
@@ -28,11 +30,13 @@ const sessionApiDist = fileURLToPath(new URL('../../session-api/dist/', import.m
 const coreDeclaration = await readFile(join(coreDist, 'index.d.ts'), 'utf8');
 const declarationFiles = await Promise.all([
   collectDeclarations(coreDist),
+  collectDeclarations(canvasFragmentDist),
   collectDeclarations(diagnosticsDist),
   collectDeclarations(interactionApiDist),
   collectDeclarations(kernelDist),
   collectDeclarations(layoutApiDist),
   collectDeclarations(pluginCommandDist),
+  collectDeclarations(pluginClipboardDist),
   collectDeclarations(pluginDuplicateSelectionDist),
   collectDeclarations(pluginHistoryDist),
   collectDeclarations(pluginInteractionDist),
@@ -46,11 +50,13 @@ const declarationFiles = await Promise.all([
   collectDeclarations(sessionApiDist),
 ]);
 
+assert.match(coreDeclaration, /export \* from '@nodebraid\/canvas-fragment';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/diagnostics';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/interaction-api';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/kernel';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/layout-api';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-command';/);
+assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-clipboard';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-duplicate-selection';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-history';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-interaction';/);
@@ -80,6 +86,10 @@ assert.ok(corePackage.kernelPlugin);
 assert.ok(corePackage.kernelService);
 assert.ok(corePackage.commandPlugin);
 assert.ok(corePackage.commandService);
+assert.equal(corePackage.copySelectionToClipboardCommand.id, 'clipboard.copy');
+assert.equal(corePackage.pasteClipboardCommand.id, 'clipboard.paste');
+assert.equal(typeof corePackage.createClipboardPlugin, 'function');
+assert.equal(typeof corePackage.createClipboardShortcutPlugin, 'function');
 assert.equal(corePackage.duplicateSelectionCommand.id, 'selection.duplicate');
 assert.equal(typeof corePackage.createDuplicateSelectionPlugin, 'function');
 assert.equal(typeof corePackage.createDuplicateSelectionShortcutPlugin, 'function');

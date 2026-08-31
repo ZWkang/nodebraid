@@ -1,0 +1,121 @@
+import { expect, test } from 'bun:test';
+
+import { nodeId } from '@nodebraid/kernel';
+import { commandPlugin, commandService, type CommandService } from '@nodebraid/plugin-command';
+import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/plugin-session';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
+
+import {
+  copySelectionToClipboardCommand,
+  createClipboardPlugin,
+  pasteClipboardCommand,
+  type CreateClipboardPluginOptions,
+} from '../src';
+
+test('Clipboard external transport and codec failures keep stable identities and original causes', async () => {
+  const encodeFailure = new Error('encode failed');
+  const encodeHarness = await createHarness({
+    transport: { readText: async () => '', writeText: async () => undefined },
+    codec: {
+      encode() {
+        throw encodeFailure;
+      },
+      decode: () => undefined,
+    },
+    materializeIds: () => ({ nodes: [], edges: [] }),
+  });
+  await expect(encodeHarness.commands.execute(copySelectionToClipboardCommand, undefined)).rejects.toMatchObject({
+    domain: 'plugin.clipboard',
+    code: 'CODEC_ENCODE_FAILED',
+    cause: encodeFailure,
+  });
+  await encodeHarness.host.dispose();
+
+  const readFailure = new DOMException('denied', 'NotAllowedError');
+  const readHarness = await createHarness({
+    transport: {
+      readText: async () => {
+        throw readFailure;
+      },
+      writeText: async () => undefined,
+    },
+    codec: { encode: () => '', decode: () => undefined },
+    materializeIds: () => ({ nodes: [], edges: [] }),
+  });
+  await expect(readHarness.commands.execute(pasteClipboardCommand, undefined)).rejects.toMatchObject({
+    domain: 'plugin.clipboard',
+    code: 'TRANSPORT_READ_FAILED',
+    cause: readFailure,
+  });
+  await readHarness.host.dispose();
+});
+
+test('Paste rejects foreign decoded values and incomplete mapping without a Commit', async () => {
+  const invalidHarness = await createHarness({
+    transport: { readText: async () => 'foreign', writeText: async () => undefined },
+    codec: { encode: () => '', decode: () => ({ type: 'foreign' }) },
+    materializeIds: () => ({ nodes: [], edges: [] }),
+  });
+  const revision = invalidHarness.kernel.read().snapshot.revision;
+  await expect(invalidHarness.commands.execute(pasteClipboardCommand, undefined)).rejects.toMatchObject({
+    domain: 'plugin.clipboard',
+    code: 'INVALID_FRAGMENT',
+  });
+  expect(invalidHarness.kernel.read().snapshot.revision).toBe(revision);
+  await invalidHarness.host.dispose();
+
+  const source = nodeId('mapping-source');
+  const fragment = {
+    type: 'nodebraid.canvas-fragment' as const,
+    nodes: [{ id: source, type: 'task', position: { x: 0, y: 0 }, data: null }],
+    edges: [],
+    selection: { nodeIds: [source], edgeIds: [] },
+  };
+  const mappingHarness = await createHarness({
+    transport: { readText: async () => 'fragment', writeText: async () => undefined },
+    codec: { encode: () => '', decode: () => fragment },
+    materializeIds: () => ({ nodes: [], edges: [] }),
+  });
+  const mappingRevision = mappingHarness.kernel.read().snapshot.revision;
+  await expect(mappingHarness.commands.execute(pasteClipboardCommand, undefined)).rejects.toMatchObject({
+    domain: 'plugin.clipboard',
+    code: 'INVALID_MATERIALIZATION',
+  });
+  expect(mappingHarness.kernel.read().snapshot.revision).toBe(mappingRevision);
+  await mappingHarness.host.dispose();
+});
+
+async function createHarness(options: CreateClipboardPluginOptions): Promise<{
+  readonly host: ReturnType<typeof createPluginHost>;
+  readonly commands: CommandService;
+  readonly kernel: KernelService;
+}> {
+  let commands: CommandService | undefined;
+  let kernel: KernelService | undefined;
+  let session: SessionService | undefined;
+  const consumer = definePlugin({
+    requires: { commands: commandService, kernel: kernelService, session: sessionService },
+    setup(context) {
+      commands = context.services.commands;
+      kernel = context.services.kernel;
+      session = context.services.session;
+    },
+  });
+  const host = createPluginHost();
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createClipboardPlugin(options)),
+    host.install(consumer),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (!commands || !kernel || !session) throw new Error('Expected Clipboard failure Runtime Services.');
+  const selected = nodeId('selected');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({ id: selected, type: 'task', position: { x: 0, y: 0 }, data: null });
+  });
+  session.setSelection({ nodeIds: [selected], edgeIds: [] });
+  return { host, commands, kernel };
+}
