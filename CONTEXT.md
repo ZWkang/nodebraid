@@ -236,12 +236,20 @@ _Avoid_: Keyboard Event, Text Input, Shortcut Command
 Renderer Input 中描述 Renderer Focus 获得或丢失的逻辑转换，不携带原生焦点对象或后端事件。
 _Avoid_: DOM Focus Event, Active Element, Keyboard Input
 
+**Input Disposition**:
+Renderer Input Subscription 在行为入队前通过同步控制相位产生的 backend-neutral 默认行为决定；任一有效 Disposition 可以请求阻止后端默认动作，其他 listener 不能撤销，但它不携带或暴露原生事件。
+_Avoid_: Event.preventDefault, Listener Boolean, Native Event Control
+
 **Input Rejection**:
-Interaction 因当前 Active Gesture 或 Pointer 所有权而明确不应用一条已规范化 Renderer Input 的结果；它可观察，但不是结构失败或 Gesture Cancellation。
+Interaction 已识别一条 Renderer Input，但因当前 Active Gesture、重复输入、Pointer 所有权或目标能力暂不可用而明确不应用它的结果；它可观察，但不是结构失败或 Gesture Cancellation。
 _Avoid_: Ignored Input, Silent Fallback, Input Fault
 
+**Interaction Shortcut Binding**:
+一份由 Plugin Activation 拥有、将规范化 Keyboard Input 条件关联到无输入强类型 Command 调用的不可变快捷键贡献；它不直接订阅 Renderer Input、不定义 Command 的稳定行为，相同 Binding 同时只能有一个 Registration，释放时立即停止新匹配并等待已发起调用结束。
+_Avoid_: Native Key Listener, Behavior Plugin, Tool Registration
+
 **Renderer Input Subscription**:
-按 Renderer 已标准化的输入顺序同步接收 Renderer Input 的可取消观察关系。
+以同步 Disposition 控制相位和广度优先行为相位接收 Renderer Input 的可取消观察关系；重入输入的默认动作在其原生 handler 返回前决定，行为仍按规范输入顺序发布。
 _Avoid_: Native Listener, Event Queue, Observable Stream
 
 **Pointer Capture**:
@@ -351,6 +359,22 @@ _Avoid_: Direct Delete, Soft Delete, Cascade Tool
 **Stale Selection**:
 Delete Selection Command 的目标实体或 incident Edge 闭包已不再与发起删除时的证据一致，因而不能把原意图安全应用到当前 Document。
 _Avoid_: Stale Gesture, Global Revision Conflict, Missing Selection
+
+**Duplicate Selection**:
+一项公开且可独立安装的 NodeBraid Plugin 能力，复制精确选中的 Node 及其内部 Edge，并在一个同步 Transaction 成功后将原 Selection 成员映射到副本；被复制 Node 的 direct parent 同样被复制时重映射到副本，否则保留原 parent，仅选择 Edge 时没有可复制子图，Selection 不进入 History。
+_Avoid_: Copy/Paste, Canvas Fragment, Interaction Config
+
+**Duplicate Selection Command**:
+以当前 Selection 为执行起点、返回 `CanvasCommit | null` 的无输入强类型 Command；其所属 Plugin 同时拥有状态证据捕获、Document 提交与后续 Session Selection 更新，Registration 随 Plugin Activation 的可用性建立和释放。
+_Avoid_: Shortcut Handler, Direct Clone, Clipboard Command
+
+**Duplicate ID Materializer**:
+应用提供的一次性同步完整映射，为规范排序的每个源 Node 与源 Edge 分别产生恰好一个新的同类 ID；它不选择源实体，也不构造或改写副本实体，输出顺序不承载语义。
+_Avoid_: ID Factory, Entity Factory, Canvas Fragment Materializer
+
+**Stale Duplicate**:
+Duplicate Selection 捕获的 Selection、源 Node identity、内部 Edge identity 或内部 Edge 闭包已不再与当前稳定状态一致，因而不能安全创建副本或覆盖较新的 Selection；无关 Commit 与外部 incident Edge 不属于该冲突。
+_Avoid_: Stale Gesture, Stale Selection, Global Revision Conflict
 
 **Layout Engine**:
 根据已提交的画布图计算候选布局、但不修改 Document 的能力。
