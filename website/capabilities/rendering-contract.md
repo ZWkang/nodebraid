@@ -52,7 +52,7 @@ Renderer 没有 Document、Session 或 Command 写权。它只投影状态并报
 
 `@nodebraid/renderer-api` 只依赖 NodeBraid 的 Kernel、Session、Interaction Projection value contract 与 Diagnostics，不依赖 Plugin Host、具体后端或框架。
 
-`@nodebraid/plugin-renderer` 静态要求 `KernelService` 与 `SessionService`。应用从 concrete Provider 获得 `RendererFactory<Config>`，调用 `createRendererPlugin(factory)` 生成一个普通 Runtime Plugin，再用 Provider-specific config 安装。NodeBraid 不提供 Factory Registry 或默认 Provider。
+`@nodebraid/plugin-renderer` 静态要求 `KernelService`、`PortService` 与 `SessionService`，并把目标 Document revision 的 Port Snapshot 与每次 Document update 一起交付 Provider。应用从 concrete Provider 获得 `RendererFactory<Config>`，调用 `createRendererPlugin(factory)` 生成一个普通 Runtime Plugin，再用 Provider-specific config 安装。NodeBraid 不提供 Factory Registry 或默认 Provider。
 
 `@nodebraid/renderer-svg` 只依赖 Renderer API 及其值契约，不依赖 Plugin Host；应用可以直接使用 Factory，也可以通过 Renderer Plugin 接入 Runtime。
 

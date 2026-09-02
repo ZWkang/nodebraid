@@ -39,7 +39,7 @@ Document update 调用返回时，Renderer 的逻辑状态必须已经接受更�
 
 ## 依赖与组合
 
-该 package 依赖 `@nodebraid/kernel` 的 Canvas View/Commit 与实体 identity、`@nodebraid/session-api` 的共享 Session Snapshot、`@nodebraid/interaction-api` 的 Projection 值，以及 `@nodebraid/diagnostics` 的结构化错误。它不依赖 Runtime、Plugin Host、具体后端、框架或 `@nodebraid/core`。
+该 package 依赖 `@nodebraid/kernel` 的 Canvas View/Commit 与实体 identity、`@nodebraid/session-api` 的共享 Session Snapshot、`@nodebraid/interaction-api` 的 Projection 值、`@nodebraid/port-api` 的 Port Snapshot，以及 `@nodebraid/diagnostics` 的结构化错误。它不依赖 Runtime、Plugin Host、具体后端、框架或 `@nodebraid/core`。
 
 Provider package 应只依赖本 contract，自行导出具名 Factory 与具体 Config。当前 [`@nodebraid/renderer-svg`](/modules/renderer-svg) 就是这条边界的官方实现；应用可再通过 [`@nodebraid/plugin-renderer`](/modules/plugin-renderer) 把 Factory 接入 Runtime。
 

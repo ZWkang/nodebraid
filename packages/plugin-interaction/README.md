@@ -11,8 +11,10 @@ Document results through typed Commands and one Kernel Transaction.
 
 The current interaction slice supports Node, Edge, Port, Canvas click selection,
 additive Box Selection, multi-Node Drag preview, middle-button and Space-assisted
-Pan, pointer-anchored Wheel Zoom, and optional mouse-only,
-Node-level Edge Connection through an application-owned Edge materializer. Drag
+Pan, pointer-anchored Wheel Zoom, and optional mouse-only Port-aware or
+Node-level Edge Connection through an application-owned Edge materializer. Port
+definitions come from `@nodebraid/plugin-port`; Interaction validates exact
+source/target roles and current definition stability before one commit. Drag
 threshold, Wheel policy, Zoom bounds, and Connection materialization are explicit
 readonly Plugin configuration. All pointer-move previews stay outside Kernel and
 Session until pointerup. Primary dragging from empty Canvas space publishes a

@@ -22,14 +22,15 @@ description: 将 NodeBraid Canvas 语义投影到现有 SVG Target 的参考级 
 - 你愿意由应用通过 CSS 和上层 Interaction 定义产品视觉与编辑行为；
 - 你要直接使用具名 Factory，或通过 [`@nodebraid/plugin-renderer`](/modules/plugin-renderer) 接入 Runtime。
 
-如果产品需要自定义 Node DOM、Port、复杂 Edge、组件挂载或完整编辑器交互，本 package 不是这些能力的替代品。
+如果产品需要自定义 Node DOM、任意 Port shape/position、复杂 Edge、组件挂载或完整编辑器交互，本 package 不是这些能力的替代品。
 
 ## 提供的能力
 
 - 同步 `createSvgRenderer(config)` Factory，一次绑定一个现有 `SVGSVGElement`；
 - 通用矩形 Node、直线 Edge、Selection 标记与 Viewport projection；
 - Pointer、Wheel、Keyboard、Focus 与 Pointer Capture 的真实 DOM bridge；
-- Node Drag、Viewport Pan、Box Selection marquee 与 Connection Preview Projection，以及 node-level source/target Anchor Hit Result；
+- Node Drag、Viewport Pan、Box Selection marquee 与 Connection Preview Projection，以及 Port 或 node-level source/target Anchor Hit Result；
+- source/target Port 的规范边界 Geometry、稳定 DOM seam 与 port-qualified Edge 端点；
 - 从 CSS screen pixel 到 SVG user space 的坐标转换与语义 Hit Test；
 - 稳定 class、`data-nodebraid-*` 属性、canonical layer order 与 keyed DOM identity；
 - 原子 Document/Session 更新、连续 revision 校验、失败回滚与 reset 恢复；
@@ -90,7 +91,8 @@ Provider 写入 geometry、稳定 class 与 `data-nodebraid-*` 属性，但不�
   stroke: currentColor;
 }
 
-.nodebraid-renderer-svg__connection-anchor {
+.nodebraid-renderer-svg__connection-anchor,
+.nodebraid-renderer-svg__port {
   r: 4px;
   fill: currentColor;
 }

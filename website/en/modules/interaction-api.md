@@ -41,4 +41,4 @@ The package depends only on Node identity and Point from `@nodebraid/kernel` and
 
 ## Limits and verification
 
-The current contract includes Node Drag, Viewport Pan, Box Selection, and node-level Connection Preview values. It has no Port Registry, hover, lasso, snapping, Tool Registry, or backend handle. Type and declaration checks reject Runtime, Renderer, DOM, and concrete Provider leakage.
+The current contract includes Node Drag, Viewport Pan, Box Selection, and Connection Preview identities with optional `portId`. It owns no Port Runtime registration, hover, lasso, snapping, Tool Registry, or backend handle. `@nodebraid/port-api` and `@nodebraid/plugin-port` own Port values and Runtime registration; type and declaration checks reject Renderer, DOM, and concrete Provider leakage.

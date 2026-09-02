@@ -25,7 +25,7 @@ A Renderer publishes input facts and Hit Results; it should not decide product b
 
 Shortcut consumer Plugins register an immutable physical-code/modifier-alternatives value and an input-free typed Command. Interaction owns conflicts, repeat, Active Gesture arbitration, capability unavailability, execution abort, and Input Disposition; consumers never subscribe to Renderer Input directly.
 
-The current version also includes optional mouse-only, Node-level Edge Connection. An application materializer owns Edge ID, type, and data; Interaction commits one typed Create Edge Command on pointerup.
+The current version also includes optional mouse-only Port-aware and Node-level Edge Connection. Renderer supplies Port hits for Nodes with definitions and source/target Anchors for Nodes without them. An application materializer owns Edge ID, type, and data; Interaction validates source/target roles and current Port definitions, then commits one typed Create Edge Command on pointerup.
 
 A primary-pointer drag from empty Canvas space enters Box Selection after the threshold. Its Preview contains only a World Rect; pointerup intersects that rect with Node position/size from the current Kernel View and writes Session Selection. Shift, Control, or Meta merges with the existing Selection, while middle-button and Space Pan keep priority.
 
@@ -33,7 +33,7 @@ When the Renderer owns Focus and no Active Gesture exists, either logical `key` 
 
 ## Dependencies and write direction
 
-The Plugin statically requires Renderer, Session, Command, and Kernel Services. It provides only the Shortcut contribution Service and does not expose Active Gesture state.
+The Plugin statically requires Renderer, Session, Command, Kernel, and Port Services. It provides only the Shortcut contribution Service and does not expose Active Gesture state.
 
 ```text
 RendererService ─▶ Input / Hit / Capture / Projection
@@ -49,4 +49,4 @@ One Activation owns one Gesture Pointer. Additional Pointers and Wheel during a 
 
 ## Non-goals and verification
 
-The current version has no Port-aware Connection, self-loop, business validation, Edge/Port box selection, lasso, Backspace deletion, Clipboard, confirmation UI, soft delete, snapping, pinch/touch tool, HTML overlay, text editing, collaboration presence, product UI, or generic Tool Registry. Successful behavior is verified through the complete Runtime + SVG seam in real Chromium.
+The current version has no self-loop, business validation, capacity/type rules, Edge/Port box selection, lasso, Backspace deletion, Clipboard, confirmation UI, soft delete, snapping, pinch/touch tool, HTML overlay, text editing, collaboration presence, product UI, or generic Tool Registry. Successful behavior is verified through the complete Runtime + SVG seam in real Chromium.

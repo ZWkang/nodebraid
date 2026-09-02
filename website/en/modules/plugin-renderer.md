@@ -37,7 +37,7 @@ The current official concrete Provider is [`@nodebraid/renderer-svg`](/en/module
 
 ## Dependencies and composition
 
-The generated Renderer Runtime Plugin statically requires [`KernelService`](/en/modules/plugin-kernel) and [`SessionService`](/en/modules/plugin-session), and provides the sole `rendererService`. It depends directly on `@nodebraid/renderer-api`, Kernel Plugin, Session Plugin, Diagnostics, and the Plugin Host seam. It does not depend on `@nodebraid/core`.
+The generated Renderer Runtime Plugin statically requires [`KernelService`](/en/modules/plugin-kernel), [`PortService`](/en/modules/plugin-port), and [`SessionService`](/en/modules/plugin-session), and provides the sole `rendererService`. It delivers revision-aligned Port Snapshots with Document updates and does not depend on `@nodebraid/core`.
 
 ```ts
 import { kernelPlugin } from '@nodebraid/plugin-kernel';
@@ -83,7 +83,7 @@ These entry points are also re-exported by `@nodebraid/core`.
 
 ## Lifecycle and error semantics
 
-A Renderer Installation remains pending while Kernel or Session Service is missing. Activation waits for the async Factory to return, immediately registers the Renderer as an Owned Resource, then establishes the current Document reset and Session Snapshot. `whenActive()` does not report success before the Renderer is ready.
+A Renderer Installation remains pending while Kernel, Port, or Session Service is missing. Activation waits for the async Factory to return, immediately registers the Renderer as an Owned Resource, then establishes the current Document reset and Session Snapshot. `whenActive()` does not report success before the Renderer is ready.
 
 Subsequent updates pass through one coordinated drain:
 

@@ -29,10 +29,11 @@ import {
 
 The facade re-exports structured errors and Diagnostic Event contracts from
 `@nodebraid/diagnostics`, the pure graph interface from `@nodebraid/kernel`, immutable
-Session values from `@nodebraid/session-api`, backend-neutral Interaction and Renderer
-contracts from `@nodebraid/interaction-api` and `@nodebraid/renderer-api`, and the NodeBraid-owned Plugin Host interface from
+Session values from `@nodebraid/session-api`, immutable Port values from
+`@nodebraid/port-api`, backend-neutral Interaction and Renderer contracts from
+`@nodebraid/interaction-api` and `@nodebraid/renderer-api`, and the NodeBraid-owned Plugin Host interface from
 `@nodebraid/runtime-cordis`. It also re-exports the official Kernel, Command,
-Session, Renderer, Interaction, and History Runtime Plugins from their corresponding
+Port, Session, Renderer, Interaction, and History Runtime Plugins from their corresponding
 `@nodebraid/plugin-*` packages, plus generic Layout contracts and Runtime
 integration from `@nodebraid/layout-api` and `@nodebraid/plugin-layout`.
 The facade also publishes the pure `@nodebraid/canvas-fragment` value seam and

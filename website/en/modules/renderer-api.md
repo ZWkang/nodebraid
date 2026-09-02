@@ -39,7 +39,7 @@ When a Document update call returns, the Renderer's logical state must have acce
 
 ## Dependencies and composition
 
-This package depends on Canvas View/Commit and entity identity from `@nodebraid/kernel`, the shared Session Snapshot from `@nodebraid/session-api`, Projection values from `@nodebraid/interaction-api`, and structured errors from `@nodebraid/diagnostics`. It does not depend on Runtime, the Plugin Host, a concrete backend, a framework, or `@nodebraid/core`.
+This package depends on Canvas View/Commit and entity identity from `@nodebraid/kernel`, the shared Session Snapshot from `@nodebraid/session-api`, Projection values from `@nodebraid/interaction-api`, Port Snapshots from `@nodebraid/port-api`, and structured errors from `@nodebraid/diagnostics`. It does not depend on Runtime, the Plugin Host, a concrete backend, a framework, or `@nodebraid/core`.
 
 A Provider package should depend only on this contract and export a named Factory plus its concrete Config. The current [`@nodebraid/renderer-svg`](/en/modules/renderer-svg) package is the official implementation of this boundary. An application can then connect the Factory to the Runtime through [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer).
 

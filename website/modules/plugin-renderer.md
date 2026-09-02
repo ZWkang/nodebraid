@@ -37,7 +37,7 @@ Document/Session 投影方法和 dispose authority 保持私有。Interaction �
 
 ## 依赖与组合
 
-生成的 Renderer Runtime Plugin 静态要求 [`KernelService`](/modules/plugin-kernel) 与 [`SessionService`](/modules/plugin-session)，并提供唯一 `rendererService`。它直接依赖 `@nodebraid/renderer-api`、Kernel Plugin、Session Plugin、Diagnostics 与 Plugin Host seam，不依赖 `@nodebraid/core`。
+生成的 Renderer Runtime Plugin 静态要求 [`KernelService`](/modules/plugin-kernel)、[`PortService`](/modules/plugin-port) 与 [`SessionService`](/modules/plugin-session)，并提供唯一 `rendererService`。它把 revision 对齐的 Port Snapshot 与 Document update 一起交付 Provider，不依赖 `@nodebraid/core`。
 
 ```ts
 import { kernelPlugin } from '@nodebraid/plugin-kernel';
@@ -83,7 +83,7 @@ import {
 
 ## 生命周期与错误语义
 
-Renderer Installation 在 Kernel 或 Session Service 缺失时保持 pending。Activation 会等待 async Factory 返回，立即把 Renderer 登记为 Owned Resource，再建立当前 Document reset 与 Session Snapshot；`whenActive()` 不会在 Renderer 尚未准备好时提前成功。
+Renderer Installation 在 Kernel、Port 或 Session Service 缺失时保持 pending。Activation 会等待 async Factory 返回，立即把 Renderer 登记为 Owned Resource，再建立当前 Document reset 与 Session Snapshot；`whenActive()` 不会在 Renderer 尚未准备好时提前成功。
 
 后续更新经过单一 drain 协调：
 

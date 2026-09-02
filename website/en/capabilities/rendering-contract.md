@@ -52,7 +52,7 @@ The Renderer has no write authority over the Document, Session, or Commands. It 
 
 `@nodebraid/renderer-api` depends only on NodeBraid's Kernel, Session, and Interaction Projection value contracts plus Diagnostics. It does not depend on the Plugin Host, a concrete backend, or a framework.
 
-`@nodebraid/plugin-renderer` statically requires `KernelService` and `SessionService`. The application obtains a `RendererFactory<Config>` from a concrete Provider, calls `createRendererPlugin(factory)` to generate a normal Runtime Plugin, then installs it with Provider-specific config. NodeBraid provides neither a Factory Registry nor a default Provider.
+`@nodebraid/plugin-renderer` statically requires `KernelService`, `PortService`, and `SessionService`, delivering the target Document revision's Port Snapshot with each Document update. The application obtains a `RendererFactory<Config>` from a concrete Provider, calls `createRendererPlugin(factory)` to generate a normal Runtime Plugin, then installs it with Provider-specific config. NodeBraid provides neither a Factory Registry nor a default Provider.
 
 `@nodebraid/renderer-svg` depends only on the Renderer API and its value contracts, not on the Plugin Host. Applications can use the Factory directly or connect it to the Runtime through the Renderer Plugin.
 

@@ -183,11 +183,27 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
         },
       },
       {
+        name: '@nodebraid/port-api',
+        slug: 'port-api',
+        summary: {
+          zh: 'Document 之外的不可变 Port 定义与 Snapshot 值契约。',
+          en: 'Immutable Port definition and Snapshot values outside the Document.',
+        },
+      },
+      {
+        name: '@nodebraid/plugin-port',
+        slug: 'plugin-port',
+        summary: {
+          zh: 'Activation-scoped Port Contribution Runtime。',
+          en: 'The activation-scoped Port Contribution Runtime.',
+        },
+      },
+      {
         name: '@nodebraid/plugin-interaction',
         slug: 'plugin-interaction',
         summary: {
-          zh: 'Selection、Drag、Pan 与 Wheel Zoom Runtime。',
-          en: 'The Selection, Drag, Pan, and Wheel Zoom Runtime.',
+          zh: 'Selection、Drag、Pan、Zoom 与 Port-aware Connection Runtime。',
+          en: 'The Selection, Drag, Pan, Zoom, and Port-aware Connection Runtime.',
         },
       },
       {

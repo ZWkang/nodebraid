@@ -35,8 +35,9 @@ If you are building an internal NodeBraid package or need only one narrow low-le
 - immutable Session values from `@nodebraid/session-api`;
 - backend-neutral Renderer contracts from `@nodebraid/renderer-api`;
 - backend-neutral Interaction Projection values from `@nodebraid/interaction-api`;
+- Port definition/Snapshot values from `@nodebraid/port-api` and the `@nodebraid/plugin-port` Runtime;
 - the NodeBraid-owned Plugin Host API from `@nodebraid/runtime-cordis`;
-- the Kernel, Command, Session, Renderer, Interaction, Duplicate Selection, Clipboard, and History Runtime Plugins;
+- the Kernel, Port, Command, Session, Renderer, Interaction, Duplicate Selection, Clipboard, and History Runtime Plugins;
 - the backend-neutral Basic Canvas Composition from `@nodebraid/preset-basic`;
 - the generic Layout API and Layout Runtime Plugin.
 

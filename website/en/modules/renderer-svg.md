@@ -22,14 +22,15 @@ It provides generic rectangular Nodes, straight Edges, and a stable DOM seam. It
 - Your application will define product visuals and editing behavior through CSS and higher-level Interaction;
 - You want to use a named Factory directly or connect it to the Runtime through [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer).
 
-If the product needs custom Node DOM, Ports, complex Edges, component mounting, or complete editor interaction, this package is not a substitute for those capabilities.
+If the product needs custom Node DOM, arbitrary Port shapes/positions, complex Edges, component mounting, or complete editor interaction, this package is not a substitute for those capabilities.
 
 ## What it provides
 
 - A synchronous `createSvgRenderer(config)` Factory bound to one existing `SVGSVGElement`;
 - Generic rectangular Nodes, straight Edges, Selection markers, and Viewport projection;
 - A real-DOM bridge for Pointer, Wheel, Keyboard, Focus, and Pointer Capture;
-- Node Drag, Viewport Pan, Box Selection marquee, and Connection Preview Projections plus Node-level source/target Anchor Hit Results;
+- Node Drag, Viewport Pan, Box Selection marquee, and Connection Preview Projections plus Port or Node-level source/target Anchor Hit Results;
+- canonical boundary Geometry, stable DOM seams, and port-qualified Edge endpoints for source/target Ports;
 - CSS-screen-pixel to SVG-user-space conversion and semantic Hit Testing;
 - Stable classes, `data-nodebraid-*` attributes, canonical layer order, and keyed DOM identity;
 - Atomic Document/Session updates, continuous revision validation, rollback on failure, and reset recovery;
@@ -87,6 +88,12 @@ The Provider writes geometry, stable classes, and `data-nodebraid-*` attributes,
 
 .nodebraid-renderer-svg__edge {
   stroke: currentColor;
+}
+
+.nodebraid-renderer-svg__connection-anchor,
+.nodebraid-renderer-svg__port {
+  r: 4px;
+  fill: currentColor;
 }
 
 [data-nodebraid-selected='true'] {

@@ -25,7 +25,7 @@ Renderer 只发布输入事实和 Hit Result，不应决定产品行为。该 Pl
 
 Shortcut consumer Plugin 可以注册不可变 physical-code + modifier alternatives 与无输入 typed Command。Interaction 统一处理 Binding 冲突、repeat、Active Gesture、capability unavailable、execution abort 与 Input Disposition；consumer 不直接订阅 Renderer。
 
-当前行为还包括 mouse-only Node-level Edge Connection：Renderer 提供 source/target Anchor，应用 materializer 拥有 Edge ID/type/data，Interaction 只在 pointerup 提交一次 typed Command。
+当前行为还包括 mouse-only Port-aware 与 Node-level Edge Connection：Renderer 为带 Port 定义的 Node 提供 Port Hit，为无 Port Node 提供 source/target Anchor；应用 materializer 拥有 Edge ID/type/data，Interaction 验证 source/target role 与当前 Port 定义，并只在 pointerup 提交一次 typed Command。
 
 Primary pointer 从空白 Canvas 拖动超过 threshold 后进入 Box Selection；Preview 只包含 World Rect，pointerup 才按当前 Kernel View 的 Node position/size 相交结果更新 Session。Shift、Control 或 Meta 与既有 Additive Modifier 语义一致，合并已有 Selection；中键和 Space Pan 优先。
 
@@ -33,7 +33,7 @@ Renderer 拥有 Focus 且没有 Active Gesture 时，logical `key` 或 physical 
 
 ## 依赖与写入方向
 
-Plugin 静态要求 Renderer、Session、Command 与 Kernel Service，只提供 Shortcut contribution Service，不公开 Active Gesture 状态。
+Plugin 静态要求 Renderer、Session、Command、Kernel 与 Port Service，只提供 Shortcut contribution Service，不公开 Active Gesture 状态。
 
 ```text
 RendererService ─▶ Input / Hit / Capture / Projection
@@ -49,4 +49,4 @@ Pointermove 只替换 Interaction Projection。pointerup 先清 Preview 并回�
 
 ## 非目标与验证
 
-当前不包含 Port-aware Connection、self-loop、业务 validation、Edge/Port 框选、lasso、Backspace、Clipboard、确认弹窗、soft delete、snapping、pinch/touch tool、HTML overlay、文本编辑、协作 presence、产品 UI 或通用 Tool Registry。成功行为由真实 Chromium 中的完整 Runtime + SVG seam 验证。
+当前不包含 self-loop、业务 validation、容量/类型规则、Edge/Port 框选、lasso、Backspace、Clipboard、确认弹窗、soft delete、snapping、pinch/touch tool、HTML overlay、文本编辑、协作 presence、产品 UI 或通用 Tool Registry。成功行为由真实 Chromium 中的完整 Runtime + SVG seam 验证。

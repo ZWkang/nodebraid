@@ -17,7 +17,7 @@ SVG Renderer Provider 已经通过真实 Target、Document/Session 同步、输�
 
 ## Interaction 扩展与框架接入
 
-Duplicate Selection 与显式 Clipboard Copy/Paste 已经通过独立 Behavior/Shortcut Plugin 交付，并共用纯内存 Canvas Fragment；选择、Box Selection、Delete Selection、多 Node 拖动、Pan、Wheel Zoom 与 node-level Edge Connection 也已存在。Serialized Document、Persistence、跨版本 Clipboard format、Port-aware Connection、Edge/Port 框选、lasso、snapping、pinch/touch、文本编辑或可扩展 Tool Registry 仍需独立设计。React、Vue 或其他 framework adapter 应保持在 Runtime 与 UI 框架之间，不取得第二份 Document authority。
+Duplicate Selection 与显式 Clipboard Copy/Paste 已经通过独立 Behavior/Shortcut Plugin 交付，并共用纯内存 Canvas Fragment；选择、Box Selection、Delete Selection、多 Node 拖动、Pan、Wheel Zoom、Port Capability 与 Port-aware/Node-level Edge Connection 也已存在。Serialized Document、Persistence、跨版本 Clipboard format、Edge/Port 框选、lasso、snapping、pinch/touch、文本编辑或可扩展 Tool Registry 仍需独立设计。React、Vue 或其他 framework adapter 应保持在 Runtime 与 UI 框架之间，不取得第二份 Document authority。
 
 ## Composition 与示例
 

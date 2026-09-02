@@ -9,14 +9,15 @@ Interaction 能力回答“用户输入怎样变成画布语义行为”。它�
 
 ## 当前交付
 
-| 层次         | Package                                                                        | 职责                                                                                                |
-| ------------ | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| 值契约       | [`@nodebraid/interaction-api`](/modules/interaction-api)                       | Node Drag、Viewport Pan、Box Selection 与 Connection Preview 不可变 Projection                      |
-| Runtime 行为 | [`@nodebraid/plugin-interaction`](/modules/plugin-interaction)                 | Selection、Box Selection、Delete Selection、multi-Node Drag、Pan、Wheel Zoom、Connection 与生命周期 |
-| 复制行为     | [`@nodebraid/plugin-duplicate-selection`](/modules/plugin-duplicate-selection) | 独立 Duplicate Command、ID materialization、子图复制与 Ctrl/Cmd+D Binding                           |
-| 剪贴板行为   | [`@nodebraid/plugin-clipboard`](/modules/plugin-clipboard)                     | 应用拥有 codec/transport 的 Copy/Paste Command 与 Ctrl/Cmd+C / Ctrl/Cmd+V Binding                   |
-| 投影中介     | [`@nodebraid/plugin-renderer`](/modules/plugin-renderer)                       | 排他的 Interaction Projection Binding 与 Renderer 同步                                              |
-| 参考后端     | [`@nodebraid/renderer-svg`](/modules/renderer-svg)                             | 在真实 SVG Geometry 上显示 Preview，并统一 Hit/Input 坐标                                           |
+| 层次         | Package                                                                        | 职责                                                                                          |
+| ------------ | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| 值契约       | [`@nodebraid/interaction-api`](/modules/interaction-api)                       | Node Drag、Viewport Pan、Box Selection 与 Connection Preview 不可变 Projection                |
+| Port 能力    | [`@nodebraid/plugin-port`](/modules/plugin-port)                               | Node/领域 Contribution 到 revision-bound Port Snapshot                                        |
+| Runtime 行为 | [`@nodebraid/plugin-interaction`](/modules/plugin-interaction)                 | Selection、Box Selection、Delete Selection、Drag、Pan、Zoom、Port-aware/Node-level Connection |
+| 复制行为     | [`@nodebraid/plugin-duplicate-selection`](/modules/plugin-duplicate-selection) | 独立 Duplicate Command、ID materialization、子图复制与 Ctrl/Cmd+D Binding                     |
+| 剪贴板行为   | [`@nodebraid/plugin-clipboard`](/modules/plugin-clipboard)                     | 应用拥有 codec/transport 的 Copy/Paste Command 与 Ctrl/Cmd+C / Ctrl/Cmd+V Binding             |
+| 投影中介     | [`@nodebraid/plugin-renderer`](/modules/plugin-renderer)                       | 排他的 Interaction Projection Binding 与 Renderer 同步                                        |
+| 参考后端     | [`@nodebraid/renderer-svg`](/modules/renderer-svg)                             | 在真实 SVG Geometry 上显示 Preview，并统一 Hit/Input 坐标                                     |
 
 ```text
 Renderer Input + Hit Result

@@ -42,4 +42,4 @@ Package 只依赖 `@nodebraid/kernel` 的 Node ID/Point 与 `@nodebraid/session-
 
 ## 限制与验证
 
-当前包含 Node Drag、Viewport Pan、Box Selection 与 node-level Connection Preview，不提供 Port Registry、hover、lasso、snapping、Tool Registry 或任意后端 handle。类型/声明检查拒绝 Runtime、Renderer、DOM 与具体 Provider 泄漏。
+当前包含 Node Drag、Viewport Pan、Box Selection 与可选 `portId` 的 Connection Preview identity，不提供 Port Runtime 注册、hover、lasso、snapping、Tool Registry 或任意后端 handle。Port 值与 Runtime 分别由 `@nodebraid/port-api` 和 `@nodebraid/plugin-port` 拥有；类型/声明检查拒绝 Renderer、DOM 与具体 Provider 泄漏。

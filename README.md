@@ -202,10 +202,12 @@ and is not re-exported as a default through `@nodebraid/core`.
 ## Interaction packages
 
 `@nodebraid/interaction-api` owns immutable, backend-neutral Node Drag, Viewport Pan,
-Box Selection, and Connection Preview values. `@nodebraid/plugin-interaction` consumes normalized
+Box Selection, and Connection Preview values. `@nodebraid/port-api` and
+`@nodebraid/plugin-port` provide immutable Port Snapshots plus activation-scoped
+Node/domain contributions. `@nodebraid/plugin-interaction` consumes normalized
 Renderer Input and Hit Results, implements selection, Box Selection, multi-Node Drag,
-middle/Space Pan, anchored Wheel Zoom, and optional mouse-only Node-level
-Edge Connection plus focused Delete Selection, and provides a narrow Shortcut
+middle/Space Pan, anchored Wheel Zoom, and optional mouse-only Port-aware or
+Node-level Edge Connection plus focused Delete Selection, and provides a narrow Shortcut
 contribution Service without exposing Interaction state.
 
 Stable Selection and Viewport changes go through Session; final Node movement,
@@ -260,7 +262,7 @@ current History Activation; reactivation starts from a fresh empty Baseline.
 ## Basic Canvas Composition
 
 `@nodebraid/preset-basic` exposes `createBasicCanvasPlugin(rendererFactory,
-options?)`, a backend-neutral ordinary Plugin that owns Kernel, Command,
+options?)`, a backend-neutral ordinary Plugin that owns Kernel, Port, Command,
 Session, Renderer, Interaction, and History through Child Installations. The
 Composition waits for every child to become active and releases them in reverse
 dependency-safe order.

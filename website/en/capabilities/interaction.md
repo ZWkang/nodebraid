@@ -12,7 +12,8 @@ The Interaction capability answers how user input becomes semantic canvas behavi
 | Layer              | Package                                                                           | Responsibility                                                                                    |
 | ------------------ | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | Value contract     | [`@nodebraid/interaction-api`](/en/modules/interaction-api)                       | Immutable Node Drag, Viewport Pan, Box Selection, and Connection Preview Projections              |
-| Runtime behavior   | [`@nodebraid/plugin-interaction`](/en/modules/plugin-interaction)                 | Selection, Box Selection, Delete Selection, Drag, Pan, Zoom, node-level Connection, and lifecycle |
+| Port capability    | [`@nodebraid/plugin-port`](/en/modules/plugin-port)                               | Node/domain Contributions resolved into revision-bound Port Snapshots                             |
+| Runtime behavior   | [`@nodebraid/plugin-interaction`](/en/modules/plugin-interaction)                 | Selection, Box Selection, Delete Selection, Drag, Pan, Zoom, and Port-aware/node-level Connection |
 | Duplicate behavior | [`@nodebraid/plugin-duplicate-selection`](/en/modules/plugin-duplicate-selection) | Independent Duplicate Command, ID materialization, subgraph copy, and Ctrl/Cmd+D Binding          |
 | Clipboard behavior | [`@nodebraid/plugin-clipboard`](/en/modules/plugin-clipboard)                     | Copy/Paste Commands with application-owned codec/transport and Ctrl/Cmd+C / Ctrl/Cmd+V Bindings   |
 | Projection adapter | [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer)                       | Exclusive Interaction Projection Binding and Renderer synchronization                             |

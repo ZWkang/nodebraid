@@ -32,9 +32,11 @@
 - `bun run --filter '@nodebraid/plugin-session' build:dependencies`：生成 Session Runtime Plugin 构建与类型检查所需的 Kernel、Runtime 与 Kernel Plugin workspace 声明。
 - `bun run --filter '@nodebraid/session-api' build:dependencies`：生成 Session 值契约所需的 Kernel workspace 声明。
 - `bun run --filter '@nodebraid/interaction-api' build:dependencies`：生成 Interaction Projection 值契约所需的 Kernel 与 Session API workspace 声明。
-- `bun run --filter '@nodebraid/renderer-api' build:dependencies`：生成 Renderer 协议所需的 Diagnostics、Kernel 与 Session API workspace 声明。
-- `bun run --filter '@nodebraid/plugin-renderer' build:dependencies`：生成 Renderer Runtime Plugin 所需的 Renderer API、Kernel Plugin 与 Session Plugin workspace 声明。
-- `bun run --filter '@nodebraid/plugin-interaction' build:dependencies`：生成 Interaction Runtime Plugin 所需的 Command、Kernel、Session 与 Renderer Plugin workspace 声明。
+- `bun run --filter '@nodebraid/port-api' build:dependencies`：生成 Port 值契约所需的 Kernel workspace 声明。
+- `bun run --filter '@nodebraid/plugin-port' build:dependencies`：生成 Port Runtime Plugin 所需的 Port API 与 Runtime workspace 声明。
+- `bun run --filter '@nodebraid/renderer-api' build:dependencies`：生成 Renderer 协议所需的 Diagnostics、Kernel、Port 与 Session API workspace 声明。
+- `bun run --filter '@nodebraid/plugin-renderer' build:dependencies`：生成 Renderer Runtime Plugin 所需的 Renderer API、Port、Kernel 与 Session Plugin workspace 声明。
+- `bun run --filter '@nodebraid/plugin-interaction' build:dependencies`：生成 Interaction Runtime Plugin 所需的 Command、Kernel、Port、Session 与 Renderer Plugin workspace 声明。
 - `bun run --filter '@nodebraid/plugin-interaction' build:test-dependencies`：在生产依赖之外生成 Interaction 公共 seam 测试所需的 History Plugin workspace 声明。
 - `bun run --filter '@nodebraid/canvas-fragment' build:dependencies`：生成纯 Canvas Fragment 值契约所需的 Kernel workspace 声明。
 - `bun run --filter '@nodebraid/plugin-duplicate-selection' build:dependencies`：生成 Duplicate Selection Behavior 与 Shortcut Plugin 构建所需的 Command、Kernel、Session 与 Interaction workspace 声明。

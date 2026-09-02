@@ -17,7 +17,7 @@ The SVG Renderer Provider has now proven a real Target, Document/Session synchro
 
 ## Interaction extensions and framework integration
 
-Independent Behavior and Shortcut Plugins now deliver Duplicate Selection and explicit Clipboard Copy/Paste over a shared in-memory Canvas Fragment. Selection, Box Selection, Delete Selection, multi-Node dragging, Pan, Wheel Zoom, and node-level Edge Connection are also present. Serialized Document, Persistence, a cross-version Clipboard format, Port-aware Connection, Edge/Port box selection, lasso, snapping, pinch/touch, text editing, and an extensible Tool Registry remain separate future designs. React, Vue, or other framework adapters should remain between the Runtime and UI framework without acquiring a second source of Document authority.
+Independent Behavior and Shortcut Plugins now deliver Duplicate Selection and explicit Clipboard Copy/Paste over a shared in-memory Canvas Fragment. Selection, Box Selection, Delete Selection, multi-Node dragging, Pan, Wheel Zoom, the Port Capability, and Port-aware/node-level Edge Connection are also present. Serialized Document, Persistence, a cross-version Clipboard format, Edge/Port box selection, lasso, snapping, pinch/touch, text editing, and an extensible Tool Registry remain separate future designs. React, Vue, or other framework adapters should remain between the Runtime and UI framework without acquiring a second source of Document authority.
 
 ## Composition and examples
 

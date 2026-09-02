@@ -4,8 +4,8 @@
 
 Backend-neutral Basic Canvas Composition for NodeBraid. Applications explicitly
 create a Plugin Host, select a Renderer Factory, and install the returned Plugin
-with Provider-specific configuration. The Composition owns Kernel, Command,
-Session, Renderer, Interaction, and History through one lifecycle.
+with Provider-specific configuration. The Composition owns Kernel, Port,
+Command, Session, Renderer, Interaction, and History through one lifecycle.
 
 The package does not select a default Renderer, create a Host, expose a Service
 Locator, or install Layout and product capabilities. Concrete Renderer Providers
