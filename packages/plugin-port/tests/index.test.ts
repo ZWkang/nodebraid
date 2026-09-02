@@ -65,9 +65,14 @@ test('domain Plugins contribute canonical Ports and disposal removes them', asyn
       },
     ],
   });
+  const sourceNode = kernel.read().query.getNode(source);
+  if (!sourceNode) throw new Error('Expected source Node.');
+  expect(ports.isConnectionTargetDefined(sourceNode, { nodeId: source, portId: 'out-a', role: 'source' })).toBeTrue();
+  expect(ports.isConnectionTargetDefined(sourceNode, { nodeId: source, role: 'source' })).toBeFalse();
 
   await contribution.dispose();
   expect(ports.snapshot(kernel.read().snapshot).nodes).toEqual([]);
+  expect(ports.isConnectionTargetDefined(sourceNode, { nodeId: source, role: 'source' })).toBeTrue();
   await host.dispose();
 });
 

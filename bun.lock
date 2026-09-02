@@ -89,6 +89,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@nodebraid/kernel": "workspace:*",
+        "@nodebraid/port-api": "workspace:*",
         "@nodebraid/session-api": "workspace:*",
       },
     },

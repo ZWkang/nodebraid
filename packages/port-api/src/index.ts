@@ -1,2 +1,2 @@
-export type { NodePortSnapshot, PortDefinition, PortRole, PortSnapshot } from './contracts';
-export { getNodePortSnapshot, getPortDefinition, hasPortDefinitions } from './port-query';
+export type { ConnectionTargetReference, NodePortSnapshot, PortDefinition, PortRole, PortSnapshot } from './contracts';
+export { getNodePortSnapshot, getPortDefinition, hasPortDefinitions, isConnectionTargetDefined } from './port-query';

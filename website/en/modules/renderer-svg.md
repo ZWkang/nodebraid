@@ -119,7 +119,7 @@ Document revision, Session, Input subscriber, Pointer, and disposed-state failur
 ## Limitations and non-goals
 
 - Renders only explicitly sized rectangular Nodes and straight Edges between valid endpoints;
-- No Ports, self-loops, curves, markers, labels, rich text, animation, or product-specific Node appearance;
+- Nodes without Ports use node-level Connection Anchors; Ports use canonical boundary Geometry, while self-loops, curves, markers, labels, rich text, animation, and product-specific Node appearance remain unsupported;
 - No default theme, theme Registry, component slots, or framework adapter;
 - Does not interpret Interaction behavior and provides no Commands, drag state machine, Selection writes, or persistence; it only displays an accepted semantic Projection;
 - Does not create the SVG Target or take ownership of the caller's existing Target children;

@@ -7,7 +7,7 @@ import type {
   ViewportPanInteractionProjection,
 } from '@nodebraid/interaction-api';
 import type { CanvasSnapshot } from '@nodebraid/kernel';
-import { getPortDefinition, hasPortDefinitions, type PortSnapshot } from '@nodebraid/port-api';
+import { isConnectionTargetDefined, type PortSnapshot } from '@nodebraid/port-api';
 import { RendererError } from '@nodebraid/renderer-api';
 import type { SessionSnapshot } from '@nodebraid/session-api';
 
@@ -243,8 +243,7 @@ function connectionAnchorAvailable(
 ): boolean {
   const node = document.nodes.find((candidate) => candidate.id === anchor.nodeId);
   if (!node?.size || node.size.width <= 0 || node.size.height <= 0) return false;
-  if (anchor.portId === undefined) return !hasPortDefinitions(ports, anchor.nodeId);
-  return getPortDefinition(ports, anchor.nodeId, anchor.portId)?.role === anchor.role;
+  return isConnectionTargetDefined(ports, anchor);
 }
 
 function throwInvalidProjectionType(): never {

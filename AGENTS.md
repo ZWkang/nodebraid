@@ -31,7 +31,7 @@
 - `bun run --filter '@nodebraid/layout-elk' build:dependencies`：生成 ELK Layout Provider 构建与类型检查所需的 Layout API workspace 声明。
 - `bun run --filter '@nodebraid/plugin-session' build:dependencies`：生成 Session Runtime Plugin 构建与类型检查所需的 Kernel、Runtime 与 Kernel Plugin workspace 声明。
 - `bun run --filter '@nodebraid/session-api' build:dependencies`：生成 Session 值契约所需的 Kernel workspace 声明。
-- `bun run --filter '@nodebraid/interaction-api' build:dependencies`：生成 Interaction Projection 值契约所需的 Kernel 与 Session API workspace 声明。
+- `bun run --filter '@nodebraid/interaction-api' build:dependencies`：生成 Interaction Projection 值契约所需的 Kernel、Port 与 Session API workspace 声明。
 - `bun run --filter '@nodebraid/port-api' build:dependencies`：生成 Port 值契约所需的 Kernel workspace 声明。
 - `bun run --filter '@nodebraid/plugin-port' build:dependencies`：生成 Port Runtime Plugin 所需的 Port API 与 Runtime workspace 声明。
 - `bun run --filter '@nodebraid/renderer-api' build:dependencies`：生成 Renderer 协议所需的 Diagnostics、Kernel、Port 与 Session API workspace 声明。

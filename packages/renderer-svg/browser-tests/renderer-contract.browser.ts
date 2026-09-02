@@ -652,6 +652,28 @@ try {
   });
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownConnectionInteraction()');
 
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupConnectionInteraction(true, true)');
+  await dispatchMouseDown(120, 120);
+  await dispatchMouseMove(240, 120);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
+    preview: { x1: '120', y1: '120', x2: '240', y2: '120', target: 'valid' },
+  });
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgRemoveConnectionTargetPort()');
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
+    preview: { x1: '120', y1: '120', x2: '240', y2: '120', target: 'none' },
+  });
+  await dispatchMouseUp(240, 120);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
+    revision: 1,
+    edgeIds: [],
+    preview: null,
+  });
+  await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgTeardownConnectionInteraction()');
+
   await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgSetupConnectionInteraction()');
   await dispatchMouseDown(120, 120);
   await dispatchMouseMove(40, 120);

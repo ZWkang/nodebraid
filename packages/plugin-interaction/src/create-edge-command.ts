@@ -1,7 +1,6 @@
 import { defineCommand, type CommandHandler } from '@nodebraid/plugin-command';
 import type { KernelService } from '@nodebraid/plugin-kernel';
 import type { PortService } from '@nodebraid/plugin-port';
-import { getPortDefinition, hasPortDefinitions, type PortSnapshot } from '@nodebraid/port-api';
 
 import type { CreateEdgeInput, CreateEdgeResult } from './contracts';
 import { isCanvasEdge, isRecord } from './canvas-value-validation';
@@ -17,7 +16,6 @@ export function createEdgeHandler(
   return (input, execution) => {
     execution.signal.throwIfAborted();
     assertCreateEdgeInput(input);
-    const portSnapshot = ports.snapshot(kernel.read().snapshot);
     const commit = kernel.transact(
       (transaction) => {
         if (input.source.role !== 'source' || input.target.role !== 'target') throwInvalidConnection();
@@ -30,12 +28,14 @@ export function createEdgeHandler(
         ) {
           throwInvalidConnection();
         }
-        if (!transaction.query.getNode(input.source.nodeId) || !transaction.query.getNode(input.target.nodeId)) {
+        const sourceNode = transaction.query.getNode(input.source.nodeId);
+        const targetNode = transaction.query.getNode(input.target.nodeId);
+        if (!sourceNode || !targetNode) {
           throw new InteractionError('STALE_GESTURE', 'Create Edge Command Endpoint Node disappeared.');
         }
         if (
-          !connectionAnchorAvailable(input.source, portSnapshot) ||
-          !connectionAnchorAvailable(input.target, portSnapshot)
+          !ports.isConnectionTargetDefined(sourceNode, input.source) ||
+          !ports.isConnectionTargetDefined(targetNode, input.target)
         ) {
           throw new InteractionError('STALE_GESTURE', 'Create Edge Command Port Definition changed.');
         }
@@ -70,11 +70,6 @@ function isConnectionAnchor(value: unknown): value is CreateEdgeInput['source'] 
     (value.portId === undefined || (typeof value.portId === 'string' && value.portId.length > 0)) &&
     (value.role === 'source' || value.role === 'target')
   );
-}
-
-function connectionAnchorAvailable(anchor: CreateEdgeInput['source'], ports: PortSnapshot): boolean {
-  if (anchor.portId === undefined) return !hasPortDefinitions(ports, anchor.nodeId);
-  return getPortDefinition(ports, anchor.nodeId, anchor.portId)?.role === anchor.role;
 }
 
 function throwInvalidConnection(): never {

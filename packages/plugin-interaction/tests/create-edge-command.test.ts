@@ -170,6 +170,32 @@ test('Create Edge commits one complete Node-level Edge', async () => {
   await expect(
     commands.execute(createEdgeCommand, {
       edge: {
+        id: edgeId('wrong-role-port-edge'),
+        type: 'flow',
+        source: { nodeId: sourceNodeId, portId: 'input' },
+        target: { nodeId: targetNodeId, portId: 'input' },
+        data: null,
+      },
+      source: { nodeId: sourceNodeId, portId: 'input', role: 'source' },
+      target: { nodeId: targetNodeId, portId: 'input', role: 'target' },
+    }),
+  ).rejects.toMatchObject({ domain: 'interaction', code: 'STALE_GESTURE' });
+  await expect(
+    commands.execute(createEdgeCommand, {
+      edge: {
+        id: edgeId('malformed-role-edge'),
+        type: 'flow',
+        source: { nodeId: sourceNodeId, portId: 'output' },
+        target: { nodeId: targetNodeId, portId: 'input' },
+        data: null,
+      },
+      source: { nodeId: sourceNodeId, portId: 'output', role: 'target' },
+      target: { nodeId: targetNodeId, portId: 'input', role: 'target' },
+    }),
+  ).rejects.toMatchObject({ domain: 'interaction', code: 'INVALID_CONNECTION' });
+  await expect(
+    commands.execute(createEdgeCommand, {
+      edge: {
         id: edgeId('bypass-port-edge'),
         type: 'flow',
         source: { nodeId: sourceNodeId },

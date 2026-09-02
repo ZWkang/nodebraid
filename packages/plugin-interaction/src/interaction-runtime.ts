@@ -5,14 +5,13 @@ import {
   type ConnectionPreviewTarget,
   type WorldRect,
 } from '@nodebraid/interaction-api';
-import type { NodeId, Point } from '@nodebraid/kernel';
+import type { CanvasNode, NodeId, Point } from '@nodebraid/kernel';
 import { commandService, type CommandRegistration, type CommandService } from '@nodebraid/plugin-command';
 import { kernelService } from '@nodebraid/plugin-kernel';
-import { portService } from '@nodebraid/plugin-port';
+import { portService, type PortService } from '@nodebraid/plugin-port';
 import { rendererService } from '@nodebraid/plugin-renderer';
 import { sessionService, type Viewport } from '@nodebraid/plugin-session';
 import type { HitResult } from '@nodebraid/renderer-api';
-import { getPortDefinition, hasPortDefinitions, type PortSnapshot } from '@nodebraid/port-api';
 import type { PluginContext } from '@nodebraid/runtime-cordis';
 
 import { computeClickSelection } from './selection-transition';
@@ -224,16 +223,15 @@ export function activateInteractionRuntime(
     } else if (gesture.type === 'viewport-pan') {
       reapplyGestureProjection(gesture);
     } else if (gesture.type === 'connection') {
-      const portSnapshot = ports.snapshot(commit.after.snapshot);
-      if (!connectionAnchorAvailable(gesture.source, commit.after.query.getNode(gesture.source.nodeId), portSnapshot)) {
+      if (!connectionAnchorAvailable(ports, gesture.source, commit.after.query.getNode(gesture.source.nodeId))) {
         cancelGesture(gesture, 'stale', true);
       } else {
         if (
           gesture.target.type !== 'none' &&
           !connectionAnchorAvailable(
+            ports,
             gesture.target.anchor,
             commit.after.query.getNode(gesture.target.anchor.nodeId),
-            portSnapshot,
           )
         ) {
           gesture.target = { type: 'none' };
@@ -249,18 +247,13 @@ export function activateInteractionRuntime(
     const gesture = activeGesture;
     if (gesture.type === 'connection') {
       const view = kernel.read();
-      const portSnapshot = ports.snapshot(view.snapshot);
-      if (!connectionAnchorAvailable(gesture.source, view.query.getNode(gesture.source.nodeId), portSnapshot)) {
+      if (!connectionAnchorAvailable(ports, gesture.source, view.query.getNode(gesture.source.nodeId))) {
         cancelGesture(gesture, 'stale', true);
         return;
       }
       if (
         gesture.target.type !== 'none' &&
-        !connectionAnchorAvailable(
-          gesture.target.anchor,
-          view.query.getNode(gesture.target.anchor.nodeId),
-          portSnapshot,
-        )
+        !connectionAnchorAvailable(ports, gesture.target.anchor, view.query.getNode(gesture.target.anchor.nodeId))
       ) {
         gesture.target = { type: 'none' };
       }
@@ -635,13 +628,11 @@ function toConnectionAnchor(hit: HitResult | null): ConnectionAnchorIdentity | u
 }
 
 function connectionAnchorAvailable(
+  ports: PortService,
   anchor: ConnectionAnchorIdentity,
-  node: Readonly<{ readonly id: NodeId }> | undefined,
-  ports: PortSnapshot,
+  node: CanvasNode | undefined,
 ): boolean {
-  if (!node) return false;
-  if (anchor.portId === undefined) return !hasPortDefinitions(ports, anchor.nodeId);
-  return getPortDefinition(ports, anchor.nodeId, anchor.portId)?.role === anchor.role;
+  return node !== undefined && ports.isConnectionTargetDefined(node, anchor);
 }
 
 function emitGestureCancellation(

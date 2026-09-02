@@ -148,8 +148,8 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       session = context.services.session;
     },
   });
-  const composition = host.install(basicCanvasPlugin, { target, connectionAnchorHitTolerance: 12 });
   const stepPorts = host.install(stepPortsPlugin);
+  const composition = host.install(basicCanvasPlugin, { target, connectionAnchorHitTolerance: 12 });
   const duplicateSelection = host.install(duplicateSelectionPlugin);
   const duplicateSelectionShortcut = host.install(duplicateSelectionShortcutPlugin);
   const clipboard = host.install(clipboardPlugin);

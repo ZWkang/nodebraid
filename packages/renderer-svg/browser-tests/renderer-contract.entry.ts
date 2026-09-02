@@ -5,7 +5,7 @@ import { interactionPlugin } from '@nodebraid/plugin-interaction';
 import { commandPlugin, commandService, type CommandService } from '@nodebraid/plugin-command';
 import { historyPlugin, redoCommand, undoCommand } from '@nodebraid/plugin-history';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
-import { portPlugin } from '@nodebraid/plugin-port';
+import { createPortContributionPlugin, portPlugin } from '@nodebraid/plugin-port';
 import { createRendererPlugin, rendererService, type RendererService } from '@nodebraid/plugin-renderer';
 import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/plugin-session';
 import { RendererError, type CanvasRenderer, type RendererInput } from '@nodebraid/renderer-api';
@@ -653,7 +653,7 @@ declare global {
   }>[];
   var __nodebraidRendererSvgMoveNodeDragExternally: () => void;
   var __nodebraidRendererSvgTeardownNodeDragInteraction: () => Promise<void>;
-  var __nodebraidRendererSvgSetupConnectionInteraction: (enabled?: boolean) => Promise<void>;
+  var __nodebraidRendererSvgSetupConnectionInteraction: (enabled?: boolean, portAware?: boolean) => Promise<void>;
   var __nodebraidRendererSvgReadConnectionInteraction: () => ConnectionInteractionResult;
   var __nodebraidRendererSvgReadConnectionSelection: () => readonly string[];
   var __nodebraidRendererSvgReadConnectionViewport: () => Readonly<{ x: number; y: number; zoom: number }>;
@@ -661,6 +661,7 @@ declare global {
   var __nodebraidRendererSvgRedoConnectionInteraction: () => Promise<void>;
   var __nodebraidRendererSvgDeleteConnectionSource: () => void;
   var __nodebraidRendererSvgDeleteConnectionTarget: () => void;
+  var __nodebraidRendererSvgRemoveConnectionTargetPort: () => Promise<void>;
   var __nodebraidRendererSvgUpdateConnectionGeometry: () => void;
   var __nodebraidRendererSvgTeardownConnectionInteraction: () => Promise<void>;
   var __nodebraidRendererSvgSetupViewportPanInteraction: (configured?: boolean) => Promise<void>;
@@ -3554,6 +3555,7 @@ let connectionInteractionTarget: SVGSVGElement | undefined;
 let connectionInteractionKernel: KernelService | undefined;
 let connectionInteractionCommands: CommandService | undefined;
 let connectionInteractionSession: SessionService | undefined;
+let connectionTargetPortInstallation: PluginInstallation | undefined;
 let viewportPanInteractionHost: ReturnType<typeof createPluginHost> | undefined;
 let viewportPanInteractionTarget: SVGSVGElement | undefined;
 let viewportPanInteractionSession: SessionService | undefined;
@@ -3739,7 +3741,10 @@ globalThis.__nodebraidRendererSvgSetupNodeDragInteraction = async (): Promise<vo
   nodeDragInteractionSession = session;
 };
 
-globalThis.__nodebraidRendererSvgSetupConnectionInteraction = async (enabled = true): Promise<void> => {
+globalThis.__nodebraidRendererSvgSetupConnectionInteraction = async (
+  enabled = true,
+  portAware = false,
+): Promise<void> => {
   const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   target.id = 'connection-interaction-target';
   target.setAttribute('width', '400');
@@ -3770,7 +3775,28 @@ globalThis.__nodebraidRendererSvgSetupConnectionInteraction = async (enabled = t
         },
       }
     : undefined;
+  const portInstallations = portAware
+    ? [
+        host.install(
+          createPortContributionPlugin({
+            id: 'browser.connection-source-port',
+            definePorts(node) {
+              return node.id === nodeId('connection-source') ? [{ id: 'output', role: 'source' }] : [];
+            },
+          }),
+        ),
+        host.install(
+          createPortContributionPlugin({
+            id: 'browser.connection-target-port',
+            definePorts(node) {
+              return node.id === nodeId('connection-target') ? [{ id: 'input', role: 'target' }] : [];
+            },
+          }),
+        ),
+      ]
+    : [];
   const installations = [
+    ...portInstallations,
     host.install(kernelPlugin),
     host.install(portPlugin),
     host.install(commandPlugin),
@@ -3803,6 +3829,7 @@ globalThis.__nodebraidRendererSvgSetupConnectionInteraction = async (enabled = t
   connectionInteractionKernel = kernel;
   connectionInteractionCommands = commands;
   connectionInteractionSession = session;
+  connectionTargetPortInstallation = portInstallations[1];
 };
 
 globalThis.__nodebraidRendererSvgReadConnectionSelection = (): readonly string[] => {
@@ -3855,6 +3882,11 @@ globalThis.__nodebraidRendererSvgDeleteConnectionTarget = (): void => {
   connectionInteractionKernel.transact((transaction) => transaction.nodes.remove(nodeId('connection-target')));
 };
 
+globalThis.__nodebraidRendererSvgRemoveConnectionTargetPort = async (): Promise<void> => {
+  await connectionTargetPortInstallation?.dispose();
+  connectionTargetPortInstallation = undefined;
+};
+
 globalThis.__nodebraidRendererSvgUpdateConnectionGeometry = (): void => {
   if (!connectionInteractionKernel) throw new Error('Expected Connection Kernel before Geometry update.');
   connectionInteractionKernel.transact((transaction) => {
@@ -3883,6 +3915,7 @@ globalThis.__nodebraidRendererSvgTeardownConnectionInteraction = async (): Promi
   connectionInteractionKernel = undefined;
   connectionInteractionCommands = undefined;
   connectionInteractionSession = undefined;
+  connectionTargetPortInstallation = undefined;
   connectionInteractionTarget?.remove();
   connectionInteractionTarget = undefined;
 };

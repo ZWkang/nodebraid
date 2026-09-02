@@ -1,11 +1,10 @@
 import type { NodeId, Point } from '@nodebraid/kernel';
+import type { ConnectionTargetReference } from '@nodebraid/port-api';
 import type { Viewport } from '@nodebraid/session-api';
 
 export type ConnectionAnchorRole = 'source' | 'target';
 
-export interface ConnectionAnchorIdentity {
-  readonly nodeId: NodeId;
-  readonly portId?: string;
+export interface ConnectionAnchorIdentity extends ConnectionTargetReference {
   readonly role: ConnectionAnchorRole;
 }
 

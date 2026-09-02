@@ -19,10 +19,11 @@ import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 import { interactionPlugin } from '../src';
 
-test('removing a source Port contribution cancels an active Gesture before materialization', async () => {
+test('Port Gesture tracks target loss, materializes exact Endpoints once, and cancels on source loss', async () => {
   const renderer = new PortConnectionRenderer();
   const host = createPluginHost();
   let kernel: KernelService | undefined;
+  const materialized: Array<Readonly<{ source: unknown; target: unknown }>> = [];
   const consumer = definePlugin({
     requires: { kernel: kernelService },
     setup(context) {
@@ -38,7 +39,8 @@ test('removing a source Port contribution cancels an active Gesture before mater
     host.install(interactionPlugin, {
       connection: {
         materializeEdge({ source, target }) {
-          return { id: edgeId('must-not-materialize'), type: 'flow', source, target, data: null };
+          materialized.push({ source, target });
+          return { id: edgeId(`port-edge-${materialized.length}`), type: 'flow', source, target, data: null };
         },
       },
     }),
@@ -64,17 +66,27 @@ test('removing a source Port contribution cancels an active Gesture before mater
       data: null,
     });
   });
-  const contribution = host.install(
+  const sourceContribution = host.install(
     createPortContributionPlugin({
-      id: 'test-ports',
+      id: 'test-source-port',
       definePorts(node) {
         if (node.id === sourceId) return [{ id: 'output', role: 'source' }];
-        if (node.id === targetId) return [{ id: 'input', role: 'target' }];
         return [];
       },
     }),
   );
-  await contribution.whenActive();
+  const createTargetContribution = (id: string) =>
+    host.install(
+      createPortContributionPlugin({
+        id,
+        definePorts(node) {
+          if (node.id === targetId) return [{ id: 'input', role: 'target' }];
+          return [];
+        },
+      }),
+    );
+  const targetContribution = createTargetContribution('test-target-port');
+  await Promise.all([sourceContribution.whenActive(), targetContribution.whenActive()]);
   renderer.hit = {
     type: 'port',
     nodeId: sourceId,
@@ -88,11 +100,56 @@ test('removing a source Port contribution cancels an active Gesture before mater
     source: { nodeId: sourceId, portId: 'output', role: 'source' },
   });
 
-  await contribution.dispose();
+  renderer.hit = {
+    type: 'port',
+    nodeId: targetId,
+    portId: 'input',
+    role: 'target',
+    worldPoint: { x: 200, y: 20 },
+  };
+  renderer.emit(pointerInput('pointer.move', { x: 200, y: 20 }));
+  expect(renderer.projections.at(-1)).toMatchObject({
+    type: 'connection-preview',
+    target: { type: 'valid', anchor: { nodeId: targetId, portId: 'input', role: 'target' } },
+  });
+
+  await targetContribution.dispose();
+
+  expect(renderer.projections.at(-1)).toMatchObject({ type: 'connection-preview', target: { type: 'none' } });
+  expect(renderer.releasedPointers).toEqual([]);
+  expect(materialized).toEqual([]);
+
+  const replacementTarget = createTargetContribution('replacement-target-port');
+  await replacementTarget.whenActive();
+  renderer.emit(pointerInput('pointer.move', { x: 200, y: 20 }));
+  renderer.emit(pointerInput('pointer.up', { x: 200, y: 20 }));
+  await settleCommands();
+
+  expect(materialized).toEqual([
+    {
+      source: { nodeId: sourceId, portId: 'output' },
+      target: { nodeId: targetId, portId: 'input' },
+    },
+  ]);
+  expect(kernel.read().snapshot.edges).toHaveLength(1);
+  expect(kernel.read().snapshot.edges[0]).toMatchObject({
+    source: { nodeId: sourceId, portId: 'output' },
+    target: { nodeId: targetId, portId: 'input' },
+  });
+
+  renderer.hit = {
+    type: 'port',
+    nodeId: sourceId,
+    portId: 'output',
+    role: 'source',
+    worldPoint: { x: 80, y: 20 },
+  };
+  renderer.emit(pointerInput('pointer.down', { x: 80, y: 20 }));
+  await sourceContribution.dispose();
 
   expect(renderer.projections.at(-1)).toBeNull();
-  expect(renderer.releasedPointers).toEqual([1]);
-  expect(kernel.read().snapshot.edges).toEqual([]);
+  expect(renderer.releasedPointers).toEqual([1, 1]);
+  expect(materialized).toHaveLength(1);
   await host.dispose();
 });
 
@@ -140,4 +197,8 @@ function pointerInput(type: PointerInput['type'], point: Readonly<{ x: number; y
     pressedButtons: type === 'pointer.down' ? ['primary'] : [],
     modifiers: { alt: false, control: false, meta: false, shift: false },
   };
+}
+
+function settleCommands(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
 }

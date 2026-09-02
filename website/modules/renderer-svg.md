@@ -124,7 +124,7 @@ Document revision、Session、Input subscriber、Pointer 与 disposed-state 失�
 ## 限制与非目标
 
 - 仅渲染显式 `Size` 的矩形 Node 与有效端点之间的直线 Edge；
-- Connection Anchor 仅是 node-level 语义；不支持 Port、自环、曲线、marker、label、富文本、动画或业务 Node 外观；
+- 无 Port Node 使用 node-level Connection Anchor；Port 使用规范边界 Geometry，但不支持自环、曲线、marker、label、富文本、动画或业务 Node 外观；
 - 不提供默认主题、theme registry、组件插槽或 framework adapter；
 - 不解释 Interaction 行为，也不提供 Command、拖拽状态机、Selection 写入或持久化；它只显示已接受的语义 Projection；
 - 不创建 SVG Target，也不接管调用方已有的 Target 子节点；

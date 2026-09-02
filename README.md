@@ -415,6 +415,8 @@ Build the Interaction value and Runtime packages independently:
 
 ```bash
 bun run --filter '@nodebraid/interaction-api' build:dependencies
+bun run --filter '@nodebraid/port-api' build:dependencies
+bun run --filter '@nodebraid/plugin-port' build:dependencies
 bun run --filter '@nodebraid/plugin-interaction' build:dependencies
 bun run --filter '@nodebraid/plugin-interaction' build:test-dependencies
 bun run --filter '@nodebraid/plugin-duplicate-selection' build:dependencies

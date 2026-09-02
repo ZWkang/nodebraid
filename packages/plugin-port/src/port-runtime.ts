@@ -1,6 +1,6 @@
 import type { PluginDiagnostics } from '@nodebraid/diagnostics';
 import type { CanvasNode, CanvasSnapshot } from '@nodebraid/kernel';
-import type { NodePortSnapshot, PortDefinition, PortSnapshot } from '@nodebraid/port-api';
+import type { ConnectionTargetReference, NodePortSnapshot, PortDefinition, PortSnapshot } from '@nodebraid/port-api';
 
 import type { PortContribution, PortRegistration, PortService } from './contracts';
 import { portDiagnosticEvents } from './diagnostic-events';
@@ -76,6 +76,16 @@ export function createPortRuntime(diagnostics: PluginDiagnostics): {
         generation,
         nodes: Object.freeze(nodes),
       });
+    },
+    isConnectionTargetDefined(node: CanvasNode, target: ConnectionTargetReference): boolean {
+      assertActive();
+      if (node.id !== target.nodeId) return false;
+      const contributions = Array.from(entries.values(), (entry) => entry.contribution).sort((left, right) =>
+        compareIds(left.id, right.id),
+      );
+      const definitions = resolveNodePorts(node, contributions);
+      if (target.portId === undefined) return definitions.length === 0;
+      return definitions.find((definition) => definition.id === target.portId)?.role === target.role;
     },
     subscribe(listener: () => void): () => void {
       assertActive();

@@ -41,7 +41,7 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
-    "build:dependencies": "bun run --filter '@nodebraid/diagnostics' build && bun run --filter '@nodebraid/interaction-api' build && bun run --filter '@nodebraid/port-api' build && bun run --filter '@nodebraid/session-api' build",
+    "build:dependencies": "bun run --filter '@nodebraid/diagnostics' build && bun run --filter '@nodebraid/port-api' build && bun run --filter '@nodebraid/interaction-api' build && bun run --filter '@nodebraid/session-api' build",
     "prepack": "bun run build",
     "test": "bun test ./tests",
     "test:artifacts": "bun run ./artifacts/check-declarations.ts",

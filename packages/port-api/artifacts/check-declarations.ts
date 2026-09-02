@@ -24,4 +24,5 @@ assert.deepEqual(Object.keys(packageExports).sort(), [
   'getNodePortSnapshot',
   'getPortDefinition',
   'hasPortDefinitions',
+  'isConnectionTargetDefined',
 ]);

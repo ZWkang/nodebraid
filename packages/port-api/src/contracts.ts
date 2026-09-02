@@ -7,6 +7,12 @@ export interface PortDefinition {
   readonly role: PortRole;
 }
 
+export interface ConnectionTargetReference {
+  readonly nodeId: NodeId;
+  readonly portId?: string;
+  readonly role: PortRole;
+}
+
 export interface NodePortSnapshot {
   readonly nodeId: NodeId;
   readonly ports: readonly PortDefinition[];
