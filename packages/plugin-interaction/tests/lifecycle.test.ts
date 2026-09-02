@@ -5,6 +5,7 @@ import type { InteractionProjection } from '@nodebraid/interaction-api';
 import { commandPlugin, commandService, defineCommand, type CommandService } from '@nodebraid/plugin-command';
 import { nodeId } from '@nodebraid/kernel';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { portPlugin } from '@nodebraid/plugin-port';
 import { createRendererPlugin, rendererService, type RendererService } from '@nodebraid/plugin-renderer';
 import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/plugin-session';
 import type {
@@ -64,6 +65,7 @@ test('Shortcut disposal aborts and awaits execution, retains reservation, and re
   const shortcut = host.install(shortcutProvider);
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     rendererInstallation,
@@ -126,6 +128,7 @@ test('Delete Selection registration follows dependency reactivation and disposal
   const interaction = host.install(interactionPlugin);
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     rendererInstallation,
@@ -170,6 +173,7 @@ test('Connection materializer failure keeps identity and reports exactly once af
   const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => recording)),
@@ -211,6 +215,7 @@ test('Connection dependency recovery creates a fresh idle Activation', async () 
   });
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     rendererInstallation,
@@ -240,6 +245,7 @@ test('Connection final Hit Test failure still clears Preview and releases Captur
   const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => recording)),
@@ -275,6 +281,7 @@ test('Connection Escape attempts every terminal cleanup and never materializes a
   const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => recording)),
@@ -322,6 +329,7 @@ test('Box Selection disposal continues after every public Renderer cleanup failu
   const interaction = host.install(interactionPlugin);
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => recording)),
@@ -370,6 +378,7 @@ for (const terminal of ['escape', 'pointer-cancel'] as const) {
     const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
     const installations = [
       host.install(kernelPlugin),
+      host.install(portPlugin),
       host.install(commandPlugin),
       host.install(sessionPlugin),
       host.install(createRendererPlugin(() => recording)),
@@ -409,6 +418,7 @@ test('Interaction dependency recovery creates a fresh idle Activation', async ()
   const interaction = host.install(interactionPlugin);
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     rendererInstallation,
@@ -491,6 +501,7 @@ test('a recovered Renderer reset receives the still-compatible Active Gesture ag
   const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => renderer)),
@@ -548,6 +559,7 @@ async function activateCommandFaultScenario(faults: DiagnosticFault[]): Promise<
   const interaction = host.install(interactionPlugin);
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => renderer)),

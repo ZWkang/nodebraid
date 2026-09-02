@@ -287,10 +287,10 @@ try {
     requestAnimationFrame(() => resolve(true));
   })`);
   const sourceAnchor = await readElementCenter(
-    '[data-nodebraid-connection-anchor-node-id="example-compose"][data-nodebraid-connection-anchor-role="source"]',
+    '[data-nodebraid-port-node-id="example-compose"][data-nodebraid-port-id="output"][data-nodebraid-port-role="source"]',
   );
   const targetAnchor = await readElementCenter(
-    '[data-nodebraid-connection-anchor-node-id="example-ship"][data-nodebraid-connection-anchor-role="target"]',
+    '[data-nodebraid-port-node-id="example-ship"][data-nodebraid-port-id="input"][data-nodebraid-port-role="target"]',
   );
   await dispatchMouseDown(sourceAnchor.x, sourceAnchor.y);
   assert.equal(

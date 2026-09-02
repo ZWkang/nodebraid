@@ -4,6 +4,7 @@ import type { DiagnosticFault } from '@nodebraid/diagnostics';
 import type { InteractionProjection } from '@nodebraid/interaction-api';
 import { nodeId, type CanvasView } from '@nodebraid/kernel';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { portPlugin } from '@nodebraid/plugin-port';
 import {
   RendererError,
   type CanvasRenderer,
@@ -296,6 +297,7 @@ describe('@nodebraid/plugin-renderer', () => {
     });
     const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
     const kernelInstallation = host.install(kernelPlugin);
+    host.install(portPlugin);
     const sessionInstallation = host.install(sessionPlugin);
     const observerInstallation = host.install(earlierObserver);
     await Promise.all([
@@ -349,6 +351,7 @@ async function activateRenderer<Config>(
   const configArguments = (config === undefined ? [] : [config]) as RendererInstallArguments<Config>;
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(sessionPlugin),
     host.install(plugin, ...configArguments),
     host.install(consumer),

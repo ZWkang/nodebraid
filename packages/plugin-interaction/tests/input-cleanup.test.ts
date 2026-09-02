@@ -4,6 +4,7 @@ import type { DiagnosticFault } from '@nodebraid/diagnostics';
 import { nodeId } from '@nodebraid/kernel';
 import { commandPlugin } from '@nodebraid/plugin-command';
 import { kernelPlugin } from '@nodebraid/plugin-kernel';
+import { portPlugin } from '@nodebraid/plugin-port';
 import { createRendererPlugin } from '@nodebraid/plugin-renderer';
 import { sessionPlugin } from '@nodebraid/plugin-session';
 import type {
@@ -25,6 +26,7 @@ test('a failed Selection transition releases Pointer Capture before reporting th
   const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => renderer)),

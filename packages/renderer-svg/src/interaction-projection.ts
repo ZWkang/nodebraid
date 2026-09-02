@@ -7,12 +7,14 @@ import type {
   ViewportPanInteractionProjection,
 } from '@nodebraid/interaction-api';
 import type { CanvasSnapshot } from '@nodebraid/kernel';
+import { getPortDefinition, hasPortDefinitions, type PortSnapshot } from '@nodebraid/port-api';
 import { RendererError } from '@nodebraid/renderer-api';
 import type { SessionSnapshot } from '@nodebraid/session-api';
 
 export function acceptInteractionProjection(
   value: unknown,
   document: CanvasSnapshot,
+  ports: PortSnapshot,
   session: SessionSnapshot,
 ): InteractionProjection {
   if (!isRecord(value)) throwInvalidProjectionType();
@@ -22,7 +24,7 @@ export function acceptInteractionProjection(
     case 'viewport-pan':
       return acceptViewportPan(value, session);
     case 'connection-preview':
-      return acceptConnectionPreview(value, document);
+      return acceptConnectionPreview(value, document, ports);
     case 'box-selection':
       return acceptBoxSelection(value);
     default:
@@ -33,16 +35,11 @@ export function acceptInteractionProjection(
 export function isInteractionCompatibleWithDocument(
   interaction: InteractionProjection | null,
   document: CanvasSnapshot,
+  ports: PortSnapshot,
 ): boolean {
   if (interaction?.type === 'connection-preview') {
-    const referencedNodeIds = [
-      interaction.source.nodeId,
-      ...(interaction.target.type === 'none' ? [] : [interaction.target.anchor.nodeId]),
-    ];
-    return referencedNodeIds.every((nodeId) => {
-      const node = document.nodes.find((candidate) => candidate.id === nodeId);
-      return node?.size !== undefined && node.size.width > 0 && node.size.height > 0;
-    });
+    if (!connectionAnchorAvailable(interaction.source, document, ports)) return false;
+    return interaction.target.type === 'none' || connectionAnchorAvailable(interaction.target.anchor, document, ports);
   }
   if (interaction?.type !== 'node-drag') return true;
   const nodes = new Map(document.nodes.map((node) => [node.id, node]));
@@ -146,6 +143,7 @@ function acceptViewportPan(value: Record<string, unknown>, session: SessionSnaps
 function acceptConnectionPreview(
   value: Record<string, unknown>,
   document: CanvasSnapshot,
+  ports: PortSnapshot,
 ): ConnectionPreviewInteractionProjection {
   if (!isConnectionAnchor(value.source) || !isRecord(value.pointerWorldPoint) || !isRecord(value.target)) {
     throwInvalidProjectionStructure('connection-preview');
@@ -158,8 +156,9 @@ function acceptConnectionPreview(
   }
   const projection = value as unknown as ConnectionPreviewInteractionProjection;
   assertPoint('pointerWorldPoint', projection.pointerWorldPoint);
-  assertConnectionAnchorBaseline(projection.source, 'source', document);
-  if (projection.target.type !== 'none') assertConnectionAnchorBaseline(projection.target.anchor, 'target', document);
+  assertConnectionAnchorBaseline(projection.source, 'source', document, ports);
+  if (projection.target.type !== 'none')
+    assertConnectionAnchorBaseline(projection.target.anchor, 'target', document, ports);
   return Object.freeze({
     type: 'connection-preview',
     source: Object.freeze({ ...projection.source }),
@@ -192,14 +191,14 @@ function assertConnectionAnchorBaseline(
   anchor: ConnectionAnchorIdentity,
   role: ConnectionAnchorIdentity['role'],
   document: CanvasSnapshot,
+  ports: PortSnapshot,
 ): void {
   if (anchor.role !== role) {
     throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Connection Anchor role is invalid.', {
       issue: 'INVALID_CONNECTION_ANCHOR_ROLE',
     });
   }
-  const node = document.nodes.find((candidate) => candidate.id === anchor.nodeId);
-  if (node?.size && node.size.width > 0 && node.size.height > 0) return;
+  if (connectionAnchorAvailable(anchor, document, ports)) return;
   throw new RendererError('INTERACTION_OUT_OF_SYNC', 'Connection Anchor Node is unavailable.', {
     issue: 'CONNECTION_ANCHOR_UNAVAILABLE',
   });
@@ -232,8 +231,20 @@ function isConnectionAnchor(value: unknown): value is ConnectionAnchorIdentity {
     isRecord(value) &&
     typeof value.nodeId === 'string' &&
     value.nodeId.length > 0 &&
+    (value.portId === undefined || (typeof value.portId === 'string' && value.portId.length > 0)) &&
     (value.role === 'source' || value.role === 'target')
   );
+}
+
+function connectionAnchorAvailable(
+  anchor: ConnectionAnchorIdentity,
+  document: CanvasSnapshot,
+  ports: PortSnapshot,
+): boolean {
+  const node = document.nodes.find((candidate) => candidate.id === anchor.nodeId);
+  if (!node?.size || node.size.width <= 0 || node.size.height <= 0) return false;
+  if (anchor.portId === undefined) return !hasPortDefinitions(ports, anchor.nodeId);
+  return getPortDefinition(ports, anchor.nodeId, anchor.portId)?.role === anchor.role;
 }
 
 function throwInvalidProjectionType(): never {

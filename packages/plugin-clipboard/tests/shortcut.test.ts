@@ -6,6 +6,7 @@ import { nodeId } from '@nodebraid/kernel';
 import { commandPlugin } from '@nodebraid/plugin-command';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
 import { interactionPlugin } from '@nodebraid/plugin-interaction';
+import { portPlugin } from '@nodebraid/plugin-port';
 import { createRendererPlugin } from '@nodebraid/plugin-renderer';
 import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/plugin-session';
 import type {
@@ -42,6 +43,7 @@ test('default Clipboard Shortcuts route exact Mod+C and Mod+V through Interactio
   const host = createPluginHost();
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => renderer)),

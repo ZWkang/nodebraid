@@ -1,6 +1,7 @@
 import type { CanvasCommit, CanvasView } from '@nodebraid/kernel';
 import type { InteractionProjection } from '@nodebraid/interaction-api';
 import { kernelService } from '@nodebraid/plugin-kernel';
+import { portService } from '@nodebraid/plugin-port';
 import { sessionService, type SessionSnapshot } from '@nodebraid/plugin-session';
 import {
   RendererError,
@@ -19,17 +20,19 @@ export const rendererService = defineService<RendererService>('renderer');
 
 type PendingRendererUpdate =
   | { readonly type: 'commit'; readonly commit: CanvasCommit }
-  | { readonly type: 'session'; readonly snapshot: SessionSnapshot };
+  | { readonly type: 'session'; readonly snapshot: SessionSnapshot }
+  | { readonly type: 'ports' };
 
 export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
   if (typeof factory !== 'function') throw new TypeError('Renderer Factory must be a function.');
 
   return definePlugin({
     name: '@nodebraid/plugin-renderer',
-    requires: { kernel: kernelService, session: sessionService },
+    requires: { kernel: kernelService, ports: portService, session: sessionService },
     provides: { renderer: rendererService },
     async setup(context, config: Config) {
       const kernel = context.services.kernel;
+      const ports = context.services.ports;
       const session = context.services.session;
       const renderer = await factory(config);
       context.own(() => renderer.dispose());
@@ -47,6 +50,7 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
       let interactionBindingActive = false;
       let stopKernel = (): void => undefined;
       let stopSession = (): void => undefined;
+      let stopPorts = (): void => undefined;
 
       const assertActive = (): void => {
         if (disposed) {
@@ -67,7 +71,7 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
         const view = kernel.read();
         const snapshot = session.getSnapshot();
         assertSessionResolvable(snapshot, view);
-        renderer.updateDocument({ type: 'reset', view });
+        renderer.updateDocument({ type: 'reset', view, ports: ports.snapshot(view.snapshot) });
         renderer.updateSession(snapshot);
         deliveredView = view;
         deliveredSession = snapshot;
@@ -89,7 +93,7 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
             receivedRevision,
           });
         }
-        renderer.updateDocument({ type: 'commit', commit });
+        renderer.updateDocument({ type: 'commit', commit, ports: ports.snapshot(commit.after.snapshot) });
         deliveredView = commit.after;
       };
 
@@ -104,6 +108,7 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
         if (!view) return -1;
         for (let index = 1; index < pendingUpdates.length; index += 1) {
           const update = pendingUpdates[index]!;
+          if (update.type === 'ports') continue;
           if (update.type === 'commit') return -1;
           if (isSessionResolvable(update.snapshot, view)) return index;
         }
@@ -116,6 +121,7 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
         if (!currentSession) return -1;
         for (let index = 1; index < pendingUpdates.length; index += 1) {
           const update = pendingUpdates[index]!;
+          if (update.type === 'ports') continue;
           if (update.type !== 'commit') continue;
           return isSessionResolvable(currentSession, update.commit.after) ? index : -1;
         }
@@ -127,6 +133,12 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
         const currentSession = deliveredSession;
         const first = pendingUpdates[0];
         if (!first || !currentView || !currentSession) return false;
+
+        if (first.type === 'ports') {
+          pendingUpdates.shift();
+          resetToCurrentState(true);
+          return true;
+        }
 
         if (first.type === 'session') {
           if (isSessionResolvable(first.snapshot, currentView)) {
@@ -195,13 +207,16 @@ export function createRendererPlugin<Config>(factory: RendererFactory<Config>) {
       stopSession = session.subscribe(() => {
         if (!disposed) enqueueUpdate({ type: 'session', snapshot: session.getSnapshot() });
       });
+      stopPorts = ports.subscribe(() => {
+        if (!disposed) enqueueUpdate({ type: 'ports' });
+      });
 
       context.own(() => {
         if (disposed) return;
         disposed = true;
         pendingUpdates.length = 0;
         const cleanupErrors: unknown[] = [];
-        for (const stop of [stopSession, stopKernel, ...inputSubscriptions]) {
+        for (const stop of [stopPorts, stopSession, stopKernel, ...inputSubscriptions]) {
           try {
             stop();
           } catch (error) {

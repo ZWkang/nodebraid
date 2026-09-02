@@ -1,5 +1,6 @@
 import type { InteractionProjection } from '@nodebraid/interaction-api';
 import type { CanvasCommit, CanvasView, EdgeId, NodeId, Point } from '@nodebraid/kernel';
+import type { PortRole, PortSnapshot } from '@nodebraid/port-api';
 import type { SessionSnapshot } from '@nodebraid/session-api';
 
 export interface ScreenPoint {
@@ -66,7 +67,13 @@ export type HitResult =
   | { readonly type: 'canvas'; readonly worldPoint: Point }
   | { readonly type: 'node'; readonly nodeId: NodeId; readonly worldPoint: Point }
   | { readonly type: 'edge'; readonly edgeId: EdgeId; readonly worldPoint: Point }
-  | { readonly type: 'port'; readonly nodeId: NodeId; readonly portId: string; readonly worldPoint: Point }
+  | {
+      readonly type: 'port';
+      readonly nodeId: NodeId;
+      readonly portId: string;
+      readonly role: PortRole;
+      readonly worldPoint: Point;
+    }
   | {
       readonly type: 'connection-anchor';
       readonly nodeId: NodeId;
@@ -75,7 +82,8 @@ export type HitResult =
     };
 
 export type RendererDocumentUpdate =
-  { readonly type: 'reset'; readonly view: CanvasView } | { readonly type: 'commit'; readonly commit: CanvasCommit };
+  | { readonly type: 'reset'; readonly view: CanvasView; readonly ports?: PortSnapshot }
+  | { readonly type: 'commit'; readonly commit: CanvasCommit; readonly ports?: PortSnapshot };
 
 /** Provider seam: semantic projection and input facts without Document or Session write authority. */
 export interface CanvasRenderer {

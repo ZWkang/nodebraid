@@ -1,5 +1,6 @@
 import type { InteractionProjection } from '@nodebraid/interaction-api';
 import type { CanvasSnapshot } from '@nodebraid/kernel';
+import type { PortSnapshot } from '@nodebraid/port-api';
 import {
   RendererError,
   type CanvasRenderer,
@@ -25,6 +26,7 @@ import {
 import {
   cloneCanvasSnapshot,
   cloneSessionSnapshot,
+  acceptPortSnapshot,
   validateRendererDocumentUpdate,
   validateSessionSnapshot,
 } from './renderer-state';
@@ -86,6 +88,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
   let acceptedSession: SessionSnapshot | undefined;
   let acceptedInteraction: InteractionProjection | null = null;
   let baselineSnapshot: CanvasSnapshot | undefined;
+  let acceptedPorts: PortSnapshot | undefined;
   let projectionOutOfSync = false;
   let observedResizeError: unknown;
   let disposePromise: Promise<void> | undefined;
@@ -147,6 +150,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
     previous: InteractionProjection | null,
     next: InteractionProjection | null,
     baseline: CanvasSnapshot,
+    ports: PortSnapshot,
     session: SessionSnapshot,
     journal: DomMutationJournal,
     targetMatrix?: AffineMatrix,
@@ -165,6 +169,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         baseline,
         edgesLayer,
         nodesLayer,
+        ports,
         journal,
       );
     }
@@ -176,13 +181,13 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
     }
     switch (next?.type) {
       case 'node-drag':
-        applyNodeDragProjection(next, baseline, edgesLayer, nodesLayer, journal);
+        applyNodeDragProjection(next, baseline, edgesLayer, nodesLayer, ports, journal);
         break;
       case 'viewport-pan':
         applySession({ selection: session.selection, viewport: next.viewport }, journal, targetMatrix);
         break;
       case 'connection-preview':
-        applyConnectionPreview(next, baseline, interactionLayer, journal);
+        applyConnectionPreview(next, baseline, ports, interactionLayer, journal);
         break;
       case 'box-selection':
         applyBoxSelection(next, interactionLayer, journal);
@@ -436,9 +441,10 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         if (acceptedSession) validateSessionSnapshot(acceptedSession, acceptedUpdate.view.snapshot);
         const targetMatrix = readTargetMatrix(target, 'TARGET_UNAVAILABLE');
         const nextBaseline = cloneCanvasSnapshot(acceptedUpdate.view.snapshot);
+        const nextPorts = acceptPortSnapshot(acceptedUpdate.ports, acceptedUpdate.view.snapshot);
         const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
         try {
-          renderReset(acceptedUpdate.view, document, edgesLayer, nodesLayer, interactionLayer);
+          renderReset(acceptedUpdate.view, document, edgesLayer, nodesLayer, interactionLayer, nextPorts);
           if (acceptedSession) applySession(acceptedSession, journal, targetMatrix);
         } catch (error) {
           const rollbackErrors = journal.rollback();
@@ -449,6 +455,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
           throw error;
         }
         baselineSnapshot = nextBaseline;
+        acceptedPorts = nextPorts;
         acceptedInteraction = null;
         projectionOutOfSync = false;
         observedResizeError = undefined;
@@ -456,9 +463,11 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         if (projectionOutOfSync) throwProjectionOutOfSync(acceptedUpdate.commit.before.snapshot.revision);
         const targetMatrix = readTargetMatrix(target, 'TARGET_UNAVAILABLE');
         const session = acceptedSession;
+        const nextPorts = acceptPortSnapshot(acceptedUpdate.ports, acceptedUpdate.commit.after.snapshot);
         const nextInteraction = isInteractionCompatibleWithDocument(
           acceptedInteraction,
           acceptedUpdate.commit.after.snapshot,
+          nextPorts,
         )
           ? acceptedInteraction
           : null;
@@ -471,12 +480,14 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
             edgesLayer,
             nodesLayer,
             interactionLayer,
+            nextPorts,
             (journal) => {
               if (session) {
                 applyInteractionProjection(
                   acceptedInteraction,
                   nextInteraction,
                   acceptedUpdate.commit.after.snapshot,
+                  nextPorts,
                   session,
                   journal,
                   targetMatrix,
@@ -489,6 +500,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
           throw error;
         }
         baselineSnapshot = cloneCanvasSnapshot(acceptedUpdate.commit.after.snapshot);
+        acceptedPorts = nextPorts;
         acceptedInteraction = nextInteraction;
       }
     },
@@ -496,7 +508,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
       assertActive();
       assertNoObservedResizeError();
       assertProjectionSynchronized();
-      if (!baselineSnapshot) {
+      if (!baselineSnapshot || !acceptedPorts) {
         throw new RendererError('INVALID_SESSION_SNAPSHOT', 'SVG Renderer Session requires a Document Baseline.', {
           issue: 'DOCUMENT_BASELINE_MISSING',
         });
@@ -512,7 +524,14 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
           : acceptedInteraction;
       const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
       try {
-        applyInteractionProjection(acceptedInteraction, nextInteraction, baselineSnapshot, accepted, journal);
+        applyInteractionProjection(
+          acceptedInteraction,
+          nextInteraction,
+          baselineSnapshot,
+          acceptedPorts,
+          accepted,
+          journal,
+        );
       } catch (error) {
         const rollbackErrors = journal.rollback();
         if (rollbackErrors.length > 0) {
@@ -528,7 +547,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
       assertActive();
       assertNoObservedResizeError();
       assertProjectionSynchronized();
-      if (!baselineSnapshot || !acceptedSession) {
+      if (!baselineSnapshot || !acceptedPorts || !acceptedSession) {
         throw new RendererError(
           'INVALID_SESSION_SNAPSHOT',
           'SVG Renderer Interaction Projection requires Document and Session state.',
@@ -536,10 +555,19 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         );
       }
       const accepted =
-        projection === null ? null : acceptInteractionProjection(projection, baselineSnapshot, acceptedSession);
+        projection === null
+          ? null
+          : acceptInteractionProjection(projection, baselineSnapshot, acceptedPorts, acceptedSession);
       const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
       try {
-        applyInteractionProjection(acceptedInteraction, accepted, baselineSnapshot, acceptedSession, journal);
+        applyInteractionProjection(
+          acceptedInteraction,
+          accepted,
+          baselineSnapshot,
+          acceptedPorts,
+          acceptedSession,
+          journal,
+        );
       } catch (error) {
         const rollbackErrors = journal.rollback();
         if (rollbackErrors.length > 0) {
@@ -573,7 +601,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
       assertActive();
       assertNoObservedResizeError();
       assertProjectionSynchronized();
-      if (!baselineSnapshot || !acceptedSession) {
+      if (!baselineSnapshot || !acceptedPorts || !acceptedSession) {
         throw new RendererError(
           'INVALID_SESSION_SNAPSHOT',
           'SVG Renderer Hit Test requires Document and Session state.',
@@ -587,6 +615,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         point,
         target,
         createEffectiveSnapshot(baselineSnapshot, acceptedInteraction),
+        acceptedPorts,
         createEffectiveSession(acceptedSession, acceptedInteraction),
         edgeHitTolerance,
         connectionAnchorHitTolerance,

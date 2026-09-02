@@ -1,5 +1,6 @@
 import { commandService } from '@nodebraid/plugin-command';
 import { kernelService } from '@nodebraid/plugin-kernel';
+import { portService } from '@nodebraid/plugin-port';
 import { rendererService } from '@nodebraid/plugin-renderer';
 import { sessionService } from '@nodebraid/plugin-session';
 import { definePlugin } from '@nodebraid/runtime-cordis';
@@ -16,6 +17,7 @@ export const interactionPlugin = definePlugin({
     session: sessionService,
     commands: commandService,
     kernel: kernelService,
+    ports: portService,
   },
   provides: { shortcuts: interactionShortcutService },
   setup(context, providedConfig: InteractionConfig | undefined) {

@@ -6,6 +6,7 @@ import {
   createDuplicateSelectionPlugin,
   createDuplicateSelectionShortcutPlugin,
   createPluginHost,
+  createPortContributionPlugin,
   definePlugin,
   edgeId,
   historyService,
@@ -96,6 +97,17 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       };
     },
   });
+  const stepPortsPlugin = createPortContributionPlugin({
+    id: 'nodebraid.examples.step-ports',
+    definePorts(node) {
+      return node.type === 'step'
+        ? [
+            { id: 'input', role: 'target' },
+            { id: 'output', role: 'source' },
+          ]
+        : [];
+    },
+  });
   const duplicateSelectionShortcutPlugin = createDuplicateSelectionShortcutPlugin();
   const clipboardPlugin = createClipboardPlugin({
     transport: createNavigatorClipboardTransport(),
@@ -137,6 +149,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
     },
   });
   const composition = host.install(basicCanvasPlugin, { target, connectionAnchorHitTolerance: 12 });
+  const stepPorts = host.install(stepPortsPlugin);
   const duplicateSelection = host.install(duplicateSelectionPlugin);
   const duplicateSelectionShortcut = host.install(duplicateSelectionShortcutPlugin);
   const clipboard = host.install(clipboardPlugin);
@@ -146,6 +159,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
   try {
     await Promise.all([
       composition.whenActive(),
+      stepPorts.whenActive(),
       duplicateSelection.whenActive(),
       duplicateSelectionShortcut.whenActive(),
       clipboard.whenActive(),
@@ -185,8 +199,8 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       transaction.edges.add({
         id: initialEdge,
         type: 'flow',
-        source: { nodeId: first },
-        target: { nodeId: second },
+        source: { nodeId: first, portId: 'output' },
+        target: { nodeId: second, portId: 'input' },
         data: null,
       });
     });

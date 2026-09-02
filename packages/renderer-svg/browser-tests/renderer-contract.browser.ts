@@ -1018,13 +1018,31 @@ try {
     },
   });
 
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgPortProjection()', {
+    ports: [
+      { nodeId: 'port-a-source', portId: 'out-a', role: 'source', cx: '80', cy: '30' },
+      { nodeId: 'port-a-source', portId: 'out-b', role: 'source', cx: '80', cy: '60' },
+      { nodeId: 'port-b-target', portId: 'in-a', role: 'target', cx: '200', cy: '30' },
+      { nodeId: 'port-b-target', portId: 'in-b', role: 'target', cx: '200', cy: '60' },
+    ],
+    nodeAnchorCount: 0,
+    edge: { x1: '80', y1: '60', x2: '200', y2: '30' },
+    sourceHit: {
+      type: 'port',
+      nodeId: 'port-a-source',
+      portId: 'out-b',
+      role: 'source',
+      worldPoint: { x: 80, y: 60 },
+    },
+  });
+
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket02PortError()', {
     error: {
       name: 'RendererError',
       domain: 'renderer',
       code: 'INVALID_DOCUMENT_UPDATE',
       details: {
-        issue: 'UNSUPPORTED_PORT_GEOMETRY',
+        issue: 'UNAVAILABLE_PORT_GEOMETRY',
         edgeId: 'port-edge',
         endpoint: 'source',
         portId: 'out',

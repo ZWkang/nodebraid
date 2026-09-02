@@ -5,6 +5,7 @@ export type ConnectionAnchorRole = 'source' | 'target';
 
 export interface ConnectionAnchorIdentity {
   readonly nodeId: NodeId;
+  readonly portId?: string;
   readonly role: ConnectionAnchorRole;
 }
 

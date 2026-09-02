@@ -13,9 +13,11 @@ import type {
   NodeId,
 } from '@nodebraid/kernel';
 import { RendererError } from '@nodebraid/renderer-api';
+import type { PortSnapshot } from '@nodebraid/port-api';
 import type { SessionSnapshot } from '@nodebraid/session-api';
 
 import { validateCanvasView, validateSessionSnapshot } from './renderer-state';
+import { getNodePortGeometries, resolveConnectionAnchorPoint, resolveEdgeEndpointPoint } from './port-geometry';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
@@ -26,15 +28,16 @@ export function renderReset(
   edgesLayer: SVGGElement,
   nodesLayer: SVGGElement,
   interactionLayer: SVGGElement,
+  ports: PortSnapshot,
 ): void {
   validateCanvasView(view);
   const nodes = view.snapshot.nodes.map((node) => createNodeElement(document, node));
   const nodesById = new Map(view.snapshot.nodes.map((node) => [node.id, node]));
-  const edges = view.snapshot.edges.map((edge) => createEdgeElement(document, edge, nodesById));
+  const edges = view.snapshot.edges.map((edge) => createEdgeElement(document, edge, nodesById, ports));
   edgesLayer.replaceChildren(...edges);
   nodesLayer.replaceChildren(...nodes);
   interactionLayer.replaceChildren(
-    ...view.snapshot.nodes.flatMap((node) => createConnectionAnchorElements(document, node)),
+    ...view.snapshot.nodes.flatMap((node) => createConnectionTargetElements(document, node, ports)),
   );
 }
 
@@ -47,6 +50,7 @@ export function applyCommit(
   edgesLayer: SVGGElement,
   nodesLayer: SVGGElement,
   interactionLayer: SVGGElement,
+  ports: PortSnapshot,
   completeProjection?: (journal: DomMutationJournal) => void,
 ): void {
   validateCanvasView(commit.before);
@@ -80,7 +84,9 @@ export function applyCommit(
     commit.after.snapshot.nodes.map((node) => [node.id, createNodeElement(document, node)] as const),
   );
   const validatedEdges = new Map(
-    commit.after.snapshot.edges.map((edge) => [edge.id, createEdgeElement(document, edge, afterNodesById)] as const),
+    commit.after.snapshot.edges.map(
+      (edge) => [edge.id, createEdgeElement(document, edge, afterNodesById, ports)] as const,
+    ),
   );
   const changedNodeIds = new Set(
     commit.changeSet.changes.filter((change) => change.entity === 'node').map((change) => change.id),
@@ -103,7 +109,7 @@ export function applyCommit(
     edgesLayer.append(
       ...commit.after.snapshot.edges.map((edge) => requireEntityElement(edgesLayer, 'data-nodebraid-edge-id', edge.id)),
     );
-    syncConnectionAnchors(commit.after.snapshot.nodes, document, interactionLayer, journal);
+    syncConnectionTargets(commit.after.snapshot.nodes, document, interactionLayer, ports, journal);
     completeProjection?.(journal);
   } catch (error) {
     const rollbackErrors = journal.rollback();
@@ -114,37 +120,57 @@ export function applyCommit(
   }
 }
 
-function syncConnectionAnchors(
+function syncConnectionTargets(
   nodes: readonly CanvasNode[],
   document: Document,
   interactionLayer: SVGGElement,
+  ports: PortSnapshot,
   journal: DomMutationJournal,
 ): void {
   const ordered: SVGCircleElement[] = [];
-  const existingAnchors = Array.from(
-    interactionLayer.querySelectorAll<SVGCircleElement>('[data-nodebraid-connection-anchor-node-id]'),
+  const existingTargets = Array.from(
+    interactionLayer.querySelectorAll<SVGCircleElement>(
+      '[data-nodebraid-connection-anchor-node-id], [data-nodebraid-port-node-id]',
+    ),
   );
-  const existingAnchorsByKey = new Map(existingAnchors.map((element) => [connectionAnchorKey(element), element]));
+  const existingTargetsByKey = new Map(existingTargets.map((element) => [connectionTargetKey(element), element]));
   for (const node of nodes) {
-    for (const candidate of createConnectionAnchorElements(document, node)) {
-      const key = connectionAnchorKey(candidate);
-      const existing = existingAnchorsByKey.get(key);
+    for (const candidate of createConnectionTargetElements(document, node, ports)) {
+      const key = connectionTargetKey(candidate);
+      const existing = existingTargetsByKey.get(key);
       if (existing) {
         copyGeometryAttributes(candidate, existing, ['cx', 'cy'], journal);
         ordered.push(existing);
-        existingAnchorsByKey.delete(key);
+        existingTargetsByKey.delete(key);
       } else {
         ordered.push(candidate);
       }
     }
   }
-  for (const element of existingAnchorsByKey.values()) element.remove();
+  for (const element of existingTargetsByKey.values()) element.remove();
   interactionLayer.append(...ordered, ...interactionLayer.querySelectorAll('[data-nodebraid-connection-preview]'));
 }
 
-function createConnectionAnchorElements(document: Document, node: CanvasNode): readonly SVGCircleElement[] {
+function createConnectionTargetElements(
+  document: Document,
+  node: CanvasNode,
+  ports: PortSnapshot,
+): readonly SVGCircleElement[] {
   const size = node.size;
   if (!size || size.width <= 0 || size.height <= 0) return [];
+  const portGeometries = getNodePortGeometries(node, ports);
+  if (portGeometries.length > 0) {
+    return portGeometries.map((geometry) => {
+      const element = createSvgElement(document, 'circle');
+      element.setAttribute('class', 'nodebraid-renderer-svg__port');
+      element.setAttribute('data-nodebraid-port-node-id', node.id);
+      element.setAttribute('data-nodebraid-port-id', geometry.portId);
+      element.setAttribute('data-nodebraid-port-role', geometry.role);
+      element.setAttribute('cx', String(geometry.worldPoint.x));
+      element.setAttribute('cy', String(geometry.worldPoint.y));
+      return element;
+    });
+  }
   return (['target', 'source'] as const).map((role) => {
     const element = createSvgElement(document, 'circle');
     element.setAttribute('class', 'nodebraid-renderer-svg__connection-anchor');
@@ -156,32 +182,27 @@ function createConnectionAnchorElements(document: Document, node: CanvasNode): r
   });
 }
 
-function connectionAnchorKey(element: SVGElement): string {
-  return `${element.getAttribute('data-nodebraid-connection-anchor-node-id')}\u0000${element.getAttribute('data-nodebraid-connection-anchor-role')}`;
+function connectionTargetKey(element: SVGElement): string {
+  const portNodeId = element.getAttribute('data-nodebraid-port-node-id');
+  if (portNodeId !== null) {
+    return `port\u0000${portNodeId}\u0000${element.getAttribute('data-nodebraid-port-id')}\u0000${element.getAttribute('data-nodebraid-port-role')}`;
+  }
+  return `anchor\u0000${element.getAttribute('data-nodebraid-connection-anchor-node-id')}\u0000${element.getAttribute('data-nodebraid-connection-anchor-role')}`;
 }
 
 /** @internal */
 export function applyConnectionPreview(
   preview: ConnectionPreviewInteractionProjection,
   snapshot: CanvasSnapshot,
+  ports: PortSnapshot,
   interactionLayer: SVGGElement,
   journal: DomMutationJournal,
 ): void {
-  const sourceNode = snapshot.nodes.find((node) => node.id === preview.source.nodeId);
-  if (!sourceNode?.size) throw new Error('Validated Connection source Node is unavailable.');
-  const source = {
-    x: sourceNode.position.x + sourceNode.size.width,
-    y: sourceNode.position.y + sourceNode.size.height / 2,
-  };
+  const source = resolveConnectionAnchorPoint(snapshot, ports, preview.source);
   let endpoint = preview.pointerWorldPoint;
   if (preview.target.type !== 'none') {
     const targetAnchor = preview.target.anchor;
-    const targetNode = snapshot.nodes.find((node) => node.id === targetAnchor.nodeId);
-    if (!targetNode?.size) throw new Error('Validated Connection target Node is unavailable.');
-    endpoint = {
-      x: targetAnchor.role === 'source' ? targetNode.position.x + targetNode.size.width : targetNode.position.x,
-      y: targetNode.position.y + targetNode.size.height / 2,
-    };
+    endpoint = resolveConnectionAnchorPoint(snapshot, ports, targetAnchor);
   }
   let element = interactionLayer.querySelector<SVGLineElement>('[data-nodebraid-connection-preview]');
   if (!element) {
@@ -232,6 +253,7 @@ export function applyNodeDragProjection(
   baselineSnapshot: CanvasSnapshot,
   edgesLayer: SVGGElement,
   nodesLayer: SVGGElement,
+  ports: PortSnapshot,
   suppliedJournal?: DomMutationJournal,
 ): void {
   const journal = suppliedJournal ?? new DomMutationJournal(edgesLayer, nodesLayer);
@@ -251,7 +273,7 @@ export function applyNodeDragProjection(
     for (const edge of baselineSnapshot.edges) {
       if (!candidates.has(edge.source.nodeId) && !candidates.has(edge.target.nodeId)) continue;
       const existing = requireEntityElement(edgesLayer, 'data-nodebraid-edge-id', edge.id) as SVGLineElement;
-      const validated = createEdgeElement(edgesLayer.ownerDocument, edge, effectiveNodes);
+      const validated = createEdgeElement(edgesLayer.ownerDocument, edge, effectiveNodes, ports);
       copyGeometryAttributes(validated, existing, ['x1', 'y1', 'x2', 'y2'], journal);
     }
   } catch (error) {
@@ -336,41 +358,23 @@ function createEdgeElement(
   document: Document,
   edge: CanvasEdge,
   nodesById: ReadonlyMap<NodeId, CanvasNode>,
+  ports: PortSnapshot,
 ): SVGLineElement {
-  const portEndpoint =
-    edge.source.portId !== undefined
-      ? ({ endpoint: 'source', portId: edge.source.portId } as const)
-      : edge.target.portId !== undefined
-        ? ({ endpoint: 'target', portId: edge.target.portId } as const)
-        : undefined;
-  if (portEndpoint) {
-    throw new RendererError('INVALID_DOCUMENT_UPDATE', 'SVG Renderer has no Port Geometry for this Edge.', {
-      issue: 'UNSUPPORTED_PORT_GEOMETRY',
-      edgeId: edge.id,
-      ...portEndpoint,
-    });
-  }
   if (edge.source.nodeId === edge.target.nodeId) {
     throw new RendererError('INVALID_DOCUMENT_UPDATE', 'SVG Renderer cannot project a self-loop as a straight Edge.', {
       issue: 'UNSUPPORTED_SELF_LOOP',
       edgeId: edge.id,
     });
   }
-  const source = nodesById.get(edge.source.nodeId);
-  const target = nodesById.get(edge.target.nodeId);
-  if (!source?.size || !target?.size) {
-    throw new RendererError('INVALID_DOCUMENT_UPDATE', 'SVG Edge endpoints require sized Nodes.', {
-      issue: 'MISSING_NODE_SIZE',
-      edgeId: edge.id,
-    });
-  }
+  const source = resolveEdgeEndpointPoint(nodesById, ports, edge.source, 'source', edge.id);
+  const target = resolveEdgeEndpointPoint(nodesById, ports, edge.target, 'target', edge.id);
   const element = createSvgElement(document, 'line');
   element.setAttribute('class', 'nodebraid-renderer-svg__edge');
   element.setAttribute('data-nodebraid-edge-id', edge.id);
-  element.setAttribute('x1', String(source.position.x + source.size.width / 2));
-  element.setAttribute('y1', String(source.position.y + source.size.height / 2));
-  element.setAttribute('x2', String(target.position.x + target.size.width / 2));
-  element.setAttribute('y2', String(target.position.y + target.size.height / 2));
+  element.setAttribute('x1', String(source.x));
+  element.setAttribute('y1', String(source.y));
+  element.setAttribute('x2', String(target.x));
+  element.setAttribute('y2', String(target.y));
   return element;
 }
 

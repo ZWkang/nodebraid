@@ -1,14 +1,17 @@
 import type { CanvasSnapshot } from '@nodebraid/kernel';
+import type { PortSnapshot } from '@nodebraid/port-api';
 import { RendererError, type HitResult, type ScreenPoint } from '@nodebraid/renderer-api';
 import type { SessionSnapshot } from '@nodebraid/session-api';
 
 import { readTargetMatrix } from './target-mapping';
+import { getNodePortGeometries, resolveEdgeEndpointPoint } from './port-geometry';
 
 /** @internal */
 export function hitTestProjection(
   point: ScreenPoint,
   target: SVGSVGElement,
   documentSnapshot: CanvasSnapshot,
+  portSnapshot: PortSnapshot,
   sessionSnapshot: SessionSnapshot,
   edgeHitTolerance: number,
   connectionAnchorHitTolerance: number,
@@ -25,6 +28,25 @@ export function hitTestProjection(
   for (let index = documentSnapshot.nodes.length - 1; index >= 0; index -= 1) {
     const node = documentSnapshot.nodes[index];
     if (!node?.size || node.size.width <= 0 || node.size.height <= 0) continue;
+    const portGeometries = getNodePortGeometries(node, portSnapshot);
+    for (let portIndex = portGeometries.length - 1; portIndex >= 0; portIndex -= 1) {
+      const geometry = portGeometries[portIndex];
+      if (!geometry) continue;
+      const portScreenPoint = {
+        x: geometry.worldPoint.x * viewport.zoom + viewport.x,
+        y: geometry.worldPoint.y * viewport.zoom + viewport.y,
+      };
+      if (Math.hypot(point.x - portScreenPoint.x, point.y - portScreenPoint.y) <= connectionAnchorHitTolerance) {
+        return {
+          type: 'port',
+          nodeId: geometry.nodeId,
+          portId: geometry.portId,
+          role: geometry.role,
+          worldPoint,
+        };
+      }
+    }
+    if (portGeometries.length > 0) continue;
     for (const role of ['source', 'target'] as const) {
       const anchorWorldPoint = {
         x: role === 'source' ? node.position.x + node.size.width : node.position.x,
@@ -55,16 +77,15 @@ export function hitTestProjection(
   for (let index = documentSnapshot.edges.length - 1; index >= 0; index -= 1) {
     const edge = documentSnapshot.edges[index];
     if (!edge) continue;
-    const source = nodesById.get(edge.source.nodeId);
-    const destination = nodesById.get(edge.target.nodeId);
-    if (!source?.size || !destination?.size) continue;
+    const source = resolveEdgeEndpointPoint(nodesById, portSnapshot, edge.source, 'source', edge.id);
+    const destination = resolveEdgeEndpointPoint(nodesById, portSnapshot, edge.target, 'target', edge.id);
     const sourceScreen = {
-      x: (source.position.x + source.size.width / 2) * viewport.zoom + viewport.x,
-      y: (source.position.y + source.size.height / 2) * viewport.zoom + viewport.y,
+      x: source.x * viewport.zoom + viewport.x,
+      y: source.y * viewport.zoom + viewport.y,
     };
     const destinationScreen = {
-      x: (destination.position.x + destination.size.width / 2) * viewport.zoom + viewport.x,
-      y: (destination.position.y + destination.size.height / 2) * viewport.zoom + viewport.y,
+      x: destination.x * viewport.zoom + viewport.x,
+      y: destination.y * viewport.zoom + viewport.y,
     };
     if (distanceToSegment(point, sourceScreen, destinationScreen) <= edgeHitTolerance) {
       return { type: 'edge', edgeId: edge.id, worldPoint };

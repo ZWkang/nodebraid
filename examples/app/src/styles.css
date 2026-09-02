@@ -333,7 +333,8 @@ h1 {
   pointer-events: none;
 }
 
-.nodebraid-renderer-svg__connection-anchor {
+.nodebraid-renderer-svg__connection-anchor,
+.nodebraid-renderer-svg__port {
   fill: #3156d3;
   stroke: #fff;
   stroke-width: 2;

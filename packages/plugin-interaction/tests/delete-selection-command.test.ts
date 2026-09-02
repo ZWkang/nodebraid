@@ -10,6 +10,7 @@ import {
   type HistoryService,
 } from '@nodebraid/plugin-history';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { portPlugin } from '@nodebraid/plugin-port';
 import { createRendererPlugin } from '@nodebraid/plugin-renderer';
 import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/plugin-session';
 import type {
@@ -440,6 +441,7 @@ async function activateDeleteCommandRuntime(): Promise<{
   const host = createPluginHost();
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => new CommandRenderer())),

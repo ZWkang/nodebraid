@@ -5,6 +5,7 @@ import { interactionPlugin } from '@nodebraid/plugin-interaction';
 import { commandPlugin, commandService, type CommandService } from '@nodebraid/plugin-command';
 import { historyPlugin, redoCommand, undoCommand } from '@nodebraid/plugin-history';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { portPlugin } from '@nodebraid/plugin-port';
 import { createRendererPlugin, rendererService, type RendererService } from '@nodebraid/plugin-renderer';
 import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/plugin-session';
 import { RendererError, type CanvasRenderer, type RendererInput } from '@nodebraid/renderer-api';
@@ -35,6 +36,24 @@ interface ConnectionAnchorResult {
     cx: string | null;
     cy: string | null;
   }>[];
+  readonly sourceHit: unknown;
+}
+
+interface PortProjectionResult {
+  readonly ports: readonly Readonly<{
+    nodeId: string | null;
+    portId: string | null;
+    role: string | null;
+    cx: string | null;
+    cy: string | null;
+  }>[];
+  readonly nodeAnchorCount: number;
+  readonly edge: Readonly<{
+    x1: string | null;
+    y1: string | null;
+    x2: string | null;
+    y2: string | null;
+  }>;
   readonly sourceHit: unknown;
 }
 
@@ -660,6 +679,7 @@ declare global {
   var __nodebraidRendererSvgReadInteractionProjectionInput: () => RendererInput | undefined;
   var __nodebraidRendererSvgTeardownInteractionProjectionInput: () => Promise<void>;
   var __nodebraidRendererSvgTicket02FirstEdge: () => Promise<FirstEdgeResult>;
+  var __nodebraidRendererSvgPortProjection: () => Promise<PortProjectionResult>;
   var __nodebraidRendererSvgTicket02PortError: () => Promise<GeometryErrorResult>;
   var __nodebraidRendererSvgTicket02SelfLoopError: () => Promise<GeometryErrorResult>;
   var __nodebraidRendererSvgTicket02MissingSizeError: () => Promise<GeometryErrorResult>;
@@ -1833,6 +1853,7 @@ globalThis.__nodebraidRendererSvgRuntimeInteractionProjection =
     });
     const installations = [
       host.install(kernelPlugin),
+      host.install(portPlugin),
       host.install(sessionPlugin),
       host.install(rendererPlugin, { target }),
       host.install(consumer),
@@ -2010,6 +2031,92 @@ globalThis.__nodebraidRendererSvgTicket02PortError = async (): Promise<GeometryE
   const result: GeometryErrorResult = {
     error: errorResult,
     projectionUnchanged: target.querySelector('.nodebraid-renderer-svg')?.innerHTML === projectionBefore,
+  };
+  await renderer.dispose();
+  target.remove();
+  return result;
+};
+
+globalThis.__nodebraidRendererSvgPortProjection = async (): Promise<PortProjectionResult> => {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  document.body.append(target);
+  const renderer = createSvgRenderer({ target });
+  const kernel = createCanvasKernel();
+  const sourceId = nodeId('port-a-source');
+  const targetId = nodeId('port-b-target');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({
+      id: sourceId,
+      type: 'producer',
+      position: { x: 0, y: 0 },
+      size: { width: 80, height: 90 },
+      data: null,
+    });
+    transaction.nodes.add({
+      id: targetId,
+      type: 'consumer',
+      position: { x: 200, y: 0 },
+      size: { width: 100, height: 90 },
+      data: null,
+    });
+    transaction.edges.add({
+      id: edgeId('port-aware-edge'),
+      type: 'flow',
+      source: { nodeId: sourceId, portId: 'out-b' },
+      target: { nodeId: targetId, portId: 'in-a' },
+      data: null,
+    });
+  });
+  const view = kernel.read();
+  renderer.updateDocument({
+    type: 'reset',
+    view,
+    ports: {
+      documentRevision: view.snapshot.revision,
+      generation: 1,
+      nodes: [
+        {
+          nodeId: sourceId,
+          ports: [
+            { id: 'out-a', role: 'source' },
+            { id: 'out-b', role: 'source' },
+          ],
+        },
+        {
+          nodeId: targetId,
+          ports: [
+            { id: 'in-a', role: 'target' },
+            { id: 'in-b', role: 'target' },
+          ],
+        },
+      ],
+    },
+  });
+  renderer.updateSession({
+    selection: { nodeIds: [], edgeIds: [] },
+    viewport: { x: 0, y: 0, zoom: 1 },
+  });
+  const portElements = Array.from(target.querySelectorAll<SVGCircleElement>('[data-nodebraid-port-id]'));
+  const edge = target.querySelector<SVGLineElement>('[data-nodebraid-edge-id="port-aware-edge"]');
+  if (!edge) throw new Error('Expected port-qualified Edge projection.');
+  const result: PortProjectionResult = {
+    ports: portElements.map((element) => ({
+      nodeId: element.getAttribute('data-nodebraid-port-node-id'),
+      portId: element.getAttribute('data-nodebraid-port-id'),
+      role: element.getAttribute('data-nodebraid-port-role'),
+      cx: element.getAttribute('cx'),
+      cy: element.getAttribute('cy'),
+    })),
+    nodeAnchorCount: target.querySelectorAll('[data-nodebraid-connection-anchor-node-id]').length,
+    edge: {
+      x1: edge.getAttribute('x1'),
+      y1: edge.getAttribute('y1'),
+      x2: edge.getAttribute('x2'),
+      y2: edge.getAttribute('y2'),
+    },
+    sourceHit: renderer.hitTest({ x: 80, y: 60 }),
   };
   await renderer.dispose();
   target.remove();
@@ -3483,6 +3590,7 @@ globalThis.__nodebraidRendererSvgSetupViewportPanInteraction = async (configured
   const interactionInstallation = host.install(interactionPlugin, interactionConfig);
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(rendererPlugin, { target }),
@@ -3598,6 +3706,7 @@ globalThis.__nodebraidRendererSvgSetupNodeDragInteraction = async (): Promise<vo
   });
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(rendererPlugin, { target }),
@@ -3663,6 +3772,7 @@ globalThis.__nodebraidRendererSvgSetupConnectionInteraction = async (enabled = t
     : undefined;
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(createSvgRenderer), { target }),
@@ -3917,6 +4027,7 @@ globalThis.__nodebraidRendererSvgSetupSelectionInteraction = async (): Promise<v
   const interactionInstallation = host.install(interactionPlugin);
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     rendererInstallation,
@@ -4843,6 +4954,7 @@ globalThis.__nodebraidRendererSvgTicket11RuntimeIntegration = async (): Promise<
   });
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(sessionPlugin),
     host.install(rendererPlugin, { target }),
     host.install(consumer),
@@ -4964,6 +5076,7 @@ globalThis.__nodebraidRendererSvgTicket11SetupRuntimeCapture = async (): Promise
   const rendererPlugin = createRendererPlugin((config: Readonly<SvgRendererConfig>) => createSvgRenderer(config));
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(sessionPlugin),
     host.install(rendererPlugin, { target }),
     host.install(consumer),

@@ -1,4 +1,5 @@
 import type { CanvasCommit, CanvasEdge, CanvasNode, CanvasSnapshot, CanvasView, NodeId } from '@nodebraid/kernel';
+import type { PortSnapshot } from '@nodebraid/port-api';
 import { RendererError, type RendererDocumentUpdate } from '@nodebraid/renderer-api';
 import type { SessionSnapshot } from '@nodebraid/session-api';
 
@@ -43,6 +44,66 @@ export function validateRendererDocumentUpdate(value: unknown): RendererDocument
   }
   validateCanvasCommit(value.commit);
   return value as unknown as RendererDocumentUpdate;
+}
+
+/** @internal */
+export function acceptPortSnapshot(value: unknown, document: CanvasSnapshot): PortSnapshot {
+  if (value === undefined) {
+    return Object.freeze({
+      documentRevision: document.revision,
+      generation: 0,
+      nodes: Object.freeze([]),
+    });
+  }
+  if (
+    !isRecord(value) ||
+    value.documentRevision !== document.revision ||
+    !Number.isSafeInteger(value.generation) ||
+    (value.generation as number) < 0 ||
+    !Array.isArray(value.nodes)
+  ) {
+    throwInvalidPortSnapshot('PORT_SNAPSHOT_MISMATCH');
+  }
+  const documentNodeIds = new Set(document.nodes.map((node) => node.id));
+  let previousNodeId: string | undefined;
+  const nodes = value.nodes.map((candidate) => {
+    if (
+      !isRecord(candidate) ||
+      typeof candidate.nodeId !== 'string' ||
+      candidate.nodeId.length === 0 ||
+      !documentNodeIds.has(candidate.nodeId as NodeId) ||
+      !Array.isArray(candidate.ports) ||
+      candidate.ports.length === 0 ||
+      (previousNodeId !== undefined && previousNodeId >= candidate.nodeId)
+    ) {
+      throwInvalidPortSnapshot('INVALID_NODE_PORTS');
+    }
+    previousNodeId = candidate.nodeId;
+    let previousPortId: string | undefined;
+    const ports = candidate.ports.map((port) => {
+      if (
+        !isRecord(port) ||
+        typeof port.id !== 'string' ||
+        port.id.length === 0 ||
+        (port.role !== 'source' && port.role !== 'target') ||
+        (previousPortId !== undefined && previousPortId >= port.id)
+      ) {
+        throwInvalidPortSnapshot('INVALID_PORT_DEFINITION');
+      }
+      previousPortId = port.id;
+      return Object.freeze({ id: port.id, role: port.role });
+    });
+    return Object.freeze({ nodeId: candidate.nodeId as NodeId, ports: Object.freeze(ports) });
+  });
+  return Object.freeze({
+    documentRevision: value.documentRevision as number,
+    generation: value.generation as number,
+    nodes: Object.freeze(nodes),
+  });
+}
+
+function throwInvalidPortSnapshot(issue: string): never {
+  throw new RendererError('INVALID_DOCUMENT_UPDATE', 'SVG Renderer Port Snapshot is invalid.', { issue });
 }
 
 function validateCanvasCommit(value: unknown): asserts value is CanvasCommit {

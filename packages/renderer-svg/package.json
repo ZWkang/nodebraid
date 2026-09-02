@@ -53,6 +53,7 @@
     "@nodebraid/diagnostics": "workspace:*",
     "@nodebraid/interaction-api": "workspace:*",
     "@nodebraid/kernel": "workspace:*",
+    "@nodebraid/port-api": "workspace:*",
     "@nodebraid/renderer-api": "workspace:*",
     "@nodebraid/session-api": "workspace:*"
   }

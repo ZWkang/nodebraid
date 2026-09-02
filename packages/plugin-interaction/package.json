@@ -40,7 +40,7 @@
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
     "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
-    "build:dependencies": "bun run --filter '@nodebraid/plugin-command' build && bun run --filter '@nodebraid/plugin-kernel' build && bun run --filter '@nodebraid/plugin-session' build && bun run --filter '@nodebraid/plugin-renderer' build",
+    "build:dependencies": "bun run --filter '@nodebraid/plugin-command' build && bun run --filter '@nodebraid/plugin-kernel' build && bun run --filter '@nodebraid/plugin-port' build && bun run --filter '@nodebraid/plugin-session' build && bun run --filter '@nodebraid/plugin-renderer' build",
     "build:test-dependencies": "bun run build:dependencies && bun run --filter '@nodebraid/plugin-history' build",
     "prepack": "bun run build",
     "test": "bun run build:test-dependencies && bun test ./tests",
@@ -53,8 +53,10 @@
     "@nodebraid/kernel": "workspace:*",
     "@nodebraid/plugin-command": "workspace:*",
     "@nodebraid/plugin-kernel": "workspace:*",
+    "@nodebraid/plugin-port": "workspace:*",
     "@nodebraid/plugin-renderer": "workspace:*",
     "@nodebraid/plugin-session": "workspace:*",
+    "@nodebraid/port-api": "workspace:*",
     "@nodebraid/renderer-api": "workspace:*",
     "@nodebraid/runtime-cordis": "workspace:*"
   },

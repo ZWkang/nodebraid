@@ -174,6 +174,7 @@ test('Composition diagnostics expose the complete reverse Child cleanup order', 
     '@nodebraid/plugin-renderer',
     '@nodebraid/plugin-session',
     '@nodebraid/plugin-command',
+    '@nodebraid/plugin-port',
     '@nodebraid/plugin-kernel',
   ]);
 

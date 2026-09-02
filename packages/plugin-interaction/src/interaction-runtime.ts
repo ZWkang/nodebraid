@@ -8,9 +8,11 @@ import {
 import type { NodeId, Point } from '@nodebraid/kernel';
 import { commandService, type CommandRegistration, type CommandService } from '@nodebraid/plugin-command';
 import { kernelService } from '@nodebraid/plugin-kernel';
+import { portService } from '@nodebraid/plugin-port';
 import { rendererService } from '@nodebraid/plugin-renderer';
 import { sessionService, type Viewport } from '@nodebraid/plugin-session';
 import type { HitResult } from '@nodebraid/renderer-api';
+import { getPortDefinition, hasPortDefinitions, type PortSnapshot } from '@nodebraid/port-api';
 import type { PluginContext } from '@nodebraid/runtime-cordis';
 
 import { computeClickSelection } from './selection-transition';
@@ -34,6 +36,7 @@ type InteractionRequirements = {
   readonly session: typeof sessionService;
   readonly commands: typeof commandService;
   readonly kernel: typeof kernelService;
+  readonly ports: typeof portService;
 };
 
 interface SelectionGesture {
@@ -94,6 +97,7 @@ export function activateInteractionRuntime(
   const session = context.services.session;
   const kernel = context.services.kernel;
   const commands = context.services.commands;
+  const ports = context.services.ports;
   let closing = false;
   let activeGesture: ActiveGesture | undefined;
   let spacePressed = false;
@@ -103,6 +107,7 @@ export function activateInteractionRuntime(
   let deleteSelectionRegistration: CommandRegistration | undefined;
   let stopKernel = (): void => undefined;
   let stopSession = (): void => undefined;
+  let stopPorts = (): void => undefined;
   let stopInput = (): void => undefined;
   const projection = renderer.bindInteractionProjection();
   const shortcutRuntime = createShortcutRuntime({
@@ -167,6 +172,7 @@ export function activateInteractionRuntime(
     };
     attempt(stopInput);
     attempt(stopSession);
+    attempt(stopPorts);
     attempt(stopKernel);
     attempt(() => projection.dispose());
     if (gesture) attempt(() => renderer.releasePointer(gesture.pointerId));
@@ -203,7 +209,7 @@ export function activateInteractionRuntime(
   });
 
   moveRegistration = commands.register(moveNodesCommand, createMoveNodesHandler(kernel));
-  createEdgeRegistration = commands.register(createEdgeCommand, createEdgeHandler(kernel));
+  createEdgeRegistration = commands.register(createEdgeCommand, createEdgeHandler(kernel, ports));
   deleteSelectionRegistration = commands.register(deleteSelectionCommand, createDeleteSelectionHandler(kernel));
   stopKernel = kernel.observeCommits((commit) => {
     if (closing || !activeGesture) return;
@@ -218,11 +224,18 @@ export function activateInteractionRuntime(
     } else if (gesture.type === 'viewport-pan') {
       reapplyGestureProjection(gesture);
     } else if (gesture.type === 'connection') {
-      const sourceExists = commit.after.query.getNode(gesture.source.nodeId) !== undefined;
-      if (!sourceExists) {
+      const portSnapshot = ports.snapshot(commit.after.snapshot);
+      if (!connectionAnchorAvailable(gesture.source, commit.after.query.getNode(gesture.source.nodeId), portSnapshot)) {
         cancelGesture(gesture, 'stale', true);
       } else {
-        if (gesture.target.type !== 'none' && !commit.after.query.getNode(gesture.target.anchor.nodeId)) {
+        if (
+          gesture.target.type !== 'none' &&
+          !connectionAnchorAvailable(
+            gesture.target.anchor,
+            commit.after.query.getNode(gesture.target.anchor.nodeId),
+            portSnapshot,
+          )
+        ) {
           gesture.target = { type: 'none' };
         }
         reapplyGestureProjection(gesture);
@@ -230,6 +243,29 @@ export function activateInteractionRuntime(
     } else if (gesture.type === 'box-selection') {
       reapplyGestureProjection(gesture);
     }
+  });
+  stopPorts = ports.subscribe(() => {
+    if (closing || !activeGesture) return;
+    const gesture = activeGesture;
+    if (gesture.type === 'connection') {
+      const view = kernel.read();
+      const portSnapshot = ports.snapshot(view.snapshot);
+      if (!connectionAnchorAvailable(gesture.source, view.query.getNode(gesture.source.nodeId), portSnapshot)) {
+        cancelGesture(gesture, 'stale', true);
+        return;
+      }
+      if (
+        gesture.target.type !== 'none' &&
+        !connectionAnchorAvailable(
+          gesture.target.anchor,
+          view.query.getNode(gesture.target.anchor.nodeId),
+          portSnapshot,
+        )
+      ) {
+        gesture.target = { type: 'none' };
+      }
+    }
+    reapplyGestureProjection(gesture);
   });
   stopSession = session.subscribe(() => {
     if (closing || !activeGesture) return;
@@ -341,13 +377,8 @@ export function activateInteractionRuntime(
         const hit = renderer.hitTest(input.screenPoint);
         if (hit === null) return;
         const additive = input.modifiers.shift || input.modifiers.meta || input.modifiers.control;
-        if (
-          hit.type === 'connection-anchor' &&
-          hit.role === 'source' &&
-          config.connection &&
-          !additive &&
-          input.pointerType !== 'mouse'
-        ) {
+        const connectionHit = toConnectionAnchor(hit);
+        if (connectionHit?.role === 'source' && config.connection && !additive && input.pointerType !== 'mouse') {
           context.diagnostics.emit({
             name: interactionDiagnosticEvents.inputRejected,
             level: 'info',
@@ -370,17 +401,11 @@ export function activateInteractionRuntime(
             };
             return;
           }
-          if (
-            hit.type === 'connection-anchor' &&
-            hit.role === 'source' &&
-            config.connection &&
-            !additive &&
-            input.button === 'primary'
-          ) {
+          if (connectionHit?.role === 'source' && config.connection && !additive && input.button === 'primary') {
             const gesture: ConnectionGesture = {
               type: 'connection',
               pointerId: input.pointerId,
-              source: { nodeId: hit.nodeId, role: 'source' },
+              source: connectionHit,
               pointerWorldPoint: input.worldPoint,
               target: { type: 'none' },
             };
@@ -575,20 +600,48 @@ function updateConnectionGesture(gesture: ConnectionGesture, pointerWorldPoint: 
     gesture.target = { type: 'none' };
     return;
   }
-  const anchor = { nodeId: hit.nodeId, role: hit.role } as const;
+  const anchor = toConnectionAnchor(hit);
+  if (!anchor) {
+    gesture.target = { type: 'none' };
+    return;
+  }
   gesture.target = hit.nodeId !== gesture.source.nodeId ? { type: 'valid', anchor } : { type: 'invalid', anchor };
 }
 
-function isConnectionAnchorHit(
-  hit: unknown,
-): hit is Readonly<{ type: 'connection-anchor'; nodeId: NodeId; role: 'source' | 'target' }> {
+function isConnectionAnchorHit(hit: unknown): hit is Readonly<{
+  type: 'connection-anchor' | 'port';
+  nodeId: NodeId;
+  portId?: string;
+  role: 'source' | 'target';
+}> {
   return (
     typeof hit === 'object' &&
     hit !== null &&
-    Reflect.get(hit, 'type') === 'connection-anchor' &&
+    (Reflect.get(hit, 'type') === 'connection-anchor' || Reflect.get(hit, 'type') === 'port') &&
     typeof Reflect.get(hit, 'nodeId') === 'string' &&
+    (Reflect.get(hit, 'type') !== 'port' ||
+      (typeof Reflect.get(hit, 'portId') === 'string' && (Reflect.get(hit, 'portId') as string).length > 0)) &&
     (Reflect.get(hit, 'role') === 'source' || Reflect.get(hit, 'role') === 'target')
   );
+}
+
+function toConnectionAnchor(hit: HitResult | null): ConnectionAnchorIdentity | undefined {
+  if (!isConnectionAnchorHit(hit)) return undefined;
+  return Object.freeze({
+    nodeId: hit.nodeId,
+    ...(hit.type === 'port' ? { portId: hit.portId } : {}),
+    role: hit.role,
+  });
+}
+
+function connectionAnchorAvailable(
+  anchor: ConnectionAnchorIdentity,
+  node: Readonly<{ readonly id: NodeId }> | undefined,
+  ports: PortSnapshot,
+): boolean {
+  if (!node) return false;
+  if (anchor.portId === undefined) return !hasPortDefinitions(ports, anchor.nodeId);
+  return getPortDefinition(ports, anchor.nodeId, anchor.portId)?.role === anchor.role;
 }
 
 function emitGestureCancellation(
@@ -630,8 +683,14 @@ function executeCreateEdge(
   isClosing: () => boolean,
 ): void {
   if (gesture.target.type !== 'valid') return;
-  const source = Object.freeze({ nodeId: gesture.source.nodeId });
-  const target = Object.freeze({ nodeId: gesture.target.anchor.nodeId });
+  const source = Object.freeze({
+    nodeId: gesture.source.nodeId,
+    ...(gesture.source.portId === undefined ? {} : { portId: gesture.source.portId }),
+  });
+  const target = Object.freeze({
+    nodeId: gesture.target.anchor.nodeId,
+    ...(gesture.target.anchor.portId === undefined ? {} : { portId: gesture.target.anchor.portId }),
+  });
   let edge;
   try {
     edge = materializeEdge(Object.freeze({ source, target }));

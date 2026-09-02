@@ -3,6 +3,7 @@ import { expect, test } from 'bun:test';
 import { edgeId, nodeId } from '@nodebraid/kernel';
 import { commandPlugin, commandService, type CommandService } from '@nodebraid/plugin-command';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { createPortContributionPlugin, portPlugin } from '@nodebraid/plugin-port';
 import { createRendererPlugin } from '@nodebraid/plugin-renderer';
 import { sessionPlugin } from '@nodebraid/plugin-session';
 import type {
@@ -30,6 +31,7 @@ test('Create Edge commits one complete Node-level Edge', async () => {
   const host = createPluginHost();
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => new CommandRenderer())),
@@ -135,6 +137,49 @@ test('Create Edge commits one complete Node-level Edge', async () => {
     }),
   ).rejects.toMatchObject({ domain: 'interaction', code: 'STALE_GESTURE' });
   expect(kernel.read()).toBe(beforeRejected);
+
+  const portContribution = host.install(
+    createPortContributionPlugin({
+      id: 'command-test-ports',
+      definePorts(node) {
+        if (node.id === sourceNodeId) return [{ id: 'output', role: 'source' }];
+        if (node.id === targetNodeId) return [{ id: 'input', role: 'target' }];
+        return [];
+      },
+    }),
+  );
+  await portContribution.whenActive();
+  const portConnectionId = edgeId('port-aware-edge');
+  await expect(
+    commands.execute(createEdgeCommand, {
+      edge: {
+        id: portConnectionId,
+        type: 'flow',
+        source: { nodeId: sourceNodeId, portId: 'output' },
+        target: { nodeId: targetNodeId, portId: 'input' },
+        data: null,
+      },
+      source: { nodeId: sourceNodeId, portId: 'output', role: 'source' },
+      target: { nodeId: targetNodeId, portId: 'input', role: 'target' },
+    }),
+  ).resolves.toMatchObject({ changeSet: { commandId: 'interaction.edge.create' } });
+  expect(kernel.read().query.getEdge(portConnectionId)).toMatchObject({
+    source: { nodeId: sourceNodeId, portId: 'output' },
+    target: { nodeId: targetNodeId, portId: 'input' },
+  });
+  await expect(
+    commands.execute(createEdgeCommand, {
+      edge: {
+        id: edgeId('bypass-port-edge'),
+        type: 'flow',
+        source: { nodeId: sourceNodeId },
+        target: { nodeId: targetNodeId },
+        data: null,
+      },
+      source: { nodeId: sourceNodeId, role: 'source' },
+      target: { nodeId: targetNodeId, role: 'target' },
+    }),
+  ).rejects.toMatchObject({ domain: 'interaction', code: 'STALE_GESTURE' });
   await host.dispose();
 });
 

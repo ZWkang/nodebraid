@@ -2,6 +2,7 @@ import { commandPlugin } from '@nodebraid/plugin-command';
 import { historyPlugin } from '@nodebraid/plugin-history';
 import { interactionPlugin, type InteractionConfig } from '@nodebraid/plugin-interaction';
 import { kernelPlugin } from '@nodebraid/plugin-kernel';
+import { portPlugin } from '@nodebraid/plugin-port';
 import { createRendererPlugin } from '@nodebraid/plugin-renderer';
 import { sessionPlugin } from '@nodebraid/plugin-session';
 import type { RendererFactory } from '@nodebraid/renderer-api';
@@ -22,6 +23,7 @@ export function createBasicCanvasPlugin<RendererConfig>(
     async setup(context, config) {
       const installations = [
         context.install(kernelPlugin),
+        context.install(portPlugin),
         context.install(commandPlugin),
         context.install(sessionPlugin),
         context.install(rendererPlugin, config),

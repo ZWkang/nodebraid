@@ -3,6 +3,7 @@ import { expect, test } from 'bun:test';
 import { nodeId } from '@nodebraid/kernel';
 import { commandPlugin, commandService, type CommandService } from '@nodebraid/plugin-command';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { portPlugin } from '@nodebraid/plugin-port';
 import { createRendererPlugin } from '@nodebraid/plugin-renderer';
 import { sessionPlugin } from '@nodebraid/plugin-session';
 import type {
@@ -30,6 +31,7 @@ test('Move Nodes rejects an empty input without changing Document', async () => 
   const host = createPluginHost();
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => new CommandRenderer())),

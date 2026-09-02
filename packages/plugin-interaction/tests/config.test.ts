@@ -2,6 +2,7 @@ import { expect, test } from 'bun:test';
 
 import { commandPlugin } from '@nodebraid/plugin-command';
 import { kernelPlugin } from '@nodebraid/plugin-kernel';
+import { portPlugin } from '@nodebraid/plugin-port';
 import { createRendererPlugin } from '@nodebraid/plugin-renderer';
 import { sessionPlugin } from '@nodebraid/plugin-session';
 import type {
@@ -20,6 +21,7 @@ test('Interaction accepts an explicit synchronous Connection materializer', asyn
   const host = createPluginHost();
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => new ConfigRenderer())),
@@ -41,6 +43,7 @@ test('Interaction rejects unknown config fields through Plugin installation', as
   const host = createPluginHost();
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => new ConfigRenderer())),
@@ -59,6 +62,7 @@ test('Interaction rejects malformed numeric config without coercion', async () =
   const host = createPluginHost();
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => new ConfigRenderer())),

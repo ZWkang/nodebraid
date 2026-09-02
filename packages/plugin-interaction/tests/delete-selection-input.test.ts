@@ -6,6 +6,7 @@ import { edgeId, nodeId } from '@nodebraid/kernel';
 import { commandPlugin, commandService, defineCommand } from '@nodebraid/plugin-command';
 import { historyPlugin, historyService, type HistoryService } from '@nodebraid/plugin-history';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { portPlugin } from '@nodebraid/plugin-port';
 import { createRendererPlugin } from '@nodebraid/plugin-renderer';
 import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/plugin-session';
 import type {
@@ -53,6 +54,7 @@ test('a live Interaction Shortcut Binding executes its Command and prevents the 
   const shortcutInstallation = host.install(shortcutProvider);
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => renderer)),
@@ -284,6 +286,7 @@ async function activateInputRuntime(
   const host = createPluginHost(options.host);
   const installations = [
     host.install(kernelPlugin),
+    host.install(portPlugin),
     host.install(commandPlugin),
     host.install(sessionPlugin),
     host.install(createRendererPlugin(() => renderer)),
