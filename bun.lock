@@ -70,8 +70,10 @@
         "@nodebraid/plugin-interaction": "workspace:*",
         "@nodebraid/plugin-kernel": "workspace:*",
         "@nodebraid/plugin-layout": "workspace:*",
+        "@nodebraid/plugin-port": "workspace:*",
         "@nodebraid/plugin-renderer": "workspace:*",
         "@nodebraid/plugin-session": "workspace:*",
+        "@nodebraid/port-api": "workspace:*",
         "@nodebraid/preset-basic": "workspace:*",
         "@nodebraid/renderer-api": "workspace:*",
         "@nodebraid/runtime-cordis": "workspace:*",
@@ -184,8 +186,10 @@
         "@nodebraid/kernel": "workspace:*",
         "@nodebraid/plugin-command": "workspace:*",
         "@nodebraid/plugin-kernel": "workspace:*",
+        "@nodebraid/plugin-port": "workspace:*",
         "@nodebraid/plugin-renderer": "workspace:*",
         "@nodebraid/plugin-session": "workspace:*",
+        "@nodebraid/port-api": "workspace:*",
         "@nodebraid/renderer-api": "workspace:*",
         "@nodebraid/runtime-cordis": "workspace:*",
       },
@@ -212,6 +216,16 @@
         "@nodebraid/runtime-cordis": "workspace:*",
       },
     },
+    "packages/plugin-port": {
+      "name": "@nodebraid/plugin-port",
+      "version": "0.0.1",
+      "dependencies": {
+        "@nodebraid/diagnostics": "workspace:*",
+        "@nodebraid/kernel": "workspace:*",
+        "@nodebraid/port-api": "workspace:*",
+        "@nodebraid/runtime-cordis": "workspace:*",
+      },
+    },
     "packages/plugin-renderer": {
       "name": "@nodebraid/plugin-renderer",
       "version": "0.0.1",
@@ -220,6 +234,7 @@
         "@nodebraid/interaction-api": "workspace:*",
         "@nodebraid/kernel": "workspace:*",
         "@nodebraid/plugin-kernel": "workspace:*",
+        "@nodebraid/plugin-port": "workspace:*",
         "@nodebraid/plugin-session": "workspace:*",
         "@nodebraid/renderer-api": "workspace:*",
         "@nodebraid/runtime-cordis": "workspace:*",
@@ -236,6 +251,13 @@
         "@nodebraid/session-api": "workspace:*",
       },
     },
+    "packages/port-api": {
+      "name": "@nodebraid/port-api",
+      "version": "0.0.1",
+      "dependencies": {
+        "@nodebraid/kernel": "workspace:*",
+      },
+    },
     "packages/preset-basic": {
       "name": "@nodebraid/preset-basic",
       "version": "0.0.1",
@@ -244,6 +266,7 @@
         "@nodebraid/plugin-history": "workspace:*",
         "@nodebraid/plugin-interaction": "workspace:*",
         "@nodebraid/plugin-kernel": "workspace:*",
+        "@nodebraid/plugin-port": "workspace:*",
         "@nodebraid/plugin-renderer": "workspace:*",
         "@nodebraid/plugin-session": "workspace:*",
         "@nodebraid/renderer-api": "workspace:*",
@@ -257,6 +280,7 @@
         "@nodebraid/diagnostics": "workspace:*",
         "@nodebraid/interaction-api": "workspace:*",
         "@nodebraid/kernel": "workspace:*",
+        "@nodebraid/port-api": "workspace:*",
         "@nodebraid/session-api": "workspace:*",
       },
     },
@@ -267,6 +291,7 @@
         "@nodebraid/diagnostics": "workspace:*",
         "@nodebraid/interaction-api": "workspace:*",
         "@nodebraid/kernel": "workspace:*",
+        "@nodebraid/port-api": "workspace:*",
         "@nodebraid/renderer-api": "workspace:*",
         "@nodebraid/session-api": "workspace:*",
       },
@@ -549,9 +574,13 @@
 
     "@nodebraid/plugin-layout": ["@nodebraid/plugin-layout@workspace:packages/plugin-layout"],
 
+    "@nodebraid/plugin-port": ["@nodebraid/plugin-port@workspace:packages/plugin-port"],
+
     "@nodebraid/plugin-renderer": ["@nodebraid/plugin-renderer@workspace:packages/plugin-renderer"],
 
     "@nodebraid/plugin-session": ["@nodebraid/plugin-session@workspace:packages/plugin-session"],
+
+    "@nodebraid/port-api": ["@nodebraid/port-api@workspace:packages/port-api"],
 
     "@nodebraid/preset-basic": ["@nodebraid/preset-basic@workspace:packages/preset-basic"],
 

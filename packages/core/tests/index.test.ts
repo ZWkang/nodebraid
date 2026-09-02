@@ -14,6 +14,7 @@ import {
   createDuplicateSelectionShortcutPlugin,
   createRendererPlugin,
   createPluginHost,
+  createPortContributionPlugin,
   defineCommand,
   definePlugin,
   defineService,
@@ -29,6 +30,8 @@ import {
   kernelService,
   nodeId,
   moveNodesCommand,
+  portPlugin,
+  portService,
   pasteClipboardCommand,
   sessionPlugin,
   sessionService,
@@ -40,9 +43,17 @@ import {
   type PluginInstallation,
   type InteractionProjection,
   type SessionService,
+  type PortDefinition,
 } from '../src';
 
 describe('@nodebraid/core', () => {
+  test('publishes Port values and Runtime contribution seams', () => {
+    const definition: PortDefinition = { id: 'output', role: 'source' };
+    expect(definition).toEqual({ id: 'output', role: 'source' });
+    expect(portPlugin).toBeDefined();
+    expect(portService).toBeDefined();
+    expect(typeof createPortContributionPlugin).toBe('function');
+  });
   test('publishes Canvas Fragment and Clipboard through the public facade', () => {
     expect(copySelectionToClipboardCommand.id).toBe('clipboard.copy');
     expect(pasteClipboardCommand.id).toBe('clipboard.paste');

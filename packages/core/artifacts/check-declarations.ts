@@ -20,10 +20,12 @@ const pluginDuplicateSelectionDist = fileURLToPath(new URL('../../plugin-duplica
 const pluginHistoryDist = fileURLToPath(new URL('../../plugin-history/dist/', import.meta.url));
 const pluginInteractionDist = fileURLToPath(new URL('../../plugin-interaction/dist/', import.meta.url));
 const pluginKernelDist = fileURLToPath(new URL('../../plugin-kernel/dist/', import.meta.url));
+const pluginPortDist = fileURLToPath(new URL('../../plugin-port/dist/', import.meta.url));
 const pluginRendererDist = fileURLToPath(new URL('../../plugin-renderer/dist/', import.meta.url));
 const pluginSessionDist = fileURLToPath(new URL('../../plugin-session/dist/', import.meta.url));
 const pluginLayoutDist = fileURLToPath(new URL('../../plugin-layout/dist/', import.meta.url));
 const presetBasicDist = fileURLToPath(new URL('../../preset-basic/dist/', import.meta.url));
+const portApiDist = fileURLToPath(new URL('../../port-api/dist/', import.meta.url));
 const rendererApiDist = fileURLToPath(new URL('../../renderer-api/dist/', import.meta.url));
 const runtimeDist = fileURLToPath(new URL('../../runtime-cordis/dist/', import.meta.url));
 const sessionApiDist = fileURLToPath(new URL('../../session-api/dist/', import.meta.url));
@@ -41,10 +43,12 @@ const declarationFiles = await Promise.all([
   collectDeclarations(pluginHistoryDist),
   collectDeclarations(pluginInteractionDist),
   collectDeclarations(pluginKernelDist),
+  collectDeclarations(pluginPortDist),
   collectDeclarations(pluginRendererDist),
   collectDeclarations(pluginSessionDist),
   collectDeclarations(pluginLayoutDist),
   collectDeclarations(presetBasicDist),
+  collectDeclarations(portApiDist),
   collectDeclarations(rendererApiDist),
   collectDeclarations(runtimeDist),
   collectDeclarations(sessionApiDist),
@@ -61,10 +65,12 @@ assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-duplicate-sele
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-history';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-interaction';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-kernel';/);
+assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-port';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-renderer';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-session';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/plugin-layout';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/preset-basic';/);
+assert.match(coreDeclaration, /export \* from '@nodebraid\/port-api';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/renderer-api';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/runtime-cordis';/);
 assert.match(coreDeclaration, /export \* from '@nodebraid\/session-api';/);
@@ -84,6 +90,9 @@ assert.ok(corePackage.NodeBraidError);
 assert.equal(corePackage.diagnosticEvents.sinkFault, 'nodebraid.diagnostics.sink.fault');
 assert.ok(corePackage.kernelPlugin);
 assert.ok(corePackage.kernelService);
+assert.ok(corePackage.portPlugin);
+assert.ok(corePackage.portService);
+assert.equal(typeof corePackage.createPortContributionPlugin, 'function');
 assert.ok(corePackage.commandPlugin);
 assert.ok(corePackage.commandService);
 assert.equal(corePackage.copySelectionToClipboardCommand.id, 'clipboard.copy');

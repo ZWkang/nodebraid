@@ -1,0 +1,52 @@
+{
+  "name": "@nodebraid/port-api",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Renderer-independent Port value contracts for NodeBraid.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "zwkang",
+    "email": "kang95630@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZWkang/nodebraid.git",
+    "directory": "packages/port-api"
+  },
+  "bugs": "https://github.com/ZWkang/nodebraid/issues",
+  "homepage": "https://github.com/ZWkang/nodebraid/tree/main/packages/port-api#readme",
+  "keywords": [
+    "nodebraid",
+    "port",
+    "connection"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsgo -p tsconfig.build.json --watch",
+    "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
+    "build:dependencies": "bun run --filter '@nodebraid/kernel' build",
+    "prepack": "bun run build",
+    "test": "bun test ./tests",
+    "test:artifacts": "bun run ./artifacts/check-declarations.ts",
+    "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@nodebraid/kernel": "workspace:*"
+  }
+}
