@@ -666,7 +666,7 @@ try {
     edgeIds: [],
     preview: { x1: '120', y1: '120', x2: '240', y2: '120', target: 'none' },
   });
-  await dispatchMouseUp(240, 120);
+  await dispatchMouseUp(180, 160);
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgReadConnectionInteraction()', {
     revision: 1,
     edgeIds: [],
