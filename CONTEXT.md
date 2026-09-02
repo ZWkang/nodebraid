@@ -24,6 +24,18 @@ _Avoid_: Renderer Line, Connection Object
 Edge 的一端，引用一个 Node，并可以带有由上层领域能力解释的 Port 标识。
 _Avoid_: Port, Anchor Object, Renderer Handle
 
+**Port**:
+附着于一个 Node、具有稳定局部标识与 source 或 target role 的连接能力定义；它不是 Document 实体，也不脱离所属 Node 独立存在。
+_Avoid_: Port Entity, Port Node, Renderer Handle
+
+**Port Contribution**:
+由 Node 类型或领域 Plugin 在其 Activation 内注册、并从 Node 领域值同步产生 Port 定义的具名贡献。
+_Avoid_: Port Entity Writer, Renderer Registration, Tool Contribution
+
+**Port Snapshot**:
+Port Capability 针对一个已提交 Canvas Snapshot 解析出的不可变、规范排序 Port 定义集合；它与 Document revision 和当前贡献 generation 对齐，但不属于 Document。
+_Avoid_: Port Document, Serialized Ports, Renderer Scene
+
 **Transaction**:
 对 Document 的一次同步、原子更新尝试；只有最终图满足 Kernel 结构不变量时才会提交。
 _Avoid_: Async Transaction, Mutation Session, Direct Write
@@ -201,7 +213,7 @@ _Avoid_: Target Lock, Global Renderer Slot, DOM Ownership
 _Avoid_: SVG Document, Product Scene, Authoritative Graph
 
 **Port Geometry**:
-一个 port-qualified Endpoint 可供 Renderer 解析的世界坐标连接位置；缺失时不得把 Node 中心猜测为该 Port 的位置。
+Renderer 根据当前已接受 Port Snapshot 与 Node Geometry 为一个 Port 计算的世界坐标连接位置；缺失时不得把 Node 中心猜测为该 Port 的位置。
 _Avoid_: Node-center Fallback, Renderer Handle, Port ID
 
 **Renderer Baseline**:
@@ -277,8 +289,8 @@ _Avoid_: Canvas Renderer Service, Renderer Host, Mutable Renderer
 _Avoid_: Renderer Behavior, Native Event Handler, Direct Document Mutation
 
 **Connection Anchor**:
-附着于一个 Node、并以 source 或 target role 参与 Edge Connection 的 Renderer 语义命中目标；它不是 Document 实体，首版也不表达 Port 身份。
-_Avoid_: Port, Endpoint, Renderer Handle, Anchor Object
+附着于一个 Node、并以 source 或 target role 参与 Edge Connection 的 Renderer 语义命中目标；无 Port Node 使用 node-level Anchor，Port 命中则以 port-qualified Anchor identity 进入 Interaction，但两者都不是 Document 实体。
+_Avoid_: Endpoint Entity, Renderer Handle, Anchor Object
 
 **Connection Gesture**:
 从 source Connection Anchor 开始、以瞬态 Connection Preview 评估 target Connection Anchor，并以提交一条 Edge 或取消结束的 Active Gesture。
@@ -349,8 +361,12 @@ _Avoid_: Old Pointer, Stale Renderer, Rebased Gesture
 _Avoid_: Move Delta, Drag Commit, Position Patch
 
 **Create Edge Command**:
-仅在完整 Edge 与 source、target Connection Anchor 证据一致，且所需 Node 与 Edge ID 仍可用时，原子提交该 Edge 的强类型 Command。
+仅在完整 Edge 与 source、target Connection Anchor 证据一致，且所需 Node、Port 定义与 Edge ID 仍可用时，原子提交该 Edge 的强类型 Command。
 _Avoid_: Edge Factory, Direct Edge Write, Connection Commit
+
+**Port Capability**:
+由专用 Runtime Plugin 提供、在 Activation 生命周期内注册 Port Contribution，并针对已提交 Node 值解析确定性 Port Snapshot 的窄能力。
+_Avoid_: Port Entity Store, Generic Registry, Tool Registry
 
 **Delete Selection Command**:
 将一份 Selection 中显式选中的 Edge，以及显式选中 Node 与其全部 incident Edge，作为一个原子、可撤销的 Document 变化提交。

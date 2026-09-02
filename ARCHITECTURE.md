@@ -101,10 +101,8 @@ interface CanvasNode<T = unknown> {
 interface CanvasEdge<T = unknown> {
   id: EdgeId;
   type: string;
-  source: NodeId;
-  target: NodeId;
-  sourcePort?: string;
-  targetPort?: string;
+  source: { nodeId: NodeId; portId?: string };
+  target: { nodeId: NodeId; portId?: string };
   data: T;
 }
 
@@ -120,6 +118,12 @@ interface CanvasDocument {
 `data` 归节点或边类型插件解释。`extensions` 按插件命名空间保存需要随文档持久化的数据，插件不得写入其他插件的命名空间。
 
 Document 不保存 hover、拖拽预览、指针位置等瞬时状态。Selection 和 Viewport 属于编辑器实例状态，应与可持久化图数据明确分离。
+
+Port 也不是 Node、Edge 之外的 Document Entity。Document 只在 Endpoint 上保存可选
+`portId`；当前有效的 Port 定义由 Node 类型或领域 Plugin 贡献给专用 Port Capability，
+并针对已提交 Node 值解析为 revision-bound Port Snapshot。Port Contribution 的安装、
+释放与冲突显式遵循 Plugin Activation 生命周期，NodeBraid 不从不透明 `node.data`
+猜测 Port，也不把 Port 独立持久化。
 
 ### Transaction
 
@@ -352,7 +356,15 @@ interface CanvasRenderer {
 `CanvasRenderer` 不定义 universal `mount(HTMLElement)`。一个 Renderer Instance
 在创建时绑定一个 Target，切换 Target 或 Provider 需要释放旧实例并创建新实例。
 `@nodebraid/plugin-renderer` 负责把 Factory 与 Kernel、Session、Plugin Host 生命周期
-组合起来，并只向 Interaction 暴露输入、命中、Pointer Capture 与 Focus。
+组合起来，并把与 Document revision 对齐的 Port Snapshot 一并交付 Renderer；它只向
+Interaction 暴露输入、命中、Pointer Capture 与 Focus。
+
+Port-aware Connection 保持一条稳定职责链：Port Capability 解析定义，Renderer Provider
+根据定义与 Node Geometry 计算 Port Geometry、投影和 Hit Result，Interaction 判断
+source/target role、重验 Gesture 期间的 Port 稳定性，并通过一次 Create Edge Command
+和同步 Kernel Transaction 提交完整 Edge。没有 Port 定义的 Node 继续使用 node-level
+Connection Anchor；存在 Port 定义的 Node 不生成 node-level Anchor，因此不会绕过 Port
+语义或把缺失 Port 静默连接到 Node 中心。
 
 Renderer Provider 可以包括：
 

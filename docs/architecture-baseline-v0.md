@@ -491,7 +491,7 @@ RendererInput 已冻结为 Pointer、Wheel 与 Keyboard 的最小 union；HitRes
 - 读取 Query；
 - 注册与生命周期绑定的 Disposable。
 
-Command Service 由官方 `@nodebraid/plugin-command` 通过普通 Runtime Service 提供，但不形成独立架构层。定义 handler 的 Feature Plugin 通过自己的静态 Service Binding 获取 Kernel、Session 或其他依赖，Command Service 不提供动态 Service lookup。Node Type Registry、Port Registry、Effect Registry、UI Registry 和 Renderer Contribution Registry 当前都不是必需基础设施。
+Command Service 由官方 `@nodebraid/plugin-command` 通过普通 Runtime Service 提供，但不形成独立架构层。定义 handler 的 Feature Plugin 通过自己的静态 Service Binding 获取 Kernel、Session 或其他依赖，Command Service 不提供动态 Service lookup。Port 使用专用、Activation-scoped Contribution Capability；Node Type Registry、通用/全局 Port Registry、Effect Registry、UI Registry 和 Renderer Contribution Registry 当前都不是必需基础设施。
 
 ### 7.2 提交后副作用
 
@@ -599,7 +599,7 @@ Cordis 生命周期
 - 完整业务 Validation 系统；
 - Yjs Collaboration；
 - Domain Plugin 规范；
-- Port 顶级实体或 Port Registry；
+- Port 顶级实体或通用/全局 Port Registry；
 - Renderer 热切换；
 - 多 View 共享一个 Document；
 - Effect Journal；
