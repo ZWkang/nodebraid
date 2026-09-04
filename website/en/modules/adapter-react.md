@@ -59,6 +59,7 @@ function RuntimeView({ runtime }: { runtime: ApplicationRuntime }) {
 The Runtime Factory identity must remain stable. Changing the Factory or Target identity expresses an
 explicit remount or retry. The Adapter owns the lifecycle of `ready.runtime`; consumers must not call
 `dispose()` themselves.
+Attach `mount.ref` to one live Target only; a second simultaneous Target fails explicitly.
 
 ## Lifecycle and failures
 
@@ -68,6 +69,9 @@ explicit remount or retry. The Adapter owns the lifecycle of `ready.runtime`; co
 - a dispose rejection also retains its identity and terminally prevents that Hook instance from acquiring more resources;
 - React cannot await effect cleanup, so deterministic means exactly-once ownership and strict ordering, not a Promise returned by component unmount;
 - the Factory remains responsible for rolling back partial initialization before it rejects.
+
+v0 verifies React 19 client rendering only. Snapshot Hooks provide no `getServerSnapshot`; SSR fails
+explicitly rather than guessing that a live getter is a reproducible hydration Snapshot.
 
 ## Limitations and non-goals
 

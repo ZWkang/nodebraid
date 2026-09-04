@@ -21,6 +21,7 @@ export type RuntimeMountSnapshot<Target, Runtime extends DisposableRuntime> =
   | Readonly<{ status: 'failed'; failure: RuntimeMountFailure }>;
 
 export interface RuntimeMount<Target, Runtime extends DisposableRuntime> {
+  /** Attach to exactly one React Target at a time. A second live Target fails explicitly. */
   readonly ref: RefCallback<Target>;
   readonly snapshot: RuntimeMountSnapshot<Target, Runtime>;
 }

@@ -289,6 +289,10 @@ components, controlled Documents, product UI, or a shared React/Vue abstraction.
 The Basic SVG Example consumes this public package rather than keeping a private
 mount coordinator or Snapshot wrappers.
 
+The verified v0 boundary is React 19 client rendering with one live Target per
+callback ref. Snapshot Hooks fail explicitly during SSR because the Runtime has
+no hydration Snapshot contract to reproduce server state.
+
 ## Layout packages
 
 `@nodebraid/layout-api` defines immutable Layout Inputs, asynchronous Layout

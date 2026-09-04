@@ -46,6 +46,7 @@ try {
     createCountWhileFirstPending: 1,
     staleResolutionEvents: ['create:1', 'resolve:1', 'dispose:start:1', 'dispose:end:1', 'create:2'],
     firstReady: { status: 'ready', runtimeId: '2', failurePhase: null, targetRuntimeId: '2' },
+    firstReadyRemountRender: { generation: 2, status: 'pending', runtimeId: null },
     readyRemountEvents: [
       'create:1',
       'resolve:1',
@@ -101,6 +102,16 @@ try {
     subscriptionsWhileMounted: { kernel: 1, session: 1, history: 1 },
     subscriptionsAfterUnmount: { kernel: 0, session: 0, history: 0 },
   });
+
+  assert.deepEqual(await evaluateBrowserScenario('globalThis.__nodebraidReactAdapterReporterRace()'), {
+    committed: 1,
+    abandoned: 0,
+  });
+
+  assert.equal(
+    await evaluateBrowserScenario('globalThis.__nodebraidReactAdapterMultipleTarget()'),
+    'Runtime Mount ref cannot be attached to more than one React Target at a time.',
+  );
 } finally {
   await runAgentBrowser(['close']);
   await server.stop(true);

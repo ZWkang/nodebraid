@@ -454,12 +454,17 @@ Target 或 Factory identity 改变时，旧 generation 先失去发布资格；�
 释放，后继 Factory 必须等待旧 Factory 与 `dispose()` 收口。Strict Mode 重放遵循同一
 顺序，dispose failure 会显式报告并阻断该 Hook instance 继续获取资源。React cleanup
 不能被 React 异步等待，因此 Adapter 不声称 component unmount 返回可等待的 Promise。
+callback ref 同时只接受一个 live Target；generation 在 commit-phase layout lifecycle
+切换，未提交的 concurrent render 不能替换现有 Failure Reporter。
 
 `useKernelView()`、`useSessionSnapshot()` 与 `useHistorySnapshot()` 使用
 `useSyncExternalStore` 消费既有稳定 Snapshot。它们不公开 RxJS Observable、不制造
 optional Snapshot、不加 selector，也不复制 Document 的写入能力。Vue Adapter 尚未实现；
 如果出现真实消费者，应在 Vue 自己的生命周期与投影惯例上独立设计，而不是预先提取跨
 React/Vue 的假想 interface。
+
+React Adapter v0 的验证范围是 React 19 client rendering；Snapshot Hooks 不提供
+`getServerSnapshot`，因此 SSR 显式失败，不猜测无法由 Runtime 保证的 hydration Snapshot。
 
 ## 命令与交互
 

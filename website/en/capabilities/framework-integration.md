@@ -31,6 +31,8 @@ through the established Command, Session, and Kernel seams.
 - create/dispose Failures retain their original identity and reach the required Reporter;
 - resource acquisition stops after a dispose Failure rather than assuming a dirty Target was released;
 - React component unmount does not return an awaitable Promise; exactly-once ownership and strict ordering provide determinism.
+- the callback ref accepts one live Target at a time, and an abandoned concurrent render cannot replace the current Failure Reporter;
+- v0 supports React 19 client rendering only and does not guess an SSR hydration Snapshot.
 
 ## Explicit boundaries
 

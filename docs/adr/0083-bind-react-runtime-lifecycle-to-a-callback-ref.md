@@ -14,6 +14,12 @@ generation 先失去发布资格，迟到的 Runtime 必须释放，后继 Facto
 显式暴露，并使该 Hook instance 进入不能继续获取资源的终态，不能假设 Renderer Target
 Reservation 已经释放。
 
+一份 callback ref 同时只能绑定一个 live React Target；第二个 Target 会显式失败，因为
+后续 `null` callback 无法标识究竟是哪一个 Target detach。generation 的公开值按当前
+Target 与 Factory identity 校验，并在 commit-phase layout lifecycle 中撤销旧 attempt，
+避免 passive effect 前继续暴露或发布 stale Runtime。Failure Reporter 也只在对应 render
+commit 后替换，未提交或被放弃的 concurrent render 不能接管现有 Runtime 的 Failure。
+
 React effect cleanup 不能异步等待，因此本决定中的确定性 dispose 指每份成功返回的
 Runtime 最多释放一次、Strict Mode setup/cleanup/setup 与普通重挂载严格串行、后继
 Factory 不越过旧清理；它不声称 React unmount 会返回可等待的 Promise。当前真实
@@ -38,6 +44,10 @@ timeout 或 silent fallback 猜测 Factory 状态。Factory 自己仍负责 reje
 module 使用这些 Hooks，以维持 Hook 顺序。Adapter 保持泛型 Target 与 Runtime，不依赖
 DOM、Renderer Provider、Cordis implementation、`@nodebraid/core` facade 或 Examples
 Application。
+
+v0 的已验证范围是 React 19 client rendering。Snapshot Hooks 不提供
+`getServerSnapshot`，SSR 会显式失败，而不是把当前 live getter 伪装成 hydration 可以重放
+的 Snapshot；只有真实服务端 Runtime 与序列化 hydration contract 出现后才扩展该 seam。
 
 删除该 package 后，Factory generation、Strict Mode 重挂载、迟到结果处理、串行
 create/dispose、终态清理 Failure reporting，以及三套 `useSyncExternalStore` wiring 都会

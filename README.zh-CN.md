@@ -242,6 +242,10 @@ Service 接入 `useSyncExternalStore`，不增加写入或 selector。
 产品 UI 或 React/Vue 公共抽象。Basic SVG Example 直接消费这个公开 package，不再保留私有
 mount coordinator 或 Snapshot wrapper。
 
+v0 已验证边界是 React 19 client rendering，且每个 callback ref 同时只绑定一个 live
+Target。Runtime 尚无可重放的 hydration Snapshot contract，因此 Snapshot Hooks 在 SSR 中
+显式失败。
+
 ## Layout packages
 
 `@nodebraid/layout-api` 定义不可变 Layout Input、异步 Layout Engine、显式

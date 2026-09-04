@@ -1,4 +1,4 @@
-import { StrictMode, useCallback, useState } from 'react';
+import { StrictMode, Suspense, startTransition, useCallback, useState, type RefCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import type { CanvasView } from '@nodebraid/kernel';
@@ -30,10 +30,17 @@ interface ReportedFailure {
   readonly sameError: boolean;
 }
 
+interface RuntimeRender {
+  readonly generation: number;
+  readonly runtimeId: number | null;
+  readonly status: string;
+}
+
 class RuntimeController {
   readonly attempts: RuntimeAttempt[] = [];
   readonly events: string[] = [];
   readonly failures: ReportedFailure[] = [];
+  readonly renders: RuntimeRender[] = [];
   expectedFailure: unknown;
   failDisposeId: number | undefined;
   remount: (() => void) | undefined;
@@ -78,6 +85,10 @@ class RuntimeController {
     this.events.push(`report:${failure.phase}`);
     this.failures.push({ phase: failure.phase, sameError: failure.error === this.expectedFailure });
   }
+
+  recordRender(generation: number, status: string, runtimeId: number | null): void {
+    this.renders.push({ generation, status, runtimeId });
+  }
 }
 
 function RuntimeHarness({ controller }: Readonly<{ controller: RuntimeController }>) {
@@ -86,6 +97,11 @@ function RuntimeHarness({ controller }: Readonly<{ controller: RuntimeController
   const factory = useCallback((target: HTMLDivElement) => controller.create(target), [controller, generation]);
   const reportFailure = useCallback((failure: RuntimeMountFailure) => controller.report(failure), [controller]);
   const mount = useRuntimeMount(factory, reportFailure);
+  controller.recordRender(
+    generation,
+    mount.snapshot.status,
+    mount.snapshot.status === 'ready' ? mount.snapshot.runtime.id : null,
+  );
 
   return (
     <section
@@ -120,7 +136,10 @@ async function runLifecycleScenario() {
   await waitFor(() => readStatus(container).runtimeId === '2');
   const firstReady = readStatus(container);
 
+  const renderCountBeforeReadyRemount = controller.renders.length;
   controller.remount?.();
+  await waitFor(() => controller.renders.length > renderCountBeforeReadyRemount);
+  const firstReadyRemountRender = controller.renders[renderCountBeforeReadyRemount];
   await waitFor(() => controller.attempts.length === 3);
   const readyRemountEvents = [...controller.events];
   controller.attempts[2]?.resolve();
@@ -134,6 +153,7 @@ async function runLifecycleScenario() {
     createCountWhileFirstPending,
     staleResolutionEvents,
     firstReady,
+    firstReadyRemountRender,
     readyRemountEvents,
     finalEvents: controller.events,
     failures: controller.failures,
@@ -181,6 +201,102 @@ async function runFailureScenario() {
     failures: controller.failures,
     events: controller.events,
   };
+}
+
+const suspendedForever = new Promise<never>(() => {});
+
+class ReporterRaceController extends RuntimeController {
+  readonly reporterCalls = { committed: 0, abandoned: 0 };
+  renderAbandonedReporter: (() => void) | undefined;
+  suspendedRenderCount = 0;
+
+  readonly committedReporter = (_failure: RuntimeMountFailure) => {
+    this.reporterCalls.committed += 1;
+  };
+
+  readonly abandonedReporter = (_failure: RuntimeMountFailure) => {
+    this.reporterCalls.abandoned += 1;
+  };
+}
+
+function ReporterRaceHarness({ controller }: Readonly<{ controller: ReporterRaceController }>) {
+  const [renderAbandonedReporter, setRenderAbandonedReporter] = useState(false);
+  controller.renderAbandonedReporter = () => {
+    startTransition(() => setRenderAbandonedReporter(true));
+  };
+  return (
+    <Suspense fallback={<span data-suspended-fallback />}>
+      <ReporterRaceMount controller={controller} abandoned={renderAbandonedReporter} />
+    </Suspense>
+  );
+}
+
+function ReporterRaceMount({
+  controller,
+  abandoned,
+}: Readonly<{ controller: ReporterRaceController; abandoned: boolean }>) {
+  const mount = useRuntimeMount(
+    controller.create,
+    abandoned ? controller.abandonedReporter : controller.committedReporter,
+  );
+  if (abandoned) {
+    controller.suspendedRenderCount += 1;
+    throw suspendedForever;
+  }
+  return <div ref={mount.ref} data-reporter-race-target />;
+}
+
+async function runReporterRaceScenario() {
+  const container = document.createElement('div');
+  document.body.append(container);
+  const root = createRoot(container);
+  const controller = new ReporterRaceController();
+  root.render(<ReporterRaceHarness controller={controller} />);
+  await waitFor(() => controller.attempts.length === 1);
+  controller.renderAbandonedReporter?.();
+  await waitFor(() => controller.suspendedRenderCount > 0);
+  controller.attempts[0]?.reject(new Error('committed reporter race failure'));
+  await waitFor(() => controller.reporterCalls.committed + controller.reporterCalls.abandoned === 1);
+  root.unmount();
+  container.remove();
+  return controller.reporterCalls;
+}
+
+interface RefProbeController {
+  ref: RefCallback<HTMLDivElement> | undefined;
+}
+
+function RefProbe({ controller }: Readonly<{ controller: RefProbeController }>) {
+  const mount = useRuntimeMount(
+    async () => ({ dispose: async () => {} }),
+    () => {},
+  );
+  controller.ref = mount.ref;
+  return null;
+}
+
+async function runMultipleTargetScenario() {
+  const container = document.createElement('div');
+  document.body.append(container);
+  const root = createRoot(container);
+  const controller: RefProbeController = { ref: undefined };
+  root.render(<RefProbe controller={controller} />);
+  await waitFor(() => controller.ref !== undefined);
+  const first = document.createElement('div');
+  const second = document.createElement('div');
+  let message: string | undefined;
+  controller.ref?.(first);
+  try {
+    controller.ref?.(second);
+  } catch (error) {
+    message = error instanceof Error ? error.message : String(error);
+  } finally {
+    controller.ref?.(null);
+  }
+  await delay(0);
+  root.unmount();
+  container.remove();
+  return message;
 }
 
 interface SnapshotSources {
@@ -319,8 +435,12 @@ declare global {
   var __nodebraidReactAdapterLifecycle: typeof runLifecycleScenario;
   var __nodebraidReactAdapterFailures: typeof runFailureScenario;
   var __nodebraidReactAdapterSnapshots: typeof runSnapshotScenario;
+  var __nodebraidReactAdapterReporterRace: typeof runReporterRaceScenario;
+  var __nodebraidReactAdapterMultipleTarget: typeof runMultipleTargetScenario;
 }
 
 globalThis.__nodebraidReactAdapterLifecycle = runLifecycleScenario;
 globalThis.__nodebraidReactAdapterFailures = runFailureScenario;
 globalThis.__nodebraidReactAdapterSnapshots = runSnapshotScenario;
+globalThis.__nodebraidReactAdapterReporterRace = runReporterRaceScenario;
+globalThis.__nodebraidReactAdapterMultipleTarget = runMultipleTargetScenario;

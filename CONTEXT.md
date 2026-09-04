@@ -125,7 +125,7 @@ _Avoid_: Product Demo, Example Site, Editor Shell
 _Avoid_: Public Examples Package, Framework Module, Documentation Fixture
 
 **React Adapter**:
-把应用提供的 target-specific async Runtime Factory 绑定到 React Target 生命周期，并将既有稳定 Runtime Service Snapshot 投影到 React 的公开框架模块；它不拥有 Document 写入、Renderer JSX 或产品 UI。
+把应用提供的 target-specific async Runtime Factory 绑定到一个 live React Target 生命周期，并将既有稳定 Runtime Service Snapshot 投影到 React 19 client rendering 的公开框架模块；它不拥有 Document 写入、Renderer JSX、SSR hydration 或产品 UI。
 _Avoid_: React Editor, React Renderer, Canvas Provider
 
 **Runtime Factory**:

@@ -34,11 +34,19 @@ cannot await effect cleanup, so deterministic disposal means exactly-once
 ownership and strict create/dispose ordering; lifecycle failures are also sent to
 the required Reporter when no mounted React caller remains.
 
+Attach `mount.ref` to exactly one live React Target. A second simultaneous Target
+fails explicitly because a callback-ref `null` notification cannot identify which
+of two Targets detached.
+
 `useKernelView()`, `useSessionSnapshot()`, and `useHistorySnapshot()` project the
 existing stable Runtime Service Snapshots with `useSyncExternalStore`. They do not
 copy state, expose writes, add selectors, or fabricate optional values. Render
 their consumers only inside the ready branch so Hooks remain unconditional in
 that child module.
+
+The v0 package is a React 19 client adapter. Snapshot Hooks intentionally omit a
+`getServerSnapshot`; server rendering fails explicitly instead of guessing a
+hydration value that the Runtime cannot reproduce.
 
 The Adapter does not provide React Context, Providers, Renderer JSX, Node
 components, product UI, controlled Documents, write proxies, registries,

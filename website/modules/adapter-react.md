@@ -58,6 +58,7 @@ function RuntimeView({ runtime }: { runtime: ApplicationRuntime }) {
 
 Runtime Factory identity 必须稳定；改变 Factory 或 Target identity 表示显式 remount/retry。
 `ready.runtime` 的生命周期归 Adapter 所有，consumer 不应自行调用 `dispose()`。
+`mount.ref` 同时只能绑定一个 live Target；第二个 Target 会显式失败。
 
 ## 生命周期与失败
 
@@ -67,6 +68,9 @@ Runtime Factory identity 必须稳定；改变 Factory 或 Target identity 表�
 - dispose reject 同样保留 identity，并终止该 Hook instance 的后续资源获取；
 - React 不会等待 effect cleanup，所以确定性表示 exactly-once ownership 与严格顺序，不表示 component unmount 返回 Promise；
 - Factory reject 前的部分初始化资源仍由 Factory 自己回滚。
+
+v0 只验证 React 19 client rendering。Snapshot Hooks 不提供 `getServerSnapshot`；SSR 会
+显式失败，不会把 live getter 猜成 hydration Snapshot。
 
 ## 限制与非目标
 

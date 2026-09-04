@@ -30,6 +30,8 @@ React Adapter 通过 callback ref 接收具体 Target，并把应用提供的 Ru
 - create/dispose Failure 保留原始 identity，并通过必填 Reporter 显式暴露；
 - dispose Failure 后不继续获取资源，避免把残留 Target 当作已经释放；
 - React component unmount 本身不返回可等待的 Promise，确定性由 exactly-once ownership 与严格顺序保证。
+- callback ref 同时只能绑定一个 live Target，未提交 concurrent render 不能替换当前 Failure Reporter；
+- v0 只支持 React 19 client rendering，SSR 不会获得猜测的 hydration Snapshot。
 
 ## 明确边界
 

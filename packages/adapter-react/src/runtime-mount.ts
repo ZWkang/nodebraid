@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import type {
   DisposableRuntime,
@@ -14,19 +14,28 @@ const pendingSnapshot = Object.freeze({ status: 'pending' } as const);
 interface MountAttempt<Target, Runtime extends DisposableRuntime> {
   active: boolean;
   disposeStarted: boolean;
-  readonly factory: RuntimeFactory<Target, Runtime>;
+  readonly identity: MountIdentity<Target, Runtime>;
   runtime: Runtime | undefined;
+}
+
+interface MountIdentity<Target, Runtime extends DisposableRuntime> {
+  readonly factory: RuntimeFactory<Target, Runtime>;
   readonly target: Target;
 }
 
+interface MountPublication<Target, Runtime extends DisposableRuntime> {
+  readonly identity: MountIdentity<Target, Runtime> | undefined;
+  readonly snapshot: RuntimeMountSnapshot<Target, Runtime>;
+}
+
 class RuntimeMountSequence<Target, Runtime extends DisposableRuntime> {
-  readonly #publish: (snapshot: RuntimeMountSnapshot<Target, Runtime>) => void;
+  readonly #publish: (publication: MountPublication<Target, Runtime>) => void;
   readonly #report: (failure: RuntimeMountFailure) => void;
   #brokenFailure: RuntimeMountFailure | undefined;
   #tail: Promise<void> = Promise.resolve();
 
   constructor(
-    publish: (snapshot: RuntimeMountSnapshot<Target, Runtime>) => void,
+    publish: (publication: MountPublication<Target, Runtime>) => void,
     report: (failure: RuntimeMountFailure) => void,
   ) {
     this.#publish = publish;
@@ -34,14 +43,14 @@ class RuntimeMountSequence<Target, Runtime extends DisposableRuntime> {
   }
 
   mount(target: Target, factory: RuntimeFactory<Target, Runtime>): () => void {
+    const identity = Object.freeze({ factory, target });
     const attempt: MountAttempt<Target, Runtime> = {
       active: true,
       disposeStarted: false,
-      factory,
+      identity,
       runtime: undefined,
-      target,
     };
-    this.#publish(pendingSnapshot);
+    this.#publishSnapshot(attempt, pendingSnapshot);
     this.#enqueue(() => this.#start(attempt));
 
     return () => {
@@ -63,7 +72,7 @@ class RuntimeMountSequence<Target, Runtime extends DisposableRuntime> {
 
     let runtime: Runtime;
     try {
-      runtime = await attempt.factory(attempt.target);
+      runtime = await attempt.identity.factory(attempt.identity.target);
     } catch (error) {
       const failure = createFailure('create', error);
       this.#publishFailure(attempt, failure);
@@ -76,7 +85,7 @@ class RuntimeMountSequence<Target, Runtime extends DisposableRuntime> {
       await this.#dispose(attempt);
       return;
     }
-    this.#publish(Object.freeze({ status: 'ready', target: attempt.target, runtime }));
+    this.#publishSnapshot(attempt, Object.freeze({ status: 'ready', target: attempt.identity.target, runtime }));
   }
 
   async #dispose(attempt: MountAttempt<Target, Runtime>): Promise<void> {
@@ -95,7 +104,11 @@ class RuntimeMountSequence<Target, Runtime extends DisposableRuntime> {
   }
 
   #publishFailure(attempt: MountAttempt<Target, Runtime>, failure: RuntimeMountFailure): void {
-    if (attempt.active) this.#publish(Object.freeze({ status: 'failed', failure }));
+    if (attempt.active) this.#publishSnapshot(attempt, Object.freeze({ status: 'failed', failure }));
+  }
+
+  #publishSnapshot(attempt: MountAttempt<Target, Runtime>, snapshot: RuntimeMountSnapshot<Target, Runtime>): void {
+    this.#publish(Object.freeze({ identity: attempt.identity, snapshot }));
   }
 
   #reportFailure(failure: RuntimeMountFailure): void {
@@ -114,24 +127,40 @@ export function useRuntimeMount<Target, Runtime extends DisposableRuntime>(
   reportFailure: RuntimeMountFailureReporter,
 ): RuntimeMount<Target, Runtime> {
   const reportFailureRef = useRef(reportFailure);
-  reportFailureRef.current = reportFailure;
+  useLayoutEffect(() => {
+    reportFailureRef.current = reportFailure;
+  }, [reportFailure]);
   const [target, setTarget] = useState<Target | null>(null);
-  const [snapshot, setSnapshot] = useState<RuntimeMountSnapshot<Target, Runtime>>(pendingSnapshot);
+  const [publication, setPublication] = useState<MountPublication<Target, Runtime>>(() =>
+    Object.freeze({ identity: undefined, snapshot: pendingSnapshot }),
+  );
   const sequenceRef = useRef<RuntimeMountSequence<Target, Runtime> | null>(null);
   if (!sequenceRef.current) {
-    sequenceRef.current = new RuntimeMountSequence(setSnapshot, (failure) => reportFailureRef.current(failure));
+    sequenceRef.current = new RuntimeMountSequence(setPublication, (failure) => reportFailureRef.current(failure));
   }
+  const attachedTargetRef = useRef<Target | null>(null);
 
-  const ref = useCallback((nextTarget: Target | null) => setTarget(nextTarget), []);
+  const ref = useCallback((nextTarget: Target | null) => {
+    const attachedTarget = attachedTargetRef.current;
+    if (nextTarget !== null && attachedTarget !== null && nextTarget !== attachedTarget) {
+      throw new Error('Runtime Mount ref cannot be attached to more than one React Target at a time.');
+    }
+    attachedTargetRef.current = nextTarget;
+    setTarget(nextTarget);
+  }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (target === null) {
-      setSnapshot(pendingSnapshot);
+      setPublication(Object.freeze({ identity: undefined, snapshot: pendingSnapshot }));
       return;
     }
     return sequenceRef.current?.mount(target, factory);
   }, [factory, target]);
 
+  const snapshot =
+    target !== null && publication.identity?.target === target && publication.identity.factory === factory
+      ? publication.snapshot
+      : pendingSnapshot;
   return useMemo(() => Object.freeze({ ref, snapshot }), [ref, snapshot]);
 }
 
