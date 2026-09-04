@@ -11,8 +11,15 @@ import {
   RotateCcw,
   Undo2,
 } from 'lucide-react';
-import { useEffect, useRef, useState, type ComponentProps, type ReactNode, type RefObject } from 'react';
+import { useCallback, useState, type ComponentProps, type ReactNode } from 'react';
 
+import {
+  useHistorySnapshot,
+  useKernelView,
+  useRuntimeMount,
+  useSessionSnapshot,
+  type RuntimeMountFailureReporter,
+} from '@nodebraid/adapter-react';
 import { describeError, redoCommand, undoCommand, type Viewport } from '@nodebraid/core';
 
 import { Badge } from '@/components/ui/badge';
@@ -20,15 +27,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { type ExampleRuntime } from '@/example-runtime/create-example-runtime';
-import { runtimeMountCoordinator } from '@/example-runtime/runtime-mount-coordinator';
-import {
-  useClipboardFailure,
-  useHistorySnapshot,
-  useKernelView,
-  useOptionalHistorySnapshot,
-  useSessionSnapshot,
-} from '@/hooks/use-runtime-snapshots';
+import { createExampleRuntime, type ExampleRuntime } from '@/example-runtime/create-example-runtime';
+import { useClipboardFailure } from '@/example-runtime/use-clipboard-failure';
 
 type Language = 'en' | 'zh';
 
@@ -41,36 +41,25 @@ export const Route = createFileRoute('/basic-svg')({
 
 function BasicSvgExample() {
   const { lang } = Route.useSearch();
-  const target = useRef<SVGSVGElement>(null);
   const [generation, setGeneration] = useState(0);
-  const [runtime, setRuntime] = useState<ExampleRuntime>();
   const [errorMessage, setErrorMessage] = useState<string>();
-  const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading');
   const reportFailure = (error: unknown) => {
     setErrorMessage(describeExampleError(error));
     queueMicrotask(() => {
       throw error;
     });
   };
-
-  useEffect(() => {
-    const element = target.current;
-    if (!element) throw new Error('Basic SVG Example target is missing.');
-    setStatus('loading');
-    setRuntime(undefined);
-    setErrorMessage(undefined);
-    return runtimeMountCoordinator.mount(
-      element,
-      (nextRuntime) => {
-        setRuntime(nextRuntime);
-        setStatus('ready');
-      },
-      (error) => {
-        setStatus('failed');
-        reportFailure(error);
-      },
-    );
-  }, [generation]);
+  const reportMountFailure = useCallback<RuntimeMountFailureReporter>(({ error }) => {
+    queueMicrotask(() => {
+      throw error;
+    });
+  }, []);
+  const runtimeFactory = useCallback((target: SVGSVGElement) => createExampleRuntime(target), [generation]);
+  const mount = useRuntimeMount(runtimeFactory, reportMountFailure);
+  const ready = mount.snapshot.status === 'ready' ? mount.snapshot : undefined;
+  const status = mount.snapshot.status === 'pending' ? 'loading' : mount.snapshot.status;
+  const displayedError =
+    mount.snapshot.status === 'failed' ? describeExampleError(mount.snapshot.failure.error) : errorMessage;
 
   const copy = translations[lang];
 
@@ -83,24 +72,33 @@ function BasicSvgExample() {
       </section>
       <div className="example-workspace">
         <section className="canvas-column">
-          <CanvasToolbar
-            copy={copy}
-            runtime={runtime}
-            target={target}
-            onResetExample={() => setGeneration((value) => value + 1)}
-            onError={reportFailure}
-          />
+          {ready ? (
+            <CanvasToolbar
+              copy={copy}
+              runtime={ready.runtime}
+              target={ready.target}
+              onResetExample={() => {
+                setErrorMessage(undefined);
+                setGeneration((value) => value + 1);
+              }}
+              onError={reportFailure}
+            />
+          ) : null}
           <section className="canvas-frame" aria-label={copy.canvasLabel}>
-            <svg ref={target} className="canvas-target" width="960" height="640" tabIndex={0} />
+            <svg ref={mount.ref} className="canvas-target" width="960" height="640" tabIndex={0} />
           </section>
         </section>
         <aside className="example-sidebar">
-          {runtime ? <RuntimeStatus copy={copy} runtime={runtime} /> : <LoadingStatus copy={copy} status={status} />}
-          {errorMessage ? (
+          {ready ? (
+            <RuntimeStatus copy={copy} runtime={ready.runtime} />
+          ) : (
+            <LoadingStatus copy={copy} status={mount.snapshot.status === 'failed' ? 'failed' : 'loading'} />
+          )}
+          {displayedError ? (
             <Card className="error-card" role="alert">
               <CardHeader>
                 <CardTitle>{copy.error}</CardTitle>
-                <CardDescription>{errorMessage}</CardDescription>
+                <CardDescription>{displayedError}</CardDescription>
               </CardHeader>
             </Card>
           ) : null}
@@ -125,19 +123,16 @@ function BasicSvgExample() {
 
 interface CanvasToolbarProps {
   readonly copy: Copy;
-  readonly runtime: ExampleRuntime | undefined;
-  readonly target: RefObject<SVGSVGElement | null>;
+  readonly runtime: ExampleRuntime;
+  readonly target: SVGSVGElement;
   readonly onResetExample: () => void;
   readonly onError: (error: unknown) => void;
 }
 
 function CanvasToolbar({ copy, runtime, target, onResetExample, onError }: CanvasToolbarProps) {
-  const disabled = runtime === undefined;
   const [clipboardShortcutsEnabled, setClipboardShortcutsEnabled] = useState(true);
   const [duplicateShortcutEnabled, setDuplicateShortcutEnabled] = useState(true);
-  useEffect(() => setClipboardShortcutsEnabled(true), [runtime]);
-  useEffect(() => setDuplicateShortcutEnabled(true), [runtime]);
-  const history = useOptionalHistorySnapshot(runtime);
+  const history = useHistorySnapshot(runtime.history);
   const run = (operation: () => void | Promise<void>) => {
     try {
       void Promise.resolve(operation()).catch(onError);
@@ -151,63 +146,52 @@ function CanvasToolbar({ copy, runtime, target, onResetExample, onError }: Canva
       <ToolbarButton
         label={copy.undo}
         icon={<Undo2 />}
-        disabled={disabled || !history.canUndo}
-        onClick={() => run(async () => void (await runtime?.commands.execute(undoCommand, undefined)))}
+        disabled={!history.canUndo}
+        onClick={() => run(async () => void (await runtime.commands.execute(undoCommand, undefined)))}
       />
       <ToolbarButton
         label={copy.redo}
         icon={<Redo2 />}
-        disabled={disabled || !history.canRedo}
-        onClick={() => run(async () => void (await runtime?.commands.execute(redoCommand, undefined)))}
+        disabled={!history.canRedo}
+        onClick={() => run(async () => void (await runtime.commands.execute(redoCommand, undefined)))}
       />
       <Separator orientation="vertical" className="toolbar-separator" />
-      <ToolbarButton
-        label={copy.zoomIn}
-        icon={<Plus />}
-        disabled={disabled}
-        onClick={() => runtime && target.current && zoomAtCenter(runtime, target.current, 1.2)}
-      />
-      <ToolbarButton
-        label={copy.zoomOut}
-        icon={<Minus />}
-        disabled={disabled}
-        onClick={() => runtime && target.current && zoomAtCenter(runtime, target.current, 1 / 1.2)}
-      />
+      <ToolbarButton label={copy.zoomIn} icon={<Plus />} onClick={() => zoomAtCenter(runtime, target, 1.2)} />
+      <ToolbarButton label={copy.zoomOut} icon={<Minus />} onClick={() => zoomAtCenter(runtime, target, 1 / 1.2)} />
       <ToolbarButton
         label={copy.fitView}
         icon={<Maximize2 />}
-        disabled={disabled || runtime?.kernel.read().snapshot.nodes.length === 0}
-        onClick={() => runtime && target.current && fitView(runtime, target.current)}
+        disabled={runtime.kernel.read().snapshot.nodes.length === 0}
+        onClick={() => fitView(runtime, target)}
       />
       <ToolbarButton
         label={copy.resetView}
         icon={<Focus />}
-        disabled={disabled}
-        onClick={() => runtime?.session.setViewport({ x: 0, y: 0, zoom: 1 })}
+        onClick={() => runtime.session.setViewport({ x: 0, y: 0, zoom: 1 })}
       />
       <Separator orientation="vertical" className="toolbar-separator" />
-      <ToolbarButton label={copy.resetExample} icon={<RotateCcw />} disabled={disabled} onClick={onResetExample} />
+      <ToolbarButton label={copy.resetExample} icon={<RotateCcw />} onClick={onResetExample} />
       <ToolbarButton
         label={copy.disableClipboardShortcuts}
         icon={<ClipboardX />}
-        disabled={disabled || !clipboardShortcutsEnabled}
+        disabled={!clipboardShortcutsEnabled}
         onClick={() =>
           run(async () => {
-            await runtime?.disposeClipboardShortcuts();
+            await runtime.disposeClipboardShortcuts();
             setClipboardShortcutsEnabled(false);
-            target.current?.focus();
+            target.focus();
           })
         }
       />
       <ToolbarButton
         label={copy.disableDuplicateShortcut}
         icon={<KeyboardOff />}
-        disabled={disabled || !duplicateShortcutEnabled}
+        disabled={!duplicateShortcutEnabled}
         onClick={() =>
           run(async () => {
-            await runtime?.disposeDuplicateShortcut();
+            await runtime.disposeDuplicateShortcut();
             setDuplicateShortcutEnabled(false);
-            target.current?.focus();
+            target.focus();
           })
         }
       />
@@ -231,9 +215,9 @@ function ToolbarButton({ label, icon, ...props }: ComponentProps<typeof Button> 
 }
 
 function RuntimeStatus({ copy, runtime }: Readonly<{ copy: Copy; runtime: ExampleRuntime }>) {
-  const view = useKernelView(runtime);
-  const session = useSessionSnapshot(runtime);
-  const history = useHistorySnapshot(runtime);
+  const view = useKernelView(runtime.kernel);
+  const session = useSessionSnapshot(runtime.session);
+  const history = useHistorySnapshot(runtime.history);
   const clipboardFailure = useClipboardFailure(runtime);
   const selected = [...session.selection.nodeIds, ...session.selection.edgeIds];
 
@@ -274,7 +258,7 @@ function RuntimeStatus({ copy, runtime }: Readonly<{ copy: Copy; runtime: Exampl
   );
 }
 
-function LoadingStatus({ copy, status }: Readonly<{ copy: Copy; status: 'loading' | 'ready' | 'failed' }>) {
+function LoadingStatus({ copy, status }: Readonly<{ copy: Copy; status: 'loading' | 'failed' }>) {
   return (
     <Card>
       <CardHeader>

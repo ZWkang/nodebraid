@@ -135,6 +135,32 @@ try {
     history: 'Undo / —',
   });
 
+  await evaluateBrowserScenario(`(() => {
+    const target = document.querySelector('.canvas-target');
+    const projection = target?.querySelector(':scope > [data-nodebraid-renderer-svg-root]');
+    if (!(target instanceof SVGSVGElement) || !(projection instanceof SVGGElement)) {
+      throw new Error('Missing mounted SVG Runtime before React Adapter remount.');
+    }
+    globalThis.__nodebraidReactAdapterTarget = target;
+    globalThis.__nodebraidReactAdapterProjection = projection;
+    globalThis.__nodebraidReactAdapterMutations = { added: 0, removed: 0 };
+    globalThis.__nodebraidReactAdapterObserver = new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.addedNodes) {
+          if (node instanceof SVGGElement && node.hasAttribute('data-nodebraid-renderer-svg-root')) {
+            globalThis.__nodebraidReactAdapterMutations.added += 1;
+          }
+        }
+        for (const node of record.removedNodes) {
+          if (node instanceof SVGGElement && node.hasAttribute('data-nodebraid-renderer-svg-root')) {
+            globalThis.__nodebraidReactAdapterMutations.removed += 1;
+          }
+        }
+      }
+    });
+    globalThis.__nodebraidReactAdapterObserver.observe(target, { childList: true });
+    return true;
+  })()`);
   await runAgentBrowser(['click', '[aria-label="Reset example"]']);
   assert.deepEqual(await waitForMetrics({ revision: '1', nodes: '3', edges: '1', history: 'Undo / —' }), {
     revision: '1',
@@ -143,6 +169,24 @@ try {
     history: 'Undo / —',
   });
   assert.equal(await evaluateBrowserScenario(`document.querySelectorAll('[data-nodebraid-node-id]').length`), 3);
+  assert.deepEqual(
+    await evaluateBrowserScenario(`(() => {
+      globalThis.__nodebraidReactAdapterObserver.disconnect();
+      const target = document.querySelector('.canvas-target');
+      return {
+        sameTarget: target === globalThis.__nodebraidReactAdapterTarget,
+        oldProjectionConnected: globalThis.__nodebraidReactAdapterProjection.isConnected,
+        projectionCount: target?.querySelectorAll(':scope > [data-nodebraid-renderer-svg-root]').length,
+        mutations: globalThis.__nodebraidReactAdapterMutations,
+      };
+    })()`),
+    {
+      sameTarget: true,
+      oldProjectionConnected: false,
+      projectionCount: 1,
+      mutations: { added: 1, removed: 1 },
+    },
+  );
 
   await runAgentBrowser(['click', '[data-nodebraid-node-id="example-discover"]']);
   await evaluateBrowserScenario(`(() => {
@@ -356,6 +400,59 @@ try {
   assert.deepEqual(
     await waitForMetrics({ revision: '6', nodes: '1', edges: '0', selection: 'None', history: 'Undo / —' }),
     { revision: '6', nodes: '1', edges: '0', selection: 'None', history: 'Undo / —' },
+  );
+
+  await evaluateBrowserScenario(`(() => {
+    const target = document.querySelector('.canvas-target');
+    if (!(target instanceof SVGSVGElement)) throw new Error('Missing SVG Target for mount failure test.');
+    const expected = new Error('Expected React Adapter Runtime Factory failure.');
+    globalThis.__nodebraidExpectedMountFailure = expected;
+    globalThis.__nodebraidReportedMountFailure = false;
+    addEventListener('error', (event) => {
+      if (event.error === expected) {
+        globalThis.__nodebraidReportedMountFailure = true;
+        event.preventDefault();
+      }
+    });
+    Object.defineProperty(target, 'append', {
+      configurable: true,
+      value() {
+        delete target.append;
+        throw expected;
+      },
+    });
+    return true;
+  })()`);
+  await clickExampleControl('Reset example');
+  assert.deepEqual(
+    await evaluateBrowserScenario(`new Promise((resolve, reject) => {
+      const deadline = Date.now() + 5000;
+      const read = () => {
+        const status = document.querySelector('[data-example-status]')?.getAttribute('data-example-status');
+        const reported = globalThis.__nodebraidReportedMountFailure;
+        if (status === 'failed' && reported) {
+          resolve({
+            status,
+            reported,
+            projectionCount: document.querySelectorAll('[data-nodebraid-renderer-svg-root]').length,
+            message: document.querySelector('[role="alert"]')?.textContent,
+          });
+          return;
+        }
+        if (Date.now() >= deadline) {
+          reject(new Error('React Adapter Runtime Factory failure was not exposed.'));
+          return;
+        }
+        setTimeout(read, 25);
+      };
+      read();
+    })`),
+    {
+      status: 'failed',
+      reported: true,
+      projectionCount: 0,
+      message: 'Runtime errorExpected React Adapter Runtime Factory failure.',
+    },
   );
 } finally {
   await runAgentBrowser(['close']);
