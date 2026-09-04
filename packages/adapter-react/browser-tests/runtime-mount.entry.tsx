@@ -36,14 +36,11 @@ interface RuntimeRender {
   readonly status: string;
 }
 
-class RuntimeController {
+class ControlledRuntimeFactory {
   readonly attempts: RuntimeAttempt[] = [];
   readonly events: string[] = [];
-  readonly failures: ReportedFailure[] = [];
-  readonly renders: RuntimeRender[] = [];
   expectedFailure: unknown;
   failDisposeId: number | undefined;
-  remount: (() => void) | undefined;
 
   readonly create = async (target: HTMLDivElement): Promise<ControlledRuntime> => {
     const id = this.attempts.length + 1;
@@ -80,10 +77,17 @@ class RuntimeController {
       },
     };
   };
+}
+
+class RuntimeController {
+  readonly factory = new ControlledRuntimeFactory();
+  readonly failures: ReportedFailure[] = [];
+  readonly renders: RuntimeRender[] = [];
+  remount: (() => void) | undefined;
 
   report(failure: RuntimeMountFailure): void {
-    this.events.push(`report:${failure.phase}`);
-    this.failures.push({ phase: failure.phase, sameError: failure.error === this.expectedFailure });
+    this.factory.events.push(`report:${failure.phase}`);
+    this.failures.push({ phase: failure.phase, sameError: failure.error === this.factory.expectedFailure });
   }
 
   recordRender(generation: number, status: string, runtimeId: number | null): void {
@@ -94,7 +98,7 @@ class RuntimeController {
 function RuntimeHarness({ controller }: Readonly<{ controller: RuntimeController }>) {
   const [generation, setGeneration] = useState(0);
   controller.remount = () => setGeneration((value) => value + 1);
-  const factory = useCallback((target: HTMLDivElement) => controller.create(target), [controller, generation]);
+  const factory = useCallback((target: HTMLDivElement) => controller.factory.create(target), [controller, generation]);
   const reportFailure = useCallback((failure: RuntimeMountFailure) => controller.report(failure), [controller]);
   const mount = useRuntimeMount(factory, reportFailure);
   controller.recordRender(
@@ -125,14 +129,14 @@ async function runLifecycleScenario() {
     </StrictMode>,
   );
 
-  await waitFor(() => controller.attempts.length === 1);
+  await waitFor(() => controller.factory.attempts.length === 1);
   controller.remount?.();
   await delay(50);
-  const createCountWhileFirstPending = controller.attempts.length;
-  controller.attempts[0]?.resolve();
-  await waitFor(() => controller.attempts.length === 2);
-  const staleResolutionEvents = [...controller.events];
-  controller.attempts[1]?.resolve();
+  const createCountWhileFirstPending = controller.factory.attempts.length;
+  controller.factory.attempts[0]?.resolve();
+  await waitFor(() => controller.factory.attempts.length === 2);
+  const staleResolutionEvents = [...controller.factory.events];
+  controller.factory.attempts[1]?.resolve();
   await waitFor(() => readStatus(container).runtimeId === '2');
   const firstReady = readStatus(container);
 
@@ -140,12 +144,12 @@ async function runLifecycleScenario() {
   controller.remount?.();
   await waitFor(() => controller.renders.length > renderCountBeforeReadyRemount);
   const firstReadyRemountRender = controller.renders[renderCountBeforeReadyRemount];
-  await waitFor(() => controller.attempts.length === 3);
-  const readyRemountEvents = [...controller.events];
-  controller.attempts[2]?.resolve();
+  await waitFor(() => controller.factory.attempts.length === 3);
+  const readyRemountEvents = [...controller.factory.events];
+  controller.factory.attempts[2]?.resolve();
   await waitFor(() => readStatus(container).runtimeId === '3');
   root.unmount();
-  await waitFor(() => controller.events.includes('dispose:end:3'));
+  await waitFor(() => controller.factory.events.includes('dispose:end:3'));
   const targetConnectedAfterUnmount = container.querySelector('[data-runtime-target]')?.isConnected ?? false;
   container.remove();
 
@@ -155,7 +159,7 @@ async function runLifecycleScenario() {
     firstReady,
     firstReadyRemountRender,
     readyRemountEvents,
-    finalEvents: controller.events,
+    finalEvents: controller.factory.events,
     failures: controller.failures,
     targetConnectedAfterUnmount,
   };
@@ -172,25 +176,25 @@ async function runFailureScenario() {
     </StrictMode>,
   );
 
-  await waitFor(() => controller.attempts.length === 1);
+  await waitFor(() => controller.factory.attempts.length === 1);
   const createFailure = new Error('controlled create failure');
-  controller.expectedFailure = createFailure;
-  controller.attempts[0]?.reject(createFailure);
+  controller.factory.expectedFailure = createFailure;
+  controller.factory.attempts[0]?.reject(createFailure);
   await waitFor(() => readStatus(container).failurePhase === 'create' && controller.failures.length === 1);
   const createFailureState = readStatus(container);
 
   controller.remount?.();
-  await waitFor(() => controller.attempts.length === 2);
-  controller.attempts[1]?.resolve();
+  await waitFor(() => controller.factory.attempts.length === 2);
+  controller.factory.attempts[1]?.resolve();
   await waitFor(() => readStatus(container).runtimeId === '2');
   const disposeFailure = new Error('controlled dispose failure');
-  controller.expectedFailure = disposeFailure;
-  controller.failDisposeId = 2;
+  controller.factory.expectedFailure = disposeFailure;
+  controller.factory.failDisposeId = 2;
   controller.remount?.();
   await waitFor(() => readStatus(container).failurePhase === 'dispose' && controller.failures.length === 2);
   await delay(50);
   const disposeFailureState = readStatus(container);
-  const createCountAfterDisposeFailure = controller.attempts.length;
+  const createCountAfterDisposeFailure = controller.factory.attempts.length;
   root.unmount();
   container.remove();
 
@@ -199,13 +203,14 @@ async function runFailureScenario() {
     disposeFailureState,
     createCountAfterDisposeFailure,
     failures: controller.failures,
-    events: controller.events,
+    events: controller.factory.events,
   };
 }
 
 const suspendedForever = new Promise<never>(() => {});
 
-class ReporterRaceController extends RuntimeController {
+class ReporterRaceController {
+  readonly factory = new ControlledRuntimeFactory();
   readonly reporterCalls = { committed: 0, abandoned: 0 };
   renderAbandonedReporter: (() => void) | undefined;
   suspendedRenderCount = 0;
@@ -236,7 +241,7 @@ function ReporterRaceMount({
   abandoned,
 }: Readonly<{ controller: ReporterRaceController; abandoned: boolean }>) {
   const mount = useRuntimeMount(
-    controller.create,
+    controller.factory.create,
     abandoned ? controller.abandonedReporter : controller.committedReporter,
   );
   if (abandoned) {
@@ -252,10 +257,10 @@ async function runReporterRaceScenario() {
   const root = createRoot(container);
   const controller = new ReporterRaceController();
   root.render(<ReporterRaceHarness controller={controller} />);
-  await waitFor(() => controller.attempts.length === 1);
+  await waitFor(() => controller.factory.attempts.length === 1);
   controller.renderAbandonedReporter?.();
   await waitFor(() => controller.suspendedRenderCount > 0);
-  controller.attempts[0]?.reject(new Error('committed reporter race failure'));
+  controller.factory.attempts[0]?.reject(new Error('committed reporter race failure'));
   await waitFor(() => controller.reporterCalls.committed + controller.reporterCalls.abandoned === 1);
   root.unmount();
   container.remove();
