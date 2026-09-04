@@ -8,13 +8,15 @@ NodeBraid 是一个插件化、渲染器无关的流程画布引擎，用于构�
 当前源码已经提供一条可运行的 headless Canvas Runtime、显式的 Basic Canvas
 Composition，以及参考级 SVG Renderer。已实现能力包括原子图事务、Selection 与
 Viewport 状态、类型化 Command、Undo/Redo、Selection、Box Selection、Delete Selection、Duplicate Selection、Clipboard Copy/Paste、多节点拖拽、Pan、Wheel
-Zoom、节点级连边、Dagre 与 ELK Layout Provider、结构化诊断和 Plugin 生命周期所有权。
+Zoom、Port-aware 与节点级连边、Dagre 与 ELK Layout Provider、结构化诊断和 Plugin 生命周期所有权。
 
-私有 React Examples Application 已把这些公共 interface 组合成可单独启动的 Basic SVG
-开发者参考应用，包含统一导航、实时 Runtime 状态、框选、连边、Viewport 控制与 History 操作。
+公开 React Adapter 已将应用 Runtime Factory 绑定到 React Target，并投影稳定的 Kernel、
+Session 与 History Snapshot。私有 React Examples Application 通过它把公共 interface
+组合成可单独启动的 Basic SVG 开发者参考应用，包含统一导航、实时 Runtime 状态、框选、
+连边、Viewport 控制与 History 操作。
 
-NodeBraid 仍处于预发布阶段，尚未提供产品级编辑器外壳、框架适配器、持久化、协作或序列化
-schema。源码 package 使用 `@nodebraid/*` 命名空间，但尚未发布到 npm。
+NodeBraid 仍处于预发布阶段，尚未提供产品级编辑器外壳、React 之外的框架适配器、持久化、
+协作或序列化 schema。源码 package 使用 `@nodebraid/*` 命名空间，但尚未发布到 npm。
 
 ## 文档
 
@@ -61,7 +63,7 @@ revision=1 nodes=1
 - tsgo：TypeScript 类型检查。
 - oxlint：代码检查。
 - Prettier：格式化。
-- agent-browser：真实 Chromium Renderer seam 测试。
+- agent-browser：真实 Chromium React Adapter 与 Renderer seam 测试。
 - React、TanStack Router、shadcn Base UI、Tailwind CSS 与 Vite：私有 Examples Application。
 
 ## 目录结构
@@ -69,6 +71,7 @@ revision=1 nodes=1
 ```text
 .
 ├── packages/
+│   ├── adapter-react/  # @nodebraid/adapter-react React 生命周期适配器
 │   ├── core/           # @nodebraid/core 公共 facade
 │   ├── canvas-fragment/ # 纯内存 Canvas Fragment 值契约
 │   ├── diagnostics/    # @nodebraid/diagnostics 错误与 Diagnostic Event
@@ -227,6 +230,18 @@ Interaction 与 History。Composition 会等待每个 child 激活，并按依�
 Layout 或领域能力作为同级 Plugin 安装。Core 会重导出 Composition factory，但不会重导出或选择
 `@nodebraid/renderer-svg` 或其他具体 Provider。
 
+## React Adapter
+
+`@nodebraid/adapter-react` 通过 `useRuntimeMount()` 接受 target-specific async Runtime
+Factory。其 callback ref 拥有 `pending` / `ready` / `failed` 转换、Strict Mode 重放、过期
+Factory 结果、异步 dispose 顺序和显式生命周期 Failure reporting。
+`useKernelView()`、`useSessionSnapshot()` 与 `useHistorySnapshot()` 将既有稳定 Runtime
+Service 接入 `useSyncExternalStore`，不增加写入或 selector。
+
+该 package 不提供 Context、Provider、Renderer JSX、React Node Component、受控 Document、
+产品 UI 或 React/Vue 公共抽象。Basic SVG Example 直接消费这个公开 package，不再保留私有
+mount coordinator 或 Snapshot wrapper。
+
 ## Layout packages
 
 `@nodebraid/layout-api` 定义不可变 Layout Input、异步 Layout Engine、显式
@@ -246,7 +261,7 @@ Provider，不会由 `@nodebraid/core` 重导出。Dagre 提供确定性的 full
 bun install
 ```
 
-安装 SVG Renderer 浏览器测试所需 Chromium：
+安装 React Adapter 与 SVG Renderer 浏览器测试所需 Chromium：
 
 ```bash
 bunx agent-browser install
@@ -352,6 +367,13 @@ bun run --filter '@nodebraid/plugin-session' build:dependencies
 
 ```bash
 bun run --filter '@nodebraid/plugin-history' build:dependencies
+```
+
+构建并验证 React Adapter，包括真实 Chromium public-seam 测试：
+
+```bash
+bun run --filter '@nodebraid/adapter-react' build:dependencies
+bun run --filter '@nodebraid/adapter-react' test:browser
 ```
 
 构建 SVG Renderer Provider 所需依赖并运行真实浏览器 seam 测试：

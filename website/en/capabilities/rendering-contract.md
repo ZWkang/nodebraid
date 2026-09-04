@@ -27,7 +27,7 @@ The Rendering Contract capability family defines how NodeBraid Canvas semantics 
 - Your Interaction Plugin needs standardized input, Hit Testing, Pointer Capture, or Focus;
 - You are evaluating the responsibility boundary between NodeBraid and a concrete rendering backend.
 
-If generic SVG Geometry and the stable DOM seam meet your needs, select `@nodebraid/renderer-svg` directly. NodeBraid now provides a separate Interaction Runtime, while product-specific Node visuals and framework adapters remain explicit application responsibilities.
+If generic SVG Geometry and the stable DOM seam meet your needs, select `@nodebraid/renderer-svg` directly. NodeBraid now provides a separate Interaction Runtime and [`@nodebraid/adapter-react`](/en/modules/adapter-react) for lifecycle integration, while product-specific Node visuals remain an explicit application responsibility.
 
 ## What it provides
 
@@ -76,7 +76,7 @@ The NodeBraid packages have not been publicly released. Verify them from source 
 
 ## Limitations and non-goals
 
-- The only current concrete Provider is the reference SVG implementation; there is no Canvas2D, WebGL, Konva, Pixi, or framework adapter;
+- The only current concrete Provider is the reference SVG implementation; there is no Canvas2D, WebGL, Konva, or Pixi Provider. The React Adapter is a separate lifecycle module, not a Renderer Provider;
 - No default Provider, dynamic Registry, or universal `HTMLElement` mount;
 - The Renderer does not modify the Document or Session and does not execute Commands directly;
 - The initial input contract includes Pointer, Wheel, Keyboard, and Focus, without native events or backend targets;

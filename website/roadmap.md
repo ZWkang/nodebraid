@@ -17,11 +17,11 @@ SVG Renderer Provider 已经通过真实 Target、Document/Session 同步、输�
 
 ## Interaction 扩展与框架接入
 
-Duplicate Selection 与显式 Clipboard Copy/Paste 已经通过独立 Behavior/Shortcut Plugin 交付，并共用纯内存 Canvas Fragment；选择、Box Selection、Delete Selection、多 Node 拖动、Pan、Wheel Zoom、Port Capability 与 Port-aware/Node-level Edge Connection 也已存在。Serialized Document、Persistence、跨版本 Clipboard format、Edge/Port 框选、lasso、snapping、pinch/touch、文本编辑或可扩展 Tool Registry 仍需独立设计。React、Vue 或其他 framework adapter 应保持在 Runtime 与 UI 框架之间，不取得第二份 Document authority。
+Duplicate Selection 与显式 Clipboard Copy/Paste 已经通过独立 Behavior/Shortcut Plugin 交付，并共用纯内存 Canvas Fragment；选择、Box Selection、Delete Selection、多 Node 拖动、Pan、Wheel Zoom、Port Capability 与 Port-aware/Node-level Edge Connection 也已存在。公开 React Adapter 已交付 Runtime Mount 与稳定 Snapshot projection；Vue 或其他 framework adapter 仍需按各自框架惯例独立设计，并保持在 Runtime 与 UI 框架之间，不取得第二份 Document authority。Serialized Document、Persistence、跨版本 Clipboard format、Edge/Port 框选、lasso、snapping、pinch/touch、文本编辑或可扩展 Tool Registry 仍需独立设计。
 
 ## Composition 与示例
 
-后端无关的 Basic Canvas Composition 与私有 Examples Application 已经交付，并通过 Chromium 验证真实 Router 页面、Selection、Box Selection、trusted Ctrl/Cmd+C / Ctrl/Cmd+V Clipboard、Ctrl/Cmd+D Duplicate、Delete、Move、Connection、History、Viewport 控制与 Runtime Reset。后续 framework adapter 或产品示例仍保持显式应用层能力；Plugin Host 不会隐式安装 preset，preset 也不会选择默认 Renderer。
+后端无关的 Basic Canvas Composition、React Adapter 与私有 Examples Application 已经交付，并通过 Chromium 验证真实 Router 页面、React mount/unmount/remount、Selection、Box Selection、trusted Ctrl/Cmd+C / Ctrl/Cmd+V Clipboard、Ctrl/Cmd+D Duplicate、Delete、Move、Connection、History、Viewport 控制与 Runtime Reset。后续 framework adapter 或产品示例仍保持显式应用层能力；Plugin Host 不会隐式安装 preset，preset 也不会选择默认 Renderer。
 
 ## 更后面的探索
 

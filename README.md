@@ -9,18 +9,20 @@ rendering to one UI framework or graphics backend.
 The current source tree provides a runnable headless Canvas Runtime, an explicit
 Basic Canvas Composition, and a reference-quality SVG Renderer. The implemented
 surface includes atomic graph transactions, Selection and Viewport state, typed
-Commands, Undo/Redo, Selection, Box Selection, Delete Selection, Duplicate Selection, Clipboard Copy/Paste, multi-Node Drag, Pan, Wheel Zoom, node-level Edge
+Commands, Undo/Redo, Selection, Box Selection, Delete Selection, Duplicate Selection, Clipboard Copy/Paste, multi-Node Drag, Pan, Wheel Zoom, Port-aware and node-level Edge
 Connection, Dagre and ELK Layout Providers, structured diagnostics, and Plugin
 lifecycle ownership.
 
-A private React Examples Application now turns those public interfaces into a
-runnable Basic SVG developer reference with unified navigation, live Runtime
-state, Edge Connection, viewport controls, and History actions.
+A public React Adapter now binds application Runtime Factories to React Targets
+and projects stable Kernel, Session, and History Snapshots. The private React
+Examples Application consumes it in a runnable Basic SVG developer reference
+with unified navigation, live Runtime state, Edge Connection, viewport controls,
+and History actions.
 
 NodeBraid is still pre-release. It does not yet provide a product-level editor
-shell, framework adapters, persistence, collaboration, or a serialization
-schema. The source packages use the `@nodebraid/*` namespace but have not been
-published to npm.
+shell, non-React framework adapters, persistence, collaboration, or a
+serialization schema. The source packages use the `@nodebraid/*` namespace but
+have not been published to npm.
 
 ## Documentation
 
@@ -70,7 +72,7 @@ the source-checkout workflow until the initial npm release is available.
 - tsgo for TypeScript checking.
 - oxlint for linting.
 - Prettier for formatting.
-- agent-browser for real Chromium Renderer seam tests.
+- agent-browser for real Chromium React Adapter and Renderer seam tests.
 - React, TanStack Router, shadcn with Base UI, Tailwind CSS, and Vite for the private Examples Application.
 
 ## Structure
@@ -78,6 +80,7 @@ the source-checkout workflow until the initial npm release is available.
 ```text
 .
 ├── packages/
+│   ├── adapter-react/  # @nodebraid/adapter-react React lifecycle adapter
 │   ├── core/           # @nodebraid/core public facade
 │   ├── canvas-fragment/ # Pure in-memory Canvas Fragment values
 │   ├── diagnostics/    # @nodebraid/diagnostics errors and Diagnostic Events
@@ -272,6 +275,20 @@ concrete Renderer Factory, and install Layout or domain capabilities as sibling
 Plugins. Core re-exports the Composition factory but does not re-export or
 select `@nodebraid/renderer-svg` or another concrete Provider.
 
+## React Adapter
+
+`@nodebraid/adapter-react` exposes `useRuntimeMount()` for target-specific async
+Runtime Factories. Its callback ref owns `pending` / `ready` / `failed`
+transitions, Strict Mode replay, stale Factory results, ordered async disposal,
+and explicit lifecycle Failure reporting. `useKernelView()`,
+`useSessionSnapshot()`, and `useHistorySnapshot()` connect existing stable
+Runtime Services to `useSyncExternalStore` without adding writes or selectors.
+
+The package does not provide Context, Providers, Renderer JSX, React Node
+components, controlled Documents, product UI, or a shared React/Vue abstraction.
+The Basic SVG Example consumes this public package rather than keeping a private
+mount coordinator or Snapshot wrappers.
+
 ## Layout packages
 
 `@nodebraid/layout-api` defines immutable Layout Inputs, asynchronous Layout
@@ -293,7 +310,7 @@ Install dependencies:
 bun install
 ```
 
-Install Chromium for the SVG Renderer browser tests:
+Install Chromium for the React Adapter and SVG Renderer browser tests:
 
 ```bash
 bunx agent-browser install
@@ -400,6 +417,14 @@ Build the declarations required by `@nodebraid/plugin-history`:
 
 ```bash
 bun run --filter '@nodebraid/plugin-history' build:dependencies
+```
+
+Build and verify the React Adapter, including its real Chromium public-seam
+tests:
+
+```bash
+bun run --filter '@nodebraid/adapter-react' build:dependencies
+bun run --filter '@nodebraid/adapter-react' test:browser
 ```
 
 Build the declarations required by the SVG Renderer Provider and run its real

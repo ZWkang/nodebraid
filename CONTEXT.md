@@ -124,6 +124,22 @@ _Avoid_: Product Demo, Example Site, Editor Shell
 承载一个或多个 Interactive Example、并拥有统一导航及独立开发、构建与测试入口的私有 Workspace Application；它不是可发布的 NodeBraid 框架模块。
 _Avoid_: Public Examples Package, Framework Module, Documentation Fixture
 
+**React Adapter**:
+把应用提供的 target-specific async Runtime Factory 绑定到 React Target 生命周期，并将既有稳定 Runtime Service Snapshot 投影到 React 的公开框架模块；它不拥有 Document 写入、Renderer JSX 或产品 UI。
+_Avoid_: React Editor, React Renderer, Canvas Provider
+
+**Runtime Factory**:
+应用提供的异步入口，为一份具体 Renderer Target 创建并返回一份由调用方生命周期拥有、可异步释放的 Canvas Runtime 聚合值；Factory reject 前的部分初始化回滚仍由 Factory 自己负责。
+_Avoid_: Renderer Factory, Runtime Registry, Canvas Provider
+
+**Runtime Mount Generation**:
+React Adapter 中由 Target 与 Runtime Factory identity 确定的一次挂载意图；新的 generation 会撤销旧 generation 发布 Runtime 的资格，但不会假设尚未完成的 Factory 已经停止。
+_Avoid_: Plugin Activation, Renderer Instance, Retry Attempt
+
+**Runtime Mount Snapshot**:
+React Adapter 对当前 Runtime Mount Generation 的不可变观察值，只可能是 pending、携带 Target 与 Runtime 的 ready，或保留原始 Failure 的 failed。
+_Avoid_: Canvas Snapshot, Installation Snapshot, Optional Runtime
+
 **Child Installation**:
 由父 Plugin 的 Activation 安装并拥有、随父 Activation 结束而释放的 Plugin Installation。
 _Avoid_: Nested Runtime, Detached Plugin

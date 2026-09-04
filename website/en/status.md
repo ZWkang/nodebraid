@@ -14,13 +14,14 @@ NodeBraid is at an early implementation stage, but it already has a working head
 - Renderer-independent Kernel, synchronous Transactions, Canvas Views, Queries, and Change Sets;
 - Kernel, Command, Session, History, and Renderer Runtime Plugins;
 - Selection, Viewport, and backend-neutral Renderer value contracts;
-- Backend-neutral Interaction Projections plus Selection, Box Selection, Delete Selection, independent Duplicate Selection, multi-Node Drag, Pan, Wheel Zoom, and node-level Edge Connection Runtime behavior;
+- Backend-neutral Interaction Projections plus Selection, Box Selection, Delete Selection, independent Duplicate Selection, multi-Node Drag, Pan, Wheel Zoom, and Port-aware/node-level Edge Connection Runtime behavior;
 - Pure in-memory `@nodebraid/canvas-fragment` values and explicit Clipboard Copy/Paste with application-owned codec and transport;
 - The reference-quality `@nodebraid/renderer-svg` Provider, with real-Chromium verification of SVG projection, input, Hit Testing, and lifecycle;
 - Layout Input/Engine/Proposal contracts and Runtime Command integration;
 - Dagre full Layout Provider;
 - ELK full, incremental, and Fixed Node Layout Providers;
 - The backend-neutral `@nodebraid/preset-basic` Basic Canvas Composition and a real SVG canonical example;
+- The public `@nodebraid/adapter-react` Runtime Mount and stable Snapshot Hooks with real-Chromium lifecycle verification;
 - A private `@nodebraid/examples` React/TanStack Router Examples Application with real UI + Canvas Chromium acceptance;
 - A public facade aggregated through `@nodebraid/core`.
 
@@ -29,7 +30,7 @@ See [All modules](/en/modules/) for the complete inventory.
 ## Current gaps
 
 ::: warning No product-level editor shell yet
-The current branch delivers the Basic Canvas Composition, Duplicate/Delete Selection, explicit Clipboard Copy/Paste, the Port Capability, Port-aware/node-level Edge Connection, the SVG Renderer loop, and a developer-reference Examples Application, but it still has no public framework adapter or product-level editor shell. It does not include Document Serialization/Persistence, a cross-version Clipboard format, Edge/Port box selection, lasso, snapping, pinch/touch tools, text editing, product Node UI, or an extensible Tool Registry.
+The current branch delivers the Basic Canvas Composition, Duplicate/Delete Selection, explicit Clipboard Copy/Paste, the Port Capability, Port-aware/node-level Edge Connection, the SVG Renderer loop, the React Adapter, and a developer-reference Examples Application. It still has no Vue or other framework adapter and no product-level editor shell. It does not include Document Serialization/Persistence, a cross-version Clipboard format, Edge/Port box selection, lasso, snapping, pinch/touch tools, text editing, product Node UI, or an extensible Tool Registry.
 :::
 
 There is also no Persistence, Collaboration, serialization schema, or remote synchronization capability. A name appearing in the target architecture does not mean it has become a public package.

@@ -434,17 +434,32 @@ HTML Overlay Layer
 
 混合渲染中的 Canvas 和 HTML 必须共享同一套世界坐标、Viewport 变换、层级和选择语义。HTML 节点仍然是 Document 的视图，不得成为另一份权威状态。
 
-## Vue 和 React 集成
+## Framework Adapter
 
-Vue/React Adapter 只负责 Canvas 实例的挂载、卸载和框架状态投影。为了保持 Renderer 与框架无关，官方 Konva Renderer Provider 若实现，应直接依赖 `konva`，不依赖 `react-konva` 或 `vue-konva`。
+Framework Adapter 只负责 Canvas Runtime 的挂载、卸载和框架状态投影。它不选择
+Renderer Provider，也不把某一种后端 Target 提升为 universal `HTMLElement` mount
+contract。为了保持 Renderer 与框架无关，未来 Konva Renderer Provider 若实现，应直接
+依赖 `konva`，不依赖 `react-konva` 或 `vue-konva`。
+
+当前公开的 `@nodebraid/adapter-react` v0 让应用提供 target-specific async Runtime
+Factory，通过一个 callback-ref Hook 把它绑定到 React 生命周期：
 
 ```ts
-interface CanvasMount {
-  mount(container: HTMLElement): Disposable;
-}
+const mount = useRuntimeMount(createApplicationRuntime, reportFailure);
+
+return <svg ref={mount.ref} />;
 ```
 
-React Adapter 可以使用 `useSyncExternalStore` 消费快照；Vue Adapter 可以使用 `shallowRef` 保存需要参与模板更新的投影。两者都不公开 RxJS Observable，也不复制 Document 的写入能力。
+Target 或 Factory identity 改变时，旧 generation 先失去发布资格；迟到 Runtime 必须
+释放，后继 Factory 必须等待旧 Factory 与 `dispose()` 收口。Strict Mode 重放遵循同一
+顺序，dispose failure 会显式报告并阻断该 Hook instance 继续获取资源。React cleanup
+不能被 React 异步等待，因此 Adapter 不声称 component unmount 返回可等待的 Promise。
+
+`useKernelView()`、`useSessionSnapshot()` 与 `useHistorySnapshot()` 使用
+`useSyncExternalStore` 消费既有稳定 Snapshot。它们不公开 RxJS Observable、不制造
+optional Snapshot、不加 selector，也不复制 Document 的写入能力。Vue Adapter 尚未实现；
+如果出现真实消费者，应在 Vue 自己的生命周期与投影惯例上独立设计，而不是预先提取跨
+React/Vue 的假想 interface。
 
 ## 命令与交互
 

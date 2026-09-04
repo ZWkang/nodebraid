@@ -17,11 +17,11 @@ The SVG Renderer Provider has now proven a real Target, Document/Session synchro
 
 ## Interaction extensions and framework integration
 
-Independent Behavior and Shortcut Plugins now deliver Duplicate Selection and explicit Clipboard Copy/Paste over a shared in-memory Canvas Fragment. Selection, Box Selection, Delete Selection, multi-Node dragging, Pan, Wheel Zoom, the Port Capability, and Port-aware/node-level Edge Connection are also present. Serialized Document, Persistence, a cross-version Clipboard format, Edge/Port box selection, lasso, snapping, pinch/touch, text editing, and an extensible Tool Registry remain separate future designs. React, Vue, or other framework adapters should remain between the Runtime and UI framework without acquiring a second source of Document authority.
+Independent Behavior and Shortcut Plugins now deliver Duplicate Selection and explicit Clipboard Copy/Paste over a shared in-memory Canvas Fragment. Selection, Box Selection, Delete Selection, multi-Node dragging, Pan, Wheel Zoom, the Port Capability, and Port-aware/node-level Edge Connection are also present. The public React Adapter now delivers Runtime Mounting and stable Snapshot projection. Vue or other framework adapters still require independent designs that follow their own framework conventions while remaining between the Runtime and UI framework without acquiring a second source of Document authority. Serialized Document, Persistence, a cross-version Clipboard format, Edge/Port box selection, lasso, snapping, pinch/touch, text editing, and an extensible Tool Registry remain separate future designs.
 
 ## Composition and examples
 
-The backend-neutral Basic Canvas Composition and private Examples Application are now delivered, with Chromium verification of the real Router page, Selection, Box Selection, trusted Ctrl/Cmd+C / Ctrl/Cmd+V Clipboard, Ctrl/Cmd+D Duplicate, Delete, Move, Connection, History, viewport controls, and Runtime Reset. Future framework adapters or product examples remain explicit application-layer capabilities. The Plugin Host will not install the preset implicitly, and the preset will not choose a default Renderer.
+The backend-neutral Basic Canvas Composition, React Adapter, and private Examples Application are now delivered, with Chromium verification of the real Router page, React mount/unmount/remount, Selection, Box Selection, trusted Ctrl/Cmd+C / Ctrl/Cmd+V Clipboard, Ctrl/Cmd+D Duplicate, Delete, Move, Connection, History, viewport controls, and Runtime Reset. Future framework adapters or product examples remain explicit application-layer capabilities. The Plugin Host will not install the preset implicitly, and the preset will not choose a default Renderer.
 
 ## Later exploration
 

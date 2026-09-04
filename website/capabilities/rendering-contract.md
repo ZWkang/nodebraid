@@ -27,7 +27,7 @@ Rendering Contract 能力族定义“怎样把 NodeBraid Canvas 语义交给渲�
 - 你的 Interaction Plugin 需要订阅标准化输入、Hit Test、Pointer Capture 或 Focus；
 - 你在评估 NodeBraid 与具体渲染后端之间的责任边界。
 
-如果 SVG 的通用 Geometry 与 DOM seam 满足需求，可以直接选择 `@nodebraid/renderer-svg`；NodeBraid 已提供独立 Interaction Runtime，但产品节点视觉与 framework adapter 仍由应用显式提供。
+如果 SVG 的通用 Geometry 与 DOM seam 满足需求，可以直接选择 `@nodebraid/renderer-svg`；NodeBraid 已提供独立 Interaction Runtime 和 [`@nodebraid/adapter-react`](/modules/adapter-react) 生命周期接入，但产品节点视觉仍由应用显式提供。
 
 ## 提供的能力
 
@@ -76,7 +76,7 @@ Renderer 没有 Document、Session 或 Command 写权。它只投影状态并报
 
 ## 限制与非目标
 
-- 当前 concrete Provider 只有参考级 SVG 实现；没有 Canvas2D、WebGL、Konva、Pixi 或 framework adapter；
+- 当前 concrete Provider 只有参考级 SVG 实现；没有 Canvas2D、WebGL、Konva 或 Pixi。React Adapter 是独立生命周期 module，不是 Renderer Provider；
 - 不提供默认 Provider、动态 Registry 或 universal `HTMLElement` mount；
 - Renderer 不修改 Document、Session，也不直接执行 Command；
 - 首版输入包含 Pointer、Wheel、Keyboard 与 Focus，不包含原生事件或 backend target；

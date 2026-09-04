@@ -67,6 +67,24 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
     ],
   },
   {
+    slug: 'framework-integration',
+    title: 'Framework Integration',
+    summary: {
+      zh: '框架生命周期绑定与稳定 Runtime Snapshot 投影。',
+      en: 'Framework lifecycle binding and stable Runtime Snapshot projection.',
+    },
+    modules: [
+      {
+        name: '@nodebraid/adapter-react',
+        slug: 'adapter-react',
+        summary: {
+          zh: 'React Runtime 挂载与 Snapshot Hooks。',
+          en: 'React Runtime mounting and Snapshot Hooks.',
+        },
+      },
+    ],
+  },
+  {
     slug: 'graph-state',
     title: 'Graph State',
     summary: {
