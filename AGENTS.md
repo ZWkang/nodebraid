@@ -9,7 +9,7 @@
 使用 Bun 1.2.19 或更高版本。可复现命令如下：
 
 - `bun install`：安装依赖并启用 Git hooks。
-- `bunx agent-browser install`：安装 SVG Renderer 真实浏览器测试所需的 Chromium；Linux CI 使用 `bunx agent-browser install --with-deps`。
+- `bunx agent-browser install`：安装 React Adapter 与 SVG Renderer 真实浏览器测试所需的 Chromium；Linux CI 使用 `bunx agent-browser install --with-deps`。
 - `bun run dev`：监听根入口并持续构建到 `dist/`。
 - `bun run example:dev`：构建公共依赖并单独启动 React/TanStack Router Examples Application。
 - `bun run example:build`：生产构建私有 `@nodebraid/examples` Workspace Application。
@@ -47,9 +47,11 @@
 - `bun run --filter '@nodebraid/renderer-svg' build:test-dependencies`：生成 Renderer Plugin、Interaction、History 与 Renderer 公共 seam 浏览器场景所需的全部 workspace 声明。
 - `bun run --filter '@nodebraid/plugin-history' build:dependencies`：生成 History Runtime Plugin 构建与类型检查所需的 Command 与 Kernel Plugin workspace 声明。
 - `bun run --filter '@nodebraid/preset-basic' build:dependencies`：生成 Basic Canvas Composition 所需的 Interaction、History 及其传递 workspace 声明。
+- `bun run --filter '@nodebraid/adapter-react' build:dependencies`：生成 React Adapter 构建与类型检查所需的 Kernel、Session 与 History Plugin workspace 声明。
+- `bun run --filter '@nodebraid/adapter-react' test:browser`：构建 React Adapter 并通过真实 Chromium 验证 Runtime mount/unmount/remount、Strict Mode、竞态取消、失败与 Snapshot projection。
 - `bun run format`：使用 Prettier 格式化支持的文件。
 - `bun run test`：运行 Bun 测试。
-- `bun run test:browser`：通过仓库锁定的 `agent-browser` 在真实 Chromium 中运行 SVG Renderer 公共 seam 测试。
+- `bun run test:browser`：通过仓库锁定的 `agent-browser` 在真实 Chromium 中运行 React Adapter 与 SVG Renderer 公共 seam 测试。
 - `bun run check`：依次运行 lint、类型检查、格式检查、Bun 测试、Renderer 与 Example 真实浏览器测试、构建和 Documentation Site 检查。
 
 提交前至少运行：
@@ -65,7 +67,7 @@
 
 ## 测试指南
 
-常规测试使用 Bun 内置测试运行器，SVG Renderer 的 DOM、坐标与原生输入验收通过 `agent-browser` 驱动真实 Chromium；尚未设置覆盖率门槛。新增行为必须配套自动化测试；修复缺陷时先加入能复现问题的回归用例。Bun 测试文件使用 `tests/foo.test.ts` 命名，浏览器场景使用 `browser-tests/foo.browser.ts` 命名以避免被根 `bun test` 误发现。测试应可重复、无外部隐式依赖，并让失败直接暴露原因。
+常规测试使用 Bun 内置测试运行器，React Adapter 与 SVG Renderer 的生命周期、DOM、坐标及原生输入验收通过 `agent-browser` 驱动真实 Chromium；尚未设置覆盖率门槛。新增行为必须配套自动化测试；修复缺陷时先加入能复现问题的回归用例。Bun 测试文件使用 `tests/foo.test.ts` 命名，浏览器场景使用 `browser-tests/foo.browser.ts` 命名以避免被根 `bun test` 误发现。测试应可重复、无外部隐式依赖，并让失败直接暴露原因。
 
 ## 提交与拉取请求
 
