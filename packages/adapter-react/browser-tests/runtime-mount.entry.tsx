@@ -25,6 +25,11 @@ interface RuntimeAttempt {
   readonly resolve: () => void;
 }
 
+interface RuntimeDisposal {
+  readonly id: number;
+  readonly resolve: () => void;
+}
+
 interface ReportedFailure {
   readonly phase: RuntimeMountFailure['phase'];
   readonly sameError: boolean;
@@ -38,6 +43,8 @@ interface RuntimeRender {
 
 class ControlledRuntimeFactory {
   readonly attempts: RuntimeAttempt[] = [];
+  readonly deferredDisposalIds = new Set<number>();
+  readonly disposals: RuntimeDisposal[] = [];
   readonly events: string[] = [];
   expectedFailure: unknown;
   failDisposeId: number | undefined;
@@ -72,11 +79,25 @@ class ControlledRuntimeFactory {
           this.events.push(`dispose:reject:${id}`);
           throw this.expectedFailure;
         }
+        if (this.deferredDisposalIds.has(id)) {
+          await new Promise<void>((resolve) => this.disposals.push({ id, resolve }));
+        }
         delete target.dataset.runtimeId;
         this.events.push(`dispose:end:${id}`);
       },
     };
   };
+
+  deferDisposal(id: number): void {
+    this.deferredDisposalIds.add(id);
+  }
+
+  finishDisposal(id: number): void {
+    const disposal = this.disposals.find((candidate) => candidate.id === id);
+    if (!disposal) throw new Error(`Runtime ${id} disposal is not pending.`);
+    this.deferredDisposalIds.delete(id);
+    disposal.resolve();
+  }
 }
 
 class RuntimeController {
@@ -84,6 +105,7 @@ class RuntimeController {
   readonly failures: ReportedFailure[] = [];
   readonly renders: RuntimeRender[] = [];
   remount: (() => void) | undefined;
+  replaceTarget: (() => void) | undefined;
 
   report(failure: RuntimeMountFailure): void {
     this.factory.events.push(`report:${failure.phase}`);
@@ -97,7 +119,9 @@ class RuntimeController {
 
 function RuntimeHarness({ controller }: Readonly<{ controller: RuntimeController }>) {
   const [generation, setGeneration] = useState(0);
+  const [targetGeneration, setTargetGeneration] = useState(0);
   controller.remount = () => setGeneration((value) => value + 1);
+  controller.replaceTarget = () => setTargetGeneration((value) => value + 1);
   const factory = useCallback((target: HTMLDivElement) => controller.factory.create(target), [controller, generation]);
   const reportFailure = useCallback((failure: RuntimeMountFailure) => controller.report(failure), [controller]);
   const mount = useRuntimeMount(factory, reportFailure);
@@ -113,7 +137,7 @@ function RuntimeHarness({ controller }: Readonly<{ controller: RuntimeController
       data-runtime-id={mount.snapshot.status === 'ready' ? String(mount.snapshot.runtime.id) : undefined}
       data-failure-phase={mount.snapshot.status === 'failed' ? mount.snapshot.failure.phase : undefined}
     >
-      <div data-runtime-target ref={mount.ref} />
+      <div key={targetGeneration} data-runtime-target data-target-generation={targetGeneration} ref={mount.ref} />
     </section>
   );
 }
@@ -136,29 +160,60 @@ async function runLifecycleScenario() {
   controller.factory.attempts[0]?.resolve();
   await waitFor(() => controller.factory.attempts.length === 2);
   const staleResolutionEvents = [...controller.factory.events];
+  const staleRuntimeWasPublished = controller.renders.some(
+    (render) => render.status === 'ready' && render.runtimeId === 1,
+  );
   controller.factory.attempts[1]?.resolve();
   await waitFor(() => readStatus(container).runtimeId === '2');
   const firstReady = readStatus(container);
 
+  controller.factory.deferDisposal(2);
   const renderCountBeforeReadyRemount = controller.renders.length;
   controller.remount?.();
   await waitFor(() => controller.renders.length > renderCountBeforeReadyRemount);
   const firstReadyRemountRender = controller.renders[renderCountBeforeReadyRemount];
+  await waitFor(() => controller.factory.disposals.some((disposal) => disposal.id === 2));
+  await delay(50);
+  const createCountWhileDisposePending = controller.factory.attempts.length;
+  const statusWhileDisposePending = readStatus(container).status;
+  controller.factory.finishDisposal(2);
   await waitFor(() => controller.factory.attempts.length === 3);
   const readyRemountEvents = [...controller.factory.events];
   controller.factory.attempts[2]?.resolve();
   await waitFor(() => readStatus(container).runtimeId === '3');
+
+  const targetBeforeReplacement = container.querySelector('[data-runtime-target]');
+  controller.factory.deferDisposal(3);
+  controller.replaceTarget?.();
+  await waitFor(() => container.querySelector('[data-runtime-target]') !== targetBeforeReplacement);
+  const targetAfterReplacement = container.querySelector('[data-runtime-target]');
+  await waitFor(() => controller.factory.disposals.some((disposal) => disposal.id === 3));
+  const oldTargetConnectedWhileDisposing = targetBeforeReplacement?.isConnected ?? false;
+  await delay(50);
+  const createCountWhileTargetDisposePending = controller.factory.attempts.length;
+  controller.factory.finishDisposal(3);
+  await waitFor(() => controller.factory.attempts.length === 4);
+  const targetReplacementEvents = [...controller.factory.events];
+  controller.factory.attempts[3]?.resolve();
+  await waitFor(() => readStatus(container).runtimeId === '4');
   root.unmount();
-  await waitFor(() => controller.factory.events.includes('dispose:end:3'));
+  await waitFor(() => controller.factory.events.includes('dispose:end:4'));
   const targetConnectedAfterUnmount = container.querySelector('[data-runtime-target]')?.isConnected ?? false;
   container.remove();
 
   return {
     createCountWhileFirstPending,
+    createCountWhileDisposePending,
+    createCountWhileTargetDisposePending,
     staleResolutionEvents,
+    staleRuntimeWasPublished,
     firstReady,
     firstReadyRemountRender,
+    statusWhileDisposePending,
     readyRemountEvents,
+    targetWasReplaced: targetAfterReplacement !== targetBeforeReplacement,
+    oldTargetConnectedWhileDisposing,
+    targetReplacementEvents,
     finalEvents: controller.factory.events,
     failures: controller.failures,
     targetConnectedAfterUnmount,
