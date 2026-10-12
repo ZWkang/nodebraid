@@ -64,6 +64,23 @@ The complete example is shared with the Documentation Site at
 [`website/examples/quick-start.ts`](./website/examples/quick-start.ts). Follow
 the source-checkout workflow until the initial npm release is available.
 
+## Agentic development
+
+GitHub Agentic Workflows investigates incoming issues and dispatches confirmed
+defects for autonomous implementation, verification, review, and a visual PR.
+Approved specifications can enter the same delivery workflow. Setup, repository
+secrets, task states, and the exact verification contract are documented in
+[Agentic workflows](./docs/agents/agentic-workflows.md).
+
+```bash
+bun run agents:compile  # Compile workflow sources with gh-aw v0.89.21
+bun run agents:check    # Validate sources and detect stale compiled workflows
+```
+
+The source `.md` and generated `.lock.yml` workflows must both be committed.
+Issue automation activates after merging them to `main` and configuring the
+documented secrets; local compilation alone does not enable cloud execution.
+
 ## Stack
 
 - Bun for package management, development, builds, tests, and workspace scripts.
