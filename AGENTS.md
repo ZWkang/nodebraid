@@ -1,5 +1,16 @@
 # Repository Guidelines
 
+## AI 工作流
+
+新任务先与用户确认 grill、spec、领域文档和公共测试 seam；确认后，Agent 自主拆分任务、审查计划、实现、验证和双轴 code review，无需逐票再次确认。需求、公开契约或架构决策变化时回到前期讨论。
+
+实时 issue 调查与自主交付使用 GitHub Agentic Workflows；执行规则、凭据和验收见 `docs/agents/agentic-workflows.md`，任务路由见 `docs/agents/issue-tracker.md`。`CONTEXT.md` 是本项目唯一的领域词汇表，安装的 skill 提到 `GLOSSARY.md` 时读取它。
+
+- `bun run agents:compile`：使用固定 gh-aw v0.89.21 编译 `.github/workflows/*.md` 为必须提交的 `.lock.yml`。
+- `bun run agents:check`：检查编译器版本、严格语法验证和编译文件是否过期；CI 在完整工程检查前执行。
+
+修改 agentic workflow 后先格式化源码，再编译并执行 `agents:check`。`.lock.yml` 由编译器维护，不手工编辑或用 Prettier 重写。
+
 ## 项目结构与模块组织
 
 仓库采用 Bun 驱动的 TypeScript monorepo 结构。根级产品代码放在 `src/`，测试放在 `tests/` 并镜像源码目录；独立工作区包放在 `packages/`。文档使用 `docs/`，静态资源使用 `assets/`。入口文件和共享工具配置保留在仓库根目录。不要提交 `dist/`、`node_modules/` 等生成目录、依赖缓存或本地 IDE 配置；新增工具时同步维护 `.gitignore`。

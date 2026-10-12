@@ -4,7 +4,7 @@
 
 ### Issue tracker
 
-Issues and specs are tracked as local markdown under `.scratch/`. See `docs/agents/issue-tracker.md`.
+New live tasks are tracked in GitHub Issues; `.scratch/` keeps repository specs and historical records. See `docs/agents/issue-tracker.md`. Autonomous execution is defined in `docs/agents/agentic-workflows.md`.
 
 ### Domain docs
 
