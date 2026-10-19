@@ -6,6 +6,8 @@
 
 实时 issue 调查与自主交付使用 GitHub Agentic Workflows；执行规则、凭据和验收见 `docs/agents/agentic-workflows.md`，任务路由见 `docs/agents/issue-tracker.md`。`CONTEXT.md` 是本项目唯一的领域词汇表，安装的 skill 提到 `GLOSSARY.md` 时读取它。
 
+实现阶段应用项目级 `ponytail` 的 full 模式，先读真实调用链并优先复用，再完成最小充分改动。Standards review 同时使用 `ponytail-review`；按已确认的 spec、ADR 和公共契约判断简化，不删必要的错误处理、验证或框架 seam。
+
 - `bun run agents:compile`：使用固定 gh-aw v0.89.21 编译 `.github/workflows/*.md` 为必须提交的 `.lock.yml`。
 - `bun run agents:check`：检查编译器版本、严格语法验证和编译文件是否过期；CI 在完整工程检查前执行。
 
