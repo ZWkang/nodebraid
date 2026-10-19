@@ -37,9 +37,35 @@ PR 时报告链接，不重复创建。`GITHUB_TOKEN` 的标签写入不会触�
 确认后，Agent 自主拆分纵向任务、独立审计划、实现、测试、review、修正并整理 PR。
 需求、公开契约或 ADR 决策变化时回到前期讨论，禁止为通过测试擅自改验收条件。
 
-交付安装 checkout 中的 `tdd`、`code-review`、`pr`、`show-me` 本地 skills；不在
+交付安装 checkout 中的 `tdd`、`code-review`、`ponytail`、`ponytail-review`、`pr`、`show-me` 本地 skills；不在
 运行时下载浮动的上游版本。`CONTEXT.md` 是本项目词汇表，兼容技能中的
 `GLOSSARY.md` 名称。保留 vendored skill 原文，在项目规则中明确自主执行范围。
+
+### Ponytail 的职责
+
+计划和实现采用 `ponytail` 的 full 模式：先读受影响代码、调用者和已有能力，优先复用，
+以最小充分改动完成整个任务。Standards reviewer 同时使用 `ponytail-review`，检查修改
+影响到的调用链、风险、新逻辑的测试和不必要的复杂度，发现合并到该轴，不增加重复审查轮次。
+Spec review 仍独立核对需求，最终工程检查仍由 runner 执行。
+
+精简以已确认的 spec、ADR 和公共契约为依据；框架 seam 不因当前只有一个实现而删除，
+也不为减少代码量裁掉错误处理、回归测试或结构验证。技能的英文输出约定服从项目中文约定。
+
+本次仅安装项目级 skills，不安装全局插件或生命周期 hooks。两项 Ponytail 源文件固定自
+[`DietrichGebert/ponytail@09c434a`](https://github.com/DietrichGebert/ponytail/tree/09c434ab73ca43761c5d8b0c5d341926c2fba710)，
+原文和 MIT license 一起保留在 `.agents/skills/`，以仓库提交记录为版本依据。
+
+### 从其他工作流借鉴的闭环机制
+
+| 来源                                                                                                                               | 值得借鉴的机制                                                  | 本项目当前状态                                                         |
+| ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| [Matt implement-spec](https://github.com/mattpocock/skills/blob/main/skills/engineering/implement-spec/SKILL.md)                   | 依赖图、独立 worktree、集成负责人验证每个结果                   | 已有主 Agent 拆任务、审计划与集成规则                                  |
+| [Matt diagnosing-bugs](https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnosing-bugs/SKILL.md)                 | 先建立能捕获原始症状的运行命令，再缩小复现和修复                | issue 调查已有公共 seam 复现与 red/green 要求                          |
+| [pstack PR 维护](https://github.com/michael-denyer/pstack-claude/blob/main/plugins/pstack/skills/poteto-mode/playbooks/babysit.md) | 按当前 head 检查 CI、review 反馈与 mergeability，修复后重新验收 | 尚未接入 PR 创建后的自动反馈修复工作流                                 |
+| [pstack 决策记录](https://github.com/michael-denyer/pstack-claude/blob/main/plugins/pstack/skills/show-me-your-work/SKILL.md)      | 记录决策、原因、证据链接和结果，交接时核实证据                  | 现有规则要求 base、patch digest 与命令结果，尚未加入机器校验的交接记录 |
+
+这些是协议对照，不代表安装了 pstack 全套路由，也不采用上游固定修复轮数、自动 fallback
+或额外的人工作业门槛。Ponytail 优化实现和审查，不负责调度或关闭 PR 反馈环。
 
 Review 使用同一份完整 workspace patch，包含新增文件；仅看 `base...HEAD` 会漏掉
 未提交修改。记录 base commit、patch digest、验收条件、实际命令结果、两轴审查结果。

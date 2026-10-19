@@ -32,6 +32,8 @@ tools:
 skills:
   - .agents/skills/tdd
   - .agents/skills/code-review
+  - .agents/skills/ponytail
+  - .agents/skills/ponytail-review
   - .agents/skills/pr
   - .agents/skills/show-me
 safe-outputs:
@@ -85,6 +87,10 @@ jobs:
 Read `.tmp/agent-issue.json`, `AGENTS.md`, `CONTEXT.md`, the linked specification,
 relevant ADRs, and `docs/agents/agentic-workflows.md`. `CONTEXT.md` is this repo's
 canonical glossary, including when an installed skill calls it `GLOSSARY.md`.
+Apply the installed `ponytail` skill at its full level while planning and
+implementing: understand affected callers first, reuse existing code and platform
+features, and make the smallest complete change. Keep the approved public
+contracts, error handling and verification intact.
 This workflow authorizes routine planning, implementation, tests, independent
 reviews, and a PR for this issue. It invokes the installed `pr` and `show-me`
 guidance as part of delivery. Do not ask for task-by-task approval.
@@ -108,7 +114,12 @@ guidance as part of delivery. Do not ask for task-by-task approval.
    code-review skill's `base...HEAD` command does not include uncommitted work:
    materialize a complete patch against the captured base with new files included
    and give the same immutable patch to independent Standards and Spec reviewers.
-   Supply source docs, not the implementer's conclusions. Fix evidence-backed
+   Supply source docs, not the implementer's conclusions. The Standards reviewer
+   receives the `ponytail-review` skill path and instructions in its brief and
+   applies them to the connected callers and dependencies; fold
+   its evidence-backed findings into that axis rather than adding a duplicate
+   review round. Required public interfaces and ADR decisions take precedence over
+   suggestions to remove an abstraction. Fix evidence-backed
    findings and review every correction. Record patch digest and review results.
 5. Run the affected checks and the repository `bun run check`. A failed check or
    unfinished review prevents requesting a PR. Do not weaken assertions, disable

@@ -72,6 +72,9 @@ Approved specifications can enter the same delivery workflow. Setup, repository
 secrets, task states, and the exact verification contract are documented in
 [Agentic workflows](./docs/agents/agentic-workflows.md).
 
+Project-local Ponytail guidance keeps implementation complete and minimal;
+`ponytail-review` adds caller-aware checks to the existing Standards review.
+
 ```bash
 bun run agents:compile  # Compile workflow sources with gh-aw v0.89.21
 bun run agents:check    # Validate sources and detect stale compiled workflows
