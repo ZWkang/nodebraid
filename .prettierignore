@@ -4,9 +4,13 @@
 # Generated tool adapter skill trees mirror the vendored sources above.
 .claude/skills/
 .codebuddy/skills/
+.codex/skills/
 
 # Browser test bundles and reports are generated during verification.
 .tmp/
 
 # TanStack Router owns generated route trees.
 **/routeTree.gen.ts
+
+# gh-aw owns compiled workflows and their source hashes.
+.github/workflows/*.lock.yml
