@@ -54,3 +54,7 @@ The agent never approves or merges the PR on the user's behalf.
 
 Workflow setup, credentials, event behavior and verification are documented in
 [agentic-workflows.md](./agentic-workflows.md).
+
+## Discussion workflow
+
+Follow [discussion-workflow.md](discussion-workflow.md) when reading or handling Issue and PR feedback. It defines when to refresh discussions, how confirmed decisions affect specs and acceptance criteria, and how to connect replies with verification and remaining review work. GitHub discussions retain their original URLs and thread identities; local specs link the decisions they incorporate.
