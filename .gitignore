@@ -10,5 +10,5 @@ examples/*/.tanstack/
 
 .env
 
-# gh-aw installs runtime copies of repository skills here.
+# Local tools may generate runtime copies of repository skills here.
 .codex/skills/

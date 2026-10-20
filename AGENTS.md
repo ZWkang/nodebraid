@@ -4,18 +4,23 @@
 
 新任务先与用户确认 grill、spec、领域文档和公共测试 seam；确认后，Agent 自主拆分任务、审查计划、实现、验证和双轴 code review，无需逐票再次确认。需求、公开契约或架构决策变化时回到前期讨论。
 
-实时 issue 调查与自主交付使用 GitHub Agentic Workflows；执行规则、凭据和验收见 `docs/agents/agentic-workflows.md`，任务路由见 `docs/agents/issue-tracker.md`。`CONTEXT.md` 是本项目唯一的领域词汇表，安装的 skill 提到 `GLOSSARY.md` 时读取它。
+Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执行，使用现有 ChatGPT 订阅登录；GitHub 保留任务记录和工程 CI。执行协议见 `.agents/workflows/local-agent.md`，设置与验收见 `docs/agents/agentic-workflows.md`，任务路由见 `docs/agents/issue-tracker.md`。`CONTEXT.md` 是唯一领域词汇表，skill 提到 `GLOSSARY.md` 时读取它。
 
 实现阶段应用项目级 `ponytail` 的 full 模式，先读真实调用链并优先复用，再完成最小充分改动。Standards review 同时使用 `ponytail-review`；按已确认的 spec、ADR 和公共契约判断简化，不删必要的错误处理、验证或框架 seam。
 
-- `bun run agents:compile`：使用固定 gh-aw v0.89.21 编译 `.github/workflows/*.md` 为必须提交的 `.lock.yml`。
-- `bun run agents:check`：检查编译器版本、严格语法验证和编译文件是否过期；CI 在完整工程检查前执行。
+- `bun run agents:check`：检查本地工作流协议、skills 和残留的托管 API 执行入口；CI 在完整工程检查前执行。
+- `bun run agents:local-check`：另检查本机 ChatGPT CLI 登录；有 API-key 环境变量时明确失败，不切换计费入口。
+- `bun run agents:scan [base-sha]`：在已 fetch 的干净 main worktree 记录固定 SHA 调查范围。
 - `bun test tests/pr-feedback.test.ts`：验证 PR 当前 head 的 CI／review 状态、反馈去重和交接校验。
+- `bun test tests/defect-scan.test.ts`：验证主动调查的固定 SHA 和成功运行基线。
 
-托管 issue PR 以 `[agent] ` 标题前缀和 `feat/issue-N` 分支加入 CI／review 自动修复闭环。
+本地自动化检查新 main 变更、Issue 和托管 PR；复现并查重后记录 Issue，再实现已确认任务。
+GitHub 写入使用已连接工具或已认证 Git client，不复制订阅登录文件或连接器凭据。
+
+托管 issue PR 以 `[local-agent] `（兼容 `[agent] `）标题和 `feat/issue-N` 分支加入本地 CI／review 修复闭环。
 Agent 在原 PR 上追加修复并验证，需求变化返回讨论；最终审阅与合并由用户完成。
 
-修改 agentic workflow 后先格式化源码，再编译并执行 `agents:check`。`.lock.yml` 由编译器维护，不手工编辑或用 Prettier 重写。
+修改本地工作流后格式化并执行 `agents:check` 及相关状态测试。GitHub 不保留 API Agent 或 gh-aw 编译入口。
 
 ## 项目结构与模块组织
 

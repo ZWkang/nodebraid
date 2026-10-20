@@ -1,32 +1,36 @@
-const expectedVersion = 'v0.89.21';
+import { spawnSync } from 'node:child_process';
 
-export {};
+const requiredFiles = [
+  'AGENTS.md',
+  'CONTEXT.md',
+  '.agents/workflows/local-agent.md',
+  'docs/agents/agentic-workflows.md',
+  'docs/agents/issue-tracker.md',
+  ...['tdd', 'code-review', 'ponytail', 'ponytail-review', 'pr', 'show-me'].map(
+    (name) => `.agents/skills/${name}/SKILL.md`,
+  ),
+];
+for (const path of requiredFiles) {
+  if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+}
 
-async function command(args: string[]): Promise<{ stdout: string; stderr: string }> {
-  const child = Bun.spawn(args, { stdout: 'pipe', stderr: 'pipe' });
-  const [stdout, stderr, exitCode] = await Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-    child.exited,
-  ]);
-  if (stderr) process.stderr.write(stderr);
-  if (exitCode !== 0) {
-    throw new Error(`${args.join(' ')} exited with code ${exitCode}.`);
+// The selected executor is subscription-authenticated local Codex, so hosted AI must be absent.
+for await (const path of new Bun.Glob('.github/workflows/*').scan('.')) {
+  if (!/\.(?:ya?ml|md)$/.test(path)) continue;
+  const source = await Bun.file(path).text();
+  if (/CODEX_API_KEY|OPENAI_API_KEY|github\/gh-aw|pr-feedback\.lock\.yml/.test(source)) {
+    throw new Error(`Hosted API execution remains in ${path}; local subscription mode must not dispatch it.`);
   }
-  return { stdout, stderr };
 }
 
-const versionOutput = await command(['gh', 'aw', 'version']);
-const version = `${versionOutput.stdout}${versionOutput.stderr}`.trim();
-if (version !== `gh aw version ${expectedVersion}`) {
-  throw new Error(`Expected gh-aw ${expectedVersion}; received ${version}.`);
+if (process.argv.includes('--local')) {
+  if (process.env.CODEX_API_KEY || process.env.OPENAI_API_KEY) {
+    throw new Error('API-key environment variables are set; local workflow requires ChatGPT authentication.');
+  }
+  const result = spawnSync('codex', ['login', 'status'], { encoding: 'utf8' });
+  if (result.error) throw result.error;
+  if (result.status !== 0 || !`${result.stdout}${result.stderr}`.includes('Logged in using ChatGPT')) {
+    throw new Error('Local Codex is not authenticated with ChatGPT. Complete codex login before running the worker.');
+  }
 }
-await command(['gh', 'aw', 'compile', '--strict', '--no-emit', '--no-check-update']);
-const listing = await command(['gh', 'aw', 'list', '--stale', '--json']);
-const stale = JSON.parse(listing.stdout) as { workflow: string }[];
-if (stale.length > 0) {
-  throw new Error(
-    `Stale or missing compiled workflows: ${stale.map((item) => item.workflow).join(', ')}. Run bun run agents:compile.`,
-  );
-}
-console.log(`Agentic workflows validated with gh-aw ${expectedVersion}; compiled files are current.`);
+console.log('Local agent workflow sources verified; no hosted API workflow is active in this checkout.');

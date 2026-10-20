@@ -1,8 +1,8 @@
 import { expect, test } from 'bun:test';
 import {
   currentDecisions,
+  incomingFeedback,
   evaluateFeedback,
-  parseReceipt,
   validateReceipt,
   type FeedbackSnapshot,
 } from '../scripts/pr-feedback';
@@ -32,7 +32,17 @@ const snapshot: FeedbackSnapshot = {
   threads: [],
 };
 
+test('local evidence comments do not trigger themselves, while later edits still enter the queue', () => {
+  const own = { key: 'comment:1', digest: 'published', body: 'evidence', url: 'https://github.com/comment/1' };
+  const edited = { ...own, digest: 'edited', body: 'human correction' };
+  const incoming = { ...own, key: 'comment:2' };
+  expect(incomingFeedback([own, edited, incoming], [own])).toEqual([edited, incoming]);
+});
+
 test('only a verified current PR head is ready for human review', () => {
+  expect(evaluateFeedback({ ...snapshot, title: '[local-agent] Fix selection' }, 'ZWkang/nodebraid', []).status).toBe(
+    'ready',
+  );
   expect(evaluateFeedback(snapshot, 'ZWkang/nodebraid', []).status).toBe('ready');
   expect(evaluateFeedback({ ...snapshot, statusCheckRollup: [] }, 'ZWkang/nodebraid', []).status).toBe('waiting-ci');
   expect(
@@ -102,7 +112,7 @@ test('a handoff cannot omit feedback, invent dispositions, or claim a different 
   const item = { key: 'comment:7', digest: 'old', body: 'wrong result', url: 'https://github.com/comment/7' };
   const receipt = {
     number: 42,
-    run: 123,
+    run: 'local-run-123',
     request: 'request1',
     base: 'a'.repeat(40),
     commit: 'b'.repeat(40),
@@ -123,13 +133,6 @@ test('a handoff cannot omit feedback, invent dispositions, or claim a different 
       { ...task, pending: [item, { ...item, key: 'comment:8' }] },
     ),
   ).toThrow();
-});
-
-test('a user cannot forge the controller handoff marker', () => {
-  const body = '<!-- nodebraid-feedback:v1\n{"number":42,"run":123}\n-->';
-  const comment = { id: 1, body, updated_at: '', html_url: '', user: { login: 'reviewer', type: 'User' } };
-  expect(parseReceipt(comment)).toBeUndefined();
-  expect(parseReceipt({ ...comment, user: { login: 'github-actions[bot]', type: 'Bot' } })?.run).toBe(123);
 });
 
 test('CI result order does not cause duplicate repair dispatches', () => {
@@ -153,7 +156,7 @@ test('an unresolved thread must be revalidated at the new head before automatic 
   const pr = { ...snapshot, threads: [thread] };
   const receipt = {
     number: 42,
-    run: 123,
+    run: 'local-run-123',
     request: 'request1',
     base: 'a'.repeat(40),
     commit: 'b'.repeat(40),

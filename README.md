@@ -66,29 +66,33 @@ the source-checkout workflow until the initial npm release is available.
 
 ## Agentic development
 
-GitHub Agentic Workflows investigates incoming issues and dispatches confirmed
-defects for autonomous implementation, verification, review, and a visual PR.
-Approved specifications can enter the same delivery workflow. Setup, repository
-secrets, task states, and the exact verification contract are documented in
-[Agentic workflows](./docs/agents/agentic-workflows.md).
+Local Codex uses the existing ChatGPT sign-in for issue investigation, implementation,
+review, and PR feedback repairs. GitHub retains issues, PRs and engineering CI.
+The local chat heartbeat checks for work every five minutes while the computer and
+app are running; it is polling rather than a realtime webhook. It consumes the
+account's Codex subscription allowance, with no API-key fallback.
 
-Managed issue PRs (`[agent] ` title, `feat/issue-N` branch) receive automatic
-current-head CI and review repairs. Verified results return to the same PR;
-human review and merge remain the final step. Conflicts requiring design,
-disputed feedback and failed runs remain visible.
+The versioned execution protocol is [.agents/workflows/local-agent.md](./.agents/workflows/local-agent.md).
+[Agentic workflows](./docs/agents/agentic-workflows.md) documents setup, durable
+execution evidence, failure states and acceptance. Managed issue PRs use a
+`[local-agent] ` title and `feat/issue-N` branch; legacy `[agent] ` issue PRs remain
+eligible. Human review and merge are the final step.
 
-Project-local Ponytail guidance keeps implementation complete and minimal;
-`ponytail-review` adds caller-aware checks to the existing Standards review.
+Project-local Ponytail keeps implementation complete and minimal; `ponytail-review`
+checks connected callers in the independent Standards axis. Spec review remains
+separate. New confirmed defects require an executed reproduction and issue deduplication.
 
 ```bash
-bun run agents:compile  # Compile workflow sources with gh-aw v0.89.21
-bun run agents:check    # Validate sources and detect stale compiled workflows
-bun test tests/pr-feedback.test.ts # Check feedback state and handoff validation
+bun run agents:check       # Validate local protocol and absence of hosted AI jobs
+bun run agents:local-check # Also verify local ChatGPT CLI authentication
+bun run agents:scan        # Prepare a main-snapshot investigation
+bun run agents:scan <sha>  # Prepare changes since the last completed investigation
+bun test tests/agent-issue.test.ts tests/pr-feedback.test.ts tests/defect-scan.test.ts
 ```
 
-The source `.md` and generated `.lock.yml` workflows must both be committed.
-Issue automation activates after merging them to `main` and configuring the
-documented secrets; local compilation alone does not enable cloud execution.
+The migration removes API-backed GitHub Agentic Workflows rather than running both
+executors. A registered schedule is not end-to-end acceptance; review the actual
+issue, red/green tests, independent reviews, published head, CI and repair evidence.
 
 ## Stack
 
