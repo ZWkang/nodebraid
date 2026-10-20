@@ -18,9 +18,6 @@ jobs:
         with:
           bun-version: 1.2.19
       - run: bun install --frozen-lockfile
-      - uses: github/gh-aw/actions/setup-cli@c35393777e5604a63721d09512263b1383301d4f
-        with:
-          version: v0.89.21
       - run: bun run agents:check
       - run: bunx agent-browser install --with-deps
       - run: bun run check

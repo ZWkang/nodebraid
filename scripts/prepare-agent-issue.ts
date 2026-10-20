@@ -1,5 +1,3 @@
-import { mkdir } from 'node:fs/promises';
-
 export interface AgentIssue {
   number: number;
   state: string;
@@ -31,35 +29,4 @@ export function validateAgentIssue(issue: AgentIssue, expectedNumber: number): v
   if (labels.has('needs-info') || labels.has('needs-design')) {
     throw new Error(`Issue #${issue.number} still needs information or design decisions.`);
   }
-}
-
-if (import.meta.main) {
-  const number = parseIssueNumber(process.env.ISSUE_NUMBER);
-  const repository = process.env.ISSUE_REPOSITORY;
-  if (!repository || !/^[\w.-]+\/[\w.-]+$/.test(repository)) {
-    throw new Error('ISSUE_REPOSITORY must identify owner/repository.');
-  }
-  const result = Bun.spawn(
-    [
-      'gh',
-      'issue',
-      'view',
-      String(number),
-      '--repo',
-      repository,
-      '--json',
-      'number,state,title,body,url,labels,comments',
-    ],
-    { stdout: 'pipe', stderr: 'inherit' },
-  );
-  const output = await new Response(result.stdout).text();
-  const exitCode = await result.exited;
-  if (exitCode !== 0) {
-    throw new Error(`GitHub issue read failed with exit code ${exitCode}.`);
-  }
-  const issue = JSON.parse(output) as AgentIssue;
-  validateAgentIssue(issue, number);
-  await mkdir('.tmp', { recursive: true });
-  await Bun.write('.tmp/agent-issue.json', JSON.stringify(issue, null, 2));
-  console.log(`Prepared ${repository}#${number}: ${issue.title}`);
 }
