@@ -11,6 +11,14 @@ Include a "suggested skills" section in the document, naming which skills the ne
 
 Do not duplicate content already captured in other artifacts (specs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
 
+When Issue or PR discussions are involved, follow `docs/agents/discussion-workflow.md` and include:
+
+- Related Issue/PR links and the last comments, reviews, or threads read (IDs/timestamps and reviewed commit).
+- Unresolved questions or threads, confirmed conclusions, and links to their implementation and verification evidence.
+- Replies still to send, who is expected to respond or re-review, and the authorized scope for continuing.
+
+Link existing discussion records and artifacts rather than copying their contents.
+
 Redact any sensitive information, such as API keys, passwords, or personally identifiable information.
 
 If the user passed arguments, treat them as a description of what the next session will focus on and tailor the doc accordingly.

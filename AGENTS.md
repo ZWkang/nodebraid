@@ -86,3 +86,7 @@ Agent 在原 PR 上追加修复并验证，需求变化返回讨论；最终审�
 历史目前只有 `Initial commit`，尚未形成稳定约定。提交信息使用简短祈使句，可采用 `feat: add flow parser`、`fix: reject invalid node` 等 Conventional Commit 前缀；每个提交只处理一个逻辑主题。
 
 拉取请求需说明目的、主要改动和验证命令，关联相关 issue。涉及界面变化时附截图；涉及配置时列出新增环境变量，但不得提交密钥、令牌或个人配置。
+
+## Issue 与 PR 讨论
+
+涉及 Issue、PR 或其反馈的任务，先读取 [讨论工作流](docs/agents/discussion-workflow.md)；tracker 的存储与操作约定见 [issue-tracker.md](docs/agents/issue-tracker.md)。开始或恢复工作、提交审查结果和准备收尾时，读取相关讨论，将已确认的结论纳入需求与验证，并记录未决问题。处理反馈时关联原评论、改动和验证证据，区分已修改、已验证、已回复和等待复审。
