@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.base.json",
+  "include": [
+    "scripts/local-agent*.ts",
+    "scripts/github-feedback.ts",
+    "scripts/discovery*.ts",
+    "scripts/pr-feedback.ts",
+    "scripts/prepare-defect-scan.ts"
+  ]
+}

@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 
 interface Check {
+  headSha?: string;
   name?: string;
   workflowName?: string;
   status?: string;
@@ -106,16 +107,14 @@ function ciPassed(pr: FeedbackSnapshot): boolean {
 }
 
 export function currentDecisions(pr: FeedbackSnapshot, receipts: Receipt[]): Decision[] {
-  return receipts.flatMap((receipt) =>
-    receipt.decisions.filter(
-      (decision) =>
-        receipt.commit === pr.headRefOid ||
-        !pr.threads.some((thread) => thread.id === decision.key && !thread.isResolved),
-    ),
-  );
+  return receipts
+    .filter((receipt) => receipt.number === pr.number && receipt.commit === pr.headRefOid)
+    .flatMap((receipt) => receipt.decisions);
 }
 
 export function evaluateFeedback(pr: FeedbackSnapshot, repository: string, decisions: Decision[]) {
+  if (pr.threads.some((thread) => thread.comments.pageInfo.hasNextPage))
+    throw new Error('Incomplete thread pagination.');
   const pending = pr.feedback.filter(
     (item) =>
       !decisions.some(

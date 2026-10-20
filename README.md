@@ -87,12 +87,22 @@ bun run agents:check       # Validate local protocol and absence of hosted AI jo
 bun run agents:local-check # Also verify local ChatGPT CLI authentication
 bun run agents:scan        # Prepare a main-snapshot investigation
 bun run agents:scan <sha>  # Prepare changes since the last completed investigation
+bun run agents:typecheck  # Type-check the executable local workflow
+bun run agents:run        # Show prepare/inspect/verify/publication/evaluate usage
+bun run agents:discovery init queue.json # Explicitly initialize public seam coverage
+bun run agents:discovery sync queue.json # Resume pending seams, even without new commits
+bun run agents:discovery finish queue.json report.json # Record one successful investigation
 bun test tests/agent-issue.test.ts tests/pr-feedback.test.ts tests/defect-scan.test.ts
 ```
 
 The migration removes API-backed GitHub Agentic Workflows rather than running both
 executors. A registered schedule is not end-to-end acceptance; review the actual
 issue, red/green tests, independent reviews, published head, CI and repair evidence.
+Local runs bind an independent prepared task to its exact checked head/tree/patch
+and actual remote publication. New heads need fresh verification. The persistent
+discovery queue retains unexamined areas instead of treating a main checkpoint as
+complete repository coverage. Command input formats and recovery are documented
+in [Agentic workflows](./docs/agents/agentic-workflows.md#执行命令和恢复).
 
 ## Stack
 

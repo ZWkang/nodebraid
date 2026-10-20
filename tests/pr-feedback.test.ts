@@ -175,3 +175,37 @@ test('removing opt-in or switching to draft excludes even otherwise actionable f
   expect(evaluateFeedback({ ...pr, isDraft: true }, 'ZWkang/nodebraid', []).status).toBe('excluded');
   expect(evaluateFeedback({ ...pr, title: 'Human PR' }, 'ZWkang/nodebraid', []).status).toBe('excluded');
 });
+
+test('a receipt from another PR or an old head cannot hide current feedback', () => {
+  const item = { key: 'comment:9', digest: 'current', body: 'broken', url: 'https://github.com/comment/9' };
+  const receipt = {
+    number: 999,
+    run: 'another-run',
+    request: 'other',
+    base: 'b'.repeat(40),
+    commit: 'c'.repeat(40),
+    evidence: 'another result',
+    decisions: [{ key: item.key, digest: item.digest, outcome: 'addressed' as const, reason: 'fixed elsewhere' }],
+  };
+  expect(currentDecisions({ ...snapshot, feedback: [item] }, [receipt])).toEqual([]);
+});
+
+test('an incomplete resolved thread cannot hide a newer reply on its next page', () => {
+  expect(() =>
+    evaluateFeedback(
+      {
+        ...snapshot,
+        threads: [
+          {
+            id: 'thread',
+            isResolved: true,
+            path: 'x.ts',
+            comments: { nodes: [], pageInfo: { hasNextPage: true, endCursor: 'next' } },
+          },
+        ],
+      },
+      'ZWkang/nodebraid',
+      [],
+    ),
+  ).toThrow('pagination');
+});
