@@ -20,6 +20,11 @@ flowchart TD
   I --> J[独立步骤执行 bun run check]
   J -->|通过| K[pr + show-me 组织可审阅 PR]
   J -->|失败| L[运行失败，不发布 PR]
+  K --> M[PR Feedback Events 汇总当前 head 的 CI 和 review]
+  M -->|明确问题| N[pr-feedback 修复、回归测试、两轴 review、完整检查]
+  N -->|发布成功| M
+  M -->|验证与反馈已处理| O[用户最终审阅和合并]
+  M -->|需求变化、争议或运行失败| P[保留证据，等待决策或排障]
 ```
 
 调查可以由任何 issue 提交者触发，使用可信默认分支的源码；补充评论仅在
@@ -57,12 +62,12 @@ Spec review 仍独立核对需求，最终工程检查仍由 runner 执行。
 
 ### 从其他工作流借鉴的闭环机制
 
-| 来源                                                                                                                               | 值得借鉴的机制                                                  | 本项目当前状态                                                         |
-| ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| [Matt implement-spec](https://github.com/mattpocock/skills/blob/main/skills/engineering/implement-spec/SKILL.md)                   | 依赖图、独立 worktree、集成负责人验证每个结果                   | 已有主 Agent 拆任务、审计划与集成规则                                  |
-| [Matt diagnosing-bugs](https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnosing-bugs/SKILL.md)                 | 先建立能捕获原始症状的运行命令，再缩小复现和修复                | issue 调查已有公共 seam 复现与 red/green 要求                          |
-| [pstack PR 维护](https://github.com/michael-denyer/pstack-claude/blob/main/plugins/pstack/skills/poteto-mode/playbooks/babysit.md) | 按当前 head 检查 CI、review 反馈与 mergeability，修复后重新验收 | 尚未接入 PR 创建后的自动反馈修复工作流                                 |
-| [pstack 决策记录](https://github.com/michael-denyer/pstack-claude/blob/main/plugins/pstack/skills/show-me-your-work/SKILL.md)      | 记录决策、原因、证据链接和结果，交接时核实证据                  | 现有规则要求 base、patch digest 与命令结果，尚未加入机器校验的交接记录 |
+| 来源                                                                                                                               | 值得借鉴的机制                                                  | 本项目当前状态                                                                |
+| ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [Matt implement-spec](https://github.com/mattpocock/skills/blob/main/skills/engineering/implement-spec/SKILL.md)                   | 依赖图、独立 worktree、集成负责人验证每个结果                   | 已有主 Agent 拆任务、审计划与集成规则                                         |
+| [Matt diagnosing-bugs](https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnosing-bugs/SKILL.md)                 | 先建立能捕获原始症状的运行命令，再缩小复现和修复                | issue 调查已有公共 seam 复现与 red/green 要求                                 |
+| [pstack PR 维护](https://github.com/michael-denyer/pstack-claude/blob/main/plugins/pstack/skills/poteto-mode/playbooks/babysit.md) | 按当前 head 检查 CI、review 反馈与 mergeability，修复后重新验收 | PR 事件控制器与 gh-aw 修复 worker 已接入，合并后执行线上验收                  |
+| [pstack 决策记录](https://github.com/michael-denyer/pstack-claude/blob/main/plugins/pstack/skills/show-me-your-work/SKILL.md)      | 记录决策、原因、证据链接和结果，交接时核实证据                  | runner 校验反馈处置、request、base、实际 commit；控制器核实运行成功和分支归属 |
 
 这些是协议对照，不代表安装了 pstack 全套路由，也不采用上游固定修复轮数、自动 fallback
 或额外的人工作业门槛。Ponytail 优化实现和审查，不负责调度或关闭 PR 反馈环。
@@ -70,6 +75,67 @@ Spec review 仍独立核对需求，最终工程检查仍由 runner 执行。
 Review 使用同一份完整 workspace patch，包含新增文件；仅看 `base...HEAD` 会漏掉
 未提交修改。记录 base commit、patch digest、验收条件、实际命令结果、两轴审查结果。
 修正后复验并更新证据。详细日志留在运行记录，PR 使用结构图、Before/After 证据和影响范围。
+
+## PR 发布后的反馈闭环
+
+`issue-delivery` 创建 `[agent] ` 标题前缀、`feat/issue-<number>` 分支的 PR，显式加入自动维护。
+只处理本仓库发往 `main` 的开放、非 draft PR；fork 和普通人工 PR 不自动修改。
+移除标题前缀或转为 draft 即可退出。关闭 `PR Feedback Control` workflow 可停止同步和
+新修复派发；已经运行或排队的 `Agent PR Feedback` 需要在 Actions 另行取消。
+
+普通 Actions `pr-feedback-events.yml` 仅产生无写权限的事件信号。其作业结束后，
+`pr-feedback-control.yml` 通过 `workflow_run` 在默认分支运行，避免控制器自身的 pending
+check 留在被判断的 PR head。控制器只 checkout 可信 `main`，不安装或执行 PR 代码，
+不持有 OpenAI key；仅可信 main 同步使用 `agent-publish` 中的 `AGENT_PR_TOKEN`。
+它响应 PR head、review、review thread、PR 评论、Checks／修复 workflow 完成、
+外部 check suite／commit status 和 `main` 更新。
+每次读取所有开放的托管 PR，因此 Actions 合并同组 pending 事件时不会遗漏其他 PR。
+完整读取分页的评论、review、thread 和 workflow runs，不把分页上限当成全部证据。
+
+存在新反馈、当前 CI 失败、冲突或需要更新 base 时，控制器用默认 `GITHUB_TOKEN` 显式
+dispatch `pr-feedback.lock.yml`。输入绑定 PR 编号、完整 head SHA 和反馈指纹；启动前再次
+核对并 checkout 精确 PR head。旧请求明确报 superseded；同一个 PR 的修复串行执行，
+新 head 或新反馈在后续 reconciliation 中重新判断，不复用旧 head 的 CI 结果。
+
+Worker 使用 TDD、Ponytail、独立 Standards／Spec review、`pr`／`show-me` 证据方式。
+真实缺陷自主修复；错误或不适用的 review 建议给出证据；产品、公开契约或架构变化返回
+设计讨论。每条反馈都记录 `addressed`、`not-actionable` 或 `needs-design` 及理由。
+CI 修复不允许弱化测试或绕过检查。修改提交在原 PR 分支上，仅追加 commit；需要更新
+base 时由可信控制器用 GitHub merge API 将固定 main SHA 合入原 PR 分支，不 rebase 或
+force push。这样 gh-aw v0.89.21 不会把 main 已批准的 README／配置改动误当成 Agent
+patch，仍完整保留 protected-files 保护。API 无法干净合并的冲突会记录为显式失败，
+继续处理其他 PR；该 PR 必须先解决 base 冲突再恢复，不能声称已经闭环到可合并。
+
+可信脚本在切换 PR 前复制到 runner 的只读控制目录；post-step 从该目录独立核对 request、
+base、当前实际 commit、完整反馈处置和干净工作树，并执行 `bun run check`。成功后上传
+`pr-feedback-result` artifact。只有**整个修复运行成功**且 commit 可从当前 PR head 到达，
+控制器才将 artifact 发布为可回放的 PR 结果评论。发布失败、旧分支或人工伪造的评论标记
+不能作为成功交接。评论或 thread 被编辑、补充后，其内容摘要变化，必须重新调查；
+已解决 thread 上的新回复也会重新进入反馈队列。
+
+结果发布后等待真实 CI。项目 `Checks / checks` 必须成功，已报告的其他 CI 不能有失败或
+pending；再结合 GitHub `mergeable`、`mergeStateStatus`、review decision 和未解决 thread
+判断状态。只有内容未变化、处置绑定当前 head、已记录 `addressed` 且 CI 通过的 thread
+自动 resolve。旧 head 上仍未关闭的 thread 必须重新调查其在新 head 上的适用性。
+争议 thread 保留给审阅者；绝不代替人批准、dismiss `changes requested` 或解除分支保护。
+`REVIEW_REQUIRED` 单独显示等待人工审阅，不能声称已经满足全部合并条件。最后由用户审阅和合并。
+
+同一反馈指纹用已有 workflow run 去重，不给修复轮数加固定上限。已失败的运行明确展示
+原始链接；不会把缺少凭据等运行错误当成代码修复成功，也不会对不变的失败持续空转。
+新评论、CI 重跑结果或新提交会触发重新判断。排障后可在 Actions 重跑失败的
+`Agent PR Feedback` 运行；手动运行事件控制器只是重新读取状态，不绕过反馈去重。
+
+控制脚本的公开测试 seam 为状态评估与交接校验：
+
+```bash
+bun test tests/pr-feedback.test.ts
+```
+
+覆盖当前 head CI、反馈指纹去重、review 编辑、设计问题、GitHub 合并门禁、交接遗漏／伪造。
+编译和这些测试不代表已跑通云端 Codex；线上验收需在默认分支合并后，用真实托管 PR 分别
+验证一次失败 CI 修复和一条真实 review 修复，检查新 commit、回归测试、artifact、结果评论、
+当前 head 的 Checks、thread 状态及最终人工交接。中途制造新 head 应让旧请求失效；缺少
+凭据、失败检查、争议建议和需求变化都必须保留可见状态。
 
 ## 启用
 
@@ -108,6 +174,14 @@ bun run agents:check
 先格式化 `.md` 源码，再编译。禁止手工重写 `.lock.yml`；`.gitattributes` 将其标为
 生成文件，Prettier 忽略它们。运行时安装的 `.codex/skills/` 被 Git 和 Prettier 忽略，
 不会污染产品 patch 或因上游格式导致检查失败。CI 使用同一版本检查编译和过期产物。
+
+PR 修复复用同一组密钥和隔离环境，不新增 secret。Agent job 仍不能读取实际发布 token；
+可信默认分支控制器的 main 同步和 safe-output 发布作业读取该 environment secret。
+`signed-commits: false` 选择直接 append-only push，以保留机器交接中的实际 SHA；此配置
+要求 PR 分支未启用签名提交保护。若启用该保护，应先调整发布和 SHA 交接协议再启用此 worker。
+固定 checkout `fetch-depth: 0` 为当前小仓库预置 bundle 所需历史，不启用自动补抓历史的
+fallback。`fallback-as-pull-request: false` 和 `protected-files: blocked` 保证发布失败不会
+另建替代 PR 或绕过 automation／steering 文件保护。
 
 首次线上验收：新建含真实复现步骤的缺陷 issue，检查调查评论、标签和派发运行，随后
 检查修复 PR、回归测试、两轴 review 记录、完整 Checks 和 issue 关联。缺少凭据或
