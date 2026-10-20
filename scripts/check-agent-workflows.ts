@@ -6,6 +6,11 @@ const requiredFiles = [
   '.agents/workflows/local-agent.md',
   'docs/agents/agentic-workflows.md',
   'docs/agents/issue-tracker.md',
+  'scripts/local-agent.ts',
+  'scripts/local-agent-run.ts',
+  'scripts/github-feedback.ts',
+  'scripts/discovery.ts',
+  'scripts/discovery-queue.ts',
   ...['tdd', 'code-review', 'ponytail', 'ponytail-review', 'pr', 'show-me'].map(
     (name) => `.agents/skills/${name}/SKILL.md`,
   ),

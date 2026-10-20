@@ -83,10 +83,86 @@ bun run agents:scan <last-reviewed-sha> # 后续完整变更范围
 该命令写入忽略的 `.tmp/agent-defect-scan.json`。调查后按根因、症状和公共接口查重，
 新 Issue 包含真实可运行复现、命令退出状态、base/head、预期契约、实际行为与验收条件。
 调查失败或 Issue 未实际发布时不推进基线；没有新发现不等于全仓无缺陷。
+全局 SHA 只表示变更调查位置。另用 `discovery.json` 保存公共 seam 的待办；首次迁移
+显式 `init`，保守地将所有现存 package、workflow、docs 和 examples 标为 pending，
+已执行的调查再以原始证据逐项完成。`sync` 保留未完成和已删除 package 的调查记录，
+只有受影响的已完成 seam 会重新排队。没有新提交也继续 pending seam，不重复完整构建。
 
 本机状态存放在 `$CODEX_HOME/local-workflows/nodebraid/`，包含 checkpoint、反馈摘要、
 当前 PR head 和不可混同的阶段证据。不得存密钥。损坏状态直接报错；首次创建明确初始化。
 原始工具结果与 GitHub 链接保留，不把成功注册调度、一次检查通过或本地 commit 当成整个闭环成功。
+
+## 执行命令和恢复
+
+执行使用版本管理的 `scripts/local-agent.ts`，不再调用忽略目录中的临时验收脚本。
+每次 Issue 或 PR 反馈请求有独立 run 目录，通常放在上述本机 `runs/<run-id>/`。
+
+```bash
+bun run agents:run normalize raw-github.json published-feedback.json snapshot.json
+bun run agents:run prepare task-input.json /absolute/path/to/run
+bun run agents:run frontier /absolute/path/to/run completed-steps.json
+bun run agents:run inspect /absolute/path/to/run
+bun run agents:run verify /absolute/path/to/run reviews.json decisions.json
+bun run agents:run publication /absolute/path/to/run actual-remote-commit.json
+bun run agents:run evaluate /absolute/path/to/run snapshot.json
+```
+
+`task-input.json` 的字段为 `run`、`repository`、`source: {kind: issue|pr, number}`、
+`branch`、完整 SHA `base`、原始请求摘要 `request`、待处理反馈 `pending`，以及
+`plan: [{id, blockedBy, acceptance}]`。`base` 是本轮发布将追加的远端提交；它必须是
+本地验证提交的祖先。原 Issue/spec revision 和用户已确认的验收条件随输入一起归档。
+`pending` 来自完整归一化快照的 `evaluateFeedback` 结果。依赖图必须无环且引用存在，
+`completed-steps.json` 是已有执行证据的已完成 step ID 数组，不能越过未完成 blocker。
+
+`prepare` 独立写入 `prepared-task.json`，重启后相同输入可恢复，变更输入需要新 run；
+不能从结果 receipt 复制一个“预期 task”。`inspect` 输出当前完整 head、tree 和原始
+`git diff --binary <base> HEAD` 的 SHA-256，两个 reviewer 以同一组值审查完整 patch。
+`reviews.json` 是 `{standards, spec}`，每轴包含 `head`、`tree`、`patch`、实际 `report` 和
+明确的 `verdict: passed|changes-requested|needs-design`；仅两轴均 passed 可验证发布。
+`decisions.json` 必须恰好覆盖原 pending 的 key/digest、处置和原因。
+
+`verify` 在干净提交上运行真实 `bun run check`，保留每次尝试的唯一日志，并检查运行前后
+source 没变。失败结果保存在 `verification.json`，原始日志不覆盖；重启后可以复验，
+没有绿色分支替代真实进程。`publication` 读取 GitHub Git commit 原始返回值
+`{sha, tree: {sha}, parents: [{sha}]}`，核对远端 tree 与已检查 tree，且第一父提交必须是
+本轮 expected remote head；不能仅在后续 merge parent 中找到旧 base 就接受发布。
+API 生成的远端 SHA 可以不同，但一份 run 不得绑定第二次发布。先记录发布再调整本地 ref。
+
+`normalize` 的完整输入契约为 `scripts/github-feedback.ts` 的 `GitHubFeedback`：
+`comments`、`reviews` 为每页 100 条的 REST page 数组，包含最后短页（恰好 100 条时
+还要读空页）；`threads` 包含外层页和已读完 cursor 的评论；CI arrays 匹配报告总数。
+实际 workflow 的 head/path/name 用于识别项目 Checks，workflow 自身的 pending/failure
+也保留，不能只挑成功的 job。combined-status 响应的原始 `sha` 也必须核对当前 head。
+普通 COMMENTED 不能清除同一人的 changes requested，只有其后正式批准或 dismiss
+才更新有效决定。`published-feedback.json` 仅含已发布且 key/digest 精确
+匹配的自己评论。新评论、编辑、resolved thread 的新回复和人类 changes requested
+都进入判断。新 head 返回 `waiting-verification`，不会把旧 tree、测试和 review 改贴到新 SHA。
+
+调查队列的命令为：
+
+```bash
+bun run agents:discovery init /absolute/path/to/discovery.json
+bun run agents:discovery sync /absolute/path/to/discovery.json
+bun run agents:discovery finish /absolute/path/to/discovery.json report.json
+```
+
+命令在已 fetch 的干净 main 上执行。`report.json` 含 `seam`（如 `packages/kernel`）、
+`head`、`evidence`、`remaining: [剩余公共接口的唯一名称]` 和 `commands: [{command, exitCode}]`。命令失败、报告缺失或过期不会
+清掉 pending；原始命令输出、查重和 Issue 发布结果仍随报告归档。成功报告保存成不可变
+evidence 文件再原子更新队列；相同报告恢复不会重复完成任务。一次完成只代表报告中实际
+调查的公共接口，仍未检查的部分必须在 `remaining` 中拆成剩余待办（全部完成时显式 `[]`），不能用一行概述声称整个 package 已覆盖。
+
+## GitHub 合并门禁
+
+配置默认分支时使用独立的 `main-pr-and-checks` ruleset：required PR、由 GitHub Actions 上报的
+`checks`、最新 main、讨论解决和非快进/删除保护。单人维护时 approving review count
+为 0，避免作者无法批准自己的 PR；最终审阅和合并仍由用户手动完成。原 disabled `deny`
+规则含限制所有更新等其他策略，不能直接启用代替上述配置。
+可审查的请求正文保存在 `docs/agents/main-ruleset.json`；它只是配置输入，不代表远端已启用。
+
+只有读回 active rules 及默认分支后才能报告生效。管理操作需要已有 GitHub 管理登录，
+连接器不能写 rulesets 或认证失效时保留错误；准备好的 JSON 不算已生效。不能通过
+关闭 TLS 校验、复制连接器凭据或调用付费模型完成配置。
 
 ## 验证与验收状态
 
@@ -102,6 +178,10 @@ bun run agents:scan <last-reviewed-sha> # 后续完整变更范围
   在启动前明确失败：没有 `CODEX_API_KEY`／`OPENAI_API_KEY`。这不计作本地订阅验收。
 - 后续本地实现、双轴 review、PR、实际 CI 与反馈修复分别记录其真实结果；不人为破坏
   main 或伪造 review 来补齐验收项目。最终合并由用户执行。
+
+本地执行层测试使用隔离 Git 仓库和真实子进程，覆盖检查失败/恢复、task 不可重绑、
+新 head、分页和依赖前沿。这些 fixture 结果与下一次真实远端 CI/review 修复验收分开记录；
+未真实触发的线上分支继续标为 unverified。
 
 在 Codex Scheduled 中关闭这条本地自动化可停止新调度，正在运行的 turn 另行取消。
 GitHub CI 不依赖这台机器；已有 GitHub secrets 不被自动删除，但迁移后不再被 AI 工作流使用。
