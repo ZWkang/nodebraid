@@ -41,6 +41,7 @@ safe-outputs:
   add-comment:
     target: '*'
   create-pull-request:
+    title-prefix: '[agent] '
     github-token: ${{ secrets.AGENT_PR_TOKEN }}
     base-branch: main
     draft: false
@@ -125,7 +126,8 @@ guidance as part of delivery. Do not ask for task-by-task approval.
    unfinished review prevents requesting a PR. Do not weaken assertions, disable
    checks, change acceptance criteria, add fake success, or add silent fallback
    behavior to obtain a pass. Record the exact commands, results and patch digest.
-6. Use a source branch named `feat/issue-<number>`. Request a PR through the
+6. Use a source branch named `feat/issue-<number>` and a title starting with `[agent] `.
+   This opts the PR into the documented CI/review feedback loop. Request a PR through the
    `create-pull-request` safe output, with `Fixes #<number>` and the installed `pr`
    template: Summary with a focused diagram/diff, Evidence with observed
    before/after behavior and checks, and Merge Danger with compatibility and

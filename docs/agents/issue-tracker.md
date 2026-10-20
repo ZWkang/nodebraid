@@ -43,5 +43,11 @@ Keep the source issue open while a PR is in review. The PR includes `Fixes #N`;
 merging it closes the issue. Implementation, successful checks and a review-ready
 PR are separate states; do not claim the issue is resolved before merge.
 
+Delivery titles start with `[agent] ` and use `feat/issue-N` branches. This opts
+the existing PR into current-head CI/review maintenance. New feedback is
+investigated, verified fixes append to the same branch, and evidence returns
+to the PR. Design changes and disputed reviews remain visible for discussion.
+The agent never approves or merges the PR on the user's behalf.
+
 Workflow setup, credentials, event behavior and verification are documented in
 [agentic-workflows.md](./agentic-workflows.md).

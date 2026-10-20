@@ -72,12 +72,18 @@ Approved specifications can enter the same delivery workflow. Setup, repository
 secrets, task states, and the exact verification contract are documented in
 [Agentic workflows](./docs/agents/agentic-workflows.md).
 
+Managed issue PRs (`[agent] ` title, `feat/issue-N` branch) receive automatic
+current-head CI and review repairs. Verified results return to the same PR;
+human review and merge remain the final step. Conflicts requiring design,
+disputed feedback and failed runs remain visible.
+
 Project-local Ponytail guidance keeps implementation complete and minimal;
 `ponytail-review` adds caller-aware checks to the existing Standards review.
 
 ```bash
 bun run agents:compile  # Compile workflow sources with gh-aw v0.89.21
 bun run agents:check    # Validate sources and detect stale compiled workflows
+bun test tests/pr-feedback.test.ts # Check feedback state and handoff validation
 ```
 
 The source `.md` and generated `.lock.yml` workflows must both be committed.

@@ -10,6 +10,10 @@
 
 - `bun run agents:compile`：使用固定 gh-aw v0.89.21 编译 `.github/workflows/*.md` 为必须提交的 `.lock.yml`。
 - `bun run agents:check`：检查编译器版本、严格语法验证和编译文件是否过期；CI 在完整工程检查前执行。
+- `bun test tests/pr-feedback.test.ts`：验证 PR 当前 head 的 CI／review 状态、反馈去重和交接校验。
+
+托管 issue PR 以 `[agent] ` 标题前缀和 `feat/issue-N` 分支加入 CI／review 自动修复闭环。
+Agent 在原 PR 上追加修复并验证，需求变化返回讨论；最终审阅与合并由用户完成。
 
 修改 agentic workflow 后先格式化源码，再编译并执行 `agents:check`。`.lock.yml` 由编译器维护，不手工编辑或用 Prettier 重写。
 
