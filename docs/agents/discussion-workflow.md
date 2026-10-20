@@ -1,6 +1,6 @@
 # Issue and PR discussions
 
-Use this workflow when a task references an Issue, PR, review comment, or linked discussion. The [tracker configuration](issue-tracker.md) defines GitHub as the source for live tasks and conversations; local specs remain version-controlled. This supplements the [local subscription workflow](../../.agents/workflows/local-agent.md), which owns scheduling, eligibility, existing authorization, full checks, durable receipts, and managed PR thread resolution. Final approval and merge remain with the user.
+Use this workflow when a task references an Issue, PR, review comment, or linked discussion. The [tracker configuration](issue-tracker.md) defines GitHub as the source for new specs, live tasks and conversations; parent Issues hold specs, while local specs remain historical evidence. This supplements the [local subscription workflow](../../.agents/workflows/local-agent.md), which owns scheduling, eligibility, existing authorization, full checks, durable receipts, and managed PR thread resolution. Final approval and merge remain with the user.
 
 ## Read the conversation at work boundaries
 
@@ -35,9 +35,9 @@ Use the authorization already present in the user's request or an authorized loc
 
 Where re-review is needed, state who needs to review and what remains open. Perform an authorized re-review request after verification. Distinguish an author marking a thread resolved from the reviewer accepting the change; report the platform's actual review state.
 
-## Local specs and historical discussions
+## Parent specs and historical discussions
 
-Read the entire referenced local file, including any `## Comments`, and preserve its history. Local specs record confirmed decisions with links to their GitHub sources. Historical local tickets provide context; do not turn them into a parallel live task or conversation tracker. Keep unanswered questions visible in the source discussion and link them from the task's evidence.
+Record confirmed decisions in the parent spec Issue with links to their source discussions and approval comments. When a legacy local spec or ticket is referenced, read the entire file, including any `## Comments`, and preserve it as historical evidence. Do not update local specs or tickets as a parallel live requirements, task or conversation tracker. Keep unanswered questions visible in the source discussion and link them from the task's evidence.
 
 ## Review, handoff, and completion
 

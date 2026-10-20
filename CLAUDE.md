@@ -4,7 +4,7 @@
 
 ### Issue tracker
 
-New live tasks are tracked in GitHub Issues; `.scratch/` keeps repository specs and historical records. See `docs/agents/issue-tracker.md`. Autonomous execution is defined in `docs/agents/agentic-workflows.md`.
+New specs and live tasks are tracked in GitHub Issues for `ZWkang/nodebraid`: parent issues hold specs, child issues hold implementation tasks, and PRs link to those tasks. `.scratch/` contains historical records only. See `docs/agents/issue-tracker.md`. Autonomous execution is defined in `docs/agents/agentic-workflows.md`.
 
 ### Domain docs
 

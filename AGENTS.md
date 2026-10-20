@@ -1,5 +1,15 @@
 # Repository Guidelines
 
+## Agent skills
+
+### Issue tracker
+
+新增需求规格和活跃任务统一记录在 `ZWkang/nodebraid` 的 GitHub Issues：父 Issue 保存规格，子 Issue 保存实现任务，PR 关联对应任务。开始需求整理、拆票、实现或审查前，先读取 [Issue tracker 约定](docs/agents/issue-tracker.md)。`.scratch/` 仅保留历史资料，不再新增规格或维护活跃任务状态。
+
+### Domain docs
+
+本仓库使用单一领域上下文。探索代码前，按 [Domain docs 约定](docs/agents/domain.md) 读取根目录 `CONTEXT.md` 和相关 `docs/adr/`。
+
 ## AI 工作流
 
 新任务先与用户确认 grill、spec、领域文档和公共测试 seam；确认后，Agent 自主拆分任务、审查计划、实现、验证和双轴 code review，无需逐票再次确认。需求、公开契约或架构决策变化时回到前期讨论。
