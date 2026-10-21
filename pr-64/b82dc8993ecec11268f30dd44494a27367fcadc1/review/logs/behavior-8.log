@@ -1,0 +1,33 @@
+bun test v1.4.2 (744846f84)
+
+tests/local-agent-reconcile.test.ts:
+(pass) merged stacked delivery remains incomplete until its real merge commit reaches fetched main [1697.95ms]
+(pass) incomplete PR decision metadata cannot send an already integrated implementation back to the frontier [918.91ms]
+156 |       for (const state of [undefined, null, 'MERGED', 'open']) {
+157 |         const result = f.invoke({
+158 |           ...f.input,
+159 |           [collection]: f.input[collection].map((item) => ({ ...item, issue: { ...item.issue, state } })),
+160 |         });
+161 |         expect(result.stdout).toBe('');
+                                    ^
+error: expect(received).toBe(expected)
+
+- ""
++ "{"main":"226dce881edb31626adbbcee8a13bf24a537be73","defaultBranch":"main","pullRequests":[{"number":49,"url":"https://github.com/ZWkang/nodebraid/pull/49","commit":"8fafce06cc345dfd894d9870118acb0ee6fbd1ab","status":"needs-integration"}],"tasks":[{"number":42,"delivery":49,"status":"needs-integration","delivered":false,"reason":null,"blockedBy":[],"missingAcceptance":[],"pullRequests":[{"number":49,"url":"https://github.com/ZWkang/nodebraid/pull/49","commit":"8fafce06cc345dfd894d9870118acb0ee6fbd1ab","status":"needs-integration"}],"canClose":false}],"specs":[{"number":37,"title":"spec: delivery","missingSlices":[],"status":"waiting-children","unfinished":[42],"missingAcceptance":["end-to-end"],"canClose":false}],"integration":[{"issue":42,"pullRequest":49}],"frontier":[]}
++ "
+
+- Expected  - 1
++ Received  + 2
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/spec-delivery-recovery/cflow/tests/local-agent-reconcile.test.ts:161:31)
+(fail) invalid task and parent issue states fail before deriving delivery or closure candidates [575.41ms]
+(pass) an open stacked PR is retargeted only after its upstream is integrated, then requires fresh verification [1356.47ms]
+(pass) a completed follow-up delivery does not repeatedly integrate its historical feature-branch merge [1126.05ms]
+(pass) missing native relationships and stale default-branch evidence fail explicitly [710.13ms]
+(pass) approved task frontier respects native blockers, active owners and explicit execution choices [1349.13ms]
+
+ 6 pass
+ 1 fail
+ 77 expect() calls
+Ran 7 tests across 1 file. [7.78s]
+

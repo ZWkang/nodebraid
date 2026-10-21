@@ -1,0 +1,26 @@
+bun test v1.4.2 (744846f84)
+
+tests/local-agent-reconcile.test.ts:
+(pass) merged stacked delivery remains incomplete until its real merge commit reaches fetched main [1390.86ms]
+(pass) an open stacked PR is retargeted only after its upstream is integrated, then requires fresh verification [1475.52ms]
+167 |     result = f.invoke();
+168 |     expect(result.status).not.toBe(0);
+169 |     expect(result.stderr).toContain('Fetched default branch');
+170 |     f.input.main = f.git('rev-parse', 'refs/remotes/origin/main');
+171 |     f.input.pullRequests[0]!.base.repo.full_name = 'other/repository';
+172 |     expect(f.invoke().stderr).toContain('another repository');
+                                    ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "another repository"
+Received: ""
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/spec-delivery-recovery/cflow/tests/local-agent-reconcile.test.ts:172:31)
+(fail) missing native relationships and stale default-branch evidence fail explicitly [1078.06ms]
+(pass) approved task frontier respects native blockers, active owners and explicit execution choices [3472.55ms]
+
+ 3 pass
+ 1 fail
+ 35 expect() calls
+Ran 4 tests across 1 file. [7.44s]
+

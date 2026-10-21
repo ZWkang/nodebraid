@@ -1,0 +1,34 @@
+bun test v1.4.2 (744846f84)
+
+tests/pr-feedback.test.ts:
+(pass) local evidence comments do not trigger themselves, while later edits still enter the queue [0.29ms]
+(pass) only a verified current PR head is ready for human review [0.92ms]
+58 |   ).toBe('excluded');
+59 | });
+60 | 
+61 | test('stacked PRs retain feedback maintenance and integration branches can deliver to main', () => {
+62 |   const stacked = { ...snapshot, baseRefName: 'feat/issue-6' };
+63 |   expect(evaluateFeedback(stacked, 'ZWkang/nodebraid', []).status).toBe('needs-integration');
+                                                                        ^
+error: expect(received).toBe(expected)
+
+Expected: "needs-integration"
+Received: "excluded"
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/spec-delivery-recovery/cflow/tests/pr-feedback.test.ts:63:68)
+(fail) stacked PRs retain feedback maintenance and integration branches can deliver to main [1.83ms]
+(pass) the same failed check requests one repair; a rerun or new head requests new work [0.23ms]
+(pass) addressed review feedback is not repeated, but edits and design questions remain actionable [0.32ms]
+(pass) green CI does not dismiss a human change request or ignore a conflicting base [0.12ms]
+(pass) a handoff cannot omit feedback, invent dispositions, or claim a different request [0.43ms]
+(pass) CI result order does not cause duplicate repair dispatches [0.33ms]
+(pass) an unresolved thread must be revalidated at the new head before automatic resolution [0.14ms]
+(pass) removing opt-in or switching to draft excludes even otherwise actionable feedback [0.02ms]
+(pass) a receipt from another PR or an old head cannot hide current feedback [0.02ms]
+(pass) an incomplete resolved thread cannot hide a newer reply on its next page [0.03ms]
+
+ 11 pass
+ 1 fail
+ 31 expect() calls
+Ran 12 tests across 1 file. [27.00ms]
+

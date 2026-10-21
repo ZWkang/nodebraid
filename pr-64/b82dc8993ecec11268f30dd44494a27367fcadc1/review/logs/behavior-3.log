@@ -1,0 +1,30 @@
+bun test v1.4.2 (744846f84)
+
+tests/local-agent-reconcile.test.ts:
+(pass) merged stacked delivery remains incomplete until its real merge commit reaches fetched main [2748.14ms]
+(pass) missing native relationships and stale default-branch evidence fail explicitly [1579.60ms]
+118 |     f.input.tasks.push(next);
+119 |     f.input.specs[0]!.children[0]!.push({ number: 43 });
+120 |     f.input.specs[0]!.slices.push({ id: 'follow-up', task: 43 });
+121 |     let result = f.invoke();
+122 |     expect(result.status).toBe(0);
+123 |     expect(JSON.parse(result.stdout).frontier).toEqual([42]);
+                                                     ^
+error: expect(received).toEqual(expected)
+
+- [
+-   42,
+- ]
++ undefined
+
+- Expected  - 3
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/spec-delivery-recovery/cflow/tests/local-agent-reconcile.test.ts:123:48)
+(fail) approved task frontier respects native blockers, active owners and explicit execution choices [1594.52ms]
+
+ 2 pass
+ 1 fail
+ 19 expect() calls
+Ran 3 tests across 1 file. [5.95s]
+

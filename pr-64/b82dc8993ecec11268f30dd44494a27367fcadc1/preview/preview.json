@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "8406cc9373ba2d73e7363f347e4d96a624215397",
+    "head": "b82dc8993ecec11268f30dd44494a27367fcadc1",
+    "tree": "2daee1bf5661f546e965872fb4310b84eb364a57",
+    "patch": "e52c29ad692756743772393d1114c16877803ed28819679a66300e0bbb06bf83"
+  },
+  "status": "not-applicable",
+  "limitations": [],
+  "scenes": [],
+  "artifacts": [],
+  "reason": "No changed Examples Application or Canvas runtime source selects a visible scene."
+}

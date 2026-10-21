@@ -1,0 +1,23 @@
+bun test v1.4.2 (744846f84)
+
+tests/local-agent-run.test.ts:
+58 |     tree: sha('d'),
+59 |     localHead: sha('c'),
+60 |     parent: sha('a'),
+61 |   };
+62 |   expect(evaluateVerifiedRun(task, verified, publication, { ...snapshot, baseRefName: 'feat/issue-9' }).status).toBe('needs-integration');
+63 |   expect(evaluateVerifiedRun(task, verified, publication, snapshot).status).toBe('waiting-verification');
+                                                                                 ^
+error: expect(received).toBe(expected)
+
+Expected: "waiting-verification"
+Received: "ready"
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/spec-delivery-recovery/cflow/tests/local-agent-run.test.ts:63:77)
+(fail) a new green head cannot inherit the previous tree, reviews or test evidence [1.49ms]
+
+ 0 pass
+ 1 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [24.00ms]
+
