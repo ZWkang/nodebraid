@@ -2158,6 +2158,129 @@ describe('@nodebraid/runtime-cordis', () => {
     });
   });
 
+  for (const failure of ['missing binding', 'getter error'] as const) {
+    test(`rolls back Owned Resources and Children on Provided Service ${failure}`, async () => {
+      const token = defineService<object>('invalid-provider');
+      const getterError = new Error('provided getter failed');
+      const cleanupError = new Error('rollback cleanup failed');
+      const cleanupOrder: string[] = [];
+      let setupSignal!: AbortSignal;
+      let child!: PluginInstallation;
+      const host = createPluginHost();
+      const consumer = host.install(definePlugin({ requires: { token }, setup() {} }));
+      const installation = host.install(
+        definePlugin({
+          provides: { token },
+          async setup(context) {
+            setupSignal = context.signal;
+            context.own(() => {
+              cleanupOrder.push('first');
+            });
+            child = context.install(
+              definePlugin({
+                setup(childContext) {
+                  childContext.own(() => {
+                    cleanupOrder.push('child');
+                  });
+                },
+              }),
+            );
+            await child.whenActive();
+            context.own(() => {
+              cleanupOrder.push('last');
+              throw cleanupError;
+            });
+            const result = {} as { token: object };
+            if (failure === 'getter error') {
+              Object.defineProperty(result, 'token', {
+                enumerable: true,
+                get() {
+                  throw getterError;
+                },
+              });
+            }
+            return result;
+          },
+        }),
+      );
+
+      const activationError = await installation.whenActive().catch((error: unknown) => error);
+      const unrelated = host.install(definePlugin({ setup() {} }));
+      await unrelated.whenActive();
+      const beforeDisposal = {
+        signalAborted: setupSignal.aborted,
+        cleanupOrder: [...cleanupOrder],
+        child: child.getSnapshot(),
+        parent: installation.getSnapshot(),
+        consumer: consumer.getSnapshot().status,
+      };
+      const disposalError = await installation.dispose().catch((error: unknown) => error);
+      await host.dispose();
+
+      expect(beforeDisposal.signalAborted).toBe(true);
+      expect(beforeDisposal.cleanupOrder).toEqual(['last', 'child', 'first']);
+      expect(beforeDisposal.child).toEqual({ status: 'disposed' });
+      expect(beforeDisposal.parent).toEqual({ status: 'failed', error: activationError });
+      expect(beforeDisposal.consumer).toBe('pending');
+      if (failure === 'getter error') {
+        expect(activationError).toBe(getterError);
+      } else {
+        expect(activationError).toBeInstanceOf(PluginHostError);
+        expect(activationError).toMatchObject({ code: 'CONTRACT_VIOLATION' });
+      }
+      expect(disposalError).toBeInstanceOf(AggregateError);
+      expect(collectAggregateLeaves(disposalError)).toEqual([cleanupError]);
+      expect(cleanupOrder).toEqual(['last', 'child', 'first']);
+    });
+  }
+
+  test('preserves a Provided getter error without inspecting its name after rollback', async () => {
+    const token = defineService<object>('throwing-getter');
+    const getterError = new Error('original provided getter failure');
+    const inspectionError = new Error('unexpected error.name read');
+    let nameReads = 0;
+    let cleaned = 0;
+    let markInspected!: () => void;
+    const inspected = new Promise<void>((resolve) => {
+      markInspected = resolve;
+    });
+    Object.defineProperty(getterError, 'name', {
+      get() {
+        nameReads++;
+        markInspected();
+        throw inspectionError;
+      },
+    });
+    const host = createPluginHost();
+    const installation = host.install(
+      definePlugin({
+        provides: { token },
+        setup(context) {
+          context.own(() => {
+            cleaned++;
+          });
+          return {
+            get token(): object {
+              throw getterError;
+            },
+          };
+        },
+      }),
+    );
+    const result = await Promise.race([
+      installation.whenActive().catch((error: unknown) => error),
+      inspected.then(() => inspectionError),
+    ]);
+    const snapshot = installation.getSnapshot();
+    await host.dispose();
+
+    expect(result === getterError).toBe(true);
+    expect(nameReads).toBe(0);
+    expect(cleaned).toBe(1);
+    expect(snapshot.status).toBe('failed');
+    if (snapshot.status === 'failed') expect(snapshot.error === getterError).toBe(true);
+  });
+
   test('continues cleanup and reports every disposer failure', async () => {
     const firstError = new Error('first cleanup failed');
     const secondError = new Error('second cleanup failed');
