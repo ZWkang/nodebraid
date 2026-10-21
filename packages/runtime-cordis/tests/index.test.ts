@@ -356,26 +356,66 @@ describe('@nodebraid/runtime-cordis', () => {
     });
   }
 
-  test('fails a Provider that returns the same Service Token through duplicate bindings', async () => {
-    const catalog = defineService<{ value: string }>('catalog');
-    const provider = definePlugin({
-      provides: { primary: catalog, duplicate: catalog },
-      setup() {
-        return {
-          primary: { value: 'primary' },
-          duplicate: { value: 'duplicate' },
-        };
-      },
+  for (const firstBinding of ['primary', '']) {
+    test(`fails duplicate bindings after ${JSON.stringify(firstBinding)} before publishing a Service`, async () => {
+      const catalog = defineService<{ value: string }>('catalog');
+      const provider = definePlugin({
+        provides: { [firstBinding]: catalog, duplicate: catalog },
+        setup() {
+          return {
+            [firstBinding]: { value: 'primary' },
+            duplicate: { value: 'duplicate' },
+          };
+        },
+      });
+      const host = createPluginHost();
+      let markConsumerStarted!: () => void;
+      const consumerStarted = new Promise<void>((resolve) => {
+        markConsumerStarted = resolve;
+      });
+      const consumer = host.install(definePlugin({ requires: { catalog }, setup: markConsumerStarted }));
+      const installation = host.install(provider);
+
+      try {
+        const activationError = await Promise.race([
+          installation.whenActive().then(
+            () => undefined,
+            (error: unknown) => error,
+          ),
+          consumerStarted.then(() => new Error('An invalid Provider published a partial Service.')),
+        ]);
+
+        expect(activationError).toBeInstanceOf(PluginHostError);
+        expect(activationError).toMatchObject({ code: 'CONTRACT_VIOLATION' });
+        expect(installation.getSnapshot()).toEqual({ status: 'failed', error: activationError });
+        expect(consumer.getSnapshot().status).toBe('pending');
+      } finally {
+        await host.dispose();
+      }
     });
+  }
+
+  test('allows an empty Binding when its Provided Service Token is unique', async () => {
+    const catalog = defineService<{ value: string }>('catalog');
+    const service = { value: 'empty binding' };
+    let received: { value: string } | undefined;
     const host = createPluginHost();
+    const consumer = host.install(
+      definePlugin({
+        requires: { '': catalog },
+        setup(context) {
+          received = context.services[''];
+        },
+      }),
+    );
+    const provider = host.install(definePlugin({ provides: { '': catalog }, setup: () => ({ '': service }) }));
 
-    const installation = host.install(provider);
-    const activationError = await installation.whenActive().catch((error: unknown) => error);
-
-    expect(activationError).toMatchObject({ code: 'CONTRACT_VIOLATION' });
-    expect(installation.getSnapshot()).toEqual({ status: 'failed', error: activationError });
-
-    await host.dispose();
+    try {
+      await Promise.all([consumer.whenActive(), provider.whenActive()]);
+      expect(received).toBe(service);
+    } finally {
+      await host.dispose();
+    }
   });
 
   test('reserves a Provided Service Token from installation until disposal', async () => {
