@@ -94,6 +94,7 @@ bun run agents:run        # Show prepare/inspect/verify/publication/evaluate usa
 bun run agents:preview --base <sha> --out <empty-dir> [--all] # Capture real Examples evidence
 bun run agents:report <run-dir> <output-dir> # Add complete reviews and declared logs; never overwrite
 bun run agents:publish-evidence prepare <dir> <repository> <pr> <head> # Prepare connector publication
+bun run agents:publish-evidence preflight # CI only: emit eligibility before downloading artifacts
 bun run agents:discovery init queue.json # Explicitly initialize public seam coverage
 bun run agents:discovery sync queue.json # Resume pending seams, even without new commits
 bun run agents:discovery finish queue.json report.json # Record one successful investigation

@@ -129,7 +129,14 @@ bun run agents:publish-evidence <output-dir> <pr-number> <published-head-sha>
 [`Publish PR evidence`](../../.github/workflows/pr-evidence.yml) 通过 `workflow_run`
 接收完成的 Checks。具有写权限的 publisher 只从默认分支 `main` checkout 受信任代码，
 重新读取来源 workflow 的 repository/path/event/head，并找到仍 open 且 head 精确相同的
-唯一 PR，不信任 artifact 自报的 PR 号。下载 artifact 后按数据验证，不执行 PR 脚本或生成的
+唯一 PR，不信任 artifact 自报的 PR 号。下载前先运行只读
+`agents:publish-evidence preflight`，完整读取源 workflow 和 commit 关联 PR 的所有分页。
+源 PR 已关闭或 head 已被替换时，输出明确的 `not-applicable` 原因及 `publish=false`，跳过下载与
+发布，不生成发布回执。仍有当前 PR 时输出 `publish=true`，之后仍须下载、验证并在实际发布时
+重新检查 PR/head；API 读取失败、来源身份错误、多个匹配 PR 和当前 PR 缺失 artifact 仍然失败。
+preflight 只用于 CI，要求既有 `GITHUB_TOKEN`、`GITHUB_REPOSITORY`、`GITHUB_EVENT_PATH` 和
+runner 提供的 `GITHUB_OUTPUT`，不会新增登录或修改权限。
+下载 artifact 后按数据验证，不执行 PR 脚本或生成的
 HTML。这条 CI 路径只接受 preview，不接受 PR 代码提供的独立审查报告；没有已发布报告时，
 PR 区块明确写“独立审查与本地验证报告：未提供”。完整本地报告走前述授权发布路径。
 
