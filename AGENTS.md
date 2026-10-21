@@ -6,6 +6,8 @@
 
 新增需求规格和活跃任务统一记录在 `ZWkang/nodebraid` 的 GitHub Issues：父 Issue 保存规格，子 Issue 保存实现任务，PR 关联对应任务。开始需求整理、拆票、实现或审查前，先读取 [Issue tracker 约定](docs/agents/issue-tracker.md)。`.scratch/` 仅保留历史资料，不再新增规格或维护活跃任务状态。
 
+GitHub 继续作为事实源；完整读取需求/spec 及相关任务后，将只读副本与历史版本保存到 `$CODEX_HOME/local-workflows/nodebraid/issues/`，便于本地查看和归档。副本不回写 GitHub，不作为实时执行资格依据。
+
 ### Domain docs
 
 本仓库使用单一领域上下文。探索代码前，按 [Domain docs 约定](docs/agents/domain.md) 读取根目录 `CONTEXT.md` 和相关 `docs/adr/`。
@@ -34,6 +36,7 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 - `bun run agents:local-check`：另检查本机 ChatGPT CLI 登录；有 API-key 环境变量时明确失败，不切换计费入口。
 - `bun run agents:scan [base-sha]`：在已 fetch 的干净 main worktree 记录固定 SHA 调查范围。
 - `bun run agents:run`：归一化完整 GitHub 上下文，独立准备任务、检查依赖前沿、执行真实检查、绑定发布 tree 和判断当前 head；参数见 `docs/agents/agentic-workflows.md`。
+- `bun run agents:run archive-issue <snapshot.json> <issues-dir>`：保存完整 GitHub Issue 正文与讨论的本地阅读副本和不可覆盖历史版本；输入与默认存放位置见 Issue tracker 约定。
 - `bun run agents:discovery init|sync <queue.json>`：显式初始化或恢复按公共 seam 保存的调查待办；无新提交也保留未检查区域。
 - `bun run agents:discovery finish <queue.json> <report.json>`：只用当前 main 的成功执行报告完成一个待办。
 - `bun run agents:typecheck`：检查本地工作流命令及其共享状态模块的 TypeScript 类型；包含在完整工程类型检查中。

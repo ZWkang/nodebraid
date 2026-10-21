@@ -5,6 +5,40 @@ New requirements, specs and live tasks are tracked in
 GitHub is the source of truth for their content, discussion and status across
 chats and worktrees.
 
+## Local reading and archive copies
+
+After completely reading or reading back a requirement/spec Issue, its parent spec
+and implementation tasks, save each Issue to
+`$CODEX_HOME/local-workflows/nodebraid/issues/<number>/` (normally under `~/.codex/`).
+Use the existing GitHub connector or authenticated client; read the full body and
+all comment pages, including edited comments. Save open and closed Issues alike.
+
+```bash
+bun run agents:run archive-issue snapshot.json ~/.codex/local-workflows/nodebraid/issues
+```
+
+The input is `{ repository: "ZWkang/nodebraid", readAt, issue, comments }`:
+`readAt` is the actual ISO read time; `issue` is the complete connector
+`fetch_issue` result's `structuredContent.issue`, and `comments` is the complete
+`fetch_issue_comments` result's `structuredContent.comments`. Other clients must
+map their fields to this shape without dropping the original body or discussion.
+The Issue's `comments` count must match the full comment array; incomplete reads
+fail before replacing the local copy. Unavailable source timestamps remain null.
+
+`current.md` is the readable copy and `current.json` preserves the source fields.
+`history/<content-hash>.md/.json` retains each distinct version, including closed
+Issues. Re-reading unchanged content refreshes the current read time without
+adding a history version. Source URLs, available update times and the read time
+remain visible. Preserve the full body and comments verbatim; do not summarize
+away acceptance criteria or decisions.
+
+These are generated, read-only copies for browsing and archiving, not another
+tracker. Never use them to infer current execution eligibility or push local
+edits back to GitHub. Refresh GitHub before acting; if it cannot be read, report
+the failure and keep the previous copy explicitly stale. A later successful
+archive replaces the generated current copy but preserves history. Store copies
+outside disposable worktrees and do not commit them to the source repository.
+
 Existing `.scratch/` specs and tickets remain historical records. Do not create
 new specs or maintain duplicate live task status there. When resuming historical
 work, check current code and existing GitHub issues/PRs before creating or linking
@@ -109,13 +143,13 @@ require repeated approval of the same scope.
 ## When a skill says "publish to the issue tracker"
 
 Create or update the corresponding GitHub issue: a parent for a spec, or a child
-for an implementation task. Return its URL. Do not write a new `.scratch/` spec
+for an implementation task. Read it back, refresh its local archive and return its URL. Do not write a new `.scratch/` spec
 or ticket.
 
 ## When a skill says "fetch the relevant ticket"
 
 Read the GitHub issue by number or URL, including its full context and linked
-parent spec. An explicitly referenced legacy local file can still be read as
+parent spec, then refresh their local archive copies. An explicitly referenced legacy local file can still be read as
 historical evidence.
 
 ## Native relationships
