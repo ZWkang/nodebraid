@@ -153,6 +153,39 @@ test('Paste rejects foreign decoded values and incomplete mapping without a Comm
   await mappingHarness.host.dispose();
 });
 
+test('Paste rejects a decoded Fragment whose normalized Node collection is empty', async () => {
+  const nodes = new Proxy([], {
+    get(target, key, receiver) {
+      return key === 'length' ? 0.5 : Reflect.get(target, key, receiver);
+    },
+  });
+  const harness = await createHarness({
+    transport: { readText: async () => 'empty-fragment', writeText: async () => undefined },
+    codec: {
+      encode: () => '',
+      decode: () => ({
+        type: 'nodebraid.canvas-fragment',
+        nodes,
+        edges: [],
+        selection: { nodeIds: [], edgeIds: [] },
+      }),
+    },
+    materializeIds: () => ({ nodes: [], edges: [] }),
+  });
+  const before = harness.kernel.read().snapshot;
+
+  try {
+    await expect(harness.commands.execute(pasteClipboardCommand, undefined)).rejects.toMatchObject({
+      domain: 'plugin.clipboard',
+      code: 'INVALID_FRAGMENT',
+      cause: expect.objectContaining({ domain: 'canvas-fragment', code: 'INVALID_FRAGMENT' }),
+    });
+    expect(harness.kernel.read().snapshot).toBe(before);
+  } finally {
+    await harness.host.dispose();
+  }
+});
+
 test('Paste wraps a Kernel validation rejection as COMMIT_FAILED without partial state', async () => {
   const source = nodeId('overflow-source');
   const pasted = nodeId('overflow-pasted');

@@ -8,8 +8,8 @@ export function acceptCanvasFragment(value: unknown): CanvasFragment {
   const record = requireRecord(value, ['type', 'nodes', 'edges', 'selection']);
   if (read(record, 'type') !== 'nodebraid.canvas-fragment') throwInvalid('Canvas Fragment type is invalid.');
   const rawNodes = requireArray(read(record, 'nodes'), 'Canvas Fragment nodes must be an array.');
-  if (rawNodes.length === 0) throwInvalid('Canvas Fragment must contain at least one Node.');
   const nodes = mapArrayValues(rawNodes, acceptNode).sort((left, right) => compareIds(left.id, right.id));
+  if (nodes.length === 0) throwInvalid('Canvas Fragment must contain at least one Node.');
   const nodeIds = new Set<NodeId>();
   for (const node of nodes) {
     if (nodeIds.has(node.id)) throwInvalid('Canvas Fragment Node IDs must be unique.');
