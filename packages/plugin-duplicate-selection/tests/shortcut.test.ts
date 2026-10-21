@@ -4,7 +4,7 @@ import type { InteractionProjection } from '@nodebraid/interaction-api';
 import { nodeId } from '@nodebraid/kernel';
 import { commandPlugin } from '@nodebraid/plugin-command';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
-import { interactionPlugin } from '@nodebraid/plugin-interaction';
+import { defineInteractionShortcut, interactionPlugin } from '@nodebraid/plugin-interaction';
 import { portPlugin } from '@nodebraid/plugin-port';
 import { createRendererPlugin } from '@nodebraid/plugin-renderer';
 import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/plugin-session';
@@ -21,6 +21,49 @@ import type { SessionSnapshot } from '@nodebraid/session-api';
 import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
 import { createDuplicateSelectionPlugin, createDuplicateSelectionShortcutPlugin } from '../src';
+
+test('the Duplicate Shortcut factory captures its option reference once', () => {
+  const shortcut = defineInteractionShortcut({
+    code: 'KeyK',
+    modifierAlternatives: [{ alt: false, control: true, meta: false, shift: false }],
+  });
+  let reads = 0;
+  const plugin = createDuplicateSelectionShortcutPlugin({
+    get shortcut() {
+      return ++reads === 1 ? shortcut : undefined;
+    },
+  });
+  expect(plugin).toBeDefined();
+  expect(reads).toBe(1);
+});
+
+test('the Duplicate Shortcut factory preserves captured invalid values and getter failures', () => {
+  const shortcut = defineInteractionShortcut({
+    code: 'KeyK',
+    modifierAlternatives: [{ alt: false, control: true, meta: false, shift: false }],
+  });
+  let reads = 0;
+  expect(() =>
+    createDuplicateSelectionShortcutPlugin({
+      get shortcut() {
+        return ++reads === 1 ? (null as never) : shortcut;
+      },
+    }),
+  ).toThrow(expect.objectContaining({ domain: 'plugin.duplicate-selection', code: 'INVALID_CONFIG' }));
+  expect(reads).toBe(1);
+  const failure = new Error('original shortcut option failure');
+  let received: unknown;
+  try {
+    createDuplicateSelectionShortcutPlugin({
+      get shortcut(): never {
+        throw failure;
+      },
+    });
+  } catch (error) {
+    received = error;
+  }
+  expect(received).toBe(failure);
+});
 
 test('the default Duplicate Shortcut invokes the public behavior through Mod+D', async () => {
   const sourceId = nodeId('shortcut-source');

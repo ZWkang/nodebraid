@@ -19,7 +19,7 @@ import {
 } from '@nodebraid/plugin-session';
 import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
-import { createDuplicateSelectionPlugin, duplicateSelectionCommand } from '../src';
+import { createDuplicateSelectionPlugin, duplicateSelectionCommand, type DuplicateIdMaterializer } from '../src';
 
 test('Duplicate Selection factories reject malformed config structurally', () => {
   expect(() =>
@@ -70,6 +70,194 @@ test('Duplicate Selection copies the current Node and selects its duplicate as o
   expect(runtime.session.getSnapshot().selection).toEqual({ nodeIds: [duplicateId], edgeIds: [] });
   expect(runtime.history.getSnapshot()).toEqual({ canUndo: true, canRedo: false });
   await runtime.host.dispose();
+});
+
+test('Duplicate Selection captures the validated materializer for execution', async () => {
+  const sourceId = nodeId('captured-materializer-source');
+  const duplicateId = nodeId('captured-materializer-copy');
+  let reads = 0;
+  let materializations = 0;
+  const materializeIds = () => {
+    materializations++;
+    return { nodes: [{ sourceId, duplicateId }], edges: [] };
+  };
+  const runtime = await activateRuntime(
+    createDuplicateSelectionPlugin({
+      get materializeIds() {
+        return ++reads === 1 ? materializeIds : (null as never);
+      },
+    }),
+  );
+  runtime.kernel.transact((transaction) => {
+    transaction.nodes.add({ id: sourceId, type: 'task', position: { x: 10, y: 20 }, data: null });
+  });
+  runtime.session.setSelection({ nodeIds: [sourceId], edgeIds: [] });
+
+  try {
+    await expect(runtime.commands.execute(duplicateSelectionCommand, undefined)).resolves.toMatchObject({
+      changeSet: { revision: 2, commandId: duplicateSelectionCommand.id },
+    });
+    expect(runtime.kernel.read().query.getNode(duplicateId)?.position).toEqual({ x: 34, y: 44 });
+    expect({ reads, materializations }).toEqual({ reads: 1, materializations: 1 });
+  } finally {
+    await runtime.host.dispose();
+  }
+});
+
+test('Duplicate Selection captures the finite offset coordinates accepted at creation', async () => {
+  const sourceId = nodeId('captured-offset-source');
+  const duplicateId = nodeId('captured-offset-copy');
+  let xReads = 0;
+  let yReads = 0;
+  const offset = {
+    get x() {
+      return ++xReads === 1 ? 5 : Number.NaN;
+    },
+    get y() {
+      return ++yReads === 1 ? 6 : Number.POSITIVE_INFINITY;
+    },
+  };
+  const runtime = await activateRuntime(
+    createDuplicateSelectionPlugin({
+      materializeIds: () => ({ nodes: [{ sourceId, duplicateId }], edges: [] }),
+      offset,
+    }),
+  );
+  runtime.kernel.transact((transaction) => {
+    transaction.nodes.add({ id: sourceId, type: 'task', position: { x: 10, y: 20 }, data: null });
+  });
+  runtime.session.setSelection({ nodeIds: [sourceId], edgeIds: [] });
+
+  try {
+    await expect(runtime.commands.execute(duplicateSelectionCommand, undefined)).resolves.toBeDefined();
+    expect(runtime.kernel.read().query.getNode(duplicateId)?.position).toEqual({ x: 15, y: 26 });
+    expect({ xReads, yReads, inputFrozen: Object.isFrozen(offset) }).toEqual({
+      xReads: 1,
+      yReads: 1,
+      inputFrozen: false,
+    });
+  } finally {
+    await runtime.host.dispose();
+  }
+});
+
+test('Duplicate Selection captures its offset reference and retains an explicit zero copy', async () => {
+  const sourceId = nodeId('offset-reference-source');
+  const duplicateId = nodeId('offset-reference-copy');
+  const offset = { x: 0, y: 0 };
+  let reads = 0;
+  const plugin = createDuplicateSelectionPlugin({
+    materializeIds: () => ({ nodes: [{ sourceId, duplicateId }], edges: [] }),
+    get offset() {
+      return ++reads === 1 ? offset : (null as never);
+    },
+  });
+  offset.x = 99;
+  offset.y = 99;
+  const runtime = await activateRuntime(plugin);
+  runtime.kernel.transact((transaction) => {
+    transaction.nodes.add({ id: sourceId, type: 'task', position: { x: 10, y: 20 }, data: null });
+  });
+  runtime.session.setSelection({ nodeIds: [sourceId], edgeIds: [] });
+
+  try {
+    await expect(runtime.commands.execute(duplicateSelectionCommand, undefined)).resolves.toBeDefined();
+    expect(runtime.kernel.read().query.getNode(duplicateId)?.position).toEqual({ x: 10, y: 20 });
+    expect({ reads, inputFrozen: Object.isFrozen(offset) }).toEqual({ reads: 1, inputFrozen: false });
+  } finally {
+    await runtime.host.dispose();
+  }
+});
+
+test('Duplicate Selection preserves validation short circuits before later option reads', () => {
+  let materializerReads = 0;
+  let offsetReads = 0;
+  const options = {
+    get materializeIds(): DuplicateIdMaterializer {
+      materializerReads++;
+      return null as never;
+    },
+    get offset(): never {
+      offsetReads++;
+      throw new Error('Invalid materializer must fail before reading offset.');
+    },
+  };
+  expect(() => createDuplicateSelectionPlugin(options)).toThrow(expect.objectContaining({ code: 'INVALID_CONFIG' }));
+  expect({ materializerReads, offsetReads }).toEqual({ materializerReads: 1, offsetReads: 0 });
+  let yReads = 0;
+  expect(() =>
+    createDuplicateSelectionPlugin({
+      materializeIds: () => ({ nodes: [], edges: [] }),
+      offset: {
+        x: Number.NaN,
+        get y(): number {
+          yReads++;
+          throw new Error('Invalid x must fail before reading y.');
+        },
+      },
+    }),
+  ).toThrow(expect.objectContaining({ code: 'INVALID_CONFIG' }));
+  expect(yReads).toBe(0);
+  let unknownFieldReads = 0;
+  expect(() =>
+    createDuplicateSelectionPlugin({
+      extra: true,
+      get materializeIds(): DuplicateIdMaterializer {
+        unknownFieldReads++;
+        throw new Error('Unknown field must fail first.');
+      },
+    } as never),
+  ).toThrow(expect.objectContaining({ code: 'INVALID_CONFIG' }));
+  expect(unknownFieldReads).toBe(0);
+});
+
+test('Duplicate Selection preserves original option getter failures', () => {
+  const failure = new Error('original option read failure');
+  const valid = () => ({ nodes: [], edges: [] });
+  const attempts = [
+    () =>
+      createDuplicateSelectionPlugin({
+        get materializeIds(): never {
+          throw failure;
+        },
+      }),
+    () =>
+      createDuplicateSelectionPlugin({
+        materializeIds: valid,
+        get offset(): never {
+          throw failure;
+        },
+      }),
+    () =>
+      createDuplicateSelectionPlugin({
+        materializeIds: valid,
+        offset: {
+          get x(): number {
+            throw failure;
+          },
+          y: 0,
+        },
+      }),
+    () =>
+      createDuplicateSelectionPlugin({
+        materializeIds: valid,
+        offset: {
+          x: 0,
+          get y(): number {
+            throw failure;
+          },
+        },
+      }),
+  ];
+  for (const attempt of attempts) {
+    let received: unknown;
+    try {
+      attempt();
+    } catch (error) {
+      received = error;
+    }
+    expect(received).toBe(failure);
+  }
 });
 
 test('Duplicate Selection remaps nested Nodes, ports, self-loops, and parallel internal Edges only', async () => {

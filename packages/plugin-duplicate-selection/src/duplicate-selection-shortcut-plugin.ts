@@ -42,9 +42,10 @@ function acceptOptions(options: CreateDuplicateSelectionShortcutPluginOptions): 
       );
     }
   }
-  if (options.shortcut === undefined) return defaultShortcut;
+  const shortcut = options.shortcut;
+  if (shortcut === undefined) return defaultShortcut;
   try {
-    return defineInteractionShortcut(options.shortcut);
+    return defineInteractionShortcut(shortcut);
   } catch (error) {
     if (error instanceof InteractionError && error.code === 'INVALID_SHORTCUT') {
       throw new DuplicateSelectionError(

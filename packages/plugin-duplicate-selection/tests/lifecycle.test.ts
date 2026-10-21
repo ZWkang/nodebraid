@@ -22,8 +22,12 @@ test('Duplicate Selection registration follows dependency loss, reactivation, an
       sessions.push(context.services.session);
     },
   });
+  let materializerReads = 0;
+  const materializeIds = () => ({ nodes: [{ sourceId, duplicateId }], edges: [] });
   const behaviorPlugin = createDuplicateSelectionPlugin({
-    materializeIds: () => ({ nodes: [{ sourceId, duplicateId }], edges: [] }),
+    get materializeIds() {
+      return ++materializerReads === 1 ? materializeIds : (null as never);
+    },
   });
   const host = createPluginHost();
   const sessionInstallation = host.install(sessionPlugin);
@@ -59,6 +63,7 @@ test('Duplicate Selection registration follows dependency loss, reactivation, an
     changeSet: { commandId: duplicateSelectionCommand.id },
   });
   expect(currentSession.getSnapshot().selection).toEqual({ nodeIds: [duplicateId], edgeIds: [] });
+  expect(materializerReads).toBe(1);
 
   await behavior.dispose();
   await expect(commands.execute(duplicateSelectionCommand, undefined)).rejects.toMatchObject({
