@@ -240,6 +240,13 @@ export class CordisPluginInstallation implements PluginInstallation {
 
   dispose(): Promise<void> {
     if (!this.#disposal) {
+      let completeDisposal!: () => void;
+      let failDisposal!: (error: unknown) => void;
+      // Cache before abort listeners can synchronously re-enter dispose().
+      this.#disposal = new Promise<void>((resolve, reject) => {
+        completeDisposal = resolve;
+        failDisposal = reject;
+      });
       this.#disposeRequested = true;
       this.#rejectWaiters(this.#disposedError());
       this.#currentActivation?.controller.abort();
@@ -249,7 +256,7 @@ export class CordisPluginInstallation implements PluginInstallation {
           // The cached error is exposed after Cordis settles the Fiber below.
         });
       }
-      this.#disposal = Promise.resolve()
+      void Promise.resolve()
         .then(() => this.#fiber!.dispose())
         .then(async () => {
           try {
@@ -280,7 +287,8 @@ export class CordisPluginInstallation implements PluginInstallation {
             }
             throw error;
           },
-        );
+        )
+        .then(completeDisposal, failDisposal);
     }
     return this.#disposal;
   }

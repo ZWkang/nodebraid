@@ -127,12 +127,19 @@ class CordisPluginHost implements PluginHost {
 
   dispose(): Promise<void> {
     if (!this.#disposal) {
+      let completeDisposal!: () => void;
+      let failDisposal!: (error: unknown) => void;
+      // Cache before diagnostics or child abort listeners can re-enter dispose().
+      this.#disposal = new Promise<void>((resolve, reject) => {
+        completeDisposal = resolve;
+        failDisposal = reject;
+      });
       this.#closed = true;
       this.#diagnostics.emit({
         name: runtimeDiagnosticEvents.hostDisposing,
         level: 'debug',
       });
-      this.#disposal = (async () => {
+      void (async () => {
         const results = await Promise.allSettled(
           [...this.#rootInstallations].map((installation) => installation.dispose()),
         );
@@ -148,7 +155,7 @@ class CordisPluginHost implements PluginHost {
           name: runtimeDiagnosticEvents.hostDisposed,
           level: 'info',
         });
-      })();
+      })().then(completeDisposal, failDisposal);
     }
     return this.#disposal;
   }
