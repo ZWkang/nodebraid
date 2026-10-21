@@ -271,20 +271,31 @@ export function replaceEvidenceBlock(body: string, block: string): string {
   return body.slice(0, begin) + block + body.slice(end + END.length);
 }
 
-export function resolveEvidencePullRequest(
+export function findEvidencePullRequest(
   pulls: { number: number; state: string; head: { sha: string }; base: { repo: { full_name: string } } }[],
   repository: string,
   head: string,
-): number {
+): number | undefined {
   const matching = pulls.filter(
     (pr) => pr.state === 'open' && pr.head.sha === head && pr.base.repo.full_name === repository,
   );
+  if (matching.length === 0) return undefined;
   assert.equal(
     matching.length,
     1,
     'Expected exactly one open PR at the producer head; refuse stale or ambiguous evidence',
   );
   return matching[0]!.number;
+}
+
+export function resolveEvidencePullRequest(
+  pulls: Parameters<typeof findEvidencePullRequest>[0],
+  repository: string,
+  head: string,
+): number {
+  const pr = findEvidencePullRequest(pulls, repository, head);
+  assert.ok(pr !== undefined, 'Expected exactly one open PR at the producer head; refuse stale or ambiguous evidence');
+  return pr;
 }
 
 interface PullRequest {

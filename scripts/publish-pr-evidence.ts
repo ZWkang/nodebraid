@@ -1,8 +1,14 @@
 import assert from 'node:assert/strict';
-import { readFile, writeFile } from 'node:fs/promises';
+import { appendFile, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
-import { loadEvidenceBundle, publishEvidence, renderEvidenceBlock, resolveEvidencePullRequest } from './pr-evidence';
+import {
+  findEvidencePullRequest,
+  loadEvidenceBundle,
+  publishEvidence,
+  renderEvidenceBlock,
+  resolveEvidencePullRequest,
+} from './pr-evidence';
 
 const arguments_ = process.argv.slice(2);
 if (arguments_[0] === 'prepare') {
@@ -76,6 +82,24 @@ if (!prArgument) {
     const batch = (await response.json()) as typeof pulls;
     pulls.push(...batch);
     if (batch.length < 100) break;
+  }
+  if (directory === 'preflight') {
+    const candidate = findEvidencePullRequest(pulls, repository, head);
+    assert.ok(
+      candidate === undefined || (Number.isSafeInteger(candidate) && candidate > 0),
+      'Invalid source PR number',
+    );
+    const output = process.env.GITHUB_OUTPUT;
+    assert.ok(output, 'Evidence preflight requires GITHUB_OUTPUT');
+    await appendFile(output, `publish=${candidate !== undefined}\n`);
+    console.log(
+      JSON.stringify(
+        candidate === undefined
+          ? { status: 'not-applicable', reason: 'no-open-current-head-pr', runId: id, head }
+          : { status: 'eligible', runId: id, head, pr: candidate },
+      ),
+    );
+    process.exit(0);
   }
   pr = resolveEvidencePullRequest(pulls, repository, head);
   previewOnly = true;

@@ -25,13 +25,20 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.2.19
+      - name: Check evidence producer eligibility
+        id: producer
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bun scripts/publish-pr-evidence.ts preflight
       - uses: actions/download-artifact@v4
+        if: steps.producer.outputs.publish == 'true'
         with:
           name: pr-evidence
           path: evidence
           github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
       - name: Publish current-head evidence
+        if: steps.producer.outputs.publish == 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: bun scripts/publish-pr-evidence.ts evidence

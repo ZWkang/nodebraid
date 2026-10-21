@@ -34,6 +34,7 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 - `bun run agents:preview --base <sha> --out <empty-dir> [--all]`：在干净提交上采集 Examples Application 场景、截图、录屏与 manifest，失败证据也保留。
 - `bun run agents:report <run-dir> <output-dir>`：生成绑定发布 head 的完整审查/验证报告和声明日志；可追加到同一 preview 目录，只创建新文件。
 - `bun run agents:publish-evidence prepare <dir> <repository> <pr> <head>`：生成连接器发布计划；已有 `GITHUB_TOKEN` 和 `GITHUB_REPOSITORY` 时，使用 `bun run agents:publish-evidence <dir> <pr> <head>` 实际发布并回读。
+- `bun run agents:publish-evidence preflight`：CI 下载 artifact 前只读检查源 PR 资格；已关闭或过期 head 明确记录 `not-applicable` 并禁用发布，读取或身份错误仍失败。
 - `bun test tests/pr-feedback.test.ts`：验证 PR 当前 head 的 CI／review 状态、反馈去重和交接校验。
 - `bun test tests/defect-scan.test.ts`：验证主动调查的固定 SHA 和成功运行基线。
 
