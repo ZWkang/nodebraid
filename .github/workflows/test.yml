@@ -6,11 +6,16 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v7
         with:
           node-version: 22.13.0
@@ -21,3 +26,34 @@ jobs:
       - run: bun run agents:check
       - run: bunx agent-browser install --with-deps
       - run: bun run check
+
+  preview:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.13.0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.19
+      - run: bun install --frozen-lockfile
+      - run: bunx agent-browser install --with-deps
+      - name: Install the recording encoder
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Capture changed Examples behavior
+        env:
+          EVIDENCE_BASE: ${{ github.event.pull_request.base.sha }}
+        run: bun run agents:preview --base "$EVIDENCE_BASE" --out .tmp/pr-evidence
+      - name: Preserve evidence, including failed scenarios
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-evidence
+          path: .tmp/pr-evidence
+          if-no-files-found: error

@@ -91,6 +91,9 @@ bun run agents:scan        # Prepare a main-snapshot investigation
 bun run agents:scan <sha>  # Prepare changes since the last completed investigation
 bun run agents:typecheck  # Type-check the executable local workflow
 bun run agents:run        # Show prepare/inspect/verify/publication/evaluate usage
+bun run agents:preview --base <sha> --out <empty-dir> [--all] # Capture real Examples evidence
+bun run agents:report <run-dir> <output-dir> # Add complete reviews and declared logs; never overwrite
+bun run agents:publish-evidence prepare <dir> <repository> <pr> <head> # Prepare connector publication
 bun run agents:discovery init queue.json # Explicitly initialize public seam coverage
 bun run agents:discovery sync queue.json # Resume pending seams, even without new commits
 bun run agents:discovery finish queue.json report.json # Record one successful investigation
@@ -105,6 +108,22 @@ and actual remote publication. New heads need fresh verification. The persistent
 discovery queue retains unexamined areas instead of treating a main checkpoint as
 complete repository coverage. Command input formats and recovery are documented
 in [Agentic workflows](./docs/agents/agentic-workflows.md#执行命令和恢复).
+
+The project [verify-nodebraid](./.agents/skills/verify-nodebraid/SKILL.md) skill drives
+the production Examples Application with the pinned `agent-browser`. The
+[PR evidence workflow](./docs/agents/pr-evidence.md) publishes full review reports,
+declared verification logs, screenshots and recordings under the current PR head.
+Run preview first, then generate the report into the same output directory. With
+existing `GITHUB_TOKEN` and `GITHUB_REPOSITORY`, `bun run agents:publish-evidence
+<dir> <pr> <head>` publishes directly; otherwise use the prepared plan with connected
+GitHub tools. Preparing files does not publish them.
+
+The PR preview job uses read-only permissions. The `workflow_run` publisher runs
+trusted default-branch code and accepts preview data, not independent review reports
+from PR code. It starts triggering only after the workflow reaches the default
+branch. Before reporting ready, record the actual report URL, source head and
+evidence commit; `agents:run evaluate` does not yet check that publication receipt.
+This does not add a model API, another scheduler, or changes to branch protection.
 
 ## Stack
 

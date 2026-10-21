@@ -28,11 +28,12 @@ export function createAgentBrowserRunner(
   executable: string,
   repositoryRoot: string,
   session: string,
+  environment?: Readonly<Record<string, string>>,
 ): (arguments_: readonly string[]) => Promise<string> {
   return async (arguments_) => {
     const process = Bun.spawn([executable, '--session', session, ...arguments_], {
       cwd: repositoryRoot,
-      env: processEnv(),
+      env: environment ?? processEnv(),
       stdout: 'pipe',
       stderr: 'pipe',
     });

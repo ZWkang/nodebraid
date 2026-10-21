@@ -2,6 +2,9 @@
   "extends": "./tsconfig.base.json",
   "include": [
     "scripts/local-agent*.ts",
+    "scripts/*evidence.ts",
+    "scripts/*preview*.ts",
+    "scripts/verification-report.ts",
     "scripts/github-feedback.ts",
     "scripts/discovery*.ts",
     "scripts/pr-feedback.ts",

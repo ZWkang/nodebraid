@@ -12,7 +12,7 @@ flowchart TD
   C -->|范围明确| D[拆任务、TDD、Ponytail full]
   C -->|需要决策| E[返回 grill / spec / docs]
   D --> F[独立 Standards + Spec review、完整检查]
-  F --> G[pr + show-me 发布到原 PR]
+  F --> G[pr + show-me、完整报告和界面证据发布到原 PR]
   G --> H[GitHub CI / review]
   H -->|明确问题| D
   H -->|当前 head 已验证| I[用户最终审阅和合并]
@@ -32,7 +32,8 @@ bun run agents:local-check  # 另检查本机 ChatGPT CLI 登录及 API-key 环�
 bun test tests/agent-issue.test.ts tests/pr-feedback.test.ts tests/defect-scan.test.ts
 ```
 
-GitHub CI 只执行第一个命令，不需要本机登录、OpenAI API key 或发布 PAT。
+GitHub CI 的本地协议检查只执行第一个命令，不需要本机登录或 OpenAI API key。
+证据 publisher 使用 Actions 自带的 GitHub token，不要求另配发布 PAT。
 `agents:check` 只验证仓库执行契约，不能证明调度器已启用或某个任务已经完成。
 本地登录检查也不证明还有多少剩余额度，实际限额错误仍需保留。
 
@@ -53,6 +54,10 @@ GitHub 操作优先使用本地 Codex 已连接的 GitHub 工具；已登录的 
 Standards 同时应用 `ponytail-review`，Spec 独立核对原始要求。不能因精简而删除必要的
 错误处理、公共 seam 或 ADR 约束。使用同一份包含新文件的完整 patch，记录 base、tree、
 patch digest、命令与结果。修正后复验，详细轨迹保留在运行记录中。
+
+可见 Canvas 变更与场景维护使用项目 [verify-nodebraid](../../.agents/skills/verify-nodebraid/SKILL.md)。
+完整审查报告、行为证据与真实截图/录屏通过 [PR 证据流程](./pr-evidence.md) 发布到当前 head。
+该流程沿用现有订阅执行与 GitHub CI，不增加模型 API 或调度器。
 
 Issue 标签路由见 [issue-tracker.md](./issue-tracker.md)。只有实际复现且预期已明确的缺陷，
 或已确认的 spec 可以实现；风格问题、缺少测试、新需求和不明确的预期不能冒充 bug。
@@ -128,6 +133,14 @@ source 没变。失败结果保存在 `verification.json`，原始日志不覆�
 本轮 expected remote head；不能仅在后续 merge parent 中找到旧 base 就接受发布。
 API 生成的远端 SHA 可以不同，但一份 run 不得绑定第二次发布。先记录发布再调整本地 ref。
 
+证据命令为 `agents:preview --base <sha> --out <empty-dir> [--all]`、
+`agents:report <run-dir> <output-dir>` 与
+`agents:publish-evidence prepare <output-dir> <repository> <pr> <head>`。
+先采集 preview，再将 report 生成到同一目录；report 只创建新文件。`prepare` 只生成连接器
+发布计划；已有 `GITHUB_TOKEN` / `GITHUB_REPOSITORY` 的环境可直接执行
+`agents:publish-evidence <output-dir> <pr> <head>`。参数、行为证据 schema、连接器操作和
+CI 权限边界见 [PR 证据](./pr-evidence.md)。
+
 `normalize` 的完整输入契约为 `scripts/github-feedback.ts` 的 `GitHubFeedback`：
 `comments`、`reviews` 为每页 100 条的 REST page 数组，包含最后短页（恰好 100 条时
 还要读空页）；`threads` 包含外层页和已读完 cursor 的评论；CI arrays 匹配报告总数。
@@ -137,6 +150,10 @@ API 生成的远端 SHA 可以不同，但一份 run 不得绑定第二次发布
 才更新有效决定。`published-feedback.json` 仅含已发布且 key/digest 精确
 匹配的自己评论。新评论、编辑、resolved thread 的新回复和人类 changes requested
 都进入判断。新 head 返回 `waiting-verification`，不会把旧 tree、测试和 review 改贴到新 SHA。
+
+`evaluate` 尚未自动检查完整报告和媒体的发布回执。每次交付 ready 前，执行者还必须实际
+发布并回读当前 head 的报告，记录报告 URL、source head 与 evidence commit；不能把
+`evaluate` 的 ready 或 CI preview 上传成功当成这一步已完成。
 
 调查队列的命令为：
 
@@ -182,6 +199,11 @@ evidence 文件再原子更新队列；相同报告恢复不会重复完成任�
 本地执行层测试使用隔离 Git 仓库和真实子进程，覆盖检查失败/恢复、task 不可重绑、
 新 head、分页和依赖前沿。这些 fixture 结果与下一次真实远端 CI/review 修复验收分开记录；
 未真实触发的线上分支继续标为 unverified。
+
+新增 `Checks / preview` 在确切 PR head 上采集证据；`workflow_run` publisher 只从受信任
+main 执行，并只接受 PR artifact 的 preview 数据。完整独立审查报告通过本地授权路径发布。
+新 publisher 合入默认分支后才会触发；未读到真实 run、证据分支和 PR 回读结果前，不报告
+远端部署或端到端验收完成。此交付不修改独立 Issue #10 的 GitHub 合并门禁。
 
 在 Codex Scheduled 中关闭这条本地自动化可停止新调度，正在运行的 turn 另行取消。
 GitHub CI 不依赖这台机器；已有 GitHub secrets 不被自动删除，但迁移后不再被 AI 工作流使用。
