@@ -42,6 +42,9 @@
   },
   "scripts": {
     "agents:check": "bun run scripts/check-agent-workflows.ts",
+    "agents:preview": "bun run scripts/collect-preview.ts",
+    "agents:report": "bun run scripts/verification-report.ts",
+    "agents:publish-evidence": "bun run scripts/publish-pr-evidence.ts",
     "check": "bun run lint && bun run typecheck && bun run format:check && bun run test && bun run test:browser && bun run example:check && bun run build && bun run docs:check",
     "dev": "bun build ./src/index.ts --outdir ./dist --target bun --watch",
     "docs:build": "NODEBRAID_DOCS_BASE=/nodebraid/ vitepress build website",

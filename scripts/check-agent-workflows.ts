@@ -11,6 +11,10 @@ const requiredFiles = [
   'scripts/github-feedback.ts',
   'scripts/discovery.ts',
   'scripts/discovery-queue.ts',
+  'scripts/collect-preview.ts',
+  'scripts/pr-evidence.ts',
+  'scripts/verification-report.ts',
+  '.agents/skills/verify-nodebraid/SKILL.md',
   ...['tdd', 'code-review', 'ponytail', 'ponytail-review', 'pr', 'show-me'].map(
     (name) => `.agents/skills/${name}/SKILL.md`,
   ),

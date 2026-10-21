@@ -22,6 +22,8 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 
 实现阶段应用项目级 `ponytail` 的 full 模式，先读真实调用链并优先复用，再完成最小充分改动。Standards review 同时使用 `ponytail-review`；按已确认的 spec、ADR 和公共契约判断简化，不删必要的错误处理、验证或框架 seam。
 
+可见 Canvas 变更和浏览器验证维护使用项目级 [verify-nodebraid](.agents/skills/verify-nodebraid/SKILL.md)，通过锁定的 `agent-browser` 采集真实证据。完整审查报告与媒体的生成、连接器发布和权限边界见 [PR 证据](docs/agents/pr-evidence.md)；每次 ready 前必须实际发布并回读当前 head 的报告，保留报告 URL、source head 与 evidence commit。`agents:run evaluate` 尚未自动校验展示回执。
+
 - `bun run agents:check`：检查本地工作流协议、skills 和残留的托管 API 执行入口；CI 在完整工程检查前执行。
 - `bun run agents:local-check`：另检查本机 ChatGPT CLI 登录；有 API-key 环境变量时明确失败，不切换计费入口。
 - `bun run agents:scan [base-sha]`：在已 fetch 的干净 main worktree 记录固定 SHA 调查范围。
@@ -29,6 +31,9 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 - `bun run agents:discovery init|sync <queue.json>`：显式初始化或恢复按公共 seam 保存的调查待办；无新提交也保留未检查区域。
 - `bun run agents:discovery finish <queue.json> <report.json>`：只用当前 main 的成功执行报告完成一个待办。
 - `bun run agents:typecheck`：检查本地工作流命令及其共享状态模块的 TypeScript 类型；包含在完整工程类型检查中。
+- `bun run agents:preview --base <sha> --out <empty-dir> [--all]`：在干净提交上采集 Examples Application 场景、截图、录屏与 manifest，失败证据也保留。
+- `bun run agents:report <run-dir> <output-dir>`：生成绑定发布 head 的完整审查/验证报告和声明日志；可追加到同一 preview 目录，只创建新文件。
+- `bun run agents:publish-evidence prepare <dir> <repository> <pr> <head>`：生成连接器发布计划；已有 `GITHUB_TOKEN` 和 `GITHUB_REPOSITORY` 时，使用 `bun run agents:publish-evidence <dir> <pr> <head>` 实际发布并回读。
 - `bun test tests/pr-feedback.test.ts`：验证 PR 当前 head 的 CI／review 状态、反馈去重和交接校验。
 - `bun test tests/defect-scan.test.ts`：验证主动调查的固定 SHA 和成功运行基线。
 

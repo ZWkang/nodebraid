@@ -104,8 +104,9 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    with the implementer's self-assessment.
    Use `agents:run inspect <run-dir>` to give both reviewers the same full
    head/tree/raw-patch digest. Save their actual reports with those identities.
-3. Run affected tests and the full `bun run check`. Use real browser evidence for
-   visual changes and the documented behavior-specific validation matrix. Failures
+3. Run affected tests and the full `bun run check`. For visible Canvas changes,
+   use the project `verify-nodebraid` skill and its feature map to collect real
+   `agent-browser` evidence. Follow the documented behavior-specific validation matrix. Failures
    prevent a ready PR; never weaken assertions, change acceptance criteria, add
    fake success or silently degrade behavior to obtain green checks.
    `agents:run verify <run-dir> <reviews.json> <decisions.json>` runs the real
@@ -115,8 +116,9 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
 4. Use `feat/issue-N` and a `[local-agent] ` title to opt a PR into local maintenance.
    Legacy `[agent] ` issue PRs are also managed. Create a non-draft PR only after local
    verification and review, with `Fixes #N` and the installed `pr`/`show-me` template:
-   focused Summary, real Before/After Evidence, and Merge Danger. Detailed logs
-   remain linked rather than copied into the PR.
+   focused Summary, real Before/After Evidence, and Merge Danger. Publish the full
+   reviews, declared behavior evidence and media through [PR evidence](../../docs/agents/pr-evidence.md).
+   Keep detailed logs linked; the generated marker block preserves the author's body.
 5. Publish through authenticated GitHub tools or an already authenticated Git
    client. Compare the actual remote tree to the reviewed local tree. With GitHub
    Git-data tools, create the exact tree, verify its SHA, then create an append-only
@@ -128,7 +130,11 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    branch to an API-generated SHA. It verifies tree and append-only parent against
    the checked source. One run cannot be rebound to another publication.
 6. Record the actual published head in the local receipt; Git-data API commit SHAs
-   may differ from local SHAs even when trees match. Give the user the PR link.
+   may differ from local SHAs even when trees match. Collect preview at the actual
+   published head and generate `agents:report` from the verified run. Publish and
+   read back the complete report before declaring ready, retaining its URL, source
+   head and evidence commit. A prepared publication plan is not a publication.
+   Give the user the PR link.
    Until current-head GitHub checks and feedback pass, report it as waiting for CI
    or repair. Only then hand it to the user as ready for final review. A draft is
    an explicit opt-out; do not leave a newly managed PR in that state.
@@ -152,6 +158,9 @@ change requests, and binds job checks to actual current-head workflow identities
 Use `evaluate <run-dir> <snapshot.json>` for readiness. A changed published head
 returns `waiting-verification`; never copy old tests/reviews onto its new SHA.
 Do not replace context with empty feedback arrays to obtain ready.
+`evaluate` does not yet validate the presentation publication receipt. Its `ready`
+result still requires the report/media publication and current-head readback above;
+CI preview alone does not establish independent review or full-check completion.
 
 1. Investigate failing CI and every new/edited review or thread comment. Read the
    actual logs. Fix confirmed defects; classify other feedback with explicit
@@ -162,8 +171,8 @@ Do not replace context with empty feedback arrays to obtain ready.
    needed; resolve mechanical conflicts with tests and review. Conflicts that need
    a new design decision or affect steering/security policy return to the user.
    Do not weaken branch protection or publish unreviewed conflict resolutions.
-3. Repeat affected tests, full checks, both review axes and publication verification
-   after each fix. Persist each feedback item's key, content digest, disposition
+3. Repeat affected tests, full checks, both review axes, relevant preview scenes and
+   evidence publication after each fix. Persist each feedback item's key, content digest, disposition
    and reason with the actual published SHA. A receipt must match the prepared
    task/request and list every feedback item exactly once.
 4. Resolve only an unchanged addressed thread whose disposition was revalidated at
