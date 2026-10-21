@@ -28,6 +28,48 @@ function materializationInput() {
   };
 }
 
+test.each([0, 0.5, -1, '0', Number.NaN, undefined, null, false])(
+  'rejects an empty normalized Node collection for length %s',
+  (length) => {
+    const nodes = new Proxy([], {
+      get(target, key, receiver) {
+        return key === 'length' ? length : Reflect.get(target, key, receiver);
+      },
+    });
+
+    expect(() =>
+      acceptCanvasFragment({
+        type: 'nodebraid.canvas-fragment',
+        nodes,
+        edges: [],
+        selection: { nodeIds: [], edgeIds: [] },
+      }),
+    ).toThrow(
+      expect.objectContaining({
+        domain: 'canvas-fragment',
+        code: 'INVALID_FRAGMENT',
+        message: 'Canvas Fragment must contain at least one Node.',
+      }),
+    );
+  },
+);
+
+test('returns the same Node collection that passed Fragment validation', () => {
+  const input = fragmentInput();
+  let lengthReads = 0;
+  input.nodes = new Proxy(input.nodes, {
+    get(target, key, receiver) {
+      return key === 'length' ? (lengthReads++ === 0 ? 1 : 0) : Reflect.get(target, key, receiver);
+    },
+  });
+
+  const accepted = acceptCanvasFragment(input);
+
+  expect(accepted.nodes.map((node) => node.id)).toEqual([nodeId('source')]);
+  expect(accepted.nodes[0]?.data).toBe(input.nodes[0]!.data);
+  expect(acceptCanvasFragment(accepted)).toEqual(accepted);
+});
+
 test('rejects malformed Fragment elements even when the array defines map', () => {
   const input = fragmentInput();
   input.nodes[0]!.position.x = Number.NaN;
