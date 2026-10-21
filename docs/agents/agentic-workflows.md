@@ -123,12 +123,20 @@ bun run agents:scan <last-reviewed-sha> # 后续完整变更范围
 当前 PR head 和不可混同的阶段证据。不得存密钥。损坏状态直接报错；首次创建明确初始化。
 原始工具结果与 GitHub 链接保留，不把成功注册调度、一次检查通过或本地 commit 当成整个闭环成功。
 
+需求/spec 及其实现任务的本地副本保存在同级 `issues/<number>/`：`current.md` 方便阅读，
+`current.json` 保留原始字段，`history/<content-hash>.md/.json` 保留不同版本。GitHub 仍是事实源；
+本地副本不回写、不参与资格判断，不提交到源码仓库，也不随 worktree 清理。每次按既有讨论边界
+完整读取 GitHub 或写入后回读成功，执行 `agents:run archive-issue`；无需新增定时任务。
+相同内容不重复归档，关闭 Issue 的副本继续保留。输入与失败处理见
+[本地副本约定](./issue-tracker.md#local-reading-and-archive-copies)。
+
 ## 执行命令和恢复
 
 执行使用版本管理的 `scripts/local-agent.ts`，不再调用忽略目录中的临时验收脚本。
 每次 Issue 或 PR 反馈请求有独立 run 目录，通常放在上述本机 `runs/<run-id>/`。
 
 ```bash
+bun run agents:run archive-issue snapshot.json ~/.codex/local-workflows/nodebraid/issues
 bun run agents:run normalize raw-github.json published-feedback.json snapshot.json
 bun run agents:run reconcile reconciliation-source.json reconciliation.json
 bun run agents:run prepare task-input.json /absolute/path/to/run

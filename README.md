@@ -73,6 +73,10 @@ the source-checkout workflow until the initial npm release is available.
 
 Local Codex uses the existing ChatGPT sign-in for issue investigation, implementation,
 review, and PR feedback repairs. GitHub retains issues, PRs and engineering CI.
+Requirements/specs and their tasks also have local reading copies and versioned
+archives under `~/.codex/local-workflows/nodebraid/issues/`. GitHub stays authoritative;
+the copies are refreshed after complete reads and never written back. See the
+[archive contract](./docs/agents/issue-tracker.md#local-reading-and-archive-copies).
 The local chat heartbeat checks for work every five minutes while the computer and
 app are running; it is polling rather than a realtime webhook. It consumes the
 account's Codex subscription allowance, with no API-key fallback.
@@ -105,7 +109,8 @@ bun run agents:local-check # Also verify local ChatGPT CLI authentication
 bun run agents:scan        # Prepare a main-snapshot investigation
 bun run agents:scan <sha>  # Prepare changes since the last completed investigation
 bun run agents:typecheck  # Type-check the executable local workflow
-bun run agents:run        # Show reconciliation and execution usage
+bun run agents:run        # Show archive, reconciliation and execution usage
+bun run agents:run archive-issue snapshot.json ~/.codex/local-workflows/nodebraid/issues # Keep an Issue reading copy and history
 bun run agents:run reconcile source.json [output.json] # Read-only delivery/frontier/closure assessment after fetch
 bun run agents:preview --base <sha> --out <empty-dir> [--all] # Capture real Examples evidence
 bun run agents:report <run-dir> <output-dir> # Add complete reviews and declared logs; never overwrite

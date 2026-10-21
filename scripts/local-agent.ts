@@ -12,6 +12,7 @@ import {
 } from './local-agent-run';
 import { normalizeFeedback } from './github-feedback';
 import { planFrontier } from './discovery-queue';
+import { archiveIssue } from './local-agent-issue-archive';
 import { reconcileDelivery } from './local-agent-reconcile';
 
 const read = <T>(path: string): T => JSON.parse(readFileSync(path, 'utf8')) as T;
@@ -34,10 +35,13 @@ const snapshot = (base: string) => {
 const [mode, first, second, third] = process.argv.slice(2);
 if (!first)
   throw new Error(
-    'Usage: local-agent reconcile source.json [output.json] | normalize raw.json published.json output.json | prepare input.json run-dir | inspect run-dir | frontier run-dir completed.json | verify run-dir reviews.json decisions.json | publication run-dir remote-commit.json | evaluate run-dir snapshot.json',
+    'Usage: local-agent archive-issue snapshot.json issues-dir | reconcile source.json [output.json] | normalize raw.json published.json output.json | prepare input.json run-dir | inspect run-dir | frontier run-dir completed.json | verify run-dir reviews.json decisions.json | publication run-dir remote-commit.json | evaluate run-dir snapshot.json',
   );
 
-if (mode === 'reconcile') {
+if (mode === 'archive-issue') {
+  if (!second) throw new Error('archive-issue requires a complete Issue snapshot and an issues directory');
+  console.log(JSON.stringify(archiveIssue(read(first), resolve(second))));
+} else if (mode === 'reconcile') {
   const result = reconcileDelivery(read(first));
   if (second) save(second, result);
   console.log(JSON.stringify(result));
