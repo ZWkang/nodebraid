@@ -1118,7 +1118,7 @@ $ bun run --filter '@nodebraid/core' build && bun run --filter '@nodebraid/rende
 @nodebraid/adapter-react build: @nodebraid/plugin-history build: @nodebraid/plugin-kernel build: Exited with code 0
 @nodebraid/adapter-react build: @nodebraid/plugin-history build: Exited with code 0
 @nodebraid/adapter-react build: Exited with code 0
-vite v8.2.2 building client environment for production...
+[36mvite v8.2.2 [32mbuilding client environment for production...[36m[39m
 transforming...
 ✓ 2181 modules transformed.
 rendering chunks...
@@ -1136,4 +1136,4 @@ dist/assets/preload-helper-nlOK6TZ5.js                      35.01 kB │ gzip:  
 dist/assets/basic-svg-BkGNzYiI.js                          188.60 kB │ gzip:  54.26 kB
 dist/assets/index-CDmBOr1G.js                              348.54 kB │ gzip: 113.55 kB
 
-✓ built in 548ms
+[32m✓ built in 695ms[39m
