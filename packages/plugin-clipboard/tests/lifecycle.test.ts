@@ -6,7 +6,12 @@ import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plug
 import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/plugin-session';
 import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
-import { copySelectionToClipboardCommand, createClipboardPlugin, pasteClipboardCommand } from '../src';
+import {
+  copySelectionToClipboardCommand,
+  createClipboardPlugin,
+  pasteClipboardCommand,
+  type ClipboardIdMaterializer,
+} from '../src';
 
 test('Clipboard disposal aborts and awaits an in-flight external read without residual registrations', async () => {
   let commands: CommandService | undefined;
@@ -88,6 +93,7 @@ test('caller cancellation keeps its reason and dependency recovery creates fresh
   let blockRead = true;
   let readCalls = 0;
   let settleRead: ((text: string) => void) | undefined;
+  let materializerReads = 0;
   const clipboardPlugin = createClipboardPlugin({
     transport: {
       readText(signal) {
@@ -111,10 +117,14 @@ test('caller cancellation keeps its reason and dependency recovery creates fresh
         return fragment;
       },
     },
-    materializeIds: ({ nodeIds }) => ({
-      nodes: nodeIds.map((sourceId) => ({ sourceId, materializedId: pasted })),
-      edges: [],
-    }),
+    get materializeIds(): ClipboardIdMaterializer {
+      materializerReads += 1;
+      if (materializerReads !== 1) throw new Error('Clipboard configuration must be captured once.');
+      return ({ nodeIds }) => ({
+        nodes: nodeIds.map((sourceId) => ({ sourceId, materializedId: pasted })),
+        edges: [],
+      });
+    },
   });
   const host = createPluginHost();
   const sessionInstallation = host.install(sessionPlugin);
@@ -170,5 +180,6 @@ test('caller cancellation keeps its reason and dependency recovery creates fresh
     changeSet: { commandId: pasteClipboardCommand.id },
   });
   expect(currentSession.getSnapshot().selection).toEqual({ nodeIds: [pasted], edgeIds: [] });
+  expect(materializerReads).toBe(1);
   await host.dispose();
 });
