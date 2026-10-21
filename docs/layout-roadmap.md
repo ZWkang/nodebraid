@@ -1,14 +1,14 @@
 # NodeBraid Layout 范围记录
 
-> 状态：首版已实现
+> 状态：首版及带 Port 图的 Node 拓扑布局已实现
 >
-> 日期：2026-08-19
+> 更新：2026-10-21
 >
-> 本文记录首版与后续能力边界，不是详细接口手册。首版四个 Layout 包已按本基线实现；“后续单独设计与实现”中的能力仍未实现。
+> 本文记录当前能力边界，不是详细接口手册。首版四个 Layout 包与后续 Node 拓扑兼容均已实现；“后续单独设计与实现”中的能力仍未实现。
 
-## 首版设计范围
+## 已实现设计范围
 
-已确认纳入首版设计：
+当前实现保持以下边界：
 
 - 整个 Canvas View 参与一次布局计算；不接受 Selection 或任意 Node 子集作为计算范围。
 - Layout Engine 只返回候选 Node 位置，不直接修改 Kernel。
@@ -18,8 +18,8 @@
 - Layout Proposal 精确覆盖输入 Node，并绑定计算时的 Kernel revision；提交时 revision 不同则整体失败。
 - 增量布局仍重新计算整张图，并把非固定 Node 的现有位置作为减少移动的软约束。
 - 固定 Node 的原有绝对世界坐标是硬约束；它仍参与计算，且 Proposal 必须返回相同坐标。
-- Edge 只投影 ID 与两端 Node ID，不投影 `type` 或不透明 `data`。
-- 首版遇到 `parentId` 或 Endpoint `portId` 时显式失败，不扁平化嵌套图，也不将 Port 退化为 Node 中心。
+- Edge 只投影 ID 与两端 Node ID，不投影 `type`、`portId` 或不透明 `data`；普通 Edge 与单端、双端带 Port 的 Edge 可以混用，平行 Edge 保留独立身份。
+- 遇到 `parentId` 时显式失败，不扁平化嵌套图。Port-qualified 图按 Node 拓扑布局，Port Geometry 仍由 Renderer 拥有，不作为算法输入。
 - Layout Input 保留自环；不支持自环的 Provider 必须显式失败，不得静默删除。
 - Layout Request 显式区分 full 与 incremental 模式；每个 Node 投影 `id`、`size`、`position` 与本次请求的 fixed 约束。
 - Proposal 直接表达 Kernel Node 的绝对世界坐标，不引用 Viewport，Runtime 不自动居中。
@@ -34,7 +34,7 @@
 - 一份 Proposal 在一次同步 Transaction 中替换所有实际变化的 Node 位置，产生一个 Change Set 和一个 History Entry；`commandId` 使用 Provider Command 的诊断 ID。
 - 所有首版 Provider 都必须支持 full 布局；至少一个官方 Provider 必须真正支持 incremental 与 Fixed Node。Provider 明确声明其他能力，不支持的请求在计算前失败。
 - Layout Engine 以不可变 capability 显式声明 incremental、Fixed Node 与自环支持；full 是所有首版 Provider 的必备契约。
-- 共享投影层验证 Layout Request、Fixed Node ID、Size、嵌套与 Port；Provider 验证配置及算法约束；Runtime 验证 Proposal 和提交时 revision。
+- 共享投影层验证 Layout Request、Fixed Node ID、Size 与嵌套；Provider 验证配置及算法约束；Runtime 验证 Proposal 和提交时 revision。
 - Layout Command 在输入投影前、Provider 调用前、Provider 返回后及 Transaction 前检查取消；同步 Transaction 开始后不可取消或倒销。
 - 空图与全部 Node 固定的图仍调用 Provider 并要求完整 Proposal，不绕过配置、capability 或 Provider 契约验证；最终可产生 `null` Commit。
 - `@nodebraid/plugin-layout` 是静态绑定一个 Layout Engine 与一个 typed Command 的 Runtime 集成工厂，不提供 LayoutService；Provider 包仍保持 Runtime-free。
@@ -63,6 +63,14 @@ Dagre 与 ELK 都必须真实验证 `layout-api` seam，两者都支持 full，�
 
 `@nodebraid/core` 重导出 `layout-api` 与 `plugin-layout` 的通用能力，但不依赖或重导出 Dagre、ELK。高级消费者可以直接调用低层 Layout Engine 获得未提交 Proposal；官方 Runtime 写入路径仍是 `plugin-layout` Provider Command。
 
+## 带 Port 图的 Node 拓扑兼容
+
+[已确认规格 #37](https://github.com/ZWkang/nodebraid/issues/37) 的 [headless 切片 #41](https://github.com/ZWkang/nodebraid/issues/41) 取消了首版对 Endpoint `portId` 的拒绝。Dagre 与 ELK 使用同一 Node 拓扑投影；只改变 Port ID 不改变候选位置。Layout 不依赖 PortService、Port Snapshot 或 Contribution generation，也不验证 Port 存在性、role 或定义合法性；现有 Port、Interaction 与 Renderer 的验证责任保持。
+
+Runtime 只替换实际变化的 Node position，保留其他 Node 字段、Edge、Endpoint、`portId` 和领域 data。布局不写 Session，不修改 Selection 或 Viewport，也不自动 Fit View；净变化对应一次 Commit、一次 History Entry 和单步 Undo/Redo，无净变化返回 `null`，不推进 revision 或历史。包括 Endpoint `portId` 修改在内的 Document revision 变化仍使旧 Proposal 整体 stale；只有 Contribution generation 变化不构成 Layout 失败条件。Layout 成功不额外承诺某个 Renderer 能绘制该图。
+
+Basic SVG 的手动入口与浏览器验收属于后续 [#42](https://github.com/ZWkang/nodebraid/issues/42)，不属于本 headless 切片的交付。
+
 ## 后续单独设计与实现
 
 以下能力本次只保留路线记录，不进入首版契约：
@@ -70,7 +78,7 @@ Dagre 与 ELK 都必须真实验证 `layout-api` seam，两者都支持 full，�
 - Layout Proposal 预览与人工接受、拒绝流程。
 - Selection 或任意 Node 子集布局。
 - 嵌套图布局，包括父 Node 尺寸、内边距、子 Node 相对坐标和自适应边界。
-- Port-aware Layout，包括 Port 几何、顺序和连接约束。
+- Port-aware Layout，包括 Port 几何、方位、顺序和连接约束参与算法；当前的 Node 拓扑兼容不提供这些语义。
 - Edge Routing 及路径结果提交。
 - Worker 执行与跨线程数据传输。
 - Layout Input 或 Proposal 缓存。

@@ -42,7 +42,7 @@ test('invalid mode and Fixed Node identities are rejected as invalid Layout Requ
   ]);
 });
 
-test('nested Nodes and Port Endpoints are rejected as unsupported Layout Inputs', () => {
+test('nested Nodes are rejected as unsupported Layout Inputs', () => {
   const parentId = nodeId('parent');
   const childId = nodeId('child');
   const nestedKernel = createCanvasKernel();
@@ -64,11 +64,23 @@ test('nested Nodes and Port Endpoints are rejected as unsupported Layout Inputs'
     });
   });
 
+  let failure: LayoutError | undefined;
+  try {
+    createLayoutInput(nestedKernel.read(), { mode: 'full', fixedNodeIds: [] });
+  } catch (error) {
+    failure = error as LayoutError;
+  }
+  expect({ code: failure?.code, details: failure?.details }).toEqual({
+    code: 'INVALID_INPUT',
+    details: { issue: 'UNSUPPORTED_NESTING', nodeId: childId, parentId },
+  });
+});
+
+test('mixed Port Endpoints project to Node topology without changing the Document', () => {
   const sourceId = nodeId('source');
   const targetId = nodeId('target');
-  const connectionId = edgeId('connection');
-  const portKernel = createCanvasKernel();
-  portKernel.transact((transaction) => {
+  const kernel = createCanvasKernel();
+  kernel.transact((transaction) => {
     for (const id of [sourceId, targetId]) {
       transaction.nodes.add({
         id,
@@ -78,33 +90,24 @@ test('nested Nodes and Port Endpoints are rejected as unsupported Layout Inputs'
         data: null,
       });
     }
-    transaction.edges.add({
-      id: connectionId,
-      type: 'flow',
-      source: { nodeId: sourceId, portId: 'out' },
-      target: { nodeId: targetId },
-      data: null,
-    });
-  });
-
-  const errors = [nestedKernel.read(), portKernel.read()].map((view) => {
-    try {
-      createLayoutInput(view, { mode: 'full', fixedNodeIds: [] });
-      return undefined;
-    } catch (reason) {
-      const error = reason as LayoutError;
-      return { code: error.code, details: error.details };
+    for (const [id, source, target] of [
+      ['both', { nodeId: sourceId, portId: 'out-a' }, { nodeId: targetId, portId: 'in-a' }],
+      ['plain', { nodeId: sourceId }, { nodeId: targetId }],
+      ['source', { nodeId: sourceId, portId: 'out-b' }, { nodeId: targetId }],
+      ['target', { nodeId: sourceId }, { nodeId: targetId, portId: 'in-b' }],
+    ] as const) {
+      transaction.edges.add({ id: edgeId(id), type: 'flow', source, target, data: null });
     }
   });
-
-  expect(errors).toEqual([
-    {
-      code: 'INVALID_INPUT',
-      details: { issue: 'UNSUPPORTED_NESTING', nodeId: childId, parentId },
-    },
-    {
-      code: 'INVALID_INPUT',
-      details: { issue: 'UNSUPPORTED_PORT', edgeId: connectionId, endpoint: 'source', portId: 'out' },
-    },
+  const view = kernel.read();
+  const input = createLayoutInput(view, { mode: 'full', fixedNodeIds: [] });
+  expect(input.edges).toEqual([
+    { id: edgeId('both'), sourceNodeId: sourceId, targetNodeId: targetId },
+    { id: edgeId('plain'), sourceNodeId: sourceId, targetNodeId: targetId },
+    { id: edgeId('source'), sourceNodeId: sourceId, targetNodeId: targetId },
+    { id: edgeId('target'), sourceNodeId: sourceId, targetNodeId: targetId },
   ]);
+  expect(kernel.read()).toBe(view);
+  expect(view.query.getEdge(edgeId('both'))?.source.portId).toBe('out-a');
+  expect(view.query.getEdge(edgeId('both'))?.target.portId).toBe('in-a');
 });

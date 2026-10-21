@@ -6,6 +6,8 @@ Dagre Layout Provider for NodeBraid.
 
 The Provider implements deterministic whole-canvas full layout through `@nodebraid/layout-api`. It converts Dagre's center coordinates into NodeBraid's top-left absolute world coordinates and supports empty graphs, zero-sized Nodes, disconnected components, parallel Edges, directed cycles, and self-loops.
 
+Ordinary and Port-qualified Edges share the same Node-topology projection, retaining each Edge ID. Port IDs, definitions, and geometry do not affect the calculation; Port Geometry remains Renderer-owned.
+
 Dagre does not advertise incremental or Fixed Node capabilities. Use an Engine-specific typed Command through `@nodebraid/plugin-layout` when applying a Proposal to a Canvas Runtime.
 
 ## Development

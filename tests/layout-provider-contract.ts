@@ -83,5 +83,25 @@ export function registerFullLayoutProviderContract<Config>(options: {
       deterministic: true,
       empty: { sourceRevision: 0, positions: [] },
     });
+
+    kernel.transact((transaction) => {
+      for (const [id, sourcePort, targetPort] of [
+        ['alpha-beta-1', 'out-a', undefined],
+        ['alpha-beta-2', undefined, 'in-a'],
+        ['beta-alpha', 'out-b', 'in-b'],
+      ] as const) {
+        const edge = transaction.query.getEdge(edgeId(id));
+        if (!edge) throw new Error('Expected baseline Edge.');
+        transaction.edges.replace(edge.id, {
+          ...edge,
+          source: sourcePort === undefined ? edge.source : { ...edge.source, portId: sourcePort },
+          target: targetPort === undefined ? edge.target : { ...edge.target, portId: targetPort },
+        });
+      }
+    });
+    const portInput = createLayoutInput(kernel.read(), { mode: 'full', fixedNodeIds: [] });
+    const withPorts = await options.engine.compute(portInput, options.config, context);
+    expect(portInput.edges).toEqual(input.edges);
+    expect(withPorts.positions).toEqual(first.positions);
   });
 }

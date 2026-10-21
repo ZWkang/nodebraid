@@ -17,7 +17,7 @@ NodeBraid 处于早期实现阶段，但已经形成一条可运行的 headless 
 - Backend-neutral Interaction Projection，以及 Selection、Box Selection、Delete Selection、独立 Duplicate Selection、multi-Node Drag、Pan、Wheel Zoom 与 Port-aware/node-level Edge Connection Runtime；
 - 纯内存 `@nodebraid/canvas-fragment`，以及应用拥有 codec/transport 的显式 Clipboard Copy/Paste Behavior；
 - 参考级 `@nodebraid/renderer-svg` Provider，以及真实 Chromium 中的 SVG projection、输入、Hit Test 与 lifecycle 验证；
-- Layout Input/Engine/Proposal contract 与 Runtime Command integration；
+- Layout Input/Engine/Proposal contract 与 Runtime Command integration；Dagre、ELK 均接受普通与 Port-qualified Edge 混合的 Node 拓扑，保留端口连接并支持单步 History，无需 Port Plugin；
 - Dagre full Layout Provider；
 - ELK full、incremental 与 Fixed Node Layout Provider；
 - 后端无关的 `@nodebraid/preset-basic` Basic Canvas Composition，以及真实 SVG canonical example；
@@ -34,6 +34,8 @@ NodeBraid 处于早期实现阶段，但已经形成一条可运行的 headless 
 :::
 
 当前也没有 Persistence、Collaboration、序列化 schema 或远程同步能力。目标架构中出现某个名称，不代表它已经成为公共 package。
+
+带 Port 图的 Layout 仅排列 Node；Port 方位、顺序和 Geometry 参与算法的 Port-aware Layout 仍未实现，Renderer 继续拥有 Port Geometry。
 
 ## Package 发布状态
 

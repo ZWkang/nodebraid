@@ -44,22 +44,25 @@ NodeBraid specifies neither a default Provider nor a dynamic Layout Registry. A 
 
 ## Input boundaries
 
-The initial Layout release processes the whole Canvas and requires:
+Layout processes the whole Canvas and requires:
 
 - every Node to have an explicit Size;
 - Nodes without a `parentId`;
-- Edge Endpoints without a `portId`;
 - Fixed Node IDs that exist and are unique;
 - `incremental` mode still computes the entire graph, with current positions serving only as stability constraints;
 - Fixed Nodes are a hard constraint that must preserve their absolute World Positions.
 
-Inputs that violate these conditions fail before reaching the Provider. NodeBraid does not guess sizes, ignore Ports, or lay out only part of the graph.
+Inputs that violate these conditions fail before reaching the Provider. NodeBraid does not guess sizes or lay out only part of the graph.
+
+Ordinary Edges can be mixed with Edges that carry `portId` on either or both Endpoints. Dagre and ELK both lay out the Node topology: Layout Input retains each Edge ID and its endpoint Node IDs without merging parallel Edges. Changing only Port IDs leaves candidate positions unchanged for the same Node topology and configuration. This requires no Port Plugin, reads no Port Snapshot or Contribution generation, and performs no Port existence, role, or definition validation.
+
+The Renderer still computes Port Geometry from Node Geometry and the Port Snapshot. Layout takes no Port side, order, or relative-coordinate input, does not reposition Ports, and promises no port-level crossing optimization. A successful calculation does not replace Port, Interaction, or Renderer validation.
 
 ## Commits and concurrency
 
-A valid Proposal must carry the captured source revision and provide exactly one finite coordinate for every input Node. Before committing, the Runtime reads the current Kernel revision again. If the Document has changed, the entire Proposal fails with `STALE_PROPOSAL` instead of being automatically rebased.
+A valid Proposal must carry the captured source revision and provide exactly one finite coordinate for every input Node. Before committing, the Runtime reads the current Kernel revision again. If the Document has changed, including an Endpoint `portId` edit, the entire Proposal fails with `STALE_PROPOSAL` instead of being automatically rebased. A Port Contribution generation change alone introduces no additional Layout failure condition.
 
-A Layout Command with net changes produces at most one Canvas Commit, so it naturally maps to one Change Set and one History Entry. When every position is unchanged, it may return a `null` Commit.
+A Layout Command replaces only changed Node positions, preserving all other Node fields, Edges, Endpoints, `portId`, and domain data. It does not write Session state: Selection and Viewport remain unchanged, with no automatic Fit View. Net changes produce one Canvas Commit, one Change Set, and one History Entry for one-step Undo/Redo. Unchanged positions return `null` without advancing revision or history.
 
 ## Not included today
 
@@ -68,8 +71,8 @@ A Layout Command with net changes produces at most one Canvas Commit, so it natu
 - preview, animation, or interactive dragging policies;
 - Worker execution, caching, or persistence;
 - a dynamic Provider Registry or default Provider;
-- silent degradation for nested Nodes or Port Geometry.
+- nested Nodes or Port-aware geometric layout.
 
 ## Verification evidence
 
-The current implementation is verified by provider-neutral contract tests, Proposal and Request validation tests, Runtime stale/cancellation/commit tests, and real end-to-end composition tests for Dagre and ELK. Both Providers enter a real Plugin Host, Kernel, and Command Service through the same `LayoutEngine` seam.
+The current implementation is verified by provider-neutral contract tests, Proposal and Request validation tests, Runtime stale/cancellation/commit tests, and real end-to-end composition tests for Dagre and ELK. Both Providers enter a real Plugin Host, Kernel, Command, History, and Session through the same `LayoutEngine` seam, verifying Port preservation, one-step Undo/Redo, net-zero behavior, and unchanged Session state without a Port Plugin.

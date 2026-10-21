@@ -17,7 +17,7 @@ NodeBraid is at an early implementation stage, but it already has a working head
 - Backend-neutral Interaction Projections plus Selection, Box Selection, Delete Selection, independent Duplicate Selection, multi-Node Drag, Pan, Wheel Zoom, and Port-aware/node-level Edge Connection Runtime behavior;
 - Pure in-memory `@nodebraid/canvas-fragment` values and explicit Clipboard Copy/Paste with application-owned codec and transport;
 - The reference-quality `@nodebraid/renderer-svg` Provider, with real-Chromium verification of SVG projection, input, Hit Testing, and lifecycle;
-- Layout Input/Engine/Proposal contracts and Runtime Command integration;
+- Layout Input/Engine/Proposal contracts and Runtime Command integration; Dagre and ELK both accept Node topologies mixing ordinary and Port-qualified Edges, preserve Port connections, and support one-step History without a Port Plugin;
 - Dagre full Layout Provider;
 - ELK full, incremental, and Fixed Node Layout Providers;
 - The backend-neutral `@nodebraid/preset-basic` Basic Canvas Composition and a real SVG canonical example;
@@ -34,6 +34,8 @@ The current branch delivers the Basic Canvas Composition, Duplicate/Delete Selec
 :::
 
 There is also no Persistence, Collaboration, serialization schema, or remote synchronization capability. A name appearing in the target architecture does not mean it has become a public package.
+
+Layout for graphs with Ports only arranges Nodes. Port-aware layout that uses Port sides, order, or Geometry in the algorithm remains unimplemented; the Renderer continues to own Port Geometry.
 
 ## Package publication status
 
