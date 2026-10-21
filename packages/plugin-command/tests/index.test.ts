@@ -264,6 +264,151 @@ describe('@nodebraid/plugin-command', () => {
     }
   });
 
+  test('does not start a Command when execution options dispose its Registration', async () => {
+    const command = defineCommand<void, string>('execution.options-disposal');
+    const completion = createDeferred<string>();
+    const { host, service } = await activateCommandService();
+    let handlerCalls = 0;
+    let signalReads = 0;
+    let disposal: Promise<void> | undefined;
+    const registration = service.register(command, () => {
+      handlerCalls++;
+      return completion.promise;
+    });
+    const caller = new AbortController();
+    const execution = service.execute(command, undefined, {
+      get signal() {
+        signalReads++;
+        disposal = registration.dispose();
+        return caller.signal;
+      },
+    });
+    const outcome = execution.then(
+      (value) => ({ value }),
+      (error: unknown) => ({ error }),
+    );
+    completion.resolve('finished');
+
+    try {
+      expect(await outcome).toMatchObject({ error: { code: 'COMMAND_NOT_FOUND' } });
+      expect({ handlerCalls, signalReads }).toEqual({ handlerCalls: 0, signalReads: 1 });
+    } finally {
+      await disposal;
+      await registration.dispose();
+      await host.dispose();
+    }
+  });
+
+  test('keeps existing executions owned while options dispose their Registration', async () => {
+    const command = defineCommand<number, number>('execution.options-disposal-existing');
+    const completion = createDeferred<number>();
+    const { host, service } = await activateCommandService();
+    let signal: AbortSignal | undefined;
+    let handlerCalls = 0;
+    const registration = service.register(command, (_input, execution) => {
+      handlerCalls++;
+      signal = execution.signal;
+      return completion.promise;
+    });
+    const first = service.execute(command, 1);
+    let disposed = false;
+    let disposal: Promise<void> | undefined;
+    const second = service.execute(command, 2, {
+      get signal() {
+        disposal = registration.dispose();
+        void disposal.then(() => {
+          disposed = true;
+        });
+        return undefined;
+      },
+    });
+    const secondOutcome = second.then(
+      (value) => ({ value }),
+      (error: unknown) => ({ error }),
+    );
+
+    try {
+      expect({ handlerCalls, aborted: signal?.aborted, disposed }).toEqual({
+        handlerCalls: 1,
+        aborted: true,
+        disposed: false,
+      });
+      expectCommandError(() => service.register(command, () => 3), 'COMMAND_ALREADY_REGISTERED');
+      completion.resolve(1);
+      expect(await secondOutcome).toMatchObject({ error: { code: 'COMMAND_NOT_FOUND' } });
+      await expect(first).resolves.toBe(1);
+      await disposal;
+      const replacement = service.register(command, () => 3);
+      await expect(service.execute(command, 0)).resolves.toBe(3);
+      await replacement.dispose();
+    } finally {
+      completion.resolve(1);
+      await first;
+      await secondOutcome;
+      await registration.dispose();
+      await host.dispose();
+    }
+  });
+
+  test('preserves structural errors before reading execution options', async () => {
+    const command = defineCommand<void, void>('execution.options-preconditions');
+    const forged = Object.freeze({ id: 'forged' }) as Command<void, void>;
+    const { host, service } = await activateCommandService();
+    let signalReads = 0;
+    const options = {
+      get signal(): AbortSignal {
+        signalReads++;
+        throw new Error('Options must not be read for unavailable Commands.');
+      },
+    };
+
+    try {
+      await expect(service.execute(command, undefined, options)).rejects.toMatchObject({ code: 'COMMAND_NOT_FOUND' });
+      await expect(service.execute(forged, undefined, options)).rejects.toMatchObject({ code: 'INVALID_COMMAND' });
+      await host.dispose();
+      await expect(service.execute(command, undefined, options)).rejects.toMatchObject({ code: 'SERVICE_DISPOSED' });
+      expect(signalReads).toBe(0);
+    } finally {
+      await host.dispose();
+    }
+  });
+
+  test('preserves option failures and permits unrelated Registration disposal', async () => {
+    const command = defineCommand<void, string>('execution.options-unrelated');
+    const unrelated = defineCommand<void, void>('execution.options-unrelated-target');
+    const { host, service } = await activateCommandService();
+    const registration = service.register(command, () => 'finished');
+    const otherRegistration = service.register(unrelated, () => {});
+    const failure = new Error('caller option failure');
+    let signalReads = 0;
+    let unrelatedDisposal: Promise<void> | undefined;
+
+    try {
+      await expect(
+        service.execute(command, undefined, {
+          get signal(): AbortSignal {
+            throw failure;
+          },
+        }),
+      ).rejects.toBe(failure);
+      await expect(
+        service.execute(command, undefined, {
+          get signal() {
+            signalReads++;
+            unrelatedDisposal = otherRegistration.dispose();
+            return undefined;
+          },
+        }),
+      ).resolves.toBe('finished');
+      expect(signalReads).toBe(1);
+      await unrelatedDisposal;
+    } finally {
+      await registration.dispose();
+      await otherRegistration.dispose();
+      await host.dispose();
+    }
+  });
+
   test('reinstalls an empty Command Service after Provider disposal', async () => {
     const identity = defineCommand<string, string>('identity');
     const services: CommandService[] = [];

@@ -43,6 +43,20 @@ export const commandPlugin = definePlugin({
       }
     };
 
+    const getActiveRegistration = (command: unknown): RegisteredCommand => {
+      assertActive();
+      const commandId = getCommandId(command);
+      const registration = registrations.get(command as AnyCommand);
+      if (!registration || registration.disposePromise) {
+        throw new CommandError(
+          'COMMAND_NOT_FOUND',
+          `Command "${commandId}" is not registered.`,
+          Object.freeze({ commandId }),
+        );
+      }
+      return registration;
+    };
+
     const disposeRegistration = (registration: RegisteredCommand): Promise<void> => {
       if (registration.disposePromise) return registration.disposePromise;
       let completeDisposal!: () => void;
@@ -100,19 +114,12 @@ export const commandPlugin = definePlugin({
         input: Input,
         options?: CommandExecutionOptions,
       ): Promise<Output> {
-        assertActive();
-        const commandId = getCommandId(command);
-        const registration = registrations.get(command as AnyCommand);
-        if (!registration || registration.disposePromise) {
-          throw new CommandError(
-            'COMMAND_NOT_FOUND',
-            `Command "${commandId}" is not registered.`,
-            Object.freeze({ commandId }),
-          );
-        }
-        const activeRegistration = registration;
-        const controller = new AbortController();
+        getActiveRegistration(command);
         const callerSignal = options?.signal;
+        // Caller-owned options can re-enter disposal before execution is admitted.
+        const activeRegistration = getActiveRegistration(command);
+        const commandId = activeRegistration.commandId;
+        const controller = new AbortController();
         const abort = () => controller.abort(callerSignal?.reason);
         callerSignal?.addEventListener('abort', abort, { once: true });
         if (callerSignal?.aborted) abort();
