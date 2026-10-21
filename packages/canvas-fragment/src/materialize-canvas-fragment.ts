@@ -9,6 +9,7 @@ import type {
   CanvasFragmentNodeIdMapping,
   MaterializedCanvasFragment,
 } from './contracts';
+import { mapArrayValues } from './map-array-values';
 
 export function materializeCanvasFragment(
   fragmentValue: CanvasFragment,
@@ -108,7 +109,7 @@ function acceptMappings<Id extends string, Mapping extends { readonly sourceId: 
   const expected = new Set(sourceIds);
   const sourceSeen = new Set<Id>();
   const materializedSeen = new Set<Id>();
-  const mappings = value.map((mappingValue): Mapping => {
+  const mappings = mapArrayValues(value, (mappingValue): Mapping => {
     const mapping = acceptMappingRecord(mappingValue, entity);
     const sourceId = mapping.sourceId as Id;
     const materializedId = mapping.materializedId as Id;
