@@ -1,0 +1,49 @@
+$ bun run ./browser-tests/basic-svg.browser.ts && bun run ./browser-tests/clipboard.browser.ts
+54 |         setTimeout(read, 25);
+55 |       };
+56 |       read();
+57 |     })
+58 |   `);
+59 |   assert.deepEqual(result, {
+              ^
+AssertionError: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
+    controls: [
+      'Undo',
+      'Redo',
+-     'Auto layout',
+      'Zoom in',
+      'Zoom out',
+      'Fit view',
+      'Reset view',
+      'Reset example',
+
+ generatedMessage: true,
+     actual: {
+  controls: [ "Undo", "Redo", "Zoom in", "Zoom out", "Fit view", "Reset view", "Reset example",
+    "Disable clipboard shortcuts", "Disable duplicate shortcut"
+  ],
+  heading: "Basic SVG Canvas",
+  metrics: [Object ...],
+  nodeCount: 3,
+  status: "ready",
+},
+   expected: {
+  heading: "Basic SVG Canvas",
+  status: "ready",
+  nodeCount: 3,
+  controls: [ "Undo", "Redo", "Auto layout", "Zoom in", "Zoom out", "Fit view", "Reset view", "Reset example",
+    "Disable clipboard shortcuts", "Disable duplicate shortcut"
+  ],
+  metrics: [Object ...],
+},
+   operator: "deepStrictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/worktrees/de61/cflow/examples/app/browser-tests/basic-svg.browser.ts:59:10
+
+Bun v1.4.2 (macOS arm64)
+error: script "test:browser" exited with code 1

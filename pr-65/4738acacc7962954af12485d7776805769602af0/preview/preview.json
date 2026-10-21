@@ -8,92 +8,29 @@
   },
   "status": "passed",
   "limitations": [
-    "Documentation Site changes are outside these Examples Application scenes; run docs:check separately."
+    "This task-specific capture verifies manual Layout. Moved-Port connection and ordinary editing are covered by the separately recorded Basic SVG browser suite."
   ],
   "scenes": [
     {
-      "id": "viewport",
-      "title": "Viewport zoom and reset",
+      "id": "manual-layout",
+      "title": "Manual Dagre layout preserves Ports, Selection, Viewport and History",
       "status": "passed",
       "steps": [
-        "Doctor: wait for the real Examples Application and its initial Canvas",
-        "Zoom in through the toolbar; verify 1.20× and unchanged Document",
-        "Reset view; verify the initial 1.00× Viewport"
+        "Initial load has three Nodes, one Edge and no automatic Layout; select Discover and zoom out.",
+        "Click Auto layout once; assert changed LR Node positions, original Edge/Port alignment and unchanged Selection/Viewport.",
+        "Repeat deterministic Layout without a new revision; one Undo and one Redo restore exact prior/current projections."
       ],
       "artifacts": [
-        "viewport/before.png",
-        "viewport/before.snapshot.json",
-        "viewport/zoomed.png",
-        "viewport/zoomed.snapshot.json",
-        "viewport/after.png",
-        "viewport/after.snapshot.json",
-        "viewport/recording.mp4",
-        "viewport/review-encoding.log",
-        "viewport/review.mp4",
-        "viewport/actions.log"
-      ]
-    },
-    {
-      "id": "selection-history",
-      "title": "Selection, duplication and history",
-      "status": "passed",
-      "steps": [
-        "Doctor: wait for the real Examples Application and its initial Canvas",
-        "Select Discover and duplicate using a native keyboard shortcut",
-        "Undo and redo the duplicate; verify Document counts and revision"
-      ],
-      "artifacts": [
-        "selection-history/before.png",
-        "selection-history/before.snapshot.json",
-        "selection-history/duplicated.png",
-        "selection-history/duplicated.snapshot.json",
-        "selection-history/after.png",
-        "selection-history/after.snapshot.json",
-        "selection-history/recording.mp4",
-        "selection-history/review-encoding.log",
-        "selection-history/review.mp4",
-        "selection-history/actions.log"
-      ]
-    },
-    {
-      "id": "port-connection",
-      "title": "Connect source and target Ports",
-      "status": "passed",
-      "steps": [
-        "Doctor: wait for the real Examples Application and its initial Canvas",
-        "Drag Compose output Port onto Ship input Port"
-      ],
-      "artifacts": [
-        "port-connection/before.png",
-        "port-connection/before.snapshot.json",
-        "port-connection/connecting.png",
-        "port-connection/connecting.snapshot.json",
-        "port-connection/after.png",
-        "port-connection/after.snapshot.json",
-        "port-connection/recording.mp4",
-        "port-connection/review-encoding.log",
-        "port-connection/review.mp4",
-        "port-connection/actions.log"
-      ]
-    },
-    {
-      "id": "clipboard",
-      "title": "Copy and paste through the system clipboard",
-      "status": "passed",
-      "steps": [
-        "Doctor: wait for the real Examples Application and its initial Canvas",
-        "Grant clipboard permission only to this isolated browser context",
-        "Copy Discover, paste it, and verify the resulting Canvas"
-      ],
-      "artifacts": [
-        "clipboard/before.png",
-        "clipboard/before.snapshot.json",
-        "clipboard/after.png",
-        "clipboard/after.snapshot.json",
-        "clipboard/recording.mp4",
-        "clipboard/review-encoding.log",
-        "clipboard/review.mp4",
-        "clipboard/actions.log"
+        "build.log",
+        "before-layout.png",
+        "before-layout.json",
+        "after-layout.png",
+        "after-layout.json",
+        "undo-layout.png",
+        "undo-layout.json",
+        "redo-layout.png",
+        "redo-layout.json",
+        "actions.log"
       ]
     }
   ],
@@ -101,202 +38,52 @@
     {
       "path": "build.log",
       "kind": "log",
-      "sha256": "a3a1ba9aa6b5c68dbf1a87403c9acaac38dfcbbcab197203e99ddb4608d11513"
+      "sha256": "0e479bd54d537268825f6d2a80c29b7e06a8a27c387dd77320f9875da1168d39"
     },
     {
-      "path": "ffmpeg.log",
+      "path": "before-layout.png",
+      "kind": "screenshot",
+      "sha256": "f3b1ecc2d8233efe13b737a13810f24fb328408921d50d1cc4376052e800bf13"
+    },
+    {
+      "path": "before-layout.json",
+      "kind": "snapshot",
+      "sha256": "5c23b6bed176aacaed8130c22822b27260e1255396737ae069e11b83d954c262"
+    },
+    {
+      "path": "after-layout.png",
+      "kind": "screenshot",
+      "sha256": "56aed54cc53d088186ca1d27ead5a826adf2d0947cd3010f3efe014d0c8b3fc1"
+    },
+    {
+      "path": "after-layout.json",
+      "kind": "snapshot",
+      "sha256": "6f91a9affe3f84cadacabbce2979b52be036ae932efde672627c70a1ab38ff5e"
+    },
+    {
+      "path": "undo-layout.png",
+      "kind": "screenshot",
+      "sha256": "4cc9d84c0ff06479035d9c23f01a97e1bce452634f55b39ca44cdf6262b8f7c8"
+    },
+    {
+      "path": "undo-layout.json",
+      "kind": "snapshot",
+      "sha256": "34a11d3d7196a6f470a3070a3435901f9ea55cdb301a0caeb566617a3f19ae35"
+    },
+    {
+      "path": "redo-layout.png",
+      "kind": "screenshot",
+      "sha256": "b358e76c59e632c9e2c13b6e6214f9926f6ab33312713741123b0990b0746e88"
+    },
+    {
+      "path": "redo-layout.json",
+      "kind": "snapshot",
+      "sha256": "2e2935863dfa5686f5ccb7dac3e39cdc5851ab8175905861452935181d0a4e2d"
+    },
+    {
+      "path": "actions.log",
       "kind": "log",
-      "sha256": "5b320c97f515e79171f10a2147d875ffb6b14bd2b25681047b73c46fe0a527ee"
-    },
-    {
-      "path": "viewport/before.png",
-      "kind": "screenshot",
-      "sha256": "02cbbd8ce21b22f9f211a333e1142f730703f5a45048430197019fb2578f3aab"
-    },
-    {
-      "path": "viewport/before.snapshot.json",
-      "kind": "snapshot",
-      "sha256": "3bbb029dcea20143f4d762dc745f84ea4e7015263e44a27e0b72dbd167429589"
-    },
-    {
-      "path": "viewport/zoomed.png",
-      "kind": "screenshot",
-      "sha256": "9d5c76893b86f6c0917c84ed91203a4be9279e145c2b3743cd2c6ec1c839ad1c"
-    },
-    {
-      "path": "viewport/zoomed.snapshot.json",
-      "kind": "snapshot",
-      "sha256": "13aa26e890963f712aeb4599e0b754f2c79ad4b15514cd738abcb6c51a117e14"
-    },
-    {
-      "path": "viewport/after.png",
-      "kind": "screenshot",
-      "sha256": "32884497a8f8e75351c7ad401b38f0f44f47d26dd30969181260b51eeb28de89"
-    },
-    {
-      "path": "viewport/after.snapshot.json",
-      "kind": "snapshot",
-      "sha256": "1ffad277b3f1d36d465d63de24c62d3a930087f13779a73cfcd72269b29eafae"
-    },
-    {
-      "path": "viewport/recording.mp4",
-      "kind": "recording",
-      "sha256": "7e61afd5b79223a1e9ca8e54ab52dd9a134350aa44b4a40a55f94973948eec39"
-    },
-    {
-      "path": "viewport/review-encoding.log",
-      "kind": "log",
-      "sha256": "602852802967934f360e23afedf106052c5d044b73e201a7cdae0dce7d833aeb"
-    },
-    {
-      "path": "viewport/review.mp4",
-      "kind": "recording",
-      "sha256": "8b37cae6eeff64e6bc4a1abcb5003a2f3cef62f2a152ca98d06ccf3046603849"
-    },
-    {
-      "path": "viewport/actions.log",
-      "kind": "log",
-      "sha256": "5267b11ef52a4ff89c4e1645d7754fcbf3a0f87cef9acb60e92d89520a3e86cb"
-    },
-    {
-      "path": "selection-history/before.png",
-      "kind": "screenshot",
-      "sha256": "02cbbd8ce21b22f9f211a333e1142f730703f5a45048430197019fb2578f3aab"
-    },
-    {
-      "path": "selection-history/before.snapshot.json",
-      "kind": "snapshot",
-      "sha256": "3bbb029dcea20143f4d762dc745f84ea4e7015263e44a27e0b72dbd167429589"
-    },
-    {
-      "path": "selection-history/duplicated.png",
-      "kind": "screenshot",
-      "sha256": "c3794af7e0d1a0ed63cb38194dfee6c9c72533032657edc66058cd0e92faec13"
-    },
-    {
-      "path": "selection-history/duplicated.snapshot.json",
-      "kind": "snapshot",
-      "sha256": "bf2fb207e656a7f4bad58f8815efe2952e39141455d40c925a55950baffa0a47"
-    },
-    {
-      "path": "selection-history/after.png",
-      "kind": "screenshot",
-      "sha256": "59af1b6a01481cf56d0ea0c417b01e3985fc714739fd99a041f79da39a2b6d13"
-    },
-    {
-      "path": "selection-history/after.snapshot.json",
-      "kind": "snapshot",
-      "sha256": "c5ece6476f482a704e50ccf8b50670f8b881688006e280e65d85ce7dc8b219dc"
-    },
-    {
-      "path": "selection-history/recording.mp4",
-      "kind": "recording",
-      "sha256": "a127beedcd0048aeca90166eab66fdc9d1b424591dec4eba69fd7833b649382a"
-    },
-    {
-      "path": "selection-history/review-encoding.log",
-      "kind": "log",
-      "sha256": "332f8359d2406d1ba25dd5729d61416c3a2d9d45f390ff8db6825a94531be450"
-    },
-    {
-      "path": "selection-history/review.mp4",
-      "kind": "recording",
-      "sha256": "cd01d0c0a259dad6c6509a63a0df41915180f6a2e7f5ff024247c2de9881fa56"
-    },
-    {
-      "path": "selection-history/actions.log",
-      "kind": "log",
-      "sha256": "181914f2773cd43ab410b50d8cc29dfa24a00acf0a97b005d1d00ed080bf78ed"
-    },
-    {
-      "path": "port-connection/before.png",
-      "kind": "screenshot",
-      "sha256": "02cbbd8ce21b22f9f211a333e1142f730703f5a45048430197019fb2578f3aab"
-    },
-    {
-      "path": "port-connection/before.snapshot.json",
-      "kind": "snapshot",
-      "sha256": "3bbb029dcea20143f4d762dc745f84ea4e7015263e44a27e0b72dbd167429589"
-    },
-    {
-      "path": "port-connection/connecting.png",
-      "kind": "screenshot",
-      "sha256": "3070f93eb8b01410816da915837e67caf1e8cd16b2b72798693683c2bac201a4"
-    },
-    {
-      "path": "port-connection/connecting.snapshot.json",
-      "kind": "snapshot",
-      "sha256": "3bbb029dcea20143f4d762dc745f84ea4e7015263e44a27e0b72dbd167429589"
-    },
-    {
-      "path": "port-connection/after.png",
-      "kind": "screenshot",
-      "sha256": "14fc618bb25a018f84f8041e213a3060c399bfcc76e9501ac43e4b694479d7ae"
-    },
-    {
-      "path": "port-connection/after.snapshot.json",
-      "kind": "snapshot",
-      "sha256": "980b6a9471c49a648149d1f2fa247981fdeb8db2aea00804c65a4c015bcdfae3"
-    },
-    {
-      "path": "port-connection/recording.mp4",
-      "kind": "recording",
-      "sha256": "8dcb7b98c120a1277ee2870fb7b9575a5ab9e7a04853cc6ffff83a8506c07dba"
-    },
-    {
-      "path": "port-connection/review-encoding.log",
-      "kind": "log",
-      "sha256": "196ea16e41a65b87e8f536acad83640be2200c9b2eb4e3ae5fa98aec9c52c517"
-    },
-    {
-      "path": "port-connection/review.mp4",
-      "kind": "recording",
-      "sha256": "d03885b00ce877ae29fdbc4877ac6731632f5a4ed674b88b8f76de45ccb4dbbc"
-    },
-    {
-      "path": "port-connection/actions.log",
-      "kind": "log",
-      "sha256": "cbe7eea679172b2ce0365e295adc8961b74ce17f1a9a782b142f5068bb46f723"
-    },
-    {
-      "path": "clipboard/before.png",
-      "kind": "screenshot",
-      "sha256": "02cbbd8ce21b22f9f211a333e1142f730703f5a45048430197019fb2578f3aab"
-    },
-    {
-      "path": "clipboard/before.snapshot.json",
-      "kind": "snapshot",
-      "sha256": "3bbb029dcea20143f4d762dc745f84ea4e7015263e44a27e0b72dbd167429589"
-    },
-    {
-      "path": "clipboard/after.png",
-      "kind": "screenshot",
-      "sha256": "46ed7d9853328bded748ca4312431d64b9cea8c0a19d2b0253638d320d1eaa23"
-    },
-    {
-      "path": "clipboard/after.snapshot.json",
-      "kind": "snapshot",
-      "sha256": "b237f118fe2691acd697284bc77e025d03d8a2e8b225e4c79ff0dff32702edfb"
-    },
-    {
-      "path": "clipboard/recording.mp4",
-      "kind": "recording",
-      "sha256": "2a35849aeee30fbb5f62425e4ba47bb53b05fac422aa7a09674544b41c81c390"
-    },
-    {
-      "path": "clipboard/review-encoding.log",
-      "kind": "log",
-      "sha256": "dd93eec650b656652197620ab7ddd97bd0b4322a55340365a2802c6e520264a9"
-    },
-    {
-      "path": "clipboard/review.mp4",
-      "kind": "recording",
-      "sha256": "bce030508ce35f6a8aab67455a7060c9f9ba36085c1e64841fe9fcf31430b0f4"
-    },
-    {
-      "path": "clipboard/actions.log",
-      "kind": "log",
-      "sha256": "f080674ad7f73c9f9253ee9ceda14c0da7c5a46cd75a10a6c0b2a56a7d0952ae"
+      "sha256": "c610f36146f33afaf14eb84dd7582707f895160decf36a99ac38566cda181138"
     }
   ]
 }
