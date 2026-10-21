@@ -1,0 +1,10 @@
+@nodebraid/canvas-fragment build: $ bun run --filter '@nodebraid/diagnostics' build && bun run --filter '@nodebraid/kernel' build
+@nodebraid/canvas-fragment build: @nodebraid/diagnostics build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/canvas-fragment build: @nodebraid/diagnostics build: Exited with code 0
+@nodebraid/canvas-fragment build: @nodebraid/kernel build: $ bun run --filter '@nodebraid/diagnostics' build
+@nodebraid/canvas-fragment build: @nodebraid/kernel build: @nodebraid/diagnostics build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/canvas-fragment build: @nodebraid/kernel build: @nodebraid/diagnostics build: Exited with code 0
+@nodebraid/canvas-fragment build: @nodebraid/kernel build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/canvas-fragment build: @nodebraid/kernel build: Exited with code 0
+@nodebraid/canvas-fragment build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/canvas-fragment build: Exited with code 0

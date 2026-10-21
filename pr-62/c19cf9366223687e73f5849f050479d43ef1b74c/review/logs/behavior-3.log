@@ -1,0 +1,33 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-clipboard/tests/failures.test.ts:
+173 |     materializeIds: () => ({ nodes: [], edges: [] }),
+174 |   });
+175 |   const before = harness.kernel.read().snapshot;
+176 | 
+177 |   try {
+178 |     await expect(harness.commands.execute(pasteClipboardCommand, undefined)).rejects.toMatchObject({
+                                                                                           ^
+error: expect(received).toMatchObject(expected)
+
+- {
+-   "cause": ObjectContaining {
+-     "code": "INVALID_FRAGMENT",
+-     "domain": "canvas-fragment",
+-   },
+-   "code": "INVALID_FRAGMENT",
+-   "domain": "plugin.clipboard",
+- }
++ [CanvasFragmentError: Canvas Fragment must contain at least one Node.]
+
+- Expected  - 8
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/packages/plugin-clipboard/tests/failures.test.ts:178:86)
+(fail) Paste rejects a decoded Fragment whose normalized Node collection is empty [25.15ms]
+
+ 0 pass
+ 4 filtered out
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [132.00ms]

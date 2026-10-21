@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "e88b531ba643ca2e32e558e2195c9784271af33f",
+    "head": "c19cf9366223687e73f5849f050479d43ef1b74c",
+    "tree": "401ef3c6892b35f61c1fcc2ff85b2d4427a5f18c",
+    "patch": "39338ace33092a479b81122e32299446b46c3a1f40c1d026c517df69d5bf0d5e",
+    "localHead": "aa935d2162ee77b42715baa5e41dafc83584e274"
+  },
+  "task": {
+    "run": "3b5cf684-3507-4c1f-828c-06031ac83ceb",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 59
+    },
+    "request": "d471a41e84b7b6172bccfb5f2e1b00b84b148ca8fb45e8595187662da8b030c7",
+    "plan": [
+      {
+        "id": "nonempty-collection",
+        "blockedBy": [],
+        "acceptance": "Public Fragment red-green: normalized zero-length Proxy arrays reject with existing INVALID_FRAGMENT, domain and message; no empty accepted Fragment is returned."
+      },
+      {
+        "id": "snapshot-and-consumers",
+        "blockedBy": [
+          "nonempty-collection"
+        ],
+        "acceptance": "Retain one accepted indexed collection for nonempty and membership validation; native length conversion, source read/error identity, valid ordering/opaque data/immutability and real Clipboard/Duplicate behavior preserved."
+      },
+      {
+        "id": "delivery",
+        "blockedBy": [
+          "snapshot-and-consumers"
+        ],
+        "acceptance": "Affected/full checks and independent Standards+ponytail-review/Spec; append-only exact remote tree/parent, current-head CI, actual report/preview publication/readback; human review/merge."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "aa935d2162ee77b42715baa5e41dafc83584e274",
+      "tree": "401ef3c6892b35f61c1fcc2ff85b2d4427a5f18c",
+      "patch": "39338ace33092a479b81122e32299446b46c3a1f40c1d026c517df69d5bf0d5e",
+      "report": "**verdict: passed**\n\n完整三文件已审查。\n\n硬标准：未发现违反。非空检查使用规范化后的自有 Node 集合，符合 ADR0078 的 Fragment 验证边界；未改变 ADR0012 的 opaque data 引用约定。公共回归符合 AGENTS/TDD 要求，Clipboard 测试使用真实 Runtime Services。\n\n判断性 smell：未发现有具体后果的可操作问题。移动既有判断即可修复根因，无新增抽象或边界策略。\n\n已追踪 Fragment 接受、materialization、Clipboard 错误包装、Duplicate 和 Example codec。保留原生长度转换、索引读取异常、排序及冻结行为；Clipboard 在提交前以 `INVALID_FRAGMENT` 拒绝空集合。\n\n本轮实际执行三个相关包测试：**98 pass、392 assertions**；`git diff --check` 通过，工作树干净。未执行构建、full check、浏览器、发布或 CI；结论限于指定提交。\n\n```text\nhead: aa935d2162ee77b42715baa5e41dafc83584e274\ntree: 401ef3c6892b35f61c1fcc2ff85b2d4427a5f18c\npatch: 39338ace33092a479b81122e32299446b46c3a1f40c1d026c517df69d5bf0d5e\n```"
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "aa935d2162ee77b42715baa5e41dafc83584e274",
+      "tree": "401ef3c6892b35f61c1fcc2ff85b2d4427a5f18c",
+      "patch": "39338ace33092a479b81122e32299446b46c3a1f40c1d026c517df69d5bf0d5e",
+      "report": "verdict: **passed**\n\n已核验完整三文件补丁、Issue #59 全文、空 comments/blockers、prepared task、ADR0078/0012及公共消费者；未发现验收遗漏、范围扩张或错误实现。\n\n既有非空检查移到 owned Node 集合之后，与后续验证及返回值使用同一集合；normalized-zero 输入保留原 `CanvasFragmentError` domain/code/message。原生长度转换、索引读取异常、opaque data、parent/Endpoint、Selection 和冻结语义未改变。真实 Clipboard 回归确认错误在 decoded Fragment 边界包装为 `plugin.clipboard/INVALID_FRAGMENT`，且无状态提交。\n\n已查看原始 red 日志，失败属于预期行为断言。实际运行：\n\n`bun test packages/canvas-fragment/tests packages/plugin-clipboard/tests packages/plugin-duplicate-selection/tests`\n\n结果 **98 pass、0 fail、392 assertions**；`git diff --check` 通过，工作树干净。\n\n未执行构建、full check，未验证当前 head 的远端 CI 或报告发布回读。\n\n- head: `aa935d2162ee77b42715baa5e41dafc83584e274`\n- tree: `401ef3c6892b35f61c1fcc2ff85b2d4427a5f18c`\n- patch SHA256: `39338ace33092a479b81122e32299446b46c3a1f40c1d026c517df69d5bf0d5e`"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "normalized-empty-red",
+      "acceptance": "On base e88b531, a genuine Proxy array length 0.5 passed the existing nonempty check and returned an empty accepted Fragment. The public regression expected INVALID_FRAGMENT but no exception was thrown.",
+      "command": "bun test packages/canvas-fragment/tests/array-input.test.ts --test-name-pattern 'empty normalized'",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "normalized-empty-green",
+      "acceptance": "The same public regression rejects normalized empty input with the existing CanvasFragmentError domain, code and exact message after checking the owned collection.",
+      "command": "bun test packages/canvas-fragment/tests/array-input.test.ts --test-name-pattern 'empty normalized'",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "clipboard-old-built-dependency-red",
+      "acceptance": "Real Command/Runtime test ran against the unmodified Fragment artifact built from base e88b531 before rebuilding the changed dependency. It exposed the raw CanvasFragmentError instead of the promised Clipboard INVALID_FRAGMENT wrapper. This is a behavior assertion failure, not a build/setup failure.",
+      "command": "bun test packages/plugin-clipboard/tests/failures.test.ts --test-name-pattern 'normalized Node collection'",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "fragment-build",
+      "acceptance": "Rebuilt the changed Fragment package and its required declarations/artifact checks before testing consumers through package-name imports.",
+      "command": "bun run --filter '@nodebraid/canvas-fragment' build",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "fragment-and-consumers-green",
+      "acceptance": "98 tests / 392 assertions passed: normalized-zero lengths, one accepted Node collection, original input-read errors/hooks, and real Clipboard/Duplicate integration. Clipboard rejects the decoded malformed value with the proper wrapper and no Document change.",
+      "command": "bun test packages/canvas-fragment/tests packages/plugin-clipboard/tests packages/plugin-duplicate-selection/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "1b36b53fdad67893abd8f4384ff7c606a28874a16175008a679f1beb98de1db1"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "b234921349d04d6f7d510e13bc44f80e7abbb9a968fc1bc58d96cb3d17578c5a"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "403e662304c534a9299a5c9dea75a1e336b002cc9adf6cb0ac3b334f6b8e7adc"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "c27844450f4a33f0c0f0a1acebd4c1719fd51aca3fd21b230c8b3b0e0d11a9ba"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "95f9b04b896db85add9406911b73cf6b5a0ffbb37c3c48b2c6590550657c6ec2"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "750fdc69e506771d46d34c6f0b5940db5e8a9a3141c95d5ae07bb1d0fc248a7b"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "5bba58a97defa7e19cd20a6e0a40a4d13f8244b8f7592824074dd8afb63a5b7e"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "3e2392ab22beee961919121329398ea71ee23027cb00b0cdfe56b42566473d61"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "db7439341a793f5d26ad30f8e222c32e0e3d7f9a9cf09395534c3769dd0b7312"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+bun test v1.4.2 (744846f84)
+
+packages/canvas-fragment/tests/array-input.test.ts:
+(pass) rejects an empty normalized Node collection [0.98ms]
+
+ 1 pass
+ 11 filtered out
+ 0 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [18.00ms]

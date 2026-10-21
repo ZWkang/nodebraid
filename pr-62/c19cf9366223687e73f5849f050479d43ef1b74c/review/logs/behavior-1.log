@@ -1,0 +1,33 @@
+bun test v1.4.2 (744846f84)
+
+packages/canvas-fragment/tests/array-input.test.ts:
+40 |       type: 'nodebraid.canvas-fragment',
+41 |       nodes,
+42 |       edges: [],
+43 |       selection: { nodeIds: [], edgeIds: [] },
+44 |     }),
+45 |   ).toThrow(
+         ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: {
+  type: "nodebraid.canvas-fragment",
+  nodes: [],
+  edges: [],
+  selection: {
+    nodeIds: [],
+    edgeIds: [],
+  },
+}
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/packages/canvas-fragment/tests/array-input.test.ts:45:5)
+(fail) rejects an empty normalized Node collection [2.10ms]
+
+ 0 pass
+ 11 filtered out
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [29.00ms]

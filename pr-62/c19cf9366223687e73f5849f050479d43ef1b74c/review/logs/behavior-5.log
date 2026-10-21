@@ -1,0 +1,135 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-clipboard/tests/behavior.test.ts:
+(pass) Copy keeps empty and edge-only Selection as no-ops without codec or transport calls [55.02ms]
+(pass) History Undo removes a Paste and Redo restores only the Document [15.02ms]
+(pass) Clipboard preserves nested parents, ports, self-loops, parallel Edges, and boundary scope [6.90ms]
+(pass) Paste rejects a missing external parent immediately before commit [4.07ms]
+(pass) Paste preserves its Commit but rejects when a newer Selection wins [6.42ms]
+(pass) concurrent Paste Commands are independent and repeated Paste keeps one deterministic offset [5.77ms]
+(pass) Copy and Paste execute independently without queuing or rewriting the captured Fragment [2.38ms]
+
+packages/plugin-clipboard/tests/index.test.ts:
+(pass) Copy captures one committed selected-node Fragment before writing text [1.53ms]
+(pass) Paste reads, validates, materializes, commits once, and selects the pasted Fragment [17.01ms]
+
+packages/plugin-clipboard/tests/types.test.ts:
+(pass) publishes typed Clipboard behavior and Shortcut Plugins [0.35ms]
+
+packages/plugin-clipboard/tests/duplicate-composition.test.ts:
+(pass) Duplicate and Clipboard compose through one Host and shared Canvas Fragment seam [7.45ms]
+
+packages/plugin-clipboard/tests/shortcut.test.ts:
+(pass) default Clipboard Shortcuts route exact Mod+C and Mod+V through Interaction [14.05ms]
+
+packages/plugin-clipboard/tests/lifecycle.test.ts:
+(pass) Clipboard disposal aborts and awaits an in-flight external read without residual registrations [2.54ms]
+(pass) caller cancellation keeps its reason and dependency recovery creates fresh Clipboard registrations [2.26ms]
+
+packages/plugin-clipboard/tests/factory.test.ts:
+(pass) Copy and Paste retain the accepted transport property [5.23ms]
+(pass) Copy and Paste retain the accepted readText property [1.57ms]
+(pass) Copy and Paste retain the accepted writeText property [1.08ms]
+(pass) Copy and Paste retain the accepted codec property [3.51ms]
+(pass) Copy and Paste retain the accepted encode property [2.73ms]
+(pass) Copy and Paste retain the accepted decode property [3.57ms]
+(pass) Copy and Paste retain the accepted materializeIds property [1.67ms]
+(pass) Copy and Paste retain the accepted offset property [2.94ms]
+(pass) Copy and Paste retain the accepted x property [1.09ms]
+(pass) Copy and Paste retain the accepted y property [1.02ms]
+(pass) factory keeps the original transport getter exception [0.15ms]
+(pass) factory keeps the original readText getter exception
+(pass) factory keeps the original writeText getter exception
+(pass) factory keeps the original codec getter exception
+(pass) factory keeps the original encode getter exception
+(pass) factory keeps the original decode getter exception
+(pass) factory keeps the original materializeIds getter exception
+(pass) factory keeps the original offset getter exception
+(pass) factory keeps the original x getter exception
+(pass) factory keeps the original y getter exception
+(pass) factory rejects invalid transport before reading codec [0.07ms]
+(pass) factory rejects invalid readText before reading writeText
+(pass) factory rejects invalid writeText before reading codec
+(pass) factory rejects invalid codec before reading materializeIds
+(pass) factory rejects invalid encode before reading decode [0.02ms]
+(pass) factory rejects invalid decode before reading materializeIds [0.02ms]
+(pass) factory rejects invalid materializeIds before reading offset
+(pass) factory rejects invalid x before reading y
+(pass) factory rejects unknown fields before invoking configuration getters [0.08ms]
+(pass) factory preserves omitted, nullish, and zero offsets: undefined [2.68ms]
+(pass) factory preserves omitted, nullish, and zero offsets: null [0.81ms]
+(pass) factory preserves omitted, nullish, and zero offsets: {
+  x: 0,
+  y: 0,
+} [0.94ms]
+(pass) factory owns its accepted shell while keeping application inputs mutable [1.06ms]
+
+packages/plugin-clipboard/tests/failures.test.ts:
+(pass) Clipboard external transport and codec failures keep stable identities and original causes [6.03ms]
+(pass) Paste rejects foreign decoded values and incomplete mapping without a Commit [5.26ms]
+(pass) Paste rejects a decoded Fragment whose normalized Node collection is empty [3.14ms]
+(pass) Paste wraps a Kernel validation rejection as COMMIT_FAILED without partial state [2.38ms]
+(pass) Paste rejects occupied materialized Node and Edge IDs atomically [2.17ms]
+
+packages/plugin-duplicate-selection/tests/index.test.ts:
+(pass) Duplicate Selection factories reject malformed config structurally [0.79ms]
+(pass) Duplicate Selection copies the current Node and selects its duplicate as one History entry [2.98ms]
+(pass) Duplicate Selection captures the validated materializer for execution [4.49ms]
+(pass) Duplicate Selection captures the finite offset coordinates accepted at creation [1.47ms]
+(pass) Duplicate Selection captures its offset reference and retains an explicit zero copy [0.99ms]
+(pass) Duplicate Selection preserves validation short circuits before later option reads [0.13ms]
+(pass) Duplicate Selection preserves original option getter failures [0.10ms]
+(pass) Duplicate Selection remaps nested Nodes, ports, self-loops, and parallel internal Edges only [1.56ms]
+(pass) Duplicate Selection preserves an unselected parent and does not copy unselected descendants [1.65ms]
+(pass) Duplicate Selection keeps empty and edge-only Selection as no-ops without materialization [2.40ms]
+(pass) Duplicate Selection rejects incomplete ID mapping atomically [1.14ms]
+(pass) Duplicate Selection rejects extra, duplicate, colliding, and async ID materialization [7.07ms]
+(pass) Duplicate Selection preserves an application materializer failure identity [1.03ms]
+(pass) Duplicate Selection rejects same-value source ABA without blocking unrelated Commits [0.93ms]
+(pass) Duplicate Selection rejects a new internal Edge and same-value internal Edge ABA [1.78ms]
+(pass) Undo removes Duplicate Selection and Redo restores Document without reselecting [1.36ms]
+(pass) Duplicate Selection preserves a Commit but does not overwrite newer Selection from a Commit observer [2.34ms]
+(pass) Duplicate Selection wraps post-Commit Session loss with the committed revision [1.39ms]
+
+packages/plugin-duplicate-selection/tests/types.test.ts:
+(pass) publishes typed Duplicate Selection behavior and Shortcut Plugins [0.21ms]
+
+packages/plugin-duplicate-selection/tests/shortcut.test.ts:
+(pass) the Duplicate Shortcut factory captures its option reference once [0.07ms]
+(pass) the Duplicate Shortcut factory preserves captured invalid values and getter failures [0.18ms]
+(pass) the default Duplicate Shortcut invokes the public behavior through Mod+D [5.12ms]
+
+packages/plugin-duplicate-selection/tests/lifecycle.test.ts:
+(pass) Duplicate Selection registration follows dependency loss, reactivation, and disposal [1.61ms]
+
+packages/canvas-fragment/tests/index.test.ts:
+(pass) captures the selected-node induced subgraph and explicit Selection in canonical order [0.27ms]
+(pass) materializes nested Nodes and port-qualified Edges with fresh IDs and one world offset [0.28ms]
+(pass) accepts one decoded Fragment shell and rejects edges outside its Node set [0.16ms]
+
+packages/canvas-fragment/tests/array-input.test.ts:
+(pass) rejects an empty normalized Node collection for length %s [0.10ms]
+(pass) rejects an empty normalized Node collection for length %s [0.03ms]
+(pass) rejects an empty normalized Node collection for length %s [0.02ms]
+(pass) rejects an empty normalized Node collection for length 0 [0.05ms]
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length %s [0.02ms]
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length %s
+(pass) returns the same Node collection that passed Fragment validation [0.36ms]
+(pass) rejects malformed Fragment elements even when the array defines map [0.05ms]
+(pass) materializes the actual mapping elements even when the array defines map [0.17ms]
+(pass) validates every element within a Proxy array length [0.34ms]
+(pass) accepts frozen array data without invoking method, iterator or constructor hooks [0.34ms]
+(pass) rejects a missing Fragment nodes element [0.85ms]
+(pass) rejects a missing Fragment edges element [0.06ms]
+(pass) rejects a missing Fragment selectionNodes element [0.07ms]
+(pass) rejects a missing Fragment selectionEdges element [0.04ms]
+(pass) rejects a missing nodes materialization element [0.26ms]
+(pass) rejects a missing edges materialization element [0.11ms]
+(pass) preserves an array element read failure [0.18ms]
+
+ 98 pass
+ 0 fail
+ 392 expect() calls
+Ran 98 tests across 14 files. [383.00ms]
