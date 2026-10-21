@@ -1,0 +1,28 @@
+bun test v1.4.2 (744846f84)
+
+tests/local-agent-bases.test.ts:
+Switched to a new branch 'feat/issue-68'
+(pass) initial delivery keeps the review base separate from the append parent [1271.34ms]
+Switched to a new branch 'feat/issue-68'
+(pass) append delivery keeps the review base separate from the append parent [875.09ms]
+Switched to a new branch 'feat/issue-68'
+Switched to a new branch 'main'
+Switched to branch 'feat/issue-68'
+130 |         );
+131 |         expect(git('rev-parse', `${flattened}^{tree}`)).toBe(tree);
+132 |         expect(git('show', '-s', '--format=%P', flattened)).toBe(parent);
+133 |         json('.tmp/dropped-base-parent.json', { sha: flattened, tree: { sha: tree }, parents: [{ sha: parent }] });
+134 |         const rejected = invoke(cli, 'publication', '.tmp/run', '.tmp/dropped-base-parent.json');
+135 |         expect(rejected.status).not.toBe(0);
+                                          ^
+error: expect(received).not.toBe(expected)
+
+Expected: not 0
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/tests/local-agent-bases.test.ts:135:37)
+(fail) main-sync delivery keeps the review base separate from the append parent [730.06ms]
+
+ 2 pass
+ 1 fail
+ 44 expect() calls
+Ran 3 tests across 1 file. [2.94s]

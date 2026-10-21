@@ -1,0 +1,24 @@
+bun test v1.4.2 (744846f84)
+
+tests/local-agent-bases.test.ts:
+Switched to a new branch 'feat/issue-68'
+54 |       request: 'Execution fixture for independent scope and parent binding; not a live review.',
+55 |       pending: [],
+56 |       plan: [{ id: 'deliver', blockedBy: [], acceptance: 'Real Git scope, real Bun check and coherent evidence' }],
+57 |     });
+58 |     expect(invoke(cli, 'prepare', '.tmp/input.json', '.tmp/run').status).toBe(0);
+59 |     expect(read('.tmp/run/prepared-task.json').expectedParent).toBe(parent);
+                                                                    ^
+error: expect(received).toBe(expected)
+
+Expected: "7f95b68e2206aa9a0135b8b16c8bee58f2676ebb"
+Received: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/tests/local-agent-bases.test.ts:59:64)
+(fail) append delivery keeps the review base separate from the append parent [366.03ms]
+
+ 0 pass
+ 2 filtered out
+ 1 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [439.00ms]

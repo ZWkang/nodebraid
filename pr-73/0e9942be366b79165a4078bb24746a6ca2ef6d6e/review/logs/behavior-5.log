@@ -1,0 +1,85 @@
+bun test v1.4.2 (744846f84)
+
+tests/local-agent-reconcile.test.ts:
+(pass) one spec issue needs no child issue and closes only after its main PR is integrated and accepted [1167.97ms]
+(pass) merged stacked delivery remains incomplete until its real merge commit reaches fetched main [716.68ms]
+(pass) incomplete PR decision metadata cannot send an already integrated implementation back to the frontier [579.40ms]
+(pass) invalid task and parent issue states fail before deriving delivery or closure candidates [424.90ms]
+(pass) an open stacked PR is retargeted only after its upstream is integrated, then requires fresh verification [530.21ms]
+(pass) a completed follow-up delivery does not repeatedly integrate its historical feature-branch merge [512.79ms]
+(pass) missing native relationships and stale default-branch evidence fail explicitly [424.26ms]
+(pass) approved task frontier respects native blockers, active owners and explicit execution choices [842.29ms]
+
+tests/pr-evidence.test.ts:
+(pass) publishes actual checksummed evidence and preserves author text on repeated updates [5.81ms]
+(pass) rejects stale source, tampered bytes and files outside the evidence directory [7.00ms]
+(pass) rejects symlinks and inconsistent scene artifact references [1.58ms]
+(pass) a failed scenario stays failed in the published report [0.81ms]
+(pass) a changed PR head prevents all publication writes [7.13ms]
+(pass) publishes media through Git data, updates only the evidence block and reads it back [8.38ms]
+(pass) cannot publish claimed evidence for another source tree [1.73ms]
+(pass) rejects a success claim without screenshots and malformed PR markers [0.80ms]
+(pass) resolves an empty workflow PR association from current commit-linked PRs only [0.13ms]
+(pass) untrusted preview names cannot address the independent review namespace [1.36ms]
+(pass) preview-only publication refuses a different saved base/patch before uploading [2.89ms]
+(pass) review-only publication refuses a different saved base/patch before uploading [2.43ms]
+(pass) preserving a previous report requires its original artifact bytes to match [3.10ms]
+
+tests/local-agent-run.test.ts:
+(pass) a new green head cannot inherit the previous tree, reviews or test evidence [2.35ms]
+
+tests/verification-report.test.ts:
+Switched to a new branch 'feat/issue-45'
+(pass) legacy runs without expectedParent stay historical and are not rewritten by reporting [532.43ms]
+Switched to a new branch 'feat/issue-45'
+(pass) legacy runs without baseRefName stay historical and are not rewritten by reporting [521.78ms]
+Switched to a new branch 'feat/issue-45'
+(pass) repeating report generation preserves the previous proof rather than overwriting it [541.56ms]
+Switched to a new branch 'feat/issue-45'
+(pass) the public report command preserves both reviews, real logs and published identity without inventing regressions [588.73ms]
+Switched to a new branch 'feat/issue-45'
+(pass) declared behavior results retain real red/green logs, failures and explicit unrun checks [565.18ms]
+Switched to a new branch 'feat/issue-45'
+(pass) the report refuses log paths outside the run and every symlink, including metadata and output files [703.38ms]
+Switched to a new branch 'feat/issue-45'
+(pass) stale publication or reviews and missing original logs fail before a report is written [682.12ms]
+Switched to a new branch 'feat/issue-45'
+(pass) behavior declarations cannot turn missing execution, unexplained red or contradictory exits into a pass [663.65ms]
+
+tests/local-agent-cli.test.ts:
+(pass) one issue resumes its local ticket frontier without creating child issues [168.92ms]
+Switched to a new branch 'feat/issue-10'
+(pass) a persisted task resumes after a failed real check and never blesses an unrelated head [800.34ms]
+
+tests/pr-feedback.test.ts:
+(pass) local evidence comments do not trigger themselves, while later edits still enter the queue [0.09ms]
+(pass) only a verified current PR head is ready for human review [0.11ms]
+(pass) stacked PRs retain feedback maintenance and integration branches can deliver to main [0.04ms]
+(pass) the same failed check requests one repair; a rerun or new head requests new work [0.03ms]
+(pass) addressed review feedback is not repeated, but edits and design questions remain actionable [0.03ms]
+(pass) green CI does not dismiss a human change request or ignore a conflicting base [0.02ms]
+(pass) a handoff cannot omit feedback, invent dispositions, or claim a different request [0.39ms]
+(pass) CI result order does not cause duplicate repair dispatches [0.03ms]
+(pass) an unresolved thread must be revalidated at the new head before automatic resolution [0.04ms]
+(pass) removing opt-in or switching to draft excludes even otherwise actionable feedback [0.02ms]
+(pass) a receipt from another PR or an old head cannot hide current feedback [0.01ms]
+(pass) an incomplete resolved thread cannot hide a newer reply on its next page [0.02ms]
+
+tests/github-feedback.test.ts:
+(pass) pagination must finish, including the empty page after an exact page boundary [0.33ms]
+(pass) edited and resolved-thread replies enter feedback while current-head workflow identity is checked [0.52ms]
+
+tests/local-agent-bases.test.ts:
+Switched to a new branch 'feat/issue-68'
+(pass) initial delivery keeps the review base separate from the append parent [1116.04ms]
+Switched to a new branch 'feat/issue-68'
+(pass) append delivery keeps the review base separate from the append parent [880.60ms]
+Switched to a new branch 'feat/issue-68'
+Switched to a new branch 'main'
+Switched to branch 'feat/issue-68'
+(pass) main-sync delivery keeps the review base separate from the append parent [1152.09ms]
+
+ 49 pass
+ 0 fail
+ 391 expect() calls
+Ran 49 tests across 8 files. [14.21s]

@@ -1,0 +1,111 @@
+$ bun run lint && bun run format:check && bun run scripts/build-workspaces.ts && bun run build:root && bun run typecheck:self && bun run test && bun run test:browser:self && bun run --cwd examples/app test:browser:self && bun run docs:check:self
+$ oxlint .
+examples/app/src/example-runtime/create-example-runtime.ts:70:33: warning unicorn(no-useless-spread): Using a spread operator here creates a new array unnecessarily. help: `for…of` can iterate over iterable, it's unnecessary to convert to an array.
+packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:53:30: warning unicorn(no-new-array): Do not use `new Array(singleArgument)`. help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+examples/app/browser-tests/clipboard.browser.ts:250:30: warning eslint(no-unsafe-finally): Unsafe `finally` block. help: Control flow inside `try` or `catch` blocks will be overwritten by this statement.
+examples/app/browser-tests/clipboard.browser.ts:251:28: warning eslint(no-unsafe-finally): Unsafe `finally` block. help: Control flow inside `try` or `catch` blocks will be overwritten by this statement.
+packages/diagnostics/src/diagnostic-value.ts:58:22: warning unicorn(no-new-array): Do not use `new Array(singleArgument)`. help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+packages/kernel/tests/commit-preparation.test.ts:111:17: warning unicorn(no-thenable): Do not add `then` to an object. help: If an object is defined as 'thenable', once it's accidentally used in an await expression, it may cause problems
+packages/diagnostics/tests/index.test.ts:71:20: warning unicorn(no-new-array): Do not use `new Array(singleArgument)`. help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+packages/diagnostics/tests/index.test.ts:97:18: warning unicorn(no-new-array): Do not use `new Array(singleArgument)`. help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+packages/diagnostics/tests/index.test.ts:107:18: warning unicorn(no-new-array): Do not use `new Array(singleArgument)`. help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+$ prettier --check --ignore-unknown .
+Checking formatting...
+All matched files use Prettier code style!
+[build] @nodebraid/diagnostics
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/kernel
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/runtime-cordis
+$ tsgo -p tsconfig.build.json
+[build] @nodebraid/plugin-command
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-kernel
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-history
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/session-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-session
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/adapter-react
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/canvas-fragment
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/port-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/interaction-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-api
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-port
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-renderer
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-interaction
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-clipboard
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-duplicate-selection
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-layout
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/preset-basic
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/core
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-dagre
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-elk
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-svg
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/examples
+$ vite build
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 2185 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                              0.62 kB │ gzip:   0.34 kB
+dist/assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2    7.42 kB
+dist/assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2      8.00 kB
+dist/assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2       15.08 kB
+dist/assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2      16.51 kB
+dist/assets/geist-latin-wght-normal-BgDaEnEv.woff2          29.40 kB
+dist/assets/index-B7yrd1ul.css                              38.29 kB │ gzip:   8.10 kB
+dist/assets/routes-B9kSEoms.js                               0.56 kB │ gzip:   0.41 kB
+dist/assets/rolldown-runtime-CbXtAM7H.js                     0.58 kB │ gzip:   0.36 kB
+dist/assets/preload-helper-nlOK6TZ5.js                      35.01 kB │ gzip:  12.63 kB
+dist/assets/basic-svg-DzZgKwmP.js                          241.75 kB │ gzip:  72.23 kB
+dist/assets/index-DTTkPC96.js                              348.54 kB │ gzip: 113.55 kB
+
+✓ built in 320ms
+$ bun build ./src/index.ts --outdir ./dist --target bun
+Bundled 1 module in 8ms
+
+  index.js  67 bytes  (entry point)
+
+$ tsgo --noEmit -p tsconfig.json && tsgo --noEmit -p packages/diagnostics/tsconfig.json && tsgo --noEmit -p packages/kernel/tsconfig.json && tsgo --noEmit -p packages/canvas-fragment/tsconfig.json && tsgo --noEmit -p packages/session-api/tsconfig.json && tsgo --noEmit -p packages/interaction-api/tsconfig.json && tsgo --noEmit -p packages/port-api/tsconfig.json && tsgo --noEmit -p packages/renderer-api/tsconfig.json && tsgo --noEmit -p packages/renderer-svg/tsconfig.json && tsgo --noEmit -p packages/runtime-cordis/tsconfig.json && tsgo --noEmit -p packages/plugin-command/tsconfig.json && tsgo --noEmit -p packages/plugin-kernel/tsconfig.json && tsgo --noEmit -p packages/plugin-port/tsconfig.json && tsgo --noEmit -p packages/plugin-session/tsconfig.json && tsgo --noEmit -p packages/plugin-renderer/tsconfig.json && tsgo --noEmit -p packages/plugin-interaction/tsconfig.json && tsgo --noEmit -p packages/plugin-duplicate-selection/tsconfig.json && tsgo --noEmit -p packages/plugin-clipboard/tsconfig.json && tsgo --noEmit -p packages/plugin-history/tsconfig.json && tsgo --noEmit -p packages/preset-basic/tsconfig.json && tsgo --noEmit -p packages/layout-api/tsconfig.json && tsgo --noEmit -p packages/layout-dagre/tsconfig.json && tsgo --noEmit -p packages/layout-elk/tsconfig.json && tsgo --noEmit -p packages/plugin-layout/tsconfig.json && tsgo --noEmit -p packages/core/tsconfig.json && tsgo --noEmit -p packages/adapter-react/tsconfig.json && tsgo --noEmit -p examples/app/tsconfig.json && bun run agents:typecheck
+tests/local-agent-cli.test.ts(125,59): error TS2345: Argument of type '{ run: string; repository: string; source: { kind: string; number: number; }; branch: string; baseRefName: string; base: string; request: string; pending: never[]; plan: { id: string; blockedBy: never[]; acceptance: string; }[]; }' is not assignable to parameter of type 'RunInput'.
+  The types of 'source.kind' are incompatible between these types.
+    Type 'string' is not assignable to type '"issue" | "pr"'.
+error: script "typecheck:self" exited with code 1
+error: script "check" exited with code 1

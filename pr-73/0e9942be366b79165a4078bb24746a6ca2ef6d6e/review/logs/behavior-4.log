@@ -1,0 +1,26 @@
+$ bun run scripts/publish-pr-evidence.ts prepare "/Users/zhou/.codex/local-workflows/nodebraid/runs/b3c4ce07-5414-471b-ad40-1efa7d5e4a51/ci-scope-repro" ZWkang/nodebraid "67" "904c993c25954a48913cc95de38eed43e80eb8f0"
+112 |           expectedSource[key],
+113 |           `Published evidence ${key} differs from the incoming scope`,
+114 |         );
+115 |     if (source) {
+116 |       assert.equal(manifest.source.tree, source.tree, 'Reports describe different trees');
+117 |       assert.equal(manifest.source.base, source.base, 'Reports describe different bases');
+                   ^
+AssertionError: Reports describe different bases
++ actual - expected
+
++ '855db365eada23057c3a2e9d14a543efbf44f171'
+- '14d10d01f0a027babf4157ef8dd57ff14a453e0c'
+
+ generatedMessage: false,
+     actual: "855db365eada23057c3a2e9d14a543efbf44f171",
+   expected: "14d10d01f0a027babf4157ef8dd57ff14a453e0c",
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at collectEvidence (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/scripts/pr-evidence.ts:117:14)
+      at loadEvidenceBundle (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/scripts/pr-evidence.ts:197:24)
+
+Bun v1.4.2 (macOS arm64)
+error: script "agents:publish-evidence" exited with code 1

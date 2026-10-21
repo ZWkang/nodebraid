@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "99ed305515afaec32ef49494b509446ad9ba998c",
+    "expectedParent": "99ed305515afaec32ef49494b509446ad9ba998c",
+    "head": "0e9942be366b79165a4078bb24746a6ca2ef6d6e",
+    "tree": "457cc9db6c83019fab51e09747ab1f10b28bb481",
+    "patch": "eb7ef3bb1d7b57c8392acb69ba065a36fa46c5cab8e4f385b2fe136eda04ae75",
+    "localHead": "43f4c4e1150aab1c1339e0f25c6dac9fbb49492f"
+  },
+  "task": {
+    "run": "f27880b4-86f8-4aa0-8068-f29c46b9b366",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 68
+    },
+    "request": "c5c26cfb5a8a5a14f7a8b4707632a9db94891d0ab17d0ecde4bf0df4f6ffb9f1",
+    "plan": [
+      {
+        "id": "contract-and-regressions",
+        "blockedBy": [],
+        "acceptance": "Approved independent review-base/expected-parent contract is implemented; real initial/append/main-sync CLI/Git checks, legacy immutability, target-SHA/source/parent/artifact mismatch rejection, and main99 one-Issue/one-PR guidance pass. Actual publication must retain review-base ancestry; real flattened-parent red/green and unreadable-parent error checks pass."
+      },
+      {
+        "id": "independent-review-and-full-gate",
+        "blockedBy": [
+          "contract-and-regressions"
+        ],
+        "acceptance": "Both actual independent Standards+ponytail-review and Spec reports identify the full fixed head/tree/patch; sole agents:run verify full check passes without source changes."
+      },
+      {
+        "id": "publish-and-premerge-feedback",
+        "blockedBy": [
+          "independent-review-and-full-gate"
+        ],
+        "acceptance": "Actual GitHub tree/first-parent match prepared data, current published-head report/preview are uploaded and read back, full feedback/current-head CI/mergeability verified, and pending post-merge prerequisite stated. No auto merge or closure."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "publish-and-premerge-feedback"
+        ],
+        "acceptance": "Requires actual delivery merge into fetched main. Verify main contains the upgraded executor and its public CLI contract, all remaining acceptance and saved evidence, before authorized Issue closure. Until then keep Refs #68 and this ticket pending. Record untriggered live AI repair observations separately without manufacturing failures."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "43f4c4e1150aab1c1339e0f25c6dac9fbb49492f",
+      "tree": "457cc9db6c83019fab51e09747ab1f10b28bb481",
+      "patch": "eb7ef3bb1d7b57c8392acb69ba065a36fa46c5cab8e4f385b2fe136eda04ae75",
+      "verdict": "passed",
+      "report": "# Standards + ponytail-review — Issue #68 最终类型修正复审\n\nVerdict: passed\n\n- Base: `99ed305515afaec32ef49494b509446ad9ba998c`\n- Head: `43f4c4e1150aab1c1339e0f25c6dac9fbb49492f`\n- Tree: `457cc9db6c83019fab51e09747ab1f10b28bb481`\n- Binary patch SHA-256: `eb7ef3bb1d7b57c8392acb69ba065a36fa46c5cab8e4f385b2fe136eda04ae75`\n\n当前完整十五文件补丁身份已核验。与前一审查提交相比，唯一变化是测试导入 `RunInput` 类型并给 input 添加该注解；所有 scripts 字节不变。\n\n## 硬规范\n\n未发现违反。`RunInput` 注解使 source.kind 保持契约规定的联合类型，解决 legacyInput 传入 prepareRun 时的类型推宽；没有增加断言转换、修改运行时输入或削弱任何测试断言。\n\n已复核原 review-base/expectedParent 调用链及祖先缺漏处置。第一父、tree、实际远端父提交继承 review base 的检查保持；同 tree 单父丢失目标历史和 Git 读取错误仍被拒绝。初次、追加、main-sync 的公共 CLI 回归在当前提交通过，合法发布的 preview/report/publisher prepare 范围一致。\n\n旧 run 缺字段仍保持原 digest 和产物，不能通过默认补值重新验证、发布或生成报告；目标分支/SHA 改变使旧验证失效。上述处理符合共同证据范围契约、Boundary Discipline、Fix Root Causes、Test Behavior, Not Implementation 及 Prove It Works。\n\n## 判断性 smell / ponytail\n\n未发现有具体后果的可操作 smell。类型修正使用现有输入类型，未增加抽象、依赖、fallback 或新的流程约束；完整修复仍集中在原执行与证据边界。\n\n## 当前提交实际检查及限制\n\n本轮实际执行：\n\n- `bun x --no-install tsgo --noEmit -p tsconfig.json`：exit 0。\n- `bun test tests/local-agent-cli.test.ts tests/local-agent-bases.test.ts`：5 pass、84 assertions。\n- 完整范围 `git diff --check`：通过。\n\n旧完整检查的失败与原审查记录保留在历史中；未将其改为成功。未重复仓库 full check、构建、浏览器、真实远端发布或当前 head CI。脚本未变是复核依据，不将旧 head 的测试数量当作当前运行结果。\n"
+    },
+    "spec": {
+      "head": "43f4c4e1150aab1c1339e0f25c6dac9fbb49492f",
+      "tree": "457cc9db6c83019fab51e09747ab1f10b28bb481",
+      "patch": "eb7ef3bb1d7b57c8392acb69ba065a36fa46c5cab8e4f385b2fe136eda04ae75",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n已核验新 head/tree/完整 binary patch，并对照完整 Issue68 范围复核。765c786→43f4c4e 仅修改测试中的类型导入及 `const input: RunInput` 标注；生产脚本、协议和其他测试均未变化。类型标注没有改动断言、移除运行时 guard 或加入绕过类型检查的转换，不削弱验收。\n\n此前已验证的 review base/expectedParent 分离、远端审查 base 祖先校验、legacy 不升级、target SHA 失效及一致 preview/report/publisher 链保持。没有新增功能范围或改变单 Issue/PR、本地票据政策。\n\n实际执行：`bun test tests/local-agent-cli.test.ts tests/local-agent-bases.test.ts`，5 pass、0 fail、84 assertions。真实 initial/append/main-sync CLI 路径及丢失第二父的拒绝仍通过；这些是执行层 fixtures，不是线上 AI 验收。`git diff --check` 通过，工作树干净。\n\n旧 head 的完整检查失败及审查报告保留在 history，未换绑。未运行本仓库 full check/build、root tsgo、当前 head 远端 CI、发布或报告/preview 回读；新 head 仍需完整交付验证。\n\n- base: `99ed305515afaec32ef49494b509446ad9ba998c`\n- head: `43f4c4e1150aab1c1339e0f25c6dac9fbb49492f`\n- tree: `457cc9db6c83019fab51e09747ab1f10b28bb481`\n- raw binary patch SHA256: `eb7ef3bb1d7b57c8392acb69ba065a36fa46c5cab8e4f385b2fe136eda04ae75`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-independent-parent-red",
+      "acceptance": "Before the fix, actual public prepare CLI discards expectedParent even though actual Git append parent differs from review base. This red belongs to original baseline56, not current source.",
+      "command": "bun test tests/local-agent-bases.test.ts --test-name-pattern append delivery (before implementation)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "original-target-scope-red",
+      "acceptance": "Before target-SHA binding, same-head green feedback can use a different target review SHA; the exact-scope regression fails.",
+      "command": "bun test tests/local-agent-run.test.ts (before target-SHA check)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "original-production-scope-failure",
+      "acceptance": "Actual eligible/current-head CI publisher39610501066 failed: saved review base855 versus incoming actual PR base14d. This is historical production failure, not rerun or relabelled as current success.",
+      "command": "GitHub Actions Publish PR evidence run39610501066/job119257800037",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "original-public-bundle-red",
+      "acceptance": "Original public evidence prepare CLI fails with Reports describe different bases when combining actual same-head report and CI-scope preview; original output retained.",
+      "command": "bun run agents:publish-evidence prepare original ci-scope-repro bundle",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "related-real-execution-checks",
+      "acceptance": "49 tests /391 assertions, including real same-tree publication with dropped review-base parent rejected and unreadable parent Git failure surfaced. Initial/append/main-sync flows reach coherent preview/report/publisher; legacy/digest/target/artifact checks remain. Fixtures are not live AI repair acceptance.",
+      "command": "bun test tests/local-agent-bases.test.ts tests/local-agent-run.test.ts tests/local-agent-cli.test.ts tests/local-agent-reconcile.test.ts tests/github-feedback.test.ts tests/verification-report.test.ts tests/pr-evidence.test.ts tests/pr-feedback.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "workflow-sources",
+      "acceptance": "Current merged protocol and required local workflow sources pass integrity checks.",
+      "command": "bun run agents:check",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "workflow-types",
+      "acceptance": "Upgraded executor and evidence modules typecheck.",
+      "command": "bun run agents:typecheck",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "dropped-review-base-parent-red",
+      "acceptance": "At7df, a real commit with the reviewed tree and correct first parent but no target ancestry was incorrectly accepted. The public CLI regression failed before the ancestry fix.",
+      "command": "bun test tests/local-agent-bases.test.ts (before publication ancestry fix)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "root-test-input-type-failure",
+      "acceptance": "First full verify at765c786 failed root TypeScript: legacy fixture source.kind widened to string. Actual failure retained; fixed by contextual RunInput typing only.",
+      "command": "agents:run verify (full bun run check at765c786)",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "root-test-input-type-green",
+      "acceptance": "Root TypeScript project including tests accepts the explicit RunInput fixture after the type correction.",
+      "command": "bunx tsgo --noEmit -p tsconfig.json",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-10.log"
+    },
+    {
+      "id": "typed-public-cli-fixture-green",
+      "acceptance": "5 public CLI and real Git integration tests /84 assertions pass at43f4c4e after contextual type correction; no production runtime change.",
+      "command": "bun test tests/local-agent-cli.test.ts tests/local-agent-bases.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-11.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "c8bc48eff43b749e8376b770324dc8016d841959aa3167ddeb6e88599478d9ae"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "ed749443e37b6dbf1e8773bd2899c804e4be4d50a5811b6c0cda586f96e4a7dc"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "3b30033b92e8bcdbebec809fdb56d7ad70bfb0a9733ab1d3cba5721902e3476d"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "f83f074ba14c75a03256a37b0a40b5ddc3745948083eb480bc6ba2bd3d17b7fd"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "c88a1a52e7cf97e4d5bd3023f442155d64f8cd0228ba783996a1991a048c9230"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "f274e1e32202b67ff9f71958ce3a388f0e6063fb073d7aa94a1aeb450fe1aa5f"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "422ac12e8865fc477aaae7355fe96fd0cfa82b2402bf77eb028f256af621b14b"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "7f5c42ae590e070a663b4068fb909f3b404c1f46785c3e41f97bde6b6db4ecf1"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "39e287118e839a40efee0646ed00775890533b39ebd8bbca2a6a4f9d12854487"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "1d1a28885bf6430ac6be019cba6d97a4dba0ce2da9279255ea7f5426d8d965ce"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "0345b421f34b1b0a17c0dce8ffa92d02fa5b41e4ed6fd004760c52658d03cfe4"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "12de43b4cfb65bf9f6a7fceac89dd2e99f48e25fab7550e1300117fa9a346ad8"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/behavior-11.log",
+      "kind": "log",
+      "sha256": "b204214be73f113494397aacb6cb5802a8c6d65636628c2948eec2e7f6f2b1ab"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "3fcb50480a913a649003f2cbeed35f30d7e41d1d8ab3589c72a42793e4732103"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+bun test v1.4.2 (744846f84)
+
+tests/local-agent-cli.test.ts:
+(pass) one issue resumes its local ticket frontier without creating child issues [447.03ms]
+Switched to a new branch 'feat/issue-10'
+(pass) a persisted task resumes after a failed real check and never blesses an unrelated head [1729.11ms]
+
+tests/local-agent-bases.test.ts:
+Switched to a new branch 'feat/issue-68'
+(pass) initial delivery keeps the review base separate from the append parent [1239.23ms]
+Switched to a new branch 'feat/issue-68'
+(pass) append delivery keeps the review base separate from the append parent [867.26ms]
+Switched to a new branch 'feat/issue-68'
+Switched to a new branch 'main'
+Switched to branch 'feat/issue-68'
+(pass) main-sync delivery keeps the review base separate from the append parent [1146.25ms]
+
+ 5 pass
+ 0 fail
+ 84 expect() calls
+Ran 5 tests across 2 files. [5.49s]
