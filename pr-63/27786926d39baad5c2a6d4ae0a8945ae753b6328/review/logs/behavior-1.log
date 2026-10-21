@@ -1,0 +1,44 @@
+bun test v1.4.2 (744846f84)
+
+tests/defect-scan.test.ts:
+(pass) the first investigation records a full snapshot instead of inventing a prior scan [2.54ms]
+(pass) the next investigation covers changes since the last successful scan [2.20ms]
+(pass) the CLI pins a clean main snapshot and rejects uncommitted source changes [348.05ms]
+
+tests/local-agent-run.test.ts:
+(pass) a new green head cannot inherit the previous tree, reviews or test evidence [8.71ms]
+
+tests/local-agent-cli.test.ts:
+Switched to a new branch 'feat/issue-10'
+(pass) a persisted task resumes after a failed real check and never blesses an unrelated head [1036.47ms]
+
+tests/agent-issue.test.ts:
+(pass) accepts an issue number without interpreting command or expression input [0.80ms]
+(pass) allows confirmed bugs and approved specifications to enter autonomous delivery [0.98ms]
+(pass) rejects a different issue and closed work [0.08ms]
+(pass) does not turn untriaged reports or unresolved design questions into coding tasks [0.08ms]
+
+tests/pr-feedback.test.ts:
+(pass) local evidence comments do not trigger themselves, while later edits still enter the queue [0.09ms]
+(pass) only a verified current PR head is ready for human review [0.09ms]
+(pass) the same failed check requests one repair; a rerun or new head requests new work [0.04ms]
+(pass) addressed review feedback is not repeated, but edits and design questions remain actionable [0.07ms]
+(pass) green CI does not dismiss a human change request or ignore a conflicting base [0.03ms]
+(pass) a handoff cannot omit feedback, invent dispositions, or claim a different request [0.11ms]
+(pass) CI result order does not cause duplicate repair dispatches [0.03ms]
+(pass) an unresolved thread must be revalidated at the new head before automatic resolution [0.12ms]
+(pass) removing opt-in or switching to draft excludes even otherwise actionable feedback [0.02ms]
+(pass) a receipt from another PR or an old head cannot hide current feedback [0.02ms]
+(pass) an incomplete resolved thread cannot hide a newer reply on its next page [0.02ms]
+
+tests/local-agent-issue-archive.test.ts:
+(pass) archives the complete issue and discussion as a readable local copy [5.54ms]
+(pass) refreshes the current read time without replacing identical historical content [2.00ms]
+(pass) keeps earlier versions when either the specification or its comments are edited [2.98ms]
+(pass) archives closed specifications with no execution labels or body [1.87ms]
+(pass) rejects incomplete or mismatched input without changing the current copy or history [9.06ms]
+
+ 25 pass
+ 0 fail
+ 138 expect() calls
+Ran 25 tests across 6 files. [1467.00ms]
