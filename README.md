@@ -73,7 +73,7 @@ the source-checkout workflow until the initial npm release is available.
 
 Local Codex uses the existing ChatGPT sign-in for issue investigation, implementation,
 review, and PR feedback repairs. GitHub retains issues, PRs and engineering CI.
-Requirements/specs and their tasks also have local reading copies and versioned
+Requirement/spec Issues also have local reading copies and versioned
 archives under `~/.codex/local-workflows/nodebraid/issues/`. GitHub stays authoritative;
 the copies are refreshed after complete reads and never written back. See the
 [archive contract](./docs/agents/issue-tracker.md#local-reading-and-archive-copies).
@@ -85,13 +85,19 @@ The versioned execution protocol is [.agents/workflows/local-agent.md](./.agents
 [Agentic workflows](./docs/agents/agentic-workflows.md) documents setup, durable
 execution evidence, failure states and acceptance. Managed issue PRs use a
 `[local-agent] ` title and `feat/issue-N` branch; legacy `[agent] ` issue PRs remain
-eligible. A required follow-up integration uses `feat/issue-N-integration` and
-retains the original PR/task chain. Stacked PRs keep feedback maintenance but
-require actual main integration before completion; retargeting requires fresh
-verification even at the same head. Human review and merge remain the default;
-explicit user authorization can permit verified merge and issue closure.
-Parent spec titles use `spec: `; approved scope, native children, owners, execution
-choices and acceptance are reconciled independently of title casing.
+eligible. Each new requirement uses one `spec: ` Issue and one PR to main, linked
+directly to that Issue. Use `Refs #N` while post-merge acceptance remains;
+`Fixes #N` is used only when merge is the last acceptance condition and closure
+is authorized. Once implementation is authorized, the same Issue gets
+`approved-spec` and `ready-for-agent`. Local tickets live in the run's immutable
+prepared plan, completed-step record and evidence; they do not become child
+Issues or stacked PRs. Several commits and delegates contribute to the same PR.
+Ready for merge review checks pre-merge tickets and evidence; closure additionally
+checks actual main integration and every remaining ticket and acceptance result.
+Historical parent/child and stacked PR chains remain readable and recoverable,
+including `feat/issue-N-integration`; they are not the model for new work.
+Human review and merge remain the default; explicit authorization can permit
+verified merge and closure. Owners, execution choices and acceptance remain explicit.
 
 Project-local Ponytail keeps implementation complete and minimal; `ponytail-review`
 checks connected callers in the independent Standards axis. Spec review remains
@@ -112,6 +118,7 @@ bun run agents:typecheck  # Type-check the executable local workflow
 bun run agents:run        # Show archive, reconciliation and execution usage
 bun run agents:run archive-issue snapshot.json ~/.codex/local-workflows/nodebraid/issues # Keep an Issue reading copy and history
 bun run agents:run reconcile source.json [output.json] # Read-only delivery/frontier/closure assessment after fetch
+bun run agents:run frontier <run-dir> <completed-steps.json> # Select local tickets within the single delivery
 bun run agents:preview --base <sha> --out <empty-dir> [--all] # Capture real Examples evidence
 bun run agents:report <run-dir> <output-dir> # Add complete reviews and declared logs; never overwrite
 bun run agents:publish-evidence prepare <dir> <repository> <pr> <head> # Prepare connector publication

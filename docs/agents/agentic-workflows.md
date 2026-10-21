@@ -9,7 +9,7 @@
 flowchart TD
   A[本地 Codex 周期检查 GitHub] --> B[Issue / 已确认 Spec / 新 main 变更]
   B --> C[真实调查、复现、查重]
-  C -->|范围明确| D[拆任务、TDD、Ponytail full]
+  C -->|范围明确| D[同一 Issue 内拆本地 ticket、TDD、Ponytail full]
   C -->|需要决策| E[返回 grill / spec / docs]
   D --> F[独立 Standards + Spec review、完整检查]
   F --> G[pr + show-me、完整报告和界面证据发布到原 PR]
@@ -73,9 +73,10 @@ bun run check:affected --plan      # 只展示检查范围，不执行
 
 Issue 标签路由见 [issue-tracker.md](./issue-tracker.md)。只有实际复现且预期已明确的缺陷，
 或已确认的 spec 可以实现；风格问题、缺少测试、新需求和不明确的预期不能冒充 bug。
-GitHub 是实时任务状态来源，本地 ledger 保存证据和去重元数据，不维护另一套人工任务清单。
+GitHub Issue 保存规格、讨论和交付状态；本地 run 保存该需求的实施 ticket、完成证据和
+去重元数据。只读 Issue 归档与 ticket 执行记录各有用途，不能从旧副本推断实时执行资格。
 
-托管 PR 使用 `feat/issue-N`（必要后续集成为 `feat/issue-N-integration`）与
+新需求使用一个 spec Issue 和一个目标为 main 的 PR。托管 PR 使用 `feat/issue-N` 与
 `[local-agent] ` 标题；也接管既有 `[agent] ` issue PR。
 移除前缀、关闭 PR 或转为 draft 后不再自动处理。每次写入前重新检查当前资格和 head；
 不得复用旧 head 的绿灯。新 review、编辑或已解决 thread 的新回复都需重新判断。
@@ -83,16 +84,30 @@ GitHub 是实时任务状态来源，本地 ledger 保存证据和去重元数�
 默认保留用户最终审阅与合并。已有明确用户授权可允许验证通过后的合并和关闭 Issue，
 不得据此开启 auto-merge、绕过 checks 或代替 reviewer 批准。
 
-父规格标题统一为 `spec: `，但标题不参与执行授权。每次恢复都核对批准范围、原生子任务、
-阻塞关系、现有 PR、负责人、执行 opt-out 和剩余验收。在已有交付授权内复用现有切片、
-自主补齐缺失子任务；保留仅本地执行、暂停和其他活跃负责人的任务。缺失原生关系必须
-明确处理并回读，不能只凭评论链接算登记成功。
+规格标题统一为 `spec: `，但标题不参与执行授权。设计和验收确认、实施获准后，同一
+Issue 标记 `approved-spec` 与 `ready-for-agent`，直接成为交付任务。`to-tickets` 把
+内部切片写入本地 run 的计划，不再发布子 Issue、原生 ticket 依赖或叠加 PR。
+每次恢复核对批准范围、现有 PR、负责人、外部需求依赖、执行 opt-out、本地计划和剩余验收；
+保留仅本地执行、暂停和其他活跃负责人的任务。
 
-叠加 PR 仍维护 CI 和反馈，全部通过也只到 `needs-integration`。上游实际进入 fetched main
-后，将仍开放的后续 PR retarget 到 main 并创建新 run 重做验证；已 merged 的后续 PR 则
-复用原代码创建集成 PR，保留原任务、PR 与提交链。实际 merge commit 未被 main 包含时，
-源 Issue 不能算完成。父规格收尾还须核对所有子任务与逐条验收证据，按已有授权发布汇总、
-关闭并回读；无授权时等待用户。
+本地 ticket 复用 `input.json.plan`、不可改写的 `prepared-task.json.plan`、
+`completed-steps.json` 与原始运行证据；计划和可选阅读说明都保存在 worktree 外的同一 run。
+`frontier <run-dir> <completed-steps.json>` 推进本地依赖。多个 ticket、提交和 Agent
+协作汇入同一个 PR，PR 直接关联 spec Issue。存在合并后验收时使用 `Refs #N`，
+验收后按既有权限显式关闭；只有合并是最后剩余条件且关闭已获授权时才使用 `Fixes #N`。
+按 Issue tracker 的关闭规则核对提交消息及 Development 的自动关闭关联，避免提前关闭。
+ready 表示可供合并前审阅：协调者核对全部合并前 ticket/验收，以及当前 head 的检查、
+审查和报告。只能在合并后执行的步骤须在保存的 acceptance 和交接中写明前置条件，
+继续保持未完成；ready 不要求提前完成这些步骤或先进入 main。
+关闭 Issue 时再要求实际 main 集成、本地 frontier 为空和所有剩余验收证据。
+步骤须在实际执行后才标完成，不能为了启动 verify 提前勾完。frontier 仅表示依赖候选，
+执行前还须核对外部条件和权限。现有 verify/reconcile 不读取本地完成列表，
+不能把上述协调检查描述成自动门禁。
+
+旧父子 Issue、叠加 PR 和 `feat/issue-N-integration` 保留为历史恢复能力，不批量改写。
+旧叠加 PR 全部检查通过也只到 `needs-integration`；上游进入 main 后，按原链继续集成、
+retarget 和复验。历史父规格仍核对已有子任务及验收。任何源 Issue 都须在实际 main 集成、
+完整验收和已有关闭授权满足后收尾，并读回结果。
 
 发布为 append-only，GitHub Git-data API 路径必须核对远端 tree 与已审阅 tree 一致，
 使用 expected head 更新分支，不 force push。API 生成的 commit SHA 与本地 SHA 可能不同，
@@ -156,6 +171,10 @@ bun run agents:run evaluate /absolute/path/to/run snapshot.json
 PR retarget 后，即使 head 未变也要另建绑定新 base 的 run，重做 review 与完整验证。
 `pending` 来自完整归一化快照的 `evaluateFeedback` 结果。依赖图必须无环且引用存在，
 `completed-steps.json` 是已有执行证据的已完成 step ID 数组，不能越过未完成 blocker。
+这些 step 就是本地 ticket；Issue 编号不作为内部 ticket ID。
+`input.json` 是准备前的草稿，prepare 后以 `prepared-task.json.plan` 为执行依据。
+改变计划或请求时新建 run，保留旧记录，并根据实际证据重新评估可复用的完成项。
+需求、验收和讨论仍在同一个 GitHub Issue；本地 ticket 不发布成新的 Issue 或 PR。
 
 `reconcile` 是只读对账命令，不调用 GitHub 写入、不 merge、不关闭 Issue；可选第二个
 参数保存报告。它读取完整独立来源，契约为
@@ -166,30 +185,35 @@ PR retarget 后，即使 head 未变也要另建绑定新 base 的 run，重做 
   merged PR 的真实 `merge_commit_sha` 执行 Git 祖先检查；提交缺失或 Git 错误直接失败。
 - `actor` 为当前 GitHub 用户，`executor` 为当前执行聊天身份。`closeAuthorization`
   记录已有用户关闭授权的来源，没有授权填空字符串；它不代表合并权限。
-- `specs`、`tasks` 都保留完整 `issue`（正文、评论、标签、assignees、规范化的
+- 新需求使用 `specs: []`，每个单一交付 Issue 只在 `tasks` 中出现一次，`parent: null`。
+  这里的 `tasks` 指 GitHub 交付，不是本地 plan 的 ticket。`blockers` 只装真实外部
+  Issue 依赖的完整 REST 分页，无依赖时为 `[[]]`，不填本地 step ID。
+- 每个条目保留完整 `issue`（正文、评论、标签、assignees、规范化的
   `OPEN|CLOSED` 状态），以及从真实讨论确认的 `approval` 来源链接或 null、
   `execution: agent|local-only|paused`、当前执行 `owner` 或 null、
   全部 `acceptance: [{id, evidence}]`。未完成证据为 null，不能省略尚未完成的条件。
-- 每个 spec 的 `children`、task 的 `blockers` 是真实 REST 分页数组，元素含 issue
+- `specs` 聚合仅用于既有父子 Issue 的历史对账。此时 spec 的 `children`、task 的
+  `blockers` 是真实 REST 分页数组，元素含 issue
   `number`，通过最后一个少于 100 条的页面（空集合为 `[[]]`）。spec 的
   `slices: [{id, task}]` 覆盖完整已批准范围，未拆分项的 task 为 null；task 的
   `parent` 是父 issue number 或 null。声明的切片、父子关联与原生关系必须一致。
-- task 的 `pullRequests` 列出全部已有 PR number；`delivery` 标明实际交付 PR number
-  或 null。顶层 `pullRequests` 保留这些 PR 和所依赖上游 PR 的实时
+- 新任务的 `pullRequests` 复用该需求的唯一 PR，创建前为空；`delivery` 是该 PR number
+  或 null。历史条目保留全部已有 PR number 和选定的最终 delivery，不能丢失原链。
+  顶层 `pullRequests` 保留这些 PR 和历史依赖上游 PR 的实时
   `number/title/state/draft/head/base/merged/merge_commit_sha/html_url` 元数据；
   每个 `base.repo.full_name` 必须是当前仓库，包括已 merged 的 PR；
   后续集成不能丢弃原始 PR 链。后续 PR 可以复用旧实现 head 而不包含旧功能分支的
   merge commit；此时将新 PR 选为 task 的 `delivery`，按它与验收判断任务完成。
 
-报告包含任务 `frontier`、按当前任务 `delivery` 得出的 `integration` 候选、
-PR 集成/retarget 历史状态、规格规范标题、未完成子任务与验收、
-以及关闭候选 `canClose`。证据字段是来源引用，helper 不读取或认证 URL 内容，
+报告包含 GitHub 交付 `frontier`、按当前任务 `delivery` 得出的 `integration` 候选、
+PR 集成状态、历史聚合规格的标题/未完成子任务、未完成验收和
+关闭候选 `canClose`。证据字段是来源引用，helper 不读取或认证 URL 内容，
 非空字符串本身不能证明当前 CI、反馈、独立 review 或全量检查通过。执行者必须复用
 已有真实 `verify`、`publication`、报告发布/回读和 `evaluate` 结果核实对应交付 head，
-再把真实证据引用填入每项验收；父规格的外部验收仍须逐项实跑。候选不是执行授权或
-完成证书。执行者还须对原始批准范围确认完整性，
-按协议维护反馈、处理需要拆分/登记的工作，并在每次授权写入前刷新来源和 main。
-关闭子任务并回读后再次对账，才可评估父规格关闭。缺失关系、依赖循环和不完整分页
+再把真实证据引用填入每项验收。候选不是执行授权或完成证书。
+执行者还须确认整个 spec 和本地 tickets 的证据完整，维护同一 PR 的反馈，并在每次
+授权写入前刷新来源和 main。对于旧父子记录，关闭已有子任务并回读后再次对账，才可
+评估父规格关闭。历史关系缺失、依赖循环和不完整分页
 明确失败。规范改名、拆票完成或单次绿色检查不等于完成交付。
 历史 PR 的 `needs-integration` 不是待执行队列；已选定的后续 delivery 进入 main
 且验收通过后，`integration` 不再包含该任务，不因旧 merge commit 缺席而重复恢复。

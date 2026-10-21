@@ -1,6 +1,6 @@
 # Issue and PR discussions
 
-Use this workflow when a task references an Issue, PR, review comment, or linked discussion. The [tracker configuration](issue-tracker.md) defines GitHub as the source for new specs, live tasks and conversations; parent Issues hold specs, while local specs remain historical evidence. This supplements the [local subscription workflow](../../.agents/workflows/local-agent.md), which owns scheduling, eligibility, existing authorization, full checks, durable receipts, and managed PR thread resolution. Human approval and merge remain the default; apply any explicit user merge/closure authorization only after the workflow's checks pass.
+Use this workflow when a task references an Issue, PR, review comment, or linked discussion. The [tracker configuration](issue-tracker.md) defines one GitHub Issue as the spec and one main PR as its delivery. Local tickets in the prepared run plan record implementation steps. This supplements the [local subscription workflow](../../.agents/workflows/local-agent.md), which owns scheduling, eligibility, existing authorization, full checks, durable receipts, and managed PR thread resolution. Human approval and merge remain the default; apply any explicit user merge/closure authorization only after the workflow's checks pass.
 
 ## Read the conversation at work boundaries
 
@@ -10,7 +10,7 @@ Read the relevant discussion when starting or resuming work, before delivering a
 - **PR:** read the current description and head commit, linked Issue, general comments, submitted review summaries and states, and inline review threads with their replies and resolution state. Follow pagination for each surface; a general comment list alone does not establish that all review feedback was read.
 - On the first read, establish the full relevant context. On later reads, include edited comments, changed bodies, new reviews, and changed thread states as well as new messages. An outdated inline location does not mean its concern is resolved.
 - Keep source links or local anchors, the read time, and comment/review identifiers or update timestamps. For PRs, also record the head commit used for review and verification. Managed runs use the existing durable receipts; other tasks can use their notes or handoff.
-- After fully reading a requirement/spec Issue and its linked parent/tasks, refresh their [local reading and archive copies](issue-tracker.md#local-reading-and-archive-copies). Do the same after an authorized change is read back. Keep full bodies and comments; local copies never replace the live read or become a second task tracker.
+- After fully reading a spec Issue and relevant existing Issues, refresh their [local reading and archive copies](issue-tracker.md#local-reading-and-archive-copies). Do the same after an authorized change is read back. Keep full bodies and comments; these copies never replace the live read. Local ticket progress belongs to the run, not the archived Issue copy.
 - If the PR head changes, inspect the new diff and reassess which findings and verification results still apply. Repeat affected checks before claiming the current revision is verified; retain the commit associated with earlier evidence.
 - If a source cannot be read, report the failed operation and missing context. Continue independent work where possible, but do not report inaccessible feedback as absent or resolved.
 
@@ -20,7 +20,7 @@ For each actionable item, identify whether it clarifies requirements, reports a 
 
 A suggestion is not automatically an accepted requirement. Use explicit agreements from the user or responsible maintainer, and preserve the source of each decision. Private chat authorization and its metadata stay in local workflow records; public Issues, PRs, comments and reports follow the [public writing rules](issue-tracker.md#public-issue-and-pr-writing) and record only the resulting functional scope, engineering decisions and verification evidence. For defects within approved scope, establish expected behavior from the approved contract and a reproduction without seeking repeated approval. If the body, spec, and comments disagree, expose the conflict and resolve the affected decision before implementing it; unrelated work can continue.
 
-Within the requested scope, carry confirmed decisions into the owning spec or ticket's acceptance criteria and relevant tests. Record architectural decisions in the existing ADR workflow when applicable. Preserve conversation history and link the updated artifact. When the current task is review-only, report the needed update instead of changing that source. A decomposition skill's parent edit restriction does not override separately authorized reconciliation and acceptance-based closure.
+Within the requested scope, carry confirmed decisions into the spec Issue and the local plan's acceptance criteria and relevant tests. A changed prepared plan needs a new run; preserve the earlier plan and evidence. Record architectural decisions in the existing ADR workflow when applicable. Preserve conversation history and link the updated artifact. When the current task is review-only, report the needed update instead of changing that source.
 
 ## Handle feedback and reply with evidence
 
@@ -36,9 +36,9 @@ Use the authorization already present in the user's request or an authorized loc
 
 Where re-review is needed, state who needs to review and what remains open. Perform an authorized re-review request after verification. Distinguish an author marking a thread resolved from the reviewer accepting the change; report the platform's actual review state.
 
-## Parent specs and historical discussions
+## Specs, local tickets and historical discussions
 
-Record confirmed decisions in the parent spec Issue with links to their source discussions and approval comments. When a legacy local spec or ticket is referenced, read the entire file, including any `## Comments`, and preserve it as historical evidence. Do not update local specs or tickets as a parallel live requirements, task or conversation tracker. Keep unanswered questions visible in the source discussion and link them from the task's evidence.
+Record confirmed decisions in the single spec Issue with links to their source discussions and approval comments. Local tickets execute that scope through the prepared plan and completed-step evidence; they do not become separate GitHub discussions or sources of requirements. When a historical parent/child Issue or local file is referenced, read its full discussion and preserve it as evidence. Keep unanswered questions visible in the canonical Issue and link them from the run.
 
 ## Review, handoff, and completion
 
