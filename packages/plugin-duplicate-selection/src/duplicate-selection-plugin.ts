@@ -33,18 +33,25 @@ function acceptOptions(
       throw new DuplicateSelectionError('INVALID_CONFIG', 'Duplicate Selection options contain an unknown field.');
     }
   }
-  if (typeof options.materializeIds !== 'function') {
+  const materializeIds = options.materializeIds;
+  if (typeof materializeIds !== 'function') {
     throw new DuplicateSelectionError('INVALID_CONFIG', 'Duplicate Selection materializeIds must be a function.');
   }
-  const offset = options.offset === undefined ? { x: 24, y: 24 } : options.offset;
+  const configuredOffset = options.offset;
+  const offset = configuredOffset === undefined ? { x: 24, y: 24 } : configuredOffset;
   if (typeof offset !== 'object' || offset === null || Array.isArray(offset)) {
     throw new DuplicateSelectionError('INVALID_CONFIG', 'Duplicate Selection offset must be a Point.');
   }
-  if (!Number.isFinite(offset.x) || !Number.isFinite(offset.y)) {
+  const x = offset.x;
+  if (!Number.isFinite(x)) {
+    throw new DuplicateSelectionError('INVALID_CONFIG', 'Duplicate Selection offset must be finite.');
+  }
+  const y = offset.y;
+  if (!Number.isFinite(y)) {
     throw new DuplicateSelectionError('INVALID_CONFIG', 'Duplicate Selection offset must be finite.');
   }
   return Object.freeze({
-    materializeIds: options.materializeIds,
-    offset: Object.freeze({ x: offset.x, y: offset.y }),
+    materializeIds,
+    offset: Object.freeze({ x, y }),
   });
 }
