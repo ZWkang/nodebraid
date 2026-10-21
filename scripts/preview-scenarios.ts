@@ -36,7 +36,7 @@ export function previewLimitations(files: readonly string[]): string[] {
   const limitations: string[] = [];
   if (files.some((file) => /^packages\/(layout-[^/]+|plugin-layout)\//.test(file))) {
     limitations.push(
-      'The Examples Application has no Layout control. These scenes cover existing Canvas behavior, not Layout execution.',
+      'These preview scenes cover Canvas behavior, not Layout execution. The Basic SVG browser suite verifies the manual Auto layout control; capture its interaction separately for Layout evidence.',
     );
   }
   if (files.some((file) => file.startsWith('website/'))) {

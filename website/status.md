@@ -22,7 +22,7 @@ NodeBraid 处于早期实现阶段，但已经形成一条可运行的 headless 
 - ELK full、incremental 与 Fixed Node Layout Provider；
 - 后端无关的 `@nodebraid/preset-basic` Basic Canvas Composition，以及真实 SVG canonical example；
 - 公开 `@nodebraid/adapter-react` Runtime Mount 与稳定 Snapshot Hooks，以及真实 Chromium lifecycle 验证；
-- 私有 `@nodebraid/examples` React/TanStack Router Examples Application，以及真实 UI + Canvas Chromium 验收；
+- 私有 `@nodebraid/examples` React/TanStack Router Examples Application；Basic SVG 提供手动 Dagre/full/LR 整图布局，保留 Selection、Viewport 与原 Port 连接，并通过真实 UI + Canvas Chromium 验收；
 - 通过 `@nodebraid/core` 聚合的公共 facade。
 
 完整清单见 [全部模块](/modules/)。

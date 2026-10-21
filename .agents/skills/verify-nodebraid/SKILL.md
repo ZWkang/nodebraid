@@ -59,8 +59,10 @@ Never substitute internal Runtime setters, injected Events or a mock Canvas.
 Changed runtime/Examples source selects relevant scenes deterministically in
 [`preview-scenarios.ts`](../../../scripts/preview-scenarios.ts). Shared code and
 collector/skill changes run all four. Docs/tests-only changes are explicitly
-`not-applicable`. Layout changes run Canvas regression scenes with a limitation:
-the Example has no Layout control, so Layout execution remains unverified.
+`not-applicable`. The Example's manual Auto layout control is verified by
+`examples/app/browser-tests/basic-svg.browser.ts`. These four preview scenes do
+not click it, so their screenshots do not prove Layout execution; capture the
+Layout interaction separately when providing evidence for a Layout change.
 
 ## Evidence
 
