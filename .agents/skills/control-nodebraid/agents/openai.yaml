@@ -1,0 +1,3 @@
+interface:
+  display_name: 'Control NodeBraid'
+  short_description: 'Verify NodeBraid with existing tests and browser recipes'

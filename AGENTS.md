@@ -10,6 +10,10 @@
 
 本仓库使用单一领域上下文。探索代码前，按 [Domain docs 约定](docs/agents/domain.md) 读取根目录 `CONTEXT.md` 和相关 `docs/adr/`。
 
+### Capability verification
+
+选择验证命令、复现画布交互或收集验收证据时，使用 [control-nodebraid](.agents/skills/control-nodebraid/SKILL.md) 及其能力验证地图，复用现有公共 seam 测试、浏览器 suite 和 Examples Application。
+
 ## AI 工作流
 
 新任务先与用户确认 grill、spec、领域文档和公共测试 seam；确认后，Agent 自主拆分任务、审查计划、实现、验证和双轴 code review，无需逐票再次确认。需求、公开契约或架构决策变化时回到前期讨论。
