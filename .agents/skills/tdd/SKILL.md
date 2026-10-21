@@ -11,6 +11,8 @@ When exploring the codebase, read `CONTEXT.md` (if it exists) so test names and 
 
 ## What a good test is
 
+Use [Test Behavior, Not Implementation](../principle-test-behavior-not-implementation/SKILL.md) when choosing assertions, and [Sequence Work into Verifiable Units](../principle-sequence-verifiable-units/SKILL.md) when arranging slices. These refine the existing red/green loop and agreed public seams.
+
 Tests verify behavior through public interfaces, not implementation details. Code can change entirely; tests shouldn't. A good test reads like a specification — "user can checkout with valid cart" tells you exactly what capability exists — and survives refactors because it doesn't care about internal structure.
 
 See [tests.md](tests.md) for examples and [mocking.md](mocking.md) for mocking guidelines.

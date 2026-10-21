@@ -14,6 +14,10 @@
 
 选择验证命令、复现画布交互或收集验收证据时，使用 [control-nodebraid](.agents/skills/control-nodebraid/SKILL.md) 及其能力验证地图，复用现有公共 seam 测试、浏览器 suite 和 Examples Application。
 
+### Engineering principles
+
+设计、实现、调试与审查按[项目工程原则](docs/agents/principles.md)的触发条件读取对应 `principle-*` 正文。24 条原则均为项目维护版，按场景使用；既有需求、ADR、公共契约与授权边界约束取舍。委派时传递适用原则路径，继续使用现有流程和验证入口。
+
 ## AI 工作流
 
 新任务先与用户确认 grill、spec、领域文档和公共测试 seam；确认后，Agent 自主拆分任务、审查计划、实现、验证和双轴 code review，无需逐票再次确认。需求、公开契约或架构决策变化时回到前期讨论。

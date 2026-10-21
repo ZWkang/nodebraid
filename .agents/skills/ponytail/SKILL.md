@@ -18,6 +18,8 @@ Active for the whole session until the user says "stop ponytail" or "normal mode
 
 ## Before you write
 
+Select applicable guidance from the [project principle index](../../../docs/agents/principles.md). Use it for the current design, debugging or implementation decision while preserving this skill's full mode and the project's approved contracts.
+
 Read the task and the code it touches. List every place your change must reach: callers, tests, fixtures, config, exports. Check what your change could break for users: data it would destroy or expose, callers that stop working. That is scope. Extra features are not.
 
 ## The smallest complete change

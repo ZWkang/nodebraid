@@ -86,6 +86,12 @@ Project-local Ponytail keeps implementation complete and minimal; `ponytail-revi
 checks connected callers in the independent Standards axis. Spec review remains
 separate. New confirmed defects require an executed reproduction and issue deduplication.
 
+The [project engineering principles](./docs/agents/principles.md) index routes
+design, implementation, debugging and review to 24 project-maintained pstack
+principles. Read the applicable guidance for the current task; existing workflows,
+approved contracts and authorization remain authoritative. `agents:check` also
+checks that the index, license and all principle files are present.
+
 ```bash
 bun run agents:check       # Validate local protocol and absence of hosted AI jobs
 bun run agents:local-check # Also verify local ChatGPT CLI authentication

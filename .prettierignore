@@ -1,5 +1,7 @@
-# Vendored engineering skills preserve their upstream formatting.
-.agents/skills/
+# Existing vendored skills preserve their upstream formatting.
+# Project-maintained principles use the repository formatter.
+.agents/skills/*/
+!.agents/skills/principle-*/
 
 # Generated tool adapter skill trees mirror the vendored sources above.
 .claude/skills/
