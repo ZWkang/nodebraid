@@ -22,7 +22,7 @@ NodeBraid is at an early implementation stage, but it already has a working head
 - ELK full, incremental, and Fixed Node Layout Providers;
 - The backend-neutral `@nodebraid/preset-basic` Basic Canvas Composition and a real SVG canonical example;
 - The public `@nodebraid/adapter-react` Runtime Mount and stable Snapshot Hooks with real-Chromium lifecycle verification;
-- A private `@nodebraid/examples` React/TanStack Router Examples Application with real UI + Canvas Chromium acceptance;
+- A private `@nodebraid/examples` React/TanStack Router Examples Application; Basic SVG provides manual whole-canvas Dagre/full/LR layout that preserves Selection, Viewport, and original Port connections, with real UI + Canvas Chromium acceptance;
 - A public facade aggregated through `@nodebraid/core`.
 
 See [All modules](/en/modules/) for the complete inventory.

@@ -1,6 +1,6 @@
 # NodeBraid Layout 范围记录
 
-> 状态：首版及带 Port 图的 Node 拓扑布局已实现
+> 状态：首版、带 Port 图的 Node 拓扑布局与 Basic SVG 手动布局已实现
 >
 > 更新：2026-10-21
 >
@@ -69,7 +69,9 @@ Dagre 与 ELK 都必须真实验证 `layout-api` seam，两者都支持 full，�
 
 Runtime 只替换实际变化的 Node position，保留其他 Node 字段、Edge、Endpoint、`portId` 和领域 data。布局不写 Session，不修改 Selection 或 Viewport，也不自动 Fit View；净变化对应一次 Commit、一次 History Entry 和单步 Undo/Redo，无净变化返回 `null`，不推进 revision 或历史。包括 Endpoint `portId` 修改在内的 Document revision 变化仍使旧 Proposal 整体 stale；只有 Contribution generation 变化不构成 Layout 失败条件。Layout 成功不额外承诺某个 Renderer 能绘制该图。
 
-Basic SVG 的手动入口与浏览器验收属于后续 [#42](https://github.com/ZWkang/nodebraid/issues/42)，不属于本 headless 切片的交付。
+Basic SVG 通过 [#42](https://github.com/ZWkang/nodebraid/issues/42) 接入单个手动“自动布局”（Auto layout）按钮。应用定义自己的 typed Command，显式安装 Dagre Layout Plugin 并在 Runtime Factory 就绪前等待其 active；按钮通过现有 CommandService 以 `full`、`LR` 和空 Fixed Node 集合布局整张 Canvas，其他参数沿用公开默认值。框架同时支持 Dagre 与 ELK，示例只选择 Dagre，不增加默认 Provider 或算法、方向选择器。
+
+页面初始化及拖动、连线、复制粘贴等普通编辑不自动触发布局。按钮保持 Selection 和 Viewport，不自动 Fit View；沿用现有 Command 错误卡片，不增加专门 busy 状态、重复点击禁用、排队、去重、全局锁、自动取消或重试。真实 Chromium 场景验证布局后 Node 与 Port 同步移动、原连接保持、布局单步 Undo/Redo，以及随后从移动后的 Port 新建连线；中英文示例指引配有真实 UI 截图。
 
 ## 后续单独设计与实现
 
