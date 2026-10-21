@@ -146,25 +146,45 @@ test('a clean checkout selects no development checks and website changes select 
   }
 });
 
-test('root tests follow a side-effect import into a local fixture', () => {
+test.each(['fixture.ts', 'fixture.tsx', 'fixture.js', 'fixture/index.js'])(
+  'root tests follow an extensionless side-effect import into %s without executing it',
+  (fixturePath) => {
+    const f = fixture();
+    try {
+      f.write('tests/consumer.test.ts', "import './fixture';\n");
+      f.write(
+        `tests/${fixturePath}`,
+        `import '@nodebraid/value';\nimport '${fixturePath.includes('/') ? '../' : './'}consumer.test';\nthrow new Error('planning must not execute fixtures');\n`,
+      );
+      f.git('add', '.');
+      f.git(
+        '-c',
+        'user.name=Test',
+        '-c',
+        'user.email=test@example.invalid',
+        '-c',
+        'core.hooksPath=/dev/null',
+        'commit',
+        '-qm',
+        'fixture import',
+      );
+      f.write('packages/value/src/index.ts', 'export const value = 2;\n');
+      const result = f.invoke('--plan');
+      expect(result.status).toBe(0);
+      expect(JSON.parse(result.stdout).tests).toEqual(['tests/consumer.test.ts']);
+    } finally {
+      rmSync(f.root, { recursive: true });
+    }
+  },
+);
+
+test('planning exposes a missing local fixture as a native resolution error', () => {
   const f = fixture();
   try {
-    f.write('tests/consumer.test.ts', "import './fixture';\n");
-    f.write('tests/fixture.ts', "import '@nodebraid/value';\n");
-    f.git('add', '.');
-    f.git(
-      '-c',
-      'user.name=Test',
-      '-c',
-      'user.email=test@example.invalid',
-      '-c',
-      'core.hooksPath=/dev/null',
-      'commit',
-      '-qm',
-      'fixture import',
-    );
-    f.write('packages/value/src/index.ts', 'export const value = 2;\n');
-    expect(JSON.parse(f.invoke('--plan').stdout).tests).toEqual(['tests/consumer.test.ts']);
+    f.write('tests/consumer.test.ts', "import './missing-fixture';\n");
+    const result = f.invoke('--plan');
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('./missing-fixture');
   } finally {
     rmSync(f.root, { recursive: true });
   }
