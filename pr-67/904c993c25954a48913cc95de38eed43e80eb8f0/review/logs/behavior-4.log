@@ -1,0 +1,32 @@
+bun test v1.4.2 (744846f84)
+
+tests/check-affected.test.ts:
+(pass) development plan follows production and test consumers without selecting unrelated suites [153.10ms]
+(pass) branch comparison includes commits, staged changes, untracked files and both sides of renames [371.69ms]
+(pass) shared changes explicitly select full checks and preserve the real command failure [185.54ms]
+(pass) a clean checkout selects no development checks and website changes select documentation [162.63ms]
+(pass) root tests follow an extensionless side-effect import into fixture.ts without executing it [153.18ms]
+(pass) root tests follow an extensionless side-effect import into fixture.tsx without executing it [162.15ms]
+(pass) root tests follow an extensionless side-effect import into fixture.js without executing it [147.99ms]
+(pass) root tests follow an extensionless side-effect import into fixture/index.js without executing it [146.65ms]
+(pass) planning exposes a missing local fixture as a native resolution error [113.00ms]
+(pass) root test selection ignores package names and import statements inside fixture strings [146.77ms]
+(pass) affected execution runs every selected layer once and stops on a real selected failure [1140.19ms]
+
+tests/local-agent-issue-archive.test.ts:
+(pass) archives the complete issue and discussion as a readable local copy [4.12ms]
+(pass) refreshes the current read time without replacing identical historical content [2.38ms]
+(pass) keeps earlier versions when either the specification or its comments are edited [2.63ms]
+(pass) archives closed specifications with no execution labels or body [1.91ms]
+(pass) rejects incomplete or mismatched input without changing the current copy or history [8.73ms]
+
+tests/build-workspaces.test.ts:
+(pass) one invocation builds a shared dependency once before its consumers and a later invocation rebuilds it [189.40ms]
+(pass) dependency modes prepare production and test dependencies without building the selected workspace [129.05ms]
+(pass) a real build failure stops its consumers and is returned as a failing command [34.83ms]
+(pass) a dependency cycle fails with the workspace path instead of recursing until stack overflow [16.13ms]
+
+ 20 pass
+ 0 fail
+ 117 expect() calls
+Ran 20 tests across 3 files. [3.30s]

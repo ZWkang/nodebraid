@@ -1,0 +1,46 @@
+{
+  "mode": "affected",
+  "files": [
+    "packages/value/src/index.ts"
+  ],
+  "packages": [
+    "@nodebraid/value"
+  ],
+  "tests": [
+    "tests/consumer.test.ts"
+  ],
+  "browser": [],
+  "docs": false,
+  "shared": []
+}
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install prettier --check --ignore-unknown packages/value/src/index.ts
+Checking formatting...
+All matched files use Prettier code style!
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install oxlint packages/value/src/index.ts
+[build] @nodebraid/value
+Bundled 1 module in 10ms
+
+  index.js  59 bytes  (entry point)
+
+
+[check:affected] packages/value: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] .: /Users/zhou/.bun/bin/bun test tests/consumer.test.ts
+bun test v1.4.2 (744846f84)
+$ bun build ./src/index.ts --outdir ./dist --target bun
+$ tsgo --noEmit -p tsconfig.json
+
+tests/consumer.test.ts:
+error: expect(received).toBe(expected)
+
+Expected: 1
+Received: 2
+
+(fail) public value contract [2.03ms]
+
+ 0 pass
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [7.00ms]
