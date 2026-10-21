@@ -112,9 +112,10 @@ export const commandPlugin = definePlugin({
         }
         const activeRegistration = registration;
         const controller = new AbortController();
-        const abort = () => controller.abort(options?.signal?.reason);
-        options?.signal?.addEventListener('abort', abort, { once: true });
-        if (options?.signal?.aborted) abort();
+        const callerSignal = options?.signal;
+        const abort = () => controller.abort(callerSignal?.reason);
+        callerSignal?.addEventListener('abort', abort, { once: true });
+        if (callerSignal?.aborted) abort();
         let settleExecution!: () => void;
         const settled = new Promise<void>((resolve) => {
           settleExecution = resolve;
@@ -143,7 +144,7 @@ export const commandPlugin = definePlugin({
 
         function finishExecution(): void {
           activeRegistration.executions.delete(execution);
-          options?.signal?.removeEventListener('abort', abort);
+          callerSignal?.removeEventListener('abort', abort);
           settleExecution();
         }
       },
