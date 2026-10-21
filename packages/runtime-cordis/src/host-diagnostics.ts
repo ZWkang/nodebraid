@@ -226,14 +226,21 @@ export class HostDiagnostics {
     }
     ancestors.add(error);
     try {
-      const nestedErrors = error.errors
-        .map((nestedError) => this.#findUndiagnosedError(nestedError, ancestors))
-        .filter((result): result is Readonly<{ readonly found: true; readonly error: unknown }> => result.found)
-        .map((result) => result.error);
+      const members = error.errors;
+      if (!Array.isArray(members)) throw new TypeError('AggregateError.errors must be an array.');
+      const nestedErrors = Array.from<unknown>({ length: members.length });
+      const length = nestedErrors.length;
+      let retained = 0;
+      for (let index = 0; index < length; index += 1) {
+        if (!(index in members)) continue;
+        const result = this.#findUndiagnosedError(members[index], ancestors);
+        if (result.found) nestedErrors[retained++] = result.error;
+      }
+      nestedErrors.length = retained;
       if (nestedErrors.length === 0) return Object.freeze({ found: false });
       if (
-        nestedErrors.length === error.errors.length &&
-        nestedErrors.every((nestedError, index) => nestedError === error.errors[index])
+        nestedErrors.length === length &&
+        nestedErrors.every((nestedError, index) => nestedError === members[index])
       ) {
         return Object.freeze({ found: true, error });
       }

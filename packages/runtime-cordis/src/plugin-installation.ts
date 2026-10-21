@@ -135,7 +135,7 @@ export class CordisPluginInstallation implements PluginInstallation {
             this.#failDependencyCleanup(activation, disappearingServiceName, cleanupError);
             return async () => {};
           }
-          throw cleanupError;
+          // Terminal dispose() reads the Activation's cached cleanup rejection.
         }
         if (!this.#disposeRequested) {
           this.#setSnapshot(createPendingSnapshot(this.getMissing()));
@@ -154,7 +154,7 @@ export class CordisPluginInstallation implements PluginInstallation {
           this.#failDependencyCleanup(activation, disappearingServiceName, cleanupError);
           return async () => {};
         }
-        throw cleanupError;
+        // Terminal dispose() reads the Activation's cached cleanup rejection.
       }
       if (!this.#disposeRequested) {
         this.#setSnapshot(createPendingSnapshot(this.getMissing()));
@@ -223,8 +223,9 @@ export class CordisPluginInstallation implements PluginInstallation {
           this.#cleanupErrors.push(...errors);
           if (!this.#disposeRequested) {
             this.#fail(error, 'cleanup');
+            throw error;
           }
-          throw error;
+          // Terminal dispose() exposes these cached errors after Cordis settles.
         }
       })();
       return deactivation;
