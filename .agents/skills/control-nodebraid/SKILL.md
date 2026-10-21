@@ -8,6 +8,8 @@ description: >
 
 # Control NodeBraid
 
+声明验证结论前应用 [Prove It Works](../principle-prove-it-works/SKILL.md)；汇报性能或评测数字时应用 [Explain the Number](../principle-explain-the-number/SKILL.md)。其他原则按[项目索引](../../../docs/agents/principles.md)选择，继续复用本 skill 的验证地图和现有证据协议。
+
 从要证明的行为出发，在[能力验证地图](references/capabilities.md)中选择对应能力，只读取相关测试和配方。地图记录已有入口与观察方式，不代表这些检查在当前 checkout 已经通过。
 
 ## 选择验证层级

@@ -15,6 +15,10 @@ This is a report the user asked for, so give it in full.
 
 ## 1. Understand first
 
+- Select relevant [project principles](../../../docs/agents/principles.md) from
+  the actual change and read their leaf guidance. Support findings with concrete
+  behavior and contract evidence; a principle's name alone is not a finding.
+
 - Review what the user names: uncommitted or staged changes, a branch, a PR
   link, or files. Nothing named: the uncommitted changes, or the last commit
   if there are none.
