@@ -1,0 +1,134 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-session/tests/input-values.test.ts:
+(pass) Session publishes the x value accepted during Viewport validation [30.05ms]
+(pass) Session publishes the y value accepted during Viewport validation [2.54ms]
+(pass) Session publishes the zoom value accepted during Viewport validation [1.10ms]
+38 |   let reads = 0;
+39 |   Object.defineProperty(input, field, { get() { return ++reads === 1 ? first : []; } });
+40 |   const h = await harness();
+41 |   try {
+42 |     h.session.setSelection(input);
+43 |     expect(h.session.getSnapshot().selection).toEqual({ nodeIds: [b], edgeIds: [ab] });
+                                                   ^
+error: expect(received).toEqual(expected)
+
+  {
+    "edgeIds": [
+      "ab",
+    ],
+-   "nodeIds": [
+-     "b",
+-   ],
++   "nodeIds": [],
+  }
+
+- Expected  - 3
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-76-session-inputs/cflow/packages/plugin-session/tests/input-values.test.ts:43:47)
+(fail) Session retains the nodeIds collection accepted during validation [9.91ms]
+38 |   let reads = 0;
+39 |   Object.defineProperty(input, field, { get() { return ++reads === 1 ? first : []; } });
+40 |   const h = await harness();
+41 |   try {
+42 |     h.session.setSelection(input);
+43 |     expect(h.session.getSnapshot().selection).toEqual({ nodeIds: [b], edgeIds: [ab] });
+                                                   ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "edgeIds": [
+-     "ab",
+-   ],
++   "edgeIds": [],
+    "nodeIds": [
+      "b",
+    ],
+  }
+
+- Expected  - 3
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-76-session-inputs/cflow/packages/plugin-session/tests/input-values.test.ts:43:47)
+(fail) Session retains the edgeIds collection accepted during validation [1.16ms]
+50 |   let reads = 0;
+51 |   Object.defineProperty(input[field], '0', { get() { return ++reads === 1 ? first : field === 'nodeIds' ? a : edgeId('missing'); } });
+52 |   const h = await harness();
+53 |   try {
+54 |     h.session.setSelection(input);
+55 |     expect(h.session.getSnapshot().selection).toEqual({ nodeIds: [b], edgeIds: [ab] });
+                                                   ^
+error: expect(received).toEqual(expected)
+
+  {
+    "edgeIds": [
+      "ab",
+    ],
+    "nodeIds": [
+-     "b",
++     "a",
+    ],
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-76-session-inputs/cflow/packages/plugin-session/tests/input-values.test.ts:55:47)
+(fail) Session retains the nodeIds element accepted during validation [1.34ms]
+92 |         const nextSelection = createSelectionSnapshot(selection);
+93 |         const view = context.services.kernel.read();
+94 |         const missingNodeIds = Object.freeze(nextSelection.nodeIds.filter((id) => !view.query.getNode(id)));
+95 |         const missingEdgeIds = Object.freeze(nextSelection.edgeIds.filter((id) => !view.query.getEdge(id)));
+96 |         if (missingNodeIds.length > 0 || missingEdgeIds.length > 0) {
+97 |           throw new SessionError(
+                     ^
+SessionError: Selection contains entities that do not exist in the current Canvas View.
+  domain: "plugin.session",
+   cause: undefined,
+ details: {
+  missingEdgeIds: [ "missing" ],
+  missingNodeIds: [],
+},
+    code: "SELECTION_ENTITY_NOT_FOUND"
+
+      at setSelection (/Users/zhou/.codex/worktrees/issue-76-session-inputs/cflow/packages/plugin-session/src/session-plugin.ts:97:17)
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-76-session-inputs/cflow/packages/plugin-session/tests/input-values.test.ts:54:15)
+(fail) Session retains the edgeIds element accepted during validation [2.27ms]
+63 |   Object.defineProperty(ids, Symbol.iterator, { value: function* () { iteratorCalls++; } });
+64 |   Object.defineProperty(input, field, { value: ids });
+65 |   const h = await harness();
+66 |   try {
+67 |     const before = h.session.getSnapshot();
+68 |     expect(() => h.session.setSelection(input)).toThrow(expect.objectContaining({ domain: 'plugin.session', code: 'SELECTION_ENTITY_NOT_FOUND' }));
+                                                     ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-76-session-inputs/cflow/packages/plugin-session/tests/input-values.test.ts:68:49)
+(fail) Session rejects an actual unknown nodeIds member hidden by an iterator [2.19ms]
+63 |   Object.defineProperty(ids, Symbol.iterator, { value: function* () { iteratorCalls++; } });
+64 |   Object.defineProperty(input, field, { value: ids });
+65 |   const h = await harness();
+66 |   try {
+67 |     const before = h.session.getSnapshot();
+68 |     expect(() => h.session.setSelection(input)).toThrow(expect.objectContaining({ domain: 'plugin.session', code: 'SELECTION_ENTITY_NOT_FOUND' }));
+                                                     ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-76-session-inputs/cflow/packages/plugin-session/tests/input-values.test.ts:68:49)
+(fail) Session rejects an actual unknown edgeIds member hidden by an iterator [0.67ms]
+
+ 3 pass
+ 6 fail
+ 14 expect() calls
+Ran 9 tests across 1 file. [118.00ms]

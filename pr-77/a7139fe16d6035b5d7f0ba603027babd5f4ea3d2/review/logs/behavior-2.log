@@ -1,0 +1,71 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-session/tests/input-values.test.ts:
+25 |   let reads = 0;
+26 |   Object.defineProperty(input, field, { get() { return ++reads === 1 ? accepted : field === 'zoom' ? 0 : Number.NaN; } });
+27 |   const h = await harness();
+28 |   try {
+29 |     h.session.setViewport(input);
+30 |     expect(h.session.getSnapshot().viewport).toEqual({ x: 10, y: 20, zoom: 2 });
+                                                  ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "x": 10,
++   "x": NaN,
+    "y": 20,
+    "zoom": 2,
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-76-session-inputs/cflow/packages/plugin-session/tests/input-values.test.ts:30:46)
+(fail) Session publishes the x value accepted during Viewport validation [30.36ms]
+25 |   let reads = 0;
+26 |   Object.defineProperty(input, field, { get() { return ++reads === 1 ? accepted : field === 'zoom' ? 0 : Number.NaN; } });
+27 |   const h = await harness();
+28 |   try {
+29 |     h.session.setViewport(input);
+30 |     expect(h.session.getSnapshot().viewport).toEqual({ x: 10, y: 20, zoom: 2 });
+                                                  ^
+error: expect(received).toEqual(expected)
+
+  {
+    "x": 10,
+-   "y": 20,
++   "y": NaN,
+    "zoom": 2,
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-76-session-inputs/cflow/packages/plugin-session/tests/input-values.test.ts:30:46)
+(fail) Session publishes the y value accepted during Viewport validation [2.30ms]
+25 |   let reads = 0;
+26 |   Object.defineProperty(input, field, { get() { return ++reads === 1 ? accepted : field === 'zoom' ? 0 : Number.NaN; } });
+27 |   const h = await harness();
+28 |   try {
+29 |     h.session.setViewport(input);
+30 |     expect(h.session.getSnapshot().viewport).toEqual({ x: 10, y: 20, zoom: 2 });
+                                                  ^
+error: expect(received).toEqual(expected)
+
+  {
+    "x": 10,
+    "y": 20,
+-   "zoom": 2,
++   "zoom": 0,
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-76-session-inputs/cflow/packages/plugin-session/tests/input-values.test.ts:30:46)
+(fail) Session publishes the zoom value accepted during Viewport validation [1.12ms]
+
+ 0 pass
+ 3 fail
+ 3 expect() calls
+Ran 3 tests across 1 file. [95.00ms]

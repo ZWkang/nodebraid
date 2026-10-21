@@ -1,0 +1,3 @@
+@nodebraid/plugin-session typecheck:self: tests/input-values.test.ts(188,15): error TS2322: Type 'EdgeId[]' is not assignable to type 'never'.
+@nodebraid/plugin-session typecheck:self: tests/input-values.test.ts(197,17): error TS2322: Type 'void' is not assignable to type 'readonly EdgeId[]'.
+@nodebraid/plugin-session typecheck:self: Exited with code 1
