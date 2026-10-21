@@ -22,7 +22,7 @@ export interface BehaviorEvidence {
 
 export interface VerificationReportContent {
   schemaVersion: 1;
-  source: { base: string; head: string; tree: string; patch: string; localHead: string };
+  source: { base: string; expectedParent: string; head: string; tree: string; patch: string; localHead: string };
   task: Pick<PreparedRun, 'run' | 'repository' | 'source' | 'request' | 'plan'>;
   checks: VerifiedRun['checks'];
   reviews: VerifiedRun['reviews'];
@@ -45,7 +45,8 @@ export function renderVerificationReport(report: VerificationReportContent): str
     '',
     '## Reviewed and published source',
     '',
-    `- Base: \`${source.base}\``,
+    `- Review base: \`${source.base}\``,
+    `- Independently prepared append parent: \`${source.expectedParent}\``,
     `- Published head: \`${source.head}\``,
     `- Reviewed local head: \`${source.localHead}\``,
     `- Tree: \`${source.tree}\``,
@@ -125,6 +126,8 @@ export function collectVerificationReport(runDirectory: string): CollectedVerifi
   const readFile = (name: string) => readRunFile(directory, name);
   const read = <T>(name: string): T => JSON.parse(readFile(name).toString('utf8')) as T;
   const task = read<PreparedRun>('prepared-task.json');
+  if (!task.baseRefName?.trim() || !task.expectedParent)
+    throw new Error('Legacy run lacks baseRefName or expectedParent; preserve it and prepare a new run.');
   const verified = read<VerifiedRun>('verification.json');
   const publication = read<Publication>('publication.json');
   validateVerification(task, verified);
@@ -132,7 +135,7 @@ export function collectVerificationReport(runDirectory: string): CollectedVerifi
     publication.taskDigest !== task.digest ||
     publication.localHead !== verified.head ||
     publication.tree !== verified.tree ||
-    publication.parent !== task.base ||
+    publication.parent !== task.expectedParent ||
     !/^[a-f0-9]{40}$/.test(publication.head)
   )
     throw new Error('Publication does not match the verified source.');
@@ -165,6 +168,7 @@ export function collectVerificationReport(runDirectory: string): CollectedVerifi
     schemaVersion: 1,
     source: {
       base: task.base,
+      expectedParent: task.expectedParent,
       head: publication.head,
       tree: verified.tree,
       patch: verified.patch,

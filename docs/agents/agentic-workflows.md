@@ -163,12 +163,17 @@ bun run agents:run evaluate /absolute/path/to/run snapshot.json
 ```
 
 `task-input.json` 的字段为 `run`、`repository`、`source: {kind: issue|pr, number}`、
-`branch`、当前 PR 目标分支 `baseRefName`、完整 SHA `base`、原始请求摘要 `request`、待处理反馈 `pending`，以及
-`plan: [{id, blockedBy, acceptance}]`。`base` 是本轮发布将追加的远端提交；它必须是
-本地验证提交的祖先。原 Issue/spec revision 和用户已确认的验收条件随输入一起归档。
-新 `prepare` 和 `verify` 必须有 `baseRefName`。旧记录缺失该字段时仍保持原 digest，
-可读取并生成历史报告，但 `evaluate` 明确返回 `waiting-verification`；不得直接补写旧记录。
-PR retarget 后，即使 head 未变也要另建绑定新 base 的 run，重做 review 与完整验证。
+`branch`、当前 PR 目标分支 `baseRefName`、完整 SHA `base`、完整 SHA `expectedParent`、
+原始请求摘要 `request`、待处理反馈 `pending`，以及 `plan: [{id, blockedBy, acceptance}]`。
+`base` 是目标分支本次读取的提交，作为 review、完整 binary patch、验证、preview 与 report 的共同审查起点。
+`expectedParent` 是本轮发布必须追加的远端源分支 head；新分支尚不存在时使用刚 fetch 的目标提交。
+初次发布二者通常相同，追加修复和同步 main 时可以不同；必须在执行前从独立来源保存，
+不能从发布响应倒推，也不能用其中一个代替另一个。本地验证提交必须包含二者的祖先历史。
+原 Issue/spec revision 和用户已确认的验收条件随输入一起归档。
+新 `prepare`、`verify`、`publication` 和 report 都要求 `expectedParent`；prepare/verify 仍要求 `baseRefName`。
+旧记录保持原 digest 和已发布产物，可读取供历史审计，但缺少任一独立字段时 `evaluate` 返回
+`waiting-verification`，当前执行器不会为其补值、复验、发布或重生成报告；必须另建 run。
+PR retarget 或目标 SHA 改变后，即使 head 未变也要绑定新 base，重做 review 与完整验证。
 `pending` 来自完整归一化快照的 `evaluateFeedback` 结果。依赖图必须无环且引用存在，
 `completed-steps.json` 是已有执行证据的已完成 step ID 数组，不能越过未完成 blocker。
 这些 step 就是本地 ticket；Issue 编号不作为内部 ticket ID。
@@ -230,18 +235,22 @@ PR 集成状态、历史聚合规格的标题/未完成子任务、未完成验�
 保存在 `verification.json`，原始日志不覆盖；重启后可以复验。同一 head 的新尝试也会
 重新执行真实进程，不缓存或跳过检查。`publication` 读取 GitHub Git commit 原始返回值
 `{sha, tree: {sha}, parents: [{sha}]}`，核对远端 tree 与已检查 tree，且第一父提交必须是
-本轮 expected remote head；不能仅在后续 merge parent 中找到旧 base 就接受发布。
+独立保存的 `expectedParent`；不能仅在后续 merge parent 中找到它或拿审查 `base` 代替。
+实际远端父提交中还必须至少有一个包含审查 `base` 的祖先历史；同步 main 时不能丢掉
+保留这段历史的额外父提交。发布前须使这些父提交对象在本地可读；Git 读取错误直接失败。
 API 生成的远端 SHA 可以不同，但一份 run 不得绑定第二次发布。先记录发布再调整本地 ref。
 
 证据命令为 `agents:preview --base <sha> --out <empty-dir> [--all]`、
 `agents:report <run-dir> <output-dir>` 与
 `agents:publish-evidence prepare <output-dir> <repository> <pr> <head>`。
+preview 的 `--base` 使用 prepared task 的审查 `base`，report 另记录已验证的 `expectedParent`。
 先采集 preview，再将 report 生成到同一目录；report 只创建新文件。`prepare` 只生成连接器
 发布计划；已有 `GITHUB_TOKEN` / `GITHUB_REPOSITORY` 的环境可直接执行
 `agents:publish-evidence <output-dir> <pr> <head>`。参数、行为证据 schema、连接器操作和
 CI 权限边界见 [PR 证据](./pr-evidence.md)。
 
 `normalize` 的完整输入契约为 `scripts/github-feedback.ts` 的 `GitHubFeedback`：
+PR 的 `base.sha` 必须是真实目标 SHA，归一化为 `baseRefOid`；缺失或无效时明确失败。
 `comments`、`reviews` 为每页 100 条的 REST page 数组，包含最后短页（恰好 100 条时
 还要读空页）；`threads` 包含外层页和已读完 cursor 的评论；CI arrays 匹配报告总数。
 实际 workflow 的 head/path/name 用于识别项目 Checks，workflow 自身的 pending/failure
@@ -249,7 +258,8 @@ CI 权限边界见 [PR 证据](./pr-evidence.md)。
 普通 COMMENTED 不能清除同一人的 changes requested，只有其后正式批准或 dismiss
 才更新有效决定。`published-feedback.json` 仅含已发布且 key/digest 精确
 匹配的自己评论。新评论、编辑、resolved thread 的新回复和人类 changes requested
-都进入判断。新 head 返回 `waiting-verification`，不会把旧 tree、测试和 review 改贴到新 SHA。
+都进入判断。新 head、目标分支名或目标 SHA 改变时返回 `waiting-verification`，
+不会把旧 tree、测试和 review 改贴到新 SHA，也不会用已通过的另一审查范围交付。
 
 `evaluate` 尚未自动检查完整报告和媒体的发布回执。每次交付 ready 前，执行者还必须实际
 发布并回读当前 head 的报告，记录报告 URL、source head 与 evidence commit；不能把

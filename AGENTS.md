@@ -35,7 +35,7 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 - `bun run agents:check`：检查本地工作流协议、skills 和残留的托管 API 执行入口；CI 在完整工程检查前执行。
 - `bun run agents:local-check`：另检查本机 ChatGPT CLI 登录；有 API-key 环境变量时明确失败，不切换计费入口。
 - `bun run agents:scan [base-sha]`：在已 fetch 的干净 main worktree 记录固定 SHA 调查范围。
-- `bun run agents:run`：归一化完整 GitHub 上下文，独立准备任务、检查依赖前沿、执行真实检查、绑定发布 tree 和判断当前 head；参数见 `docs/agents/agentic-workflows.md`。
+- `bun run agents:run`：归一化完整 GitHub 上下文，独立保存审查 `base` 与追加 `expectedParent`、检查依赖前沿、执行真实检查、绑定发布 tree 和判断当前 head/目标 SHA；参数见 `docs/agents/agentic-workflows.md`。
 - `bun run agents:run archive-issue <snapshot.json> <issues-dir>`：保存完整 GitHub Issue 正文与讨论的本地阅读副本和不可覆盖历史版本；输入与默认存放位置见 Issue tracker 约定。
 - `bun run agents:run reconcile <source.json> [output.json]`：在 fetch 后核对单一交付 Issue、PR、外部依赖/负责人、实际 main 集成与验收；历史父子记录继续可读。输出 GitHub 交付候选，不执行远端写入。
 - `bun run agents:run frontier <run-dir> <completed-steps.json>`：按本地 prepared plan 和实际完成记录选择可执行 ticket；ticket 不创建 GitHub Issue 或独立 PR。
