@@ -68,11 +68,7 @@ function describeErrorAtPath(error: unknown, path: string, ancestors: Map<object
         name: error.name,
         message: error.message,
         ...(typeof error.stack === 'string' ? { stack: error.stack } : {}),
-        errors: Object.freeze(
-          error.errors.map((nestedError, index) =>
-            describeErrorAtPath(nestedError, `${path}.errors[${index}]`, ancestors),
-          ),
-        ),
+        errors: describeAggregateMembers(error.errors, `${path}.errors`, ancestors),
         ...(error.cause === undefined ? {} : { cause: describeErrorAtPath(error.cause, `${path}.cause`, ancestors) }),
       });
     }
@@ -101,4 +97,21 @@ function describeErrorAtPath(error: unknown, path: string, ancestors: Map<object
   } finally {
     ancestors.delete(error);
   }
+}
+
+function describeAggregateMembers(
+  errors: unknown,
+  path: string,
+  ancestors: Map<object, string>,
+): readonly DiagnosticErrorDescription[] {
+  if (!Array.isArray(errors)) throw new TypeError('AggregateError.errors must be an array.');
+  const descriptions = Array.from<DiagnosticErrorDescription>({ length: errors.length });
+  for (let index = 0; index < descriptions.length; index += 1) {
+    if (index in errors) {
+      descriptions[index] = describeErrorAtPath(errors[index], `${path}[${index}]`, ancestors);
+    } else {
+      delete descriptions[index];
+    }
+  }
+  return Object.freeze(descriptions);
 }
