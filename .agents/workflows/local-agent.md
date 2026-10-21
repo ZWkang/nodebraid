@@ -30,6 +30,15 @@ are optional when already authenticated; a CLI access failure must not be report
 as GitHub success. Do not transfer connector credentials into shell environments.
 Follow all pagination, including reviews and thread comments.
 
+At the existing discussion-read boundaries, archive each completely read
+requirement/spec Issue and its parent/tasks with `agents:run archive-issue` as
+specified in [the tracker](../../docs/agents/issue-tracker.md#local-reading-and-archive-copies).
+Refresh after authorized GitHub writes have been read back as well. Keep readable
+current copies and immutable versions under the shared local `issues/` directory,
+including closed Issues. GitHub remains authoritative; these copies do not grant
+execution eligibility and are never written back. A failed GitHub read leaves the
+previous copy available but stale, not a successful sync.
+
 Store metadata in `$CODEX_HOME/local-workflows/nodebraid/` (normally
 `~/.codex/local-workflows/nodebraid/`). Do not store secrets or change memories.
 Keep an inspectable `state.json` and append execution evidence under `runs/`:
