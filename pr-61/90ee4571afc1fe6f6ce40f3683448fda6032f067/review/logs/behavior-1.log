@@ -1,0 +1,391 @@
+Reproducer source:
+from pathlib import Path
+import json, re, shutil, subprocess, sys, tempfile
+
+root = Path(sys.argv[1]).resolve()
+print("Reproducer source:\n" + Path(__file__).read_text(), flush=True)
+print("Source HEAD:", subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(), flush=True)
+principles = sorted((root / ".agents/skills").glob("principle-*/SKILL.md"))
+assert len(principles) == 24
+for path in principles:
+    subprocess.run(["python3", "/Users/zhou/.codex/skills/.system/skill-creator/scripts/quick_validate.py", str(path.parent)], check=True)
+changed = subprocess.check_output(["git", "diff", "--name-only", "0849c19674eb9a2fe5f6faff7ab90716c3341486", "HEAD"], cwd=root, text=True).splitlines()
+count = 0
+for name in changed:
+    path = root / name
+    if path.suffix != ".md":
+        continue
+    for target in re.findall(r"\]\(([^)]+)\)", path.read_text()):
+        if "://" in target or target.startswith("#") or " " in target:
+            continue
+        assert (path.parent / target.split("#", 1)[0]).resolve().exists(), (name, target)
+        count += 1
+print(f"All 24 definitions validate; {count} local links resolve.", flush=True)
+with tempfile.TemporaryDirectory(prefix="principle-contract-") as temp:
+    fixture = Path(temp)
+    for folder in [".agents", "docs", "scripts", ".github/workflows"]:
+        shutil.copytree(root / folder, fixture / folder)
+    for name in ["AGENTS.md", "CONTEXT.md"]:
+        shutil.copyfile(root / name, fixture / name)
+    def check():
+        result = subprocess.run(["bun", str(root / "scripts/check-agent-workflows.ts")], cwd=fixture, text=True, capture_output=True)
+        print(result.stdout, end="", flush=True)
+        print(result.stderr, end="", flush=True)
+        return result
+    assert check().returncode == 0
+    candidates = sorted((fixture / ".agents/skills").glob("principle-*/SKILL.md")) + [fixture / "docs/agents/principles.md", fixture / ".agents/skills/PSTACK-LICENSE"]
+    for path in candidates:
+        data = path.read_bytes()
+        path.unlink()
+        try:
+            result = check()
+            relative = str(path.relative_to(fixture))
+            assert result.returncode != 0, relative
+            assert f"Missing local workflow source: {relative}" in result.stderr, result.stderr
+            print(f"Expected rejection verified: {relative}; exit {result.returncode}", flush=True)
+        finally:
+            path.write_bytes(data)
+    assert check().returncode == 0
+print("PASS: all 26 required source omissions rejected; complete and restored source sets accepted.", flush=True)
+
+Source HEAD: 2e2d029edf8a8598c7b172a40366b7dfcffd7f8b
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+Skill is valid!
+All 24 definitions validate; 145 local links resolve.
+Local agent workflow sources verified; no hosted API workflow is active in this checkout.
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-attack-the-premise/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-attack-the-premise/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-boundary-discipline/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-boundary-discipline/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-build-the-lever/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-build-the-lever/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-encode-lessons-in-structure/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-encode-lessons-in-structure/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-exhaust-the-design-space/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-exhaust-the-design-space/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-experience-first/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-experience-first/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-explain-the-number/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-explain-the-number/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-fix-root-causes/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-fix-root-causes/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-foundational-thinking/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-foundational-thinking/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-guard-the-context-window/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-guard-the-context-window/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-laziness-protocol/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-laziness-protocol/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-make-operations-idempotent/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-make-operations-idempotent/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-migrate-callers-then-delete-legacy-apis/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-migrate-callers-then-delete-legacy-apis/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-minimize-reader-load/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-minimize-reader-load/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-model-the-domain/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-model-the-domain/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-never-block-on-the-human/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-never-block-on-the-human/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-outcome-oriented-execution/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-outcome-oriented-execution/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-prove-it-works/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-prove-it-works/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-redesign-from-first-principles/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-redesign-from-first-principles/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-separate-before-serializing-shared-state/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-separate-before-serializing-shared-state/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-sequence-verifiable-units/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-sequence-verifiable-units/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-subtract-before-you-add/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-subtract-before-you-add/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-test-behavior-not-implementation/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-test-behavior-not-implementation/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/principle-type-system-discipline/SKILL.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/principle-type-system-discipline/SKILL.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: docs/agents/principles.md
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: docs/agents/principles.md; exit 1
+46 |     'test-behavior-not-implementation',
+47 |     'type-system-discipline',
+48 |   ].map((name) => `.agents/skills/principle-${name}/SKILL.md`),
+49 | ];
+50 | for (const path of requiredFiles) {
+51 |   if (!(await Bun.file(path).exists())) throw new Error(`Missing local workflow source: ${path}`);
+                                                       ^
+error: Missing local workflow source: .agents/skills/PSTACK-LICENSE
+      at /Users/zhou/.codex/worktrees/b45c/cflow/scripts/check-agent-workflows.ts:51:51
+
+Bun v1.4.2 (macOS arm64)
+Expected rejection verified: .agents/skills/PSTACK-LICENSE; exit 1
+Local agent workflow sources verified; no hosted API workflow is active in this checkout.
+PASS: all 26 required source omissions rejected; complete and restored source sets accepted.
