@@ -13,6 +13,7 @@ export interface RunInput {
   repository: string;
   source: { kind: 'issue' | 'pr'; number: number };
   branch: string;
+  baseRefName?: string;
   base: string;
   request: string;
   pending: FeedbackItem[];
@@ -80,6 +81,7 @@ export function prepareRun(input: RunInput): PreparedRun {
     repository: input.repository,
     source: input.source,
     branch: input.branch,
+    ...(input.baseRefName === undefined ? {} : { baseRefName: input.baseRefName }),
     base: input.base,
     request: input.request,
     pending: input.pending,
@@ -157,7 +159,16 @@ export function evaluateVerifiedRun(
     (task.source.kind === 'pr' && task.source.number !== pr.number)
   )
     throw new Error('Task belongs to another PR.');
-  if (pr.headRefOid !== publication.head) return { status: 'waiting-verification' as const };
+  if (!task.baseRefName)
+    return {
+      status: 'waiting-verification' as const,
+      reason: 'Legacy run has no verified PR base; prepare a new run.',
+    };
+  if (pr.headRefOid !== publication.head || pr.baseRefName !== task.baseRefName)
+    return {
+      status: 'waiting-verification' as const,
+      reason: 'PR head or base changed; prepare and verify a new run.',
+    };
   if (pr.statusCheckRollup.some((check) => check.headSha !== pr.headRefOid))
     throw new Error('Check head is unverified.');
   return evaluateFeedback(pr, task.repository, verified.decisions);

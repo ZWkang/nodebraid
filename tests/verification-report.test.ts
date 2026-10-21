@@ -40,6 +40,7 @@ function fixture() {
       repository: 'ZWkang/nodebraid',
       source: { kind: 'issue', number: 45 },
       branch: 'feat/issue-45',
+      baseRefName: 'main',
       base,
       request: 'approved report scope',
       pending: [],

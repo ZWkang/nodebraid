@@ -10,6 +10,7 @@ const requiredFiles = [
   '.agents/skills/PSTACK-LICENSE',
   'scripts/local-agent.ts',
   'scripts/local-agent-run.ts',
+  'scripts/local-agent-reconcile.ts',
   'scripts/github-feedback.ts',
   'scripts/discovery.ts',
   'scripts/discovery-queue.ts',

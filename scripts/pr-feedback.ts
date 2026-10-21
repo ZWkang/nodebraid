@@ -76,14 +76,16 @@ function digest(value: unknown): string {
   return createHash('sha256').update(JSON.stringify(value)).digest('hex');
 }
 
-export function isManagedPR(pr: FeedbackSnapshot, repository: string): boolean {
+export function isManagedPR(
+  pr: Pick<FeedbackSnapshot, 'state' | 'isDraft' | 'headRepository' | 'title' | 'headRefName'>,
+  repository: string,
+): boolean {
   return (
     pr.state === 'OPEN' &&
     !pr.isDraft &&
-    pr.baseRefName === 'main' &&
     pr.headRepository?.nameWithOwner === repository &&
     (pr.title.startsWith('[local-agent] ') || pr.title.startsWith('[agent] ')) &&
-    /^feat\/issue-[1-9]\d*$/.test(pr.headRefName)
+    /^feat\/issue-[1-9]\d*(?:-integration)?$/.test(pr.headRefName)
   );
 }
 
@@ -128,11 +130,12 @@ export function evaluateFeedback(pr: FeedbackSnapshot, repository: string, decis
   const updateBase = pr.mergeable === 'CONFLICTING' || pr.mergeStateStatus === 'BEHIND';
   const request = digest({
     head: pr.headRefOid,
+    base: pr.baseRefName,
     feedback: pending.map((item) => [item.key, item.digest]).sort(),
     failed,
     updateBase,
   });
-  let status: 'excluded' | 'repair' | 'waiting-ci' | 'waiting-review' | 'ready';
+  let status: 'excluded' | 'repair' | 'waiting-ci' | 'waiting-review' | 'needs-integration' | 'ready';
   if (!isManagedPR(pr, repository)) status = 'excluded';
   else if (pending.length || failed.length || updateBase) status = 'repair';
   else if (!ciPassed(pr) || pr.mergeable === 'UNKNOWN') status = 'waiting-ci';
@@ -143,7 +146,7 @@ export function evaluateFeedback(pr: FeedbackSnapshot, repository: string, decis
     pr.mergeStateStatus !== 'CLEAN'
   )
     status = 'waiting-review';
-  else status = 'ready';
+  else status = pr.baseRefName === 'main' ? 'ready' : 'needs-integration';
   return { status, request, pending, failed, updateBase };
 }
 

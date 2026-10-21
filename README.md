@@ -80,7 +80,13 @@ The versioned execution protocol is [.agents/workflows/local-agent.md](./.agents
 [Agentic workflows](./docs/agents/agentic-workflows.md) documents setup, durable
 execution evidence, failure states and acceptance. Managed issue PRs use a
 `[local-agent] ` title and `feat/issue-N` branch; legacy `[agent] ` issue PRs remain
-eligible. Human review and merge are the final step.
+eligible. A required follow-up integration uses `feat/issue-N-integration` and
+retains the original PR/task chain. Stacked PRs keep feedback maintenance but
+require actual main integration before completion; retargeting requires fresh
+verification even at the same head. Human review and merge remain the default;
+explicit user authorization can permit verified merge and issue closure.
+Parent spec titles use `spec: `; approved scope, native children, owners, execution
+choices and acceptance are reconciled independently of title casing.
 
 Project-local Ponytail keeps implementation complete and minimal; `ponytail-review`
 checks connected callers in the independent Standards axis. Spec review remains
@@ -98,7 +104,8 @@ bun run agents:local-check # Also verify local ChatGPT CLI authentication
 bun run agents:scan        # Prepare a main-snapshot investigation
 bun run agents:scan <sha>  # Prepare changes since the last completed investigation
 bun run agents:typecheck  # Type-check the executable local workflow
-bun run agents:run        # Show prepare/inspect/verify/publication/evaluate usage
+bun run agents:run        # Show reconciliation and execution usage
+bun run agents:run reconcile source.json [output.json] # Read-only delivery/frontier/closure assessment after fetch
 bun run agents:preview --base <sha> --out <empty-dir> [--all] # Capture real Examples evidence
 bun run agents:report <run-dir> <output-dir> # Add complete reviews and declared logs; never overwrite
 bun run agents:publish-evidence prepare <dir> <repository> <pr> <head> # Prepare connector publication

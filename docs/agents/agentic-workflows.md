@@ -75,10 +75,24 @@ Issue 标签路由见 [issue-tracker.md](./issue-tracker.md)。只有实际复�
 或已确认的 spec 可以实现；风格问题、缺少测试、新需求和不明确的预期不能冒充 bug。
 GitHub 是实时任务状态来源，本地 ledger 保存证据和去重元数据，不维护另一套人工任务清单。
 
-托管 PR 使用 `feat/issue-N` 与 `[local-agent] ` 标题；也接管既有 `[agent] ` issue PR。
+托管 PR 使用 `feat/issue-N`（必要后续集成为 `feat/issue-N-integration`）与
+`[local-agent] ` 标题；也接管既有 `[agent] ` issue PR。
 移除前缀、关闭 PR 或转为 draft 后不再自动处理。每次写入前重新检查当前资格和 head；
 不得复用旧 head 的绿灯。新 review、编辑或已解决 thread 的新回复都需重新判断。
 人类 `changes requested` 和争议 thread 不自动 dismiss／approve；需要人工批准时明确等待。
+默认保留用户最终审阅与合并。已有明确用户授权可允许验证通过后的合并和关闭 Issue，
+不得据此开启 auto-merge、绕过 checks 或代替 reviewer 批准。
+
+父规格标题统一为 `spec: `，但标题不参与执行授权。每次恢复都核对批准范围、原生子任务、
+阻塞关系、现有 PR、负责人、执行 opt-out 和剩余验收。在已有交付授权内复用现有切片、
+自主补齐缺失子任务；保留仅本地执行、暂停和其他活跃负责人的任务。缺失原生关系必须
+明确处理并回读，不能只凭评论链接算登记成功。
+
+叠加 PR 仍维护 CI 和反馈，全部通过也只到 `needs-integration`。上游实际进入 fetched main
+后，将仍开放的后续 PR retarget 到 main 并创建新 run 重做验证；已 merged 的后续 PR 则
+复用原代码创建集成 PR，保留原任务、PR 与提交链。实际 merge commit 未被 main 包含时，
+源 Issue 不能算完成。父规格收尾还须核对所有子任务与逐条验收证据，按已有授权发布汇总、
+关闭并回读；无授权时等待用户。
 
 发布为 append-only，GitHub Git-data API 路径必须核对远端 tree 与已审阅 tree 一致，
 使用 expected head 更新分支，不 force push。API 生成的 commit SHA 与本地 SHA 可能不同，
@@ -116,6 +130,7 @@ bun run agents:scan <last-reviewed-sha> # 后续完整变更范围
 
 ```bash
 bun run agents:run normalize raw-github.json published-feedback.json snapshot.json
+bun run agents:run reconcile reconciliation-source.json reconciliation.json
 bun run agents:run prepare task-input.json /absolute/path/to/run
 bun run agents:run frontier /absolute/path/to/run completed-steps.json
 bun run agents:run inspect /absolute/path/to/run
@@ -125,11 +140,51 @@ bun run agents:run evaluate /absolute/path/to/run snapshot.json
 ```
 
 `task-input.json` 的字段为 `run`、`repository`、`source: {kind: issue|pr, number}`、
-`branch`、完整 SHA `base`、原始请求摘要 `request`、待处理反馈 `pending`，以及
+`branch`、当前 PR 目标分支 `baseRefName`、完整 SHA `base`、原始请求摘要 `request`、待处理反馈 `pending`，以及
 `plan: [{id, blockedBy, acceptance}]`。`base` 是本轮发布将追加的远端提交；它必须是
 本地验证提交的祖先。原 Issue/spec revision 和用户已确认的验收条件随输入一起归档。
+新 `prepare` 和 `verify` 必须有 `baseRefName`。旧记录缺失该字段时仍保持原 digest，
+可读取并生成历史报告，但 `evaluate` 明确返回 `waiting-verification`；不得直接补写旧记录。
+PR retarget 后，即使 head 未变也要另建绑定新 base 的 run，重做 review 与完整验证。
 `pending` 来自完整归一化快照的 `evaluateFeedback` 结果。依赖图必须无环且引用存在，
 `completed-steps.json` 是已有执行证据的已完成 step ID 数组，不能越过未完成 blocker。
+
+`reconcile` 是只读对账命令，不调用 GitHub 写入、不 merge、不关闭 Issue；可选第二个
+参数保存报告。它读取完整独立来源，契约为
+[`ReconciliationInput`](../../scripts/local-agent-reconcile.ts)，不能从上一份成功报告倒推输入：
+
+- `repository: {full_name, default_branch}` 来自仓库元数据；`main` 为刚 fetch 的
+  `refs/remotes/origin/<default_branch>` SHA。命令要求该 ref 与 SHA 一致，并对每个
+  merged PR 的真实 `merge_commit_sha` 执行 Git 祖先检查；提交缺失或 Git 错误直接失败。
+- `actor` 为当前 GitHub 用户，`executor` 为当前执行聊天身份。`closeAuthorization`
+  记录已有用户关闭授权的来源，没有授权填空字符串；它不代表合并权限。
+- `specs`、`tasks` 都保留完整 `issue`（正文、评论、标签、assignees、规范化的
+  `OPEN|CLOSED` 状态），以及从真实讨论确认的 `approval` 来源链接或 null、
+  `execution: agent|local-only|paused`、当前执行 `owner` 或 null、
+  全部 `acceptance: [{id, evidence}]`。未完成证据为 null，不能省略尚未完成的条件。
+- 每个 spec 的 `children`、task 的 `blockers` 是真实 REST 分页数组，元素含 issue
+  `number`，通过最后一个少于 100 条的页面（空集合为 `[[]]`）。spec 的
+  `slices: [{id, task}]` 覆盖完整已批准范围，未拆分项的 task 为 null；task 的
+  `parent` 是父 issue number 或 null。声明的切片、父子关联与原生关系必须一致。
+- task 的 `pullRequests` 列出全部已有 PR number；`delivery` 标明实际交付 PR number
+  或 null。顶层 `pullRequests` 保留这些 PR 和所依赖上游 PR 的实时
+  `number/title/state/draft/head/base/merged/merge_commit_sha/html_url` 元数据；
+  每个 `base.repo.full_name` 必须是当前仓库，包括已 merged 的 PR；
+  后续集成不能丢弃原始 PR 链。后续 PR 可以复用旧实现 head 而不包含旧功能分支的
+  merge commit；此时将新 PR 选为 task 的 `delivery`，按它与验收判断任务完成。
+
+报告包含任务 `frontier`、按当前任务 `delivery` 得出的 `integration` 候选、
+PR 集成/retarget 历史状态、规格规范标题、未完成子任务与验收、
+以及关闭候选 `canClose`。证据字段是来源引用，helper 不读取或认证 URL 内容，
+非空字符串本身不能证明当前 CI、反馈、独立 review 或全量检查通过。执行者必须复用
+已有真实 `verify`、`publication`、报告发布/回读和 `evaluate` 结果核实对应交付 head，
+再把真实证据引用填入每项验收；父规格的外部验收仍须逐项实跑。候选不是执行授权或
+完成证书。执行者还须对原始批准范围确认完整性，
+按协议维护反馈、处理需要拆分/登记的工作，并在每次授权写入前刷新来源和 main。
+关闭子任务并回读后再次对账，才可评估父规格关闭。缺失关系、依赖循环和不完整分页
+明确失败。规范改名、拆票完成或单次绿色检查不等于完成交付。
+历史 PR 的 `needs-integration` 不是待执行队列；已选定的后续 delivery 进入 main
+且验收通过后，`integration` 不再包含该任务，不因旧 merge commit 缺席而重复恢复。
 
 `prepare` 独立写入 `prepared-task.json`，重启后相同输入可恢复，变更输入需要新 run；
 不能从结果 receipt 复制一个“预期 task”。`inspect` 输出当前完整 head、tree 和原始

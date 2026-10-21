@@ -15,7 +15,9 @@ republish completed work. `CONTEXT.md` and `docs/adr/` remain in the repository.
 
 - **Spec**: one parent issue per feature, containing the problem, solution, user
   stories, scope, implementation decisions, testing decisions and acceptance
-  criteria. Record decisions and approval in comments.
+  criteria. Use the title prefix `spec: `. Record decisions and approval in comments.
+  Identify specs by their approved role and native relationships; title case never
+  grants implementation authority.
 - **Implementation task**: one child issue per independently verifiable slice.
   Link it to the spec with GitHub's native sub-issue relationship and include the
   parent URL in its body. Record genuine blockers as native issue dependencies.
@@ -24,7 +26,9 @@ republish completed work. `CONTEXT.md` and `docs/adr/` remain in the repository.
   record a new decision instead of silently changing the implementation target.
 - **PR**: link the parent spec and the implementation issue, report validation,
   and use `Fixes #N` for the task it completes. Keep the task open while the PR is
-  under review. Closing a child task does not automatically complete its parent.
+  under review. A merge into a feature branch is still `needs-integration` until
+  its delivery commit reaches fetched main. Closing a child task does not
+  automatically complete its parent.
 - Before creating work, search open and closed issues and PRs for the same
   requirement or defect. Continue existing work instead of duplicating it.
 - Before implementation or review, read the source issue, full comments, labels,
@@ -106,6 +110,28 @@ Preserve genuine blocking relationships; readiness does not bypass open
 blockers. Agent implementation and review within an approved task do not
 require repeated approval of the same scope.
 
+At every recovery, reconcile approved parent scope against existing children,
+blockers, PRs, current assignees/execution owner and remaining acceptance criteria.
+Within existing authorization, reuse existing slices and publish only missing
+ones with `to-tickets`; do not wait for the parent to gain `ready-for-agent`.
+Preserve an explicit local-only choice, pause, unapproved scope or another active
+owner. Missing native relationships are an explicit reconciliation failure:
+repair and read them back within the authorized scope before continuing.
+
+Before closing an implementation task, verify its actual delivery merge commit
+with `git merge-base --is-ancestor <merge-sha> origin/main` after fetching main.
+For a follow-up integration PR, retain the original task, PR and commit chain.
+Use the follow-up as the task's selected delivery. It may integrate the original
+implementation head without the old feature-branch merge commit; once accepted
+on main, that old PR's ancestry is historical evidence, not another recovery task.
+A merged PR alone, a closed issue or an old verification receipt is insufficient.
+Before closing a parent, account for every approved slice, all native children,
+their default-branch integration and every remaining acceptance criterion.
+Publish the acceptance summary and close only with existing user authorization;
+otherwise report it as waiting for authorization. A decomposition skill's parent
+edit restriction applies to decomposition, not separately authorized acceptance
+and closure. Run `agents:run reconcile` as described in the local workflow.
+
 ## When a skill says "publish to the issue tracker"
 
 Create or update the corresponding GitHub issue: a parent for a spec, or a child
@@ -145,7 +171,8 @@ Decisions-so-far and Fog sections; its tickets are native sub-issues.
   `gh issue edit <number> --repo ZWkang/nodebraid --add-assignee @me`.
 - **Resolve**: record the answer or verification evidence in a comment and link
   it from the map's Decisions-so-far. Close completed investigation tickets;
-  implementation tasks stay open until their linked PR is merged.
+  implementation tasks stay open until their delivery is integrated into main
+  and accepted.
 
 ## Autonomous delivery
 
@@ -160,15 +187,19 @@ to implementation. Unchanged issue fingerprints are not repeatedly investigated.
 Main-change discovery first reproduces and records a defect, then implementation
 reads that original issue and its acceptance criteria.
 
-Keep the source issue open while a PR is in review. The PR includes `Fixes #N`;
-merging it closes the issue. Implementation, successful checks and a review-ready
-PR are separate states; do not claim the issue is resolved before merge.
+Keep the source issue open while a PR is in review or awaiting default-branch
+integration. Use `Fixes #N` for the final delivery PR to main; a stacked PR links
+the task without claiming closure. Reconcile the actual merge and acceptance
+before reporting resolution.
 
-Delivery titles start with `[local-agent] ` (legacy `[agent] ` is also recognized) and use `feat/issue-N` branches. This opts
+Delivery titles start with `[local-agent] ` (legacy `[agent] ` is also recognized) and use `feat/issue-N` branches
+or `feat/issue-N-integration` for a required follow-up integration. This opts
 the existing PR into current-head CI/review maintenance. New feedback is
 investigated, verified fixes append to the same branch, and evidence returns
 to the PR. Design changes and disputed reviews remain visible for discussion.
-The agent never approves or merges the PR on the user's behalf.
+Human review and merge remain the default. Explicit user authorization can permit
+merge and issue closure after verification; it does not permit self-approval,
+dismissing reviews, bypassing checks or enabling auto-merge.
 
 Workflow setup, credentials, event behavior and verification are documented in
 [agentic-workflows.md](./agentic-workflows.md).

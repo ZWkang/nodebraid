@@ -18,6 +18,11 @@ Work from whatever is already in the conversation context. If the user passes a 
 
 For linked Issue or PR discussions, follow `docs/agents/discussion-workflow.md`. Use confirmed decisions to shape acceptance criteria and preserve their source links. Keep proposals and unresolved questions distinct from agreed requirements.
 
+For NodeBraid, reconcile existing open and closed child issues and PRs first,
+including native relationships, actual main integration, active owners and
+local-only/paused execution. Reuse existing slices and create only missing work.
+The parent title uses `spec: `; title case never establishes approval.
+
 ### 2. Explore the codebase (optional)
 
 If you have not already explored the codebase, do so to understand the current state of the code. Ticket titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs in the area you're touching.
@@ -55,7 +60,9 @@ Ask the user:
 - Are the blocking edges correct — does each ticket only depend on tickets that genuinely gate it?
 - Should any tickets be merged or split further?
 
-Iterate until the user approves the breakdown.
+Iterate until the user approves the breakdown, unless existing authorization
+already delegates decomposition within the approved scope. In that case,
+self-review the slices and blockers and proceed without repeating approval.
 
 ### 5. Publish the tickets to the configured tracker
 
@@ -68,7 +75,13 @@ Publish the approved tickets. **How** depends on the tracker `/setup-matt-pocock
 
 Work the **frontier**: any ticket whose blockers are all done. For a purely linear chain that means top to bottom.
 
-Do NOT close or modify any parent issue.
+Do not close or modify the parent merely as part of decomposition. This does not
+block a separately authorized reconciliation, acceptance summary or closure
+after all children, default-branch integration and parent acceptance are verified.
+For NodeBraid, native sub-issue and blocker links are required and read back;
+text links cannot silently replace a failed relationship write. Approved feature
+children link the approval comment and receive `enhancement`, `approved-spec`
+and `ready-for-agent`, while an explicit execution opt-out remains preserved.
 
 <local-ticket-template>
 
