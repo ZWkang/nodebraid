@@ -1,0 +1,21 @@
+bun test v1.2.19 (aad3abea)
+
+tests/check-affected.test.ts:
+(pass) development plan follows production and test consumers without selecting unrelated suites [221.19ms]
+(pass) branch comparison includes commits, staged changes, untracked files and both sides of renames [428.75ms]
+(pass) shared changes explicitly select full checks and preserve the real command failure [434.48ms]
+(pass) a clean checkout selects no development checks and website changes select documentation [326.27ms]
+(pass) root tests follow a side-effect import into a local fixture [280.95ms]
+(pass) root test selection ignores package names and import statements inside fixture strings [270.14ms]
+(pass) affected execution runs every selected layer once and stops on a real selected failure [1874.81ms]
+
+tests/build-workspaces.test.ts:
+(pass) one invocation builds a shared dependency once before its consumers and a later invocation rebuilds it [458.90ms]
+(pass) dependency modes prepare production and test dependencies without building the selected workspace [326.44ms]
+(pass) a real build failure stops its consumers and is returned as a failing command [66.69ms]
+(pass) a dependency cycle fails with the workspace path instead of recursing until stack overflow [30.55ms]
+
+ 11 pass
+ 0 fail
+ 42 expect() calls
+Ran 11 tests across 2 files. [4.84s]
