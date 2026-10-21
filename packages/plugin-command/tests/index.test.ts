@@ -213,6 +213,57 @@ describe('@nodebraid/plugin-command', () => {
     await host.dispose();
   });
 
+  test('preserves the original caller signal after execution options are reused', async () => {
+    const wait = defineCommand<void, string>('execution.reused-options');
+    const completion = createDeferred<string>();
+    let executionSignal: AbortSignal | undefined;
+    const { host, service } = await activateCommandService();
+    const registration = service.register(wait, (_input, context) => {
+      executionSignal = context.signal;
+      return completion.promise;
+    });
+    const caller = new AbortController();
+    const replacement = new AbortController();
+    const options = { signal: caller.signal };
+    const execution = service.execute(wait, undefined, options);
+    options.signal = replacement.signal;
+    const cancellation = new Error('original caller cancellation');
+
+    try {
+      caller.abort(cancellation);
+      expect(executionSignal?.reason).toBe(cancellation);
+    } finally {
+      completion.resolve('finished');
+      await execution;
+      await registration.dispose();
+      await host.dispose();
+    }
+  });
+
+  test('detaches the original caller signal after reused-options execution settles', async () => {
+    const immediate = defineCommand<void, string>('execution.reused-options-cleanup');
+    let executionSignal: AbortSignal | undefined;
+    const { host, service } = await activateCommandService();
+    const registration = service.register(immediate, (_input, context) => {
+      executionSignal = context.signal;
+      return 'finished';
+    });
+    const caller = new AbortController();
+    const replacement = new AbortController();
+    const options = { signal: caller.signal };
+    const execution = service.execute(immediate, undefined, options);
+    options.signal = replacement.signal;
+
+    try {
+      await expect(execution).resolves.toBe('finished');
+      caller.abort(new Error('after execution settled'));
+      expect(executionSignal?.aborted).toBeFalse();
+    } finally {
+      await registration.dispose();
+      await host.dispose();
+    }
+  });
+
   test('reinstalls an empty Command Service after Provider disposal', async () => {
     const identity = defineCommand<string, string>('identity');
     const services: CommandService[] = [];

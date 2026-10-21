@@ -2,8 +2,9 @@ import type { PluginDiagnostics } from '@nodebraid/diagnostics';
 
 import { runtimeDiagnosticEvents } from './diagnostic-events';
 import type { ChildInstaller, RuntimeContext, ServicePublisher } from './internal-contracts';
-import type { OwnedResourceDisposer, PluginDefinition, ProvidedServices } from './plugin-contracts';
+import type { OwnedResourceDisposer, PluginDefinition } from './plugin-contracts';
 import { PluginHostError } from './plugin-host-error';
+import { validateProvidedServices } from './provided-services';
 import { getServiceName, type BoundServices, type ServiceBindings } from './service-token';
 
 export class PluginActivation<Config, Requires extends ServiceBindings, Provides extends ServiceBindings> {
@@ -20,7 +21,7 @@ export class PluginActivation<Config, Requires extends ServiceBindings, Provides
     private readonly diagnostics: PluginDiagnostics,
   ) {}
 
-  async run(context: RuntimeContext): Promise<ProvidedServices<Provides>> {
+  async run(context: RuntimeContext): Promise<BoundServices<Provides>> {
     const services = Object.fromEntries(
       Object.entries(this.definition.requires ?? {}).map(([binding, token]) => [
         binding,
@@ -28,7 +29,7 @@ export class PluginActivation<Config, Requires extends ServiceBindings, Provides
       ]),
     ) as BoundServices<Requires>;
     try {
-      return await this.definition.setup(
+      const result = await this.definition.setup(
         {
           diagnostics: this.diagnostics,
           signal: this.controller.signal,
@@ -48,6 +49,8 @@ export class PluginActivation<Config, Requires extends ServiceBindings, Provides
         },
         this.config,
       );
+      // definePlugin() captures a Provided Binding record even when none was declared.
+      return validateProvidedServices<Provides>(this.definition.name, this.definition.provides!, result);
     } catch (error) {
       try {
         await this.dispose('setup-failed');

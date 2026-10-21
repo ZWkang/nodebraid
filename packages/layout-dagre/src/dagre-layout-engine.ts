@@ -10,6 +10,8 @@ export const dagreLayoutEngine = defineLayoutEngine<DagreLayoutConfig>({
   compute(input, config, context) {
     context.signal.throwIfAborted();
     const effectiveConfig = resolveDagreLayoutConfig(config);
+    // Graphlib joins endpoint IDs and edge names with control-character delimiters.
+    const nodeKeys = new Map(input.nodes.map((node, index) => [node.id, `node-${index}`]));
     const graph = new graphlib.Graph({ directed: true, multigraph: true })
       .setGraph({
         rankdir: effectiveConfig.direction,
@@ -21,17 +23,17 @@ export const dagreLayoutEngine = defineLayoutEngine<DagreLayoutConfig>({
       })
       .setDefaultEdgeLabel(() => ({}));
     for (const node of input.nodes) {
-      graph.setNode(node.id, { width: node.size.width, height: node.size.height });
+      graph.setNode(nodeKeys.get(node.id)!, { width: node.size.width, height: node.size.height });
     }
-    for (const edge of input.edges) {
-      graph.setEdge(edge.sourceNodeId, edge.targetNodeId, {}, edge.id);
+    for (const [index, edge] of input.edges.entries()) {
+      graph.setEdge(nodeKeys.get(edge.sourceNodeId)!, nodeKeys.get(edge.targetNodeId)!, {}, `edge-${index}`);
     }
     layout(graph);
     context.signal.throwIfAborted();
     return {
       sourceRevision: input.revision,
       positions: input.nodes.map((node) => {
-        const result = graph.node(node.id) as { x: number; y: number };
+        const result = graph.node(nodeKeys.get(node.id)!) as { x: number; y: number };
         return {
           id: node.id,
           position: {

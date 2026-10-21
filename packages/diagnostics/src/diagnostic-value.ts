@@ -47,10 +47,32 @@ function copyAndFreezeDiagnosticValue(value: unknown, path: string, ancestors: M
     }
     ancestors.set(value, path);
     try {
-      if (Array.isArray(value)) {
-        return Object.freeze(
-          value.map((item, index) => copyAndFreezeDiagnosticValue(item, `${path}[${index}]`, ancestors)),
+      const symbolKey = Object.getOwnPropertySymbols(value)[0];
+      if (symbolKey) {
+        throw new DiagnosticValueError(
+          `Diagnostic value at ${path} must use string keys; received ${String(symbolKey)}.`,
+          { path, issue: 'SYMBOL_KEY', receivedKey: String(symbolKey) },
         );
+      }
+      if (Array.isArray(value)) {
+        const copy = new Array<DiagnosticValue>(value.length);
+        for (let index = 0; index < value.length; index += 1) {
+          let descriptor: PropertyDescriptor | undefined;
+          for (let owner: object | null = value; owner !== null; owner = Object.getPrototypeOf(owner)) {
+            descriptor = Object.getOwnPropertyDescriptor(owner, index);
+            if (descriptor) break;
+          }
+          if (!descriptor) continue;
+          const propertyPath = `${path}[${index}]`;
+          if (!('value' in descriptor)) {
+            throw new DiagnosticValueError(
+              `Diagnostic value at ${propertyPath} must use a data property; received accessor.`,
+              { path: propertyPath, issue: 'ACCESSOR_PROPERTY' },
+            );
+          }
+          copy[index] = copyAndFreezeDiagnosticValue(descriptor.value, propertyPath, ancestors);
+        }
+        return Object.freeze(copy);
       }
       const prototype = Object.getPrototypeOf(value);
       if (prototype !== Object.prototype && prototype !== null) {
@@ -58,13 +80,6 @@ function copyAndFreezeDiagnosticValue(value: unknown, path: string, ancestors: M
         throw new DiagnosticValueError(
           `Diagnostic value at ${path} must be a plain record; received ${constructorName}.`,
           { path, issue: 'NON_PLAIN_OBJECT', receivedClass: constructorName },
-        );
-      }
-      const symbolKey = Object.getOwnPropertySymbols(value)[0];
-      if (symbolKey) {
-        throw new DiagnosticValueError(
-          `Diagnostic value at ${path} must use string keys; received ${String(symbolKey)}.`,
-          { path, issue: 'SYMBOL_KEY', receivedKey: String(symbolKey) },
         );
       }
       return Object.freeze(

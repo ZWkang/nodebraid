@@ -66,6 +66,46 @@ The complete example is shared with the Documentation Site at
 [`website/examples/quick-start.ts`](./website/examples/quick-start.ts). Follow
 the source-checkout workflow until the initial npm release is available.
 
+## Agentic development
+
+Local Codex uses the existing ChatGPT sign-in for issue investigation, implementation,
+review, and PR feedback repairs. GitHub retains issues, PRs and engineering CI.
+The local chat heartbeat checks for work every five minutes while the computer and
+app are running; it is polling rather than a realtime webhook. It consumes the
+account's Codex subscription allowance, with no API-key fallback.
+
+The versioned execution protocol is [.agents/workflows/local-agent.md](./.agents/workflows/local-agent.md).
+[Agentic workflows](./docs/agents/agentic-workflows.md) documents setup, durable
+execution evidence, failure states and acceptance. Managed issue PRs use a
+`[local-agent] ` title and `feat/issue-N` branch; legacy `[agent] ` issue PRs remain
+eligible. Human review and merge are the final step.
+
+Project-local Ponytail keeps implementation complete and minimal; `ponytail-review`
+checks connected callers in the independent Standards axis. Spec review remains
+separate. New confirmed defects require an executed reproduction and issue deduplication.
+
+```bash
+bun run agents:check       # Validate local protocol and absence of hosted AI jobs
+bun run agents:local-check # Also verify local ChatGPT CLI authentication
+bun run agents:scan        # Prepare a main-snapshot investigation
+bun run agents:scan <sha>  # Prepare changes since the last completed investigation
+bun run agents:typecheck  # Type-check the executable local workflow
+bun run agents:run        # Show prepare/inspect/verify/publication/evaluate usage
+bun run agents:discovery init queue.json # Explicitly initialize public seam coverage
+bun run agents:discovery sync queue.json # Resume pending seams, even without new commits
+bun run agents:discovery finish queue.json report.json # Record one successful investigation
+bun test tests/agent-issue.test.ts tests/pr-feedback.test.ts tests/defect-scan.test.ts
+```
+
+The migration removes API-backed GitHub Agentic Workflows rather than running both
+executors. A registered schedule is not end-to-end acceptance; review the actual
+issue, red/green tests, independent reviews, published head, CI and repair evidence.
+Local runs bind an independent prepared task to its exact checked head/tree/patch
+and actual remote publication. New heads need fresh verification. The persistent
+discovery queue retains unexamined areas instead of treating a main checkpoint as
+complete repository coverage. Command input formats and recovery are documented
+in [Agentic workflows](./docs/agents/agentic-workflows.md#执行命令和恢复).
+
 ## Stack
 
 - Bun for package management, development, builds, tests, and workspace scripts.

@@ -81,59 +81,66 @@ export function createCanvasKernel(): CanvasKernel {
         },
       });
 
-      let callbackResult: unknown;
       transactionActive = true;
       try {
-        callbackResult = callback(transaction);
+        let callbackResult: unknown;
+        try {
+          callbackResult = callback(transaction);
+        } finally {
+          // Close Draft capabilities before inspecting the callback result or metadata.
+          transactionOpen = false;
+        }
+        if (isThenable(callbackResult)) {
+          throw new KernelError(
+            'ASYNC_TRANSACTION',
+            'Transaction callback must complete synchronously.',
+            Object.freeze({}),
+          );
+        }
+
+        // Intermediate states may be incomplete; only the final Draft is subject to structural validation.
+        const issues = validateGraph(draftNodes, draftEdges);
+        if (issues.length > 0) {
+          throw new KernelError(
+            'INVALID_GRAPH',
+            'The final graph is invalid.',
+            Object.freeze({ issues: describeGraphIssues(issues) }),
+          );
+        }
+        // Coalesce repeated writes into the original before and final after values, dropping net-zero entries.
+        const nodeChanges = collectEntityChanges('node', nodes, draftNodes, touchedNodeIds, canvasNodesEqual);
+        const edgeChanges = collectEntityChanges('edge', edges, draftEdges, touchedEdgeIds, canvasEdgesEqual);
+        const changes: readonly GraphChange[] = Object.freeze([...nodeChanges, ...edgeChanges]);
+        if (changes.length === 0) return null;
+
+        const revision = incrementRevision(before.snapshot.revision);
+        if (revision === null) {
+          throw new KernelError(
+            'REVISION_OVERFLOW',
+            'Kernel revision cannot exceed Number.MAX_SAFE_INTEGER.',
+            Object.freeze({ revision: before.snapshot.revision }),
+          );
+        }
+        const after = createCanvasView(revision, draftNodes, draftEdges);
+        const origin = metadata?.origin;
+        const commandId = metadata?.commandId;
+        const changeSet: ChangeSet = Object.freeze({
+          beforeRevision: before.snapshot.revision,
+          revision,
+          ...(origin === undefined ? {} : { origin }),
+          ...(commandId === undefined ? {} : { commandId }),
+          changes,
+        });
+
+        const commit = Object.freeze({ before, after, changeSet });
+        // Publish only after every potentially throwing preparation step succeeds.
+        nodes = draftNodes;
+        edges = draftEdges;
+        view = after;
+        return commit;
       } finally {
-        // Capabilities close even when user code throws, preventing a leaked Draft from escaping atomicity.
-        transactionOpen = false;
         transactionActive = false;
       }
-      if (isThenable(callbackResult)) {
-        throw new KernelError(
-          'ASYNC_TRANSACTION',
-          'Transaction callback must complete synchronously.',
-          Object.freeze({}),
-        );
-      }
-
-      // Intermediate states may be incomplete; only the final Draft is subject to structural validation.
-      const issues = validateGraph(draftNodes, draftEdges);
-      if (issues.length > 0) {
-        throw new KernelError(
-          'INVALID_GRAPH',
-          'The final graph is invalid.',
-          Object.freeze({ issues: describeGraphIssues(issues) }),
-        );
-      }
-      // Coalesce repeated writes into the original before and final after values, dropping net-zero entries.
-      const nodeChanges = collectEntityChanges('node', nodes, draftNodes, touchedNodeIds, canvasNodesEqual);
-      const edgeChanges = collectEntityChanges('edge', edges, draftEdges, touchedEdgeIds, canvasEdgesEqual);
-      const changes: readonly GraphChange[] = Object.freeze([...nodeChanges, ...edgeChanges]);
-      if (changes.length === 0) return null;
-
-      const revision = incrementRevision(before.snapshot.revision);
-      if (revision === null) {
-        throw new KernelError(
-          'REVISION_OVERFLOW',
-          'Kernel revision cannot exceed Number.MAX_SAFE_INTEGER.',
-          Object.freeze({ revision: before.snapshot.revision }),
-        );
-      }
-      // This assignment is the single authoritative commit point.
-      nodes = draftNodes;
-      edges = draftEdges;
-      view = createCanvasView(revision, nodes, edges);
-      const changeSet: ChangeSet = Object.freeze({
-        beforeRevision: before.snapshot.revision,
-        revision,
-        ...(metadata?.origin === undefined ? {} : { origin: metadata.origin }),
-        ...(metadata?.commandId === undefined ? {} : { commandId: metadata.commandId }),
-        changes,
-      });
-
-      return Object.freeze({ before, after: view, changeSet });
     },
   });
 }

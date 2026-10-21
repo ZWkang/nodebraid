@@ -17,7 +17,6 @@ import type {
   PluginInstallation,
 } from './plugin-contracts';
 import { PluginHostError } from './plugin-host-error';
-import { validateProvidedServices } from './provided-services';
 import { getServiceName, type BoundServices, type ServiceBindings, type ServiceTokenBase } from './service-token';
 
 export class CordisPluginInstallation implements PluginInstallation {
@@ -120,18 +119,14 @@ export class CordisPluginInstallation implements PluginInstallation {
 
     let providedServices: BoundServices<ServiceBindings>;
     try {
-      providedServices = validateProvidedServices(
-        this.definition.name,
-        this.definition.provides ?? {},
-        await activation.run(context),
-      );
+      providedServices = await activation.run(context);
     } catch (error) {
       // An aborted signal alone does not make an arbitrary business failure a
       // cancellation. Only an explicit abort error may return to pending.
       if (
         activation.controller.signal.aborted &&
-        isCancellationError(error, activation.controller.signal) &&
-        (this.#disposeRequested || this.getMissing().length > 0)
+        (this.#disposeRequested || this.getMissing().length > 0) &&
+        isCancellationError(error, activation.controller.signal)
       ) {
         try {
           await activation.dispose(this.#disposeRequested ? 'installation-disposed' : 'dependency-lost');
@@ -240,6 +235,13 @@ export class CordisPluginInstallation implements PluginInstallation {
 
   dispose(): Promise<void> {
     if (!this.#disposal) {
+      let completeDisposal!: () => void;
+      let failDisposal!: (error: unknown) => void;
+      // Cache before abort listeners can synchronously re-enter dispose().
+      this.#disposal = new Promise<void>((resolve, reject) => {
+        completeDisposal = resolve;
+        failDisposal = reject;
+      });
       this.#disposeRequested = true;
       this.#rejectWaiters(this.#disposedError());
       this.#currentActivation?.controller.abort();
@@ -249,7 +251,7 @@ export class CordisPluginInstallation implements PluginInstallation {
           // The cached error is exposed after Cordis settles the Fiber below.
         });
       }
-      this.#disposal = Promise.resolve()
+      void Promise.resolve()
         .then(() => this.#fiber!.dispose())
         .then(async () => {
           try {
@@ -280,7 +282,8 @@ export class CordisPluginInstallation implements PluginInstallation {
             }
             throw error;
           },
-        );
+        )
+        .then(completeDisposal, failDisposal);
     }
     return this.#disposal;
   }

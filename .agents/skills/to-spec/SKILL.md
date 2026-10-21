@@ -12,11 +12,13 @@ The issue tracker and triage label vocabulary should have been provided to you. 
 
 1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any ADRs in the area you're touching.
 
+If the conversation references an Issue or PR, read its current body and relevant discussion using `docs/agents/discussion-workflow.md`. Synthesize confirmed decisions with source links; keep conflicting or unanswered points explicit rather than turning suggestions into requirements.
+
 2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below, then publish it to the project issue tracker. Apply the `ready-for-agent` triage label - no need for additional triage.
+3. Before publishing, refresh the referenced discussion and incorporate any newly confirmed decisions. Write the spec using the template below, then publish it to the project issue tracker. Follow the tracker's approval and eligibility rules before applying `ready-for-agent`. If an unresolved point affects scope or acceptance criteria, record it explicitly and leave the spec as a draft without claiming it is ready for implementation.
 
 <spec-template>
 

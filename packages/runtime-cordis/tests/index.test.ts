@@ -9,6 +9,7 @@ import {
   type PluginDefinition,
   type PluginInstallation,
   PluginHostError,
+  runtimeDiagnosticEvents,
   type ServiceToken,
 } from '../src';
 
@@ -355,26 +356,66 @@ describe('@nodebraid/runtime-cordis', () => {
     });
   }
 
-  test('fails a Provider that returns the same Service Token through duplicate bindings', async () => {
-    const catalog = defineService<{ value: string }>('catalog');
-    const provider = definePlugin({
-      provides: { primary: catalog, duplicate: catalog },
-      setup() {
-        return {
-          primary: { value: 'primary' },
-          duplicate: { value: 'duplicate' },
-        };
-      },
+  for (const firstBinding of ['primary', '']) {
+    test(`fails duplicate bindings after ${JSON.stringify(firstBinding)} before publishing a Service`, async () => {
+      const catalog = defineService<{ value: string }>('catalog');
+      const provider = definePlugin({
+        provides: { [firstBinding]: catalog, duplicate: catalog },
+        setup() {
+          return {
+            [firstBinding]: { value: 'primary' },
+            duplicate: { value: 'duplicate' },
+          };
+        },
+      });
+      const host = createPluginHost();
+      let markConsumerStarted!: () => void;
+      const consumerStarted = new Promise<void>((resolve) => {
+        markConsumerStarted = resolve;
+      });
+      const consumer = host.install(definePlugin({ requires: { catalog }, setup: markConsumerStarted }));
+      const installation = host.install(provider);
+
+      try {
+        const activationError = await Promise.race([
+          installation.whenActive().then(
+            () => undefined,
+            (error: unknown) => error,
+          ),
+          consumerStarted.then(() => new Error('An invalid Provider published a partial Service.')),
+        ]);
+
+        expect(activationError).toBeInstanceOf(PluginHostError);
+        expect(activationError).toMatchObject({ code: 'CONTRACT_VIOLATION' });
+        expect(installation.getSnapshot()).toEqual({ status: 'failed', error: activationError });
+        expect(consumer.getSnapshot().status).toBe('pending');
+      } finally {
+        await host.dispose();
+      }
     });
+  }
+
+  test('allows an empty Binding when its Provided Service Token is unique', async () => {
+    const catalog = defineService<{ value: string }>('catalog');
+    const service = { value: 'empty binding' };
+    let received: { value: string } | undefined;
     const host = createPluginHost();
+    const consumer = host.install(
+      definePlugin({
+        requires: { '': catalog },
+        setup(context) {
+          received = context.services[''];
+        },
+      }),
+    );
+    const provider = host.install(definePlugin({ provides: { '': catalog }, setup: () => ({ '': service }) }));
 
-    const installation = host.install(provider);
-    const activationError = await installation.whenActive().catch((error: unknown) => error);
-
-    expect(activationError).toMatchObject({ code: 'CONTRACT_VIOLATION' });
-    expect(installation.getSnapshot()).toEqual({ status: 'failed', error: activationError });
-
-    await host.dispose();
+    try {
+      await Promise.all([consumer.whenActive(), provider.whenActive()]);
+      expect(received).toBe(service);
+    } finally {
+      await host.dispose();
+    }
   });
 
   test('reserves a Provided Service Token from installation until disposal', async () => {
@@ -2059,6 +2100,103 @@ describe('@nodebraid/runtime-cordis', () => {
     expect(installation.dispose()).toBe(firstDispose);
   });
 
+  for (const target of ['installation', 'host'] as const) {
+    for (const failCleanup of [false, true]) {
+      test(`keeps ${target} disposal idempotent during abort reentry with ${failCleanup ? 'failed' : 'successful'} cleanup`, async () => {
+        const cleanupError = new Error('owned resource cleanup failed');
+        const events: string[] = [];
+        const host = createPluginHost({
+          diagnostics: {
+            sink: (event) => {
+              events.push(event.name);
+            },
+          },
+        });
+        let installation!: PluginInstallation;
+        let reentrant: Promise<void> | undefined;
+        let setupSignal!: AbortSignal;
+        let cleanupCount = 0;
+        let disposedCount = 0;
+        installation = host.install(
+          definePlugin({
+            setup(context) {
+              setupSignal = context.signal;
+              context.signal.addEventListener(
+                'abort',
+                () => {
+                  reentrant = target === 'installation' ? installation.dispose() : host.dispose();
+                },
+                { once: true },
+              );
+              context.own(() => {
+                cleanupCount++;
+                if (failCleanup) throw cleanupError;
+              });
+            },
+          }),
+        );
+        installation.subscribe(() => {
+          if (installation.getSnapshot().status === 'disposed') disposedCount++;
+        });
+        await installation.whenActive();
+
+        const disposal = target === 'installation' ? installation.dispose() : host.dispose();
+        const abortedImmediately = setupSignal.aborted;
+        const [outerResult, innerResult] = await Promise.all([
+          disposal.catch((error: unknown) => error),
+          reentrant?.catch((error: unknown) => error),
+        ]);
+
+        expect(reentrant).toBe(disposal);
+        expect(abortedImmediately).toBe(true);
+        expect(innerResult).toBe(outerResult);
+        if (failCleanup) {
+          expect(outerResult).toBeInstanceOf(AggregateError);
+          expect(collectAggregateLeaves(outerResult)).toEqual([cleanupError]);
+        } else {
+          expect(outerResult).toBeUndefined();
+        }
+        expect(cleanupCount).toBe(1);
+        expect(disposedCount).toBe(1);
+        expect(installation.getSnapshot()).toEqual({ status: 'disposed' });
+        expect(target === 'installation' ? installation.dispose() : host.dispose()).toBe(disposal);
+        if (target === 'host') {
+          expect(events.filter((name) => name === runtimeDiagnosticEvents.hostDisposing)).toHaveLength(1);
+          expect(events.filter((name) => name === runtimeDiagnosticEvents.hostDisposed)).toHaveLength(
+            failCleanup ? 0 : 1,
+          );
+        } else {
+          await host.dispose();
+        }
+      });
+    }
+  }
+
+  test('keeps Host disposal idempotent during Diagnostic Sink reentry', async () => {
+    const events: string[] = [];
+    let reentered = false;
+    let reentrant: Promise<void> | undefined;
+    const host = createPluginHost({
+      diagnostics: {
+        sink(event) {
+          events.push(event.name);
+          if (event.name === runtimeDiagnosticEvents.hostDisposing && !reentered) {
+            reentered = true;
+            reentrant = host.dispose();
+          }
+        },
+      },
+    });
+
+    const disposal = host.dispose();
+    await Promise.all([disposal, reentrant]);
+
+    expect(reentrant).toBe(disposal);
+    expect(events.filter((name) => name === runtimeDiagnosticEvents.hostDisposing)).toHaveLength(1);
+    expect(events.filter((name) => name === runtimeDiagnosticEvents.hostDisposed)).toHaveLength(1);
+    expect(host.dispose()).toBe(disposal);
+  });
+
   test('aborts pending setup and waits for it before becoming disposed', async () => {
     let setupSignal: AbortSignal | undefined;
     let finishSetup: (() => void) | undefined;
@@ -2156,6 +2294,129 @@ describe('@nodebraid/runtime-cordis', () => {
       status: 'failed',
       error: setupError,
     });
+  });
+
+  for (const failure of ['missing binding', 'getter error'] as const) {
+    test(`rolls back Owned Resources and Children on Provided Service ${failure}`, async () => {
+      const token = defineService<object>('invalid-provider');
+      const getterError = new Error('provided getter failed');
+      const cleanupError = new Error('rollback cleanup failed');
+      const cleanupOrder: string[] = [];
+      let setupSignal!: AbortSignal;
+      let child!: PluginInstallation;
+      const host = createPluginHost();
+      const consumer = host.install(definePlugin({ requires: { token }, setup() {} }));
+      const installation = host.install(
+        definePlugin({
+          provides: { token },
+          async setup(context) {
+            setupSignal = context.signal;
+            context.own(() => {
+              cleanupOrder.push('first');
+            });
+            child = context.install(
+              definePlugin({
+                setup(childContext) {
+                  childContext.own(() => {
+                    cleanupOrder.push('child');
+                  });
+                },
+              }),
+            );
+            await child.whenActive();
+            context.own(() => {
+              cleanupOrder.push('last');
+              throw cleanupError;
+            });
+            const result = {} as { token: object };
+            if (failure === 'getter error') {
+              Object.defineProperty(result, 'token', {
+                enumerable: true,
+                get() {
+                  throw getterError;
+                },
+              });
+            }
+            return result;
+          },
+        }),
+      );
+
+      const activationError = await installation.whenActive().catch((error: unknown) => error);
+      const unrelated = host.install(definePlugin({ setup() {} }));
+      await unrelated.whenActive();
+      const beforeDisposal = {
+        signalAborted: setupSignal.aborted,
+        cleanupOrder: [...cleanupOrder],
+        child: child.getSnapshot(),
+        parent: installation.getSnapshot(),
+        consumer: consumer.getSnapshot().status,
+      };
+      const disposalError = await installation.dispose().catch((error: unknown) => error);
+      await host.dispose();
+
+      expect(beforeDisposal.signalAborted).toBe(true);
+      expect(beforeDisposal.cleanupOrder).toEqual(['last', 'child', 'first']);
+      expect(beforeDisposal.child).toEqual({ status: 'disposed' });
+      expect(beforeDisposal.parent).toEqual({ status: 'failed', error: activationError });
+      expect(beforeDisposal.consumer).toBe('pending');
+      if (failure === 'getter error') {
+        expect(activationError).toBe(getterError);
+      } else {
+        expect(activationError).toBeInstanceOf(PluginHostError);
+        expect(activationError).toMatchObject({ code: 'CONTRACT_VIOLATION' });
+      }
+      expect(disposalError).toBeInstanceOf(AggregateError);
+      expect(collectAggregateLeaves(disposalError)).toEqual([cleanupError]);
+      expect(cleanupOrder).toEqual(['last', 'child', 'first']);
+    });
+  }
+
+  test('preserves a Provided getter error without inspecting its name after rollback', async () => {
+    const token = defineService<object>('throwing-getter');
+    const getterError = new Error('original provided getter failure');
+    const inspectionError = new Error('unexpected error.name read');
+    let nameReads = 0;
+    let cleaned = 0;
+    let markInspected!: () => void;
+    const inspected = new Promise<void>((resolve) => {
+      markInspected = resolve;
+    });
+    Object.defineProperty(getterError, 'name', {
+      get() {
+        nameReads++;
+        markInspected();
+        throw inspectionError;
+      },
+    });
+    const host = createPluginHost();
+    const installation = host.install(
+      definePlugin({
+        provides: { token },
+        setup(context) {
+          context.own(() => {
+            cleaned++;
+          });
+          return {
+            get token(): object {
+              throw getterError;
+            },
+          };
+        },
+      }),
+    );
+    const result = await Promise.race([
+      installation.whenActive().catch((error: unknown) => error),
+      inspected.then(() => inspectionError),
+    ]);
+    const snapshot = installation.getSnapshot();
+    await host.dispose();
+
+    expect(result === getterError).toBe(true);
+    expect(nameReads).toBe(0);
+    expect(cleaned).toBe(1);
+    expect(snapshot.status).toBe('failed');
+    if (snapshot.status === 'failed') expect(snapshot.error === getterError).toBe(true);
   });
 
   test('continues cleanup and reports every disposer failure', async () => {

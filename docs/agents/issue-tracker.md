@@ -33,7 +33,8 @@ republish completed work. `CONTEXT.md` and `docs/adr/` remain in the repository.
 
 ## Operations
 
-Use the connected GitHub tools or an authenticated `gh` CLI. With `gh`, always
+Use the connected GitHub tools or an authenticated `gh` CLI. Do not export
+subscription login files or require a publication PAT. With `gh`, always
 specify `--repo ZWkang/nodebraid`; REST paths below explicitly name the same repo.
 
 - Read: `gh issue view <number> --repo ZWkang/nodebraid --json number,title,body,state,labels,assignees,url`.
@@ -115,3 +116,33 @@ Decisions-so-far and Fog sections; its tickets are native sub-issues.
 - **Resolve**: record the answer or verification evidence in a comment and link
   it from the map's Decisions-so-far. Close completed investigation tickets;
   implementation tasks stay open until their linked PR is merged.
+
+## Autonomous delivery
+
+The investigation comment records the base commit, public contract, reproduction
+command, expected/actual results and acceptance criteria. An approved-spec issue
+links the parent spec and the approval comment defining its accepted scope. Agent task decomposition, implementation and review
+do not require repeated human approval within that scope.
+
+The local chat heartbeat reads ready issues and new evidence periodically. No
+GitHub label event or API workflow dispatch is required to pass a confirmed task
+to implementation. Unchanged issue fingerprints are not repeatedly investigated.
+Main-change discovery first reproduces and records a defect, then implementation
+reads that original issue and its acceptance criteria.
+
+Keep the source issue open while a PR is in review. The PR includes `Fixes #N`;
+merging it closes the issue. Implementation, successful checks and a review-ready
+PR are separate states; do not claim the issue is resolved before merge.
+
+Delivery titles start with `[local-agent] ` (legacy `[agent] ` is also recognized) and use `feat/issue-N` branches. This opts
+the existing PR into current-head CI/review maintenance. New feedback is
+investigated, verified fixes append to the same branch, and evidence returns
+to the PR. Design changes and disputed reviews remain visible for discussion.
+The agent never approves or merges the PR on the user's behalf.
+
+Workflow setup, credentials, event behavior and verification are documented in
+[agentic-workflows.md](./agentic-workflows.md).
+
+## Discussion workflow
+
+Follow [discussion-workflow.md](discussion-workflow.md) when reading or handling Issue and PR feedback. It defines when to refresh discussions, how confirmed decisions affect specs and acceptance criteria, and how to connect replies with verification and remaining review work. GitHub discussions retain their original URLs and thread identities; parent spec issues link the decisions they incorporate; local specs remain historical evidence.

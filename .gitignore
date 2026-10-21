@@ -9,3 +9,6 @@ examples/*/dist/
 examples/*/.tanstack/
 
 .env
+
+# Local tools may generate runtime copies of repository skills here.
+.codex/skills/

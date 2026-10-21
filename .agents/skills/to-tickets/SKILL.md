@@ -16,6 +16,8 @@ The issue tracker and triage label vocabulary should have been provided to you. 
 
 Work from whatever is already in the conversation context. If the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
 
+For linked Issue or PR discussions, follow `docs/agents/discussion-workflow.md`. Use confirmed decisions to shape acceptance criteria and preserve their source links. Keep proposals and unresolved questions distinct from agreed requirements.
+
 ### 2. Explore the codebase (optional)
 
 If you have not already explored the codebase, do so to understand the current state of the code. Ticket titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs in the area you're touching.
@@ -56,6 +58,8 @@ Ask the user:
 Iterate until the user approves the breakdown.
 
 ### 5. Publish the tickets to the configured tracker
+
+Refresh the referenced discussion before publishing and incorporate newly confirmed acceptance criteria into the affected tickets. Revisit approval only if the new information changes scope, granularity, or blocking edges beyond the existing authorization; do not silently publish an obsolete plan.
 
 Publish the approved tickets. **How** depends on the tracker `/setup-matt-pocock-skills` configured — the tickets are the same either way, only the shape of the blocking edges changes:
 

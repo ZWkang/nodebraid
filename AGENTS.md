@@ -10,6 +10,32 @@
 
 本仓库使用单一领域上下文。探索代码前，按 [Domain docs 约定](docs/agents/domain.md) 读取根目录 `CONTEXT.md` 和相关 `docs/adr/`。
 
+## AI 工作流
+
+新任务先与用户确认 grill、spec、领域文档和公共测试 seam；确认后，Agent 自主拆分任务、审查计划、实现、验证和双轴 code review，无需逐票再次确认。需求、公开契约或架构决策变化时回到前期讨论。
+
+Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执行，使用现有 ChatGPT 订阅登录；GitHub 保留任务记录和工程 CI。执行协议见 `.agents/workflows/local-agent.md`，设置与验收见 `docs/agents/agentic-workflows.md`，任务路由见 `docs/agents/issue-tracker.md`。`CONTEXT.md` 是唯一领域词汇表，skill 提到 `GLOSSARY.md` 时读取它。
+
+实现阶段应用项目级 `ponytail` 的 full 模式，先读真实调用链并优先复用，再完成最小充分改动。Standards review 同时使用 `ponytail-review`；按已确认的 spec、ADR 和公共契约判断简化，不删必要的错误处理、验证或框架 seam。
+
+- `bun run agents:check`：检查本地工作流协议、skills 和残留的托管 API 执行入口；CI 在完整工程检查前执行。
+- `bun run agents:local-check`：另检查本机 ChatGPT CLI 登录；有 API-key 环境变量时明确失败，不切换计费入口。
+- `bun run agents:scan [base-sha]`：在已 fetch 的干净 main worktree 记录固定 SHA 调查范围。
+- `bun run agents:run`：归一化完整 GitHub 上下文，独立准备任务、检查依赖前沿、执行真实检查、绑定发布 tree 和判断当前 head；参数见 `docs/agents/agentic-workflows.md`。
+- `bun run agents:discovery init|sync <queue.json>`：显式初始化或恢复按公共 seam 保存的调查待办；无新提交也保留未检查区域。
+- `bun run agents:discovery finish <queue.json> <report.json>`：只用当前 main 的成功执行报告完成一个待办。
+- `bun run agents:typecheck`：检查本地工作流命令及其共享状态模块的 TypeScript 类型；包含在完整工程类型检查中。
+- `bun test tests/pr-feedback.test.ts`：验证 PR 当前 head 的 CI／review 状态、反馈去重和交接校验。
+- `bun test tests/defect-scan.test.ts`：验证主动调查的固定 SHA 和成功运行基线。
+
+本地自动化检查新 main 变更、Issue 和托管 PR；复现并查重后记录 Issue，再实现已确认任务。
+GitHub 写入使用已连接工具或已认证 Git client，不复制订阅登录文件或连接器凭据。
+
+托管 issue PR 以 `[local-agent] `（兼容 `[agent] `）标题和 `feat/issue-N` 分支加入本地 CI／review 修复闭环。
+Agent 在原 PR 上追加修复并验证，需求变化返回讨论；最终审阅与合并由用户完成。
+
+修改本地工作流后格式化并执行 `agents:check` 及相关状态测试。GitHub 不保留 API Agent 或 gh-aw 编译入口。
+
 ## 项目结构与模块组织
 
 仓库采用 Bun 驱动的 TypeScript monorepo 结构。根级产品代码放在 `src/`，测试放在 `tests/` 并镜像源码目录；独立工作区包放在 `packages/`。文档使用 `docs/`，静态资源使用 `assets/`。入口文件和共享工具配置保留在仓库根目录。不要提交 `dist/`、`node_modules/` 等生成目录、依赖缓存或本地 IDE 配置；新增工具时同步维护 `.gitignore`。
@@ -84,3 +110,7 @@
 历史目前只有 `Initial commit`，尚未形成稳定约定。提交信息使用简短祈使句，可采用 `feat: add flow parser`、`fix: reject invalid node` 等 Conventional Commit 前缀；每个提交只处理一个逻辑主题。
 
 拉取请求需说明目的、主要改动和验证命令，关联相关 issue。涉及界面变化时附截图；涉及配置时列出新增环境变量，但不得提交密钥、令牌或个人配置。
+
+## Issue 与 PR 讨论
+
+涉及 Issue、PR 或其反馈的任务，先读取 [讨论工作流](docs/agents/discussion-workflow.md)；tracker 的存储与操作约定见 [issue-tracker.md](docs/agents/issue-tracker.md)。开始或恢复工作、提交审查结果和准备收尾时，读取相关讨论，将已确认的结论纳入需求与验证，并记录未决问题。处理反馈时关联原评论、改动和验证证据，区分已修改、已验证、已回复和等待复审。

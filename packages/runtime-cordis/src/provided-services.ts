@@ -11,7 +11,7 @@ export function validateProvidedServices<Provides extends ServiceBindings>(
   const bindingsByToken = new Map<ServiceTokenBase, string>();
   for (const [binding, token] of Object.entries(provides)) {
     const duplicate = bindingsByToken.get(token);
-    if (duplicate) {
+    if (duplicate !== undefined) {
       throw new PluginHostError(
         'CONTRACT_VIOLATION',
         `Plugin "${pluginName ?? '<anonymous>'}" declares Provided Service Token "${token.name}" through both "${duplicate}" and "${binding}".`,

@@ -347,6 +347,41 @@ test('an unsafe Diagnostic attribute fails with a structured path and original c
   await host.dispose();
 });
 
+test('an array Diagnostic accessor fails without executing it during Plugin setup', async () => {
+  let reads = 0;
+  const values = [1];
+  Object.defineProperty(values, '0', {
+    get() {
+      reads += 1;
+      return 1;
+    },
+  });
+  const plugin = definePlugin({
+    setup(context) {
+      context.diagnostics.emit({
+        name: 'example.invalid-array',
+        level: 'debug',
+        attributes: { values },
+      });
+    },
+  });
+  const host = createPluginHost();
+  const installation = host.install(plugin);
+
+  const error = await installation.whenActive().catch((reason: unknown) => reason);
+
+  expect(reads).toBe(0);
+  expect(error).toMatchObject({
+    name: 'DiagnosticsError',
+    domain: 'diagnostics',
+    code: 'INVALID_DIAGNOSTIC_VALUE',
+    details: { path: 'attributes.values[0]', issue: 'ACCESSOR_PROPERTY' },
+    cause: expect.any(TypeError),
+  });
+
+  await host.dispose();
+});
+
 test('an unknown Diagnostic level fails as an invalid event contract', async () => {
   const plugin = definePlugin({
     setup(context) {

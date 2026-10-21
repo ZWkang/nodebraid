@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test';
 
 import {
+  DiagnosticsError,
   NodeBraidError,
   diagnosticEvents,
   describeDiagnosticEvent,
@@ -40,6 +41,95 @@ test('Diagnostic normalization rejects a Symbol key instead of dropping it', () 
 
   expect(() => normalizeDiagnosticAttributes(attributes)).toThrow(
     'Diagnostic value at attributes must use string keys; received Symbol(secret).',
+  );
+});
+
+test('Diagnostic arrays are normalized without executing an input map method', () => {
+  let calls = 0;
+  const values = [{ count: 2 }];
+  Object.defineProperty(values, 'map', {
+    value() {
+      calls += 1;
+      return [Number.NaN];
+    },
+  });
+
+  const normalized = normalizeDiagnosticAttributes({ values });
+  values[0]!.count = 3;
+
+  expect(calls).toBe(0);
+  expect(normalized.values).toEqual([{ count: 2 }]);
+  expect(Object.isFrozen(normalized.values)).toBeTrue();
+  expect(Object.isFrozen(normalized.values[0])).toBeTrue();
+  expect(JSON.stringify(normalized)).toBe('{"values":[{"count":2}]}');
+});
+
+test.each(['own', 'inherited'] as const)(
+  'Diagnostic normalization rejects %s array index accessors without invoking them',
+  (ownership) => {
+    let reads = 0;
+    const values = new Array<number>(1);
+    const owner = ownership === 'own' ? values : Object.create(Array.prototype);
+    Object.defineProperty(owner, '0', {
+      get() {
+        reads += 1;
+        return 1;
+      },
+    });
+    if (ownership === 'inherited') Object.setPrototypeOf(values, owner);
+
+    expect(() => normalizeDiagnosticAttributes({ nested: { values } })).toThrow(
+      'Diagnostic value at attributes.nested.values[0] must use a data property; received accessor.',
+    );
+    expect(reads).toBe(0);
+  },
+);
+
+test('Diagnostic arrays reject Symbol keys instead of dropping them', () => {
+  const values = Object.assign([1], { [Symbol('secret')]: 'hidden' });
+
+  expect(() => normalizeDiagnosticAttributes({ values })).toThrow(
+    'Diagnostic value at attributes.values must use string keys; received Symbol(secret).',
+  );
+});
+
+test('Diagnostic arrays validate inherited elements instead of replacing them with holes', () => {
+  const values = new Array<number>(1);
+  Object.setPrototypeOf(values, Object.create(Array.prototype, { 0: { value: Number.NaN } }));
+
+  expect(() => normalizeDiagnosticAttributes({ values })).toThrow(
+    'Diagnostic value at attributes.values[0] must be finite; received NaN.',
+  );
+});
+
+test('Diagnostic arrays copy inherited data while preserving genuine holes', () => {
+  const inherited = { count: 2 };
+  const values = new Array<{ count: number }>(2);
+  Object.setPrototypeOf(values, Object.create(Array.prototype, { 0: { value: inherited } }));
+
+  const normalized = normalizeDiagnosticAttributes({ values });
+  inherited.count = 3;
+
+  expect(normalized.values[0]).toEqual({ count: 2 });
+  expect(Object.isFrozen(normalized.values[0])).toBeTrue();
+  expect(normalized.values.length).toBe(2);
+  expect(Object.hasOwn(normalized.values, 1)).toBeFalse();
+});
+
+test('Diagnostic arrays are copied without reading a constructor hook', () => {
+  const values = [1];
+  Object.defineProperty(values, 'constructor', {
+    get() {
+      throw new Error('Input constructor must not run.');
+    },
+  });
+
+  expect(normalizeDiagnosticAttributes({ values })).toEqual({ values: [1] });
+});
+
+test('structural error details reject an unsafe nested array element at its exact path', () => {
+  expect(() => new DiagnosticsError('INVALID_EVENT', 'Invalid event.', { values: [[Number.NaN]] })).toThrow(
+    'Diagnostic value at details.values[0][0] must be finite; received NaN.',
   );
 });
 

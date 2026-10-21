@@ -59,6 +59,43 @@ registerFullLayoutProviderContract({
   capabilities: { incremental: false, fixedNodes: false, selfLoops: true },
 });
 
+test('Dagre preserves every edge constraint when opaque IDs contain graphlib delimiters', async () => {
+  const kernel = createCanvasKernel();
+  const sourceId = nodeId('A');
+  const targetIds = [nodeId('B'), nodeId('B\u0001D')];
+  kernel.transact((transaction) => {
+    for (const id of [sourceId, ...targetIds]) {
+      transaction.nodes.add({
+        id,
+        type: 'task',
+        position: { x: 0, y: 0 },
+        size: { width: 100, height: 40 },
+        data: null,
+      });
+    }
+    for (const [index, id] of [edgeId('D\u0001E'), edgeId('E')].entries()) {
+      transaction.edges.add({
+        id,
+        type: 'flow',
+        source: { nodeId: sourceId },
+        target: { nodeId: targetIds[index]! },
+        data: null,
+      });
+    }
+  });
+  const proposal = await dagreLayoutEngine.compute(
+    createLayoutInput(kernel.read(), { mode: 'full', fixedNodeIds: [] }),
+    { direction: 'LR', rankSpacing: 50 },
+    { signal: new AbortController().signal },
+  );
+  const source = proposal.positions.find((position) => position.id === sourceId)!;
+  expect(proposal.positions.map((position) => position.id)).toEqual([sourceId, ...targetIds]);
+  for (const id of targetIds) {
+    const target = proposal.positions.find((position) => position.id === id)!;
+    expect(target.position.x - source.position.x).toBeGreaterThanOrEqual(150);
+  }
+});
+
 test('Dagre rejects a non-finite Provider configuration before layout', async () => {
   const input = createLayoutInput(createCanvasKernel().read(), { mode: 'full', fixedNodeIds: [] });
 
