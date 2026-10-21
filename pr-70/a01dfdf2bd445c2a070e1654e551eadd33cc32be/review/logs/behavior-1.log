@@ -1,0 +1,22 @@
+{"hookReads":1,"cleanupCalls":1,"replacedByHookFailure":true,"retainsOriginal":false,"disposeFailureEvents":0,"installationStatus":"disposed"}
+19 | try {
+20 |   await installation.whenActive();
+21 |   const failure = await installation.dispose().catch((error: unknown) => error);
+22 |   const observed = { hookReads, cleanupCalls, replacedByHookFailure: failure === hookFailure, retainsOriginal: contains(failure, original), disposeFailureEvents: events.filter(event => event.name === 'nodebraid.runtime.installation.dispose.failed').length, installationStatus: installation.getSnapshot().status };
+23 |   console.log(JSON.stringify(observed));
+24 |   assert.equal(hookReads, 0, 'Diagnostic observation must not invoke a supplied collection hook');
+              ^
+AssertionError: Diagnostic observation must not invoke a supplied collection hook
+
+1 !== 0
+
+ generatedMessage: false,
+     actual: 1,
+   expected: 0,
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261021T135905-discovery/runtime-cleanup-probe.ts:24:10
+
+Bun v1.4.2 (macOS arm64)

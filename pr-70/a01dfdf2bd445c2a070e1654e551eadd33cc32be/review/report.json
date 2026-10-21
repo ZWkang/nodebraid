@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "d88f2e09e66119a9873a3ee150da637b1fbf8bb8",
+    "head": "a01dfdf2bd445c2a070e1654e551eadd33cc32be",
+    "tree": "178815c324bc75a2a6ffc6f299900cedc32a65c4",
+    "patch": "710989693c8b28eef75d1cc05ee532644b72e81722e7e529fdd67c3ab21ef396",
+    "localHead": "b8a9c219119e39a5e68b08324f29c259c6eb676e"
+  },
+  "task": {
+    "run": "82dac695-82ea-471d-a85a-76bf46efa964",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 69
+    },
+    "request": "1c91ef3b1199b0c2b208116eb26b373aae97053503b4f0c2fdec4e2d914ed1c1",
+    "plan": [
+      {
+        "id": "integrate-current-main",
+        "blockedBy": [],
+        "acceptance": "Merge fetched maind88 before first publication; preserve exact original Runtime patch and baseline14 red evidence. Investigate actual browser failure; no old verification is relabelled."
+      },
+      {
+        "id": "cleanup-error-preservation",
+        "blockedBy": [
+          "integrate-current-main"
+        ],
+        "acceptance": "Public real Host lifecycle red/green: Runtime diagnostic traversal never invokes supplied collection hooks, original owned-resource error remains in disposal rejection, exactly one error-level cleanup event; source objects unchanged and disposal cached."
+      },
+      {
+        "id": "traversal-compatibility",
+        "blockedBy": [
+          "cleanup-error-preservation"
+        ],
+        "acceptance": "Own indexed aggregate traversal preserves ordering, sparse/inherited members, nested/circular and already-diagnosed error filtering, native indexed read failures and malformed-collection visible failure; original package-name probe passes."
+      },
+      {
+        "id": "delivery",
+        "blockedBy": [
+          "traversal-compatibility"
+        ],
+        "acceptance": "Actual affected checks, independent Standards+ponytail-review and Spec; sole full gate agents:run verify; exact remote source/tree/first-parent, actual published-head report/preview hashes, current CI/feedback and automatic evidence publication readback; human final review/merge."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "b8a9c219119e39a5e68b08324f29c259c6eb676e",
+      "tree": "178815c324bc75a2a6ffc6f299900cedc32a65c4",
+      "patch": "710989693c8b28eef75d1cc05ee532644b72e81722e7e529fdd67c3ab21ef396",
+      "report": "# Standards + ponytail-review — Issue #69 完整补丁复审\n\nVerdict: passed\n\n- Base: `d88f2e09e66119a9873a3ee150da637b1fbf8bb8`\n- Head: `b8a9c219119e39a5e68b08324f29c259c6eb676e`\n- Tree: `178815c324bc75a2a6ffc6f299900cedc32a65c4`\n- Binary patch SHA-256: `710989693c8b28eef75d1cc05ee532644b72e81722e7e529fdd67c3ab21ef396`\n\n已重新读取完整三文件补丁，检查 HostDiagnostics 自有遍历、Activation 清理缓存、Installation 全部 terminal 分支、Host/依赖清理及 Cordis 错误展开路径。\n\n## 硬规范及原 P2 处置\n\n未发现当前补丁违反硬规范。原异步 setup P2 已修复：setup 在 abort 后 resolve/reject 的两条路径均不再把调用方清理 AggregateError 抛给 Cordis，而由现有 public dispose 在 Fiber 结束后重新读取 Activation 的同一缓存拒绝。错误未被吞掉，也没有提前重复入账。\n\n新增真实 Host 回归验证两种结算、原始错误成员、清理一次、缓存 Promise 与单一失败事件；现有依赖清理、逆序资源释放、Child、故障观察及错误身份回归保持通过。符合 ADR0028 的观察/传播分离、ADR0004 的完整清理聚合，以及 Fix Root Causes、Boundary Discipline、Test Behavior, Not Implementation。\n\n自有数组遍历继续保持原生长度转换、稀疏/继承成员和已诊断错误过滤；没有新增 accessor 禁令或 fallback。\n\n## 判断性 smell / ponytail\n\n未发现有具体后果的可操作 smell。改动复用既有 Activation/Installation 缓存与聚合责任，没有新增框架或公共 seam；按单 Host 的已约定负载，修复最小且完整。\n\n## 实际检查及限制\n\n本轮 `bun test packages/runtime-cordis/tests`：100 pass、463 assertions（Bun 1.4.2）。原样重放保留的公共 stdin 探针，exit 0，输出：\n`{\"hookReads\":0,\"replacedByHook\":false,\"status\":\"disposed\",\"cachedPromise\":true,\"disposeEvents\":1}`。\n\n`git diff --check` 通过。旧 head 的失败报告/探针保持原身份；本报告只绑定上述新提交。未运行构建、full check、浏览器、远端发布或当前 head CI；不把仍在执行的其他检查计作通过。\n"
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "b8a9c219119e39a5e68b08324f29c259c6eb676e",
+      "tree": "178815c324bc75a2a6ffc6f299900cedc32a65c4",
+      "patch": "710989693c8b28eef75d1cc05ee532644b72e81722e7e529fdd67c3ab21ef396",
+      "report": "verdict: **passed**\n\n已对新 head 完整三文件补丁重新独立审查，核对 Issue69 原验收、prepared task、ADR0028/0030、真实 Host/Installation/Activation/Cordis 调用链；未发现新增验收遗漏、范围扩张或错误实现。原 7989243 报告保留在 review-history，未将其通过结果换绑。\n\n两处早期 setup 清理 catch 仅在终态保留 Activation 已缓存的拒绝；当前 Activation 引用仍在，公开 dispose 等 Cordis 结算后读取同一清理 Promise 并聚合拒绝，因此没有早期重复 push、重复清理或静默成功。setup 被中止后 resolve/reject 两条新回归均覆盖；依赖丢失分支、取消识别与普通业务 setup 错误处理未改变。完整补丁同时保留自有索引遍历、原始错误引用、一次错误事件、缓存及 Host/Child/依赖错误顺序和去重。\n\n实际执行：`bun test packages/runtime-cordis/tests/diagnostic-cleanup.test.ts packages/runtime-cordis/tests/diagnostics.test.ts packages/runtime-cordis/tests/index.test.ts`，98 pass、0 fail、449 assertions。已核读 early-setup-red.log，两个旧实现失败均为 forEach hook 被调用的行为断言。`git diff --check` 通过，工作树干净。\n\n未执行构建、affected 全链路、full verify、浏览器、远端发布、当前 head CI 或报告发布回读；不会把运行中的 affected-after-review 计为通过。Issue68 不属于本补丁。仅写本报告，历史报告与源码未改。\n\n- base: `d88f2e09e66119a9873a3ee150da637b1fbf8bb8`\n- head: `b8a9c219119e39a5e68b08324f29c259c6eb676e`\n- tree: `178815c324bc75a2a6ffc6f299900cedc32a65c4`\n- raw binary patch SHA256: `710989693c8b28eef75d1cc05ee532644b72e81722e7e529fdd67c3ab21ef396`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-public-package-red",
+      "acceptance": "At original base14, a real package-name Host cleanup loses its owned AggregateError through a supplied map getter and emits no cleanup error event. Original expected hookReads0 assertion fails.",
+      "command": "bun runtime-cleanup-probe.ts at original base14d10d0",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "public-regression-red",
+      "acceptance": "Original public Host regression fails because supplied map getter executes. This result belongs to the original pre-fix source, not current head.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-cleanup.test.ts before implementation",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "cordis-boundary-red",
+      "acceptance": "Before owner-boundary fix, public forEach hook and cyclic AggregateError regressions fail through real Cordis traversal; logs retained.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-cleanup.test.ts --test-name-pattern forEach|circular (before boundary fix)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "public-package-green",
+      "acceptance": "Current Runtime package-name Host probe: hooks0, original retained, one cleanup failure event, one cleanup call and disposed state.",
+      "command": "bun original runtime-cleanup-probe.ts against current package build",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "current-public-runtime-suite",
+      "acceptance": "After the independent review correction: 100 Runtime tests /463 assertions pass, including early setup resolve/reject cleanup and dependency de-duplication.",
+      "command": "bun test packages/runtime-cordis/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "historical-development-browser-failure",
+      "acceptance": "Historical prior-base affected attempt failed: Renderer page-global function missing. Unchanged targeted whole Renderer rerun later passed. No root cause established or retries/waits/test changes added; fresh current-head affected/full checks are separate.",
+      "command": "bun run check:affected --base14d10d0 (historical final Runtime working patch)",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "unchanged-renderer-investigation",
+      "acceptance": "Whole Renderer browser suite re-executed at unchanged Runtime patch and exited0; observed failure did not reproduce. This does not erase the preceding failure.",
+      "command": "bun run --filter '@nodebraid/renderer-svg' test:browser:self",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "current-head-affected-check",
+      "acceptance": "After independent review corrections, the final Runtime patch passes all actually selected package/consumer/root/browser/docs checks, including the complete Renderer suite. Historical earlier failure is retained separately.",
+      "command": "bun run check:affected --base d88f2e09e66119a9873a3ee150da637b1fbf8bb8",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "early-setup-review-regression-red",
+      "acceptance": "At fixed7989243 before correcting the independent Standards P2, public aborted Setup resolve/reject tests both fail via Cordis hooks; original log is retained.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-cleanup.test.ts --test-name-pattern aborted setup (before early-path fix)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-9.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "fd653aec7145492b1a64dc2f3d7afbebc8e5f8bb88b457e197466a3823ce0fb3"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "914086b63da9dc49308f0dd62d15f4d27c9fec2074413a9065840b115d3592bc"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "8940e4afa75a8e5700ad185557671f749a6c61a32e44cec7cd77c9bf765d66bf"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "d4f090c27bddf8b57350c535fd5777092d7d5c7ec7af4ab477dfe0417b6eba8b"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "920e487042fd4e15ca0a6eac5de75d949fda5ebf5e73c4e080bdc9bf29eb5606"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "9f9b224c35862b1ddd0f4def1d9c1199820294f5d233f47f220cb8a2797877a3"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "9866bc923fe48f857a10807fe69c61d4b9c839121a10e93d6b3d699a464ee1c1"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "4506dba371ac0e734704ba37e19ea0719e819f8a156cad485db8890baab8baaf"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "b9d6716f2df3a8e47523025608476b81a11b3f5aa55c0951c30b7b0b8cfe96ac"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "d45ccda7e4baba357566f61b99e3ad9d06ffd6f78f16076b764a01b0ddf0e63e"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "4e67a48c7199c050dc9948a664eef801f9797287bd20841ee86e3b96deafaa75"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "8acb14d4759eca27f6ca0995c4585c0798c89b77a96812fe5844da14f4610a67"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "debfcbc53da9ed3705d1cb443d4bb3bf71e0cbc0072e6b49c0925bf46dd254f3"
+    }
+  ]
+}

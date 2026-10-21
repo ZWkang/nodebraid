@@ -1,0 +1,22 @@
+bun test v1.4.2 (744846f84)
+
+packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:
+28 |   try {
+29 |     await installation.whenActive();
+30 |     const disposal = installation.dispose();
+31 |     expect(installation.dispose()).toBe(disposal);
+32 |     const failure = await disposal.catch((error: unknown) => error);
+33 |     expect(hookReads).toBe(0);
+                           ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:33:23)
+(fail) terminal cleanup diagnostics do not invoke a supplied AggregateError map getter [30.49ms]
+
+ 0 pass
+ 1 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [94.00ms]

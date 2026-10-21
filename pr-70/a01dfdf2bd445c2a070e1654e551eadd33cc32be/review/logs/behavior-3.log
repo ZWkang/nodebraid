@@ -1,0 +1,57 @@
+bun test v1.4.2 (744846f84)
+
+packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:
+30 |     try {
+31 |       await installation.whenActive();
+32 |       const disposal = installation.dispose();
+33 |       expect(installation.dispose()).toBe(disposal);
+34 |       const failure = await disposal.catch((error: unknown) => error);
+35 |       expect(hookReads).toBe(0);
+                             ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:35:25)
+(fail) terminal cleanup diagnostics do not invoke a supplied forEach hook [55.60ms]
+93 |   const host = createPluginHost({ diagnostics: { sink: (event) => events.push(event) } });
+94 |   const installation = host.install(definePlugin({ setup(context) { context.own(() => { throw original; }); } }));
+95 |   try {
+96 |     await installation.whenActive();
+97 |     const failure = await installation.dispose().catch((error: unknown) => error);
+98 |     expect(failure).toBeInstanceOf(AggregateError);
+                         ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class AggregateError extends Error]
+Received value: 454 |     return (...args) => {
+455 |       if (args.length === 1 && args[0] instanceof Error) {
+456 |         if (args[0].cause) {
+457 |           this[type](args[0].cause);
+458 |         } else if (isAggregateError(args[0])) {
+459 |           args[0].errors.forEach((error) => this[type](error));
+                ^
+RangeError: Maximum call stack size exceeded.
+      at forEach (1:11)
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/node_modules/cordis/lib/index.js:459:26)
+      at forEach (1:11)
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/node_modules/cordis/lib/index.js:459:26)
+      at forEach (1:11)
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/node_modules/cordis/lib/index.js:459:26)
+      at forEach (1:11)
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/node_modules/cordis/lib/index.js:459:26)
+      at forEach (1:11)
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/node_modules/cordis/lib/index.js:459:26)
+      at async _unload (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/node_modules/cordis/lib/index.js:978:19)
+      at async <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/node_modules/cordis/lib/index.js:747:19)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:98:21)
+(fail) terminal cleanup preserves a circular AggregateError without passing it through Cordis traversal [8.68ms]
+
+ 0 pass
+ 4 filtered out
+ 2 fail
+ 3 expect() calls
+Ran 2 tests across 1 file. [182.00ms]
