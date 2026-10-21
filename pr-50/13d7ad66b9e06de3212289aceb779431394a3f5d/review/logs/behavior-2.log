@@ -1,0 +1,13 @@
+bun test v1.4.2 (744846f84)
+
+../../../local-workflows/nodebraid/runs/04a05de6-6b68-4752-9e55-fd114398078f/publisher-regression/tests/pr-evidence.test.ts:
+(pass) untrusted preview names cannot address the independent review namespace [7.81ms]
+(pass) preview-only publication refuses a different saved base/patch before uploading [8.49ms]
+(pass) review-only publication refuses a different saved base/patch before uploading [3.58ms]
+(pass) preserving a previous report requires its original artifact bytes to match [2.87ms]
+
+ 4 pass
+ 9 filtered out
+ 0 fail
+ 10 expect() calls
+Ran 4 tests across 1 file. [44.00ms]

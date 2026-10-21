@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "90275b30daa43c2e207d7c9af94b8bb442e2f2a0",
+    "head": "13d7ad66b9e06de3212289aceb779431394a3f5d",
+    "tree": "6f4a5a19f07544d76321ca49cc7340d98d813789",
+    "patch": "52c6b9896e79fad2fdd10cc725a766601e0d9bc87e473223a765028659563c7d",
+    "localHead": "a35985b1ec0c2fcb5410e38f1bc101c260498efc"
+  },
+  "task": {
+    "run": "04a05de6-6b68-4752-9e55-fd114398078f",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 45
+    },
+    "request": "Spec #44 and approval comment6312325365: deliver ordinary verification skill, agent-browser evidence, full review/validation reports and current-head PR publishing; no formal verification or account/branch-protection changes.",
+    "plan": [
+      {
+        "id": "evidence",
+        "blockedBy": [],
+        "acceptance": "Real Examples scenes preserve screenshots, video, snapshots, errors and versioned evidence after cleanup; reporters preserve actual review and command evidence; publisher refuses stale head and retains author prose."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "a35985b1ec0c2fcb5410e38f1bc101c260498efc",
+      "tree": "6f4a5a19f07544d76321ca49cc7340d98d813789",
+      "patch": "52c6b9896e79fad2fdd10cc725a766601e0d9bc87e473223a765028659563c7d",
+      "verdict": "passed",
+      "report": "Independent /root/standards_review: passed. 已复核完整变更及最终录像增量，未发现确凿规范问题。原始 recording.mp4 在转码前保存并计算哈希；review.mp4 使用真实 ffmpeg 转码，保存独立哈希、命令和编码日志。启动错误或非零退出使场景失败，已有证据保留，清理仍执行。PR 区分原始录像与1/15速审阅录像并标出截图文件名，文档明确不能用于性能/真实耗时测量。此前P1/P2已修：preview/review路径隔离；分次发布在任何写入前校验另一份证据的base/head/tree/patch及文件hash。维护规则核对新增入口与覆盖缺口，无产品契约、形式验证、调度或#10门禁扩展。无额外精简建议。独立执行 bun test tests/pr-evidence.test.ts tests/verification-report.test.ts tests/preview-scenes.test.ts：25 pass / 0 fail；git diff --check通过，工作树干净。已回读#44/#45讨论，范围未变。未执行完整构建、浏览器或真实发布；当前head实际媒体/远端发布以独立验收为准。"
+    },
+    "spec": {
+      "head": "a35985b1ec0c2fcb5410e38f1bc101c260498efc",
+      "tree": "6f4a5a19f07544d76321ca49cc7340d98d813789",
+      "patch": "52c6b9896e79fad2fdd10cc725a766601e0d9bc87e473223a765028659563c7d",
+      "verdict": "passed",
+      "report": "Independent /root/spec_review: PASS，0项发现。已复核#44/#45、批准评论6312325365、完整规格身份与最终四文件增量。原始recording.mp4保留，真实ffmpeg生成独立review.mp4并记录命令、编码输出与hash；编码失败使场景失败且仍清理。PR明确区分原始/1/15速审阅录像和截图文件名，文档禁止把慢放当性能或实际耗时。维护新增入口漂移检查，旧地图通过不等于新功能已验证。原P1的preview/review隔离和写前完整身份/hash检查保持有效，未发现超范围实现。当前SHA相关19 tests通过及纯函数媒体标签/命名空间断言；完整patch diff --check通过，工作树干净。未运行build、浏览器或完整工程检查。35a旧head的四场景通过不作为本head证据；最终head真实录像/慢放、完整检查、PR报告媒体回读及原生父子关系仍需实际交付确认。默认分支publisher尚不能视为已部署或已触发。"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "publisher-boundaries-before",
+      "acceptance": "旧实现2142faa的隔离源码快照运行新的4项发布边界回归：缺少命名空间隔离、写前范围/hash校验产生真实断言失败；不属于最终版本失败。",
+      "command": "bun test /Users/zhou/.codex/local-workflows/nodebraid/runs/04a05de6-6b68-4752-9e55-fd114398078f/publisher-regression/tests/pr-evidence.test.ts -t \"untrusted preview names|different saved base/patch|previous report requires\" (with saved before.ts as scripts/pr-evidence.ts)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "publisher-boundaries-after",
+      "acceptance": "最终a35985b发布器的同4项回归通过；拒绝跨类覆盖、两个方向的不同base/patch混合，以及已发布字节污染。",
+      "command": "bun test /Users/zhou/.codex/local-workflows/nodebraid/runs/04a05de6-6b68-4752-9e55-fd114398078f/publisher-regression/tests/pr-evidence.test.ts -t untrusted preview names|different saved base/patch|previous report requires",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "browser-feature-map",
+      "acceptance": "实际发布head13d7ad6重新执行四项真实场景并全部通过；这是本次collector原始结果清单，40个产物独立保存，包含hash、native操作和清理事实。",
+      "command": "bun scripts/collect-preview.ts --base 90275b30daa43c2e207d7c9af94b8bb442e2f2a0 --out .tmp/pr-evidence-13d7ad6 --all",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "recording-decode",
+      "acceptance": "实际发布head13d7ad6重新生成的8份MP4均经ffprobe解码，H264、1280x720且多帧；原始和15倍慢放分别保存，不作为性能证明。",
+      "command": "ffprobe -v error -count_frames -show_entries stream=codec_name,width,height,nb_read_frames:format=duration -of json <each declared MP4>",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "79db21f711cf0d0dc5c8be0f3a01d94fc6c3ea09e04d810bdbfd60d145005316"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "30d78effd8171a7f36cb4dc22548e39f04024fd68d58b4e697aff8d4086ffbb7"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "8c5fdbac04bcf23127fc3694e15722ec5263d7a416260b6ab00115b2862c49f4"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "e8b82e9d4c90671649a4a2f81740b97822224f53f93a4b97128ed85633506cc8"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "e33d940b8ed0f8f1503c20d1759afcbcf2fb03eeba587f3f65baa5867fa116ed"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "c45237c7522535dcd065be8dbff49d92c0f333804f1ff4919c9139f58fb63560"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "fb7618d9ade3e234d8c2cd4286eea5402ee7eca619d154906f675334c7f7fc3d"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "7f4c94917ff7ad8fd6b0cf86678171addeeb47d1febfb70d471fb540da2dbc16"
+    }
+  ]
+}

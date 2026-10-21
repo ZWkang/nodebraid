@@ -1,0 +1,154 @@
+[
+  {
+    "file": "clipboard/recording.mp4",
+    "exitCode": 0,
+    "output": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1280,
+          "height": 720,
+          "nb_read_frames": "9"
+        }
+      ],
+      "format": {
+        "duration": "0.300000"
+      }
+    }
+  },
+  {
+    "file": "clipboard/review.mp4",
+    "exitCode": 0,
+    "output": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1280,
+          "height": 720,
+          "nb_read_frames": "134"
+        }
+      ],
+      "format": {
+        "duration": "4.466667"
+      }
+    }
+  },
+  {
+    "file": "port-connection/recording.mp4",
+    "exitCode": 0,
+    "output": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1280,
+          "height": 720,
+          "nb_read_frames": "10"
+        }
+      ],
+      "format": {
+        "duration": "0.333008"
+      }
+    }
+  },
+  {
+    "file": "port-connection/review.mp4",
+    "exitCode": 0,
+    "output": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1280,
+          "height": 720,
+          "nb_read_frames": "149"
+        }
+      ],
+      "format": {
+        "duration": "4.966667"
+      }
+    }
+  },
+  {
+    "file": "selection-history/recording.mp4",
+    "exitCode": 0,
+    "output": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1280,
+          "height": 720,
+          "nb_read_frames": "15"
+        }
+      ],
+      "format": {
+        "duration": "0.500000"
+      }
+    }
+  },
+  {
+    "file": "selection-history/review.mp4",
+    "exitCode": 0,
+    "output": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1280,
+          "height": 720,
+          "nb_read_frames": "224"
+        }
+      ],
+      "format": {
+        "duration": "7.466667"
+      }
+    }
+  },
+  {
+    "file": "viewport/recording.mp4",
+    "exitCode": 0,
+    "output": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1280,
+          "height": 720,
+          "nb_read_frames": "15"
+        }
+      ],
+      "format": {
+        "duration": "0.500000"
+      }
+    }
+  },
+  {
+    "file": "viewport/review.mp4",
+    "exitCode": 0,
+    "output": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1280,
+          "height": 720,
+          "nb_read_frames": "224"
+        }
+      ],
+      "format": {
+        "duration": "7.466667"
+      }
+    }
+  }
+]

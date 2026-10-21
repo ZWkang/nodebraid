@@ -1,0 +1,65 @@
+bun test v1.4.2 (744846f84)
+
+../../../local-workflows/nodebraid/runs/04a05de6-6b68-4752-9e55-fd114398078f/publisher-regression/tests/pr-evidence.test.ts:
+218 |     { path: 'logs/full-check.log', kind: 'log', sha256: createHash('sha256').update(forgedLog).digest('hex') },
+219 |     { path: 'report.json', kind: 'snapshot', sha256: createHash('sha256').update(forgedReport).digest('hex') },
+220 |   );
+221 |   writeFileSync(join(directory, 'preview.json'), JSON.stringify(manifest));
+222 |   const bundle = await loadEvidenceBundle(directory, head, true);
+223 |   expect([...bundle.files.keys()]).toContain('preview/logs/full-check.log');
+                                         ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "preview/logs/full-check.log"
+Received: [ "after.png", "logs/full-check.log", "report.json", "preview.json" ]
+
+      at <anonymous> (/Users/zhou/.codex/local-workflows/nodebraid/runs/04a05de6-6b68-4752-9e55-fd114398078f/publisher-regression/tests/pr-evidence.test.ts:223:36)
+(fail) untrusted preview names cannot address the independent review namespace [19.38ms]
+283 |           repository: 'ZWkang/nodebraid',
+284 |           pr: 45,
+285 |           token: 'test-token',
+286 |           api: server.url.origin,
+287 |         }),
+288 |       ).rejects.toThrow(/base|scope/);
+                      ^
+error: expect(received).toThrow(expected)
+
+Expected pattern: /base|scope/
+Received message: "GitHub POST /repos/ZWkang/nodebraid/git/blobs: 500 Unexpected write"
+
+      at <anonymous> (/Users/zhou/.codex/local-workflows/nodebraid/runs/04a05de6-6b68-4752-9e55-fd114398078f/publisher-regression/tests/pr-evidence.test.ts:288:17)
+(fail) preview-only publication refuses a different saved base/patch before uploading [23.55ms]
+283 |           repository: 'ZWkang/nodebraid',
+284 |           pr: 45,
+285 |           token: 'test-token',
+286 |           api: server.url.origin,
+287 |         }),
+288 |       ).rejects.toThrow(/base|scope/);
+                      ^
+error: expect(received).toThrow(expected)
+
+Expected pattern: /base|scope/
+Received message: "GitHub POST /repos/ZWkang/nodebraid/git/blobs: 500 Unexpected write"
+
+      at <anonymous> (/Users/zhou/.codex/local-workflows/nodebraid/runs/04a05de6-6b68-4752-9e55-fd114398078f/publisher-regression/tests/pr-evidence.test.ts:288:17)
+(fail) review-only publication refuses a different saved base/patch before uploading [3.75ms]
+330 |     },
+331 |   });
+332 |   try {
+333 |     await expect(
+334 |       publishEvidence(bundle, { repository: 'ZWkang/nodebraid', pr: 45, token: 'test-token', api: server.url.origin }),
+335 |     ).rejects.toThrow(/digest/);
+                    ^
+error: expect(received).toThrow(expected)
+
+Expected pattern: /digest/
+Received message: "GitHub POST /repos/ZWkang/nodebraid/git/blobs: 500 Unexpected write"
+
+      at <anonymous> (/Users/zhou/.codex/local-workflows/nodebraid/runs/04a05de6-6b68-4752-9e55-fd114398078f/publisher-regression/tests/pr-evidence.test.ts:335:15)
+(fail) preserving a previous report requires its original artifact bytes to match [4.24ms]
+
+ 0 pass
+ 9 filtered out
+ 4 fail
+ 4 expect() calls
+Ran 4 tests across 1 file. [77.00ms]
