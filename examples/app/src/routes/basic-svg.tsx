@@ -6,6 +6,7 @@ import {
   KeyboardOff,
   Maximize2,
   Minus,
+  Network,
   Plus,
   Redo2,
   RotateCcw,
@@ -27,7 +28,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { createExampleRuntime, type ExampleRuntime } from '@/example-runtime/create-example-runtime';
+import {
+  createExampleRuntime,
+  exampleLayoutCommand,
+  type ExampleRuntime,
+} from '@/example-runtime/create-example-runtime';
 import { useClipboardFailure } from '@/example-runtime/use-clipboard-failure';
 
 type Language = 'en' | 'zh';
@@ -154,6 +159,20 @@ function CanvasToolbar({ copy, runtime, target, onResetExample, onError }: Canva
         icon={<Redo2 />}
         disabled={!history.canRedo}
         onClick={() => run(async () => void (await runtime.commands.execute(redoCommand, undefined)))}
+      />
+      <ToolbarButton
+        label={copy.autoLayout}
+        icon={<Network />}
+        onClick={() =>
+          run(
+            async () =>
+              void (await runtime.commands.execute(exampleLayoutCommand, {
+                mode: 'full',
+                fixedNodeIds: [],
+                config: { direction: 'LR' },
+              })),
+          )
+        }
       />
       <Separator orientation="vertical" className="toolbar-separator" />
       <ToolbarButton label={copy.zoomIn} icon={<Plus />} onClick={() => zoomAtCenter(runtime, target, 1.2)} />
@@ -336,6 +355,7 @@ interface Copy {
   readonly toolbar: string;
   readonly undo: string;
   readonly redo: string;
+  readonly autoLayout: string;
   readonly zoomIn: string;
   readonly zoomOut: string;
   readonly fitView: string;
@@ -371,6 +391,7 @@ const translations: Readonly<Record<Language, Copy>> = {
     toolbar: 'Canvas controls',
     undo: 'Undo',
     redo: 'Redo',
+    autoLayout: 'Auto layout',
     zoomIn: 'Zoom in',
     zoomOut: 'Zoom out',
     fitView: 'Fit view',
@@ -400,6 +421,7 @@ const translations: Readonly<Record<Language, Copy>> = {
       'Press Ctrl/Cmd+D while the canvas is focused to duplicate the Selection.',
       'Press Delete while the canvas is focused to remove the Selection.',
       'Drag a selected node.',
+      'Use Auto layout to arrange nodes from left to right; Undo restores their previous positions.',
       'Drag from a source anchor to a target anchor.',
       'Pan the canvas or use the mouse wheel to zoom.',
     ],
@@ -412,6 +434,7 @@ const translations: Readonly<Record<Language, Copy>> = {
     toolbar: '画布控制',
     undo: '撤销',
     redo: '重做',
+    autoLayout: '自动布局',
     zoomIn: '放大',
     zoomOut: '缩小',
     fitView: '适应画布',
@@ -441,6 +464,7 @@ const translations: Readonly<Record<Language, Copy>> = {
       '画布获得焦点后按 Ctrl/Cmd+D，复制当前 Selection。',
       '画布获得焦点后按 Delete，删除当前 Selection。',
       '拖动已选择的 Node。',
+      '点击自动布局，从左到右排列 Node；撤销可恢复布局前的位置。',
       '从 source anchor 拖向 target anchor。',
       '拖动画布或使用滚轮缩放。',
     ],

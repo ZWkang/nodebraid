@@ -17,7 +17,8 @@ A public React Adapter now binds application Runtime Factories to React Targets
 and projects stable Kernel, Session, and History Snapshots. The private React
 Examples Application consumes it in a runnable Basic SVG developer reference
 with unified navigation, live Runtime state, Edge Connection, viewport controls,
-and History actions.
+manual Dagre/full/LR Auto layout, and History actions. Layout preserves Selection,
+Viewport, and original Port connections without automatically fitting the view.
 
 NodeBraid is still pre-release. It does not yet provide a product-level editor
 shell, non-React framework adapters, persistence, collaboration, or a
