@@ -13,10 +13,10 @@ export function applyChangeSetToDraft(
   nodeWriter: EntityWriter<NodeId, CanvasNode>,
   edgeWriter: EntityWriter<EdgeId, CanvasEdge>,
 ): void {
-  validateChangeSet(changeSet, direction);
+  const changes = validateChangeSet(changeSet, direction);
 
   // Preflight every affected entity before writing so one stale entry cannot cause partial replay.
-  for (const change of changeSet.changes) {
+  for (const change of changes) {
     if (change.entity === 'node') {
       const expected = direction === 'forward' ? change.before : change.after;
       const actual = draftNodes.get(change.id) ?? null;
@@ -29,8 +29,8 @@ export function applyChangeSetToDraft(
   }
 
   // Reverse replay also reverses entity order; final graph validation still happens once at commit.
-  const changes = direction === 'forward' ? changeSet.changes : [...changeSet.changes].reverse();
-  for (const change of changes) {
+  const orderedChanges = direction === 'forward' ? changes : [...changes].reverse();
+  for (const change of orderedChanges) {
     const source = direction === 'forward' ? change.before : change.after;
     const target = direction === 'forward' ? change.after : change.before;
     const writer = change.entity === 'node' ? nodeWriter : edgeWriter;
@@ -44,7 +44,7 @@ export function applyChangeSetToDraft(
   }
 }
 
-function validateChangeSet(changeSet: ChangeSet, direction: ChangeDirection): void {
+function validateChangeSet(changeSet: ChangeSet, direction: ChangeDirection): readonly GraphChange[] {
   // Runtime validation is required because JavaScript callers can forge values despite TypeScript declarations.
   if (direction !== 'forward' && direction !== 'reverse') {
     if (typeof direction !== 'string') {
@@ -73,11 +73,19 @@ function validateChangeSet(changeSet: ChangeSet, direction: ChangeDirection): vo
       revision: describeInvalidRevision(changeSet.revision),
     });
   }
-  if (!Array.isArray(changeSet.changes) || changeSet.changes.length === 0) {
+  const changes = changeSet.changes;
+  if (!Array.isArray(changes)) {
+    throwInvalidChangeSet('Change Set must contain at least one change.', {});
+  }
+  const length = changes.length;
+  if (length === 0) {
     throwInvalidChangeSet('Change Set must contain at least one change.', {});
   }
   const identities = new Set<string>();
-  for (const [index, change] of changeSet.changes.entries()) {
+  const accepted: GraphChange[] = [];
+  // Keep native Array length coercion without invoking the input's traversal hooks.
+  for (const index of Array.prototype.keys.call({ length })) {
+    const change: GraphChange = changes[index];
     if (!isRecord(change) || (change.entity !== 'node' && change.entity !== 'edge')) {
       throwInvalidChangeSet('Change must identify a Node or Edge.', { index });
     }
@@ -112,7 +120,9 @@ function validateChangeSet(changeSet: ChangeSet, direction: ChangeDirection): vo
         });
       }
     }
+    accepted.push(change);
   }
+  return accepted;
 }
 
 function throwChangeSetConflict(
