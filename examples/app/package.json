@@ -28,12 +28,15 @@
     "vite": "^8.2.2"
   },
   "scripts": {
-    "build": "bun run build:dependencies && vite build",
-    "build:dependencies": "bun run --filter '@nodebraid/core' build && bun run --filter '@nodebraid/renderer-svg' build && bun run --filter '@nodebraid/adapter-react' build",
-    "check": "bun run build && tsgo --noEmit -p tsconfig.json && bun run test:browser",
+    "build": "bun run ../../scripts/build-workspaces.ts @nodebraid/examples",
+    "build:self": "vite build",
+    "build:dependencies": "bun run ../../scripts/build-workspaces.ts --dependencies @nodebraid/examples",
+    "check": "bun run build && bun run typecheck:self && bun run test:browser:self",
     "dev": "bun run build:dependencies && vite --host 127.0.0.1",
-    "test": "bun run build && bun run test:browser",
-    "test:browser": "bun run ./browser-tests/basic-svg.browser.ts && bun run ./browser-tests/clipboard.browser.ts",
-    "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
+    "test": "bun run build && bun run test:browser:self",
+    "test:browser": "bun run build && bun run test:browser:self",
+    "test:browser:self": "bun run ./browser-tests/basic-svg.browser.ts && bun run ./browser-tests/clipboard.browser.ts",
+    "typecheck": "bun run build:dependencies && bun run typecheck:self",
+    "typecheck:self": "tsgo --noEmit -p tsconfig.json"
   }
 }

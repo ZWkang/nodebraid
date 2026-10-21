@@ -97,6 +97,12 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    rejects cycles and unfinished blockers. Reopening an identical task resumes it;
    a changed task requires another run. Do not derive the prepared task from the
    result receipt or replace it after execution.
+   During development, run `bun run check:affected` for changes against `HEAD`,
+   including staged, unstaged and untracked files. Use `--base main` to include
+   branch changes, or `--plan` to inspect the scope without executing checks.
+   Follow the behavior-specific validation matrix. For visible Canvas changes,
+   use the project `verify-nodebraid` skill and its feature map to collect real
+   `agent-browser` evidence. Passing affected checks is not delivery verification.
 2. Invoke `code-review` with independent Standards and Spec subagents, the same
    immutable complete patch (including new files), source docs and captured base.
    Standards also receives `ponytail-review` and follows connected callers. Fix
@@ -104,15 +110,16 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    with the implementer's self-assessment.
    Use `agents:run inspect <run-dir>` to give both reviewers the same full
    head/tree/raw-patch digest. Save their actual reports with those identities.
-3. Run affected tests and the full `bun run check`. For visible Canvas changes,
-   use the project `verify-nodebraid` skill and its feature map to collect real
-   `agent-browser` evidence. Follow the documented behavior-specific validation matrix. Failures
-   prevent a ready PR; never weaken assertions, change acceptance criteria, add
-   fake success or silently degrade behavior to obtain green checks.
-   `agents:run verify <run-dir> <reviews.json> <decisions.json>` runs the real
-   `bun run check`, retains each attempt's original log, checks source stability,
-   and validates the result against the independently prepared task. Fixture runs
-   in the test suite are execution-layer tests, not live AI repair acceptance.
+3. After both review axes pass, run
+   `bun run agents:run verify <run-dir> <reviews.json> <decisions.json>` for the
+   delivery attempt's full check. Do not manually run the same `bun run check`
+   beforehand. `verify` executes the real `bun run check`, retains each attempt's
+   original log, checks source stability, and validates the result against the
+   independently prepared task. Its receipt still records `bun run check`; every
+   new attempt executes it again, even at the same head, without caching or skips.
+   Failures prevent a ready PR; never weaken assertions, change acceptance criteria,
+   add fake success or silently degrade behavior to obtain green checks. Fixture
+   runs in the test suite are execution-layer tests, not live AI repair acceptance.
 4. Use `feat/issue-N` and a `[local-agent] ` title to opt a PR into local maintenance.
    Legacy `[agent] ` issue PRs are also managed. Create a non-draft PR only after local
    verification and review, with `Fixes #N` and the installed `pr`/`show-me` template:
@@ -171,10 +178,14 @@ CI preview alone does not establish independent review or full-check completion.
    needed; resolve mechanical conflicts with tests and review. Conflicts that need
    a new design decision or affect steering/security policy return to the user.
    Do not weaken branch protection or publish unreviewed conflict resolutions.
-3. Repeat affected tests, full checks, both review axes, relevant preview scenes and
-   evidence publication after each fix. Persist each feedback item's key, content digest, disposition
-   and reason with the actual published SHA. A receipt must match the prepared
-   task/request and list every feedback item exactly once.
+3. After each fix, run `bun run check:affected` with the relevant base, repeat both
+   review axes, then use `agents:run verify` for the full check and continue
+   publication verification. Do not add a manual full check before `verify`.
+   Repeat relevant preview scenes at the actual published head, then publish and
+   read back the full report and evidence as above.
+   Persist each feedback item's key, content digest, disposition and reason with
+   the actual published SHA. A receipt must match the prepared task/request and
+   list every feedback item exactly once.
 4. Resolve only an unchanged addressed thread whose disposition was revalidated at
    the current head and whose current CI passes. Old unresolved thread receipts
    must be re-examined after a new head. Inspect replies even on resolved threads;

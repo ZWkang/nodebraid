@@ -316,6 +316,11 @@
         "@nodebraid/renderer-api": "workspace:*",
         "@nodebraid/session-api": "workspace:*",
       },
+      "devDependencies": {
+        "@nodebraid/plugin-history": "workspace:*",
+        "@nodebraid/plugin-interaction": "workspace:*",
+        "@nodebraid/plugin-renderer": "workspace:*",
+      },
     },
     "packages/runtime-cordis": {
       "name": "@nodebraid/runtime-cordis",

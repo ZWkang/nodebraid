@@ -38,10 +38,12 @@ architecture and roadmap work:
 - [Module Index](https://zwkang.github.io/nodebraid/modules/)
 - [Architecture](./ARCHITECTURE.md)
 
-Pushes to `main` build and deploy the Documentation Site through
-`.github/workflows/docs.yml`. The repository's Pages source must be configured
-as **GitHub Actions** in Settings → Pages; the deployed project URL is
-`https://zwkang.github.io/nodebraid/`.
+The `Checks` workflow in `.github/workflows/test.yml` runs the full repository
+check, then deploys its Documentation Site artifact on pushes to `main`.
+Manual runs are available through `workflow_dispatch`; only runs on `main`
+deploy. Deployment uses the artifact from the same successful check run without
+rebuilding it. The repository's Pages source must be configured as **GitHub Actions**
+in Settings → Pages; the deployed project URL is `https://zwkang.github.io/nodebraid/`.
 
 ## Quick Start from source
 
@@ -423,11 +425,32 @@ Build the root entry and every `@nodebraid/*` workspace package:
 bun run build
 ```
 
-Run all repository checks:
+Run checks for the current development changes:
+
+```bash
+bun run check:affected             # Compare with HEAD, including staged, unstaged and untracked files
+bun run check:affected --base main # Compare with the merge-base of main and HEAD, plus working-tree changes
+bun run check:affected --plan      # Print the selected scope without executing checks
+```
+
+The affected scope includes workspace consumers through production and development
+dependencies, root integration tests that statically import affected packages
+(including through local fixtures), and the selected browser suites. Website changes
+or an affected `@nodebraid/core` also select documentation checks. Shared tooling,
+workflow files and unmapped non-Markdown files select the full check; ordinary
+Markdown outside workspaces and the website needs only formatting. Agent workflow
+Markdown and `AGENTS.md` also select the full check.
+
+Run all repository checks for delivery and CI:
 
 ```bash
 bun run check
 ```
+
+Affected checks do not replace delivery verification. For managed Agent tasks,
+complete the affected checks and both review axes, then use `agents:run verify`
+to execute the full check once for that attempt; do not manually run the same
+full check beforehand. A new verification attempt still executes it again.
 
 Run individual checks:
 
@@ -439,9 +462,15 @@ bun run test
 bun run test:browser
 ```
 
-Workspace package typechecks first build the dependency declarations required
-for package-name resolution, so the same commands work from a clean checkout
-without pre-existing `dist` directories.
+The build scheduler in `scripts/build-workspaces.ts` builds workspaces in dependency
+order and builds each workspace once per invocation. It does not cache across runs.
+The full check prepares all workspace artifacts once, then runs typechecks, Bun and
+browser tests, and documentation checks against those artifacts.
+
+Normal workspace `build`, `test`, `typecheck` and `test:browser` commands prepare
+their required dependencies, so they work without pre-existing `dist` directories.
+The `:self` scripts are internal steps for a scheduler that has already prepared
+those dependencies; use the normal commands when running a package independently.
 
 Build and verify only the standalone Diagnostics package:
 

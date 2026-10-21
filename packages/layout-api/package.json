@@ -39,11 +39,14 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts",
-    "build:dependencies": "bun run --filter '@nodebraid/kernel' build",
+    "build": "bun run ../../scripts/build-workspaces.ts @nodebraid/layout-api",
+    "build:self": "tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts",
+    "build:dependencies": "bun run ../../scripts/build-workspaces.ts --dependencies @nodebraid/layout-api",
     "prepack": "bun run build",
-    "test": "bun test ./tests",
-    "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
+    "test": "bun run build:dependencies && bun run test:self",
+    "test:self": "bun test ./tests",
+    "typecheck": "bun run build:dependencies && bun run typecheck:self",
+    "typecheck:self": "tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@nodebraid/diagnostics": "workspace:*",
