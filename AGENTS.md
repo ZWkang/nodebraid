@@ -34,6 +34,7 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 - `bun run agents:local-check`：另检查本机 ChatGPT CLI 登录；有 API-key 环境变量时明确失败，不切换计费入口。
 - `bun run agents:scan [base-sha]`：在已 fetch 的干净 main worktree 记录固定 SHA 调查范围。
 - `bun run agents:run`：归一化完整 GitHub 上下文，独立准备任务、检查依赖前沿、执行真实检查、绑定发布 tree 和判断当前 head；参数见 `docs/agents/agentic-workflows.md`。
+- `bun run agents:run reconcile <source.json> [output.json]`：在 fetch 后核对规格/子任务/阻塞/负责人、实际默认分支集成与验收，输出执行前沿和有授权的关闭候选；不执行 GitHub 写入。
 - `bun run agents:discovery init|sync <queue.json>`：显式初始化或恢复按公共 seam 保存的调查待办；无新提交也保留未检查区域。
 - `bun run agents:discovery finish <queue.json> <report.json>`：只用当前 main 的成功执行报告完成一个待办。
 - `bun run agents:typecheck`：检查本地工作流命令及其共享状态模块的 TypeScript 类型；包含在完整工程类型检查中。
@@ -47,8 +48,9 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 本地自动化检查新 main 变更、Issue 和托管 PR；复现并查重后记录 Issue，再实现已确认任务。
 GitHub 写入使用已连接工具或已认证 Git client，不复制订阅登录文件或连接器凭据。
 
-托管 issue PR 以 `[local-agent] `（兼容 `[agent] `）标题和 `feat/issue-N` 分支加入本地 CI／review 修复闭环。
-Agent 在原 PR 上追加修复并验证，需求变化返回讨论；最终审阅与合并由用户完成。
+托管 issue PR 以 `[local-agent] `（兼容 `[agent] `）标题和 `feat/issue-N` 分支加入本地 CI／review 修复闭环；已合并到功能分支的交付可用 `feat/issue-N-integration` 后续集成。
+父规格标题使用 `spec: `，批准范围内自主补齐子任务；暂停、本地执行与其他活跃负责人保持可见。
+Agent 在原 PR 上追加修复并验证，需求变化返回讨论；默认由用户最终审阅与合并，明确已有授权可执行验证后的合并与关闭。叠加 PR 不算 main 交付，retarget 后需新 run 复验，父规格关闭还须所有子任务和验收完成。
 
 修改本地工作流后格式化并执行 `agents:check` 及相关状态测试。GitHub 不保留 API Agent 或 gh-aw 编译入口。
 

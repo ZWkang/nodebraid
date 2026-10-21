@@ -36,12 +36,15 @@ test('a persisted task resumes after a failed real check and never blesses an un
       repository: 'ZWkang/nodebraid',
       source: { kind: 'issue', number: 10 },
       branch: 'feat/issue-10',
+      baseRefName: 'main',
       base,
       request: 'approved-scope',
       pending: [],
       plan: [{ id: 'fix', blockedBy: [], acceptance: 'Public regression red then green' }],
     };
     json('.tmp/input.json', input);
+    json('.tmp/unbound.json', { ...input, baseRefName: undefined });
+    expect(invoke('prepare', '.tmp/unbound.json', '.tmp/unbound-run').stderr).toContain('baseRefName');
     expect(invoke('prepare', '.tmp/input.json', '.tmp/run').status).toBe(0);
     expect(invoke('prepare', '.tmp/input.json', '.tmp/run').status).toBe(0);
     json('.tmp/input.json', { ...input, request: 'different' });
@@ -89,6 +92,8 @@ test('a persisted task resumes after a failed real check and never blesses an un
     });
     expect(JSON.parse(invoke('evaluate', '.tmp/run', '.tmp/snapshot.json').stdout).status).toBe('ready');
     const newer = JSON.parse(readFileSync(join(dir, '.tmp/snapshot.json'), 'utf8'));
+    json('.tmp/snapshot.json', { ...newer, baseRefName: 'feat/issue-9' });
+    expect(JSON.parse(invoke('evaluate', '.tmp/run', '.tmp/snapshot.json').stdout).status).toBe('waiting-verification');
     newer.headRefOid = 'c'.repeat(40);
     newer.statusCheckRollup[0].headSha = newer.headRefOid;
     json('.tmp/snapshot.json', newer);

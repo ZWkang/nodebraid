@@ -58,6 +58,17 @@ test('only a verified current PR head is ready for human review', () => {
   ).toBe('excluded');
 });
 
+test('stacked PRs retain feedback maintenance and integration branches can deliver to main', () => {
+  const stacked = { ...snapshot, baseRefName: 'feat/issue-6' };
+  expect(evaluateFeedback(stacked, 'ZWkang/nodebraid', []).status).toBe('needs-integration');
+  const feedback = { key: 'comment:stack', digest: 'new', body: 'Fix regression', url: 'https://github.com/1' };
+  expect(evaluateFeedback({ ...stacked, feedback: [feedback] }, 'ZWkang/nodebraid', []).status).toBe('repair');
+  expect(evaluateFeedback({ ...stacked, statusCheckRollup: [] }, 'ZWkang/nodebraid', []).status).toBe('waiting-ci');
+  expect(
+    evaluateFeedback({ ...snapshot, headRefName: 'feat/issue-7-integration' }, 'ZWkang/nodebraid', []).status,
+  ).toBe('ready');
+});
+
 test('the same failed check requests one repair; a rerun or new head requests new work', () => {
   const failed = { ...snapshot, statusCheckRollup: [{ ...snapshot.statusCheckRollup[0], conclusion: 'FAILURE' }] };
   const first = evaluateFeedback(failed, 'ZWkang/nodebraid', []);

@@ -1,6 +1,6 @@
 # Issue and PR discussions
 
-Use this workflow when a task references an Issue, PR, review comment, or linked discussion. The [tracker configuration](issue-tracker.md) defines GitHub as the source for new specs, live tasks and conversations; parent Issues hold specs, while local specs remain historical evidence. This supplements the [local subscription workflow](../../.agents/workflows/local-agent.md), which owns scheduling, eligibility, existing authorization, full checks, durable receipts, and managed PR thread resolution. Final approval and merge remain with the user.
+Use this workflow when a task references an Issue, PR, review comment, or linked discussion. The [tracker configuration](issue-tracker.md) defines GitHub as the source for new specs, live tasks and conversations; parent Issues hold specs, while local specs remain historical evidence. This supplements the [local subscription workflow](../../.agents/workflows/local-agent.md), which owns scheduling, eligibility, existing authorization, full checks, durable receipts, and managed PR thread resolution. Human approval and merge remain the default; apply any explicit user merge/closure authorization only after the workflow's checks pass.
 
 ## Read the conversation at work boundaries
 
@@ -19,7 +19,7 @@ For each actionable item, identify whether it clarifies requirements, reports a 
 
 A suggestion is not automatically an accepted requirement. Use explicit agreements from the user or responsible maintainer, and preserve the source of each decision. Private chat authorization and its metadata stay in local workflow records; public Issues, PRs, comments and reports follow the [public writing rules](issue-tracker.md#public-issue-and-pr-writing) and record only the resulting functional scope, engineering decisions and verification evidence. For defects within approved scope, establish expected behavior from the approved contract and a reproduction without seeking repeated approval. If the body, spec, and comments disagree, expose the conflict and resolve the affected decision before implementing it; unrelated work can continue.
 
-Within the requested scope, carry confirmed decisions into the owning spec or ticket's acceptance criteria and relevant tests. Record architectural decisions in the existing ADR workflow when applicable. Preserve conversation history and link the updated artifact. When the current task is review-only, or a skill forbids editing a parent Issue, report the needed update instead of changing that source.
+Within the requested scope, carry confirmed decisions into the owning spec or ticket's acceptance criteria and relevant tests. Record architectural decisions in the existing ADR workflow when applicable. Preserve conversation history and link the updated artifact. When the current task is review-only, report the needed update instead of changing that source. A decomposition skill's parent edit restriction does not override separately authorized reconciliation and acceptance-based closure.
 
 ## Handle feedback and reply with evidence
 

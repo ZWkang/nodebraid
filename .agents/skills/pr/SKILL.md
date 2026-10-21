@@ -1,12 +1,12 @@
 ---
 name: pr
-description: "Use when writing a PR body."
+description: 'Use when writing a PR body.'
 metadata:
   credits:
     skill: show-me
     author: Dex Horthy
     organisation: Humanlayer
-    url: "https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md"
+    url: 'https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md'
 ---
 
 Use this template for writing the PR body:
@@ -15,6 +15,9 @@ Use this template for writing the PR body:
 ## Summary
 
 <diagram, diff-sketch, or tree>
+
+**Delivery:** <parent spec and approval link; source task; target branch>
+<For a stacked or follow-up integration PR: original PR/commit chain and remaining main integration.>
 
 ## Evidence
 
@@ -33,6 +36,12 @@ Use this template for writing the PR body:
 ```
 
 ## Sections
+
+Use `Fixes #N` only on the final delivery PR targeting main. A stacked PR links
+its task without claiming closure. Preserve the original PR/commit/task chain
+when an already merged feature-branch PR needs a follow-up integration PR.
+Parent spec titles use `spec: `. Retargeting an open PR requires a new prepared
+run, checks and both reviews even if its head SHA did not change.
 
 Skip all preambles and keep prose brief. Use the user's domain language from `GLOSSARY.md`.
 

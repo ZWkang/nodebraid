@@ -12,6 +12,7 @@ import {
 } from './local-agent-run';
 import { normalizeFeedback } from './github-feedback';
 import { planFrontier } from './discovery-queue';
+import { reconcileDelivery } from './local-agent-reconcile';
 
 const read = <T>(path: string): T => JSON.parse(readFileSync(path, 'utf8')) as T;
 const git = (...args: string[]) => execFileSync('git', args, { encoding: 'utf8' }).trim();
@@ -33,10 +34,14 @@ const snapshot = (base: string) => {
 const [mode, first, second, third] = process.argv.slice(2);
 if (!first)
   throw new Error(
-    'Usage: local-agent normalize raw.json published.json output.json | prepare input.json run-dir | inspect run-dir | frontier run-dir completed.json | verify run-dir reviews.json decisions.json | publication run-dir remote-commit.json | evaluate run-dir snapshot.json',
+    'Usage: local-agent reconcile source.json [output.json] | normalize raw.json published.json output.json | prepare input.json run-dir | inspect run-dir | frontier run-dir completed.json | verify run-dir reviews.json decisions.json | publication run-dir remote-commit.json | evaluate run-dir snapshot.json',
   );
 
-if (mode === 'normalize') {
+if (mode === 'reconcile') {
+  const result = reconcileDelivery(read(first));
+  if (second) save(second, result);
+  console.log(JSON.stringify(result));
+} else if (mode === 'normalize') {
   if (!second || !third)
     throw new Error('normalize requires raw GitHub context, published-feedback.json and output.json');
   const normalized = normalizeFeedback(read(first), read(second));
@@ -45,6 +50,7 @@ if (mode === 'normalize') {
 } else if (mode === 'prepare') {
   if (!second) throw new Error('prepare requires input.json and run-dir');
   const task = prepareRun(read(first));
+  if (!task.baseRefName?.trim()) throw new Error('prepare requires the current PR baseRefName.');
   const directory = resolve(second),
     path = join(directory, 'prepared-task.json');
   mkdirSync(directory, { recursive: true });
@@ -64,6 +70,7 @@ if (mode === 'normalize') {
     if (!second) throw new Error('frontier requires completed-step IDs JSON');
     console.log(JSON.stringify(planFrontier(task.plan, read(second))));
   } else if (mode === 'verify') {
+    if (!task.baseRefName?.trim()) throw new Error('Legacy run has no PR baseRefName; prepare a new run.');
     if (!second || !third) throw new Error('verify requires independent review reports and feedback decisions');
     if (git('branch', '--show-current') !== task.branch) throw new Error('Verification is on another branch.');
     git('merge-base', '--is-ancestor', task.base, 'HEAD');

@@ -20,6 +20,12 @@ Check with the user that these seams match their expectations.
 
 3. Before publishing, refresh the referenced discussion and incorporate any newly confirmed decisions. Write the spec using the template below, then publish it to the project issue tracker. Follow the tracker's approval and eligibility rules before applying `ready-for-agent`. If an unresolved point affects scope or acceptance criteria, record it explicitly and leave the spec as a draft without claiming it is ready for implementation.
 
+For NodeBraid, use `spec: ` as the parent issue title prefix. The title does not
+grant execution permission. Preserve the approval source, explicit local-only or
+paused execution choice, current owner and outstanding acceptance. Once delivery
+is authorized, reconcile existing children and invoke `to-tickets` for missing
+approved slices; a parent remains an aggregate and does not need `ready-for-agent`.
+
 <spec-template>
 
 ## Problem Statement

@@ -61,11 +61,40 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    trees and never reset, clean or force-push them. New task worktrees start at the
    fetched main. One integration owner performs writes; review subagents are read-only.
 2. Prioritize existing in-progress PRs and approved/confirmed issues. Search for
-   an existing fix before implementing an issue, and keep one PR per issue.
+   an existing fix before implementing an issue, and keep one active delivery PR
+   per issue. An already merged feature-branch PR can require a follow-up
+   `feat/issue-N-integration` PR; preserve the original issue/PR/commit chain.
    An issue is eligible only with `ready-for-agent` and `bug` or `approved-spec`,
    without `needs-info`/`needs-design`, and while still open. Normalize connected
    issue state to the uppercase shape before using `validateAgentIssue` from
    `scripts/prepare-agent-issue.ts`. A human's approved spec still defines scope.
+   Reconcile each approved parent against all native children, blockers, existing
+   PRs, current assignees/execution owners and remaining acceptance criteria.
+   Parent titles use `spec: `; title case does not establish eligibility.
+   Preserve explicit local-only execution, pauses, unapproved scope and another
+   active owner's work. Within existing delivery authorization, reuse existing
+   slices and autonomously publish missing approved slices with `to-tickets`.
+   Read back native relationships; missing links or unreadable pages are errors,
+   never an empty frontier or an excuse to recreate work.
+   Save independent source context and run `agents:run reconcile <source.json>
+[output.json]` after fetching main, using the input contract in
+   `docs/agents/agentic-workflows.md`. Resume its eligible frontier; repeat after
+   relationship changes, integration, acceptance or authorized closures.
+   A task's selected delivery PR whose merge commit is absent from fetched main is
+   `needs-integration`, even when GitHub already closed the source issue.
+   Keep it visible and reuse its implementation; do not report task completion.
+   Use the report's task `delivery`, acceptance and `integration` candidates
+   to choose recovery work. Historical PR ancestry remains visible but is not an
+   integration queue: when a follow-up delivery has reached main and the task is
+   accepted, do not integrate its old feature-branch merge again.
+   Close an implementation issue only after actual main integration and full
+   task acceptance. Close a parent only after every approved slice, native child
+   and parent acceptance criterion is complete. Publish the acceptance summary,
+   using actual verification/publication/current-head feedback results and real
+   external acceptance. Reconciliation only checks evidence references, not their
+   contents; a nonempty reference or `canClose` candidate is not proof of CI/review.
+   use existing user closure authorization, and read back the result. Without
+   authorization, leave it waiting for the user.
 3. Investigate untriaged issues using the full report, public contract and a real
    executable reproduction. Record base, command, expected/actual result and the
    acceptance criteria. Evidence-backed defects receive `bug` and `ready-for-agent`;
@@ -97,7 +126,8 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    reproduce a defect red, implement the smallest complete fix, then show green.
    New requirements, public contracts or ADR changes return to the user.
    Before implementation, call `bun run agents:run prepare <input.json> <run-dir>`.
-   It independently saves the approved source, expected remote base, request,
+   It independently saves the approved source, expected remote base, current PR
+   `baseRefName`, request,
    feedback and acceptance/dependency plan. `frontier <run-dir> <completed.json>`
    rejects cycles and unfinished blockers. Reopening an identical task resumes it;
    a changed task requires another run. Do not derive the prepared task from the
@@ -125,18 +155,21 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    Failures prevent a ready PR; never weaken assertions, change acceptance criteria,
    add fake success or silently degrade behavior to obtain green checks. Fixture
    runs in the test suite are execution-layer tests, not live AI repair acceptance.
-4. Use `feat/issue-N` and a `[local-agent] ` title to opt a PR into local maintenance.
+4. Use `feat/issue-N` (or the recovery `feat/issue-N-integration`) and a
+   `[local-agent] ` title to opt a PR into local maintenance.
    Legacy `[agent] ` issue PRs are also managed. Create a non-draft PR only after local
-   verification and review, with `Fixes #N` and the installed `pr`/`show-me` template:
+   verification and review, with the installed `pr`/`show-me` template:
    focused Summary, real Before/After Evidence, and Merge Danger. Publish the full
    reviews, declared behavior evidence and media through [PR evidence](../../docs/agents/pr-evidence.md).
    Keep detailed logs linked; the generated marker block preserves the author's body.
+   A final delivery PR to main uses `Fixes #N`; stacked PRs link the task and
+   remaining integration without claiming closure.
 5. Publish through authenticated GitHub tools or an already authenticated Git
    client. Compare the actual remote tree to the reviewed local tree. With GitHub
    Git-data tools, create the exact tree, verify its SHA, then create an append-only
    commit and update the intended branch with the expected remote head. A failed
    tree comparison or stale ref is an error. Never force, overwrite user edits,
-   substitute a replacement PR, or report a local commit as a successful push.
+   replace an existing open PR, or report a local commit as a successful push.
    Save the actual GitHub Git commit response and run
    `agents:run publication <run-dir> <remote-commit.json>` before moving the local
    branch to an API-generated SHA. It verifies tree and append-only parent against
@@ -150,7 +183,9 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    Until current-head GitHub checks and feedback pass, report it as waiting for CI
    or repair. Only then hand it to the user as ready for final review. A draft is
    an explicit opt-out; do not leave a newly managed PR in that state.
-   The user alone approves and merges. `Fixes` closes the issue only on merge.
+   Human review and merge remain the default. Perform a merge or issue closure
+   only within explicit user authorization and after the required evidence passes.
+   Never self-approve, dismiss reviews, bypass checks or enable auto-merge.
 
 ## Maintain the current PR head
 
@@ -168,11 +203,24 @@ status and workflow arrays match their reported totals; thread comments finish
 their cursors. Normalization includes resolved-thread replies and active human
 change requests, and binds job checks to actual current-head workflow identities.
 Use `evaluate <run-dir> <snapshot.json>` for readiness. A changed published head
-returns `waiting-verification`; never copy old tests/reviews onto its new SHA.
+or target branch returns `waiting-verification`; never reuse the old verification
+after retargeting, even at the same head. Legacy runs without `baseRefName`
+remain readable historical evidence but require a new prepared run for delivery.
 Do not replace context with empty feedback arrays to obtain ready.
 `evaluate` does not yet validate the presentation publication receipt. Its `ready`
 result still requires the report/media publication and current-head readback above;
 CI preview alone does not establish independent review or full-check completion.
+
+Stacked PRs keep the same feedback/CI maintenance while open. Passing them yields
+`needs-integration`, not main delivery readiness. Once the upstream PR's actual
+merge is contained in fetched main, retarget the open successor to main, prepare
+a new run and repeat verification/reviews. An already merged successor cannot
+be retargeted: open a follow-up integration PR using its actual code and preserve
+the original task, PR and merge commit links. Reconcile real Git ancestry again
+after integration; merge status on a feature branch never establishes completion.
+The follow-up may reuse the original implementation head without including the
+old feature-branch merge commit. Select the follow-up as the task's delivery and
+verify its acceptance; retain the old PR's ancestry result only as history.
 
 1. Investigate failing CI and every new/edited review or thread comment. Read the
    actual logs. Fix confirmed defects; classify other feedback with explicit

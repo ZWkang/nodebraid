@@ -28,6 +28,7 @@ test('a new green head cannot inherit the previous tree, reviews or test evidenc
     repository: 'ZWkang/nodebraid',
     source: { kind: 'issue', number: 10 },
     branch: 'feat/issue-10',
+    baseRefName: 'feat/issue-9',
     base: sha('a'),
     request: 'approved-scope',
     pending: [],
@@ -58,7 +59,21 @@ test('a new green head cannot inherit the previous tree, reviews or test evidenc
     localHead: sha('c'),
     parent: sha('a'),
   };
-  expect(evaluateVerifiedRun(task, verified, publication, snapshot).status).toBe('ready');
+  expect(evaluateVerifiedRun(task, verified, publication, { ...snapshot, baseRefName: 'feat/issue-9' }).status).toBe(
+    'needs-integration',
+  );
+  expect(evaluateVerifiedRun(task, verified, publication, snapshot).status).toBe('waiting-verification');
+  const { baseRefName: _, digest: __, ...legacyInput } = task;
+  const legacy = prepareRun(legacyInput);
+  expect(Object.hasOwn(legacy, 'baseRefName')).toBe(false);
+  expect(legacy.digest).toBe('bcda8468a65cc217787611b585e374580213e1125f96f0d30f14a1ee70f116ce');
+  const legacyResult = evaluateVerifiedRun(
+    legacy,
+    { ...verified, taskDigest: legacy.digest },
+    { ...publication, taskDigest: legacy.digest },
+    snapshot,
+  );
+  expect(legacyResult.status).toBe('waiting-verification');
   expect(() => validateVerification({ ...task, request: 'unprepared-request' }, verified)).toThrow(
     'independent prepared task',
   );
