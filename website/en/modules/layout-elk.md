@@ -37,7 +37,7 @@ Supported configuration:
 - `nodeSpacing`;
 - `layerSpacing`;
 - `padding`;
-- `randomSeed`.
+- `randomSeed`: accepts safe integers; omitted values and `0` use the fixed default seed `1`. Other nonzero safe integer seeds are unchanged.
 
 `incremental` mode and any Fixed Nodes require `stress`. With any other algorithm, the request fails explicitly with `UNSUPPORTED_FEATURE` instead of being ignored.
 

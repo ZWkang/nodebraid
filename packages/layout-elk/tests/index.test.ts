@@ -51,6 +51,53 @@ test('ELK computes deterministic top-left world positions for a full Layout Inpu
   });
 });
 
+for (const { algorithm, mode } of [
+  { algorithm: 'layered', mode: 'full' },
+  { algorithm: 'stress', mode: 'full' },
+  { algorithm: 'stress', mode: 'incremental' },
+] as const) {
+  test(`ELK ${algorithm} ${mode} treats seed zero as the fixed default seed`, async () => {
+    const kernel = createCanvasKernel();
+    const ids = Array.from({ length: 12 }, (_, index) => nodeId(`zero-seed-${index}`));
+    kernel.transact((transaction) => {
+      for (const [index, id] of ids.entries()) {
+        transaction.nodes.add({
+          id,
+          type: 'task',
+          position: mode === 'full' ? { x: 0, y: 0 } : { x: (index % 4) * 100, y: Math.floor(index / 4) * 80 },
+          size: { width: 40, height: 20 },
+          data: null,
+        });
+        for (const delta of [1, 4]) {
+          transaction.edges.add({
+            id: edgeId(`zero-seed-${index}-${delta}`),
+            type: 'flow',
+            source: { nodeId: id },
+            target: { nodeId: ids[(index + delta) % ids.length]! },
+            data: null,
+          });
+        }
+      }
+    });
+    const input = createLayoutInput(kernel.read(), { mode, fixedNodeIds: mode === 'incremental' ? [ids[0]!] : [] });
+    const context = { signal: new AbortController().signal };
+    const compute = (randomSeed: number) =>
+      elkLayoutEngine.compute(input, Object.freeze({ algorithm, randomSeed }), context);
+    const expected = await compute(1);
+
+    for (const seed of [0, -0, 0]) expect(await compute(seed)).toEqual(expected);
+  });
+}
+
+test('ELK rejects non-integer and unsafe seeds', async () => {
+  const input = createLayoutInput(createCanvasKernel().read(), { mode: 'full', fixedNodeIds: [] });
+  for (const randomSeed of [Number.NaN, Number.POSITIVE_INFINITY, 0.5, Number.MAX_SAFE_INTEGER + 1]) {
+    await expect(
+      elkLayoutEngine.compute(input, { randomSeed }, { signal: new AbortController().signal }),
+    ).rejects.toBeInstanceOf(RangeError);
+  }
+});
+
 registerFullLayoutProviderContract({
   name: 'ELK',
   engine: elkLayoutEngine,
