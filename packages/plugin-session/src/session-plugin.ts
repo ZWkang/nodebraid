@@ -88,8 +88,12 @@ export const sessionPlugin = definePlugin({
       },
       setSelection(selection: SelectionInput): void {
         assertActive();
-        validateSelectionInput(selection);
-        const nextSelection = createSelectionSnapshot(selection);
+        const captured =
+          typeof selection === 'object' && selection !== null
+            ? { nodeIds: captureSelectionValues(selection.nodeIds), edgeIds: captureSelectionValues(selection.edgeIds) }
+            : selection;
+        validateSelectionInput(captured);
+        const nextSelection = createSelectionSnapshot(captured);
         const view = context.services.kernel.read();
         const missingNodeIds = Object.freeze(nextSelection.nodeIds.filter((id) => !view.query.getNode(id)));
         const missingEdgeIds = Object.freeze(nextSelection.edgeIds.filter((id) => !view.query.getEdge(id)));
@@ -108,7 +112,11 @@ export const sessionPlugin = definePlugin({
       },
       setViewport(viewport: Viewport): void {
         assertActive();
-        const issues = collectViewportIssues(viewport);
+        const captured =
+          typeof viewport === 'object' && viewport !== null
+            ? { x: viewport.x, y: viewport.y, zoom: viewport.zoom }
+            : viewport;
+        const issues = collectViewportIssues(captured);
         if (issues.length > 0) {
           throw new SessionError(
             'INVALID_VIEWPORT',
@@ -118,9 +126,9 @@ export const sessionPlugin = definePlugin({
         }
         publishViewport(
           Object.freeze({
-            x: normalizeZero(viewport.x),
-            y: normalizeZero(viewport.y),
-            zoom: viewport.zoom,
+            x: normalizeZero(captured.x),
+            y: normalizeZero(captured.y),
+            zoom: captured.zoom,
           }),
         );
       },
@@ -150,6 +158,14 @@ type SessionTransition = (current: SessionSnapshot) => SessionSnapshot | null;
 interface SubscriptionRegistration {
   readonly listener: () => void;
   active: boolean;
+}
+
+function captureSelectionValues(value: unknown): unknown {
+  if (!Array.isArray(value)) return value;
+  const captured: unknown[] = [];
+  // Traverse owned indices lazily so allocation cannot hide an incoming read failure.
+  for (const index of Array.prototype.keys.call({ length: value.length })) captured.push(value[index]);
+  return captured;
 }
 
 function createSelectionSnapshot(selection: SelectionInput): SelectionSnapshot {
