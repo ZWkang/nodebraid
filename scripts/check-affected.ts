@@ -1,6 +1,6 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, join, relative, resolve } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { buildWorkspaces, readWorkspaces } from './build-workspaces';
 
 const args = process.argv.slice(2);
@@ -64,11 +64,8 @@ function workspaceImports(path: string, seen = new Set<string>()): string[] {
     .filter((item) => item.path.startsWith('@nodebraid/'))
     .map((item) => item.path.split('/').slice(0, 2).join('/'));
   for (const item of imports.filter((item) => item.path.startsWith('.'))) {
-    const target = resolve(dirname(path), item.path);
-    const file = [target, `${target}.ts`, `${target}.tsx`, join(target, 'index.ts')].find(
-      (candidate) => existsSync(candidate) && /\.[cm]?[jt]sx?$/.test(candidate),
-    );
-    if (file) names.push(...workspaceImports(file, seen));
+    const file = Bun.resolveSync(item.path, dirname(path));
+    if (/\.[cm]?[jt]sx?$/.test(file)) names.push(...workspaceImports(file, seen));
   }
   return [...new Set(names)];
 }
