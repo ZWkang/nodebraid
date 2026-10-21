@@ -17,7 +17,6 @@ import type {
   PluginInstallation,
 } from './plugin-contracts';
 import { PluginHostError } from './plugin-host-error';
-import { validateProvidedServices } from './provided-services';
 import { getServiceName, type BoundServices, type ServiceBindings, type ServiceTokenBase } from './service-token';
 
 export class CordisPluginInstallation implements PluginInstallation {
@@ -120,18 +119,14 @@ export class CordisPluginInstallation implements PluginInstallation {
 
     let providedServices: BoundServices<ServiceBindings>;
     try {
-      providedServices = validateProvidedServices(
-        this.definition.name,
-        this.definition.provides ?? {},
-        await activation.run(context),
-      );
+      providedServices = await activation.run(context);
     } catch (error) {
       // An aborted signal alone does not make an arbitrary business failure a
       // cancellation. Only an explicit abort error may return to pending.
       if (
         activation.controller.signal.aborted &&
-        isCancellationError(error, activation.controller.signal) &&
-        (this.#disposeRequested || this.getMissing().length > 0)
+        (this.#disposeRequested || this.getMissing().length > 0) &&
+        isCancellationError(error, activation.controller.signal)
       ) {
         try {
           await activation.dispose(this.#disposeRequested ? 'installation-disposed' : 'dependency-lost');
