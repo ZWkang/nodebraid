@@ -9,6 +9,7 @@ import {
   type PluginDefinition,
   type PluginInstallation,
   PluginHostError,
+  runtimeDiagnosticEvents,
   type ServiceToken,
 } from '../src';
 
@@ -2057,6 +2058,103 @@ describe('@nodebraid/runtime-cordis', () => {
     await firstDispose;
     expect(disposeCount).toBe(1);
     expect(installation.dispose()).toBe(firstDispose);
+  });
+
+  for (const target of ['installation', 'host'] as const) {
+    for (const failCleanup of [false, true]) {
+      test(`keeps ${target} disposal idempotent during abort reentry with ${failCleanup ? 'failed' : 'successful'} cleanup`, async () => {
+        const cleanupError = new Error('owned resource cleanup failed');
+        const events: string[] = [];
+        const host = createPluginHost({
+          diagnostics: {
+            sink: (event) => {
+              events.push(event.name);
+            },
+          },
+        });
+        let installation!: PluginInstallation;
+        let reentrant: Promise<void> | undefined;
+        let setupSignal!: AbortSignal;
+        let cleanupCount = 0;
+        let disposedCount = 0;
+        installation = host.install(
+          definePlugin({
+            setup(context) {
+              setupSignal = context.signal;
+              context.signal.addEventListener(
+                'abort',
+                () => {
+                  reentrant = target === 'installation' ? installation.dispose() : host.dispose();
+                },
+                { once: true },
+              );
+              context.own(() => {
+                cleanupCount++;
+                if (failCleanup) throw cleanupError;
+              });
+            },
+          }),
+        );
+        installation.subscribe(() => {
+          if (installation.getSnapshot().status === 'disposed') disposedCount++;
+        });
+        await installation.whenActive();
+
+        const disposal = target === 'installation' ? installation.dispose() : host.dispose();
+        const abortedImmediately = setupSignal.aborted;
+        const [outerResult, innerResult] = await Promise.all([
+          disposal.catch((error: unknown) => error),
+          reentrant?.catch((error: unknown) => error),
+        ]);
+
+        expect(reentrant).toBe(disposal);
+        expect(abortedImmediately).toBe(true);
+        expect(innerResult).toBe(outerResult);
+        if (failCleanup) {
+          expect(outerResult).toBeInstanceOf(AggregateError);
+          expect(collectAggregateLeaves(outerResult)).toEqual([cleanupError]);
+        } else {
+          expect(outerResult).toBeUndefined();
+        }
+        expect(cleanupCount).toBe(1);
+        expect(disposedCount).toBe(1);
+        expect(installation.getSnapshot()).toEqual({ status: 'disposed' });
+        expect(target === 'installation' ? installation.dispose() : host.dispose()).toBe(disposal);
+        if (target === 'host') {
+          expect(events.filter((name) => name === runtimeDiagnosticEvents.hostDisposing)).toHaveLength(1);
+          expect(events.filter((name) => name === runtimeDiagnosticEvents.hostDisposed)).toHaveLength(
+            failCleanup ? 0 : 1,
+          );
+        } else {
+          await host.dispose();
+        }
+      });
+    }
+  }
+
+  test('keeps Host disposal idempotent during Diagnostic Sink reentry', async () => {
+    const events: string[] = [];
+    let reentered = false;
+    let reentrant: Promise<void> | undefined;
+    const host = createPluginHost({
+      diagnostics: {
+        sink(event) {
+          events.push(event.name);
+          if (event.name === runtimeDiagnosticEvents.hostDisposing && !reentered) {
+            reentered = true;
+            reentrant = host.dispose();
+          }
+        },
+      },
+    });
+
+    const disposal = host.dispose();
+    await Promise.all([disposal, reentrant]);
+
+    expect(reentrant).toBe(disposal);
+    expect(events.filter((name) => name === runtimeDiagnosticEvents.hostDisposing)).toHaveLength(1);
+    expect(events.filter((name) => name === runtimeDiagnosticEvents.hostDisposed)).toHaveLength(1);
+    expect(host.dispose()).toBe(disposal);
   });
 
   test('aborts pending setup and waits for it before becoming disposed', async () => {
