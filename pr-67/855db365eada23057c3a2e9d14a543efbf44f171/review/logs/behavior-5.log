@@ -1,0 +1,2 @@
+$ bun run scripts/check-agent-workflows.ts
+Local agent workflow sources verified; no hosted API workflow is active in this checkout.

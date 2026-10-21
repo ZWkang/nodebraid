@@ -1,0 +1,49 @@
+bun test v1.4.2 (744846f84)
+
+tests/check-affected.test.ts:
+(pass) root tests follow an extensionless side-effect import into fixture.ts without executing it [208.33ms]
+(pass) root tests follow an extensionless side-effect import into fixture.tsx without executing it [247.53ms]
+166 |       'fixture import',
+167 |     );
+168 |     f.write('packages/value/src/index.ts', 'export const value = 2;\n');
+169 |     const result = f.invoke('--plan');
+170 |     expect(result.status).toBe(0);
+171 |     expect(JSON.parse(result.stdout).tests).toEqual(['tests/consumer.test.ts']);
+                                                  ^
+error: expect(received).toEqual(expected)
+
+- [
+-   "tests/consumer.test.ts",
+- ]
++ []
+
+- Expected  - 3
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/tests/check-affected.test.ts:171:45)
+(fail) root tests follow an extensionless side-effect import into fixture.js without executing it [227.93ms]
+166 |       'fixture import',
+167 |     );
+168 |     f.write('packages/value/src/index.ts', 'export const value = 2;\n');
+169 |     const result = f.invoke('--plan');
+170 |     expect(result.status).toBe(0);
+171 |     expect(JSON.parse(result.stdout).tests).toEqual(['tests/consumer.test.ts']);
+                                                  ^
+error: expect(received).toEqual(expected)
+
+- [
+-   "tests/consumer.test.ts",
+- ]
++ []
+
+- Expected  - 3
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/tests/check-affected.test.ts:171:45)
+(fail) root tests follow an extensionless side-effect import into fixture/index.js without executing it [196.43ms]
+
+ 2 pass
+ 6 filtered out
+ 2 fail
+ 8 expect() calls
+Ran 4 tests across 1 file. [909.00ms]

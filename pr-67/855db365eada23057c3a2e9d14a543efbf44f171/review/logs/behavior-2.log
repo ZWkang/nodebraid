@@ -1,0 +1,19 @@
+{"sourceHead":"374c3bafcd4bbd95a25206084b4471195c36167a","baseline":0,"plan":{"mode":"affected","files":["packages/value/src/index.ts"],"packages":["@nodebraid/value"],"tests":[],"browser":[],"docs":false,"shared":[]},"affected":0,"directRootContract":1,"nativeResolved":"/Users/zhou/.codex/local-workflows/nodebraid/runs/20261021T124304-discovery/root-js-fixture/tests/fixture.js"}
+40 | const observed = { sourceHead: git('-C', source, 'rev-parse', 'HEAD'), baseline: baseline.status, plan: JSON.parse(plan.stdout), affected: affected.status, directRootContract: contract.status, nativeResolved: Bun.resolveSync('./fixture', join(root, 'tests')) };
+41 | writeFileSync(join(evidence, 'js-fixture-observed.json'), JSON.stringify(observed, null, 2) + '\n');
+42 | console.log(JSON.stringify(observed));
+43 | assert.equal(affected.status, 0, affected.stderr);
+44 | assert.equal(contract.status, 1, contract.stderr);
+45 | assert.notEqual(affected.status, 0, 'Affected checks must include the real failing root contract through its JavaScript fixture');
+            ^
+AssertionError: Affected checks must include the real failing root contract through its JavaScript fixture
+ generatedMessage: false,
+     actual: 0,
+   expected: 0,
+   operator: "notStrictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261021T124304-discovery/fixture-resolution-probe.ts:45:8
+
+Bun v1.4.2 (macOS arm64)

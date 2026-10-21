@@ -1,0 +1,25 @@
+bun test v1.4.2 (744846f84)
+
+tests/check-affected.test.ts:
+(pass) development plan follows production and test consumers without selecting unrelated suites [154.53ms]
+(pass) branch comparison includes commits, staged changes, untracked files and both sides of renames [308.22ms]
+(pass) shared changes explicitly select full checks and preserve the real command failure [222.28ms]
+(pass) a clean checkout selects no development checks and website changes select documentation [225.43ms]
+(pass) root tests follow an extensionless side-effect import into fixture.ts without executing it [202.93ms]
+(pass) root tests follow an extensionless side-effect import into fixture.tsx without executing it [182.84ms]
+(pass) root tests follow an extensionless side-effect import into fixture.js without executing it [183.89ms]
+(pass) root tests follow an extensionless side-effect import into fixture/index.js without executing it [174.34ms]
+(pass) planning exposes a missing local fixture as a native resolution error [134.07ms]
+(pass) root test selection ignores package names and import statements inside fixture strings [202.71ms]
+(pass) affected execution runs every selected layer once and stops on a real selected failure [1224.18ms]
+
+tests/build-workspaces.test.ts:
+(pass) one invocation builds a shared dependency once before its consumers and a later invocation rebuilds it [199.80ms]
+(pass) dependency modes prepare production and test dependencies without building the selected workspace [137.06ms]
+(pass) a real build failure stops its consumers and is returned as a failing command [35.92ms]
+(pass) a dependency cycle fails with the workspace path instead of recursing until stack overflow [15.49ms]
+
+ 15 pass
+ 0 fail
+ 51 expect() calls
+Ran 15 tests across 2 files. [3.62s]
