@@ -115,20 +115,22 @@ export function createPortRuntime(diagnostics: PluginDiagnostics): {
 }
 
 function acceptContribution(value: PortContribution): PortContribution {
-  if (
-    typeof value !== 'object' ||
-    value === null ||
-    typeof value.id !== 'string' ||
-    value.id.length === 0 ||
-    typeof value.definePorts !== 'function'
-  ) {
+  if (typeof value !== 'object' || value === null) {
+    throw new PortError('INVALID_CONTRIBUTION', 'Port Contribution is malformed.');
+  }
+  const id = value.id;
+  if (typeof id !== 'string' || id.length === 0) {
+    throw new PortError('INVALID_CONTRIBUTION', 'Port Contribution is malformed.');
+  }
+  const definePorts = value.definePorts;
+  if (typeof definePorts !== 'function') {
     throw new PortError('INVALID_CONTRIBUTION', 'Port Contribution is malformed.');
   }
   for (const key of Reflect.ownKeys(value)) {
     if (key === 'id' || key === 'definePorts') continue;
     throw new PortError('INVALID_CONTRIBUTION', 'Port Contribution contains an unknown field.');
   }
-  return Object.freeze({ id: value.id, definePorts: value.definePorts });
+  return Object.freeze({ id, definePorts });
 }
 
 function resolveNodePorts(node: CanvasNode, contributions: readonly PortContribution[]): readonly PortDefinition[] {
@@ -155,13 +157,15 @@ function resolveNodePorts(node: CanvasNode, contributions: readonly PortContribu
 }
 
 function acceptPortDefinition(value: unknown, contributionId: string): PortDefinition {
-  if (
-    typeof value !== 'object' ||
-    value === null ||
-    typeof Reflect.get(value, 'id') !== 'string' ||
-    (Reflect.get(value, 'id') as string).length === 0 ||
-    (Reflect.get(value, 'role') !== 'source' && Reflect.get(value, 'role') !== 'target')
-  ) {
+  if (typeof value !== 'object' || value === null) {
+    throw new PortError('INVALID_PORT_DEFINITION', 'Port Definition is malformed.', { contributionId });
+  }
+  const id = Reflect.get(value, 'id');
+  if (typeof id !== 'string' || id.length === 0) {
+    throw new PortError('INVALID_PORT_DEFINITION', 'Port Definition is malformed.', { contributionId });
+  }
+  const role = Reflect.get(value, 'role');
+  if (role !== 'source' && role !== 'target') {
     throw new PortError('INVALID_PORT_DEFINITION', 'Port Definition is malformed.', { contributionId });
   }
   for (const key of Reflect.ownKeys(value)) {
@@ -170,10 +174,7 @@ function acceptPortDefinition(value: unknown, contributionId: string): PortDefin
       contributionId,
     });
   }
-  return Object.freeze({
-    id: Reflect.get(value, 'id') as string,
-    role: Reflect.get(value, 'role') as PortDefinition['role'],
-  });
+  return Object.freeze({ id, role });
 }
 
 function isCanvasSnapshot(value: CanvasSnapshot): boolean {
