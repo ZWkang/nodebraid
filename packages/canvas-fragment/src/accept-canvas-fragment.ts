@@ -2,20 +2,21 @@ import type { CanvasEdge, CanvasNode, EdgeEndpoint, EdgeId, NodeId } from '@node
 
 import { CanvasFragmentError } from './canvas-fragment-error';
 import type { CanvasFragment } from './contracts';
+import { mapArrayValues } from './map-array-values';
 
 export function acceptCanvasFragment(value: unknown): CanvasFragment {
   const record = requireRecord(value, ['type', 'nodes', 'edges', 'selection']);
   if (read(record, 'type') !== 'nodebraid.canvas-fragment') throwInvalid('Canvas Fragment type is invalid.');
   const rawNodes = requireArray(read(record, 'nodes'), 'Canvas Fragment nodes must be an array.');
   if (rawNodes.length === 0) throwInvalid('Canvas Fragment must contain at least one Node.');
-  const nodes = rawNodes.map(acceptNode).sort((left, right) => compareIds(left.id, right.id));
+  const nodes = mapArrayValues(rawNodes, acceptNode).sort((left, right) => compareIds(left.id, right.id));
   const nodeIds = new Set<NodeId>();
   for (const node of nodes) {
     if (nodeIds.has(node.id)) throwInvalid('Canvas Fragment Node IDs must be unique.');
     nodeIds.add(node.id);
   }
   const rawEdges = requireArray(read(record, 'edges'), 'Canvas Fragment edges must be an array.');
-  const edges = rawEdges.map(acceptEdge).sort((left, right) => compareIds(left.id, right.id));
+  const edges = mapArrayValues(rawEdges, acceptEdge).sort((left, right) => compareIds(left.id, right.id));
   const edgeIds = new Set<EdgeId>();
   for (const edge of edges) {
     if (edgeIds.has(edge.id)) throwInvalid('Canvas Fragment Edge IDs must be unique.');
@@ -114,7 +115,7 @@ function acceptPoint(value: unknown): Readonly<{ x: number; y: number }> {
 
 function acceptIds(value: unknown, entity: string): string[] {
   const values = requireArray(value, `Canvas Fragment Selection ${entity} IDs must be an array.`);
-  const ids = values.map((id) => requireId(id, `Selection ${entity}`));
+  const ids = mapArrayValues(values, (id) => requireId(id, `Selection ${entity}`));
   if (new Set(ids).size !== ids.length) throwInvalid(`Canvas Fragment Selection ${entity} IDs must be unique.`);
   return ids.sort(compareIds);
 }
