@@ -63,6 +63,7 @@ try {
     controls: [
       'Undo',
       'Redo',
+      'Auto layout',
       'Zoom in',
       'Zoom out',
       'Fit view',
@@ -106,12 +107,68 @@ try {
     firstControl: '撤销',
     lang: 'zh',
   });
+  assert.equal(await evaluateBrowserScenario(`document.querySelector('[aria-label="自动布局"]') !== null`), true);
   await runAgentBrowser(['click', '[aria-label="Switch to English"]']);
   assert.deepEqual(await waitForPageCopy({ heading: 'Basic SVG Canvas', firstControl: 'Undo', lang: 'en' }), {
     heading: 'Basic SVG Canvas',
     firstControl: 'Undo',
     lang: 'en',
   });
+
+  await runAgentBrowser(['click', '[data-nodebraid-node-id="example-discover"]']);
+  await runAgentBrowser(['click', '[aria-label="Zoom out"]']);
+  await waitForMetrics({ revision: '1', selection: 'example-discover', zoom: '0.83×' });
+  const beforeLayout = await readLayoutState();
+  assert.ok(beforeLayout.transform, 'Expected the public SVG Viewport transform.');
+  assert.deepEqual(beforeLayout.positions, {
+    'example-compose': { x: 360, y: 260 },
+    'example-discover': { x: 80, y: 100 },
+    'example-ship': { x: 660, y: 120 },
+  });
+  await runAgentBrowser(['click', '[aria-label="Auto layout"]']);
+  await waitForMetrics({ revision: '2', nodes: '3', edges: '1', selection: 'example-discover', zoom: '0.83×' });
+  const afterLayout = await readLayoutState();
+  assert.notDeepEqual(afterLayout.positions, beforeLayout.positions);
+  assert.deepEqual(Object.keys(afterLayout.positions), Object.keys(beforeLayout.positions));
+  assert.ok(afterLayout.positions['example-compose']!.x > afterLayout.positions['example-discover']!.x);
+  assert.equal(afterLayout.transform, beforeLayout.transform);
+  assert.deepEqual(afterLayout.edgeIds, beforeLayout.edgeIds);
+  await assertEdgeAtPorts('example-initial-edge', 'example-discover', 'example-compose');
+
+  await runAgentBrowser(['click', '[aria-label="Auto layout"]']);
+  await waitForMetrics({ revision: '2', history: 'Undo / —' });
+  assert.deepEqual(await readLayoutState(), afterLayout);
+  await runAgentBrowser(['click', '[aria-label="Undo"]']);
+  await waitForMetrics({ revision: '3', selection: 'example-discover', zoom: '0.83×' });
+  assert.deepEqual(await readLayoutState(), beforeLayout);
+  await assertEdgeAtPorts('example-initial-edge', 'example-discover', 'example-compose');
+  await runAgentBrowser(['click', '[aria-label="Redo"]']);
+  await waitForMetrics({ revision: '4', selection: 'example-discover', zoom: '0.83×' });
+  assert.deepEqual(await readLayoutState(), afterLayout);
+  await assertEdgeAtPorts('example-initial-edge', 'example-discover', 'example-compose');
+
+  await evaluateBrowserScenario(`new Promise((resolve) => {
+    document.querySelector('.canvas-frame')?.scrollIntoView({ block: 'start' });
+    requestAnimationFrame(() => resolve(true));
+  })`);
+  const movedSourcePort = await readElementCenter(
+    '[data-nodebraid-port-node-id="example-compose"][data-nodebraid-port-id="output"]',
+  );
+  const movedTargetPort = await readElementCenter(
+    '[data-nodebraid-port-node-id="example-ship"][data-nodebraid-port-id="input"]',
+  );
+  await dispatchMouseDown(movedSourcePort.x, movedSourcePort.y);
+  await dispatchMouseMove(movedTargetPort.x, movedTargetPort.y);
+  await dispatchMouseUp(movedTargetPort.x, movedTargetPort.y);
+  await waitForMetrics({ revision: '5', nodes: '3', edges: '2' });
+  assert.deepEqual((await readLayoutState()).positions, afterLayout.positions);
+  await assertEdgeAtPorts('example-edge-1', 'example-compose', 'example-ship');
+  await evaluateBrowserScenario(`new Promise((resolve) => {
+    window.scrollTo(0, 0);
+    requestAnimationFrame(() => resolve(true));
+  })`);
+  await runAgentBrowser(['click', '[aria-label="Reset example"]']);
+  await waitForMetrics({ revision: '1', nodes: '3', edges: '1', selection: 'None', zoom: '1.00×' });
 
   await runAgentBrowser(['click', '[aria-label="Zoom in"]']);
   assert.deepEqual(await waitForMetrics({ zoom: '1.20×' }), { zoom: '1.20×' });
@@ -457,6 +514,47 @@ try {
 } finally {
   await runAgentBrowser(['close']);
   await server.stop(true);
+}
+
+async function readLayoutState(): Promise<
+  Readonly<{
+    positions: Readonly<Record<string, Readonly<{ x: number; y: number }>>>;
+    transform: string | null;
+    edgeIds: readonly string[];
+  }>
+> {
+  return evaluateBrowserScenario(`({
+    positions: Object.fromEntries(Array.from(document.querySelectorAll('[data-nodebraid-node-id]'), (node) => [
+      node.getAttribute('data-nodebraid-node-id'),
+      { x: Number(node.getAttribute('x')), y: Number(node.getAttribute('y')) },
+    ])),
+    transform: document.querySelector('[data-nodebraid-renderer-svg-root]')?.getAttribute('transform') ?? null,
+    edgeIds: Array.from(document.querySelectorAll('[data-nodebraid-edge-id]'), (edge) =>
+      edge.getAttribute('data-nodebraid-edge-id')),
+  })`);
+}
+
+async function assertEdgeAtPorts(edgeId: string, sourceNodeId: string, targetNodeId: string): Promise<void> {
+  const points = await evaluateBrowserScenario<{ edge: readonly number[]; ports: readonly number[] }>(`(() => {
+    const read = (selector, attributes) => {
+      const element = document.querySelector(selector);
+      if (!element) throw new Error('Missing connection projection: ' + selector);
+      return attributes.map((attribute) => {
+        const value = element.getAttribute(attribute);
+        if (value === null) throw new Error('Missing connection attribute: ' + attribute);
+        return Number(value);
+      });
+    };
+    return {
+      edge: read(${JSON.stringify(`[data-nodebraid-edge-id="${edgeId}"]`)}, ['x1', 'y1', 'x2', 'y2']),
+      ports: [
+        ...read(${JSON.stringify(`[data-nodebraid-port-node-id="${sourceNodeId}"][data-nodebraid-port-id="output"]`)}, ['cx', 'cy']),
+        ...read(${JSON.stringify(`[data-nodebraid-port-node-id="${targetNodeId}"][data-nodebraid-port-id="input"]`)}, ['cx', 'cy']),
+      ],
+    };
+  })()`);
+  assert.ok([...points.edge, ...points.ports].every(Number.isFinite));
+  assert.deepEqual(points.edge, points.ports);
 }
 
 async function readElementCenter(selector: string): Promise<Readonly<{ x: number; y: number }>> {

@@ -26,6 +26,7 @@
         "@fontsource-variable/geist": "^5.3.0",
         "@nodebraid/adapter-react": "workspace:*",
         "@nodebraid/core": "workspace:*",
+        "@nodebraid/layout-dagre": "workspace:*",
         "@nodebraid/renderer-svg": "workspace:*",
         "@tanstack/react-router": "^1.170.32",
         "class-variance-authority": "^0.7.1",

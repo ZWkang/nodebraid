@@ -5,8 +5,10 @@ import {
   createClipboardShortcutPlugin,
   createDuplicateSelectionPlugin,
   createDuplicateSelectionShortcutPlugin,
+  createLayoutPlugin,
   createPluginHost,
   createPortContributionPlugin,
+  defineCommand,
   definePlugin,
   edgeId,
   historyService,
@@ -18,11 +20,18 @@ import {
   type CommandService,
   type HistoryService,
   type KernelService,
+  type LayoutCommandInput,
+  type LayoutCommandResult,
   type SessionService,
 } from '@nodebraid/core';
+import { dagreLayoutEngine, type DagreLayoutConfig } from '@nodebraid/layout-dagre';
 import { createSvgRenderer } from '@nodebraid/renderer-svg';
 
 import { createNavigatorClipboardTransport, exampleCanvasFragmentTextCodec } from './clipboard-adapters';
+
+export const exampleLayoutCommand = defineCommand<LayoutCommandInput<DagreLayoutConfig>, LayoutCommandResult>(
+  'nodebraid.examples.layout.dagre',
+);
 
 export interface ClipboardFailureSnapshot {
   readonly code: ClipboardErrorCode;
@@ -150,6 +159,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
   });
   const stepPorts = host.install(stepPortsPlugin);
   const composition = host.install(basicCanvasPlugin, { target, connectionAnchorHitTolerance: 12 });
+  const layout = host.install(createLayoutPlugin({ engine: dagreLayoutEngine, command: exampleLayoutCommand }));
   const duplicateSelection = host.install(duplicateSelectionPlugin);
   const duplicateSelectionShortcut = host.install(duplicateSelectionShortcutPlugin);
   const clipboard = host.install(clipboardPlugin);
@@ -159,6 +169,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
   try {
     await Promise.all([
       composition.whenActive(),
+      layout.whenActive(),
       stepPorts.whenActive(),
       duplicateSelection.whenActive(),
       duplicateSelectionShortcut.whenActive(),
