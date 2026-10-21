@@ -41,39 +41,56 @@ function acceptOptions(options: CreateClipboardPluginOptions): Readonly<Required
       throw new ClipboardError('INVALID_CONFIG', 'Clipboard options contain an unknown field.');
     }
   }
-  if (
-    typeof options.transport !== 'object' ||
-    options.transport === null ||
-    typeof options.transport.readText !== 'function' ||
-    typeof options.transport.writeText !== 'function'
-  ) {
+  const transport = options.transport;
+  if (typeof transport !== 'object' || transport === null) {
     throw new ClipboardError('INVALID_CONFIG', 'Clipboard transport is malformed.');
   }
-  if (
-    typeof options.codec !== 'object' ||
-    options.codec === null ||
-    typeof options.codec.encode !== 'function' ||
-    typeof options.codec.decode !== 'function'
-  ) {
+  const readText = transport.readText;
+  if (typeof readText !== 'function') {
+    throw new ClipboardError('INVALID_CONFIG', 'Clipboard transport is malformed.');
+  }
+  const writeText = transport.writeText;
+  if (typeof writeText !== 'function') {
+    throw new ClipboardError('INVALID_CONFIG', 'Clipboard transport is malformed.');
+  }
+  const codec = options.codec;
+  if (typeof codec !== 'object' || codec === null) {
     throw new ClipboardError('INVALID_CONFIG', 'Clipboard codec is malformed.');
   }
-  if (typeof options.materializeIds !== 'function') {
+  const encode = codec.encode;
+  if (typeof encode !== 'function') {
+    throw new ClipboardError('INVALID_CONFIG', 'Clipboard codec is malformed.');
+  }
+  const decode = codec.decode;
+  if (typeof decode !== 'function') {
+    throw new ClipboardError('INVALID_CONFIG', 'Clipboard codec is malformed.');
+  }
+  const materializeIds = options.materializeIds;
+  if (typeof materializeIds !== 'function') {
     throw new ClipboardError('INVALID_CONFIG', 'Clipboard materializeIds must be a function.');
   }
   const offset = options.offset ?? { x: 24, y: 24 };
-  if (typeof offset !== 'object' || offset === null || !Number.isFinite(offset.x) || !Number.isFinite(offset.y)) {
+  if (typeof offset !== 'object' || offset === null) {
+    throw new ClipboardError('INVALID_CONFIG', 'Clipboard offset must be a finite Point.');
+  }
+  const x = offset.x;
+  if (!Number.isFinite(x)) {
+    throw new ClipboardError('INVALID_CONFIG', 'Clipboard offset must be a finite Point.');
+  }
+  const y = offset.y;
+  if (!Number.isFinite(y)) {
     throw new ClipboardError('INVALID_CONFIG', 'Clipboard offset must be a finite Point.');
   }
   return Object.freeze({
     transport: Object.freeze({
-      readText: options.transport.readText.bind(options.transport),
-      writeText: options.transport.writeText.bind(options.transport),
+      readText: readText.bind(transport),
+      writeText: writeText.bind(transport),
     }),
     codec: Object.freeze({
-      encode: options.codec.encode.bind(options.codec),
-      decode: options.codec.decode.bind(options.codec),
+      encode: encode.bind(codec),
+      decode: decode.bind(codec),
     }),
-    materializeIds: options.materializeIds,
-    offset: Object.freeze({ x: offset.x, y: offset.y }),
+    materializeIds,
+    offset: Object.freeze({ x, y }),
   });
 }
