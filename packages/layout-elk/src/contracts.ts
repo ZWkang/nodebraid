@@ -7,5 +7,6 @@ export interface ElkLayoutConfig {
   readonly nodeSpacing?: number;
   readonly layerSpacing?: number;
   readonly padding?: number;
+  /** Safe integer seed; omitted values and zero use the fixed default seed 1. */
   readonly randomSeed?: number;
 }

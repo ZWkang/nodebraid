@@ -36,5 +36,6 @@ export function resolveElkLayoutConfig(config: ElkLayoutConfig): EffectiveElkLay
   if (!Number.isSafeInteger(effective.randomSeed)) {
     throw new RangeError('ELK randomSeed must be a safe integer.');
   }
+  if (effective.randomSeed === 0) effective.randomSeed = 1;
   return Object.freeze(effective);
 }

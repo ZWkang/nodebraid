@@ -37,7 +37,7 @@ description: 基于 ELK 的 full Layout Provider，并通过 Stress 支持 incre
 - `nodeSpacing`；
 - `layerSpacing`；
 - `padding`；
-- `randomSeed`。
+- `randomSeed`：接受 safe integer；省略或设为 `0` 时使用固定默认种子 `1`，其他非零 safe integer 保持原值。
 
 `incremental` mode 和任何 Fixed Node 都要求 `stress`。使用其他 algorithm 时会以 `UNSUPPORTED_FEATURE` 明确失败，而不是忽略请求。
 
