@@ -1,0 +1,38 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-duplicate-selection/tests/mapping-input.test.ts:
+(pass) Duplicate rejects actual invalid nodes mappings instead of custom map output [7.84ms]
+(pass) Duplicate rejects actual invalid edges mappings instead of custom map output [1.61ms]
+47 |   const input = mappings(), initial = input[field];
+48 |   let reads = 0;
+49 |   Object.defineProperty(input, field, { get() { return ++reads === 1 ? initial : []; } });
+50 |   const h = await harness(() => input);
+51 |   try {
+52 |     await expect(h.commands.execute(duplicateSelectionCommand, undefined)).resolves.toMatchObject({ changeSet: { revision: 2 } });
+                                                                                         ^
+error: expect(received).resolves.toMatchObject(expected)
+
+Expected promise that resolves
+Received promise that rejected: Promise { <rejected> }
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-74-duplicate-mappings/cflow/packages/plugin-duplicate-selection/tests/mapping-input.test.ts:52:85)
+(fail) Duplicate retains the nodes collection accepted before translation [2.39ms]
+47 |   const input = mappings(), initial = input[field];
+48 |   let reads = 0;
+49 |   Object.defineProperty(input, field, { get() { return ++reads === 1 ? initial : []; } });
+50 |   const h = await harness(() => input);
+51 |   try {
+52 |     await expect(h.commands.execute(duplicateSelectionCommand, undefined)).resolves.toMatchObject({ changeSet: { revision: 2 } });
+                                                                                         ^
+error: expect(received).resolves.toMatchObject(expected)
+
+Expected promise that resolves
+Received promise that rejected: Promise { <rejected> }
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-74-duplicate-mappings/cflow/packages/plugin-duplicate-selection/tests/mapping-input.test.ts:52:85)
+(fail) Duplicate retains the edges collection accepted before translation [1.27ms]
+
+ 2 pass
+ 2 fail
+ 8 expect() calls
+Ran 4 tests across 1 file. [36.00ms]

@@ -1,0 +1,14 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-duplicate-selection/tests/mapping-input.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+error: Cannot find module '@nodebraid/plugin-command' from '/Users/zhou/.codex/worktrees/issue-74-duplicate-mappings/cflow/packages/plugin-duplicate-selection/tests/mapping-input.test.ts'
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [15.00ms]

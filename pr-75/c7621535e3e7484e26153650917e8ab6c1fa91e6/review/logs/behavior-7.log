@@ -1,0 +1,324 @@
+$ bun run scripts/check-affected.ts --base "99ed305515afaec32ef49494b509446ad9ba998c"
+{
+  "mode": "affected",
+  "files": [
+    "packages/plugin-duplicate-selection/src/duplicate-selection-command.ts",
+    "packages/plugin-duplicate-selection/tests/mapping-input.test.ts"
+  ],
+  "packages": [
+    "@nodebraid/core",
+    "@nodebraid/examples",
+    "@nodebraid/plugin-clipboard",
+    "@nodebraid/plugin-duplicate-selection"
+  ],
+  "tests": [
+    "tests/layout-providers.test.ts"
+  ],
+  "browser": [
+    "@nodebraid/examples"
+  ],
+  "docs": true,
+  "shared": []
+}
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install prettier --check --ignore-unknown packages/plugin-duplicate-selection/src/duplicate-selection-command.ts packages/plugin-duplicate-selection/tests/mapping-input.test.ts
+Checking formatting...
+All matched files use Prettier code style!
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install oxlint packages/plugin-duplicate-selection/src/duplicate-selection-command.ts packages/plugin-duplicate-selection/tests/mapping-input.test.ts
+[build] @nodebraid/diagnostics
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/kernel
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/canvas-fragment
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/port-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/session-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/interaction-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-api
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/runtime-cordis
+$ tsgo -p tsconfig.build.json
+[build] @nodebraid/plugin-command
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-kernel
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-port
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-session
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-renderer
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-interaction
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-clipboard
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-duplicate-selection
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-history
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-layout
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/preset-basic
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/core
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/adapter-react
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-dagre
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-svg
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/examples
+$ vite build
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 2185 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                              0.62 kB │ gzip:   0.34 kB
+dist/assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2    7.42 kB
+dist/assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2      8.00 kB
+dist/assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2       15.08 kB
+dist/assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2      16.51 kB
+dist/assets/geist-latin-wght-normal-BgDaEnEv.woff2          29.40 kB
+dist/assets/index-B7yrd1ul.css                              38.29 kB │ gzip:   8.10 kB
+dist/assets/routes-D98uRjlA.js                               0.56 kB │ gzip:   0.41 kB
+dist/assets/rolldown-runtime-CbXtAM7H.js                     0.58 kB │ gzip:   0.36 kB
+dist/assets/preload-helper-nlOK6TZ5.js                      35.01 kB │ gzip:  12.63 kB
+dist/assets/basic-svg-eo1RP8Bm.js                          241.91 kB │ gzip:  72.26 kB
+dist/assets/index-C0J13zzx.js                              348.54 kB │ gzip: 113.55 kB
+
+✓ built in 577ms
+[build] @nodebraid/layout-elk
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) @nodebraid/core > publishes Port values and Runtime contribution seams [0.03ms]
+(pass) @nodebraid/core > publishes Canvas Fragment and Clipboard through the public facade
+(pass) @nodebraid/core > publishes Duplicate Selection through the public facade
+(pass) @nodebraid/core > publishes the shared Diagnostics seam [0.54ms]
+(pass) @nodebraid/core > publishes the typed Plugin Host seam [2.77ms]
+(pass) @nodebraid/core > publishes the reversible Kernel seam [0.66ms]
+(pass) @nodebraid/core > publishes the Kernel Runtime Plugin seam [0.96ms]
+(pass) @nodebraid/core > publishes the Session Runtime Plugin seam [0.78ms]
+(pass) @nodebraid/core > publishes the backend-neutral Renderer and Runtime integration seams [0.03ms]
+(pass) @nodebraid/core > publishes backend-neutral Interaction values and Runtime behavior [0.01ms]
+(pass) @nodebraid/core > composes asynchronous Command preparation with a synchronous Kernel Transaction [0.94ms]
+(pass) @nodebraid/core > publishes the History Runtime Plugin seam [0.01ms]
+
+tests/preset-basic.test.ts:
+(pass) Core facade exports Basic Canvas Composition without a concrete Renderer
+
+tests/layout.test.ts:
+(pass) the Core facade exports generic Layout seams without concrete Providers [0.01ms]
+
+ 14 pass
+ 0 fail
+ 39 expect() calls
+Ran 14 tests across 3 files. [20.00ms]
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/plugin-clipboard: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/plugin-clipboard: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/behavior.test.ts:
+(pass) Copy keeps empty and edge-only Selection as no-ops without codec or transport calls [5.57ms]
+(pass) History Undo removes a Paste and Redo restores only the Document [2.14ms]
+(pass) Clipboard preserves nested parents, ports, self-loops, parallel Edges, and boundary scope [1.36ms]
+(pass) Paste rejects a missing external parent immediately before commit [1.19ms]
+(pass) Paste preserves its Commit but rejects when a newer Selection wins [1.01ms]
+(pass) concurrent Paste Commands are independent and repeated Paste keeps one deterministic offset [1.18ms]
+(pass) Copy and Paste execute independently without queuing or rewriting the captured Fragment [1.01ms]
+
+tests/index.test.ts:
+(pass) Copy captures one committed selected-node Fragment before writing text [0.66ms]
+(pass) Paste reads, validates, materializes, commits once, and selects the pasted Fragment [1.93ms]
+
+tests/types.test.ts:
+(pass) publishes typed Clipboard behavior and Shortcut Plugins [0.09ms]
+
+tests/duplicate-composition.test.ts:
+(pass) Duplicate and Clipboard compose through one Host and shared Canvas Fragment seam [1.82ms]
+
+tests/shortcut.test.ts:
+(pass) default Clipboard Shortcuts route exact Mod+C and Mod+V through Interaction [6.46ms]
+
+tests/lifecycle.test.ts:
+(pass) Clipboard disposal aborts and awaits an in-flight external read without residual registrations [0.68ms]
+(pass) caller cancellation keeps its reason and dependency recovery creates fresh Clipboard registrations [1.03ms]
+
+tests/factory.test.ts:
+(pass) Copy and Paste retain the accepted transport property [0.89ms]
+(pass) Copy and Paste retain the accepted readText property [0.55ms]
+(pass) Copy and Paste retain the accepted writeText property [0.54ms]
+(pass) Copy and Paste retain the accepted codec property [0.50ms]
+(pass) Copy and Paste retain the accepted encode property [0.60ms]
+(pass) Copy and Paste retain the accepted decode property [0.55ms]
+(pass) Copy and Paste retain the accepted materializeIds property [0.53ms]
+(pass) Copy and Paste retain the accepted offset property [1.31ms]
+(pass) Copy and Paste retain the accepted x property [0.69ms]
+(pass) Copy and Paste retain the accepted y property [0.45ms]
+(pass) factory keeps the original transport getter exception [0.08ms]
+(pass) factory keeps the original readText getter exception
+(pass) factory keeps the original writeText getter exception
+(pass) factory keeps the original codec getter exception
+(pass) factory keeps the original encode getter exception
+(pass) factory keeps the original decode getter exception
+(pass) factory keeps the original materializeIds getter exception
+(pass) factory keeps the original offset getter exception
+(pass) factory keeps the original x getter exception
+(pass) factory keeps the original y getter exception
+(pass) factory rejects invalid transport before reading codec [0.04ms]
+(pass) factory rejects invalid readText before reading writeText
+(pass) factory rejects invalid writeText before reading codec
+(pass) factory rejects invalid codec before reading materializeIds
+(pass) factory rejects invalid encode before reading decode [0.01ms]
+(pass) factory rejects invalid decode before reading materializeIds
+(pass) factory rejects invalid materializeIds before reading offset
+(pass) factory rejects invalid x before reading y
+(pass) factory rejects unknown fields before invoking configuration getters [0.05ms]
+(pass) factory preserves omitted, nullish, and zero offsets: undefined [0.48ms]
+(pass) factory preserves omitted, nullish, and zero offsets: null [0.47ms]
+(pass) factory preserves omitted, nullish, and zero offsets: {
+  x: 0,
+  y: 0,
+} [0.47ms]
+(pass) factory owns its accepted shell while keeping application inputs mutable [0.62ms]
+
+tests/failures.test.ts:
+(pass) Clipboard external transport and codec failures keep stable identities and original causes [2.12ms]
+(pass) Paste rejects foreign decoded values and incomplete mapping without a Commit [2.10ms]
+(pass) Paste rejects a decoded Fragment whose normalized Node collection is empty [0.51ms]
+(pass) Paste wraps a Kernel validation rejection as COMMIT_FAILED without partial state [1.30ms]
+(pass) Paste rejects occupied materialized Node and Edge IDs atomically [1.32ms]
+
+ 52 pass
+ 0 fail
+ 262 expect() calls
+Ran 52 tests across 8 files. [58.00ms]
+
+[check:affected] packages/plugin-duplicate-selection: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/plugin-duplicate-selection: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) Duplicate Selection factories reject malformed config structurally [0.23ms]
+(pass) Duplicate Selection copies the current Node and selects its duplicate as one History entry [5.93ms]
+(pass) Duplicate Selection captures the validated materializer for execution [1.29ms]
+(pass) Duplicate Selection captures the finite offset coordinates accepted at creation [1.16ms]
+(pass) Duplicate Selection captures its offset reference and retains an explicit zero copy [1.01ms]
+(pass) Duplicate Selection preserves validation short circuits before later option reads [0.09ms]
+(pass) Duplicate Selection preserves original option getter failures [0.06ms]
+(pass) Duplicate Selection remaps nested Nodes, ports, self-loops, and parallel internal Edges only [1.32ms]
+(pass) Duplicate Selection preserves an unselected parent and does not copy unselected descendants [1.13ms]
+(pass) Duplicate Selection keeps empty and edge-only Selection as no-ops without materialization [0.89ms]
+(pass) Duplicate Selection rejects incomplete ID mapping atomically [0.78ms]
+(pass) Duplicate Selection rejects extra, duplicate, colliding, and async ID materialization [4.09ms]
+(pass) Duplicate Selection preserves an application materializer failure identity [0.70ms]
+(pass) Duplicate Selection rejects same-value source ABA without blocking unrelated Commits [0.83ms]
+(pass) Duplicate Selection rejects a new internal Edge and same-value internal Edge ABA [1.43ms]
+(pass) Undo removes Duplicate Selection and Redo restores Document without reselecting [1.07ms]
+(pass) Duplicate Selection preserves a Commit but does not overwrite newer Selection from a Commit observer [0.80ms]
+(pass) Duplicate Selection wraps post-Commit Session loss with the committed revision [0.66ms]
+
+tests/types.test.ts:
+(pass) publishes typed Duplicate Selection behavior and Shortcut Plugins [0.05ms]
+
+tests/mapping-input.test.ts:
+(pass) Duplicate rejects actual invalid nodes mappings instead of custom map output [0.83ms]
+(pass) Duplicate rejects actual invalid edges mappings instead of custom map output [1.61ms]
+(pass) Duplicate retains the nodes collection accepted before translation [0.96ms]
+(pass) Duplicate retains the edges collection accepted before translation [0.49ms]
+(pass) Duplicate accepts frozen mappings without consulting collection hooks [0.64ms]
+(pass) Duplicate preserves the original nodes element read failure [0.50ms]
+(pass) Duplicate preserves the original edges element read failure [0.43ms]
+(pass) Duplicate rejects an invalid Node collection before reading Edge mappings [0.58ms]
+(pass) Duplicate retains native mapping index behavior for hole [0.53ms]
+(pass) Duplicate retains native mapping index behavior for inherited [0.47ms]
+(pass) Duplicate retains native mapping index behavior for string-length [0.49ms]
+
+tests/shortcut.test.ts:
+(pass) the Duplicate Shortcut factory captures its option reference once [0.04ms]
+(pass) the Duplicate Shortcut factory preserves captured invalid values and getter failures [0.11ms]
+(pass) the default Duplicate Shortcut invokes the public behavior through Mod+D [3.59ms]
+
+tests/lifecycle.test.ts:
+(pass) Duplicate Selection registration follows dependency loss, reactivation, and disposal [0.85ms]
+
+ 34 pass
+ 0 fail
+ 117 expect() calls
+Ran 34 tests across 5 files. [49.00ms]
+
+[check:affected] .: /Users/zhou/.bun/bin/bun test tests/layout-providers.test.ts
+bun test v1.4.2 (744846f84)
+
+tests/layout-providers.test.ts:
+(pass) Dagre lays out Port topology with one undoable commit and a no-op repeat [13.43ms]
+(pass) ELK lays out Port topology with one undoable commit and a no-op repeat [96.66ms]
+(pass) Dagre and ELK compose with Provider-specific typed Runtime Commands [7.33ms]
+
+ 3 pass
+ 0 fail
+ 61 expect() calls
+Ran 3 tests across 1 file. [135.00ms]
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run test:browser:self
+$ bun run ./browser-tests/basic-svg.browser.ts && bun run ./browser-tests/clipboard.browser.ts
+
+[check:affected] .: /Users/zhou/.bun/bin/bun run docs:check:self
+$ bun run docs:verify && bun run website/examples/quick-start.ts && bun run docs:build
+$ bun run website/scripts/verify-content.ts
+documentation content verified (25 modules)
+revision=1 nodes=1
+$ NODEBRAID_DOCS_BASE=/nodebraid/ vitepress build website
+
+  vitepress v1.6.4
+
+- building client + server bundles...
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[32m✓[0m building client + server bundles...
+- rendering pages...
+[32m✓[0m rendering pages...
+build complete in 13.38s.

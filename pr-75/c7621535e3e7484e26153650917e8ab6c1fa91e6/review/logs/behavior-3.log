@@ -1,0 +1,35 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-duplicate-selection/tests/mapping-input.test.ts:
+34 |   let hookCalls = 0;
+35 |   Object.defineProperty(input[field], 'map', { value() { hookCalls++; return [{ sourceId: field === 'nodes' ? source : loop, materializedId: field === 'nodes' ? copy : copyLoop }]; } });
+36 |   const h = await harness(() => input);
+37 |   try {
+38 |     const before = h.kernel.read().snapshot, selection = h.session.getSnapshot().selection;
+39 |     await expect(h.commands.execute(duplicateSelectionCommand, undefined)).rejects.toMatchObject({ domain: 'plugin.duplicate-selection', code: 'INVALID_MATERIALIZATION' });
+                                                                                        ^
+error: expect(received).rejects.toMatchObject(expected)
+
+Expected promise that rejects
+Received promise that resolved: Promise { <resolved> }
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-74-duplicate-mappings/cflow/packages/plugin-duplicate-selection/tests/mapping-input.test.ts:39:84)
+(fail) Duplicate rejects actual invalid nodes mappings instead of custom map output [11.18ms]
+34 |   let hookCalls = 0;
+35 |   Object.defineProperty(input[field], 'map', { value() { hookCalls++; return [{ sourceId: field === 'nodes' ? source : loop, materializedId: field === 'nodes' ? copy : copyLoop }]; } });
+36 |   const h = await harness(() => input);
+37 |   try {
+38 |     const before = h.kernel.read().snapshot, selection = h.session.getSnapshot().selection;
+39 |     await expect(h.commands.execute(duplicateSelectionCommand, undefined)).rejects.toMatchObject({ domain: 'plugin.duplicate-selection', code: 'INVALID_MATERIALIZATION' });
+                                                                                        ^
+error: expect(received).rejects.toMatchObject(expected)
+
+Expected promise that rejects
+Received promise that resolved: Promise { <resolved> }
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-74-duplicate-mappings/cflow/packages/plugin-duplicate-selection/tests/mapping-input.test.ts:39:84)
+(fail) Duplicate rejects actual invalid edges mappings instead of custom map output [1.61ms]
+
+ 0 pass
+ 2 fail
+Ran 2 tests across 1 file. [33.00ms]

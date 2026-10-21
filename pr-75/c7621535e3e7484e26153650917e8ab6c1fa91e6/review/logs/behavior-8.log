@@ -1,0 +1,34 @@
+@nodebraid/canvas-fragment test:self: bun test v1.4.2 (744846f84)
+@nodebraid/canvas-fragment test:self: 
+@nodebraid/canvas-fragment test:self: tests/index.test.ts:
+@nodebraid/canvas-fragment test:self: (pass) captures the selected-node induced subgraph and explicit Selection in canonical order [1.03ms]
+@nodebraid/canvas-fragment test:self: (pass) materializes nested Nodes and port-qualified Edges with fresh IDs and one world offset [0.66ms]
+@nodebraid/canvas-fragment test:self: (pass) accepts one decoded Fragment shell and rejects edges outside its Node set [0.29ms]
+@nodebraid/canvas-fragment test:self: 
+@nodebraid/canvas-fragment test:self: tests/array-input.test.ts:
+@nodebraid/canvas-fragment test:self: (pass) rejects an empty normalized Node collection for length %s [0.06ms]
+@nodebraid/canvas-fragment test:self: (pass) rejects an empty normalized Node collection for length %s [0.01ms]
+@nodebraid/canvas-fragment test:self: (pass) rejects an empty normalized Node collection for length %s
+@nodebraid/canvas-fragment test:self: (pass) rejects an empty normalized Node collection for length 0
+@nodebraid/canvas-fragment test:self: (pass) rejects an empty normalized Node collection for length %s
+@nodebraid/canvas-fragment test:self: (pass) rejects an empty normalized Node collection for length %s
+@nodebraid/canvas-fragment test:self: (pass) rejects an empty normalized Node collection for length %s
+@nodebraid/canvas-fragment test:self: (pass) rejects an empty normalized Node collection for length %s
+@nodebraid/canvas-fragment test:self: (pass) returns the same Node collection that passed Fragment validation [0.10ms]
+@nodebraid/canvas-fragment test:self: (pass) rejects malformed Fragment elements even when the array defines map [0.03ms]
+@nodebraid/canvas-fragment test:self: (pass) materializes the actual mapping elements even when the array defines map [0.06ms]
+@nodebraid/canvas-fragment test:self: (pass) validates every element within a Proxy array length [0.03ms]
+@nodebraid/canvas-fragment test:self: (pass) accepts frozen array data without invoking method, iterator or constructor hooks [0.08ms]
+@nodebraid/canvas-fragment test:self: (pass) rejects a missing Fragment nodes element [0.02ms]
+@nodebraid/canvas-fragment test:self: (pass) rejects a missing Fragment edges element
+@nodebraid/canvas-fragment test:self: (pass) rejects a missing Fragment selectionNodes element [0.01ms]
+@nodebraid/canvas-fragment test:self: (pass) rejects a missing Fragment selectionEdges element [0.01ms]
+@nodebraid/canvas-fragment test:self: (pass) rejects a missing nodes materialization element [0.05ms]
+@nodebraid/canvas-fragment test:self: (pass) rejects a missing edges materialization element [0.03ms]
+@nodebraid/canvas-fragment test:self: (pass) preserves an array element read failure [0.04ms]
+@nodebraid/canvas-fragment test:self: 
+@nodebraid/canvas-fragment test:self:  23 pass
+@nodebraid/canvas-fragment test:self:  0 fail
+@nodebraid/canvas-fragment test:self:  43 expect() calls
+@nodebraid/canvas-fragment test:self: Ran 23 tests across 2 files. [12.00ms]
+@nodebraid/canvas-fragment test:self: Exited with code 0

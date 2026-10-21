@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "99ed305515afaec32ef49494b509446ad9ba998c",
+    "expectedParent": "99ed305515afaec32ef49494b509446ad9ba998c",
+    "head": "c7621535e3e7484e26153650917e8ab6c1fa91e6",
+    "tree": "a662eb153bdecc5ec4385187135bb3e8fc6788a9",
+    "patch": "c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29",
+    "localHead": "d03be1d5138bf2937bf49c9b69f21c7c3bb361f4"
+  },
+  "task": {
+    "run": "88d80bb7-4921-4e82-b4fd-058ca934a242",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 74
+    },
+    "request": "Reject invalid actual Duplicate ID mappings atomically without invoking caller-owned collection hooks; capture each collection once while preserving native indexed semantics, existing errors and valid behavior. Source: https://github.com/ZWkang/nodebraid/issues/74",
+    "plan": [
+      {
+        "id": "public-reproduction-and-implementation",
+        "blockedBy": [],
+        "acceptance": "Actual Node/Edge mapping hooks reproduce rejection/atomicity defects red, then pass after minimal owned indexed translation. Collection capture, sparse/inherited entries, native length and original error identity remain correct."
+      },
+      {
+        "id": "related-checks-and-independent-review",
+        "blockedBy": [
+          "public-reproduction-and-implementation"
+        ],
+        "acceptance": "Fragment/Duplicate/Clipboard public seams, package declaration/type checks and affected checks pass; independent Standards+ponytail-review and Spec cover identical complete head/tree/patch, followed by sole full agents:run verify."
+      },
+      {
+        "id": "publication-and-current-feedback",
+        "blockedBy": [
+          "related-checks-and-independent-review"
+        ],
+        "acceptance": "One non-draft PR to main with Refs #74; actual published tree/first-parent/base ancestry verified; current head CI, complete feedback and real report/media publication/readback pass."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "publication-and-current-feedback"
+        ],
+        "acceptance": "Only after actual main integration, verify deployed mapping behavior and all remaining acceptance before authorized Issue closure. Keep Issue open beforehand; no auto merge."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "d03be1d5138bf2937bf49c9b69f21c7c3bb361f4",
+      "tree": "a662eb153bdecc5ec4385187135bb3e8fc6788a9",
+      "patch": "c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29",
+      "verdict": "passed",
+      "report": "# Standards + ponytail-review — Issue #74\n\nVerdict: passed\n\n- Base: `99ed305515afaec32ef49494b509446ad9ba998c`\n- Head: `d03be1d5138bf2937bf49c9b69f21c7c3bb361f4`\n- Tree: `a662eb153bdecc5ec4385187135bb3e8fc6788a9`\n- Binary patch SHA-256: `c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29`\n\n完整两文件及新增公共测试已审查。变更让 Duplicate 自己遍历并翻译实际映射元素，捕获集合后继续使用原 Fragment 验证器。\n\n## 硬规范\n\n未发现违反。已追踪 Example → Duplicate factory/Command → Fragment materialization → Kernel Transaction/Session Selection，以及 Clipboard 共享消费者。\n\n`packages/plugin-duplicate-selection/src/duplicate-selection-command.ts` 中 Node/Edge 集合各读取一次；无效 Node 集合仍先于 Edge 字段读取失败。Array.from 使用自有 array-like 描述，不执行输入 map、iterator、constructor 或 species。精确覆盖、ID 类型/namespace/唯一性仍由 Fragment 边界验证，实体写入和 Selection 更新顺序保持，符合 ADR0073/0076/0078 及 Boundary Discipline。\n\n外部 materializer、集合/元素读取失败没有被统一捕获改写，原 INVALID_MATERIALIZATION 路径保留，符合 ADR0077。新增测试通过真实 Host、Kernel、Command、Session 检查拒绝、未提交状态、集合捕获及有效 hooked arrays，符合 Test Behavior, Not Implementation。\n\n已读取保存的行为 red：非法映射错误地 resolve，以及重复读取集合导致有效输入 reject。依赖未构建的导入失败未计作行为 red。\n\n## 判断性 smell / ponytail\n\n未发现有具体后果的可操作 smell。修复集中在应用映射到 Fragment 的负责边界，复用既有共享验证；按单 Canvas Host 的选中子图负载，新增索引遍历为线性，未增加抽象、依赖、cap 或 fallback，符合 Fix Root Causes 和 Laziness Protocol。\n\n## 实际检查及限制\n\n本轮 `bun test packages/plugin-duplicate-selection/tests`：34 pass、117 assertions（Bun 1.4.2）。完整范围 `git diff --check` 通过，工作树干净。\n\n未执行构建、full check、浏览器、远端发布或 CI；不将其他执行记录当成本轮运行结果。\n"
+    },
+    "spec": {
+      "head": "d03be1d5138bf2937bf49c9b69f21c7c3bb361f4",
+      "tree": "a662eb153bdecc5ec4385187135bb3e8fc6788a9",
+      "patch": "c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n已独立核验完整两文件补丁、Issue74 全文/空评论、prepared plan、ADR0073/0077/0078，以及 Duplicate Command→转换→共享 Fragment materialization→Kernel Transaction 调用链；未发现明确验收遗漏、错误实现或范围扩张。\n\n`translateMaterialization` 各读取 nodes/edges 一次，先验证捕获的集合，再按真实索引投影到自有冻结数组；不读取来方 map/iterator/constructor/species。非法实际映射仍由现有转换/Fragment 边界拒绝，发生在 Transaction 与 Selection 更新之前。原生长度转换、继承索引、空位拒绝、读取/应用异常身份、Node 集合短路及规范化/namespace 校验保持，没有新增公开 API 或策略。\n\n实际运行：`bun test packages/plugin-duplicate-selection/tests packages/canvas-fragment/tests packages/plugin-clipboard/tests`，109 pass、0 fail、422 assertions。覆盖新11项真实 Host 回归、既有 Duplicate、Fragment 与 Clipboard 组合行为；`git diff --check` 通过，工作树干净。\n\n已核读 mapping-hook-prepared-red.log 与 collection-capture-red.log：原实现分别错误成功、重复读取后拒绝，均是业务断言失败。首次依赖未准备的日志不计作业务 red。保存的公开包 probe 与 affected/browser 结果不是本审查重跑。\n\n未运行构建、类型/声明检查、浏览器、full check、远端发布、当前 head CI 或报告/媒体回读。本产品补丁不包含执行器升级，不代表新执行协议已部署至 main；实际 main 集成及完整验收仍待完成。\n\n- base: `99ed305515afaec32ef49494b509446ad9ba998c`\n- head: `d03be1d5138bf2937bf49c9b69f21c7c3bb361f4`\n- tree: `a662eb153bdecc5ec4385187135bb3e8fc6788a9`\n- raw binary patch SHA256: `c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-public-invalid-mapping",
+      "acceptance": "At main99 the real public compiled-barrel Host probe commits a custom map replacement for numeric duplicateId42 (revision1→2); rejection assertion fails. This is the original historical source, not current success.",
+      "command": "bun original-public-repro.ts (main99 public package barrels)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "initial-unprepared-test-dependency",
+      "acceptance": "Initial focused invocation started before dependency build finished and could not resolve plugin-command. Retained as setup failure, not regression red.",
+      "command": "bun test packages/plugin-duplicate-selection/tests/mapping-input.test.ts (before dependency build finished)",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "actual-node-edge-hook-red",
+      "acceptance": "After actual dependencies completed, both real Host tests resolve and commit invalid actual Node/Edge mappings instead of rejecting; failure is the behavior assertion.",
+      "command": "bun test packages/plugin-duplicate-selection/tests/mapping-input.test.ts (before indexed translation fix)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "collection-re-read-red",
+      "acceptance": "After method-hook correction, changing Node/Edge collection getters replace the accepted arrays with empty arrays, rejecting otherwise valid duplication; both retained-value assertions fail.",
+      "command": "bun test packages/plugin-duplicate-selection/tests/mapping-input.test.ts (before collection capture fix)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "duplicate-regressions-green",
+      "acceptance": "34 real Host/public Command tests, 117 assertions; actual invalid Node/Edge mappings reject atomically, collection capture is stable, valid frozen hooked mappings pass, native sparse/inherited/string-length behavior and original errors remain.",
+      "command": "bun test packages/plugin-duplicate-selection/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "fixed-compiled-public-probe",
+      "acceptance": "Same original behavior assertions against the fixed compiled public barrels: INVALID_MATERIALIZATION, map calls0, Document revision remains1. Only import root and metadata label differ from original source; both sources retained.",
+      "command": "bun fixed-build-public-probe.ts (fixed published package barrels)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "affected-consumers-browser-docs",
+      "acceptance": "Affected selector executed Duplicate, Clipboard, Core, Examples, real Examples browser scenes, related root Layout provider composition test and docs at unchanged product source.",
+      "command": "bun run check:affected --base 99ed305515afaec32ef49494b509446ad9ba998c",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "fragment-regressions",
+      "acceptance": "Shared Fragment value regressions remain green (23 tests43 assertions); no shared validator validation was removed.",
+      "command": "bun run --filter '@nodebraid/canvas-fragment' test:self",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "duplicate-typecheck",
+      "acceptance": "Duplicate source and public test types pass.",
+      "command": "bun run --filter '@nodebraid/plugin-duplicate-selection' typecheck:self",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-9.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "f1bedb638184efc87441a96a9870aed3a583156cb5489729dd9895fa972ad10a"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "fbde7d65b8dc58d0b79c3c8147044ba7c90de0bd38eafaa2b728523a0b1872c2"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "35d85b2c61d3a63d6bb799090bd7c4264f7c7b050ff56b6d8943256da88b767f"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "c73e206f1a43e751259d8c6247de9044dd737a49027bc5d90d92cffb34acdcef"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "c4e2056ea470d9609ada9a4a18bc5bc4b44c90db65c7c443e3f2a2247195fb70"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "92d2359244584eed8a54fcca9ed91d63d0e88f7eccc5fbc72554b747d4dca583"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "1dfc36f9f97232c946c7e46a1c4eec39c1c941f696b168aa78b794b9ff55f869"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "37aae88fe8971663ba2e27e314ed438e4cb8c993edf5430ed9715785486dea8e"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "ff95439dcba9cecd0e2a96745a99942b2fbb075e3346ccb616169fe0405fef40"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "807a8315342434bc6d6f225d70dfd2eb68e899cef2fce4a8fe520fd6612b87b2"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "38931169f6ed7d886c4584369ae3fc2d89bf2387c14fc7796e54660603ea6ea5"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "a4ee73cd578c9b516ff2917e11781aa99d773724e5c36c99e556e8ef95c0428e"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "bcfc9f9e9ff173b93800e927064adbaa415add99eb2f118e0b8a48dddba218c1"
+    }
+  ]
+}

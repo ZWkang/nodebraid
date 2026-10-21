@@ -1,0 +1,1 @@
+{"base":"99ed305515afaec32ef49494b509446ad9ba998c","expected":"INVALID_MATERIALIZATION and unchanged Document","actualError":{"name":"DuplicateSelectionError","domain":"plugin.duplicate-selection","code":"INVALID_MATERIALIZATION","details":{}},"hookCalls":0,"beforeRevision":1,"afterRevision":1,"nodes":["source"],"actualDuplicateId":42}
