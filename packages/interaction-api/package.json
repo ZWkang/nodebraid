@@ -40,12 +40,15 @@
   ],
   "scripts": {
     "dev": "tsgo -p tsconfig.build.json --watch",
-    "build": "bun run build:dependencies && tsgo -p tsconfig.build.json && bun run test:artifacts",
-    "build:dependencies": "bun run --filter '@nodebraid/kernel' build && bun run --filter '@nodebraid/port-api' build && bun run --filter '@nodebraid/session-api' build",
+    "build": "bun run ../../scripts/build-workspaces.ts @nodebraid/interaction-api",
+    "build:self": "tsgo -p tsconfig.build.json && bun run test:artifacts",
+    "build:dependencies": "bun run ../../scripts/build-workspaces.ts --dependencies @nodebraid/interaction-api",
     "prepack": "bun run build",
-    "test": "bun test ./tests",
+    "test": "bun run build:dependencies && bun run test:self",
+    "test:self": "bun test ./tests",
     "test:artifacts": "bun run ./artifacts/check-declarations.ts",
-    "typecheck": "bun run build:dependencies && tsgo --noEmit -p tsconfig.json"
+    "typecheck": "bun run build:dependencies && bun run typecheck:self",
+    "typecheck:self": "tsgo --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@nodebraid/kernel": "workspace:*",

@@ -59,6 +59,18 @@ patch digest、命令与结果。修正后复验，详细轨迹保留在运行�
 完整审查报告、行为证据与真实截图/录屏通过 [PR 证据流程](./pr-evidence.md) 发布到当前 head。
 该流程沿用现有订阅执行与 GitHub CI，不增加模型 API 或调度器。
 
+开发循环按影响范围执行检查：
+
+```bash
+bun run check:affected             # 默认比较 HEAD，包含暂存、未暂存和未跟踪文件
+bun run check:affected --base main # 同时检查相对 main 的分支差异
+bun run check:affected --plan      # 只展示检查范围，不执行
+```
+
+定向通过不代表完成交付。实现或反馈修复先做定向检查，再完成双轴 review，最后由
+`agents:run verify` 执行本次交付验证的全量检查；不要在它之前人工预跑同一套
+`bun run check`。GitHub CI 仍执行全量检查。
+
 Issue 标签路由见 [issue-tracker.md](./issue-tracker.md)。只有实际复现且预期已明确的缺陷，
 或已确认的 spec 可以实现；风格问题、缺少测试、新需求和不明确的预期不能冒充 bug。
 GitHub 是实时任务状态来源，本地 ledger 保存证据和去重元数据，不维护另一套人工任务清单。
@@ -126,9 +138,10 @@ bun run agents:run evaluate /absolute/path/to/run snapshot.json
 明确的 `verdict: passed|changes-requested|needs-design`；仅两轴均 passed 可验证发布。
 `decisions.json` 必须恰好覆盖原 pending 的 key/digest、处置和原因。
 
-`verify` 在干净提交上运行真实 `bun run check`，保留每次尝试的唯一日志，并检查运行前后
-source 没变。失败结果保存在 `verification.json`，原始日志不覆盖；重启后可以复验，
-没有绿色分支替代真实进程。`publication` 读取 GitHub Git commit 原始返回值
+`verify` 是托管交付全量检查的唯一入口，在干净提交上运行真实 `bun run check`，收据中的
+命令保持 `bun run check`。每次尝试保留唯一日志，并检查运行前后 source 没变。失败结果
+保存在 `verification.json`，原始日志不覆盖；重启后可以复验。同一 head 的新尝试也会
+重新执行真实进程，不缓存或跳过检查。`publication` 读取 GitHub Git commit 原始返回值
 `{sha, tree: {sha}, parents: [{sha}]}`，核对远端 tree 与已检查 tree，且第一父提交必须是
 本轮 expected remote head；不能仅在后续 merge parent 中找到旧 base 就接受发布。
 API 生成的远端 SHA 可以不同，但一份 run 不得绑定第二次发布。先记录发布再调整本地 ref。
@@ -183,9 +196,10 @@ evidence 文件再原子更新队列；相同报告恢复不会重复完成任�
 
 ## 验证与验收状态
 
-所有实现执行 `bun run check`，按行为增加公共 seam red/green、状态序列、故障注入、
-真实 Chromium、声明隔离或 package 消费测试。具体选择来自任务风险；不宣称每个包都已
-拥有属性测试、状态模型或故障注入。禁止弱化断言、假成功和静默 fallback。
+开发迭代执行 `bun run check:affected`，按行为增加公共 seam red/green、状态序列、故障注入、
+真实 Chromium、声明隔离或 package 消费测试。正式交付仍需全量 `bun run check`，托管任务
+由 `agents:run verify` 执行一次，不在此前重复人工执行。具体选择来自任务风险；不宣称每个
+包都已拥有属性测试、状态模型或故障注入。禁止弱化断言、假成功和静默 fallback。
 
 首次真实验收使用 [Issue #6](https://github.com/ZWkang/nodebraid/issues/6)：
 

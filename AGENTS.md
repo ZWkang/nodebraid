@@ -24,6 +24,8 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 
 可见 Canvas 变更和浏览器验证维护使用项目级 [verify-nodebraid](.agents/skills/verify-nodebraid/SKILL.md)，通过锁定的 `agent-browser` 采集真实证据。完整审查报告与媒体的生成、连接器发布和权限边界见 [PR 证据](docs/agents/pr-evidence.md)；每次 ready 前必须实际发布并回读当前 head 的报告，保留报告 URL、source head 与 evidence commit。`agents:run evaluate` 尚未自动校验展示回执。
 
+开发循环使用 `bun run check:affected`，定向通过不算完成交付。托管任务先完成定向检查与双轴 review，再由 `agents:run verify` 执行本次交付验证的全量 `bun run check`，不提前人工重复执行相同全量检查。同一 head 的新验证尝试仍真实执行，保留独立日志；GitHub CI 继续全量检查。
+
 - `bun run agents:check`：检查本地工作流协议、skills 和残留的托管 API 执行入口；CI 在完整工程检查前执行。
 - `bun run agents:local-check`：另检查本机 ChatGPT CLI 登录；有 API-key 环境变量时明确失败，不切换计费入口。
 - `bun run agents:scan [base-sha]`：在已 fetch 的干净 main worktree 记录固定 SHA 调查范围。
@@ -66,7 +68,7 @@ Agent 在原 PR 上追加修复并验证，需求变化返回讨论；最终审�
 - `bun run docs:build`：生产构建 VitePress Documentation Site。
 - `bun run docs:check`：校验公开内容、执行 Quick Start 并生产构建站点。
 - `bun run docs:preview`：本地预览已经生产构建的 Documentation Site。
-- `bun run build`：构建根入口，再由 `@nodebraid/core` 先构建其余 workspace 依赖并构建公共 facade。
+- `bun run build`：构建根入口，再按依赖拓扑构建公共 facade、Layout Providers、SVG Renderer、React Adapter 及其 workspace 依赖。
 - `bun run typecheck`：先构建 workspace package-name 类型解析所需的依赖声明，再检查根 TypeScript project 和所有 `@nodebraid/*` workspace。
 - `bun run --filter '@nodebraid/diagnostics' build`：构建零依赖 Diagnostics 契约、运行声明隔离检查并验证 package-name import。
 - `bun run --filter '@nodebraid/plugin-kernel' build:dependencies`：按 Kernel、Runtime 顺序生成 Kernel Runtime Plugin 构建与类型检查所需的 workspace 声明。
@@ -98,7 +100,14 @@ Agent 在原 PR 上追加修复并验证，需求变化返回讨论；最终审�
 - `bun run format`：使用 Prettier 格式化支持的文件。
 - `bun run test`：运行 Bun 测试。
 - `bun run test:browser`：通过仓库锁定的 `agent-browser` 在真实 Chromium 中运行 React Adapter 与 SVG Renderer 公共 seam 测试。
-- `bun run check`：依次运行 lint、类型检查、格式检查、Bun 测试、Renderer 与 Example 真实浏览器测试、构建和 Documentation Site 检查。
+- `bun run check:affected`：默认比较 `HEAD`，包含暂存、未暂存和未跟踪文件，按影响范围运行开发检查。
+- `bun run check:affected --base main`：从 `main` 与 `HEAD` 的 merge-base 比较分支及工作区变更。
+- `bun run check:affected --plan`：只展示变更、受影响包、测试与检查范围，不执行检查；可与 `--base` 组合。
+- `bun run check`：依次运行 lint、格式检查、一次 workspace 拓扑构建、根入口构建、类型检查、Bun 测试、React Adapter／SVG Renderer／Example 真实浏览器测试和 Documentation Site 检查。
+
+`check:affected` 沿 workspace 的生产和开发依赖纳入消费者，并从根组合测试的静态 import（含本地 fixture）选择相关测试。`website/` 变更或影响到 `@nodebraid/core` 时检查文档；共享工具、workflow、无法映射到 workspace 的非 Markdown 文件，以及 Agent 工作流 Markdown、`AGENTS.md` 变更运行全量。workspace 和 website 之外的其他 Markdown 只检查格式。
+
+`scripts/build-workspaces.ts` 按生产依赖拓扑调度，每次调用内每个 workspace 只构建一次，不做跨次缓存。完整检查先准备全部 workspace 产物，再复用 `:self` 步骤；这些内部步骤要求依赖产物已准备好。独立执行 package 时继续使用普通 `build`、`test`、`typecheck`、`test:browser` 入口，由它们准备所需依赖。
 
 提交前至少运行：
 
