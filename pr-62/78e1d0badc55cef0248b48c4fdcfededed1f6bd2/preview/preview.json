@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "462d2cbafbf2fe4defea8a64670539cf67f96dcc",
+    "head": "78e1d0badc55cef0248b48c4fdcfededed1f6bd2",
+    "tree": "1b7642b37e6391f38d27c16351e127633803a3d5",
+    "patch": "39338ace33092a479b81122e32299446b46c3a1f40c1d026c517df69d5bf0d5e"
+  },
+  "status": "passed",
+  "limitations": [],
+  "scenes": [
+    {
+      "id": "clipboard",
+      "title": "Copy and paste through the system clipboard",
+      "status": "passed",
+      "steps": [
+        "Doctor: wait for the real Examples Application and its initial Canvas",
+        "Grant clipboard permission only to this isolated browser context",
+        "Copy Discover, paste it, and verify the resulting Canvas"
+      ],
+      "artifacts": [
+        "clipboard/before.png",
+        "clipboard/before.snapshot.json",
+        "clipboard/after.png",
+        "clipboard/after.snapshot.json",
+        "clipboard/recording.mp4",
+        "clipboard/review-encoding.log",
+        "clipboard/review.mp4",
+        "clipboard/actions.log"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build.log",
+      "kind": "log",
+      "sha256": "cd7aa1a8f69311e8d89ec0e88cae5696bd9a173ab542c8d1d27bf4ad514d5df2"
+    },
+    {
+      "path": "ffmpeg.log",
+      "kind": "log",
+      "sha256": "5b320c97f515e79171f10a2147d875ffb6b14bd2b25681047b73c46fe0a527ee"
+    },
+    {
+      "path": "clipboard/before.png",
+      "kind": "screenshot",
+      "sha256": "4a57a5b083a02cd321b56fbba47a0c83cf402ca561c99429fee9786b3046ba31"
+    },
+    {
+      "path": "clipboard/before.snapshot.json",
+      "kind": "snapshot",
+      "sha256": "f4d04ceb5e0a2f6b14add1f5f1fe539a093da463d14aa18ddf67f205df65d51a"
+    },
+    {
+      "path": "clipboard/after.png",
+      "kind": "screenshot",
+      "sha256": "596ef8e53afbcaa121da1af8cedaa5435381bd3960ac374320973ac53223a384"
+    },
+    {
+      "path": "clipboard/after.snapshot.json",
+      "kind": "snapshot",
+      "sha256": "aa9e0263c694ba7342465ac264b1b6468ad1aa55012ad1049634238ffe86b457"
+    },
+    {
+      "path": "clipboard/recording.mp4",
+      "kind": "recording",
+      "sha256": "70930db8cdda91637fab895c2d8cd0153e3a4b43358535af40a0086e79c02362"
+    },
+    {
+      "path": "clipboard/review-encoding.log",
+      "kind": "log",
+      "sha256": "ddb7b32859d774c4a4ed8f8e8ed81770f86f418a3ded06a77fc1823f8ace50a9"
+    },
+    {
+      "path": "clipboard/review.mp4",
+      "kind": "recording",
+      "sha256": "b2d9edda156887a6d4687f062076eca68050ee99ff58f8c49f6c347d6ab369e9"
+    },
+    {
+      "path": "clipboard/actions.log",
+      "kind": "log",
+      "sha256": "f60cafbd47f863bec740496d5ac8d2f90d6c9358b91f54ba97f584687d669f68"
+    }
+  ]
+}
