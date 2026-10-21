@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "99ed305515afaec32ef49494b509446ad9ba998c",
+    "expectedParent": "99ed305515afaec32ef49494b509446ad9ba998c",
+    "head": "181faea507e1c83bd26e8496036d5cdc3285043b",
+    "tree": "8ebd682c79c220fc9723d8ccec66cb6603f2792b",
+    "patch": "d0195d7d0b6c31fc143c3f3562adb0b3099efa7a6f6a40c3d632dc667c53a380",
+    "localHead": "e43480244c7210f0190ef3680f2b3bd3f4ea9d63"
+  },
+  "task": {
+    "run": "1164aeba-5330-4429-9b80-97cb1e8efa32",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 78
+    },
+    "request": "Retain the Layout Proposal values actually accepted during validation through canonicalization and freezing, preserving existing Layout contracts. Source: https://github.com/ZWkang/nodebraid/issues/78",
+    "plan": [
+      {
+        "id": "proposal-owned-values",
+        "blockedBy": [],
+        "acceptance": "Retain the original real public Layout compute/validator repro; finite coordinates, source revision, complete position sequence, IDs and Fixed Node values are captured once and the exact accepted values are published canonically and immutably."
+      },
+      {
+        "id": "proposal-caller-regressions",
+        "blockedBy": [
+          "proposal-owned-values"
+        ],
+        "acceptance": "Public direct/engine and Runtime callers cover changed getters/sequence, no second traversal, original read exceptions and validation precedence; existing error codes/details, sparse/inherited behavior, empty/all-fixed, cancellation, stale and History behavior remain intact."
+      },
+      {
+        "id": "related-checks-and-review",
+        "blockedBy": [
+          "proposal-caller-regressions"
+        ],
+        "acceptance": "Affected API/real Dagre/ELK/Runtime/consumer checks and types pass; both independent Standards+ponytail-review and Spec approve the same complete patch, then agents:run verify performs the sole full engineering check for the delivery attempt."
+      },
+      {
+        "id": "publication-current-feedback",
+        "blockedBy": [
+          "related-checks-and-review"
+        ],
+        "acceptance": "One non-draft PR to main with Refs #78; actual remote tree/first-parent/base ancestry and published SHA verified, published-head preview/report fully uploaded and read back; actual current-head CI and complete feedback/mergeability pass."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "publication-current-feedback"
+        ],
+        "acceptance": "Requires actual integration into fetched main and final public Layout acceptance before authorized closure. Keep Issue open and human final review/merge pending."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "e43480244c7210f0190ef3680f2b3bd3f4ea9d63",
+      "tree": "8ebd682c79c220fc9723d8ccec66cb6603f2792b",
+      "patch": "d0195d7d0b6c31fc143c3f3562adb0b3099efa7a6f6a40c3d632dc667c53a380",
+      "verdict": "passed",
+      "report": "# Standards + ponytail-review — Issue #78\n\nVerdict: passed\n\n- Base: `99ed305515afaec32ef49494b509446ad9ba998c`\n- Head: `e43480244c7210f0190ef3680f2b3bd3f4ea9d63`\n- Tree: `8ebd682c79c220fc9723d8ccec66cb6603f2792b`\n- Binary patch SHA-256: `d0195d7d0b6c31fc143c3f3562adb0b3099efa7a6f6a40c3d632dc667c53a380`\n\n完整三文件及新增测试已审查。已追踪 Provider/defineLayoutEngine → shared validator → freezeLayoutProposal → Runtime/Kernel/History，读取相关 Layout 契约、README 与现有 Port-topology 范围。\n\n## 硬规范\n\n未发现违反。`packages/layout-api/src/proposal-validation.ts` 捕获 sourceRevision、ID、position 和 x/y，原 positions 序列只读取、遍历一次。后续精确覆盖、规范排序及冻结仅处理自有已验证数据，符合 ADR0021/0026 的完整、有限、同 revision 和 owned immutable shell 契约。\n\nrevision、重复/未知 ID、x 再 y 的原校验顺序保留；Fixed Node 比较和错误 actual 使用同一捕获坐标。原读取/Provider 异常没有被包装或吞掉，Runtime 仍独立重验、检查实时 revision，并由 Kernel 负责最终提交。没有移除取消、stale 或共享边界验证。\n\n新增测试通过公开 validator/Engine 和真实 Host/Kernel/Command/History；覆盖一次读取、单次序列、Fixed Node、异常优先级、不可变输出及 Undo/Redo，符合 Boundary Discipline、Fix Root Causes、Test Behavior, Not Implementation 和 Sequence Verifiable Units。保存的业务 red 确为冻结 NaN、revision 1→11 的断言失败；依赖/导入错误未当作业务 red。\n\n## 判断性 smell / ponytail\n\n未发现有具体后果的可操作 smell。acceptCoordinate 复用相同坐标检查并保留读取短路；所有权复制位于原 shared boundary，未新增公共 seam、cap、retry 或 fallback。按单 Canvas 的完整布局负载，额外存储为线性，排序复杂度保持，范围最小充分。\n\n## 实际检查及限制\n\n本轮 Layout API、Runtime、真实 Dagre/ELK 和根 Runtime/History 组合测试：52 pass、182 assertions（Bun 1.4.2）。完整范围 `git diff --check` 通过，工作树干净。\n\n未执行构建、仓库 full check、浏览器、远端发布或 CI；其他仍在运行的检查未计为通过。\n"
+    },
+    "spec": {
+      "head": "e43480244c7210f0190ef3680f2b3bd3f4ea9d63",
+      "tree": "8ebd682c79c220fc9723d8ccec66cb6603f2792b",
+      "patch": "d0195d7d0b6c31fc143c3f3562adb0b3099efa7a6f6a40c3d632dc667c53a380",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n已独立审查完整三文件补丁、Issue78 原文/空讨论、prepared plan、ADR0021/0026、Layout README及关联 Issue37 全部讨论，并检查 direct validator→Engine→Runtime→Kernel/History 调用链；未发现明确验收遗漏、错误实现或范围扩张。\n\n共享边界单次捕获 sourceRevision、原生遍历得到的 positions 序列及每项 id/position/x/y，边验证边形成自有值，再排序并复用既有冻结 helper；不再遍历或读取原 Proposal。revision、重复/未知/缺失 Node、finite 坐标、Fixed Node 检查和错误先后保留。Runtime 二次验证继续作用于稳定值，当前 revision/stale、取消和 Provider 错误传播未改。没有新增 accessor 禁令、API、cap 或 fallback。\n\n实际执行：\n\n- `bun test packages/layout-api/tests tests/layout-providers.test.ts`：30 pass、138 assertions。\n- `bun test packages/plugin-layout/tests packages/layout-dagre/tests packages/layout-elk/tests`：22 pass、44 assertions。\n\n合计52 tests、182 assertions、0 fail。真实 getter-backed Engine 经 Runtime/History 验证单 Commit、重复调用 no-op、Undo/Redo及 Session/Edge/data 保持；真实 Dagre/ELK 与 stale/cancellation 回归通过。已核读坐标与 revision 的行为 red 日志；初次依赖命令或缺导入失败不计业务 red。`git diff --check` 通过，工作树干净。\n\n未执行工程构建、类型检查、浏览器、full check/正式 verify、远端发布、当前 head CI 或报告/媒体回读；运行中的 affected full 检查未计为通过。本次 Spec pass 不代表实际 main 集成与完整验收完成。\n\n- base: `99ed305515afaec32ef49494b509446ad9ba998c`\n- head: `e43480244c7210f0190ef3680f2b3bd3f4ea9d63`\n- tree: `8ebd682c79c220fc9723d8ccec66cb6603f2792b`\n- raw binary patch SHA256: `d0195d7d0b6c31fc143c3f3562adb0b3099efa7a6f6a40c3d632dc667c53a380`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-public-proposal-red",
+      "acceptance": "At main99 the real public Engine/validator returns frozen NaN, empty coverage and changed revision after successful validation. Original assertion failure and all actual outcomes retained.",
+      "command": "bun original-public-repro.ts (main99 compiled public barrels)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "dependency-flag-setup-failure",
+      "acceptance": "The initial --dependencies invocation supplied two workspace names and failed before building dependencies. Retained as setup failure, not behavioral red.",
+      "command": "bun scripts/build-workspaces.ts --dependencies @nodebraid/layout-api @nodebraid/plugin-layout",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "missing-built-dependency-setup-failure",
+      "acceptance": "First regression invocation could not import Kernel because dependency build had failed; not counted as business red.",
+      "command": "bun test packages/layout-api/tests/proposal-values.test.ts (unprepared dependencies)",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "coordinate-behavior-red",
+      "acceptance": "After correcting dependency preparation, public Engine returns NaN instead of accepted finite10; actual value assertion fails.",
+      "command": "bun test packages/layout-api/tests/proposal-values.test.ts (before coordinate ownership)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "coordinate-green",
+      "acceptance": "The finite coordinate accepted during public compute is retained after freezing, with one original field read.",
+      "command": "bun test packages/layout-api/tests/proposal-values.test.ts (coordinate ownership)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "revision-red",
+      "acceptance": "After coordinate repair, the new source-revision assertion still receives11 instead of accepted1.",
+      "command": "bun test packages/layout-api/tests/proposal-values.test.ts (before revision ownership)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "revision-green",
+      "acceptance": "Both independent coordinate and revision regressions now pass.",
+      "command": "bun test packages/layout-api/tests/proposal-values.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "proposal-contracts-green",
+      "acceptance": "26 API tests /46 assertions pass, including16 new coordinate/field/sequence/Fixed Node/error identity and validation precedence regressions.",
+      "command": "bun test packages/layout-api/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "proposal-types-green",
+      "acceptance": "Current API source and new regression fixtures pass type checking.",
+      "command": "bun run --filter @nodebraid/layout-api typecheck:self",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "related-layout-green",
+      "acceptance": "52 tests /182 assertions pass across API, real Dagre/ELK, Runtime and root composition, including new getter-backed Runtime revalidation, single Commit/History, no-op and Undo/Redo coverage.",
+      "command": "bun test packages/layout-api/tests packages/layout-dagre/tests packages/layout-elk/tests packages/plugin-layout/tests tests/layout-providers.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-10.log"
+    },
+    {
+      "id": "final-compiled-public-green",
+      "acceptance": "All three original public assertions pass against the fixed compiled barrels; header records actual committed head/tree and original metadata is explicitly labelled base.",
+      "command": "git show -s --format=%H,%T HEAD; bun fixed-final-public-probe.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-11.log"
+    },
+    {
+      "id": "affected-development-green",
+      "acceptance": "check:affected automatically selected full because the existing root composition test changed. Its actual599 tests/2527 assertions, real browser suites, builds and docs pass. This is retained as a development check; it does not replace post-review agents:run verify.",
+      "command": "bun run check:affected --base 99ed305515afaec32ef49494b509446ad9ba998c (selector mode full)",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-12.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "5b215fa448b76b131544f9721fc7220599df4f21a4ac7eab8198b28e4f38e2f1"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "00d6d70c86b75bda51cf5ea0f26e6ba40b651813aa650bdc6de926fcc2b17fb5"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "bc2aa3609d524e0bad96faebe5b266a0f4d86efcd135297b9c6841301a4fd51d"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "ac9fedbdaa27df5c132f5d8a72f9f2d9427e0456dcc043569fa72cd95ab07868"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "a6f9905c1f5f355bd30370c5db5d6939b7f6335b3308c374a8fb95bca105435a"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "0547db2a8c091187a784fccb74f0657f6589167cf6f7099695f1f79bcd947bd9"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "e3527fa5c51c05906dd9ed336e145ab848fab5d9a42b01990d15ca3cb2f4dedb"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "722a3c3df2f804d5141e0c639d89ada613e21ef9b4228d717dc52da6e283f112"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "c7a88f81f0b59573b34336bb0c105e306c812229e6327c75cac213cecd4a9885"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "3f7615cce7bac789776db52d49243a795fc18f6e0b21e19bc657f003e8aff7c5"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "b6252f5834b07f211ccde513505e1adf2a2c2ed839839af3181f4df08db97a17"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "2740bfb7ccc4f4d7ed8a8f52bda6febba20bc5bc84eba5e0ca3334acb01af77b"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "12d60ca1bf99c20d9ad8378ee2700ca118f5bc77a5676f0fb3651f3a5111ab6a"
+    },
+    {
+      "path": "logs/behavior-11.log",
+      "kind": "log",
+      "sha256": "580a54418811ff1694674f45146242482528bd867de928032f9d87a9eba96ca4"
+    },
+    {
+      "path": "logs/behavior-12.log",
+      "kind": "log",
+      "sha256": "8ff1c9f0a9f464ad800af2ab9dd39c14fd6659581671a55f96ac89389e3a6ab3"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "f945b83366e5a0fe38e2e10656eb73802f783178edf6c458512d37079f53f7ca"
+    }
+  ]
+}

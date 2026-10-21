@@ -1,0 +1,44 @@
+bun test v1.4.2 (744846f84)
+
+packages/layout-api/tests/index.test.ts:
+(pass) a custom Layout Engine computes a full Layout Proposal from a committed Canvas View [1.78ms]
+(pass) Layout data crossing the computation seam is frozen [0.12ms]
+(pass) a pre-aborted Layout Engine preserves the reason without invoking its Provider [1.14ms]
+
+packages/layout-api/tests/proposal-values.test.ts:
+(pass) Layout compute retains the finite coordinate accepted during validation [0.26ms]
+(pass) Layout validation retains the source revision accepted before reading positions [0.41ms]
+(pass) Layout retains the accepted id property [0.09ms]
+(pass) Layout retains the accepted position property [0.02ms]
+(pass) Layout retains the accepted y property [0.05ms]
+(pass) Layout retains its accepted collection without another field read or iteration [0.41ms]
+(pass) Layout publishes the Fixed Node coordinates that passed validation [0.06ms]
+(pass) Layout preserves revision validation precedence over later read errors [5.05ms]
+(pass) Layout preserves duplicate validation precedence over later read errors [0.40ms]
+(pass) Layout preserves unknown validation precedence over later read errors [0.04ms]
+(pass) Layout preserves x validation precedence over later read errors [0.44ms]
+(pass) Layout propagates the original collection read failure [0.15ms]
+(pass) Layout propagates the original id read failure [0.02ms]
+(pass) Layout propagates the original position read failure [0.43ms]
+(pass) Layout propagates the original x read failure [1.01ms]
+(pass) Layout propagates the original y read failure [0.30ms]
+
+packages/layout-api/tests/input-validation.test.ts:
+(pass) invalid mode and Fixed Node identities are rejected as invalid Layout Requests [0.33ms]
+(pass) nested Nodes are rejected as unsupported Layout Inputs [0.09ms]
+(pass) mixed Port Endpoints project to Node topology without changing the Document [0.12ms]
+
+packages/layout-api/tests/error-contract.test.ts:
+(pass) Layout structural failures expose the shared NodeBraid error identity [0.30ms]
+
+packages/layout-api/tests/proposal-validation.test.ts:
+(pass) a Layout Engine rejects incomplete, foreign, invalid, or constraint-breaking positions [0.57ms]
+(pass) a Proposal must identify the Layout Input revision [0.07ms]
+
+packages/layout-api/tests/capability-validation.test.ts:
+(pass) a low-level Layout Engine rejects unsupported Input capabilities before its Provider runs [0.18ms]
+
+ 26 pass
+ 0 fail
+ 46 expect() calls
+Ran 26 tests across 6 files. [26.00ms]

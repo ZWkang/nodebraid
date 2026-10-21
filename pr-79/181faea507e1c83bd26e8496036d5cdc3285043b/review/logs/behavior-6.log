@@ -1,0 +1,23 @@
+bun test v1.4.2 (744846f84)
+
+packages/layout-api/tests/proposal-values.test.ts:
+(pass) Layout compute retains the finite coordinate accepted during validation [0.97ms]
+33 |   let reads = 0;
+34 |   const proposal = validateLayoutProposal(input, {
+35 |     get sourceRevision() { return ++reads === 1 ? input.revision : input.revision + 10; },
+36 |     positions: [{ id, position: { x: 10, y: 20 } }],
+37 |   });
+38 |   expect(proposal.sourceRevision).toBe(input.revision);
+                                       ^
+error: expect(received).toBe(expected)
+
+Expected: 1
+Received: 11
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/layout-api/tests/proposal-values.test.ts:38:35)
+(fail) Layout validation retains the source revision accepted before reading positions [7.08ms]
+
+ 1 pass
+ 1 fail
+ 4 expect() calls
+Ran 2 tests across 1 file. [15.00ms]

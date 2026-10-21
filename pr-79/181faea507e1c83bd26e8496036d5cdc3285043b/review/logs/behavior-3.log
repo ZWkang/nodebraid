@@ -1,0 +1,14 @@
+bun test v1.4.2 (744846f84)
+
+packages/layout-api/tests/proposal-values.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+error: Cannot find module '@nodebraid/kernel' from '/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/layout-api/tests/proposal-values.test.ts'
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [17.00ms]

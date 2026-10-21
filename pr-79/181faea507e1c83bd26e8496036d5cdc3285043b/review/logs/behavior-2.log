@@ -1,0 +1,11 @@
+80 | if (import.meta.main) {
+81 |   const root = findWorkspaceRoot(process.cwd());
+82 |   const names = process.argv.slice(2);
+83 |   const workspaces = readWorkspaces(root);
+84 |   if (names[0] === '--dependencies' || names[0] === '--test-dependencies') {
+85 |     if (names.length !== 2) throw new Error(`${names[0]} requires exactly one workspace name`);
+                                           ^
+error: --dependencies requires exactly one workspace name
+      at /Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/scripts/build-workspaces.ts:85:39
+
+Bun v1.4.2 (macOS arm64)

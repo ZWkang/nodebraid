@@ -1,0 +1,19 @@
+{"head":"99ed305515afaec32ef49494b509446ad9ba998c","publicCompute":{"xReads":2,"xFinite":false,"x":"NaN","frozen":true},"collection":{"reads":2,"expectedCount":1,"actualCount":0},"revision":{"reads":2,"expected":1,"actual":11},"documentRevision":1}
+32 |   publicCompute: { xReads, xFinite: Number.isFinite(result.positions[0]?.position.x), x: String(result.positions[0]?.position.x), frozen: Object.isFrozen(result.positions[0]?.position) },
+33 |   collection: { reads: collectionReads, expectedCount: input.nodes.length, actualCount: collectionResult.positions.length },
+34 |   revision: { reads: revisionReads, expected: input.revision, actual: revisionResult.sourceRevision },
+35 |   documentRevision: kernel.read().snapshot.revision,
+36 | }));
+37 | assert(Number.isFinite(result.positions[0]?.position.x), 'Successful public Layout compute must retain the finite position accepted during validation');
+     ^
+AssertionError: Successful public Layout compute must retain the finite position accepted during validation
+ generatedMessage: false,
+     actual: false,
+   expected: true,
+   operator: "==",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261021T201012-discovery/layout-proposal-repro.ts:37:1
+
+Bun v1.4.2 (macOS arm64)

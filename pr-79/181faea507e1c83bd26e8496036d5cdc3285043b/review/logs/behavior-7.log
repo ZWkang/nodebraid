@@ -1,0 +1,10 @@
+bun test v1.4.2 (744846f84)
+
+packages/layout-api/tests/proposal-values.test.ts:
+(pass) Layout compute retains the finite coordinate accepted during validation [12.26ms]
+(pass) Layout validation retains the source revision accepted before reading positions [0.49ms]
+
+ 2 pass
+ 0 fail
+ 5 expect() calls
+Ran 2 tests across 1 file. [60.00ms]
