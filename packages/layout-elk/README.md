@@ -6,6 +6,8 @@ ELK Layout Provider for NodeBraid.
 
 The Provider implements deterministic full layout with `elkjs` and exposes self-loop support. ELK Stress additionally provides incremental layout and Fixed Node constraints: the Adapter enables interactive positioning and restores ELK's component-local result translation to NodeBraid absolute world coordinates only when every Fixed Node proves the same translation.
 
+Ordinary and Port-qualified Edges share the same Node-topology projection, retaining each Edge ID. Port IDs, definitions, and geometry do not affect the calculation; Port Geometry remains Renderer-owned.
+
 `randomSeed` accepts safe integers and defaults to the fixed seed `1`. An explicit `0` also uses `1`, so identical input and configuration remain deterministic. Other nonzero safe integer seeds are passed through unchanged.
 
 Fixed Nodes require the Stress algorithm. Worker execution is deliberately outside the first version; the package uses ELK's bundled in-process worker implementation and includes an explicit Bun loader compatibility path.

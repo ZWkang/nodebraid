@@ -33,9 +33,11 @@ description: Provider-neutral Layout Input、Engine、Proposal、capability 与�
 - `validateLayoutProposal()`：验证 revision、完整 Node coverage、有限坐标与 Fixed Node；
 - `LayoutError`：稳定 `layout + code` 错误身份。
 
+`createLayoutInput()` 接受普通 Edge 与单端、双端带 `portId` 的 Edge，统一保留每个 Edge ID 和两端 Node ID，不合并平行 Edge，也不改变原 Canvas View。Dagre 与 ELK 都使用这份 Node 拓扑投影；Port 定义与 Geometry 不进入算法。
+
 ## 依赖与组合
 
-该 package 依赖 `@nodebraid/kernel` 的 identity、geometry 与 Canvas View，以及 `@nodebraid/diagnostics` 的结构化错误契约。它不依赖 Plugin Host、Command Service、具体 Provider 或 `@nodebraid/core`。
+该 package 依赖 `@nodebraid/kernel` 的 identity、geometry 与 Canvas View，以及 `@nodebraid/diagnostics` 的结构化错误契约。它不依赖 Plugin Host、Command Service、PortService、具体 Provider 或 `@nodebraid/core`；不读取 Port Snapshot/generation，也不验证 Port 存在性、role 或定义合法性。
 
 Runtime 提交通常由 [`@nodebraid/plugin-layout`](/modules/plugin-layout) 完成；[`@nodebraid/layout-dagre`](/modules/layout-dagre) 和 [`@nodebraid/layout-elk`](/modules/layout-elk) 都实现这套 Engine seam。
 
@@ -63,7 +65,7 @@ import {
 | Code                  | 含义                                                         |
 | --------------------- | ------------------------------------------------------------ |
 | `INVALID_REQUEST`     | mode 或 Fixed Node 请求无效                                  |
-| `INVALID_INPUT`       | Canvas 投影缺少 Size，或包含不支持的 nesting/Port            |
+| `INVALID_INPUT`       | Canvas 投影缺少 Size，或包含不支持的 nesting                 |
 | `UNSUPPORTED_FEATURE` | Provider capability 不覆盖请求                               |
 | `INVALID_PROPOSAL`    | Proposal revision、Node coverage、坐标或 Fixed Node 结果无效 |
 | `STALE_PROPOSAL`      | Runtime 提交前发现 Kernel revision 已变化                    |
@@ -75,7 +77,8 @@ import {
 - Engine 不写 Kernel；
 - Proposal 不携带 Provider ID、mode、配置、Edge Routing 或任意 entity patch；
 - 首版只支持 whole-canvas input；
-- 不支持 nested Node、Port Endpoint 或缺少 Size 的 Node；
+- 不支持 nested Node 或缺少 Size 的 Node；
+- 不提供 Port 几何、方位、顺序或端口级连接约束；Port Geometry 归 Renderer 所有；
 - 不提供 Registry、默认 Provider、Worker、cache 或 persistence。
 
 ## 验证依据

@@ -33,9 +33,11 @@ Applications that only need to execute layout inside a Canvas Runtime will typic
 - `validateLayoutProposal()`: validates the revision, complete Node coverage, finite coordinates, and Fixed Nodes;
 - `LayoutError`: stable `layout + code` error identity.
 
+`createLayoutInput()` accepts ordinary Edges and Edges with `portId` on either or both Endpoints, retaining every Edge ID and endpoint Node ID without merging parallel Edges or changing the original Canvas View. Dagre and ELK both consume this Node-topology projection; Port definitions and Geometry do not enter the algorithm.
+
 ## Dependencies and composition
 
-This package depends on the identity, geometry, and Canvas View contracts from `@nodebraid/kernel`, and the structured error contract from `@nodebraid/diagnostics`. It does not depend on the Plugin Host, Command Service, a concrete Provider, or `@nodebraid/core`.
+This package depends on the identity, geometry, and Canvas View contracts from `@nodebraid/kernel`, and the structured error contract from `@nodebraid/diagnostics`. It does not depend on the Plugin Host, Command Service, PortService, a concrete Provider, or `@nodebraid/core`. It reads no Port Snapshot or generation and performs no Port existence, role, or definition validation.
 
 Runtime commits are typically handled by [`@nodebraid/plugin-layout`](/en/modules/plugin-layout). Both [`@nodebraid/layout-dagre`](/en/modules/layout-dagre) and [`@nodebraid/layout-elk`](/en/modules/layout-elk) implement this Engine seam.
 
@@ -63,7 +65,7 @@ Shared structural errors use only five codes:
 | Code                  | Meaning                                                                                |
 | --------------------- | -------------------------------------------------------------------------------------- |
 | `INVALID_REQUEST`     | The mode or Fixed Node request is invalid                                              |
-| `INVALID_INPUT`       | The Canvas projection lacks a Size or contains unsupported nesting or Ports            |
+| `INVALID_INPUT`       | The Canvas projection lacks a Size or contains unsupported nesting                     |
 | `UNSUPPORTED_FEATURE` | The Provider's declared capabilities do not cover the request                          |
 | `INVALID_PROPOSAL`    | The Proposal has an invalid revision, Node coverage, coordinates, or Fixed Node result |
 | `STALE_PROPOSAL`      | The Runtime finds that the Kernel revision has changed before committing               |
@@ -75,7 +77,8 @@ Shared structural errors use only five codes:
 - An Engine does not write to the Kernel;
 - a Proposal does not carry a Provider ID, mode, configuration, Edge Routing, or arbitrary entity patches;
 - the initial release supports only whole-canvas input;
-- nested Nodes, Port Endpoints, and Nodes without a Size are unsupported;
+- nested Nodes and Nodes without a Size are unsupported;
+- it provides no Port geometry, side, order, or port-level connection constraints; the Renderer owns Port Geometry;
 - it provides no Registry, default Provider, Worker, cache, or persistence.
 
 ## Verification evidence

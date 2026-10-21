@@ -44,22 +44,25 @@ NodeBraid 不指定默认 Provider，也没有动态 Layout Registry。Provider 
 
 ## 输入边界
 
-首版 Layout 处理整张 Canvas，并要求：
+Layout 处理整张 Canvas，并要求：
 
 - 每个 Node 都有明确 Size；
 - Node 没有 `parentId`；
-- Edge Endpoint 不带 `portId`；
 - Fixed Node ID 存在且不重复；
 - `incremental` 仍计算整张图，当前位置只提供稳定性约束；
 - Fixed Node 是必须保持绝对 World Position 的硬约束。
 
-不满足这些条件时会在进入 Provider 前失败，不会猜测尺寸、忽略 Port 或只布局一部分 Node。
+不满足这些条件时会在进入 Provider 前失败，不会猜测尺寸或只布局一部分 Node。
+
+普通 Edge、单端或双端带 `portId` 的 Edge 可以混用。Dagre 与 ELK 都按 Node 拓扑布局：Layout Input 保留每个 Edge ID 与两端 Node ID，平行 Edge 不合并；相同 Node 拓扑与配置仅改变 Port ID 时，候选位置相同。这不要求安装 Port Plugin，也不读取 Port Snapshot 或 Contribution generation，不承担 Port 存在性、role 或定义合法性验证。
+
+Port Geometry 仍由 Renderer 根据 Node Geometry 与 Port Snapshot 计算。Layout 不输入 Port 方位、顺序或相对坐标，不重新定位 Port，也不承诺端口级交叉优化；成功计算不替代 Port、Interaction 或 Renderer 的验证。
 
 ## 提交与并发
 
-有效 Proposal 必须带回捕获的 source revision，并为每个输入 Node 提供且只提供一个有限坐标。Runtime 在提交前再次读取当前 Kernel revision：如果 Document 已变化，整个 Proposal 以 `STALE_PROPOSAL` 失败，而不是自动 rebase。
+有效 Proposal 必须带回捕获的 source revision，并为每个输入 Node 提供且只提供一个有限坐标。Runtime 在提交前再次读取当前 Kernel revision：如果 Document 已变化，包括 Endpoint `portId` 被修改，整个 Proposal 以 `STALE_PROPOSAL` 失败，而不是自动 rebase。只有 Port Contribution generation 变化不会新增 Layout 失败条件。
 
-一次有净变化的 Layout Command 最多产生一个 Canvas Commit，因此自然对应一个 Change Set 和一个 History Entry；全部位置不变时可返回 `null` Commit。
+Layout Command 只替换实际变化的 Node position，保留其余 Node 字段、Edge、Endpoint、`portId` 和领域 data。它不写 Session，Selection 与 Viewport 保持不变，也不自动 Fit View。一次净变化产生一个 Canvas Commit、一个 Change Set 和一个 History Entry，可单步 Undo/Redo；全部位置不变时返回 `null`，不推进 revision 或历史。
 
 ## 当前不包含
 
@@ -68,8 +71,8 @@ NodeBraid 不指定默认 Provider，也没有动态 Layout Registry。Provider 
 - preview、animation 或交互拖拽策略；
 - Worker execution、cache 或 persistence；
 - 动态 Provider Registry 或默认 Provider；
-- 对 nested Node 和 Port Geometry 的静默降级。
+- nested Node 与 Port-aware 几何布局。
 
 ## 验证依据
 
-当前实现通过 provider-neutral contract 测试、Proposal/Request validation 测试、Runtime stale/cancellation/commit 测试，以及 Dagre 与 ELK 的真实端到端组合测试验证。两种 Provider 均通过同一 `LayoutEngine` seam 进入真实 Plugin Host、Kernel 与 Command Service。
+当前实现通过 provider-neutral contract 测试、Proposal/Request validation 测试、Runtime stale/cancellation/commit 测试，以及 Dagre 与 ELK 的真实端到端组合测试验证。两种 Provider 均通过同一 `LayoutEngine` seam 进入真实 Plugin Host、Kernel、Command、History 与 Session，验证不安装 Port Plugin 时的端口保持、单步 Undo/Redo、无净变化和 Session 状态保持。

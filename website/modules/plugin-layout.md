@@ -37,6 +37,8 @@ Layout Engine 可以异步计算位置，但不能直接修改权威 Document。
 
 每个生成的 Plugin 静态要求 `KernelService` 和 `CommandService`。它依赖 `@nodebraid/layout-api`、`@nodebraid/plugin-kernel`、`@nodebraid/plugin-command` 与 NodeBraid Plugin Host seam，不依赖 `@nodebraid/core`。
 
+带 Port 的 Document 也使用这条 Node 拓扑布局链路，无需安装 Port Plugin。Layout 不读取 Port Snapshot 或 Contribution generation，不增加 Port 定义校验；Port Geometry 仍归 Renderer 所有。
+
 应用需要自行：
 
 1. 选择一个 `LayoutEngine<Config>`；
@@ -63,9 +65,11 @@ import {
 
 Plugin Activation 注册 Command，并把 registration 作为 Owned Resource。Activation 结束时，Command registration 按 Command Service 规则从 lookup 移除、取消并等待 in-flight execution。
 
-Command 在每个异步边界前后检查调用方的 `AbortSignal`。Proposal validation 后会立即比较当前 Kernel revision；如果不再等于 source revision，则以 `STALE_PROPOSAL` 失败，不提交部分结果。
+Command 在每个异步边界前后检查调用方的 `AbortSignal`。Proposal validation 后会立即比较当前 Kernel revision；如果不再等于 source revision，则以 `STALE_PROPOSAL` 失败，不提交部分结果。修改 Endpoint `portId` 同样推进 Document revision，使旧 Proposal stale；只有 Port Contribution generation 变化不会使 Proposal stale。
 
-有效位置在一个同步 Transaction 中替换。Transaction metadata 使用 `origin: 'layout'` 与实际 Command ID，使 Diagnostics 和 History 可以识别行为来源，但 metadata 不控制正确性。
+只有实际变化的 Node position 在一个同步 Transaction 中替换；其余 Node 字段、Edge、Endpoint、`portId` 和领域 data 保留。Transaction metadata 使用 `origin: 'layout'` 与实际 Command ID，使 Diagnostics 和 History 可以识别行为来源，但 metadata 不控制正确性。
+
+净变化对应一次 Canvas Commit 和一个 History Entry，可单步 Undo/Redo；所有位置不变时返回 `null`，不推进 revision 或历史。Layout 不写 Session，Selection 和 Viewport 保持不变，也不自动 Fit View。
 
 ## 限制与非目标
 

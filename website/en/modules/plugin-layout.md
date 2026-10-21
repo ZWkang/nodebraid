@@ -37,6 +37,8 @@ If you only need to compute a Proposal offline without committing the Document, 
 
 Every generated Plugin statically requires `KernelService` and `CommandService`. It depends on `@nodebraid/layout-api`, `@nodebraid/plugin-kernel`, `@nodebraid/plugin-command`, and the NodeBraid Plugin Host seam, but not on `@nodebraid/core`.
 
+Documents with Ports use the same Node-topology layout path without installing a Port Plugin. Layout reads no Port Snapshot or Contribution generation and adds no Port definition validation; the Renderer still owns Port Geometry.
+
 The application must:
 
 1. choose a `LayoutEngine<Config>`;
@@ -63,9 +65,11 @@ These entry points are also re-exported by `@nodebraid/core`; concrete Providers
 
 Plugin Activation registers the Command and treats the registration as an Owned Resource. When Activation ends, the Command registration is removed from lookup, cancelled, and waits for in-flight execution according to Command Service rules.
 
-The Command checks the caller's `AbortSignal` before and after every asynchronous boundary. Immediately after Proposal validation, it compares the current Kernel revision; if it no longer matches the source revision, the operation fails with `STALE_PROPOSAL` and commits no partial results.
+The Command checks the caller's `AbortSignal` before and after every asynchronous boundary. Immediately after Proposal validation, it compares the current Kernel revision; if it no longer matches the source revision, the operation fails with `STALE_PROPOSAL` and commits no partial results. An Endpoint `portId` edit also advances Document revision and makes the old Proposal stale; a Port Contribution generation change alone does not.
 
-Valid positions are replaced within one synchronous Transaction. Transaction metadata uses `origin: 'layout'` and the actual Command ID so Diagnostics and History can identify the source of the behavior, but metadata does not govern correctness.
+Only changed Node positions are replaced within one synchronous Transaction; all other Node fields, Edges, Endpoints, `portId`, and domain data are preserved. Transaction metadata uses `origin: 'layout'` and the actual Command ID so Diagnostics and History can identify the source of the behavior, but metadata does not govern correctness.
+
+Net changes produce one Canvas Commit and one History Entry for one-step Undo/Redo. Unchanged positions return `null` without advancing revision or history. Layout does not write Session state, so Selection and Viewport remain unchanged, with no automatic Fit View.
 
 ## Limitations and non-goals
 

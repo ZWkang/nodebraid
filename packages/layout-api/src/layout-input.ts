@@ -61,23 +61,13 @@ export function createLayoutInput(view: CanvasView, options: LayoutInputOptions)
       fixed: fixedNodeIds.has(node.id),
     });
   });
-  const edges = view.snapshot.edges.map((edge) => {
-    for (const endpoint of ['source', 'target'] as const) {
-      const portId = edge[endpoint].portId;
-      if (portId !== undefined) {
-        throw new LayoutError(
-          'INVALID_INPUT',
-          `Port Endpoint on Edge "${edge.id}" is not supported by the first Layout version.`,
-          Object.freeze({ issue: 'UNSUPPORTED_PORT', edgeId: edge.id, endpoint, portId }),
-        );
-      }
-    }
-    return Object.freeze({
+  const edges = view.snapshot.edges.map((edge) =>
+    Object.freeze({
       id: edge.id,
       sourceNodeId: edge.source.nodeId,
       targetNodeId: edge.target.nodeId,
-    });
-  });
+    }),
+  );
   return Object.freeze({
     revision: view.snapshot.revision,
     mode: options.mode,
