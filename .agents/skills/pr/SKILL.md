@@ -16,8 +16,8 @@ Use this template for writing the PR body:
 
 <diagram, diff-sketch, or tree>
 
-**Delivery:** <parent spec and approval link; source task; target branch>
-<For a stacked or follow-up integration PR: original PR/commit chain and remaining main integration.>
+**Delivery:** <source spec Issue and accepted scope; target: main>
+Refs #<spec-issue>
 
 ## Evidence
 
@@ -37,11 +37,24 @@ Use this template for writing the PR body:
 
 ## Sections
 
-Use `Fixes #N` only on the final delivery PR targeting main. A stacked PR links
-its task without claiming closure. Preserve the original PR/commit/task chain
-when an already merged feature-branch PR needs a follow-up integration PR.
-Parent spec titles use `spec: `. Retargeting an open PR requires a new prepared
-run, checks and both reviews even if its head SHA did not change.
+One spec Issue, titled `spec: `, has one delivery PR targeting main. Link that
+source Issue directly. Keep `Refs #N` while any acceptance requires a post-merge
+operation, then close the Issue explicitly after acceptance under existing
+authorization. Use `Fixes #N` only when merge is the last remaining acceptance
+condition and closure is authorized. Follow the tracker closing rule for commit
+keywords and Development links as well as the PR body. Keep tickets in the existing local run
+plan; several commits or internally parallel steps feed this same PR. Continue
+the existing PR for feedback and repairs instead of creating a PR per ticket.
+
+Before ready for merge review, verify the pre-merge local steps and acceptance,
+current-head checks/reviews and report publication. List post-merge steps and
+their prerequisites as pending, not completed. Close the source Issue only after
+actual main integration and all remaining acceptance, with existing authorization.
+
+For historical stacked or follow-up integration PRs, retain the original
+PR/commit/Issue chain and distinguish feature-branch merges from main delivery.
+Do not bulk rewrite historical links. Retargeting an old open PR requires a new
+prepared run, checks and both reviews even if its head SHA did not change.
 
 Skip all preambles and keep prose brief. Use the user's domain language from `GLOSSARY.md`.
 

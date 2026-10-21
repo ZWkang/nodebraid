@@ -1,122 +1,99 @@
 ---
 name: to-tickets
-description: Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, published to the configured tracker — edges as text in one file per ticket locally, or native blocking links on a real tracker.
+description: Break an approved spec into local, verifiable execution steps in the existing run plan while keeping one GitHub Issue and one main PR for the spec.
 disable-model-invocation: true
 ---
 
 # To Tickets
 
-Break a plan, spec, or conversation into a set of **tickets** — tracer-bullet vertical slices, each declaring the tickets that **block** it.
+Break a spec into local **tickets** — verifiable slices with explicit blockers.
+The spec remains one GitHub Issue, titled `spec: `, and one delivery PR targeting
+main. Tickets are execution steps, not additional GitHub Issues or PRs.
 
-The issue tracker and triage label vocabulary should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
+Read `docs/agents/issue-tracker.md` and the existing local run protocol before
+decomposing work.
 
 ## Process
 
 ### 1. Gather context
 
-Work from whatever is already in the conversation context. If the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
+Read the source Issue's complete body and discussion using
+`docs/agents/discussion-workflow.md`, then refresh its local archive. Use confirmed
+scope, test seams and acceptance criteria. Preserve unresolved questions,
+local-only or paused execution, and another active owner's work.
 
-For linked Issue or PR discussions, follow `docs/agents/discussion-workflow.md`. Use confirmed decisions to shape acceptance criteria and preserve their source links. Keep proposals and unresolved questions distinct from agreed requirements.
+Read the existing PR and local run before drafting steps so resumed work reuses
+its plan and evidence. Historical child Issues and stacked PRs remain traceable;
+check their actual main integration when relevant without creating replacement
+Issues or bulk rewriting those relationships. Title case is not approval.
 
-For NodeBraid, reconcile existing open and closed child issues and PRs first,
-including native relationships, actual main integration, active owners and
-local-only/paused execution. Reuse existing slices and create only missing work.
-The parent title uses `spec: `; title case never establishes approval.
+### 2. Explore the codebase
 
-### 2. Explore the codebase (optional)
+If needed, trace the affected public seams and existing implementations. Use
+`CONTEXT.md` vocabulary and relevant ADRs. Apply `ponytail` full: reuse existing
+behavior and remove obsolete structure before adding another mechanism.
 
-If you have not already explored the codebase, do so to understand the current state of the code. Ticket titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs in the area you're touching.
+### 3. Draft verifiable slices
 
-Look for opportunities to prefactor the code to make the implementation easier. "Make the change easy, then make the easy change."
+- Prefer a narrow end-to-end behavior through the affected layers and tests.
+- Give each step an `id`, its genuine `blockedBy` step IDs, and an `acceptance`
+  statement describing the observable result and its verification.
+- Keep each step small enough to implement and review in a fresh context.
+- Sequence necessary prefactoring before the behavior it enables.
+- For a wide mechanical refactor, use expand, migrate and contract steps inside
+  the same delivery branch. When intermediate steps cannot be green alone,
+  preserve their dependency order and verify the integrated result before delivery.
 
-### 3. Draft vertical slices
+One PR may contain several commits and internally parallel work. Independent
+steps can run in parallel with explicit file ownership; every result returns to
+the same plan and final PR. Do not create GitHub sub-issues, native ticket
+dependencies or stacked PRs for these steps.
 
-Break the work into **tracer bullet** tickets.
+### 4. Review the plan
 
-<vertical-slice-rules>
+Check that every acceptance criterion has an implementing or verifying step,
+each blocker is necessary, and the dependency graph has no cycles or unknown IDs.
+Show the concise breakdown when useful. Within existing authorization to decompose
+the approved spec, self-review and proceed; do not request approval again for
+routine ticket granularity. Return requirement, public contract or architecture
+changes to discussion before implementing the affected work.
 
-- Each slice cuts a narrow but COMPLETE path through every layer (schema, API, UI, tests) — vertical, NOT a horizontal slice of one layer
-- A completed slice is demoable or verifiable on its own
-- Each slice is sized to fit in a single fresh context window
-- Any prefactoring should be done first
+### 5. Save and execute the local plan
 
-</vertical-slice-rules>
+Refresh source discussion before preparing the run. Save the original request
+and the plan in the existing
+`$CODEX_HOME/local-workflows/nodebraid/runs/<run-id>/input.json`. Use the existing
+`RunInput` contract and `plan: [{id, blockedBy, acceptance}]`. Keep ticket progress
+in the existing completed-step record. Optional `plan.md` can explain the same
+plan without maintaining another completion list.
 
-Give each ticket its **blocking edges** — the other tickets that must complete before it can start. A ticket with no blockers can start immediately.
+```bash
+bun run agents:run prepare /absolute/path/to/run/input.json /absolute/path/to/run
+bun run agents:run frontier /absolute/path/to/run /absolute/path/to/run/completed-steps.json
+```
 
-**Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change — rename a column, retype a shared symbol — whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own ticket blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in a ticket blocked by every migrate batch. When even the batches can't stay green alone, keep the sequence but let them share an integration branch that all block a final integrate-and-verify ticket — green is promised only there.
+`prepare` saves the independent, immutable `prepared-task.json.plan`. Record only
+step IDs backed by actual execution evidence in `completed-steps.json`, preserving
+the evidence in the existing run artifacts. Work the `frontier`: steps whose
+blockers are complete. Before recovery, verify actual code, PR state and evidence
+before reusing a completed step. A changed request or prepared plan needs a new
+run; never edit the prepared task or copy old verification onto a new head.
 
-### 4. Quiz the user
+The plan may include review, acceptance and publication steps. Complete each
+after its actual operation succeeds; do not require every plan step to be done
+before `verify`, because verification or publication may itself be pending.
+Ready for merge review requires evidence for all pre-merge steps and acceptance,
+plus current-head CI, reviews and report publication. Record any post-merge
+prerequisite in the step's acceptance and handoff; those steps stay pending until
+it holds. Ready does not require the PR already merged or those steps completed.
+Closing the spec requires actual main integration, all remaining acceptance and
+an empty local frontier. The frontier selects dependency candidates; the
+coordinator also checks external prerequisites and permission before acting.
+`verify` success alone does not establish these delivery facts.
 
-Present the proposed breakdown as a numbered list. For each ticket, show:
-
-- **Title**: short descriptive name
-- **Blocked by**: which other tickets (if any) must complete first
-- **What it delivers**: the end-to-end behaviour this ticket makes work
-
-Ask the user:
-
-- Does the granularity feel right? (too coarse / too fine)
-- Are the blocking edges correct — does each ticket only depend on tickets that genuinely gate it?
-- Should any tickets be merged or split further?
-
-Iterate until the user approves the breakdown, unless existing authorization
-already delegates decomposition within the approved scope. In that case,
-self-review the slices and blockers and proceed without repeating approval.
-
-### 5. Publish the tickets to the configured tracker
-
-Refresh the referenced discussion before publishing and incorporate newly confirmed acceptance criteria into the affected tickets. Revisit approval only if the new information changes scope, granularity, or blocking edges beyond the existing authorization; do not silently publish an obsolete plan.
-
-Publish the approved tickets. **How** depends on the tracker `/setup-matt-pocock-skills` configured — the tickets are the same either way, only the shape of the blocking edges changes:
-
-- **Local files** → write one file per ticket under `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-ticket file template below — one ticket per file, never a single combined file.
-- **A real issue tracker (GitHub, Linear, …)** → publish one issue per ticket in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers. Use the platform's native blocking / sub-issue relationship where it has one; otherwise set each ticket's "Blocked by" to the blocking issues. Apply the `ready-for-agent` triage label unless instructed otherwise — the tickets are agent-grabbable by construction.
-
-Work the **frontier**: any ticket whose blockers are all done. For a purely linear chain that means top to bottom.
-
-Do not close or modify the parent merely as part of decomposition. This does not
-block a separately authorized reconciliation, acceptance summary or closure
-after all children, default-branch integration and parent acceptance are verified.
-For NodeBraid, native sub-issue and blocker links are required and read back;
-text links cannot silently replace a failed relationship write. Approved feature
-children link the approval comment and receive `enhancement`, `approved-spec`
-and `ready-for-agent`, while an explicit execution opt-out remains preserved.
-
-<local-ticket-template>
-
-# <NN> — <Ticket title>
-
-**What to build:** the end-to-end behaviour this ticket makes work, from the user's perspective — not a layer-by-layer implementation list.
-
-**Blocked by:** the numbers/titles of the tickets that gate this one, or "None — can start immediately".
-
-**Status:** ready-for-agent
-
-- [ ] Acceptance criterion 1
-- [ ] Acceptance criterion 2
-
-</local-ticket-template>
-
-<issue-template>
-
-## Parent
-
-A reference to the parent issue on the tracker (if the source was an existing issue, otherwise omit this section).
-
-## What to build
-
-The end-to-end behaviour this ticket makes work, from the user's perspective — not layer-by-layer implementation.
-
-## Acceptance criteria
-
-- [ ] Criterion 1
-- [ ] Criterion 2
-
-## Blocked by
-
-- A reference to each blocking ticket, or "None — can start immediately".
-
-</issue-template>
-
-In either form, avoid specific file paths or code snippets — they go stale fast. Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
+Update the same PR with a direct reference to the spec Issue. Use `Refs #N`
+while post-merge acceptance remains; `Fixes #N` is appropriate only when merge
+is the last remaining condition and closure is authorized. Follow the tracker's
+closing-link checks. Close only after actual main integration, completed spec
+acceptance and existing authorization. Local ticket completion does not publish
+a GitHub comment or close an Issue by itself.

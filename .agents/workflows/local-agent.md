@@ -31,7 +31,7 @@ as GitHub success. Do not transfer connector credentials into shell environments
 Follow all pagination, including reviews and thread comments.
 
 At the existing discussion-read boundaries, archive each completely read
-requirement/spec Issue and its parent/tasks with `agents:run archive-issue` as
+requirement/spec Issue and relevant existing Issues with `agents:run archive-issue` as
 specified in [the tracker](../../docs/agents/issue-tracker.md#local-reading-and-archive-copies).
 Refresh after authorized GitHub writes have been read back as well. Keep readable
 current copies and immutable versions under the shared local `issues/` directory,
@@ -69,26 +69,30 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    every GitHub write. Use this chat's existing task worktrees; preserve dirty user
    trees and never reset, clean or force-push them. New task worktrees start at the
    fetched main. One integration owner performs writes; review subagents are read-only.
-2. Prioritize existing in-progress PRs and approved/confirmed issues. Search for
-   an existing fix before implementing an issue, and keep one active delivery PR
-   per issue. An already merged feature-branch PR can require a follow-up
-   `feat/issue-N-integration` PR; preserve the original issue/PR/commit chain.
+2. Prioritize existing in-progress PRs and approved/confirmed issues. Each new
+   requirement/spec is one GitHub Issue with one delivery PR to main. Search for
+   existing work and continue that Issue, branch and PR. Implementation tickets
+   stay in the local run; do not create child Issues or stacked PRs for them.
    An issue is eligible only with `ready-for-agent` and `bug` or `approved-spec`,
    without `needs-info`/`needs-design`, and while still open. Normalize connected
    issue state to the uppercase shape before using `validateAgentIssue` from
    `scripts/prepare-agent-issue.ts`. A human's approved spec still defines scope.
-   Reconcile each approved parent against all native children, blockers, existing
-   PRs, current assignees/execution owners and remaining acceptance criteria.
-   Parent titles use `spec: `; title case does not establish eligibility.
+   Spec Issue titles use `spec: `; after implementation is authorized, apply
+   `approved-spec` and `ready-for-agent` to that same Issue. Title case and merely
+   publishing a spec do not establish eligibility. Reconcile its scope, existing
+   PR, genuine external Issue dependencies, owner, local plan and acceptance.
    Preserve explicit local-only execution, pauses, unapproved scope and another
-   active owner's work. Within existing delivery authorization, reuse existing
-   slices and autonomously publish missing approved slices with `to-tickets`.
-   Read back native relationships; missing links or unreadable pages are errors,
-   never an empty frontier or an excuse to recreate work.
+   active owner's work. Within delivery authorization, `to-tickets` decomposes
+   approved work into the existing prepared run plan, with local dependency IDs.
+   For new deliveries, use `specs: []` and one `tasks` entry per spec Issue,
+   `parent: null`; `blockers` contains complete external Issue-dependency pages
+   (`[[]]` when none), not local ticket IDs.
    Save independent source context and run `agents:run reconcile <source.json>
 [output.json]` after fetching main, using the input contract in
    `docs/agents/agentic-workflows.md`. Resume its eligible frontier; repeat after
-   relationship changes, integration, acceptance or authorized closures.
+   source changes, integration, acceptance or authorized closures. This frontier
+   selects GitHub deliveries; `frontier <run-dir> <completed-steps.json>` selects
+   local tickets within one delivery.
    A task's selected delivery PR whose merge commit is absent from fetched main is
    `needs-integration`, even when GitHub already closed the source issue.
    Keep it visible and reuse its implementation; do not report task completion.
@@ -96,13 +100,17 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    to choose recovery work. Historical PR ancestry remains visible but is not an
    integration queue: when a follow-up delivery has reached main and the task is
    accepted, do not integrate its old feature-branch merge again.
-   Close an implementation issue only after actual main integration and full
-   task acceptance. Close a parent only after every approved slice, native child
-   and parent acceptance criterion is complete. Publish the acceptance summary,
+   For old parent/child records, retain the native relationships and complete
+   source PR chain. The legacy `specs` aggregate still checks those children;
+   missing links or unreadable pages are errors, not an empty frontier. Do not
+   create more GitHub tickets or rewrite historical records to fit the new model.
+   Close the spec Issue only after actual main integration, complete local ticket
+   evidence and the whole spec's acceptance. Historical aggregates also require
+   all existing children and parent criteria. Publish the acceptance summary,
    using actual verification/publication/current-head feedback results and real
    external acceptance. Reconciliation only checks evidence references, not their
    contents; a nonempty reference or `canClose` candidate is not proof of CI/review.
-   use existing user closure authorization, and read back the result. Without
+   Use existing user closure authorization, and read back the result. Without
    authorization, leave it waiting for the user.
 3. Investigate untriaged issues using the full report, public contract and a real
    executable reproduction. Record base, command, expected/actual result and the
@@ -129,18 +137,24 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
 
 ## Implement and publish
 
-1. Capture the base and plan verifiable slices. Check coverage, dependencies,
+1. Capture the base and plan verifiable local tickets. Check coverage, dependencies,
    acceptance criteria and public seams against the source spec before coding.
    Apply `ponytail` full and `tdd`: understand callers, reuse existing capabilities,
    reproduce a defect red, implement the smallest complete fix, then show green.
    New requirements, public contracts or ADR changes return to the user.
    Before implementation, call `bun run agents:run prepare <input.json> <run-dir>`.
    It independently saves the approved source, expected remote base, current PR
-   `baseRefName`, request,
-   feedback and acceptance/dependency plan. `frontier <run-dir> <completed.json>`
-   rejects cycles and unfinished blockers. Reopening an identical task resumes it;
+   `baseRefName`, request, feedback and `plan: [{id, blockedBy, acceptance}]`.
+   Write the draft plan in `input.json`; after prepare, use the immutable
+   `prepared-task.json.plan` as the ticket plan. Keep `completed-steps.json` and
+   each step's actual evidence in that run outside the worktree. Optional
+   `plan.md` explains this plan without a separate status list.
+   `frontier <run-dir> <completed-steps.json>` rejects cycles and unfinished
+   blockers. Local tickets may use several commits and Agent delegates, all
+   contributing to the same delivery PR. Reopening an identical task resumes it;
    a changed task requires another run. Do not derive the prepared task from the
-   result receipt or replace it after execution.
+   result receipt or replace it after execution. Reassess earlier step evidence
+   before carrying completion into a changed plan.
    During development, run `bun run check:affected` for changes against `HEAD`,
    including staged, unstaged and untracked files. Use `--base main` to include
    branch changes, or `--plan` to inspect the scope without executing checks.
@@ -164,15 +178,20 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    Failures prevent a ready PR; never weaken assertions, change acceptance criteria,
    add fake success or silently degrade behavior to obtain green checks. Fixture
    runs in the test suite are execution-layer tests, not live AI repair acceptance.
-4. Use `feat/issue-N` (or the recovery `feat/issue-N-integration`) and a
+4. Use `feat/issue-N` and a
    `[local-agent] ` title to opt a PR into local maintenance.
    Legacy `[agent] ` issue PRs are also managed. Create a non-draft PR only after local
    verification and review, with the installed `pr`/`show-me` template:
    focused Summary, real Before/After Evidence, and Merge Danger. Publish the full
    reviews, declared behavior evidence and media through [PR evidence](../../docs/agents/pr-evidence.md).
    Keep detailed logs linked; the generated marker block preserves the author's body.
-   A final delivery PR to main uses `Fixes #N`; stacked PRs link the task and
-   remaining integration without claiming closure.
+   The single PR targets main and links the spec Issue directly. Keep `Refs #N`
+   while post-merge acceptance remains, then close explicitly after it passes.
+   Use `Fixes #N` only when merge is the last acceptance condition and closure
+   is authorized. Follow the tracker closing rule for PR/commit keywords and
+   automatic-closing Development links; do not let them skip remaining acceptance.
+   Reuse it for all local tickets and later corrections. The existing recovery
+   `feat/issue-N-integration` form is retained only for historical PR chains.
 5. Publish through authenticated GitHub tools or an already authenticated Git
    client. Compare the actual remote tree to the reviewed local tree. With GitHub
    Git-data tools, create the exact tree, verify its SHA, then create an append-only
@@ -188,6 +207,17 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    published head and generate `agents:report` from the verified run. Publish and
    read back the complete report before declaring ready, retaining its URL, source
    head and evidence commit. A prepared publication plan is not a publication.
+   Before declaring ready for merge review, verify all pre-merge ticket and
+   acceptance results plus current-head checks, reviews and report publication.
+   List steps that require main integration as pending, with that prerequisite
+   in their saved acceptance and the handoff; ready does not require them to be
+   finished or the PR already merged. Before Issue closure, verify actual main
+   integration, all remaining evidence and an empty local ticket frontier.
+   Complete review/publication/merge tickets only after their operations succeed,
+   never early to start `verify`. A frontier is a dependency candidate list;
+   check real external prerequisites and authorization before executing a step.
+   Neither `verify` nor `evaluate` reads the completion list, so the coordinator
+   records these phase-specific checks explicitly.
    Give the user the PR link.
    Until current-head GitHub checks and feedback pass, report it as waiting for CI
    or repair. Only then hand it to the user as ready for final review. A draft is
@@ -220,7 +250,8 @@ Do not replace context with empty feedback arrays to obtain ready.
 result still requires the report/media publication and current-head readback above;
 CI preview alone does not establish independent review or full-check completion.
 
-Stacked PRs keep the same feedback/CI maintenance while open. Passing them yields
+Historical stacked PRs keep the same feedback/CI maintenance while open. New
+specs use one main PR. Passing an existing stacked PR yields
 `needs-integration`, not main delivery readiness. Once the upstream PR's actual
 merge is contained in fetched main, retarget the open successor to main, prepare
 a new run and repeat verification/reviews. An already merged successor cannot

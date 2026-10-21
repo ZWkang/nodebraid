@@ -16,15 +16,22 @@ If the conversation references an Issue or PR, read its current body and relevan
 
 2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
 
-Check with the user that these seams match their expectations.
+Reuse already confirmed test seams. Ask only when a new decision changes the
+approved scope, public contract or architecture; do not repeat an existing approval.
 
 3. Before publishing, refresh the referenced discussion and incorporate any newly confirmed decisions. Write the spec using the template below, then publish it to the project issue tracker. Follow the tracker's approval and eligibility rules before applying `ready-for-agent`. If an unresolved point affects scope or acceptance criteria, record it explicitly and leave the spec as a draft without claiming it is ready for implementation.
 
-For NodeBraid, use `spec: ` as the parent issue title prefix. The title does not
+For NodeBraid, one spec is one GitHub Issue and one delivery PR targeting main.
+Use `spec: ` as the issue title prefix. The title does not
 grant execution permission. Preserve the approval source, explicit local-only or
-paused execution choice, current owner and outstanding acceptance. Once delivery
-is authorized, reconcile existing children and invoke `to-tickets` for missing
-approved slices; a parent remains an aggregate and does not need `ready-for-agent`.
+paused execution choice, current owner and outstanding acceptance. Once scope,
+test seams and execution are approved, apply `enhancement`, `approved-spec` and
+`ready-for-agent` to this same Issue, following the tracker eligibility rules.
+Check existing Issues and PRs first and continue the same delivery rather than
+creating another implementation Issue. Use `to-tickets` for local execution
+steps in the existing run plan; do not publish those tickets to GitHub. Preserve
+historical parent/child relationships and stacked PRs as delivery evidence without
+bulk rewriting them or using them as the model for new work.
 
 <spec-template>
 

@@ -6,6 +6,61 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 
 const cli = resolve('scripts/local-agent.ts');
+
+test('one issue resumes its local ticket frontier without creating child issues', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'nodebraid-local-plan-'));
+  const git = (...args: string[]) => execFileSync('git', args, { cwd: dir, encoding: 'utf8' }).trim();
+  const invoke = (...args: string[]) => spawnSync(process.execPath, [cli, ...args], { cwd: dir, encoding: 'utf8' });
+  const json = (name: string, value: unknown) => writeFileSync(join(dir, name), JSON.stringify(value));
+  try {
+    git('init', '-q', '-b', 'main');
+    git(
+      '-c',
+      'user.name=Test',
+      '-c',
+      'user.email=test@example.invalid',
+      '-c',
+      'core.hooksPath=.git/hooks',
+      'commit',
+      '--allow-empty',
+      '-qm',
+      'fixture',
+    );
+    json('input.json', {
+      run: 'single-spec',
+      repository: 'ZWkang/nodebraid',
+      source: { kind: 'issue', number: 71 },
+      branch: 'feat/issue-71',
+      baseRefName: 'main',
+      base: git('rev-parse', 'HEAD'),
+      request: 'Deliver the approved spec in one PR with local implementation tickets.',
+      pending: [],
+      plan: [
+        { id: 'implement', blockedBy: [], acceptance: 'The approved behavior passes its public seam test.' },
+        { id: 'deliver', blockedBy: ['implement'], acceptance: 'The same PR passes delivery acceptance.' },
+      ],
+    });
+    expect(invoke('prepare', 'input.json', 'run').status).toBe(0);
+    const prepared = readFileSync(join(dir, 'run/prepared-task.json'), 'utf8');
+    json('completed.json', []);
+    expect(JSON.parse(invoke('frontier', 'run', 'completed.json').stdout)).toEqual(['implement']);
+    json('completed.json', ['implement']);
+    expect(JSON.parse(invoke('frontier', 'run', 'completed.json').stdout)).toEqual(['deliver']);
+    expect(invoke('prepare', 'input.json', 'run').status).toBe(0);
+    expect(JSON.parse(invoke('frontier', 'run', 'completed.json').stdout)).toEqual(['deliver']);
+    json('completed.json', ['implement', 'deliver']);
+    expect(JSON.parse(invoke('frontier', 'run', 'completed.json').stdout)).toEqual([]);
+    json('completed.json', ['deliver']);
+    const skippedBlocker = invoke('frontier', 'run', 'completed.json');
+    expect(skippedBlocker.status).not.toBe(0);
+    expect(skippedBlocker.stdout).toBe('');
+    expect(skippedBlocker.stderr).toContain('Completed task has an unfinished blocker.');
+    expect(readFileSync(join(dir, 'run/prepared-task.json'), 'utf8')).toBe(prepared);
+  } finally {
+    rmSync(dir, { recursive: true });
+  }
+});
+
 test('a persisted task resumes after a failed real check and never blesses an unrelated head', () => {
   const dir = mkdtempSync(join(tmpdir(), 'nodebraid-local-run-'));
   const git = (...args: string[]) => execFileSync('git', args, { cwd: dir, encoding: 'utf8' }).trim();

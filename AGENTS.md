@@ -4,7 +4,7 @@
 
 ### Issue tracker
 
-新增需求规格和活跃任务统一记录在 `ZWkang/nodebraid` 的 GitHub Issues：父 Issue 保存规格，子 Issue 保存实现任务，PR 关联对应任务。开始需求整理、拆票、实现或审查前，先读取 [Issue tracker 约定](docs/agents/issue-tracker.md)。`.scratch/` 仅保留历史资料，不再新增规格或维护活跃任务状态。
+每个新需求/spec 在 `ZWkang/nodebraid` 使用一个 GitHub Issue 和一个面向 main 的 PR。Issue 保存规格、讨论和验收；实施 ticket 只保留在本地 run 的计划及完成记录中，多次提交和内部协作持续更新同一个 PR。开始需求整理、拆票、实现或审查前，先读取 [Issue tracker 约定](docs/agents/issue-tracker.md)。`.scratch/` 仅保留历史资料。
 
 GitHub 继续作为事实源；完整读取需求/spec 及相关任务后，将只读副本与历史版本保存到 `$CODEX_HOME/local-workflows/nodebraid/issues/`，便于本地查看和归档。副本不回写 GitHub，不作为实时执行资格依据。
 
@@ -37,7 +37,8 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 - `bun run agents:scan [base-sha]`：在已 fetch 的干净 main worktree 记录固定 SHA 调查范围。
 - `bun run agents:run`：归一化完整 GitHub 上下文，独立准备任务、检查依赖前沿、执行真实检查、绑定发布 tree 和判断当前 head；参数见 `docs/agents/agentic-workflows.md`。
 - `bun run agents:run archive-issue <snapshot.json> <issues-dir>`：保存完整 GitHub Issue 正文与讨论的本地阅读副本和不可覆盖历史版本；输入与默认存放位置见 Issue tracker 约定。
-- `bun run agents:run reconcile <source.json> [output.json]`：在 fetch 后核对规格/子任务/阻塞/负责人、实际默认分支集成与验收，输出执行前沿和有授权的关闭候选；不执行 GitHub 写入。
+- `bun run agents:run reconcile <source.json> [output.json]`：在 fetch 后核对单一交付 Issue、PR、外部依赖/负责人、实际 main 集成与验收；历史父子记录继续可读。输出 GitHub 交付候选，不执行远端写入。
+- `bun run agents:run frontier <run-dir> <completed-steps.json>`：按本地 prepared plan 和实际完成记录选择可执行 ticket；ticket 不创建 GitHub Issue 或独立 PR。
 - `bun run agents:discovery init|sync <queue.json>`：显式初始化或恢复按公共 seam 保存的调查待办；无新提交也保留未检查区域。
 - `bun run agents:discovery finish <queue.json> <report.json>`：只用当前 main 的成功执行报告完成一个待办。
 - `bun run agents:typecheck`：检查本地工作流命令及其共享状态模块的 TypeScript 类型；包含在完整工程类型检查中。
@@ -51,9 +52,9 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 本地自动化检查新 main 变更、Issue 和托管 PR；复现并查重后记录 Issue，再实现已确认任务。
 GitHub 写入使用已连接工具或已认证 Git client，不复制订阅登录文件或连接器凭据。
 
-托管 issue PR 以 `[local-agent] `（兼容 `[agent] `）标题和 `feat/issue-N` 分支加入本地 CI／review 修复闭环；已合并到功能分支的交付可用 `feat/issue-N-integration` 后续集成。
-父规格标题使用 `spec: `，批准范围内自主补齐子任务；暂停、本地执行与其他活跃负责人保持可见。
-Agent 在原 PR 上追加修复并验证，需求变化返回讨论；默认由用户最终审阅与合并，明确已有授权可执行验证后的合并与关闭。叠加 PR 不算 main 交付，retarget 后需新 run 复验，父规格关闭还须所有子任务和验收完成。
+托管 PR 以 `[local-agent] `（兼容 `[agent] `）标题和 `feat/issue-N` 分支加入本地 CI／review 修复闭环，直接关联同一个 spec Issue。有合并后验收时用 `Refs #N` 保持 Issue 开放；只有合并是最后剩余条件且关闭已获授权时才用 `Fixes #N`，并核对提交消息和自动关闭关联。
+规格标题使用 `spec: `；获准实施后同一 Issue 可标记 `approved-spec` 和 `ready-for-agent`，批准范围内自主拆分本地 ticket。暂停、本地执行与其他活跃负责人保持可见。
+Agent 在原 PR 上追加修复并验证，需求变化返回讨论；默认由用户最终审阅与合并，已有明确授权可执行验证后的合并与关闭。ready 前核对合并前 ticket/验收和当前 head 的检查、审查、报告，并列明待合并后才能执行的步骤。关闭 Issue 再核对实际 main 集成、全部 ticket 证据和剩余验收。旧父子 Issue、叠加 PR 及 `feat/issue-N-integration` 保留为历史恢复路径，不用于新需求拆票。
 
 修改本地工作流后格式化并执行 `agents:check` 及相关状态测试。GitHub 不保留 API Agent 或 gh-aw 编译入口。
 

@@ -90,6 +90,76 @@ function fixture() {
   return { dir, git, input, invoke, cleanup: () => rmSync(dir, { recursive: true }) };
 }
 
+test('one spec issue needs no child issue and closes only after its main PR is integrated and accepted', () => {
+  const f = fixture();
+  try {
+    const task = f.input.tasks[0]!;
+    const pr = f.input.pullRequests[0]!;
+    f.input.specs = [];
+    f.input.pullRequests = [];
+    task.parent = null;
+    task.issue.title = 'spec: delivery';
+    task.approval = 'https://github.com/ZWkang/nodebraid/issues/42#issuecomment-1';
+    task.pullRequests = [];
+    task.delivery = null;
+    task.acceptance[0]!.evidence = null;
+    let result = f.invoke();
+    expect(result.status).toBe(0);
+    let report = JSON.parse(result.stdout);
+    expect(report.specs).toEqual([]);
+    expect(report.frontier).toEqual([42]);
+    expect(report.tasks[0].status).toBe('ready');
+    expect(report.tasks[0].canClose).toBe(false);
+
+    pr.base.ref = 'main';
+    pr.state = 'open';
+    pr.merged = false;
+    pr.merge_commit_sha = null;
+    f.input.pullRequests = [pr];
+    task.pullRequests = [49];
+    task.delivery = 49;
+    report = JSON.parse(f.invoke().stdout);
+    expect(report.frontier).toEqual([]);
+    expect(report.tasks[0].status).toBe('maintain');
+    expect(report.tasks[0].canClose).toBe(false);
+
+    f.git('switch', '-qc', 'main-delivery', f.input.main);
+    f.git('merge', '--no-ff', '-qm', 'merge one spec delivery', 'feat/issue-42');
+    pr.merge_commit_sha = f.git('rev-parse', 'HEAD');
+    pr.state = 'closed';
+    pr.merged = true;
+    report = JSON.parse(f.invoke().stdout);
+    expect(report.tasks[0].status).toBe('needs-integration');
+    expect(report.tasks[0].delivered).toBe(false);
+    expect(report.tasks[0].canClose).toBe(false);
+
+    f.input.main = pr.merge_commit_sha;
+    f.git('update-ref', 'refs/remotes/origin/main', f.input.main);
+    report = JSON.parse(f.invoke().stdout);
+    expect(report.tasks[0].status).toBe('needs-acceptance');
+    expect(report.tasks[0].missingAcceptance).toEqual(['delivery']);
+    expect(report.tasks[0].delivered).toBe(false);
+    expect(report.tasks[0].canClose).toBe(false);
+
+    task.acceptance[0]!.evidence = 'https://github.com/ZWkang/nodebraid/pull/49#issuecomment-2';
+    result = f.invoke();
+    expect(result.status).toBe(0);
+    report = JSON.parse(result.stdout);
+    expect(report.tasks[0].status).toBe('delivered');
+    expect(report.tasks[0].canClose).toBe(true);
+    expect(report.integration).toEqual([]);
+    expect(report.frontier).toEqual([]);
+    task.issue.state = 'CLOSED';
+    report = JSON.parse(f.invoke().stdout);
+    expect(report.tasks[0].status).toBe('delivered');
+    expect(report.tasks[0].canClose).toBe(false);
+    expect(report.frontier).toEqual([]);
+    expect(JSON.parse(f.invoke().stdout)).toEqual(report);
+  } finally {
+    f.cleanup();
+  }
+}, 30_000);
+
 test('merged stacked delivery remains incomplete until its real merge commit reaches fetched main', () => {
   const f = fixture();
   try {
