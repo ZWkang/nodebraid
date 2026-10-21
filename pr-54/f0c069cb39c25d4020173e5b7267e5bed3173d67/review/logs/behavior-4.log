@@ -1,0 +1,55 @@
+bun test v1.4.2 (744846f84)
+
+tests/pr-evidence.test.ts:
+(pass) publishes actual checksummed evidence and preserves author text on repeated updates [24.34ms]
+(pass) rejects stale source, tampered bytes and files outside the evidence directory [25.79ms]
+(pass) rejects symlinks and inconsistent scene artifact references [1.85ms]
+(pass) a failed scenario stays failed in the published report [0.98ms]
+(pass) a changed PR head prevents all publication writes [17.87ms]
+(pass) publishes media through Git data, updates only the evidence block and reads it back [12.82ms]
+(pass) cannot publish claimed evidence for another source tree [13.25ms]
+(pass) rejects a success claim without screenshots and malformed PR markers [4.25ms]
+(pass) resolves an empty workflow PR association from current commit-linked PRs only [0.35ms]
+(pass) untrusted preview names cannot address the independent review namespace [11.73ms]
+(pass) preview-only publication refuses a different saved base/patch before uploading [9.21ms]
+(pass) review-only publication refuses a different saved base/patch before uploading [2.99ms]
+(pass) preserving a previous report requires its original artifact bytes to match [3.38ms]
+
+tests/local-agent-run.test.ts:
+(pass) a new green head cannot inherit the previous tree, reviews or test evidence [8.13ms]
+
+tests/verification-report.test.ts:
+Switched to a new branch 'feat/issue-45'
+(pass) repeating report generation preserves the previous proof rather than overwriting it [671.66ms]
+Switched to a new branch 'feat/issue-45'
+(pass) the public report command preserves both reviews, real logs and published identity without inventing regressions [567.63ms]
+Switched to a new branch 'feat/issue-45'
+(pass) declared behavior results retain real red/green logs, failures and explicit unrun checks [855.40ms]
+Switched to a new branch 'feat/issue-45'
+(pass) the report refuses log paths outside the run and every symlink, including metadata and output files [620.74ms]
+Switched to a new branch 'feat/issue-45'
+(pass) stale publication or reviews and missing original logs fail before a report is written [695.67ms]
+Switched to a new branch 'feat/issue-45'
+(pass) behavior declarations cannot turn missing execution, unexplained red or contradictory exits into a pass [585.66ms]
+
+tests/evidence-producer.test.ts:
+(pass) a closed producer is explicitly inapplicable before artifact access or publication [16.49ms]
+(pass) a superseded producer cannot publish to a PR with a newer head [12.48ms]
+(pass) a current producer enables publication only after every PR page is read [12.10ms]
+(pass) ambiguous current producers remain an error without enabling publication [14.60ms]
+(pass) GitHub read failure in runStatus is not a no-work result [15.20ms]
+(pass) GitHub read failure in pullsStatus is not a no-work result [14.10ms]
+(pass) an invalid producer event fails before reading PR pages [14.19ms]
+(pass) an invalid producer path fails before reading PR pages [14.75ms]
+(pass) an invalid producer status fails before reading PR pages [14.18ms]
+(pass) a producer from another repository remains an error [15.11ms]
+(pass) missing evidence for an eligible current producer still fails the strict publisher [15.86ms]
+
+tests/github-feedback.test.ts:
+(pass) pagination must finish, including the empty page after an exact page boundary [0.37ms]
+(pass) edited and resolved-thread replies enter feedback while current-head workflow identity is checked [0.45ms]
+
+ 33 pass
+ 0 fail
+ 172 expect() calls
+Ran 33 tests across 5 files. [4.35s]

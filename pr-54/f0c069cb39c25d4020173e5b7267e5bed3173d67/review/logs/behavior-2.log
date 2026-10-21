@@ -1,0 +1,9 @@
+bun test v1.4.2 (744846f84)
+
+tests/evidence-producer.test.ts:
+(pass) a closed producer is explicitly inapplicable before artifact access or publication [21.88ms]
+
+ 1 pass
+ 0 fail
+ 5 expect() calls
+Ran 1 test across 1 file. [37.00ms]

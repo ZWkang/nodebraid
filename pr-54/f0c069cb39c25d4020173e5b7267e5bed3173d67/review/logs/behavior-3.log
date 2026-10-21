@@ -1,0 +1,34 @@
+bun test v1.4.2 (744846f84)
+
+tests/pr-evidence.test.ts:
+(pass) publishes actual checksummed evidence and preserves author text on repeated updates [24.70ms]
+(pass) rejects stale source, tampered bytes and files outside the evidence directory [12.10ms]
+(pass) rejects symlinks and inconsistent scene artifact references [1.58ms]
+(pass) a failed scenario stays failed in the published report [1.12ms]
+(pass) a changed PR head prevents all publication writes [10.72ms]
+(pass) publishes media through Git data, updates only the evidence block and reads it back [10.47ms]
+(pass) cannot publish claimed evidence for another source tree [3.09ms]
+(pass) rejects a success claim without screenshots and malformed PR markers [1.26ms]
+(pass) resolves an empty workflow PR association from current commit-linked PRs only [0.15ms]
+(pass) untrusted preview names cannot address the independent review namespace [1.70ms]
+(pass) preview-only publication refuses a different saved base/patch before uploading [3.31ms]
+(pass) review-only publication refuses a different saved base/patch before uploading [2.24ms]
+(pass) preserving a previous report requires its original artifact bytes to match [2.34ms]
+
+tests/evidence-producer.test.ts:
+(pass) a closed producer is explicitly inapplicable before artifact access or publication [18.24ms]
+(pass) a superseded producer cannot publish to a PR with a newer head [13.60ms]
+(pass) a current producer enables publication only after every PR page is read [13.68ms]
+(pass) ambiguous current producers remain an error without enabling publication [19.10ms]
+(pass) GitHub read failure in runStatus is not a no-work result [15.89ms]
+(pass) GitHub read failure in pullsStatus is not a no-work result [16.30ms]
+(pass) an invalid producer event fails before reading PR pages [16.35ms]
+(pass) an invalid producer path fails before reading PR pages [15.63ms]
+(pass) an invalid producer status fails before reading PR pages [16.21ms]
+(pass) a producer from another repository remains an error [16.11ms]
+(pass) missing evidence for an eligible current producer still fails the strict publisher [16.18ms]
+
+ 24 pass
+ 0 fail
+ 78 expect() calls
+Ran 24 tests across 2 files. [304.00ms]

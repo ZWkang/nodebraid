@@ -1,0 +1,22 @@
+bun test v1.4.2 (744846f84)
+
+tests/evidence-producer.test.ts:
+15 |   const fixture = producer();
+16 |   fixture.pages[0]![0]!.state = 'closed';
+17 | 
+18 |   const result = await invoke(fixture);
+19 | 
+20 |   expect(result.exitCode).toBe(0);
+                               ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/github-agentic-workflows/cflow/tests/evidence-producer.test.ts:20:27)
+(fail) a closed producer is explicitly inapplicable before artifact access or publication [119.26ms]
+
+ 0 pass
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [179.00ms]

@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "da7f5c00004d7dc7a5b37ae5711a96ae516a9121",
+    "head": "f0c069cb39c25d4020173e5b7267e5bed3173d67",
+    "tree": "feda4667bd31f4ef3cff9b26f00ea054b226fd49",
+    "patch": "3cba596e0c6141254bceed72e6f1a211025a6b6f2aa120451a94ee188f9498f4",
+    "localHead": "6a9dd850c4857ba2bffba740df47b4cd7f3b32b9"
+  },
+  "task": {
+    "run": "d495ec41-0202-4134-b851-0c132e40d969",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 53
+    },
+    "request": "69f43669e49a7ae74ebc3c023e9f502e398e3828619bc207b2e9166eb1aa8845",
+    "plan": [
+      {
+        "id": "readonly-preflight",
+        "blockedBy": [],
+        "acceptance": "CLI red-green uses authenticated source metadata/full PR pages; closed/stale produces explicit not-applicable/publish=false and no writes/receipts, open current source enables publication."
+      },
+      {
+        "id": "gate-download",
+        "blockedBy": [
+          "readonly-preflight"
+        ],
+        "acceptance": "Workflow preflight precedes/gates both artifact download and strict publisher, preserves permissions/trusted-main source, actual publication rechecks race."
+      },
+      {
+        "id": "failure-matrix",
+        "blockedBy": [
+          "gate-download"
+        ],
+        "acceptance": "API/identity/source errors and ambiguity fail; active missing artifacts still fail; pagination complete; documentation accurately separates eligibility from publication success."
+      },
+      {
+        "id": "delivery",
+        "blockedBy": [
+          "failure-matrix"
+        ],
+        "acceptance": "Related/full checks, independent Standards+ponytail-review and Spec, exact remote publication/current-head CI, new protocol full report publication/readback; human merge only."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "6a9dd850c4857ba2bffba740df47b4cd7f3b32b9",
+      "tree": "feda4667bd31f4ef3cff9b26f00ea054b226fd49",
+      "patch": "3cba596e0c6141254bceed72e6f1a211025a6b6f2aa120451a94ee188f9498f4",
+      "report": "**verdict: passed**\n\n完整八文件已审查。硬规范违反：未发现。判断性 smell：未发现有具体后果的可操作问题。\n\n已追踪 CLI → 来源 run 校验 → 完整 PR 分页 → finder/严格 resolver → artifact 加载与发布，以及 YAML 门槛。零个当前匹配 PR 明确输出 `not-applicable`、`publish=false`，不会下载、发布或生成回执；API、来源身份和歧义错误仍失败。实际 publisher 保留当前 PR/head/tree 重检，权限与可信默认分支执行边界未改变。外部 HTTP fixture 符合 TDD 边界要求，没有替代自身业务逻辑。\n\n本轮实际执行三个相关测试文件：**30 pass、159 assertions**；`git diff --check` 通过，`feat/issue-53` 工作树干净。未运行构建、full check、preview、真实 GitHub 发布或 CI，不能据此宣称线上闭环成功。\n\n```text\nhead: 6a9dd850c4857ba2bffba740df47b4cd7f3b32b9\ntree: feda4667bd31f4ef3cff9b26f00ea054b226fd49\npatch: 3cba596e0c6141254bceed72e6f1a211025a6b6f2aa120451a94ee188f9498f4\n```"
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "6a9dd850c4857ba2bffba740df47b4cd7f3b32b9",
+      "tree": "feda4667bd31f4ef3cff9b26f00ea054b226fd49",
+      "patch": "3cba596e0c6141254bceed72e6f1a211025a6b6f2aa120451a94ee188f9498f4",
+      "report": "verdict: **passed**\n\n已核验完整八文件补丁、Issue #53 原文及空 comments/blockers、prepared task、原始两次失败日志，以及当前工作流、CLI、发布器和证据协议。未发现验收遗漏、范围扩张或错误实现。\n\n下载前预检保留来源仓库、workflow、event、completed 状态、完整分页和当前 head 匹配；closed/stale 明确输出 `not-applicable`、`publish=false`，不进入下载、发布或回执路径。API/身份错误及歧义仍失败；实际发布继续严格重读 PR/head。权限和受信任默认分支 checkout 未变化。\n\n实际执行：\n\n`bun test tests/evidence-producer.test.ts tests/pr-evidence.test.ts`\n\n结果 **24 pass、0 fail、78 assertions**；`git diff --check` 通过，工作树干净。新 CLI 测试仅替换外部 HTTP，并拒绝写请求；既有发布测试覆盖真实发布函数和 HTTP 边界。\n\n未运行构建、full check、当前 head preview/report、线上发布或 CI，不能据此认定远端闭环验收完成。\n\n- head: `6a9dd850c4857ba2bffba740df47b4cd7f3b32b9`\n- tree: `feda4667bd31f4ef3cff9b26f00ea054b226fd49`\n- patch SHA256: `3cba596e0c6141254bceed72e6f1a211025a6b6f2aa120451a94ee188f9498f4`"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "closed-producer-red",
+      "acceptance": "On original main da7f5c0, a closed source PR reached strict publication resolution and exited 1 instead of explicit not-applicable; the new CLI behavior assertion failed (Expected 0, Received 1).",
+      "command": "bun test tests/evidence-producer.test.ts --test-name-pattern 'a closed producer is explicitly inapplicable'",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "closed-producer-green",
+      "acceptance": "The same closed-source regression now exits 0 with publish=false and explicit not-applicable, without artifact access, writes or receipt.",
+      "command": "bun test tests/evidence-producer.test.ts --test-name-pattern 'a closed producer is explicitly inapplicable'",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "producer-failure-matrix",
+      "acceptance": "Closed/stale, paginated current source, ambiguity, API/source identity errors and current-source missing evidence execute the real CLI with only HTTP replaced; actual publisher's strict behavior is retained. 24 tests / 78 assertions passed.",
+      "command": "bun test tests/evidence-producer.test.ts tests/pr-evidence.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "related-execution-tests",
+      "acceptance": "Real related execution, feedback normalization and report behavior remain covered: 33 tests / 172 assertions passed.",
+      "command": "bun test tests/evidence-producer.test.ts tests/pr-evidence.test.ts tests/local-agent-run.test.ts tests/github-feedback.test.ts tests/verification-report.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "workflow-validation",
+      "acceptance": "Local workflow protocol and required executable metadata validate successfully.",
+      "command": "bun run agents:check",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "workflow-types",
+      "acceptance": "Agent script TypeScript project typechecks successfully.",
+      "command": "bun run agents:typecheck",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "dcc3f67eb7a26690fba037832795e04e0fa3bc26976eb86bf0a637cb9b73fd5e"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "cafffcd0e3b0d1d72d676a09b962c81c3aff760c974c5be0ccd56ecf631f3c15"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "b2369aa4c0e501f17bcee04b26a87643e40431ac544ff60fc9fe6600b0386a8d"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "17d91e5646e5c75f3caa4e205626a61810b2519f20f2f6963527d325bd80d17e"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "29478e504bbd6755087e312a64d94a6630697bdc592547d3ec357c8c13dd5b13"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "154174ae004fd271bed4ad49feee28c51c076c03af11478946b1b579afc4adb3"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "6245ddbcf544cd460003e017c94a615ffe12c9f6cc69b326379e921362589deb"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "39e287118e839a40efee0646ed00775890533b39ebd8bbca2a6a4f9d12854487"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "1d1a28885bf6430ac6be019cba6d97a4dba0ce2da9279255ea7f5426d8d965ce"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "24f28af4e2e9cb7c73e5dc5be14bbd66c70e5668d2011fae519de04f9ca755ce"
+    }
+  ]
+}
