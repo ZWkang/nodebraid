@@ -1,0 +1,103 @@
+# Verification report
+
+Run: 0980f7f1-fa01-4d8b-9d06-a4979cb18bd5 · ZWkang/nodebraid · pr #63
+
+## Reviewed and published source
+
+- Base: `374c3bafcd4bbd95a25206084b4471195c36167a`
+- Published head: `45849e46fb346bf70c2121058a6ee3811ebb43bc`
+- Reviewed local head: `6bfa38704e6e6106d98347d0ed26bb3473b83365`
+- Tree: `1aea51ad5efa52a6c2962783d610fc6e49a7d55f`
+- Complete binary patch SHA-256: `0f4fe3f362811ccc0e19e97617cc9439cd8b59fa7db4e0d9e27696be1e3bf86e`
+
+The publication record matches the reviewed tree and expected parent. Remote PR freshness is checked separately by the publisher.
+
+## Acceptance plan
+
+保留 GitHub Issue 正文、完整评论和来源信息的本地只读阅读副本，以及按内容摘要保留的不可覆盖历史版本。GitHub继续作为事实源，本地副本不回写远端、不参与实时执行资格。以固定main374c3bafcd4bbd95a25206084b4471195c36167a为基线合入原PR63提交27786926d39baad5c2a6d4ae0a8945ae753b6328，机械保留archive-issue与reconcile入口、baseRefName验证、归档语义及main已有Layout能力，不增加功能或改变Canvas公开契约。最终功能diff、验证报告与CI preview共用main基线；原PR分支保持，远端更新以前一head27786926作身份校验且不强推。
+
+### integrate-archive
+
+Merge the original archive PR into pinned main, preserve both CLI commands and latest-main behavior, and reproduce the previously reviewed tree without changing feature scope.
+
+Dependencies: none
+
+### verify-delivery
+
+Both independent reviews, verification report and CI preview bind the same main-based complete feature diff; publishing preserves the existing PR branch with the expected old head and no force.
+
+Dependencies: integrate-archive
+
+## Full engineering check
+
+`bun run check` — exit 0; checked source remained unchanged.
+
+[Original command output](logs/full-check.log)
+
+## Standards review
+
+Verdict: passed. [Original report](reviews/standards.md)
+
+What this change does: 在既有 Issue 完整读取和回读边界保存本地 Markdown/JSON 阅读副本与内容摘要历史，并将 archive-issue 接入当前工作流。
+
+**Standards：passed。硬性规范违规 0 项；判断性 smell 0 项。**
+
+审查覆盖相对当前 main 的完整 9 文件 patch，依据 AGENTS、Issue tracker、讨论与本地协议、工程原则、code-review、ponytail-review 和 Fowler baseline。已追踪 CLI 参数、JSON 读取、归档输入验证、共享摘要函数以及历史/current 文件写入；按协议的单一归档写入者审查。
+
+完整正文及评论保留；身份和评论完整性在写入前验证；读取时间和评论顺序不制造重复历史，已有历史排他创建且不覆盖，错误沿真实 CLI 传播。原归档实现与测试 blob 保持不变，没有新增 GitHub 回写、资格判断或调度行为。
+
+已核对三处机械冲突解法：AGENTS 和 README 同时保留 archive/reconcile 文档；local-agent.ts 同时保留两个命令及 baseRefName 校验。当前 main 的交付对账、retarget 复验、公开内容规则、工程原则和 Layout 功能说明均完整保留。
+
+最终提交的 tree 与已审阅功能树一致；重新计算完整 patch 摘要并验证父链，原 PR head 仍为祖先。
+
+固定身份：
+
+- Base：`374c3bafcd4bbd95a25206084b4471195c36167a`
+- Head：`6bfa38704e6e6106d98347d0ed26bb3473b83365`
+- Tree：`1aea51ad5efa52a6c2962783d610fc6e49a7d55f`
+- Binary patch SHA-256：`0f4fe3f362811ccc0e19e97617cc9439cd8b59fa7db4e0d9e27696be1e3bf86e`
+- Parents：当前 main `374c3bafcd4bbd95a25206084b4471195c36167a`、原 PR head `27786926d39baad5c2a6d4ae0a8945ae753b6328`。
+
+Verdict: Ship（代码审查通过）。
+Not checked: 本次未运行测试或全量工程检查，未核验远端更新、CI 或证据发布。原审查及测试保留原提交身份，不作为新 head 的执行结果；并发归档不在本审查验证范围。
+
+
+## Spec review
+
+Verdict: passed. [Original report](reviews/spec.md)
+
+Spec review: passed，0 项发现。
+
+依据 [PR #63](https://github.com/ZWkang/nodebraid/pull/63) 的本地阅读副本与历史版本需求，以及 `docs/agents/issue-tracker.md` 的归档契约，审查相对当前 main 的完整 9 文件改动。
+
+- 缺失：未发现。`archive-issue` 接收已完整读取的 Issue 快照，保留原始字段、完整正文、全部评论和来源信息，生成 current Markdown/JSON 与按内容摘要保存的历史版本。关闭 Issue 和空正文可归档；正文、评论或状态变化产生新版本。
+- 错误实现：未发现。读取时间不参与内容摘要，重复读取相同内容只刷新 current；历史文件独占创建且不覆盖。来源身份、正文及评论数量、ID、URL 和内容在写入前校验，既有回归覆盖错误输入不改变当前副本或历史。原 archive 实现及测试 blob 与原发布提交一致。
+- 范围越界：未发现。归档接入既有完整读取及写后回读边界，不自行请求 GitHub，不回写远端，不参与实时执行资格，也未新增调度或改变 Canvas 公共契约。
+
+机械冲突解决正确保留 `archive-issue` 与 `reconcile` 的 import、usage、分派和文档；main 的 `baseRefName` 验证、reconcile 实现、既有 CLI 测试与 Layout 应用源码保持不变。无残留冲突或工作区修改。当前 main 是第一 parent，原 PR 提交 27786926d39baad5c2a6d4ae0a8945ae753b6328 是第二 parent，祖先关系已实测成立。
+
+本轮为代码与集成语义复核，未重复执行测试。原始测试、审查与冲突演练记录保留其原身份；本报告不宣称当前 head 的全量检查、远端更新、CI、证据发布或合并已完成。
+
+固定审查身份：
+
+- Base: `374c3bafcd4bbd95a25206084b4471195c36167a`
+- Head: `6bfa38704e6e6106d98347d0ed26bb3473b83365`
+- Tree: `1aea51ad5efa52a6c2962783d610fc6e49a7d55f`
+- Binary patch SHA-256: `0f4fe3f362811ccc0e19e97617cc9439cd8b59fa7db4e0d9e27696be1e3bf86e`
+
+
+## Behavior evidence
+
+Behavior evidence: not provided. The full engineering check does not establish regression red/green coverage.
+
+## Feedback dispositions
+
+No feedback dispositions were included in this run.
+
+## Scope and limitations
+
+The two original review reports above retain their scope, evidence and untested areas. Their separate fields do not authenticate reviewer identity or prove independence.
+
+Only explicitly recorded commands and reports are included. Missing behavior evidence, browser coverage or platform checks are not inferred to have passed.
+
+A red result records the supplied behavior explanation and expected nonzero exit. The original output must still be reviewed to distinguish a behavior assertion from a compile, setup or infrastructure failure.
