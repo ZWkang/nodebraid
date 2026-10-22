@@ -1,0 +1,24 @@
+{"host":{"reads":4,"accepted":"accepted-host","published":"","frozen":true},"eventName":{"reads":3,"accepted":"accepted.event","published":"","frozen":true},"eventLevel":{"reads":2,"accepted":"info","published":"fatal","frozen":true}}
+19 |  diagnostics.emit({name:'level.probe',get level(){return ++levelReads===1?'info':'fatal';}});
+20 |  results.eventLevel={reads:levelReads,accepted:'info',published:events.at(-1)?.level,frozen:Object.isFrozen(events.at(-1))};
+21 |  await host.dispose();
+22 | }
+23 | console.log(JSON.stringify(results));
+24 | assert.equal(results.host.published,results.host.accepted,'Host scope must retain the nonempty hostId accepted during validation');
+            ^
+AssertionError: Host scope must retain the nonempty hostId accepted during validation
++ actual - expected
+
++ ''
+- 'accepted-host'
+
+ generatedMessage: false,
+     actual: "",
+   expected: "accepted-host",
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261022T012928-maintenance/runtime-diagnostic-capture-repro.ts:24:8
+
+Bun v1.4.2 (macOS arm64)

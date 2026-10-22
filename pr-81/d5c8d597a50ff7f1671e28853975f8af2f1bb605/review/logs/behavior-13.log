@@ -1,0 +1,35 @@
+{"head":"6cf755a636636add3a2dffe6b6ca2af8f39b3c4c","tree":"cbe0aa24896ca78d9e9e9c70309f9e014f7ba75c"}
+{"reads":2,"faultReporterCalls":0,"escapedReread":true,"originalRetained":false}
+27 |       attributes: {invalid: NaN},
+28 |     });
+29 |   } catch (error) { escaped = error; }
+30 |   console.log(JSON.stringify({reads, faultReporterCalls:faults.length, escapedReread:escaped===reread,
+31 |     originalRetained:faults.some(f=>f.error instanceof AggregateError&&f.error.errors.includes(original))}));
+32 |   assert.equal(escaped, undefined, 'Reporting an invalid payload must retain the original Fault');
+              ^
+AssertionError: Reporting an invalid payload must retain the original Fault
++ actual - expected
+
++ Error: name was read after acceptance
++     at /Users/zhou/.codex/local-workflows/nodebraid/runs/2aa5d5ae-63b3-4786-af05-2cd494424635/review-report-fault-probe.ts:17:22
+- undefined
+
+ generatedMessage: false,
+   expected: undefined,
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/2aa5d5ae-63b3-4786-af05-2cd494424635/review-report-fault-probe.ts:32:10
+
+12 | const host = createPluginHost({diagnostics:{faultReporter:(fault: unknown)=>faults.push(fault)}});
+13 | let diagnostics: any;
+14 | await host.install(definePlugin({setup(context: any){diagnostics=context.diagnostics;}})).whenActive();
+15 | try {
+16 |   const original = new Error('original callback fault');
+17 |   const reread = new Error('name was read after acceptance');
+                          ^
+error: name was read after acceptance
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/2aa5d5ae-63b3-4786-af05-2cd494424635/review-report-fault-probe.ts:17:22
+
+Bun v1.4.2 (macOS arm64)

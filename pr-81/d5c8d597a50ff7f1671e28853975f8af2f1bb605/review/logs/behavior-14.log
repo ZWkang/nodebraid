@@ -1,0 +1,44 @@
+bun test v1.4.2 (744846f84)
+
+packages/runtime-cordis/tests/diagnostic-input-values.test.ts:
+(pass) Host diagnostics retains the Host ID accepted during validation [14.27ms]
+(pass) a Diagnostic Event retains the name accepted during validation [11.43ms]
+(pass) a Diagnostic Event retains the level accepted during validation [3.54ms]
+(pass) Host diagnostics rejects the first invalid Host ID: "" [3.08ms]
+(pass) Host diagnostics rejects the first invalid Host ID: null [0.49ms]
+(pass) Host diagnostics rejects the first invalid Host ID: 42 [0.10ms]
+(pass) Host diagnostics rejects the first invalid Host ID: {} [0.08ms]
+(pass) an omitted captured Host ID still creates a stable default Host scope [1.84ms]
+(pass) Host diagnostics preserves the original Host ID read failure [0.17ms]
+(pass) a Diagnostic Event rejects its first invalid name: "" [0.66ms]
+(pass) a Diagnostic Event rejects its first invalid name: null [0.30ms]
+(pass) a Diagnostic Event rejects its first invalid name: {} [0.26ms]
+(pass) a Diagnostic Event rejects its first invalid level: "fatal" [0.43ms]
+(pass) a Diagnostic Event rejects its first invalid level: null [0.22ms]
+(pass) a Diagnostic Event rejects its first invalid level: 42 [0.27ms]
+(pass) a Diagnostic Event retains its normalized attributes and original error [1.09ms]
+(pass) a Diagnostic Event preserves the original name read failure [1.20ms]
+(pass) a Diagnostic Event preserves the original level read failure [0.28ms]
+(pass) a Diagnostic Event preserves the original attributes read failure [0.47ms]
+(pass) a Diagnostic Event preserves the original error read failure [0.35ms]
+(pass) Sink failure context retains the accepted Event name after the callback changes the input [0.39ms]
+(pass) an asynchronous Sink retains the accepted name for both explicit failures [1.03ms]
+(pass) disabled ordinary diagnostics validates inputs without consuming the optional error [0.42ms]
+316 | });
+317 | 
+318 | test('invalid Fault attributes retain the accepted name and original Fault at the Reporter', async () => {
+319 |   const harness = await observeDiagnostics();
+320 |   const original = new Error('original callback Fault');
+321 |   const reread = new Error('Event name consumed after acceptance');
+                           ^
+error: Event name consumed after acceptance
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-80-runtime-diagnostics/cflow/packages/runtime-cordis/tests/diagnostic-input-values.test.ts:321:22)
+(fail) invalid Fault attributes retain the accepted name and original Fault at the Reporter [8.29ms]
+
+1 tests failed:
+(fail) invalid Fault attributes retain the accepted name and original Fault at the Reporter [8.29ms]
+
+ 23 pass
+ 1 fail
+ 63 expect() calls
+Ran 24 tests across 1 file. [140.00ms]

@@ -1,0 +1,374 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "710038f0ed0cfc830580241ca1e90fca5f50677e",
+    "expectedParent": "710038f0ed0cfc830580241ca1e90fca5f50677e",
+    "head": "d5c8d597a50ff7f1671e28853975f8af2f1bb605",
+    "tree": "0747337c09e331739d840a875e3065efdbeed6f2",
+    "patch": "e21467a1cc71cf2f808cc8004fbf9462cfbaf0e8aac02db1115c4ef75927fa4e",
+    "localHead": "9a188bfe2cdd34ec3d95a075ade752dc9ac3c97c"
+  },
+  "task": {
+    "run": "2aa5d5ae-63b3-4786-af05-2cd494424635",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 80
+    },
+    "request": "Retain the Host ID and Diagnostic Event fields accepted at the Runtime diagnostics ownership boundary, using existing public Host/Plugin diagnostics seams and preserving explicit error/Fault semantics. Source: https://github.com/ZWkang/nodebraid/issues/80",
+    "plan": [
+      {
+        "id": "host-id-capture",
+        "blockedBy": [],
+        "acceptance": "Original public compiled red retained. Add first public Host regression, observe behavioral red, capture accepted Host ID once and preserve defaults/bounded errors/read exceptions."
+      },
+      {
+        "id": "event-field-capture",
+        "blockedBy": [
+          "host-id-capture"
+        ],
+        "acceptance": "Public real active Plugin regressions red/green for Event name/level and accepted Sink-failure context. Retain owned normalized attributes, original optional errors, short-circuit validation and disabled-event behavior; no new public API/caps/fallback."
+      },
+      {
+        "id": "related-checks-and-independent-review",
+        "blockedBy": [
+          "event-field-capture"
+        ],
+        "acceptance": "Affected Runtime/Diagnostics and consumers pass; independent Standards+ponytail-review and Spec review exact head/tree/patch, then main710 agents:run verify runs real complete check with stable source."
+      },
+      {
+        "id": "publication-current-head-acceptance",
+        "blockedBy": [
+          "related-checks-and-independent-review"
+        ],
+        "acceptance": "Exact remote tree/first-parent match independent prepared source; one existing delivery Issue/one main PR, current-head CI, complete feedback, report/preview publication and immutable readback pass."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "publication-current-head-acceptance"
+        ],
+        "acceptance": "Human final review, actual fetched main integration and whole-Issue public acceptance remain pending before authorized closure."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "9a188bfe2cdd34ec3d95a075ade752dc9ac3c97c",
+      "tree": "0747337c09e331739d840a875e3065efdbeed6f2",
+      "patch": "e21467a1cc71cf2f808cc8004fbf9462cfbaf0e8aac02db1115c4ef75927fa4e",
+      "verdict": "passed",
+      "report": "What this change does: Runtime diagnostics retains the Host ID and Event fields it validates. Fault reporting also captures its name once, so invalid attributes or field-read errors cannot cause another name read while constructing failure context.\n\nVerdict: passed.\n\nReviewed identity:\n\n- Base: 710038f0ed0cfc830580241ca1e90fca5f50677e\n- Head: 9a188bfe2cdd34ec3d95a075ade752dc9ac3c97c\n- Tree: 0747337c09e331739d840a875e3065efdbeed6f2\n- Binary patch SHA256: e21467a1cc71cf2f808cc8004fbf9462cfbaf0e8aac02db1115c4ef75927fa4e\n\nHard standards: No remaining violations found in the complete two-file patch. AGENTS.md and CONTRIBUTING.md require regression evidence and visible original failures. Boundary Discipline and ADR0028/0029/0030 keep field acceptance in Runtime, diagnostics observational, and external failure identity intact. Known-field construction matches the public interfaces without changing exports or dependencies.\n\nFault reporting correction: The failure branch no longer reads caller fields. Public regressions demonstrate that invalid attributes preserve the accepted name and original Fault; invalid names retain their first value; and a first name or attributes read failure reaches the Reporter alongside the original Fault. Missing name context is explicitly described without retrying the getter.\n\nJudgment / ponytail: No actionable Fowler smell, correctness, safety, load, speed or testing finding. Local captures introduce no persistent state or abstraction. Ordinary validation order, disabled-event optional-error behavior, frozen attributes, raw error identity and asynchronous Sink context remain intact.\n\nConnected code checked: Host construction, Installation/Activation scopes and lifecycle events, PluginDiagnostics.emit/reportFault, Fault Reporter isolation, error deduplication, DiagnosticEventInput and normalization, and Kernel/Session/History/Renderer and Examples consumers. Assumed load: an isolated Host per Canvas Runtime with external callbacks.\n\nActual checks at this head:\n\n- Verified exact commits, tree, complete binary patch hash, full new test file and clean working tree.\n- `git diff --check`: passed.\n- `bun test packages/runtime-cordis/tests packages/diagnostics/tests`: 158 passed, 0 failed, 606 assertions, including all 27 new cases.\n\nNot checked: affected consumers, typecheck, builds, browsers, full engineering gate, remote CI, publication or remote report readback. This review does not establish delivery readiness.\n"
+    },
+    "spec": {
+      "head": "9a188bfe2cdd34ec3d95a075ade752dc9ac3c97c",
+      "tree": "0747337c09e331739d840a875e3065efdbeed6f2",
+      "patch": "e21467a1cc71cf2f808cc8004fbf9462cfbaf0e8aac02db1115c4ef75927fa4e",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n已对新身份完整两文件补丁重新独立审查，核对 Issue80 原文/空讨论、prepared plan、ADR0028/0029/0030及公共 Host/Plugin→emit/reportFault→Sink/FaultReporter 调用链；未发现剩余验收遗漏、错误实现或范围扩张。\n\n先前 P2 已修复：reportFault 在既有 try 内单次捕获 name，正常与输入失败路径均复用该值；属性非法或首次 name/attributes 读取失败时，现有 fault-reporting.fault 聚合保留 original Fault 和实际输入错误，Reporter 不再被后续 name getter 中断。未取得 name 时仅报告安全类型上下文，不伪造成功。Host ID/name/level 捕获、首个非法值、原始 known-field 异常、attributes/error 归属、disabled ordinary-event 的 error 懒读、sequence/scopes、Sink/async Sink 与去重语义保持，没有新增 API、cap、fallback 或 accessor 禁令。\n\n实际执行：`bun test packages/runtime-cordis/tests packages/diagnostics/tests`，158 pass、0 fail、606 assertions。另以新身份重跑原真实 no-sink public probe，退出0：reads=1、Reporter调用1、原 Fault 保留、无后续读取异常。新脚本 review-report-fault-green-probe.ts、原始 review-report-fault-green.log及身份/退出码 JSON 已分别保存；原6cf red/probe/报告未改写。`git diff --check` 通过，工作树干净。\n\n未运行 build、types、browser、full check/verify、远端发布、当前 head CI 或报告/媒体回读；运行中的 affected 消费者检查未计为通过。定向通过和 Spec pass 不代表完整交付或 main 验收完成。\n\n- base: `710038f0ed0cfc830580241ca1e90fca5f50677e`\n- head: `9a188bfe2cdd34ec3d95a075ade752dc9ac3c97c`\n- tree: `0747337c09e331739d840a875e3065efdbeed6f2`\n- raw binary patch SHA256: `e21467a1cc71cf2f808cc8004fbf9462cfbaf0e8aac02db1115c4ef75927fa4e`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-main710-public-red",
+      "acceptance": "Real compiled public Host/active Plugin probe at original fetched main710 publishes empty Host ID/name and fatal level after validation. Historical source remains main710, not a receipt for fixed source.",
+      "command": "bun runtime-diagnostic-capture-repro.ts (discovery20261022T012928-maintenance, main710)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "host-id-red",
+      "acceptance": "First vertical public Host regression before Host ID capture: expected accepted-host, received empty. Genuine behavior failure after dependencies were ready.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-input-values.test.ts (Host slice before fix)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "host-id-green",
+      "acceptance": "Host slice passed after capturing the accepted ID once.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-input-values.test.ts (Host slice after fix)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "event-name-red",
+      "acceptance": "Next vertical public active Plugin regression: accepted.event was replaced by an empty name.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-input-values.test.ts (Event name before fix)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "event-name-green",
+      "acceptance": "Owned accepted event name retained after replacing the caller spread with explicit known-field construction. Intermediate attempt that still consumed the name twice remains separately logged.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-input-values.test.ts (Event name fixed)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "event-level-red",
+      "acceptance": "Next vertical public regression: accepted info level was replaced by fatal.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-input-values.test.ts (Event level before fix)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "event-level-green",
+      "acceptance": "Event level slice passed after validating and constructing from the same captured value.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-input-values.test.ts (Event level fixed)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "public-input-safety",
+      "acceptance": "Historical pre-review source6cf: that fixed source public Host/Plugin coverage:23 tests/63 assertions. Includes first-invalid/bounded errors, defaults, original known-field exceptions, no sequence gap, attribute ownership/original error, synchronous and asynchronous Sink fault context, and disabled-event error laziness.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-input-values.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "runtime-diagnostics-related",
+      "acceptance": "Historical pre-review source6cf: that Runtime and Diagnostics public suites:154 passed/588 assertions. Existing lifecycle, failure/cleanup traversal, diagnostics and value contracts retained.",
+      "command": "bun test packages/runtime-cordis/tests packages/diagnostics/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "runtime-types",
+      "acceptance": "Historical pre-review source6cf: that Runtime type check passed. Initial widened test getter annotation error was corrected and preserved, not counted as behavioral red.",
+      "command": "bun run --filter '@nodebraid/runtime-cordis' typecheck:self",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-10.log"
+    },
+    {
+      "id": "compiled-public-green",
+      "acceptance": "Historical pre-review source6cf: Freshly built fixed public Runtime barrel returns exactly accepted-host/accepted.event/info, one read each and frozen outputs.",
+      "command": "bun runtime-diagnostic-capture-probe.ts (fixed worktree compiled public barrel)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-11.log"
+    },
+    {
+      "id": "affected-consumers",
+      "acceptance": "Historical pre-review source6cf: Actual selected affected mode completed with exit0, including consuming packages, root public compositions, real React/SVG/Examples browser suites and documentation. This is not the formal full check.",
+      "command": "bun run check:affected --base 710038f0ed0cfc830580241ca1e90fca5f50677e",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-12.log"
+    },
+    {
+      "id": "independent-spec-report-fault-red",
+      "acceptance": "Independent Spec review on exact6cf found reportFault invalid-attributes path re-read the accepted name and lost original Fault; actual public probe/read identities and original changes-requested report retained.",
+      "command": "bun review-report-fault-probe.ts (pinned6cf)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-13.log"
+    },
+    {
+      "id": "report-fault-regression-red",
+      "acceptance": "Added public regression before correction: original Fault was not delivered because name second-read marker escaped.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-input-values.test.ts (before reportFault fix)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-14.log"
+    },
+    {
+      "id": "report-fault-fixed-probe",
+      "acceptance": "Actual fixed9a public Host/Plugin probe: name read once, Reporter called once, original Fault retained alongside attributes contract error.",
+      "command": "bun report-fault-fixed-public-probe.ts (pinned9a)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-15.log"
+    },
+    {
+      "id": "runtime-diagnostics-after-review",
+      "acceptance": "Fixed post-review Runtime/Diagnostics public suites158tests606assertions, including27new input/Fault regression tests and existing lifecycle/error contracts.",
+      "command": "bun test packages/runtime-cordis/tests packages/diagnostics/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-16.log"
+    },
+    {
+      "id": "runtime-types-after-review",
+      "acceptance": "Post-review Runtime types passed.",
+      "command": "bun run --filter @nodebraid/runtime-cordis typecheck:self",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-17.log"
+    },
+    {
+      "id": "compiled-public-after-review",
+      "acceptance": "Fresh fixed9a compiled public Runtime retains original accepted Host ID, name and level, one read each.",
+      "command": "bun runtime-diagnostic-capture-probe.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-18.log"
+    },
+    {
+      "id": "affected-consumers-after-review",
+      "acceptance": "Actual post-review fixed9a affected selection passed, including real consuming public tests/browser/Examples/documentation. Earlier6cf affected result remains historical.",
+      "command": "bun run check:affected --base 710038f0ed0cfc830580241ca1e90fca5f50677e",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-19.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "2189575b464c571b39f6b46e6a1085f7b421a990e69df2446f25aeaa4b4f9e29"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "95d80db5267a38351490f61b07de3ea86016c1ae2c4dbc8cf0ea4d926ea89129"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "ae6fc6e8e97b190011d7cfe7854e94477ed7766ead392d746c91b68cfaa0213a"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "09a8b40fc3df6c13bc1490b8d51e44ada9ab7af3629591027fa18f8d0aae2329"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "fe91b4e94254b819588a39039f9bb159b84c17e11152be702bcdf3a331da7c24"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "b216c8a55c0bd9dd7226832e280cda619ae29d551c99aa842d4a3359ed012a91"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "2a6d220cededf52eb93d953b7b44a0fd851f1cb4cb70e7033fd6a0c0a442f73a"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "944745d4bf0a3a86e6c59d13fad4d7f16564d6cd3bf1d80a457c3e0b12fdb05a"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "fbd45c32021853926d6baba178c784f913ae110187013d16ff925fcc4eb1aa0d"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "6648cc1244941741d86e2c99dfac7df72d8cb4f44272099e82923929e8cef3dd"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "51a62615ee841c38c70a30f1c21ee34ee1fd81849ebb72dd5dffe4dceb2e37e8"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "7b591c4a40b5ef1cd902914f0fc580233f8844478fa11ce14b0396dc28ee5931"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "f779b29dc5b6cbbdfb7d3fcd71a78e08f4fa1a0878233e24381eafc9a05e7348"
+    },
+    {
+      "path": "logs/behavior-11.log",
+      "kind": "log",
+      "sha256": "434f6b12ee15835504319166bb0af51162540d79262a6336b053352c3899d014"
+    },
+    {
+      "path": "logs/behavior-12.log",
+      "kind": "log",
+      "sha256": "8d26f32290a73ac661558054c29b35fa90b19043eb1df6bed1ec62dca0dcb718"
+    },
+    {
+      "path": "logs/behavior-13.log",
+      "kind": "log",
+      "sha256": "55b303e86aea5dd91ee4ba748c98850063a11f5f038a4d620b2f11d82673b53b"
+    },
+    {
+      "path": "logs/behavior-14.log",
+      "kind": "log",
+      "sha256": "2e28e31e5bcb53e7fc4d6ecbe608f19ab9e3cc2ff934ac06b103a413fee7b9b6"
+    },
+    {
+      "path": "logs/behavior-15.log",
+      "kind": "log",
+      "sha256": "b098ac1ec0eff262fef9cce374112093590dfe743ed58bd956e4fe3645988251"
+    },
+    {
+      "path": "logs/behavior-16.log",
+      "kind": "log",
+      "sha256": "37615cecc97759c96f2c21ca02a799c07ab73eaa9456151b0816c22420bdf865"
+    },
+    {
+      "path": "logs/behavior-17.log",
+      "kind": "log",
+      "sha256": "f779b29dc5b6cbbdfb7d3fcd71a78e08f4fa1a0878233e24381eafc9a05e7348"
+    },
+    {
+      "path": "logs/behavior-18.log",
+      "kind": "log",
+      "sha256": "434f6b12ee15835504319166bb0af51162540d79262a6336b053352c3899d014"
+    },
+    {
+      "path": "logs/behavior-19.log",
+      "kind": "log",
+      "sha256": "bfdb95b15193769ef93adcf6140cb2807d31351ec86501ef697b8bc25883b84b"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "623798b57fb1fe5c43926e7e678498fbecd6c602b5e3dc30ce35c267c8e6b04e"
+    }
+  ]
+}

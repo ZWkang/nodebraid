@@ -1,0 +1,31 @@
+bun test v1.4.2 (744846f84)
+
+packages/runtime-cordis/tests/diagnostic-input-values.test.ts:
+(pass) Host diagnostics retains the Host ID accepted during validation [13.56ms]
+(pass) a Diagnostic Event retains the name accepted during validation [13.47ms]
+(pass) a Diagnostic Event retains the level accepted during validation [1.23ms]
+(pass) Host diagnostics rejects the first invalid Host ID: "" [3.01ms]
+(pass) Host diagnostics rejects the first invalid Host ID: null [0.71ms]
+(pass) Host diagnostics rejects the first invalid Host ID: 42 [0.12ms]
+(pass) Host diagnostics rejects the first invalid Host ID: {} [0.08ms]
+(pass) an omitted captured Host ID still creates a stable default Host scope [0.93ms]
+(pass) Host diagnostics preserves the original Host ID read failure [0.16ms]
+(pass) a Diagnostic Event rejects its first invalid name: "" [0.32ms]
+(pass) a Diagnostic Event rejects its first invalid name: null [0.24ms]
+(pass) a Diagnostic Event rejects its first invalid name: {} [0.46ms]
+(pass) a Diagnostic Event rejects its first invalid level: "fatal" [0.24ms]
+(pass) a Diagnostic Event rejects its first invalid level: null [0.18ms]
+(pass) a Diagnostic Event rejects its first invalid level: 42 [0.18ms]
+(pass) a Diagnostic Event retains its normalized attributes and original error [1.05ms]
+(pass) a Diagnostic Event preserves the original name read failure [0.49ms]
+(pass) a Diagnostic Event preserves the original level read failure [0.34ms]
+(pass) a Diagnostic Event preserves the original attributes read failure [0.38ms]
+(pass) a Diagnostic Event preserves the original error read failure [0.18ms]
+(pass) Sink failure context retains the accepted Event name after the callback changes the input [0.31ms]
+(pass) an asynchronous Sink retains the accepted name for both explicit failures [0.28ms]
+(pass) disabled ordinary diagnostics validates inputs without consuming the optional error [0.21ms]
+
+ 23 pass
+ 0 fail
+ 63 expect() calls
+Ran 23 tests across 1 file. [149.00ms]

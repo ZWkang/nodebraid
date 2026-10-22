@@ -1,0 +1,24 @@
+bun test v1.4.2 (744846f84)
+
+packages/runtime-cordis/tests/diagnostic-input-values.test.ts:
+(pass) Host diagnostics retains the Host ID accepted during validation [1.74ms]
+(pass) a Diagnostic Event retains the name accepted during validation [6.00ms]
+52 |       name: 'accepted.level',
+53 |       get level() {
+54 |         return ++reads === 1 ? 'info' : ('fatal' as never);
+55 |       },
+56 |     });
+57 |     expect(harness.events.at(-1)?.level).toBe('info');
+                                              ^
+error: expect(received).toBe(expected)
+
+Expected: "info"
+Received: "fatal"
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-80-runtime-diagnostics/cflow/packages/runtime-cordis/tests/diagnostic-input-values.test.ts:57:42)
+(fail) a Diagnostic Event retains the level accepted during validation [7.50ms]
+
+ 2 pass
+ 1 fail
+ 7 expect() calls
+Ran 3 tests across 1 file. [27.00ms]

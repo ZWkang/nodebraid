@@ -1,0 +1,1 @@
+{"host":{"reads":1,"accepted":"accepted-host","published":"accepted-host","frozen":true},"eventName":{"reads":1,"accepted":"accepted.event","published":"accepted.event","frozen":true},"eventLevel":{"reads":1,"accepted":"info","published":"info","frozen":true}}

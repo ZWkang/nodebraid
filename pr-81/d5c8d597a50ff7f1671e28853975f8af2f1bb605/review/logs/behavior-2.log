@@ -1,0 +1,22 @@
+bun test v1.4.2 (744846f84)
+
+packages/runtime-cordis/tests/diagnostic-input-values.test.ts:
+16 |         events.push(event);
+17 |       },
+18 |     },
+19 |   });
+20 |   try {
+21 |     expect(events[0]?.scope.hostId).toBe('accepted-host');
+                                         ^
+error: expect(received).toBe(expected)
+
+Expected: "accepted-host"
+Received: ""
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-80-runtime-diagnostics/cflow/packages/runtime-cordis/tests/diagnostic-input-values.test.ts:21:37)
+(fail) Host diagnostics retains the Host ID accepted during validation [20.33ms]
+
+ 0 pass
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [73.00ms]
