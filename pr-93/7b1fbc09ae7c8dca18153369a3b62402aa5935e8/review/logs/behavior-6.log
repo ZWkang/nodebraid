@@ -1,0 +1,1052 @@
+$ bun run scripts/check-affected.ts --base "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6"
+{
+  "mode": "affected",
+  "files": [
+    "packages/kernel/src/change-set.ts",
+    "packages/kernel/tests/replay-revision-values.test.ts"
+  ],
+  "packages": [
+    "@nodebraid/adapter-react",
+    "@nodebraid/canvas-fragment",
+    "@nodebraid/core",
+    "@nodebraid/examples",
+    "@nodebraid/interaction-api",
+    "@nodebraid/kernel",
+    "@nodebraid/layout-api",
+    "@nodebraid/layout-dagre",
+    "@nodebraid/layout-elk",
+    "@nodebraid/plugin-clipboard",
+    "@nodebraid/plugin-duplicate-selection",
+    "@nodebraid/plugin-history",
+    "@nodebraid/plugin-interaction",
+    "@nodebraid/plugin-kernel",
+    "@nodebraid/plugin-layout",
+    "@nodebraid/plugin-port",
+    "@nodebraid/plugin-renderer",
+    "@nodebraid/plugin-session",
+    "@nodebraid/port-api",
+    "@nodebraid/preset-basic",
+    "@nodebraid/renderer-api",
+    "@nodebraid/renderer-svg",
+    "@nodebraid/session-api"
+  ],
+  "tests": [
+    "tests/kernel-commit-preparation.test.ts",
+    "tests/layout-providers.test.ts"
+  ],
+  "browser": [
+    "@nodebraid/adapter-react",
+    "@nodebraid/examples",
+    "@nodebraid/renderer-svg"
+  ],
+  "docs": true,
+  "shared": []
+}
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install prettier --check --ignore-unknown packages/kernel/src/change-set.ts packages/kernel/tests/replay-revision-values.test.ts
+Checking formatting...
+All matched files use Prettier code style!
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install oxlint packages/kernel/src/change-set.ts packages/kernel/tests/replay-revision-values.test.ts
+[build] @nodebraid/diagnostics
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/kernel
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/runtime-cordis
+$ tsgo -p tsconfig.build.json
+[build] @nodebraid/plugin-command
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-kernel
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-history
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/session-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-session
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/adapter-react
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/canvas-fragment
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/port-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/interaction-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-api
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-port
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-renderer
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-interaction
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-clipboard
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-duplicate-selection
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-layout
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/preset-basic
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/core
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-dagre
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-svg
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/examples
+$ vite build
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 2185 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                              0.62 kB │ gzip:   0.34 kB
+dist/assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2    7.42 kB
+dist/assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2      8.00 kB
+dist/assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2       15.08 kB
+dist/assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2      16.51 kB
+dist/assets/geist-latin-wght-normal-BgDaEnEv.woff2          29.40 kB
+dist/assets/index-B7yrd1ul.css                              38.29 kB │ gzip:   8.10 kB
+dist/assets/routes-D94r1Ekj.js                               0.56 kB │ gzip:   0.41 kB
+dist/assets/rolldown-runtime-CbXtAM7H.js                     0.58 kB │ gzip:   0.36 kB
+dist/assets/preload-helper-nlOK6TZ5.js                      35.01 kB │ gzip:  12.63 kB
+dist/assets/basic-svg-BflpcFUJ.js                          241.77 kB │ gzip:  72.27 kB
+dist/assets/index-B9gCVxlQ.js                              348.54 kB │ gzip: 113.55 kB
+
+✓ built in 864ms
+[build] @nodebraid/layout-elk
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+
+[check:affected] packages/adapter-react: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/adapter-react: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/server-rendering.test.tsx:
+(pass) fails explicitly when a Snapshot Hook is server-rendered without a hydration contract [2.10ms]
+
+tests/index.test.ts:
+(pass) exports the React Adapter hooks through its public entrypoint [0.19ms]
+
+tests/types.test.ts:
+(pass) keeps the React Adapter interface narrow and type-safe
+
+ 3 pass
+ 0 fail
+ 5 expect() calls
+Ran 3 tests across 3 files. [18.00ms]
+
+[check:affected] packages/canvas-fragment: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/canvas-fragment: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) captures the selected-node induced subgraph and explicit Selection in canonical order [1.30ms]
+(pass) materializes nested Nodes and port-qualified Edges with fresh IDs and one world offset [0.57ms]
+(pass) accepts one decoded Fragment shell and rejects edges outside its Node set [2.08ms]
+
+tests/array-input.test.ts:
+(pass) rejects an empty normalized Node collection for length %s [0.04ms]
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length 0
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length %s
+(pass) returns the same Node collection that passed Fragment validation [0.10ms]
+(pass) rejects malformed Fragment elements even when the array defines map [0.03ms]
+(pass) materializes the actual mapping elements even when the array defines map [0.05ms]
+(pass) validates every element within a Proxy array length [0.03ms]
+(pass) accepts frozen array data without invoking method, iterator or constructor hooks [0.09ms]
+(pass) rejects a missing Fragment nodes element [0.02ms]
+(pass) rejects a missing Fragment edges element
+(pass) rejects a missing Fragment selectionNodes element [0.01ms]
+(pass) rejects a missing Fragment selectionEdges element [0.01ms]
+(pass) rejects a missing nodes materialization element [0.03ms]
+(pass) rejects a missing edges materialization element [0.04ms]
+(pass) preserves an array element read failure [0.03ms]
+
+ 23 pass
+ 0 fail
+ 43 expect() calls
+Ran 23 tests across 2 files. [11.00ms]
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) @nodebraid/core > publishes Port values and Runtime contribution seams [0.03ms]
+(pass) @nodebraid/core > publishes Canvas Fragment and Clipboard through the public facade [0.01ms]
+(pass) @nodebraid/core > publishes Duplicate Selection through the public facade
+(pass) @nodebraid/core > publishes the shared Diagnostics seam [1.11ms]
+(pass) @nodebraid/core > publishes the typed Plugin Host seam [3.10ms]
+(pass) @nodebraid/core > publishes the reversible Kernel seam [0.76ms]
+(pass) @nodebraid/core > publishes the Kernel Runtime Plugin seam [1.68ms]
+(pass) @nodebraid/core > publishes the Session Runtime Plugin seam [0.87ms]
+(pass) @nodebraid/core > publishes the backend-neutral Renderer and Runtime integration seams [0.04ms]
+(pass) @nodebraid/core > publishes backend-neutral Interaction values and Runtime behavior [0.02ms]
+(pass) @nodebraid/core > composes asynchronous Command preparation with a synchronous Kernel Transaction [1.33ms]
+(pass) @nodebraid/core > publishes the History Runtime Plugin seam [0.01ms]
+
+tests/preset-basic.test.ts:
+(pass) Core facade exports Basic Canvas Composition without a concrete Renderer [0.01ms]
+
+tests/layout.test.ts:
+(pass) the Core facade exports generic Layout seams without concrete Providers [0.01ms]
+
+ 14 pass
+ 0 fail
+ 39 expect() calls
+Ran 14 tests across 3 files. [23.00ms]
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/interaction-api: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/interaction-api: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) describes backend-neutral Interaction Projection values [0.09ms]
+(pass) creates immutable direction-independent World Rect values including zero area [0.09ms]
+
+ 2 pass
+ 0 fail
+ 7 expect() calls
+Ran 2 tests across 1 file. [4.00ms]
+
+[check:affected] packages/kernel: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/kernel: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/revision.test.ts:
+(pass) revision increment refuses to leave the safe-integer range [0.05ms]
+
+tests/index.test.ts:
+(pass) @nodebraid/kernel > creates one stable revision-zero Canvas View [0.27ms]
+(pass) @nodebraid/kernel > creates distinct Node and Edge identifiers and rejects empty values [0.39ms]
+(pass) @nodebraid/kernel > distinguishes missing entities from relationships of a missing Node [0.13ms]
+(pass) @nodebraid/kernel > commits one Node with matching before and after Canvas Views [0.39ms]
+(pass) @nodebraid/kernel > keeps undeclared caller fields outside committed Node and Edge values [0.14ms]
+(pass) @nodebraid/kernel > rolls back callback and invalid-position failures without replacing the Canvas View [0.22ms]
+(pass) @nodebraid/kernel > rejects an asynchronous Transaction callback and rolls back its staged writes [0.10ms]
+(pass) @nodebraid/kernel > rejects a nested Transaction and rolls back the outer callback when the error escapes [0.05ms]
+(pass) @nodebraid/kernel > closes the Transaction Context and its capabilities after the callback [0.07ms]
+(pass) @nodebraid/kernel > can catch a failed nested or strict operation and continue the outer Transaction [0.07ms]
+(pass) @nodebraid/kernel > strictly replaces and removes an existing Node [0.15ms]
+(pass) @nodebraid/kernel > collapses a Node restored to its original value into a net-zero Transaction [0.07ms]
+(pass) @nodebraid/kernel > reports strict Node writer errors without changing the Draft [0.11ms]
+(pass) @nodebraid/kernel > coalesces Node operation sequences and compares data by reference [0.11ms]
+(pass) @nodebraid/kernel > connects Nodes with an Edge and queries its directed relationships [0.12ms]
+(pass) @nodebraid/kernel > rejects an Edge whose final Endpoint references a missing Node [0.05ms]
+(pass) @nodebraid/kernel > allows temporary Endpoints, self-loops, and separate Node and Edge ID namespaces [0.08ms]
+(pass) @nodebraid/kernel > strictly edits Edges and collapses an identical restoration [0.13ms]
+(pass) @nodebraid/kernel > keeps parent relationships and queries direct children in canonical order [0.31ms]
+(pass) @nodebraid/kernel > updates Draft relationship indexes when Nodes and Edges are replaced [0.12ms]
+(pass) @nodebraid/kernel > reports every missing relationship, parent cycle, and invalid geometry in the final graph [0.12ms]
+(pass) @nodebraid/kernel > requires callers to reparent children explicitly when removing a parent [0.09ms]
+(pass) @nodebraid/kernel > applies a Change Set in reverse and forward through new Transactions [0.26ms]
+(pass) @nodebraid/kernel > rejects a malformed Change Set before changing the Draft [0.12ms]
+(pass) @nodebraid/kernel > rejects stale replay before applying any matching entity changes [0.16ms]
+(pass) @nodebraid/kernel > reverses and reapplies a complete Node and Edge creation Change Set [0.12ms]
+
+tests/replay-revision-values.test.ts:
+(pass) a later revision read cannot make an initially non-adjacent Change Set valid [0.11ms]
+(pass) node reverse rejects the first invalid revision value [0.12ms]
+(pass) edge forward rejects the first invalid revision value [0.03ms]
+(pass) edge reverse rejects the first invalid revision value [0.03ms]
+(pass) node forward rejects the first invalid beforeRevision value
+(pass) node reverse rejects the first invalid beforeRevision value [0.01ms]
+(pass) edge forward rejects the first invalid beforeRevision value [0.01ms]
+(pass) edge reverse rejects the first invalid beforeRevision value [0.02ms]
+(pass) node forward retains the first valid header pair without later reads [0.07ms]
+(pass) node reverse retains the first valid header pair without later reads [0.02ms]
+(pass) edge forward retains the first valid header pair without later reads [0.03ms]
+(pass) edge reverse retains the first valid header pair without later reads [0.03ms]
+(pass) beforeRevision header diagnostics retain the first negative value [0.34ms]
+(pass) beforeRevision header diagnostics retain the first fractional value [0.02ms]
+(pass) beforeRevision header diagnostics retain the first unsafe integer value [0.01ms]
+(pass) beforeRevision header diagnostics retain the first NaN value [0.01ms]
+(pass) beforeRevision header diagnostics retain the first positive infinity value [0.01ms]
+(pass) beforeRevision header diagnostics retain the first negative infinity value
+(pass) beforeRevision header diagnostics retain the first string value
+(pass) beforeRevision header diagnostics retain the first null value
+(pass) beforeRevision header diagnostics retain the first bigint value
+(pass) beforeRevision header diagnostics retain the first object value
+(pass) revision header diagnostics retain the first negative value
+(pass) revision header diagnostics retain the first fractional value
+(pass) revision header diagnostics retain the first unsafe integer value [0.01ms]
+(pass) revision header diagnostics retain the first NaN value [0.01ms]
+(pass) revision header diagnostics retain the first positive infinity value
+(pass) revision header diagnostics retain the first negative infinity value
+(pass) revision header diagnostics retain the first string value
+(pass) revision header diagnostics retain the first null value
+(pass) revision header diagnostics retain the first bigint value
+(pass) revision header diagnostics retain the first object value
+(pass) the largest valid adjacent header pair does not restore the input revision [0.04ms]
+(pass) replay preserves the original beforeRevision read exception [0.04ms]
+(pass) replay preserves the original revision read exception [0.02ms]
+(pass) direction and object guards precede revision property reads [0.04ms]
+(pass) inherited revision getters keep their original receiver [0.05ms]
+(pass) a caught invalid header leaves only the caller's subsequent deliberate write [0.06ms]
+
+tests/types.test.ts:
+(pass) keeps the public Kernel contract type-safe
+
+tests/writer-id-values.test.ts:
+(pass) Node add retains its accepted ID without overwriting an existing Node [0.08ms]
+(pass) Node replace keeps Query, Snapshot and replayable Change Set identities consistent [0.10ms]
+(pass) Edge add retains its accepted ID and relation indexes without overwriting another Edge [0.13ms]
+(pass) Edge replace retains its accepted ID across indexes and reverse/forward replay [0.38ms]
+(pass) duplicate add reports the captured ID before reading other entity fields [0.06ms]
+(pass) replacement mismatch reports the captured ID before reading other entity fields [0.05ms]
+(pass) missing replacement targets fail before reading the incoming ID [0.03ms]
+(pass) add preserves an original ID read failure and committed View [0.05ms]
+(pass) replace preserves an original ID read failure and committed View [0.01ms]
+(pass) a failed owned entity copy leaves no partially added or replaced value [0.07ms]
+(pass) captured replacement IDs retain net-zero View identity [0.04ms]
+(pass) closed Transaction writers fail before reading an incoming ID [0.04ms]
+
+tests/error-contract.test.ts:
+(pass) Kernel structural failures expose the shared NodeBraid error identity [0.02ms]
+(pass) Kernel identifier failures classify a JavaScript value without copying it [0.02ms]
+(pass) Change Set direction failures classify an unsafe JavaScript value [0.02ms]
+(pass) Change Set revision failures classify unsafe JavaScript values [0.03ms]
+
+tests/commit-preparation.test.ts:
+(pass) a failing origin read cannot publish a Transaction [0.04ms]
+(pass) a failing commandId read cannot publish a Transaction [0.01ms]
+(pass) commit metadata is captured once after Draft capabilities close and before publication [0.07ms]
+(pass) a net-zero Transaction does not inspect commit-only metadata [0.01ms]
+(pass) commit preparation rejects reentry from metadata [0.06ms]
+(pass) commit preparation rejects reentry from callback result [0.01ms]
+
+tests/replay-collection.test.ts:
+(pass) a changing replay iterator cannot overwrite a later Node edit [0.18ms]
+(pass) an entries hook cannot hide duplicate replay entries from validation [0.06ms]
+(pass) caught node forward conflict leaves no partial replay [0.37ms]
+(pass) caught node reverse conflict leaves no partial replay [0.04ms]
+(pass) caught edge forward conflict leaves no partial replay [0.35ms]
+(pass) caught edge reverse conflict leaves no partial replay [0.07ms]
+(pass) valid forward and reverse replay ignores input traversal hooks and preserves opaque data [0.10ms]
+(pass) replay captures the outer collection and each indexed entry once [0.07ms]
+(pass) a traversal hook cannot hide a sparse replay entry [0.04ms]
+(pass) replay preserves native length coercion: 1.5 [0.08ms]
+(pass) replay preserves native length coercion: "1.5" [0.04ms]
+(pass) replay preserves native length coercion: {
+  valueOf: [Function: valueOf],
+} [0.04ms]
+(pass) replay preserves native empty iteration for Proxy length 0.5 [0.03ms]
+(pass) replay preserves native empty iteration for Proxy length -1
+(pass) replay preserves native empty iteration for Proxy length NaN
+(pass) replay preserves native empty iteration for Proxy length undefined
+(pass) replay preserves native empty iteration for Proxy length "0"
+(pass) replay preserves native length conversion failure: 1n [0.03ms]
+(pass) replay preserves native length conversion failure: Symbol(length)
+(pass) invalid first entry retains its error before an infinite Proxy length could allocate a snapshot [0.03ms]
+
+ 108 pass
+ 0 fail
+ 451 expect() calls
+Ran 108 tests across 8 files. [23.00ms]
+
+[check:affected] packages/layout-api: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/layout-api: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) a custom Layout Engine computes a full Layout Proposal from a committed Canvas View [1.01ms]
+(pass) Layout data crossing the computation seam is frozen [0.12ms]
+(pass) a pre-aborted Layout Engine preserves the reason without invoking its Provider [0.09ms]
+
+tests/proposal-values.test.ts:
+(pass) Layout compute retains the finite coordinate accepted during validation [0.11ms]
+(pass) Layout validation retains the source revision accepted before reading positions [0.06ms]
+(pass) Layout retains the accepted id property [0.06ms]
+(pass) Layout retains the accepted position property [0.02ms]
+(pass) Layout retains the accepted y property [0.04ms]
+(pass) Layout retains its accepted collection without another field read or iteration [0.13ms]
+(pass) Layout publishes the Fixed Node coordinates that passed validation [0.04ms]
+(pass) Layout preserves revision validation precedence over later read errors [0.24ms]
+(pass) Layout preserves duplicate validation precedence over later read errors [0.09ms]
+(pass) Layout preserves unknown validation precedence over later read errors [0.04ms]
+(pass) Layout preserves x validation precedence over later read errors [0.04ms]
+(pass) Layout propagates the original collection read failure [0.05ms]
+(pass) Layout propagates the original id read failure [0.01ms]
+(pass) Layout propagates the original position read failure [0.02ms]
+(pass) Layout propagates the original x read failure [0.01ms]
+(pass) Layout propagates the original y read failure [0.01ms]
+
+tests/input-validation.test.ts:
+(pass) invalid mode and Fixed Node identities are rejected as invalid Layout Requests [0.14ms]
+(pass) nested Nodes are rejected as unsupported Layout Inputs [0.29ms]
+(pass) mixed Port Endpoints project to Node topology without changing the Document [0.12ms]
+
+tests/error-contract.test.ts:
+(pass) Layout structural failures expose the shared NodeBraid error identity [0.02ms]
+
+tests/input-values.test.ts:
+(pass) Layout Input retains the Request mode accepted during validation [0.05ms]
+(pass) Layout Input retains an accepted incremental Request mode [0.03ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: "wrong",
+  details: {
+    issue: "INVALID_MODE",
+    mode: "wrong",
+  },
+} [0.07ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: null,
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "null",
+  },
+} [0.02ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: 42,
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "number",
+  },
+} [0.01ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: {
+    privateValue: "must-not-escape",
+  },
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "object",
+  },
+} [0.01ms]
+(pass) Layout preserves the original mode read failure before Fixed Node processing [0.03ms]
+(pass) Layout rejects an invalid mode before later Fixed Node read failures [0.04ms]
+(pass) Fixed Node resolution cannot replace the Request mode already accepted [0.03ms]
+(pass) Layout preserves a Fixed Node iterator failure after one mode capture [0.04ms]
+
+tests/proposal-validation.test.ts:
+(pass) a Layout Engine rejects incomplete, foreign, invalid, or constraint-breaking positions [0.32ms]
+(pass) a Proposal must identify the Layout Input revision [0.07ms]
+
+tests/capability-validation.test.ts:
+(pass) a low-level Layout Engine rejects unsupported Input capabilities before its Provider runs [0.17ms]
+
+ 36 pass
+ 0 fail
+ 72 expect() calls
+Ran 36 tests across 7 files. [11.00ms]
+
+[check:affected] packages/layout-dagre: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/layout-dagre: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) Dagre computes deterministic top-left world positions for a full Layout Input [4.92ms]
+(pass) Dagre full layout supports the baseline graph shapes [4.29ms]
+(pass) Dagre preserves every edge constraint when opaque IDs contain graphlib delimiters [0.67ms]
+(pass) Dagre rejects a non-finite Provider configuration before layout [0.12ms]
+
+ 4 pass
+ 0 fail
+ 8 expect() calls
+Ran 4 tests across 1 file. [15.00ms]
+
+[check:affected] packages/layout-elk: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/layout-elk: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/incremental.test.ts:
+(pass) ELK Stress keeps multiple Fixed Nodes at their absolute world positions [80.97ms]
+(pass) ELK Stress incremental layout uses current positions as a deterministic soft constraint [17.38ms]
+(pass) ELK rejects incremental and Fixed Node requests for unproven algorithms [0.38ms]
+
+tests/index.test.ts:
+(pass) ELK computes deterministic top-left world positions for a full Layout Input [13.20ms]
+(pass) ELK layered full treats seed zero as the fixed default seed [82.13ms]
+(pass) ELK stress full treats seed zero as the fixed default seed [71.37ms]
+(pass) ELK stress incremental treats seed zero as the fixed default seed [18.47ms]
+(pass) ELK rejects non-integer and unsafe seeds [0.21ms]
+(pass) ELK full layout supports the baseline graph shapes [15.79ms]
+(pass) ELK rejects a non-finite Provider configuration before layout [0.16ms]
+
+ 10 pass
+ 0 fail
+ 21 expect() calls
+Ran 10 tests across 2 files. [306.00ms]
+
+[check:affected] packages/plugin-clipboard: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/plugin-clipboard: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/behavior.test.ts:
+(pass) Copy keeps empty and edge-only Selection as no-ops without codec or transport calls [6.60ms]
+(pass) History Undo removes a Paste and Redo restores only the Document [2.46ms]
+(pass) Clipboard preserves nested parents, ports, self-loops, parallel Edges, and boundary scope [1.51ms]
+(pass) Paste rejects a missing external parent immediately before commit [1.21ms]
+(pass) Paste preserves its Commit but rejects when a newer Selection wins [1.02ms]
+(pass) concurrent Paste Commands are independent and repeated Paste keeps one deterministic offset [1.36ms]
+(pass) Copy and Paste execute independently without queuing or rewriting the captured Fragment [1.08ms]
+
+tests/index.test.ts:
+(pass) Copy captures one committed selected-node Fragment before writing text [0.69ms]
+(pass) Paste reads, validates, materializes, commits once, and selects the pasted Fragment [2.10ms]
+
+tests/types.test.ts:
+(pass) publishes typed Clipboard behavior and Shortcut Plugins [0.10ms]
+
+tests/duplicate-composition.test.ts:
+(pass) Duplicate and Clipboard compose through one Host and shared Canvas Fragment seam [1.64ms]
+
+tests/shortcut.test.ts:
+(pass) default Clipboard Shortcuts route exact Mod+C and Mod+V through Interaction [6.45ms]
+
+tests/lifecycle.test.ts:
+(pass) Clipboard disposal aborts and awaits an in-flight external read without residual registrations [0.72ms]
+(pass) caller cancellation keeps its reason and dependency recovery creates fresh Clipboard registrations [1.08ms]
+
+tests/factory.test.ts:
+(pass) Copy and Paste retain the accepted transport property [0.82ms]
+(pass) Copy and Paste retain the accepted readText property [0.58ms]
+(pass) Copy and Paste retain the accepted writeText property [0.57ms]
+(pass) Copy and Paste retain the accepted codec property [0.56ms]
+(pass) Copy and Paste retain the accepted encode property [0.58ms]
+(pass) Copy and Paste retain the accepted decode property [0.53ms]
+(pass) Copy and Paste retain the accepted materializeIds property [0.53ms]
+(pass) Copy and Paste retain the accepted offset property [1.53ms]
+(pass) Copy and Paste retain the accepted x property [0.65ms]
+(pass) Copy and Paste retain the accepted y property [0.46ms]
+(pass) factory keeps the original transport getter exception [0.07ms]
+(pass) factory keeps the original readText getter exception
+(pass) factory keeps the original writeText getter exception
+(pass) factory keeps the original codec getter exception
+(pass) factory keeps the original encode getter exception
+(pass) factory keeps the original decode getter exception
+(pass) factory keeps the original materializeIds getter exception
+(pass) factory keeps the original offset getter exception
+(pass) factory keeps the original x getter exception
+(pass) factory keeps the original y getter exception
+(pass) factory rejects invalid transport before reading codec [0.04ms]
+(pass) factory rejects invalid readText before reading writeText
+(pass) factory rejects invalid writeText before reading codec
+(pass) factory rejects invalid codec before reading materializeIds
+(pass) factory rejects invalid encode before reading decode
+(pass) factory rejects invalid decode before reading materializeIds
+(pass) factory rejects invalid materializeIds before reading offset
+(pass) factory rejects invalid x before reading y
+(pass) factory rejects unknown fields before invoking configuration getters [0.05ms]
+(pass) factory preserves omitted, nullish, and zero offsets: undefined [0.49ms]
+(pass) factory preserves omitted, nullish, and zero offsets: null [0.47ms]
+(pass) factory preserves omitted, nullish, and zero offsets: {
+  x: 0,
+  y: 0,
+} [0.48ms]
+(pass) factory owns its accepted shell while keeping application inputs mutable [0.62ms]
+
+tests/failures.test.ts:
+(pass) Clipboard external transport and codec failures keep stable identities and original causes [2.16ms]
+(pass) Paste rejects foreign decoded values and incomplete mapping without a Commit [2.21ms]
+(pass) Paste rejects a decoded Fragment whose normalized Node collection is empty [0.56ms]
+(pass) Paste wraps a Kernel validation rejection as COMMIT_FAILED without partial state [1.38ms]
+(pass) Paste rejects occupied materialized Node and Edge IDs atomically [1.54ms]
+
+ 52 pass
+ 0 fail
+ 262 expect() calls
+Ran 52 tests across 8 files. [62.00ms]
+
+[check:affected] packages/plugin-duplicate-selection: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/plugin-duplicate-selection: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) Duplicate Selection factories reject malformed config structurally [0.23ms]
+(pass) Duplicate Selection copies the current Node and selects its duplicate as one History entry [5.89ms]
+(pass) Duplicate Selection captures the validated materializer for execution [1.34ms]
+(pass) Duplicate Selection captures the finite offset coordinates accepted at creation [1.10ms]
+(pass) Duplicate Selection captures its offset reference and retains an explicit zero copy [1.02ms]
+(pass) Duplicate Selection preserves validation short circuits before later option reads [0.10ms]
+(pass) Duplicate Selection preserves original option getter failures [0.06ms]
+(pass) Duplicate Selection remaps nested Nodes, ports, self-loops, and parallel internal Edges only [1.33ms]
+(pass) Duplicate Selection preserves an unselected parent and does not copy unselected descendants [1.11ms]
+(pass) Duplicate Selection keeps empty and edge-only Selection as no-ops without materialization [0.91ms]
+(pass) Duplicate Selection rejects incomplete ID mapping atomically [0.79ms]
+(pass) Duplicate Selection rejects extra, duplicate, colliding, and async ID materialization [4.17ms]
+(pass) Duplicate Selection preserves an application materializer failure identity [0.71ms]
+(pass) Duplicate Selection rejects same-value source ABA without blocking unrelated Commits [0.93ms]
+(pass) Duplicate Selection rejects a new internal Edge and same-value internal Edge ABA [1.53ms]
+(pass) Undo removes Duplicate Selection and Redo restores Document without reselecting [1.09ms]
+(pass) Duplicate Selection preserves a Commit but does not overwrite newer Selection from a Commit observer [0.83ms]
+(pass) Duplicate Selection wraps post-Commit Session loss with the committed revision [0.68ms]
+
+tests/types.test.ts:
+(pass) publishes typed Duplicate Selection behavior and Shortcut Plugins [0.05ms]
+
+tests/mapping-input.test.ts:
+(pass) Duplicate rejects actual invalid nodes mappings instead of custom map output [0.79ms]
+(pass) Duplicate rejects actual invalid edges mappings instead of custom map output [1.26ms]
+(pass) Duplicate retains the nodes collection accepted before translation [0.64ms]
+(pass) Duplicate retains the edges collection accepted before translation [0.47ms]
+(pass) Duplicate accepts frozen mappings without consulting collection hooks [0.63ms]
+(pass) Duplicate preserves the original nodes element read failure [0.49ms]
+(pass) Duplicate preserves the original edges element read failure [0.43ms]
+(pass) Duplicate rejects an invalid Node collection before reading Edge mappings [0.50ms]
+(pass) Duplicate retains native mapping index behavior for hole [0.50ms]
+(pass) Duplicate retains native mapping index behavior for inherited [0.42ms]
+(pass) Duplicate retains native mapping index behavior for string-length [0.44ms]
+
+tests/shortcut.test.ts:
+(pass) the Duplicate Shortcut factory captures its option reference once [0.03ms]
+(pass) the Duplicate Shortcut factory preserves captured invalid values and getter failures [0.10ms]
+(pass) the default Duplicate Shortcut invokes the public behavior through Mod+D [3.46ms]
+
+tests/lifecycle.test.ts:
+(pass) Duplicate Selection registration follows dependency loss, reactivation, and disposal [0.82ms]
+
+ 34 pass
+ 0 fail
+ 117 expect() calls
+Ran 34 tests across 5 files. [48.00ms]
+
+[check:affected] packages/plugin-history: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/plugin-history: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) @nodebraid/plugin-history > publishes the stable History diagnostic event catalog [0.02ms]
+(pass) @nodebraid/plugin-history > records the first post-Baseline Commit and undoes it through Command Service [5.17ms]
+(pass) @nodebraid/plugin-history > redoes the most recently undone History Entry with diagnostic metadata [1.15ms]
+(pass) @nodebraid/plugin-history > records a Recordable Commit that uses History-like diagnostic metadata [0.89ms]
+(pass) @nodebraid/plugin-history > records Command-originated work but not net-zero or failed Transactions [0.77ms]
+(pass) @nodebraid/plugin-history > clears Redo when a new Recordable Commit creates a branch [0.70ms]
+(pass) @nodebraid/plugin-history > rejects an empty Undo without changing Kernel or History [0.60ms]
+(pass) @nodebraid/plugin-history > publishes only meaningful History Snapshot changes [0.68ms]
+(pass) @nodebraid/plugin-history > snapshots subscriber recipients and isolates their errors [1.18ms]
+(pass) @nodebraid/plugin-history > allows an aligned Recordable Commit subscriber to Undo immediately [0.86ms]
+(pass) @nodebraid/plugin-history > rejects Undo before History catches up to the current Kernel revision [0.63ms]
+(pass) @nodebraid/plugin-history > keeps one queued Replay in flight and rejects a reentrant second Undo [0.59ms]
+(pass) @nodebraid/plugin-history > records a reentrant Recordable Commit and publishes only after catching up [0.67ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy while publishing its History Snapshot [0.53ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through later Kernel Observers [1.66ms]
+(pass) @nodebraid/plugin-history > returns the exact Replay Commit delivered to Kernel Observers [0.58ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through the final caught-up Snapshot publication [0.75ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Kernel Provider disappears before delivery [0.68ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Command Provider disappears before delivery [0.47ms]
+(pass) @nodebraid/plugin-history > preserves caller cancellation before starting a Replay [0.47ms]
+(pass) @nodebraid/plugin-history > prioritizes caller cancellation over an empty Undo stack [0.43ms]
+(pass) @nodebraid/plugin-history > closes old History state and reactivates from a fresh Kernel Baseline [0.86ms]
+(pass) @nodebraid/plugin-history > starts a new Baseline when Command Service returns to a retained Kernel [0.82ms]
+
+tests/types.test.ts:
+(pass) keeps the public History seam narrow and type-safe
+
+ 24 pass
+ 0 fail
+ 95 expect() calls
+Ran 24 tests across 2 files. [31.00ms]
+
+[check:affected] packages/plugin-interaction: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/plugin-interaction: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/input-cleanup.test.ts:
+(pass) a failed Selection transition releases Pointer Capture before reporting the Input fault [5.97ms]
+
+tests/types.test.ts:
+(pass) publishes Interaction as a Runtime Plugin with a narrow Shortcut contribution Service [0.02ms]
+
+tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [3.35ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [1.65ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [4.90ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [5.10ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [2.80ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [1.56ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [0.84ms]
+
+tests/create-edge-command.test.ts:
+(pass) Create Edge commits one complete Node-level Edge [1.60ms]
+
+tests/selection-transition.test.ts:
+(pass) a Port click selects its owning Node without inventing a Port selection [0.04ms]
+
+tests/config.test.ts:
+(pass) Interaction accepts an explicit synchronous Connection materializer [0.71ms]
+(pass) Interaction rejects unknown config fields through Plugin installation [1.24ms]
+(pass) Interaction rejects malformed numeric config without coercion [1.67ms]
+
+tests/lifecycle.test.ts:
+(pass) Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh [1.70ms]
+(pass) Delete Selection registration follows dependency reactivation and disposal lifecycle [1.27ms]
+(pass) Connection materializer failure keeps identity and reports exactly once after terminal cleanup [2.43ms]
+(pass) Connection dependency recovery creates a fresh idle Activation [1.71ms]
+(pass) Connection final Hit Test failure still clears Preview and releases Capture [0.73ms]
+(pass) Connection Escape attempts every terminal cleanup and never materializes after cleanup failure [0.66ms]
+(pass) Box Selection disposal continues after every public Renderer cleanup failure [0.96ms]
+(pass) Box Selection escape exposes every terminal cleanup failure [0.62ms]
+(pass) Box Selection pointer-cancel exposes every terminal cleanup failure [0.53ms]
+(pass) Interaction dependency recovery creates a fresh idle Activation [1.08ms]
+(pass) an input-driven Command rejection is reported exactly once while Interaction is active [2.08ms]
+(pass) a late Command rejection cannot report through an ended Interaction Activation [1.93ms]
+(pass) a recovered Renderer reset receives the still-compatible Active Gesture again [2.05ms]
+
+tests/move-nodes-command.test.ts:
+(pass) Move Nodes rejects an empty input without changing Document [0.98ms]
+
+tests/diagnostic-events.test.ts:
+(pass) publishes the stable Interaction diagnostic event catalog
+
+tests/port-connection.test.ts:
+(pass) Port Gesture tracks target loss, materializes exact Endpoints once, and cancels on source loss [3.26ms]
+
+tests/delete-selection-input.test.ts:
+(pass) a live Interaction Shortcut Binding executes its Command and prevents the matched input default [3.92ms]
+(pass) logical Delete key removes the current Selection through the public Renderer Input seam [2.21ms]
+(pass) physical Delete accepts modifiers and repeat while empty Selection and Backspace remain no-ops [3.41ms]
+(pass) Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connection without cancelling them [8.48ms]
+(pass) Delete Transaction failure preserves state and reports the original diagnostic identity exactly once [2.05ms]
+
+ 35 pass
+ 0 fail
+ 200 expect() calls
+Ran 35 tests across 11 files. [89.00ms]
+
+[check:affected] packages/plugin-kernel: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/plugin-kernel: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) @nodebraid/plugin-kernel > publishes the stable Kernel Plugin diagnostic event catalog [0.02ms]
+(pass) @nodebraid/plugin-kernel > provides one revision-zero Kernel Service for an Activation [4.06ms]
+(pass) @nodebraid/plugin-kernel > synchronously observes only successful net-changing Transactions [1.00ms]
+(pass) @nodebraid/plugin-kernel > reports Observer errors without rolling back or blocking later Observers [0.81ms]
+(pass) @nodebraid/plugin-kernel > schedules an explicit Observer error when platform reporting is unavailable [5.13ms]
+(pass) @nodebraid/plugin-kernel > queues reentrant Commits until every Observer sees the current revision [0.50ms]
+(pass) @nodebraid/plugin-kernel > stops Consumers before closing the Service and reinstalls a fresh Kernel [0.84ms]
+
+tests/types.test.ts:
+(pass) keeps the public Kernel Service contract type-safe
+
+ 8 pass
+ 0 fail
+ 29 expect() calls
+Ran 8 tests across 2 files. [21.00ms]
+
+[check:affected] packages/plugin-layout: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/plugin-layout: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) a typed Layout Command commits all Node positions in one Canvas Commit [5.56ms]
+
+tests/commit-protection.test.ts:
+(pass) a stale Layout Proposal cannot overwrite a newer Kernel revision [1.39ms]
+(pass) cancellation after Provider execution starts preserves the reason and prevents commit [1.22ms]
+(pass) a pre-aborted Layout Command does not invoke the Provider [0.78ms]
+
+tests/request-validation.test.ts:
+(pass) a Node without Size rejects the Layout Request before the Provider runs [0.80ms]
+(pass) unsupported incremental, Fixed Node, and self-loop capabilities fail before the Provider runs [0.87ms]
+
+tests/port-commit-protection.test.ts:
+(pass) a pending Port topology Layout preserves a newer Port Endpoint commit [1.02ms]
+(pass) a pending Port topology Layout preserves a newer Layout commit [0.61ms]
+
+ 8 pass
+ 0 fail
+ 15 expect() calls
+Ran 8 tests across 4 files. [25.00ms]
+
+[check:affected] packages/plugin-port: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/plugin-port: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) domain Plugins contribute canonical Ports and disposal removes them [4.17ms]
+(pass) Port capability rejects duplicate contribution and per-Node Port identities explicitly [0.72ms]
+(pass) subscriber faults report explicitly without hiding an accepted registration [0.69ms]
+
+tests/property-values.test.ts:
+(pass) Port Snapshots retain the definition values that passed validation [1.03ms]
+(pass) Port registration retains the identity and callback that passed validation [0.59ms]
+(pass) Connection lookup uses the validated Port Definition values [0.45ms]
+(pass) a later role value cannot rescue a malformed captured definition [0.46ms]
+(pass) property reads and Contribution callbacks preserve their original failures [0.65ms]
+(pass) malformed captured values and unknown own fields retain their Port error codes [0.71ms]
+(pass) invalid Port IDs fail before later properties are read [0.45ms]
+
+ 10 pass
+ 0 fail
+ 40 expect() calls
+Ran 10 tests across 2 files. [19.00ms]
+
+[check:affected] packages/plugin-renderer: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/plugin-renderer: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) @nodebraid/plugin-renderer > publishes the stable Renderer diagnostic event catalog [0.02ms]
+(pass) @nodebraid/plugin-renderer > creates one Renderer and publishes only the narrow Runtime Service [4.72ms]
+(pass) @nodebraid/plugin-renderer > keeps every delivered Session resolvable while Document entities are removed [1.66ms]
+(pass) @nodebraid/plugin-renderer > waits for reentrant Session reconciliation before delivering a deleting Commit [1.09ms]
+(pass) @nodebraid/plugin-renderer > delegates input, hit testing, capture and focus without exposing update methods [0.90ms]
+(pass) @nodebraid/plugin-renderer > binds one exclusive Interaction Projection writer for the Renderer Activation [0.95ms]
+(pass) @nodebraid/plugin-renderer > isolates Input listener faults through Host diagnostics [0.99ms]
+(pass) @nodebraid/plugin-renderer > reports an out-of-sync Renderer and re-establishes its current baseline [0.86ms]
+(pass) @nodebraid/plugin-renderer > attempts one full recovery after an arbitrary internal synchronization fault [0.81ms]
+(pass) @nodebraid/plugin-renderer > enters terminal Sync Failure when the single full recovery also fails [0.67ms]
+(pass) @nodebraid/plugin-renderer > does not report queued Commits already subsumed by an out-of-sync reset [1.01ms]
+
+tests/types.test.ts:
+(pass) binds Provider config without exposing CanvasRenderer update authority
+
+ 12 pass
+ 0 fail
+ 44 expect() calls
+Ran 12 tests across 2 files. [23.00ms]
+
+[check:affected] packages/plugin-session: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/plugin-session: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) @nodebraid/plugin-session > publishes the stable Session diagnostic event catalog [0.02ms]
+(pass) @nodebraid/plugin-session > provides a fresh default Session for an Activation [3.79ms]
+(pass) @nodebraid/plugin-session > publishes a canonical immutable Selection and ignores equivalent input [1.36ms]
+(pass) @nodebraid/plugin-session > rejects every missing Selection entity without changing Session state [0.79ms]
+(pass) @nodebraid/plugin-session > publishes only valid normalized Viewport changes [0.75ms]
+(pass) @nodebraid/plugin-session > reconciles Selection from the exact Kernel Commit after View [0.81ms]
+(pass) @nodebraid/plugin-session > queues reentrant Session mutations until every subscriber sees the current Snapshot [0.51ms]
+(pass) @nodebraid/plugin-session > owns each subscription independently even when listeners share one function [0.51ms]
+(pass) @nodebraid/plugin-session > reports subscriber errors without corrupting Session or blocking later subscribers [0.80ms]
+(pass) @nodebraid/plugin-session > schedules an explicit subscriber error when platform reporting is unavailable [0.96ms]
+(pass) @nodebraid/plugin-session > preserves subscriber and reporter failures when platform reporting throws [0.55ms]
+(pass) @nodebraid/plugin-session > closes old handles and creates a fresh Session when Kernel returns [0.84ms]
+(pass) @nodebraid/plugin-session > rejects an invalid subscriber before it can enter notification state [0.48ms]
+(pass) @nodebraid/plugin-session > rejects malformed Selection input with structured immutable details [0.39ms]
+(pass) @nodebraid/plugin-session > rejects sparse Selection arrays as malformed input [0.39ms]
+(pass) @nodebraid/plugin-session > rejects malformed Viewport input as a structured Session error [0.39ms]
+
+tests/types.test.ts:
+(pass) keeps the public Session Service contract narrow and immutable
+
+ 17 pass
+ 0 fail
+ 73 expect() calls
+Ran 17 tests across 2 files. [22.00ms]
+
+[check:affected] packages/port-api: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/port-api: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) Port Snapshot lookup preserves node ownership and roles [0.18ms]
+
+ 1 pass
+ 0 fail
+ 7 expect() calls
+Ran 1 test across 1 file. [4.00ms]
+
+[check:affected] packages/preset-basic: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/preset-basic: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) Composition readiness publishes every base Service through static bindings [5.91ms]
+
+tests/types.test.ts:
+(pass) Basic Canvas Composition preserves required Renderer config and provides no Service [1.54ms]
+
+tests/readiness.test.ts:
+(pass) invalid Interaction options fail the Composition with the original Interaction error [1.48ms]
+(pass) Composition snapshots Interaction options when the Plugin is created [1.16ms]
+(pass) Composition snapshots nested Connection options when the Plugin is created [1.20ms]
+(pass) Composition creation rejects malformed or unknown top-level options [0.06ms]
+(pass) Composition waits for an asynchronous Renderer before becoming active [0.99ms]
+(pass) Renderer Factory failure keeps its identity and releases the Child tree for reinstall [3.31ms]
+
+tests/lifecycle.test.ts:
+(pass) existing standard Provider makes Basic Canvas Composition fail explicitly [0.48ms]
+(pass) second Basic Canvas Composition conflicts without disturbing the active one [1.10ms]
+(pass) a later Renderer Provider conflict rolls back earlier Child reservations [1.74ms]
+(pass) Composition disposes consumers before Renderer and awaits asynchronous Renderer cleanup [1.15ms]
+(pass) Composition cleanup attempts every Renderer resource and preserves all failures [1.06ms]
+(pass) Composition diagnostics expose the complete reverse Child cleanup order [0.92ms]
+
+tests/package-import.test.ts:
+(pass) package-name import exposes the Basic Canvas Composition factory [0.63ms]
+
+ 15 pass
+ 0 fail
+ 44 expect() calls
+Ran 15 tests across 5 files. [34.00ms]
+
+[check:affected] packages/renderer-api: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/renderer-api: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) publishes backend-neutral Renderer Input values [0.03ms]
+(pass) identifies Renderer contract failures structurally [0.30ms]
+
+tests/types.test.ts:
+(pass) keeps Renderer construction and updates strongly typed
+
+ 3 pass
+ 0 fail
+ 4 expect() calls
+Ran 3 tests across 2 files. [5.00ms]
+
+[check:affected] packages/renderer-svg: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/renderer-svg: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/types.test.ts:
+(pass) publishes a synchronous typed SVG Renderer Factory [0.03ms]
+(pass) identifies SVG Provider failures structurally [0.28ms]
+
+ 2 pass
+ 0 fail
+ 6 expect() calls
+Ran 2 tests across 1 file. [7.00ms]
+
+[check:affected] packages/session-api: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/session-api: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) describes immutable Session values without Runtime capabilities [0.08ms]
+
+ 1 pass
+ 0 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [4.00ms]
+
+[check:affected] .: /Users/zhou/.bun/bin/bun test tests/kernel-commit-preparation.test.ts tests/layout-providers.test.ts
+bun test v1.4.2 (744846f84)
+
+tests/layout-providers.test.ts:
+(pass) Dagre lays out Port topology with one undoable commit and a no-op repeat [10.79ms]
+(pass) ELK lays out Port topology with one undoable commit and a no-op repeat [96.58ms]
+(pass) accepted getter-backed Layout values survive Runtime revalidation and History replay [1.46ms]
+(pass) Dagre and ELK compose with Provider-specific typed Runtime Commands [6.70ms]
+
+tests/kernel-commit-preparation.test.ts:
+(pass) failed Kernel commit preparation leaves no Observer or History revision gap [0.98ms]
+
+ 5 pass
+ 0 fail
+ 102 expect() calls
+Ran 5 tests across 2 files. [135.00ms]
+
+[check:affected] packages/adapter-react: /Users/zhou/.bun/bin/bun run test:browser:self
+$ bun run ./browser-tests/runtime-mount.browser.ts
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run test:browser:self
+$ bun run ./browser-tests/basic-svg.browser.ts && bun run ./browser-tests/clipboard.browser.ts
+
+[check:affected] packages/renderer-svg: /Users/zhou/.bun/bin/bun run test:browser:self
+$ bun run ./browser-tests/renderer-contract.browser.ts
+
+[check:affected] .: /Users/zhou/.bun/bin/bun run docs:check:self
+$ bun run docs:verify && bun run website/examples/quick-start.ts && bun run docs:build
+$ bun run website/scripts/verify-content.ts
+documentation content verified (25 modules)
+revision=1 nodes=1
+$ NODEBRAID_DOCS_BASE=/nodebraid/ vitepress build website
+
+  vitepress v1.6.4
+
+- building client + server bundles...
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[32m✓[0m building client + server bundles...
+- rendering pages...
+[32m✓[0m rendering pages...
+build complete in 12.90s.

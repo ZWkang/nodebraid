@@ -1,0 +1,205 @@
+{
+  "head": "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+  "seam": "fresh compiled public Kernel barrel",
+  "results": [
+    {
+      "direction": "forward",
+      "variant": "valid",
+      "firstTuple": [
+        0,
+        1
+      ],
+      "code": null,
+      "details": null,
+      "sameView": false,
+      "originalRevision": 0,
+      "actualRevision": 1,
+      "ids": [
+        "header-accepted"
+      ],
+      "reads": {
+        "beforeReads": 3,
+        "revisionReads": 2,
+        "changesReads": 1
+      }
+    },
+    {
+      "direction": "forward",
+      "variant": "stable-invalid",
+      "firstTuple": [
+        0,
+        5
+      ],
+      "code": "INVALID_CHANGE_SET",
+      "details": {
+        "beforeRevision": {
+          "value": 0
+        },
+        "issue": "INVALID_REVISIONS",
+        "revision": {
+          "value": 5
+        }
+      },
+      "sameView": true,
+      "originalRevision": 0,
+      "actualRevision": 0,
+      "ids": [],
+      "reads": {
+        "beforeReads": 4,
+        "revisionReads": 3,
+        "changesReads": 0
+      }
+    },
+    {
+      "direction": "forward",
+      "variant": "changing-revision",
+      "firstTuple": [
+        0,
+        5
+      ],
+      "code": null,
+      "details": null,
+      "sameView": false,
+      "originalRevision": 0,
+      "actualRevision": 1,
+      "ids": [
+        "header-accepted"
+      ],
+      "reads": {
+        "beforeReads": 3,
+        "revisionReads": 2,
+        "changesReads": 1
+      }
+    },
+    {
+      "direction": "forward",
+      "variant": "changing-before",
+      "firstTuple": [
+        0,
+        2
+      ],
+      "code": null,
+      "details": null,
+      "sameView": false,
+      "originalRevision": 0,
+      "actualRevision": 1,
+      "ids": [
+        "header-accepted"
+      ],
+      "reads": {
+        "beforeReads": 3,
+        "revisionReads": 2,
+        "changesReads": 1
+      }
+    },
+    {
+      "direction": "reverse",
+      "variant": "valid",
+      "firstTuple": [
+        0,
+        1
+      ],
+      "code": null,
+      "details": null,
+      "sameView": false,
+      "originalRevision": 1,
+      "actualRevision": 2,
+      "ids": [],
+      "reads": {
+        "beforeReads": 3,
+        "revisionReads": 2,
+        "changesReads": 1
+      }
+    },
+    {
+      "direction": "reverse",
+      "variant": "stable-invalid",
+      "firstTuple": [
+        0,
+        5
+      ],
+      "code": "INVALID_CHANGE_SET",
+      "details": {
+        "beforeRevision": {
+          "value": 0
+        },
+        "issue": "INVALID_REVISIONS",
+        "revision": {
+          "value": 5
+        }
+      },
+      "sameView": true,
+      "originalRevision": 1,
+      "actualRevision": 1,
+      "ids": [
+        "header-accepted"
+      ],
+      "reads": {
+        "beforeReads": 4,
+        "revisionReads": 3,
+        "changesReads": 0
+      }
+    },
+    {
+      "direction": "reverse",
+      "variant": "changing-revision",
+      "firstTuple": [
+        0,
+        5
+      ],
+      "code": null,
+      "details": null,
+      "sameView": false,
+      "originalRevision": 1,
+      "actualRevision": 2,
+      "ids": [],
+      "reads": {
+        "beforeReads": 3,
+        "revisionReads": 2,
+        "changesReads": 1
+      }
+    },
+    {
+      "direction": "reverse",
+      "variant": "changing-before",
+      "firstTuple": [
+        0,
+        2
+      ],
+      "code": null,
+      "details": null,
+      "sameView": false,
+      "originalRevision": 1,
+      "actualRevision": 2,
+      "ids": [],
+      "reads": {
+        "beforeReads": 3,
+        "revisionReads": 2,
+        "changesReads": 1
+      }
+    }
+  ]
+}
+25 |   }
+26 | }
+27 | console.log(JSON.stringify({ head, seam: 'fresh compiled public Kernel barrel', results }, null, 2));
+28 | for (const result of results) {
+29 |   if (result.variant === 'valid') { assert.equal(result.code, null); assert.equal(result.actualRevision, result.originalRevision + 1); }
+30 |   else { assert.equal(result.code, 'INVALID_CHANGE_SET', `${result.direction} ${result.variant}: first accepted revision tuple is non-adjacent`); assert.equal(result.sameView, true); assert.equal(result.reads.changesReads, 0); }
+                     ^
+AssertionError: forward changing-revision: first accepted revision tuple is non-adjacent
++ actual - expected
+
++ null
+- 'INVALID_CHANGE_SET'
+
+ generatedMessage: false,
+     actual: null,
+   expected: "INVALID_CHANGE_SET",
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261022T101847-maintenance/kernel-replay-header-repro.ts:30:17
+
+Bun v1.4.2 (macOS arm64)

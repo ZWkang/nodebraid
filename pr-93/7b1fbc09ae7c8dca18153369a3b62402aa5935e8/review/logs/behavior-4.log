@@ -1,0 +1,214 @@
+{
+  "head": "d937a3a3b0a45c93350008c49b45ac803c20b81e",
+  "seam": "fresh compiled public Kernel barrel",
+  "results": [
+    {
+      "direction": "forward",
+      "variant": "valid",
+      "firstTuple": [
+        0,
+        1
+      ],
+      "code": null,
+      "details": null,
+      "sameView": false,
+      "originalRevision": 0,
+      "actualRevision": 1,
+      "ids": [
+        "header-accepted"
+      ],
+      "reads": {
+        "beforeReads": 1,
+        "revisionReads": 1,
+        "changesReads": 1
+      }
+    },
+    {
+      "direction": "forward",
+      "variant": "stable-invalid",
+      "firstTuple": [
+        0,
+        5
+      ],
+      "code": "INVALID_CHANGE_SET",
+      "details": {
+        "beforeRevision": {
+          "value": 0
+        },
+        "issue": "INVALID_REVISIONS",
+        "revision": {
+          "value": 5
+        }
+      },
+      "sameView": true,
+      "originalRevision": 0,
+      "actualRevision": 0,
+      "ids": [],
+      "reads": {
+        "beforeReads": 1,
+        "revisionReads": 1,
+        "changesReads": 0
+      }
+    },
+    {
+      "direction": "forward",
+      "variant": "changing-revision",
+      "firstTuple": [
+        0,
+        5
+      ],
+      "code": "INVALID_CHANGE_SET",
+      "details": {
+        "beforeRevision": {
+          "value": 0
+        },
+        "issue": "INVALID_REVISIONS",
+        "revision": {
+          "value": 5
+        }
+      },
+      "sameView": true,
+      "originalRevision": 0,
+      "actualRevision": 0,
+      "ids": [],
+      "reads": {
+        "beforeReads": 1,
+        "revisionReads": 1,
+        "changesReads": 0
+      }
+    },
+    {
+      "direction": "forward",
+      "variant": "changing-before",
+      "firstTuple": [
+        0,
+        2
+      ],
+      "code": "INVALID_CHANGE_SET",
+      "details": {
+        "beforeRevision": {
+          "value": 0
+        },
+        "issue": "INVALID_REVISIONS",
+        "revision": {
+          "value": 2
+        }
+      },
+      "sameView": true,
+      "originalRevision": 0,
+      "actualRevision": 0,
+      "ids": [],
+      "reads": {
+        "beforeReads": 1,
+        "revisionReads": 1,
+        "changesReads": 0
+      }
+    },
+    {
+      "direction": "reverse",
+      "variant": "valid",
+      "firstTuple": [
+        0,
+        1
+      ],
+      "code": null,
+      "details": null,
+      "sameView": false,
+      "originalRevision": 1,
+      "actualRevision": 2,
+      "ids": [],
+      "reads": {
+        "beforeReads": 1,
+        "revisionReads": 1,
+        "changesReads": 1
+      }
+    },
+    {
+      "direction": "reverse",
+      "variant": "stable-invalid",
+      "firstTuple": [
+        0,
+        5
+      ],
+      "code": "INVALID_CHANGE_SET",
+      "details": {
+        "beforeRevision": {
+          "value": 0
+        },
+        "issue": "INVALID_REVISIONS",
+        "revision": {
+          "value": 5
+        }
+      },
+      "sameView": true,
+      "originalRevision": 1,
+      "actualRevision": 1,
+      "ids": [
+        "header-accepted"
+      ],
+      "reads": {
+        "beforeReads": 1,
+        "revisionReads": 1,
+        "changesReads": 0
+      }
+    },
+    {
+      "direction": "reverse",
+      "variant": "changing-revision",
+      "firstTuple": [
+        0,
+        5
+      ],
+      "code": "INVALID_CHANGE_SET",
+      "details": {
+        "beforeRevision": {
+          "value": 0
+        },
+        "issue": "INVALID_REVISIONS",
+        "revision": {
+          "value": 5
+        }
+      },
+      "sameView": true,
+      "originalRevision": 1,
+      "actualRevision": 1,
+      "ids": [
+        "header-accepted"
+      ],
+      "reads": {
+        "beforeReads": 1,
+        "revisionReads": 1,
+        "changesReads": 0
+      }
+    },
+    {
+      "direction": "reverse",
+      "variant": "changing-before",
+      "firstTuple": [
+        0,
+        2
+      ],
+      "code": "INVALID_CHANGE_SET",
+      "details": {
+        "beforeRevision": {
+          "value": 0
+        },
+        "issue": "INVALID_REVISIONS",
+        "revision": {
+          "value": 2
+        }
+      },
+      "sameView": true,
+      "originalRevision": 1,
+      "actualRevision": 1,
+      "ids": [
+        "header-accepted"
+      ],
+      "reads": {
+        "beforeReads": 1,
+        "revisionReads": 1,
+        "changesReads": 0
+      }
+    }
+  ]
+}

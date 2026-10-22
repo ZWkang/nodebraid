@@ -1,0 +1,181 @@
+@nodebraid/kernel test: $ bun run ../../scripts/build-workspaces.ts --dependencies @nodebraid/kernel
+@nodebraid/kernel test: [build] @nodebraid/diagnostics
+@nodebraid/kernel test: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/kernel test: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/kernel test: $ bun test ./tests
+@nodebraid/kernel test: bun test v1.4.2 (744846f84)
+@nodebraid/kernel test: 
+@nodebraid/kernel test: tests/revision.test.ts:
+@nodebraid/kernel test: (pass) revision increment refuses to leave the safe-integer range [0.38ms]
+@nodebraid/kernel test: 
+@nodebraid/kernel test: tests/index.test.ts:
+@nodebraid/kernel test: (pass) @nodebraid/kernel > creates one stable revision-zero Canvas View [2.56ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > creates distinct Node and Edge identifiers and rejects empty values [2.98ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > distinguishes missing entities from relationships of a missing Node [0.13ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > commits one Node with matching before and after Canvas Views [0.71ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > keeps undeclared caller fields outside committed Node and Edge values [0.32ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > rolls back callback and invalid-position failures without replacing the Canvas View [0.50ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > rejects an asynchronous Transaction callback and rolls back its staged writes [0.35ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > rejects a nested Transaction and rolls back the outer callback when the error escapes [0.05ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > closes the Transaction Context and its capabilities after the callback [0.07ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > can catch a failed nested or strict operation and continue the outer Transaction [0.08ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > strictly replaces and removes an existing Node [0.26ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > collapses a Node restored to its original value into a net-zero Transaction [0.44ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > reports strict Node writer errors without changing the Draft [0.19ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > coalesces Node operation sequences and compares data by reference [0.42ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > connects Nodes with an Edge and queries its directed relationships [0.13ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > rejects an Edge whose final Endpoint references a missing Node [0.07ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > allows temporary Endpoints, self-loops, and separate Node and Edge ID namespaces [0.08ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > strictly edits Edges and collapses an identical restoration [0.15ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > keeps parent relationships and queries direct children in canonical order [0.26ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > updates Draft relationship indexes when Nodes and Edges are replaced [0.25ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > reports every missing relationship, parent cycle, and invalid geometry in the final graph [0.42ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > requires callers to reparent children explicitly when removing a parent [0.19ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > applies a Change Set in reverse and forward through new Transactions [0.45ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > rejects a malformed Change Set before changing the Draft [0.46ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > rejects stale replay before applying any matching entity changes [0.33ms]
+@nodebraid/kernel test: (pass) @nodebraid/kernel > reverses and reapplies a complete Node and Edge creation Change Set [0.13ms]
+@nodebraid/kernel test: 
+@nodebraid/kernel test: tests/replay-revision-values.test.ts:
+@nodebraid/kernel test: 19 |         { entity: 'node', id, before: null, after: { id, type: 'task', position: { x: 1, y: 2 }, data: null } },
+@nodebraid/kernel test: 20 |       ];
+@nodebraid/kernel test: 21 |     },
+@nodebraid/kernel test: 22 |   };
+@nodebraid/kernel test: 23 | 
+@nodebraid/kernel test: 24 |   expect(() => kernel.transact((transaction) => transaction.applyChangeSet(changeSet, 'forward'))).toThrow(
+@nodebraid/kernel test:                                                                                                         ^
+@nodebraid/kernel test: error: expect(received).toThrow(expected)
+@nodebraid/kernel test: 
+@nodebraid/kernel test: Expected constructor: ExpectObjectContaining
+@nodebraid/kernel test: 
+@nodebraid/kernel test: Received function did not throw
+@nodebraid/kernel test: Received value: {
+@nodebraid/kernel test:   before: {
+@nodebraid/kernel test:     snapshot: {
+@nodebraid/kernel test:       revision: 0,
+@nodebraid/kernel test:       nodes: [],
+@nodebraid/kernel test:       edges: [],
+@nodebraid/kernel test:     },
+@nodebraid/kernel test:     query: {
+@nodebraid/kernel test:       getNode: [Function: getNode],
+@nodebraid/kernel test:       getEdge: [Function: getEdge],
+@nodebraid/kernel test:       getIncomingEdges: [Function: getIncomingEdges],
+@nodebraid/kernel test:       getOutgoingEdges: [Function: getOutgoingEdges],
+@nodebraid/kernel test:       getIncidentEdges: [Function: getIncidentEdges],
+@nodebraid/kernel test:       getChildren: [Function: getChildren],
+@nodebraid/kernel test:     },
+@nodebraid/kernel test:   },
+@nodebraid/kernel test:   after: {
+@nodebraid/kernel test:     snapshot: {
+@nodebraid/kernel test:       revision: 1,
+@nodebraid/kernel test:       nodes: [
+@nodebraid/kernel test:         {
+@nodebraid/kernel test:           id: "accepted",
+@nodebraid/kernel test:           type: "task",
+@nodebraid/kernel test:           position: {
+@nodebraid/kernel test:             x: 1,
+@nodebraid/kernel test:             y: 2,
+@nodebraid/kernel test:           },
+@nodebraid/kernel test:           data: null,
+@nodebraid/kernel test:         }
+@nodebraid/kernel test:       ],
+@nodebraid/kernel test:       edges: [],
+@nodebraid/kernel test:     },
+@nodebraid/kernel test:     query: {
+@nodebraid/kernel test:       getNode: [Function: getNode],
+@nodebraid/kernel test:       getEdge: [Function: getEdge],
+@nodebraid/kernel test:       getIncomingEdges: [Function: getIncomingEdges],
+@nodebraid/kernel test:       getOutgoingEdges: [Function: getOutgoingEdges],
+@nodebraid/kernel test:       getIncidentEdges: [Function: getIncidentEdges],
+@nodebraid/kernel test:       getChildren: [Function: getChildren],
+@nodebraid/kernel test:     },
+@nodebraid/kernel test:   },
+@nodebraid/kernel test:   changeSet: {
+@nodebraid/kernel test:     beforeRevision: 0,
+@nodebraid/kernel test:     revision: 1,
+@nodebraid/kernel test:     changes: [
+@nodebraid/kernel test:       {
+@nodebraid/kernel test:         entity: "node",
+@nodebraid/kernel test:         id: "accepted",
+@nodebraid/kernel test:         before: null,
+@nodebraid/kernel test:         after: {
+@nodebraid/kernel test:           id: "accepted",
+@nodebraid/kernel test:           type: "task",
+@nodebraid/kernel test:           position: {
+@nodebraid/kernel test:             x: 1,
+@nodebraid/kernel test:             y: 2,
+@nodebraid/kernel test:           },
+@nodebraid/kernel test:           data: null,
+@nodebraid/kernel test:         },
+@nodebraid/kernel test:       }
+@nodebraid/kernel test:     ],
+@nodebraid/kernel test:   },
+@nodebraid/kernel test: }
+@nodebraid/kernel test: 
+@nodebraid/kernel test:       at <anonymous> (/Users/zhou/.codex/worktrees/kernel-replay-revisions/cflow/packages/kernel/tests/replay-revision-values.test.ts:24:100)
+@nodebraid/kernel test: (fail) a later revision read cannot make an initially non-adjacent Change Set valid [3.42ms]
+@nodebraid/kernel test: 
+@nodebraid/kernel test: tests/types.test.ts:
+@nodebraid/kernel test: (pass) keeps the public Kernel contract type-safe
+@nodebraid/kernel test: 
+@nodebraid/kernel test: tests/writer-id-values.test.ts:
+@nodebraid/kernel test: (pass) Node add retains its accepted ID without overwriting an existing Node [0.12ms]
+@nodebraid/kernel test: (pass) Node replace keeps Query, Snapshot and replayable Change Set identities consistent [0.12ms]
+@nodebraid/kernel test: (pass) Edge add retains its accepted ID and relation indexes without overwriting another Edge [0.14ms]
+@nodebraid/kernel test: (pass) Edge replace retains its accepted ID across indexes and reverse/forward replay [0.16ms]
+@nodebraid/kernel test: (pass) duplicate add reports the captured ID before reading other entity fields [0.11ms]
+@nodebraid/kernel test: (pass) replacement mismatch reports the captured ID before reading other entity fields [0.06ms]
+@nodebraid/kernel test: (pass) missing replacement targets fail before reading the incoming ID [0.03ms]
+@nodebraid/kernel test: (pass) add preserves an original ID read failure and committed View [0.05ms]
+@nodebraid/kernel test: (pass) replace preserves an original ID read failure and committed View [0.03ms]
+@nodebraid/kernel test: (pass) a failed owned entity copy leaves no partially added or replaced value [0.10ms]
+@nodebraid/kernel test: (pass) captured replacement IDs retain net-zero View identity [0.78ms]
+@nodebraid/kernel test: (pass) closed Transaction writers fail before reading an incoming ID [0.42ms]
+@nodebraid/kernel test: 
+@nodebraid/kernel test: tests/error-contract.test.ts:
+@nodebraid/kernel test: (pass) Kernel structural failures expose the shared NodeBraid error identity [0.06ms]
+@nodebraid/kernel test: (pass) Kernel identifier failures classify a JavaScript value without copying it [0.02ms]
+@nodebraid/kernel test: (pass) Change Set direction failures classify an unsafe JavaScript value [0.03ms]
+@nodebraid/kernel test: (pass) Change Set revision failures classify unsafe JavaScript values [0.22ms]
+@nodebraid/kernel test: 
+@nodebraid/kernel test: tests/commit-preparation.test.ts:
+@nodebraid/kernel test: (pass) a failing origin read cannot publish a Transaction [0.12ms]
+@nodebraid/kernel test: (pass) a failing commandId read cannot publish a Transaction [0.03ms]
+@nodebraid/kernel test: (pass) commit metadata is captured once after Draft capabilities close and before publication [0.10ms]
+@nodebraid/kernel test: (pass) a net-zero Transaction does not inspect commit-only metadata [0.02ms]
+@nodebraid/kernel test: (pass) commit preparation rejects reentry from metadata [0.07ms]
+@nodebraid/kernel test: (pass) commit preparation rejects reentry from callback result [0.03ms]
+@nodebraid/kernel test: 
+@nodebraid/kernel test: tests/replay-collection.test.ts:
+@nodebraid/kernel test: (pass) a changing replay iterator cannot overwrite a later Node edit [0.53ms]
+@nodebraid/kernel test: (pass) an entries hook cannot hide duplicate replay entries from validation [0.07ms]
+@nodebraid/kernel test: (pass) caught node forward conflict leaves no partial replay [0.23ms]
+@nodebraid/kernel test: (pass) caught node reverse conflict leaves no partial replay [0.05ms]
+@nodebraid/kernel test: (pass) caught edge forward conflict leaves no partial replay [0.12ms]
+@nodebraid/kernel test: (pass) caught edge reverse conflict leaves no partial replay [0.06ms]
+@nodebraid/kernel test: (pass) valid forward and reverse replay ignores input traversal hooks and preserves opaque data [0.14ms]
+@nodebraid/kernel test: (pass) replay captures the outer collection and each indexed entry once [0.08ms]
+@nodebraid/kernel test: (pass) a traversal hook cannot hide a sparse replay entry [0.06ms]
+@nodebraid/kernel test: (pass) replay preserves native length coercion: 1.5 [0.55ms]
+@nodebraid/kernel test: (pass) replay preserves native length coercion: "1.5" [0.45ms]
+@nodebraid/kernel test: (pass) replay preserves native length coercion: {
+@nodebraid/kernel test:   valueOf: [Function: valueOf],
+@nodebraid/kernel test: } [0.30ms]
+@nodebraid/kernel test: (pass) replay preserves native empty iteration for Proxy length 0.5 [0.03ms]
+@nodebraid/kernel test: (pass) replay preserves native empty iteration for Proxy length -1
+@nodebraid/kernel test: (pass) replay preserves native empty iteration for Proxy length NaN
+@nodebraid/kernel test: (pass) replay preserves native empty iteration for Proxy length undefined
+@nodebraid/kernel test: (pass) replay preserves native empty iteration for Proxy length "0"
+@nodebraid/kernel test: (pass) replay preserves native length conversion failure: 1n [0.04ms]
+@nodebraid/kernel test: (pass) replay preserves native length conversion failure: Symbol(length)
+@nodebraid/kernel test: (pass) invalid first entry retains its error before an infinite Proxy length could allocate a snapshot [0.04ms]
+@nodebraid/kernel test: 
+@nodebraid/kernel test: 1 tests failed:
+@nodebraid/kernel test: (fail) a later revision read cannot make an initially non-adjacent Change Set valid [3.42ms]
+@nodebraid/kernel test: 
+@nodebraid/kernel test:  70 pass
+@nodebraid/kernel test:  1 fail
+@nodebraid/kernel test:  281 expect() calls
+@nodebraid/kernel test: Ran 71 tests across 8 files. [36.00ms]
+@nodebraid/kernel test: error: script "test:self" exited with code 1
+@nodebraid/kernel test: Exited with code 1

@@ -1,0 +1,20 @@
+@nodebraid/kernel typecheck:self: tests/replay-revision-values.test.ts(24,9): error TS2322: Type '{ entity: string; id: NodeId; before: null; after: { id: NodeId; type: string; position: { x: number; y: number; }; data: null; }; }[]' is not assignable to type 'readonly GraphChange[]'.
+@nodebraid/kernel typecheck:self:   Type '{ entity: string; id: NodeId; before: null; after: { id: NodeId; type: string; position: { x: number; y: number; }; data: null; }; }' is not assignable to type 'GraphChange'.
+@nodebraid/kernel typecheck:self:     Type '{ entity: string; id: NodeId; before: null; after: { id: NodeId; type: string; position: { x: number; y: number; }; data: null; }; }' is not assignable to type '{ readonly entity: "edge"; readonly id: EdgeId; readonly before: CanvasEdge | null; readonly after: CanvasEdge | null; }'.
+@nodebraid/kernel typecheck:self:       Types of property 'entity' are incompatible.
+@nodebraid/kernel typecheck:self:         Type 'string' is not assignable to type '"edge"'.
+@nodebraid/kernel typecheck:self: tests/replay-revision-values.test.ts(114,28): error TS2769: No overload matches this call.
+@nodebraid/kernel typecheck:self:   The last overload gave the following error.
+@nodebraid/kernel typecheck:self:     Argument of type 'CanvasEdge | CanvasNode | null' is not assignable to parameter of type 'CanvasEdge | CanvasNode | undefined'.
+@nodebraid/kernel typecheck:self:       Type 'null' is not assignable to type 'CanvasEdge | CanvasNode | undefined'.
+@nodebraid/kernel typecheck:self: tests/replay-revision-values.test.ts(138,13): error TS2769: No overload matches this call.
+@nodebraid/kernel typecheck:self:   The last overload gave the following error.
+@nodebraid/kernel typecheck:self:     The type 'readonly [{ readonly name: "negative"; readonly value: -1; readonly details: { readonly value: -1; }; }, { readonly name: "fractional"; readonly value: 0.5; readonly details: { readonly value: 0.5; }; }, ... 7 more ..., { ...; }]' is 'readonly' and cannot be assigned to the mutable type 'unknown[]'.
+@nodebraid/kernel typecheck:self: tests/replay-revision-values.test.ts(153,32): error TS18046: 'invalid' is of type 'unknown'.
+@nodebraid/kernel typecheck:self: tests/replay-revision-values.test.ts(167,54): error TS18046: 'invalid' is of type 'unknown'.
+@nodebraid/kernel typecheck:self: tests/replay-revision-values.test.ts(168,42): error TS18046: 'invalid' is of type 'unknown'.
+@nodebraid/kernel typecheck:self: tests/replay-revision-values.test.ts(265,67): error TS2769: No overload matches this call.
+@nodebraid/kernel typecheck:self:   The last overload gave the following error.
+@nodebraid/kernel typecheck:self:     Argument of type 'CanvasEdge | CanvasNode | null' is not assignable to parameter of type 'CanvasNode | undefined'.
+@nodebraid/kernel typecheck:self:       Type 'null' is not assignable to type 'CanvasNode | undefined'.
+@nodebraid/kernel typecheck:self: Exited with code 1
