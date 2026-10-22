@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+    "expectedParent": "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+    "head": "efb0d9f4ef66ff198c39c5402c0d6fd8c12f320f",
+    "tree": "d7b34834b717a5ba403b1b22913ad243c6b99490",
+    "patch": "fc5dc07c335630cc6459583ebe85efadf53f4e9b98d268e28a1319f3e4ba463c",
+    "localHead": "7916c115aa57c0f9e44c138e91f162c38333a5e5"
+  },
+  "task": {
+    "run": "7c45457f-3b3b-4d3c-8e6b-bc13b2c20df9",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 94
+    },
+    "request": "## 已确认缺陷\n\n在 fetched main `1c85d79db1e275e59f84a9bb77d1fe75c0a582e6`，中英文 `@nodebraid/plugin-renderer` 模块文档的 “Dependencies and composition / 依赖与组合” 安装代码漏掉必需的 `portPlugin`。正文正确列出了 PortService，但代码只安装 Kernel、Session 和 Renderer，读者照抄后 `Promise.all(installations.map(i => i.whenActive()))` 持续等待，Renderer Factory 从未执行。\n\n原始位置：\n- [中文组合示例](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/website/modules/plugin-renderer.md)\n- [英文组合示例](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/website/en/modules/plugin-renderer.md)\n- [Renderer 的现有 Required Services](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/packages/plugin-renderer/src/renderer-plugin.ts)\n\n## 真实复现\n\n已分别抽取两种语言的原始安装代码，使用 freshly built 的公共 package entry、真实 Plugin Host / Kernel / Session 与边界 Recording Renderer 执行。等到已有 Kernel/Session Installation active 后，Renderer 仍是 pending、Factory 调用 0 次；仅补装 Port Plugin，原来同一组 readiness promises 即全部完成，Factory 1 次、Document reset 后 Session 各 1 次，Host dispose 释放 Renderer 1 次。没有 browser/视觉验收主张。\n\n最小公开复现（Bun，先构建 workspace）：\n\n```ts\nimport assert from 'node:assert/strict';\nimport { kernelPlugin } from '@nodebraid/plugin-kernel';\nimport { portPlugin } from '@nodebraid/plugin-port';\nimport { createRendererPlugin } from '@nodebraid/plugin-renderer';\nimport { sessionPlugin } from '@nodebraid/plugin-session';\nimport { createPluginHost } from '@nodebraid/runtime-cordis';\nlet calls = 0;\nconst host = createPluginHost();\nconst renderer = createRendererPlugin(() => {\n  calls++;\n  return {\n    updateDocument() {}, updateSession() {}, updateInteraction() {},\n    subscribeInput() { return () => {}; }, hitTest() { return null; },\n    capturePointer() {}, releasePointer() {}, focus() {}, async dispose() {},\n  };\n});\ntry {\n  const kernel = host.install(kernelPlugin);\n  const session = host.install(sessionPlugin);\n  const pending = host.install(renderer);\n  await Promise.all([kernel.whenActive(), session.whenActive()]);\n  assert.equal(pending.getSnapshot().status, 'pending');\n  assert.equal(calls, 0);\n  const ports = host.install(portPlugin);\n  await Promise.all([pending.whenActive(), ports.whenActive()]);\n  assert.equal(pending.getSnapshot().status, 'active');\n  assert.equal(calls, 1);\n} finally {\n  await host.dispose();\n}\n```\n\n原始源码、失败的 activation 断言和补装单一 Provider 的对照输出保存在本地 run `20261022T114018-maintenance`；两个 causal reproduction 均 exit 0，明确确认缺陷，而不是宣称原示例成功。\n\n## 验收及范围\n\n- 两种语言的现有组合代码都从 `@nodebraid/plugin-port` 导入并安装 `portPlugin`，保留原有 Provider 选择、Config、等待及释放方式。\n- 从修复后的实际 Markdown 重新抽取同一完整示例，在真实公共 Host/Plugin seam 验证所有 Installation active、Factory 创建一次、初始 reset/session 交付和 Host 清理。保留原始 red/causal 对照证据。\n- 只修文档组合遗漏；不改变 Runtime/Renderer/Port 公共契约、pending 策略、默认 Provider、安全策略或调度机制，不加 timeout/fallback/依赖。\n- 执行文档相关/affected 检查，独立 Standards + ponytail-review / Spec，版本管理的正式完整检查，准确发布、当前 head CI/反馈和报告 readback。\n- 最终由用户审阅合并；实际 main 集成及整体验收前保持 Issue 开放。\n\n## 查重\n\n已完整读取 all-state Issues/PR collection 的最终短页：93 个 issue/PR 条目及 48 个 PR，逐项检索标题及正文的 Renderer、Port、pending 和组合示例症状/原因，未发现同一遗漏的已有任务。现有六个在途修复 PR 的范围均不同。",
+    "plan": [
+      {
+        "id": "documented-composition-red-green",
+        "blockedBy": [],
+        "acceptance": "Preserve both original Markdown activation failures and causal Port-only controls. Add exactly the Port Plugin import and installation to both locales; execute the full freshly extracted Markdown examples against public compiled packages and a recording Renderer, validating active status, reset/session and disposal."
+      },
+      {
+        "id": "documentation-validation",
+        "blockedBy": [
+          "documented-composition-red-green"
+        ],
+        "acceptance": "Run documentation/affected checks and preserve exact checked source. No Runtime/Renderer behavior, scripts, dependencies or public contract changes."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "documentation-validation"
+        ],
+        "acceptance": "Independent Standards plus ponytail-review and Spec review identical complete head/tree/patch against original Issue94 and existing Renderer dependencies."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Pinned main agents:run verify performs real full bun run check after both reviews; preserve every attempt and source stability."
+      },
+      {
+        "id": "publish-and-current-head-acceptance",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Publish exact checked tree with independent parent; one PR to main. Validate actual current-head CI/full feedback/mergeability and immutable full report/media byte readback before ready."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "publish-and-current-head-acceptance"
+        ],
+        "acceptance": "Leave Issue94 open until human review/merge, actual fetched-main integration and whole-Issue acceptance."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "7916c115aa57c0f9e44c138e91f162c38333a5e5",
+      "tree": "d7b34834b717a5ba403b1b22913ad243c6b99490",
+      "patch": "fc5dc07c335630cc6459583ebe85efadf53f4e9b98d268e28a1319f3e4ba463c",
+      "verdict": "passed",
+      "report": "What this change does: Both Renderer documentation examples now import and install the Port Plugin. This supplies the existing Port Service required by Renderer, alongside Kernel and Session.\n\nVerdict: passed. Looks good. Ship.\n\nReviewed identity:\n\n- Base: `1c85d79db1e275e59f84a9bb77d1fe75c0a582e6`\n- Head: `7916c115aa57c0f9e44c138e91f162c38333a5e5`\n- Tree: `d7b34834b717a5ba403b1b22913ad243c6b99490`\n- Binary patch SHA256: `fc5dc07c335630cc6459583ebe85efadf53f4e9b98d268e28a1319f3e4ba463c`\n\nHard standards: no violations found. Read both complete examples, Issue #94 and its saved complete empty discussion, prepared plan, AGENTS, CONTRIBUTING, CONTEXT, tracker/discussion rules and applicable principle guidance. The two-file, four-line change preserves explicit Provider choice, readiness waiting and Host disposal. It matches Renderer’s actual static requirements and the service-availability/resource ownership contracts in ADR0002, ADR0004, ADR0044 and ADR0081.\n\nJudgment checks: no concrete Fowler smell found. Applying ponytail-review, this is the smallest complete correction for one isolated Host per Canvas. No runtime behavior, public interface, dependency or test framework changes.\n\nIndependent checks at the reviewed head: saved patch equals the exact Git diff and stated hash; clean worktree; `git diff --check` passed. Audited and reran both complete example drivers. Each reached four active Installations, called the Provider once, delivered Document reset before Session, and disposed the Renderer once. Verified their executed installation bodies match the current Markdown after public compiled-entry path resolution and explicit recording-Provider/assertion instrumentation. `bun run docs:verify` passed for 25 modules. Actual command output is in `standards-command-log.txt`.\n\nNot checked: visual rendering, browser input, full engineering gate, fresh builds, remote CI and report publication. The recording Provider proves protocol and lifecycle behavior, not visual output. This Standards review does not replace the independent Spec review.\n"
+    },
+    "spec": {
+      "head": "7916c115aa57c0f9e44c138e91f162c38333a5e5",
+      "tree": "d7b34834b717a5ba403b1b22913ad243c6b99490",
+      "patch": "fc5dc07c335630cc6459583ebe85efadf53f4e9b98d268e28a1319f3e4ba463c",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n独立审查完整两文件四行补丁、Issue #94 全文/空讨论与空 blocker 页、独立 prepared plan、AGENTS/CONTEXT、tracker/讨论规范，以及 Renderer/Port/Host 相关 ADR 和真实 Required Services。未发现规格遗漏、错误实现或范围扩张。\n\n满足“两种语言的现有组合代码都从 @nodebraid/plugin-port 导入并安装 portPlugin”：中英完整示例各导入/安装一次，匹配 Renderer 既有 Kernel/Port/Session 静态依赖。Provider 选择、providerConfig、原 readiness Promise.all 与 finally 中 Host dispose 均保留；产品源码、pending/安全/调度策略及依赖未改，无 timeout 或 fallback。\n\n本轮从当前 Markdown 抽取完整代码并逐行核对可执行 fixture，记录 code hashes；实际用 Bun 分别运行 `doc-zh-complete-green.ts`、`doc-en-complete-green.ts`，均 exit 0。每例 4 个 Installation 全部 active，Factory 1 次，Document reset → Session 各 1 次，Renderer dispose 1 次。命令、精确 head/tree 和原始输出保存于 `spec-review-commands.log`；`git diff --check` 通过。现有 Port-only causal 日志保留原同组 readiness promises 被解锁的证据，未把 pending.missing 当作实时依赖诊断。\n\nRecording Renderer 仅是公共 Provider 边界的生命周期验证，不是视觉/browser 证明。未独立运行 affected/docs 全套、构建、browser/full engineering gate，未执行远端 CI、报告/媒体发布回读或最终 main 集成。Issue 保持开放；定向通过不代表完整交付验收。\n\n- base: `1c85d79db1e275e59f84a9bb77d1fe75c0a582e6`\n- head: `7916c115aa57c0f9e44c138e91f162c38333a5e5`\n- tree: `d7b34834b717a5ba403b1b22913ad243c6b99490`\n- binary patch SHA256: `fc5dc07c335630cc6459583ebe85efadf53f4e9b98d268e28a1319f3e4ba463c`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "zh-original-missing-provider",
+      "acceptance": "Original documented composition remains pending and Factory uncalled after existing Providers activate; actual active-status assertion fails. The missing list is initial metadata, not a live token diagnosis. Separate Port-only causal control confirms omitted Provider.",
+      "command": "bun renderer-doc-zh-repro.ts (original fetched main)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "zh-port-only-control",
+      "acceptance": "Adding only the omitted Port Plugin to the original Host settles the same readiness promises, Factory1, reset/session, disposal1.",
+      "command": "bun renderer-doc-zh-causal-repro.ts (original fetched main)",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "zh-complete-corrected-document",
+      "acceptance": "Freshly extracted full actual Markdown code, with public package entries and supplied recording Provider/Config, yields four active installations, Factory1, real initial reset0/session-empty and disposal1. No native/visual acceptance is inferred.",
+      "command": "bun doc-zh-complete-green.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "en-original-missing-provider",
+      "acceptance": "Original documented composition remains pending and Factory uncalled after existing Providers activate; actual active-status assertion fails. The missing list is initial metadata, not a live token diagnosis. Separate Port-only causal control confirms omitted Provider.",
+      "command": "bun renderer-doc-en-repro.ts (original fetched main)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "en-port-only-control",
+      "acceptance": "Adding only the omitted Port Plugin to the original Host settles the same readiness promises, Factory1, reset/session, disposal1.",
+      "command": "bun renderer-doc-en-causal-repro.ts (original fetched main)",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "en-complete-corrected-document",
+      "acceptance": "Freshly extracted full actual Markdown code, with public package entries and supplied recording Provider/Config, yields four active installations, Factory1, real initial reset0/session-empty and disposal1. No native/visual acceptance is inferred.",
+      "command": "bun doc-en-complete-green.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "documentation-affected",
+      "acceptance": "Affected planner selects only docs. Actual docs content, real Quick Start, and VitePress build pass.",
+      "command": "bun run check:affected",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "0a93f0294cd9fd3ce4809bb32a0d8f97e51155dc95b58479bb892d6a648ea945"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "3c5ccd8191b5396ea83e2435804abfe160c65d266fecbac127bdd09a4393e901"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "b40ec539ef136fc0f84a288bd4c7b7af8bccdc4f63fecea5847f62a957dce756"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "17d91d4f7e31edcd5d23ead576adb14ea83485afb3db0d4017359298230b5690"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "1f785b331800ba8c7c381ebf76a09e5af258435a755d60c147c925d60f79e9ea"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "cece4d79f89e21b903d952aa271e91e926cfc2311a4b7968e86d050be733436b"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "e8708e1974716065c76816b65132fd456e9bd3b8ff9f2963e0006a78e4f0691e"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "8e3b2cf4d26e622b87a20772e70bd31f032571b003de58f0f4c29e1233409ba3"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "f2dcf36b836d90e9b177392f08433a8b0e6787659c681ec37142c67b9b003e73"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "9baf74716ef29f103346063c5ee63494e29591f0fdfda074e3110a705b3e9fad"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "59d4a58c517843d571bacfc24cfa99a09d840d3fd5c773ca61014beffc45c5a1"
+    }
+  ]
+}

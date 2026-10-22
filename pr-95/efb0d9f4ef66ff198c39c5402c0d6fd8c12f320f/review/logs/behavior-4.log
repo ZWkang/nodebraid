@@ -1,0 +1,24 @@
+{"locale":"en","factoryCalls":0,"snapshot":{"status":"pending","missing":[{"name":"kernel"},{"name":"ports"},{"name":"session"}]}}
+16 | 
+17 | await Promise.all(installations.slice(0, -1).map(i => i.whenActive()));
+18 | const snapshot = installations.at(-1)!.getSnapshot();
+19 | console.log(JSON.stringify({locale:"en", factoryCalls, snapshot}));
+20 | await host.dispose();
+21 | assert.equal(snapshot.status, 'active', 'The documented composition must activate its Renderer');
+            ^
+AssertionError: The documented composition must activate its Renderer
++ actual - expected
+
++ 'pending'
+- 'active'
+
+ generatedMessage: false,
+     actual: "pending",
+   expected: "active",
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261022T114018-maintenance/renderer-doc-en-repro.ts:21:8
+
+Bun v1.4.2 (macOS arm64)
