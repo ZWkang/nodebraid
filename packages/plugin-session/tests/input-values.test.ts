@@ -230,6 +230,46 @@ test('Session owns one native length snapshot before validating and publishing I
   }
 });
 
+test.each(['nodeIds', 'edgeIds'] as const)(
+  'Session normalizes the captured coercible %s length once',
+  async (field) => {
+    const ids = field === 'nodeIds' ? [b, nodeId('missing')] : [ab, edgeId('missing')];
+    let lengthReads = 0,
+      coercions = 0;
+    const indexReads: string[] = [];
+    const length = {
+      valueOf() {
+        return ++coercions === 1 ? 2 : 1;
+      },
+    };
+    const values = new Proxy(ids, {
+      get(target, key, receiver) {
+        if (key === 'length') {
+          lengthReads++;
+          return length;
+        }
+        if (key === '0' || key === '1') indexReads.push(key);
+        return Reflect.get(target, key, receiver);
+      },
+    });
+    const input = { nodeIds: [a], edgeIds: [] };
+    Object.defineProperty(input, field, { value: values });
+    const h = await harness();
+    try {
+      const before = h.session.getSnapshot();
+      expect(() => h.session.setSelection(input)).toThrow(
+        expect.objectContaining({ domain: 'plugin.session', code: 'SELECTION_ENTITY_NOT_FOUND' }),
+      );
+      expect(h.session.getSnapshot()).toBe(before);
+      expect(lengthReads).toBe(1);
+      expect(coercions).toBe(1);
+      expect(indexReads).toEqual(['0', '1']);
+    } finally {
+      await h.host.dispose();
+    }
+  },
+);
+
 test('Session preserves an indexed read failure before allocating from the incoming length', async () => {
   const failure = new Error('first selection ID read failed');
   let indexReads = 0;

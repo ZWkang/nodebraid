@@ -163,8 +163,9 @@ interface SubscriptionRegistration {
 function captureSelectionValues(value: unknown): unknown {
   if (!Array.isArray(value)) return value;
   const captured: unknown[] = [];
+  const length = +value.length;
   // Traverse owned indices lazily so allocation cannot hide an incoming read failure.
-  for (const index of Array.prototype.keys.call({ length: value.length })) captured.push(value[index]);
+  for (const index of Array.prototype.keys.call({ length })) captured.push(value[index]);
   return captured;
 }
 
