@@ -1,0 +1,35 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/port-connection.test.ts:
+202 |     renderer.hit = { type: 'connection-anchor', nodeId: targetId, role: 'target', worldPoint: { x: 100, y: 0 } };
+203 |     renderer.emit(pointerInput('pointer.move', { x: 100, y: 0 }));
+204 |     renderer.emit(pointerInput('pointer.up', { x: 100, y: 0 }));
+205 |     await settleCommands();
+206 | 
+207 |     expect(materialized).toEqual([{ source: { nodeId: sourceId }, target: { nodeId: targetId } }]);
+                               ^
+error: expect(received).toEqual(expected)
+
+- [
+-   {
+-     "source": {
+-       "nodeId": "captured-source",
+-     },
+-     "target": {
+-       "nodeId": "captured-target",
+-     },
+-   },
+- ]
++ []
+
+- Expected  - 10
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/port-connection.test.ts:207:26)
+(fail) Connection Gesture uses the materializer accepted before its getter changes [53.35ms]
+
+ 0 pass
+ 1 filtered out
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [130.00ms]

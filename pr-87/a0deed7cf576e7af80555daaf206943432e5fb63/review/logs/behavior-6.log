@@ -1,0 +1,266 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-session/tests/index.test.ts:
+(pass) @nodebraid/plugin-session > publishes the stable Session diagnostic event catalog [0.67ms]
+(pass) @nodebraid/plugin-session > provides a fresh default Session for an Activation [14.63ms]
+(pass) @nodebraid/plugin-session > publishes a canonical immutable Selection and ignores equivalent input [5.69ms]
+(pass) @nodebraid/plugin-session > rejects every missing Selection entity without changing Session state [3.65ms]
+(pass) @nodebraid/plugin-session > publishes only valid normalized Viewport changes [2.96ms]
+(pass) @nodebraid/plugin-session > reconciles Selection from the exact Kernel Commit after View [7.83ms]
+(pass) @nodebraid/plugin-session > queues reentrant Session mutations until every subscriber sees the current Snapshot [3.46ms]
+(pass) @nodebraid/plugin-session > owns each subscription independently even when listeners share one function [5.24ms]
+(pass) @nodebraid/plugin-session > reports subscriber errors without corrupting Session or blocking later subscribers [6.37ms]
+(pass) @nodebraid/plugin-session > schedules an explicit subscriber error when platform reporting is unavailable [12.17ms]
+(pass) @nodebraid/plugin-session > preserves subscriber and reporter failures when platform reporting throws [8.34ms]
+(pass) @nodebraid/plugin-session > closes old handles and creates a fresh Session when Kernel returns [6.55ms]
+(pass) @nodebraid/plugin-session > rejects an invalid subscriber before it can enter notification state [3.65ms]
+(pass) @nodebraid/plugin-session > rejects malformed Selection input with structured immutable details [3.90ms]
+(pass) @nodebraid/plugin-session > rejects sparse Selection arrays as malformed input [3.20ms]
+(pass) @nodebraid/plugin-session > rejects malformed Viewport input as a structured Session error [2.88ms]
+
+packages/plugin-session/tests/types.test.ts:
+(pass) keeps the public Session Service contract narrow and immutable [0.12ms]
+
+packages/preset-basic/tests/index.test.ts:
+(pass) Composition readiness publishes every base Service through static bindings [20.87ms]
+
+packages/preset-basic/tests/types.test.ts:
+(pass) Basic Canvas Composition preserves required Renderer config and provides no Service [8.89ms]
+
+packages/preset-basic/tests/readiness.test.ts:
+(pass) invalid Interaction options fail the Composition with the original Interaction error [9.09ms]
+(pass) Composition snapshots Interaction options when the Plugin is created [11.56ms]
+(pass) Composition snapshots nested Connection options when the Plugin is created [6.73ms]
+(pass) Composition creation rejects malformed or unknown top-level options [0.57ms]
+(pass) Composition waits for an asynchronous Renderer before becoming active [5.54ms]
+(pass) Renderer Factory failure keeps its identity and releases the Child tree for reinstall [9.52ms]
+
+packages/preset-basic/tests/lifecycle.test.ts:
+(pass) existing standard Provider makes Basic Canvas Composition fail explicitly [1.62ms]
+(pass) second Basic Canvas Composition conflicts without disturbing the active one [4.59ms]
+(pass) a later Renderer Provider conflict rolls back earlier Child reservations [13.96ms]
+(pass) Composition disposes consumers before Renderer and awaits asynchronous Renderer cleanup [5.16ms]
+(pass) Composition cleanup attempts every Renderer resource and preserves all failures [7.51ms]
+(pass) Composition diagnostics expose the complete reverse Child cleanup order [6.19ms]
+
+packages/preset-basic/tests/package-import.test.ts:
+(pass) package-name import exposes the Basic Canvas Composition factory [10.22ms]
+
+packages/plugin-interaction/tests/input-cleanup.test.ts:
+(pass) a failed Selection transition releases Pointer Capture before reporting the Input fault [8.82ms]
+
+packages/plugin-interaction/tests/types.test.ts:
+(pass) publishes Interaction as a Runtime Plugin with a narrow Shortcut contribution Service [0.09ms]
+
+packages/plugin-interaction/tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [10.52ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [7.87ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [26.17ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [25.32ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [13.93ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [3.72ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [5.27ms]
+
+packages/plugin-interaction/tests/create-edge-command.test.ts:
+(pass) Create Edge commits one complete Node-level Edge [7.58ms]
+
+packages/plugin-interaction/tests/selection-transition.test.ts:
+(pass) a Port click selects its owning Node without inventing a Port selection [0.11ms]
+
+packages/plugin-interaction/tests/config.test.ts:
+(pass) Interaction accepts an explicit synchronous Connection materializer [3.73ms]
+(pass) Interaction rejects unknown config fields through Plugin installation [1.85ms]
+(pass) Interaction rejects malformed numeric config without coercion [11.36ms]
+(pass) Interaction revalidates the materializer on recovery and preserves its read failure [3.00ms]
+
+packages/plugin-interaction/tests/lifecycle.test.ts:
+(pass) Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh [5.81ms]
+(pass) Delete Selection registration follows dependency reactivation and disposal lifecycle [9.03ms]
+(pass) Connection materializer failure keeps identity and reports exactly once after terminal cleanup [4.95ms]
+(pass) Connection dependency recovery creates a fresh idle Activation [2.23ms]
+(pass) Connection final Hit Test failure still clears Preview and releases Capture [2.86ms]
+(pass) Connection Escape attempts every terminal cleanup and never materializes after cleanup failure [1.92ms]
+(pass) Box Selection disposal continues after every public Renderer cleanup failure [3.04ms]
+(pass) Box Selection escape exposes every terminal cleanup failure [3.33ms]
+(pass) Box Selection pointer-cancel exposes every terminal cleanup failure [1.33ms]
+(pass) Interaction dependency recovery creates a fresh idle Activation [2.42ms]
+(pass) an input-driven Command rejection is reported exactly once while Interaction is active [3.82ms]
+(pass) a late Command rejection cannot report through an ended Interaction Activation [3.07ms]
+(pass) a recovered Renderer reset receives the still-compatible Active Gesture again [6.96ms]
+
+packages/plugin-interaction/tests/move-nodes-command.test.ts:
+(pass) Move Nodes rejects an empty input without changing Document [4.26ms]
+
+packages/plugin-interaction/tests/diagnostic-events.test.ts:
+(pass) publishes the stable Interaction diagnostic event catalog [0.06ms]
+
+packages/plugin-interaction/tests/port-connection.test.ts:
+(pass) Port Gesture tracks target loss, materializes exact Endpoints once, and cancels on source loss [5.77ms]
+(pass) Connection Gesture uses the materializer accepted before its getter changes [3.54ms]
+
+packages/plugin-interaction/tests/delete-selection-input.test.ts:
+(pass) a live Interaction Shortcut Binding executes its Command and prevents the matched input default [8.03ms]
+(pass) logical Delete key removes the current Selection through the public Renderer Input seam [4.88ms]
+(pass) physical Delete accepts modifiers and repeat while empty Selection and Backspace remain no-ops [4.50ms]
+(pass) Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connection without cancelling them [90.68ms]
+(pass) Delete Transaction failure preserves state and reports the original diagnostic identity exactly once [6.37ms]
+
+packages/plugin-renderer/tests/index.test.ts:
+(pass) @nodebraid/plugin-renderer > publishes the stable Renderer diagnostic event catalog [0.04ms]
+(pass) @nodebraid/plugin-renderer > creates one Renderer and publishes only the narrow Runtime Service [6.17ms]
+(pass) @nodebraid/plugin-renderer > keeps every delivered Session resolvable while Document entities are removed [5.78ms]
+(pass) @nodebraid/plugin-renderer > waits for reentrant Session reconciliation before delivering a deleting Commit [2.68ms]
+(pass) @nodebraid/plugin-renderer > delegates input, hit testing, capture and focus without exposing update methods [2.26ms]
+(pass) @nodebraid/plugin-renderer > binds one exclusive Interaction Projection writer for the Renderer Activation [6.28ms]
+(pass) @nodebraid/plugin-renderer > isolates Input listener faults through Host diagnostics [3.65ms]
+(pass) @nodebraid/plugin-renderer > reports an out-of-sync Renderer and re-establishes its current baseline [1.78ms]
+(pass) @nodebraid/plugin-renderer > attempts one full recovery after an arbitrary internal synchronization fault [1.91ms]
+(pass) @nodebraid/plugin-renderer > enters terminal Sync Failure when the single full recovery also fails [3.04ms]
+(pass) @nodebraid/plugin-renderer > does not report queued Commits already subsumed by an out-of-sync reset [3.03ms]
+
+packages/plugin-renderer/tests/types.test.ts:
+(pass) binds Provider config without exposing CanvasRenderer update authority [0.02ms]
+
+packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:
+(pass) terminal cleanup diagnostics do not invoke a supplied map hook [2.28ms]
+(pass) terminal cleanup diagnostics do not invoke a supplied forEach hook [0.77ms]
+(pass) terminal cleanup diagnostics do not invoke a supplied constructor hook [1.27ms]
+(pass) terminal cleanup diagnostics do not invoke a supplied %s hook [0.84ms]
+(pass) cleanup diagnostics preserve sparse inherited members, native Proxy length and the raw failure [0.99ms]
+(pass) terminal cleanup preserves a circular AggregateError without passing it through Cordis traversal [5.04ms]
+(pass) terminal cleanup preserves failures when aborted setup will resolve [1.33ms]
+(pass) terminal cleanup preserves failures when aborted setup will reject [0.40ms]
+
+packages/runtime-cordis/tests/index.test.ts:
+(pass) @nodebraid/runtime-cordis > keeps Service Token identity separate from its diagnostic name [0.04ms]
+(pass) @nodebraid/runtime-cordis > keeps Plugin Service Bindings fixed after definition [0.12ms]
+(pass) @nodebraid/runtime-cordis > keeps a Consumer pending until every Required Service is active [0.49ms]
+(pass) @nodebraid/runtime-cordis > activates a Consumer-first installation with its declared Service Binding [0.81ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that omits a declared Service without publishing partial results [1.63ms]
+(pass) @nodebraid/runtime-cordis > publishes every Provided Service together after setup completes [1.13ms]
+(pass) @nodebraid/runtime-cordis > publishes every Provided Service before any one Service can activate a Consumer [0.89ms]
+(pass) @nodebraid/runtime-cordis > materializes each Provided Service getter exactly once before publication [0.52ms]
+(pass) @nodebraid/runtime-cordis > preserves a Provided Service getter error as the Activation failure [0.41ms]
+(pass) @nodebraid/runtime-cordis > rejects non-record Provided Service results with a stable contract error [1.09ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that returns an undeclared Service Binding [0.35ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that returns null for a Provided Service [0.61ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that returns undefined for a Provided Service [0.36ms]
+(pass) @nodebraid/runtime-cordis > fails duplicate bindings after "primary" before publishing a Service [0.56ms]
+(pass) @nodebraid/runtime-cordis > fails duplicate bindings after "" before publishing a Service [0.33ms]
+(pass) @nodebraid/runtime-cordis > allows an empty Binding when its Provided Service Token is unique [1.42ms]
+(pass) @nodebraid/runtime-cordis > reserves a Provided Service Token from installation until disposal [1.96ms]
+(pass) @nodebraid/runtime-cordis > retains a failed Provider reservation until disposal [0.65ms]
+(pass) @nodebraid/runtime-cordis > does not retain any reservation from a rejected multi-Service Provider [0.58ms]
+(pass) @nodebraid/runtime-cordis > activates a Provider-first Consumer with no missing Service Tokens [0.53ms]
+(pass) @nodebraid/runtime-cordis > deactivates a Consumer before cleaning up a disappearing Provider [0.59ms]
+(pass) @nodebraid/runtime-cordis > reports a dependency-driven Consumer as pending while its cleanup is still running [0.81ms]
+(pass) @nodebraid/runtime-cordis > deactivates indirect Consumers in reverse dependency order [0.71ms]
+(pass) @nodebraid/runtime-cordis > awaits Provided Service withdrawal sequentially in reverse registration order [1.01ms]
+(pass) @nodebraid/runtime-cordis > reactivates a pending Consumer with fresh Activation state and fixed configuration [2.33ms]
+(pass) @nodebraid/runtime-cordis > cancels only one pending whenActive waiter [0.77ms]
+(pass) @nodebraid/runtime-cordis > settles whenActive immediately for active and rejects it for disposed [0.36ms]
+(pass) @nodebraid/runtime-cordis > aborts an in-progress Consumer setup and waits for it when its Required Service disappears [0.65ms]
+(pass) @nodebraid/runtime-cordis > keeps a business setup error terminal when dependency cancellation races with it [1.06ms]
+(pass) @nodebraid/runtime-cordis > fails an aborting Consumer when dependency cleanup fails without duplicating the error [1.07ms]
+(pass) @nodebraid/runtime-cordis > propagates an active Consumer cleanup failure to its disappearing Provider once [0.74ms]
+(pass) @nodebraid/runtime-cordis > keeps a failed Consumer terminal across unrelated Service availability changes [1.58ms]
+(pass) @nodebraid/runtime-cordis > allows independent Plugin Installations to activate concurrently [0.98ms]
+(pass) @nodebraid/runtime-cordis > serializes setup and cleanup within one Plugin Installation [0.47ms]
+(pass) @nodebraid/runtime-cordis > rejects a dependency cycle with the complete Plugin and Service path [0.90ms]
+(pass) @nodebraid/runtime-cordis > rejects a Plugin definition that requires and provides the same Service Token [0.12ms]
+(pass) @nodebraid/runtime-cordis > rejects forged Plugin and Service Token values as invalid definitions [0.25ms]
+(pass) @nodebraid/runtime-cordis > rejects malformed Plugin definitions before creating Plugin metadata [0.11ms]
+(pass) @nodebraid/runtime-cordis > accepts only plain enumerable string-key Service Binding records [0.18ms]
+(pass) @nodebraid/runtime-cordis > captures every Plugin definition field exactly once before validation [0.69ms]
+(pass) @nodebraid/runtime-cordis > infers configuration, Service Bindings, and Provided Service results [0.04ms]
+(pass) @nodebraid/runtime-cordis > keeps Service Token values and Plugin configurations invariant [0.03ms]
+(pass) @nodebraid/runtime-cordis > returns a pending installation before activating a plugin [1.98ms]
+(pass) @nodebraid/runtime-cordis > preserves one setup failure without affecting another installation [0.56ms]
+(pass) @nodebraid/runtime-cordis > publishes each snapshot change to removable subscribers [0.31ms]
+(pass) @nodebraid/runtime-cordis > reports subscriber errors without interrupting lifecycle observers [2.13ms]
+(pass) @nodebraid/runtime-cordis > schedules subscriber errors when platform reportError is unavailable [0.99ms]
+(pass) @nodebraid/runtime-cordis > keeps subscriber reporting failures outside the Plugin lifecycle [1.02ms]
+(pass) @nodebraid/runtime-cordis > disposes owned resources in reverse registration order [0.39ms]
+(pass) @nodebraid/runtime-cordis > owns a typed Child Installation at its resource registration position [0.44ms]
+(pass) @nodebraid/runtime-cordis > rejects a detached Child installation through an ended parent Activation [0.35ms]
+(pass) @nodebraid/runtime-cordis > keeps an unawaited Child failure isolated from its parent Activation [0.48ms]
+(pass) @nodebraid/runtime-cordis > rolls back a Composition tree when an awaited Child fails [4.01ms]
+(pass) @nodebraid/runtime-cordis > validates Child Installations in the same Service reservation graph [1.51ms]
+(pass) @nodebraid/runtime-cordis > releases and recreates a Canvas-shaped Child tree with dependency-safe LIFO cleanup [1.97ms]
+(pass) @nodebraid/runtime-cordis > returns one idempotent installation disposal promise [0.27ms]
+(pass) @nodebraid/runtime-cordis > keeps installation disposal idempotent during abort reentry with successful cleanup [0.70ms]
+(pass) @nodebraid/runtime-cordis > keeps installation disposal idempotent during abort reentry with failed cleanup [1.39ms]
+(pass) @nodebraid/runtime-cordis > keeps host disposal idempotent during abort reentry with successful cleanup [0.86ms]
+(pass) @nodebraid/runtime-cordis > keeps host disposal idempotent during abort reentry with failed cleanup [0.28ms]
+(pass) @nodebraid/runtime-cordis > keeps Host disposal idempotent during Diagnostic Sink reentry [0.27ms]
+(pass) @nodebraid/runtime-cordis > aborts pending setup and waits for it before becoming disposed [0.40ms]
+(pass) @nodebraid/runtime-cordis > disposes every independent installation and closes the host [0.45ms]
+(pass) @nodebraid/runtime-cordis > rolls back owned resources when setup fails [0.62ms]
+(pass) @nodebraid/runtime-cordis > rolls back Owned Resources and Children on Provided Service missing binding [0.98ms]
+(pass) @nodebraid/runtime-cordis > rolls back Owned Resources and Children on Provided Service getter error [0.87ms]
+(pass) @nodebraid/runtime-cordis > preserves a Provided getter error without inspecting its name after rollback [0.71ms]
+(pass) @nodebraid/runtime-cordis > continues cleanup and reports every disposer failure [1.01ms]
+(pass) @nodebraid/runtime-cordis > reports cleanup failures from every host installation together [0.68ms]
+(pass) @nodebraid/runtime-cordis > preserves cleanup aggregation stages through Host disposal [1.02ms]
+(pass) @nodebraid/runtime-cordis > reports an owned Child cleanup failure once during terminal Host disposal [0.89ms]
+
+packages/runtime-cordis/tests/diagnostic-input-values.test.ts:
+(pass) Host diagnostics retains the Host ID accepted during validation [0.57ms]
+(pass) a Diagnostic Event retains the name accepted during validation [0.95ms]
+(pass) a Diagnostic Event retains the level accepted during validation [0.63ms]
+(pass) Host diagnostics rejects the first invalid Host ID: "" [0.41ms]
+(pass) Host diagnostics rejects the first invalid Host ID: null [0.12ms]
+(pass) Host diagnostics rejects the first invalid Host ID: 42 [0.10ms]
+(pass) Host diagnostics rejects the first invalid Host ID: {} [0.15ms]
+(pass) an omitted captured Host ID still creates a stable default Host scope [0.58ms]
+(pass) Host diagnostics preserves the original Host ID read failure [0.74ms]
+(pass) a Diagnostic Event rejects its first invalid name: "" [0.93ms]
+(pass) a Diagnostic Event rejects its first invalid name: null [0.33ms]
+(pass) a Diagnostic Event rejects its first invalid name: {} [0.25ms]
+(pass) a Diagnostic Event rejects its first invalid level: "fatal" [0.35ms]
+(pass) a Diagnostic Event rejects its first invalid level: null [0.81ms]
+(pass) a Diagnostic Event rejects its first invalid level: 42 [0.34ms]
+(pass) a Diagnostic Event retains its normalized attributes and original error [1.34ms]
+(pass) a Diagnostic Event preserves the original name read failure [0.70ms]
+(pass) a Diagnostic Event preserves the original level read failure [3.47ms]
+(pass) a Diagnostic Event preserves the original attributes read failure [1.74ms]
+(pass) a Diagnostic Event preserves the original error read failure [1.12ms]
+(pass) Sink failure context retains the accepted Event name after the callback changes the input [2.82ms]
+(pass) an asynchronous Sink retains the accepted name for both explicit failures [7.30ms]
+(pass) disabled ordinary diagnostics validates inputs without consuming the optional error [4.64ms]
+(pass) invalid Fault attributes retain the accepted name and original Fault at the Reporter [1.15ms]
+(pass) invalid Fault names retain their first captured value in failure diagnostics [0.47ms]
+(pass) a Fault name read failure reaches the Reporter alongside the original Fault [0.45ms]
+(pass) a Fault attributes read failure reaches the Reporter alongside the original Fault [0.41ms]
+
+packages/runtime-cordis/tests/error-contract.test.ts:
+(pass) Plugin Host structural failures expose the shared NodeBraid error identity [0.52ms]
+
+packages/runtime-cordis/tests/diagnostics.test.ts:
+(pass) the Runtime diagnostic event catalog has stable searchable names [0.06ms]
+(pass) a Plugin emits an immutable Diagnostic Event scoped to its Host Activation [1.06ms]
+(pass) a Fault Reporter failure stays outside the Plugin lifecycle and preserves both errors [0.77ms]
+(pass) a Diagnostic Sink failure becomes a non-recursive Fault without failing Plugin setup [0.46ms]
+(pass) an asynchronous Diagnostic Sink is reported as an explicit contract failure [0.35ms]
+(pass) an asynchronous Fault Reporter is exposed without changing Plugin state [0.65ms]
+(pass) an invalid Diagnostic Event fails explicitly even when no Sink is configured [0.43ms]
+(pass) an invalid reportFault input preserves the original Fault through the final Reporter [0.83ms]
+(pass) an unsafe Diagnostic attribute fails with a structured path and original cause [3.78ms]
+(pass) an array Diagnostic accessor fails without executing it during Plugin setup [1.07ms]
+(pass) an unknown Diagnostic level fails as an invalid event contract [0.44ms]
+(pass) Plugin Host rejects an empty diagnostic host ID [0.25ms]
+(pass) Installation subscriber Faults use the Host-scoped diagnostics path [0.86ms]
+(pass) an empty Plugin Host emits an ordered lifecycle [0.56ms]
+(pass) Installation status events follow Snapshot replacement and precede subscribers [1.90ms]
+(pass) a Plugin Setup failure emits one error status while preserving its identity [3.81ms]
+(pass) Activation events surround Plugin setup and completed cleanup [0.79ms]
+(pass) a terminal Installation cleanup failure emits one error event and still disposes [0.59ms]
+(pass) dependency cleanup records one Error-level Event across Consumer and Provider disposal [6.64ms]
+
+packages/runtime-cordis/tests/diagnostic-description.test.ts:
+(pass) a real Host Sink describes AggregateError members while preserving the original event error [4.76ms]
+
+ 208 pass
+ 0 fail
+ 918 expect() calls
+Ran 208 tests across 26 files. [844.00ms]

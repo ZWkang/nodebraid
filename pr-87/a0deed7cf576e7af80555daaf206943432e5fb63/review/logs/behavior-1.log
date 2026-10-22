@@ -1,0 +1,26 @@
+{"head":"1c85d79db1e275e59f84a9bb77d1fe75c0a582e6","control":{"kind":"ordinary materializer","activation":"active","readsAfterActivation":0,"readsAfterGesture":0,"calls":1,"revision":2,"edgeIds":["accepted-edge"],"released":1,"faults":[]},"actual":{"kind":"changing getter","activation":"active","readsAfterActivation":2,"readsAfterGesture":2,"calls":0,"revision":1,"edgeIds":[],"released":1,"faults":[{"name":"nodebraid.plugin.interaction.connection-materializer.fault","error":"TypeError: materializeEdge is not a function. (In 'materializeEdge(Object.freeze({ source, target }))', 'materializeEdge' is null)"}]}}
+35 |   return{kind:changing?'changing getter':'ordinary materializer',activation:interaction.getSnapshot().status,readsAfterActivation,readsAfterGesture:reads,calls,revision:kernel.read().snapshot.revision,edgeIds:kernel.read().snapshot.edges.map(e=>e.id),released:renderer.released,faults:faults.map(f=>({name:f.event.name,error:String(f.error)}))};
+36 |  }finally{await host.dispose()}
+37 | }
+38 | const control=await run(false),actual=await run(true);console.log(JSON.stringify({head,control,actual}));
+39 | assert.deepEqual(control.edgeIds,['accepted-edge'],'Public gesture control must commit the accepted Edge');
+40 | assert.deepEqual(actual.edgeIds,['accepted-edge'],'A successful Interaction activation must retain the Connection materializer accepted during validation');
+            ^
+AssertionError: A successful Interaction activation must retain the Connection materializer accepted during validation
++ actual - expected
+
++ []
+- [
+-   'accepted-edge'
+- ]
+
+ generatedMessage: false,
+     actual: [],
+   expected: [ "accepted-edge" ],
+   operator: "deepStrictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261022T063044-discovery/interaction-materializer-repro.ts:40:8
+
+Bun v1.4.2 (macOS arm64)
