@@ -5,44 +5,43 @@ import { LayoutError } from './layout-error';
 import { freezeLayoutProposal } from './owned-values';
 
 export function validateLayoutProposal(input: LayoutInput, proposal: LayoutProposal): LayoutProposal {
-  if (proposal.sourceRevision !== input.revision) {
+  const sourceRevision = proposal.sourceRevision;
+  if (sourceRevision !== input.revision) {
     throwInvalidProposal('SOURCE_REVISION_MISMATCH', 'Layout Proposal does not match its Layout Input revision.', {
       expectedRevision: input.revision,
-      sourceRevision: proposal.sourceRevision,
+      sourceRevision,
     });
   }
   const inputNodes = new Map(input.nodes.map((node) => [node.id, node]));
   const seenNodeIds = new Set<LayoutPosition['id']>();
+  const positions: LayoutPosition[] = [];
   for (const result of proposal.positions) {
-    if (seenNodeIds.has(result.id)) {
-      throwInvalidProposal('DUPLICATE_NODE', `Layout Proposal contains Node "${result.id}" more than once.`, {
-        nodeId: result.id,
+    const id = result.id;
+    if (seenNodeIds.has(id)) {
+      throwInvalidProposal('DUPLICATE_NODE', `Layout Proposal contains Node "${id}" more than once.`, {
+        nodeId: id,
       });
     }
-    const inputNode = inputNodes.get(result.id);
+    const inputNode = inputNodes.get(id);
     if (!inputNode) {
-      throwInvalidProposal('UNKNOWN_NODE', `Layout Proposal contains unknown Node "${result.id}".`, {
-        nodeId: result.id,
+      throwInvalidProposal('UNKNOWN_NODE', `Layout Proposal contains unknown Node "${id}".`, {
+        nodeId: id,
       });
     }
-    seenNodeIds.add(result.id);
-    for (const coordinate of ['x', 'y'] as const) {
-      const value = result.position[coordinate];
-      if (!Number.isFinite(value)) {
-        throwInvalidProposal('INVALID_POSITION', `Layout Proposal contains an invalid ${coordinate} coordinate.`, {
-          nodeId: result.id,
-          coordinate,
-          receivedNumber: describeNonFiniteNumber(value),
-        });
-      }
-    }
-    if (inputNode.fixed && (result.position.x !== inputNode.position.x || result.position.y !== inputNode.position.y)) {
-      throwInvalidProposal('FIXED_NODE_MOVED', `Layout Proposal moves Fixed Node "${result.id}".`, {
-        nodeId: result.id,
+    seenNodeIds.add(id);
+    const receivedPosition = result.position;
+    const position = {
+      x: acceptCoordinate(receivedPosition.x, 'x', id),
+      y: acceptCoordinate(receivedPosition.y, 'y', id),
+    };
+    if (inputNode.fixed && (position.x !== inputNode.position.x || position.y !== inputNode.position.y)) {
+      throwInvalidProposal('FIXED_NODE_MOVED', `Layout Proposal moves Fixed Node "${id}".`, {
+        nodeId: id,
         expected: Object.freeze({ ...inputNode.position }),
-        actual: Object.freeze({ ...result.position }),
+        actual: Object.freeze({ ...position }),
       });
     }
+    positions.push({ id, position });
   }
   for (const inputNode of input.nodes) {
     if (!seenNodeIds.has(inputNode.id)) {
@@ -52,10 +51,21 @@ export function validateLayoutProposal(input: LayoutInput, proposal: LayoutPropo
     }
   }
   const sortedProposal: LayoutProposal = {
-    sourceRevision: proposal.sourceRevision,
-    positions: [...proposal.positions].sort((left, right) => compareIds(left.id, right.id)),
+    sourceRevision,
+    positions: positions.sort((left, right) => compareIds(left.id, right.id)),
   };
   return freezeLayoutProposal(sortedProposal);
+}
+
+function acceptCoordinate(value: number, coordinate: 'x' | 'y', nodeId: LayoutPosition['id']): number {
+  if (!Number.isFinite(value)) {
+    throwInvalidProposal('INVALID_POSITION', `Layout Proposal contains an invalid ${coordinate} coordinate.`, {
+      nodeId,
+      coordinate,
+      receivedNumber: describeNonFiniteNumber(value),
+    });
+  }
+  return value;
 }
 
 function throwInvalidProposal(issue: string, message: string, details: DiagnosticAttributes): never {

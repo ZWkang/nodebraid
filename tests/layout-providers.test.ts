@@ -6,6 +6,7 @@ import {
   createLayoutPlugin,
   createPluginHost,
   defineCommand,
+  defineLayoutEngine,
   definePlugin,
   edgeId,
   historyPlugin,
@@ -33,6 +34,35 @@ test('Dagre lays out Port topology with one undoable commit and a no-op repeat',
 
 test('ELK lays out Port topology with one undoable commit and a no-op repeat', () =>
   assertPortLayoutHistory(elkLayoutEngine, { algorithm: 'layered', direction: 'RIGHT', randomSeed: 1 }));
+
+test('accepted getter-backed Layout values survive Runtime revalidation and History replay', async () => {
+  const reads: number[][] = [];
+  const engine = defineLayoutEngine({
+    id: 'accepted-values',
+    capabilities: { incremental: false, fixedNodes: false, selfLoops: false },
+    compute(input) {
+      const currentReads = input.nodes.map(() => 0);
+      reads.push(currentReads);
+      return {
+        sourceRevision: input.revision,
+        positions: input.nodes.map((node, index) => ({
+          id: node.id,
+          position: {
+            get x() {
+              return ++currentReads[index]! === 1 ? index * 120 : NaN;
+            },
+            y: 0,
+          },
+        })),
+      };
+    },
+  });
+  await assertPortLayoutHistory(engine, {});
+  expect(reads).toEqual([
+    [1, 1, 1],
+    [1, 1, 1],
+  ]);
+});
 
 async function assertPortLayoutHistory<Config>(engine: LayoutEngine<Config>, config: Config) {
   const command = defineCommand<LayoutCommandInput<Config>, LayoutCommandResult>(`layout.${engine.id}`);
