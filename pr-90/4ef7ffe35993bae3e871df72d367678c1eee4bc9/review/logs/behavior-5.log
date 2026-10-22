@@ -1,0 +1,48 @@
+{
+  "head": "58f3bf4479a5804d3294f83ebd8ea42f76ab644c",
+  "ordinary": {
+    "wrapped": false,
+    "abort": false,
+    "calls": 1,
+    "proposalReads": 1,
+    "originalCancellation": false,
+    "originalResultFailure": false,
+    "error": null,
+    "revision": 2,
+    "position": {
+      "x": 100,
+      "y": 0
+    },
+    "committed": true
+  },
+  "helper": {
+    "wrapped": true,
+    "abort": true,
+    "calls": 1,
+    "proposalReads": 0,
+    "originalCancellation": true,
+    "originalResultFailure": false,
+    "error": "original layout cancellation",
+    "revision": 1,
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "committed": false
+  },
+  "actual": {
+    "wrapped": false,
+    "abort": true,
+    "calls": 1,
+    "proposalReads": 0,
+    "originalCancellation": true,
+    "originalResultFailure": false,
+    "error": "original layout cancellation",
+    "revision": 1,
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "committed": false
+  }
+}

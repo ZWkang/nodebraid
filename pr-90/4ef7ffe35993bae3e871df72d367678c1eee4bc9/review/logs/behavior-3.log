@@ -1,0 +1,77 @@
+@nodebraid/plugin-layout test: $ bun run ../../scripts/build-workspaces.ts --dependencies @nodebraid/plugin-layout
+@nodebraid/plugin-layout test: [build] @nodebraid/diagnostics
+@nodebraid/plugin-layout test: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-layout test: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-layout test: [build] @nodebraid/kernel
+@nodebraid/plugin-layout test: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-layout test: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-layout test: [build] @nodebraid/layout-api
+@nodebraid/plugin-layout test: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-layout test: [build] @nodebraid/runtime-cordis
+@nodebraid/plugin-layout test: $ tsgo -p tsconfig.build.json
+@nodebraid/plugin-layout test: [build] @nodebraid/plugin-command
+@nodebraid/plugin-layout test: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-layout test: [build] @nodebraid/plugin-kernel
+@nodebraid/plugin-layout test: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-layout test: $ bun test ./tests
+@nodebraid/plugin-layout test: bun test v1.4.2 (744846f84)
+@nodebraid/plugin-layout test: 
+@nodebraid/plugin-layout test: tests/index.test.ts:
+@nodebraid/plugin-layout test: (pass) a typed Layout Command commits all Node positions in one Canvas Commit [14.17ms]
+@nodebraid/plugin-layout test: 
+@nodebraid/plugin-layout test: tests/commit-protection.test.ts:
+@nodebraid/plugin-layout test: (pass) a stale Layout Proposal cannot overwrite a newer Kernel revision [2.22ms]
+@nodebraid/plugin-layout test: (pass) cancellation after Provider execution starts preserves the reason and prevents commit [3.02ms]
+@nodebraid/plugin-layout test: (pass) a pre-aborted Layout Command does not invoke the Provider [2.82ms]
+@nodebraid/plugin-layout test: 
+@nodebraid/plugin-layout test: tests/request-validation.test.ts:
+@nodebraid/plugin-layout test: (pass) a Node without Size rejects the Layout Request before the Provider runs [1.67ms]
+@nodebraid/plugin-layout test: (pass) unsupported incremental, Fixed Node, and self-loop capabilities fail before the Provider runs [1.48ms]
+@nodebraid/plugin-layout test: 
+@nodebraid/plugin-layout test: tests/port-commit-protection.test.ts:
+@nodebraid/plugin-layout test: (pass) a pending Port topology Layout preserves a newer Port Endpoint commit [3.67ms]
+@nodebraid/plugin-layout test: (pass) a pending Port topology Layout preserves a newer Layout commit [1.19ms]
+@nodebraid/plugin-layout test: 
+@nodebraid/plugin-layout test: tests/cancellation-boundary.test.ts:
+@nodebraid/plugin-layout test: 41 |       .catch((error: unknown) => error);
+@nodebraid/plugin-layout test: 42 |     await started.promise;
+@nodebraid/plugin-layout test: 43 |     controller.abort(cancellation);
+@nodebraid/plugin-layout test: 44 |     released.resolve();
+@nodebraid/plugin-layout test: 45 | 
+@nodebraid/plugin-layout test: 46 |     expect(await execution).toBe(cancellation);
+@nodebraid/plugin-layout test:                                  ^
+@nodebraid/plugin-layout test: error: expect(received).toBe(expected)
+@nodebraid/plugin-layout test: 
+@nodebraid/plugin-layout test: Expected: 13 | 
+@nodebraid/plugin-layout test: 14 | test.each(['direct', 'helper'] as const)('%s Engine cancellation skips resolved Proposal reads', async (kind) => {
+@nodebraid/plugin-layout test: 15 |   const started = Promise.withResolvers<void>();
+@nodebraid/plugin-layout test: 16 |   const released = Promise.withResolvers<void>();
+@nodebraid/plugin-layout test: 17 |   const controller = new AbortController();
+@nodebraid/plugin-layout test: 18 |   const cancellation = new Error('original cancellation');
+@nodebraid/plugin-layout test:                                 ^
+@nodebraid/plugin-layout test: error: original cancellation
+@nodebraid/plugin-layout test:       at <anonymous> (/Users/zhou/.codex/worktrees/layout-cancellation-boundary/cflow/packages/plugin-layout/tests/cancellation-boundary.test.ts:18:28)
+@nodebraid/plugin-layout test: 
+@nodebraid/plugin-layout test: Received: 14 | test.each(['direct', 'helper'] as const)('%s Engine cancellation skips resolved Proposal reads', async (kind) => {
+@nodebraid/plugin-layout test: 15 |   const started = Promise.withResolvers<void>();
+@nodebraid/plugin-layout test: 16 |   const released = Promise.withResolvers<void>();
+@nodebraid/plugin-layout test: 17 |   const controller = new AbortController();
+@nodebraid/plugin-layout test: 18 |   const cancellation = new Error('original cancellation');
+@nodebraid/plugin-layout test: 19 |   const readFailure = new Error('cancelled Proposal must not be inspected');
+@nodebraid/plugin-layout test:                                ^
+@nodebraid/plugin-layout test: error: cancelled Proposal must not be inspected
+@nodebraid/plugin-layout test:       at <anonymous> (/Users/zhou/.codex/worktrees/layout-cancellation-boundary/cflow/packages/plugin-layout/tests/cancellation-boundary.test.ts:19:27)
+@nodebraid/plugin-layout test: 
+@nodebraid/plugin-layout test: 
+@nodebraid/plugin-layout test:       at <anonymous> (/Users/zhou/.codex/worktrees/layout-cancellation-boundary/cflow/packages/plugin-layout/tests/cancellation-boundary.test.ts:46:29)
+@nodebraid/plugin-layout test:       at async withLayout (/Users/zhou/.codex/worktrees/layout-cancellation-boundary/cflow/packages/plugin-layout/tests/cancellation-boundary.test.ts:91:11)
+@nodebraid/plugin-layout test:       at async <anonymous> (/Users/zhou/.codex/worktrees/layout-cancellation-boundary/cflow/packages/plugin-layout/tests/cancellation-boundary.test.ts:37:9)
+@nodebraid/plugin-layout test: (fail) direct Engine cancellation skips resolved Proposal reads [8.02ms]
+@nodebraid/plugin-layout test: (pass) helper Engine cancellation skips resolved Proposal reads [1.61ms]
+@nodebraid/plugin-layout test: 
+@nodebraid/plugin-layout test:  9 pass
+@nodebraid/plugin-layout test:  1 fail
+@nodebraid/plugin-layout test:  19 expect() calls
+@nodebraid/plugin-layout test: Ran 10 tests across 5 files. [68.00ms]
+@nodebraid/plugin-layout test: error: script "test:self" exited with code 1
+@nodebraid/plugin-layout test: Exited with code 1

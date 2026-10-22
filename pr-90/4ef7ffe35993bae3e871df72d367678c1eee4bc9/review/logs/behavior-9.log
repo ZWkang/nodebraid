@@ -1,0 +1,53 @@
+bun test v1.4.2 (744846f84)
+
+tests/local-agent-cli.test.ts:
+(pass) one issue resumes its local ticket frontier without creating child issues [672.59ms]
+Switched to a new branch 'feat/issue-10'
+killed 1 dangling process
+killed 1 dangling process
+140 |       tree: { sha: tree },
+141 |       parents: [{ sha: 'c'.repeat(40) }, { sha: base }],
+142 |     });
+143 |     expect(invoke('publication', '.tmp/run', '.tmp/remote.json').status).not.toBe(0);
+144 |     json('.tmp/remote.json', { sha: 'b'.repeat(40), tree: { sha: tree }, parents: [{ sha: base }] });
+145 |     expect(invoke('publication', '.tmp/run', '.tmp/remote.json').status).toBe(0);
+                                                                               ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: null
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/layout-cancellation-boundary/cflow/tests/local-agent-cli.test.ts:145:74)
+(fail) a persisted task resumes after a failed real check and never blesses an unrelated head [5385.78ms]
+  ^ this test timed out after 5000ms.
+
+tests/local-agent-bases.test.ts:
+Switched to a new branch 'feat/issue-68'
+killed 1 dangling process
+killed 1 dangling process
+170 |       expect(JSON.parse(invoke(cli, 'evaluate', '.tmp/run', '.tmp/snapshot.json').stdout).status).toBe('ready');
+171 |       json('.tmp/snapshot.json', { ...snapshot, baseRefOid: mode === 'initial' ? '0'.repeat(40) : parent });
+172 |       expect(JSON.parse(invoke(cli, 'evaluate', '.tmp/run', '.tmp/snapshot.json').stdout).status).toBe(
+173 |         'waiting-verification',
+174 |       );
+175 |       expect(invoke(preview, '--base', base, '--out', join(root, '.tmp/evidence')).status).toBe(0);
+                                                                                                 ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: null
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/layout-cancellation-boundary/cflow/tests/local-agent-bases.test.ts:175:92)
+(fail) initial delivery keeps the review base separate from the append parent [5011.99ms]
+  ^ this test timed out after 5000ms.
+Switched to a new branch 'feat/issue-68'
+(pass) append delivery keeps the review base separate from the append parent [3292.22ms]
+Switched to a new branch 'feat/issue-68'
+Switched to a new branch 'main'
+Switched to branch 'feat/issue-68'
+(pass) main-sync delivery keeps the review base separate from the append parent [3404.62ms]
+
+ 3 pass
+ 2 fail
+ 76 expect() calls
+Ran 5 tests across 2 files. [18.18s]

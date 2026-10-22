@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+    "expectedParent": "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+    "head": "4ef7ffe35993bae3e871df72d367678c1eee4bc9",
+    "tree": "1194376ec126ce02cd375aae019e0e4286b2637e",
+    "patch": "30897c7363497cddaa543f825c64a7a6af564998ce18e2f84082809966616bfe",
+    "localHead": "58f3bf4479a5804d3294f83ebd8ea42f76ab644c"
+  },
+  "task": {
+    "run": "320f79b4-d5e4-4516-85e5-c383ab104c3c",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 88
+    },
+    "request": "## Confirmed defect\n\nOn fetched main `1c85d79db1e275e59f84a9bb77d1fe75c0a582e6`, Layout Runtime inspects a directly implemented Engine's resolved Proposal before checking whether the execution was cancelled during computation.\n\nA real compiled public Host/Kernel/Command/Layout probe compares the same Provider function:\n- Without cancellation, a direct `LayoutEngine` commits the expected Node position at revision 2.\n- When wrapped with `defineLayoutEngine`, cancelling during computation preserves the exact Abort reason and reads no Proposal fields.\n- With direct `LayoutEngine` installation, the same cancellation still reads `sourceRevision`. A lazy Proposal getter's error replaces the Abort reason. No layout commit occurs, but the caller receives the wrong failure and cancelled output is inspected.\n\nThe public assertion requiring cancellation before Proposal inspection exits 1. Original source/output: local run `20261022T072944-maintenance`, `layout-cancellation-repro.ts` and `layout-cancellation-red.log`. Existing Runtime tests pass (8 tests / 15 assertions).\n\n## Contract and cause\n\n[ADR 0026](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/docs/adr/0026-validate-layout-contracts-at-their-ownership-boundaries.md) requires cancellation checks around every asynchronous boundary. [ADR 0029](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/docs/adr/0029-preserve-domain-and-external-error-identity.md) preserves original external errors and Abort reasons. The [Layout Runtime contract](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/website/en/modules/plugin-layout.md) explicitly supports third-party Engines and checks the signal before and after every asynchronous boundary.\n\nIn [layout-plugin.ts](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/packages/plugin-layout/src/layout-plugin.ts), `await engine.compute(...)` is embedded inside `validateLayoutProposal(...)`. The next Runtime cancellation check happens after validation. Engines using the official helper have an earlier check; directly implemented Engines expose the missing Runtime check.\n\n## Acceptance\n\n- Check the execution signal immediately after a successful Engine computation resolves, before reading or validating its Proposal. Preserve the existing post-validation check, live revision check and single synchronous Transaction.\n- Cancelled direct and helper Engines preserve the exact original Abort reason without inspecting resolved Proposal fields or committing.\n- Preserve uncancelled direct-Engine success, invalid Proposal rejection, original uncancelled getter errors, original computation rejection, pre-abort behavior, cancellation triggered during validation, stale/concurrent revision protection, metadata, net-zero results and lifecycle cleanup.\n- Use the existing public Host/Command/Kernel seam for a red/green regression and relevant controls. Add no API, mandatory helper, accessor ban, wrapping policy, retry, cap or fallback.\n- Complete related Layout/Command checks, independent Standards + ponytail-review / Spec, full engineering verification, actual current-head CI and complete report/media publication/readback.\n- Keep this Issue open until actual main integration and final acceptance.\n\n## Deduplication\n\nComplete all-state metadata through final short pages (87 Issues/PRs, 45 PRs) found no existing Runtime post-computation cancellation repair. Closed #78 / PR #79 repair accepted Request/Proposal values, including repeated getter reads; #21 concerns disposal-promise publication before Abort reentry. Neither inserts the missing Runtime cancellation check.",
+    "plan": [
+      {
+        "id": "public-regression-and-minimal-repair",
+        "blockedBy": [],
+        "acceptance": "Preserve the original main public cancellation red and working ordinary/helper controls. Add a failing public Host/Command/Kernel regression before production edit; insert the missing post-compute cancellation check, preserve post-validation check and existing error precedence, and pass related and affected checks."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "public-regression-and-minimal-repair"
+        ],
+        "acceptance": "Independent Standards plus ponytail-review and Spec review the same complete head/tree/patch against original Issue88 and ADR0026/0029, with no actionable findings."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Versioned deployed-main agents:run verify executes real full bun run check after targeted checks and both reviews, saving original logs and stable source identity."
+      },
+      {
+        "id": "publish-and-current-head-acceptance",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Publish exact reviewed tree with saved first parent, create one PR to main, verify actual current-head CI, complete feedback, mergeability and immutable full report/media publication/readback."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "publish-and-current-head-acceptance"
+        ],
+        "acceptance": "Keep Issue88 open until final human review/merge, actual fetched-main integration and whole-Issue acceptance."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "58f3bf4479a5804d3294f83ebd8ea42f76ab644c",
+      "tree": "1194376ec126ce02cd375aae019e0e4286b2637e",
+      "patch": "30897c7363497cddaa543f825c64a7a6af564998ce18e2f84082809966616bfe",
+      "verdict": "passed",
+      "report": "What this change does: Layout Runtime checks cancellation immediately after successful Engine computation, before inspecting the resolved Proposal. The existing check after validation remains, protecting against cancellation triggered by Proposal getters.\n\nVerdict: passed.\n\nReviewed identity:\n\n- Base: 1c85d79db1e275e59f84a9bb77d1fe75c0a582e6\n- Head: 58f3bf4479a5804d3294f83ebd8ea42f76ab644c\n- Tree: 1194376ec126ce02cd375aae019e0e4286b2637e\n- Binary patch SHA256: 30897c7363497cddaa543f825c64a7a6af564998ce18e2f84082809966616bfe\n\nHard standards: No violations found in the complete two-file patch. ADR0026 and the public Layout Runtime documentation require cancellation checks around asynchronous boundaries, including directly implemented Engines. ADR0029 preserves Abort reasons and original external errors. The new check uses the existing native signal mechanism without forcing defineLayoutEngine, wrapping failures or changing public contracts.\n\nBoth checks are necessary: the first precedes caller-owned Proposal reads; the second handles cancellation during validation. Computation rejection bypasses the new successful-result check and keeps its original failure. Live revision protection, metadata and the single synchronous Kernel Transaction remain unchanged.\n\nJudgment / ponytail: No actionable Fowler smell or correctness, safety, load, speed or testing finding. A local awaited result and one signal check repair the owning Runtime boundary without new abstraction, dependency, cap or fallback. Read all 224 new test lines, direct/helper Engine paths, Command signal forwarding and execution settlement, Proposal validation/freezing, stale checks, Kernel writes, lifecycle registration cleanup and actual application/export callers. Assumed load: isolated Canvas Runtimes with asynchronous third-party Engines and concurrent cancellation or Document changes.\n\nActual checks at this head:\n\n- Independently verified clean tree, commit history, exact head/tree/hash, prepared-task/inspection identity and complete.patch byte-for-byte.\n- Read the retained test-only red: direct Engine returned the Proposal getter failure instead of cancellation, while the helper control passed.\n- `git diff --check`: passed.\n- `bun test packages/plugin-layout/tests packages/layout-api/tests packages/plugin-command/tests`: 69 passed, 0 failed, 169 assertions. All eight new cancellation/control cases pass, including rejected computation, validation-time cancellation, normal single commit and net-zero behavior.\n\nNot checked: other affected consumers, TypeScript checks, builds, browser suites, full engineering gate, current-head CI, publication and remote evidence readback. Targeted results do not establish delivery readiness.\n"
+    },
+    "spec": {
+      "head": "58f3bf4479a5804d3294f83ebd8ea42f76ab644c",
+      "tree": "1194376ec126ce02cd375aae019e0e4286b2637e",
+      "patch": "30897c7363497cddaa543f825c64a7a6af564998ce18e2f84082809966616bfe",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n独立审查完整两文件补丁及 224 行新公共回归、Issue #88 全文/空讨论、独立 prepared request/五步依赖计划、真实空 blocker 页、AGENTS/CONTEXT、code-review/讨论规范、ADR0026/0029、Layout Runtime 文档与 Engine → Command → Kernel 调用链。未发现规格遗漏、错误实现或未请求的扩张。\n\n满足“Check the execution signal immediately after a successful Engine computation resolves, before reading or validating its Proposal”：成功 await 后先检查 execution.signal，随后才进入 validator；原验证后检查、live revision 比较与单 Transaction 保留。直接实现与 helper Engine 均保留精确 Abort reason，取消后不读取 Proposal、无提交。await 的计算拒绝仍原样传播，包括已 abort 时；未取消 getter/结构性错误、pre-abort、验证中取消、metadata、net-zero、stale/concurrent 与生命周期路径保持。没有强制 helper、新 API、包装策略、accessor ban、cap、retry 或 fallback。\n\n本轮实际运行 `bun test packages/plugin-layout/tests packages/layout-api/tests packages/plugin-command/tests tests/layout-providers.test.ts`：73 pass、0 fail、261 assertions。真实 Host/Command/Kernel 回归覆盖上述取消边界和保留性控制，并验证 Dagre/ELK/History 组合；原始命令、head/tree、输出及 exit 0 已保存 `spec-targeted-tests.log`。`git diff --check` 通过；commit 列表、精确身份、完整 binary patch、保存的 inspection/complete.patch 与干净工作树核对一致。\n\n未执行 build、browser、affected/full engineering gate 或独立 compiled public probe；未验证当前 head 的远端 CI、报告/媒体发布及回读、最终 main 集成。定向检查不代表完整交付验收。\n\n- base: `1c85d79db1e275e59f84a9bb77d1fe75c0a582e6`\n- head: `58f3bf4479a5804d3294f83ebd8ea42f76ab644c`\n- tree: `1194376ec126ce02cd375aae019e0e4286b2637e`\n- raw binary patch SHA256: `30897c7363497cddaa543f825c64a7a6af564998ce18e2f84082809966616bfe`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-main-public-red",
+      "acceptance": "原始 main1c85 编译后公共 Host/Command/Kernel 复现：普通直接 Engine 正常提交；helper 取消保留原 reason 且不读取 Proposal；直接 Engine 取消后读取 Proposal，getter error 覆盖原 reason。真实行为断言失败，预期 exit1。",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/20261022T072944-maintenance/layout-cancellation-repro.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "initial-probe-parse-failure",
+      "acceptance": "首次外部调查脚本缺少对象结尾括号，Bun 解析失败；此记录不是产品缺陷或 TDD red。修正脚本后才得到上面的真实公共行为失败，保留原始解析日志。",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/20261022T072944-maintenance/layout-cancellation-repro.ts",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "tdd-public-runtime-red",
+      "acceptance": "生产代码修改前，新增公共 Runtime 取消回归真实失败：direct Engine 收到 Proposal getter error；helper 对照通过。原 test-only patch 与日志保留，预期 exit1。",
+      "command": "bun run --filter '@nodebraid/plugin-layout' test",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "tdd-public-runtime-green",
+      "acceptance": "补上 Runtime post-compute signal check 后，同一 direct/helper 公共回归通过，精确保留取消对象、读取0次、Kernel View 不变。执行于后续控制用例加入前。",
+      "command": "bun run --filter '@nodebraid/plugin-layout' test:self",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "current-compiled-public-cancellation",
+      "acceptance": "精确提交58f3bf4479a5804d3294f83ebd8ea42f76ab644c 的编译后公共包实际运行：直接/helper Engine 取消均保留原 reason，Proposal读取0次，revision仍1；普通直接 Engine 对照提交位置100,0到revision2。",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/320f79b4-d5e4-4516-85e5-c383ab104c3c/current-public-probe.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "current-connected-layout-contracts",
+      "acceptance": "精确固定提交上的 Layout API/Runtime、真实 Dagre/ELK、Command/Kernel 和根 Layout 联合公共检查通过95项测试、319条断言。包括正常直接 Engine、invalid Proposal、getter exception、compute rejection（含abort）和validation中取消；保留过期/并发、Port topology及History测试。",
+      "command": "bun test packages/layout-api/tests packages/plugin-layout/tests packages/layout-dagre/tests packages/layout-elk/tests packages/plugin-command/tests packages/plugin-kernel/tests tests/layout-providers.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "affected-consumers-browser-and-docs",
+      "acceptance": "实际 affected 检查通过 Layout Runtime/Core/Examples 的类型、构建和产物、根 Layout 联合测试、真实 Basic SVG/Clipboard 浏览器和文档检查。执行于提交前；完整 precommit patch 与提交补丁逐字节一致。正式 verify 单独运行当前提交。",
+      "command": "bun run check:affected --base 1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "formal-check-attempt-1-failed",
+      "acceptance": "第一次正式 verify 在不变的工作流 CLI 集成测试中触发3个默认5秒超时，完整672项中669通过/3失败。保留真实完整失败日志；不提高超时、不删断言，不将局部 green 当作交付。",
+      "command": "bun run check",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "workflow-timeout-isolated-failure",
+      "acceptance": "第一次分离复现仍有2个既有CLI用例超时，失败位置不同；3项通过/2失败。保留真实诊断日志，不作为修复成功。",
+      "command": "bun test tests/local-agent-cli.test.ts tests/local-agent-bases.test.ts",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "unchanged-workflow-diagnostic-green",
+      "acceptance": "与当前main字节一致的CLI实现/测试，在main对照5项/84断言通过；修复分支原样复验也5项/84断言通过，最慢3059.72ms。未调整5秒配置、断言或执行范围；仅诊断，不替代正式全量。",
+      "command": "bun test tests/local-agent-cli.test.ts tests/local-agent-bases.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-10.log"
+    },
+    {
+      "id": "formal-check-attempt-2-failed",
+      "acceptance": "不改源码、断言和5秒配置，在 main/当前分支对照通过后再次执行完整 verify。完整672项中671通过/1失败，既有main-sync CLI用例5103.91ms超时。原始日志保留；当前不能交付ready。",
+      "command": "bun run check",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-11.log"
+    },
+    {
+      "id": "unchanged-workflow-recheck-081447",
+      "acceptance": "同一提交在本轮原样工作流复验通过5项/84断言，最慢main-sync4393.93ms；源码、断言和默认5000ms未改。仅为恢复正式完整验证的诊断结果，不替代全量门槛。",
+      "command": "bun test tests/local-agent-cli.test.ts tests/local-agent-bases.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-12.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "d8bde8d5eee6b5c706c6fa7f1e190bc7ca8ab497f8438b46f0c2f85cd408bae4"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "b9f3dfd28d8723de18bf406c66a7bacfaa37b9a656a4b9cf292bfabde26ca338"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "81a848b8c17fa91b9f85d6944824dd6334aa627c29017553cd865272aef4bb05"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "d7ee97fb41eeba844a7a5cb9e3c8abafa33d04e973a186fc02d62de08ce3d329"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "bbaa50ddff3dd3d878c706543e6a65d60ae290cdd73e2c90e2cac59144b6e84c"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "432ed3b56d0d494c727b36d4503c14fe88ecd1ace9d5f40c1e87063ae0cf427c"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "e39af8857d0b5e9d30be2eb81e7ef2d5bfda2abe0d578442d750520ea171d4fc"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "ebd38050a229493cd356fee6275655e58453735a122e20b1eb6e10ef0163ad7d"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "6aaefcaf0976ff256a20dd52abd93ed97b85eb8584b0f263dbfabd03c6229b1b"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "dc5810ee71be0bc1c2fdc9ca78103dc9a17b8cf3c2e9e4a662297a5d210f6003"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "ad1e6a9a1100c254754acc2b89c331450ce0230539d28db60e7117d9dd422752"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "7b998a93f1388a5e8e286faab449bba5041081b7dfe968ab615f13a594119b30"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "8cc6c3d0aa904a40fc067410d2957feb4db801084534f33095296d9cee1968df"
+    },
+    {
+      "path": "logs/behavior-11.log",
+      "kind": "log",
+      "sha256": "a22cdab3de973a8d564518c4e58f7c77cda1da28a23c6b1ceb93a95e220e677a"
+    },
+    {
+      "path": "logs/behavior-12.log",
+      "kind": "log",
+      "sha256": "8ac3024d1ef8363bf6d725d4b380a5bc33dba279045a931e30f94f9ca4606a1d"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "22bd596993b9b2bcd21578d2ee8fb093f6f06e50f716a42b04b2b8c76ff8a0eb"
+    }
+  ]
+}

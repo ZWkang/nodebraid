@@ -1,0 +1,16 @@
+28 |   } satisfies LayoutEngine<{}>;
+         ^
+error: Expected "}" but found "satisfies"
+    at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261022T072944-maintenance/layout-cancellation-repro.ts:28:5
+
+28 |   } satisfies LayoutEngine<{}>;
+                   ^
+error: Expected ";" but found "LayoutEngine"
+    at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261022T072944-maintenance/layout-cancellation-repro.ts:28:15
+
+28 |   } satisfies LayoutEngine<{}>;
+                                   ^
+error: Unexpected ;
+    at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261022T072944-maintenance/layout-cancellation-repro.ts:28:31
+
+Bun v1.4.2 (macOS arm64)

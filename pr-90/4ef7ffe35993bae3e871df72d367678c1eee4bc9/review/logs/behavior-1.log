@@ -1,0 +1,69 @@
+{
+  "head": "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+  "ordinary": {
+    "wrapped": false,
+    "abort": false,
+    "calls": 1,
+    "proposalReads": 1,
+    "originalCancellation": false,
+    "originalResultFailure": false,
+    "error": null,
+    "revision": 2,
+    "position": {
+      "x": 100,
+      "y": 0
+    },
+    "committed": true
+  },
+  "helper": {
+    "wrapped": true,
+    "abort": true,
+    "calls": 1,
+    "proposalReads": 0,
+    "originalCancellation": true,
+    "originalResultFailure": false,
+    "error": "original layout cancellation",
+    "revision": 1,
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "committed": false
+  },
+  "actual": {
+    "wrapped": false,
+    "abort": true,
+    "calls": 1,
+    "proposalReads": 1,
+    "originalCancellation": false,
+    "originalResultFailure": true,
+    "error": "cancelled Proposal must not be inspected",
+    "revision": 1,
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "committed": false
+  }
+}
+51 | assert.equal(ordinary.committed, true);
+52 | assert.equal(ordinary.revision, 2);
+53 | assert.equal(helper.originalCancellation, true);
+54 | assert.equal(helper.proposalReads, 0);
+55 | assert.equal(actual.revision, 1);
+56 | assert.equal(actual.originalCancellation, true, 'Layout Runtime must check cancellation before inspecting a raw Engine Proposal');
+            ^
+AssertionError: Layout Runtime must check cancellation before inspecting a raw Engine Proposal
+
+false !== true
+
+ generatedMessage: false,
+     actual: false,
+   expected: true,
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261022T072944-maintenance/layout-cancellation-repro.ts:56:8
+
+Bun v1.4.2 (macOS arm64)

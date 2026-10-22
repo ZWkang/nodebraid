@@ -1,0 +1,27 @@
+@nodebraid/plugin-layout test:self: bun test v1.4.2 (744846f84)
+@nodebraid/plugin-layout test:self: 
+@nodebraid/plugin-layout test:self: tests/index.test.ts:
+@nodebraid/plugin-layout test:self: (pass) a typed Layout Command commits all Node positions in one Canvas Commit [54.37ms]
+@nodebraid/plugin-layout test:self: 
+@nodebraid/plugin-layout test:self: tests/commit-protection.test.ts:
+@nodebraid/plugin-layout test:self: (pass) a stale Layout Proposal cannot overwrite a newer Kernel revision [5.59ms]
+@nodebraid/plugin-layout test:self: (pass) cancellation after Provider execution starts preserves the reason and prevents commit [7.08ms]
+@nodebraid/plugin-layout test:self: (pass) a pre-aborted Layout Command does not invoke the Provider [1.91ms]
+@nodebraid/plugin-layout test:self: 
+@nodebraid/plugin-layout test:self: tests/request-validation.test.ts:
+@nodebraid/plugin-layout test:self: (pass) a Node without Size rejects the Layout Request before the Provider runs [3.42ms]
+@nodebraid/plugin-layout test:self: (pass) unsupported incremental, Fixed Node, and self-loop capabilities fail before the Provider runs [2.62ms]
+@nodebraid/plugin-layout test:self: 
+@nodebraid/plugin-layout test:self: tests/port-commit-protection.test.ts:
+@nodebraid/plugin-layout test:self: (pass) a pending Port topology Layout preserves a newer Port Endpoint commit [3.98ms]
+@nodebraid/plugin-layout test:self: (pass) a pending Port topology Layout preserves a newer Layout commit [1.51ms]
+@nodebraid/plugin-layout test:self: 
+@nodebraid/plugin-layout test:self: tests/cancellation-boundary.test.ts:
+@nodebraid/plugin-layout test:self: (pass) direct Engine cancellation skips resolved Proposal reads [3.92ms]
+@nodebraid/plugin-layout test:self: (pass) helper Engine cancellation skips resolved Proposal reads [1.80ms]
+@nodebraid/plugin-layout test:self: 
+@nodebraid/plugin-layout test:self:  10 pass
+@nodebraid/plugin-layout test:self:  0 fail
+@nodebraid/plugin-layout test:self:  21 expect() calls
+@nodebraid/plugin-layout test:self: Ran 10 tests across 5 files. [163.00ms]
+@nodebraid/plugin-layout test:self: Exited with code 0
