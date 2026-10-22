@@ -1,0 +1,22 @@
+{"head":"99ed305515afaec32ef49494b509446ad9ba998c","results":[{"case":"viewport","reads":{"x":2,"y":2,"zoom":2},"actual":{"x":"NaN","y":"Infinity","zoom":0},"valid":false,"frozen":true},{"case":"selection-collection","reads":2,"actual":["b"],"expected":["a"]},{"case":"hidden-missing-node","actualError":null,"controlError":"SELECTION_ENTITY_NOT_FOUND","iteratorCalls":1,"actual":[],"before":["a"],"snapshotUnchanged":false}]}
+46 |   try{h.session.setSelection({nodeIds:ids,edgeIds:[]});}catch(error){failure=error;}
+47 |   results.push({case:'hidden-missing-node',actualError:failure?.code??null,controlError:control.code,iteratorCalls,actual:h.session.getSnapshot().selection.nodeIds,before:before.selection.nodeIds,snapshotUnchanged:h.session.getSnapshot()===before});
+48 |  } finally {await h.host.dispose();}
+49 | }
+50 | console.log(JSON.stringify({head:'99ed305515afaec32ef49494b509446ad9ba998c',results}));
+51 | assert.equal(results[0].valid,true,'Session must not publish a non-finite or zero-zoom Viewport after accepting finite positive values');
+            ^
+AssertionError: Session must not publish a non-finite or zero-zoom Viewport after accepting finite positive values
+
+false !== true
+
+ generatedMessage: false,
+     actual: false,
+   expected: true,
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261021T190719-discovery/session-input-repro.ts:51:8
+
+Bun v1.4.2 (macOS arm64)

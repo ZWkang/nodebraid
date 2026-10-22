@@ -1,0 +1,46 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-session/tests/index.test.ts:
+(pass) @nodebraid/plugin-session > publishes the stable Session diagnostic event catalog [0.75ms]
+(pass) @nodebraid/plugin-session > provides a fresh default Session for an Activation [21.28ms]
+(pass) @nodebraid/plugin-session > publishes a canonical immutable Selection and ignores equivalent input [3.26ms]
+(pass) @nodebraid/plugin-session > rejects every missing Selection entity without changing Session state [2.99ms]
+(pass) @nodebraid/plugin-session > publishes only valid normalized Viewport changes [1.70ms]
+(pass) @nodebraid/plugin-session > reconciles Selection from the exact Kernel Commit after View [1.69ms]
+(pass) @nodebraid/plugin-session > queues reentrant Session mutations until every subscriber sees the current Snapshot [1.00ms]
+(pass) @nodebraid/plugin-session > owns each subscription independently even when listeners share one function [0.63ms]
+(pass) @nodebraid/plugin-session > reports subscriber errors without corrupting Session or blocking later subscribers [1.99ms]
+(pass) @nodebraid/plugin-session > schedules an explicit subscriber error when platform reporting is unavailable [4.51ms]
+(pass) @nodebraid/plugin-session > preserves subscriber and reporter failures when platform reporting throws [1.00ms]
+(pass) @nodebraid/plugin-session > closes old handles and creates a fresh Session when Kernel returns [2.29ms]
+(pass) @nodebraid/plugin-session > rejects an invalid subscriber before it can enter notification state [1.09ms]
+(pass) @nodebraid/plugin-session > rejects malformed Selection input with structured immutable details [0.77ms]
+(pass) @nodebraid/plugin-session > rejects sparse Selection arrays as malformed input [0.58ms]
+(pass) @nodebraid/plugin-session > rejects malformed Viewport input as a structured Session error [0.94ms]
+
+packages/plugin-session/tests/types.test.ts:
+(pass) keeps the public Session Service contract narrow and immutable [0.01ms]
+
+packages/plugin-session/tests/input-values.test.ts:
+(pass) Session publishes the x value accepted during Viewport validation [1.14ms]
+(pass) Session publishes the y value accepted during Viewport validation [0.72ms]
+(pass) Session publishes the zoom value accepted during Viewport validation [4.74ms]
+(pass) Session retains the nodeIds collection accepted during validation [1.17ms]
+(pass) Session retains the edgeIds collection accepted during validation [0.80ms]
+(pass) Session retains the nodeIds element accepted during validation [0.66ms]
+(pass) Session retains the edgeIds element accepted during validation [0.44ms]
+(pass) Session rejects an actual unknown nodeIds member hidden by an iterator [2.28ms]
+(pass) Session rejects an actual unknown edgeIds member hidden by an iterator [0.63ms]
+(pass) Session canonicalizes frozen indexed IDs without consulting caller collection hooks [1.21ms]
+(pass) Session retains original viewport read failures and ordering [1.35ms]
+(pass) Session retains original selection-index read failures and ordering [0.54ms]
+(pass) Session retains original selection-field read failures and ordering [0.71ms]
+(pass) Session owns one native length snapshot before validating and publishing IDs [0.57ms]
+(pass) Session preserves an indexed read failure before allocating from the incoming length [0.47ms]
+(pass) Session preserves indexed array behavior for inherited [0.43ms]
+(pass) Session preserves indexed array behavior for string-length [0.35ms]
+
+ 34 pass
+ 0 fail
+ 116 expect() calls
+Ran 34 tests across 3 files. [105.00ms]
