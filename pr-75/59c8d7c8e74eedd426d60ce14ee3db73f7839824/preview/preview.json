@@ -36,62 +36,62 @@
     {
       "path": "build.log",
       "kind": "log",
-      "sha256": "ff92889ce3e38afc99e1410ffa9e3052908c50702998995abb494319ada485a8"
+      "sha256": "7d26bf56aee5526cc7ba588d9115cc854eeef1b4fe51e1371d750421385708f9"
     },
     {
       "path": "ffmpeg.log",
       "kind": "log",
-      "sha256": "5b320c97f515e79171f10a2147d875ffb6b14bd2b25681047b73c46fe0a527ee"
+      "sha256": "a8e768d2591df7eba04d27fcc21b1efd4f11d10a5134bc992125ae97a9d9462f"
     },
     {
       "path": "selection-history/before.png",
       "kind": "screenshot",
-      "sha256": "02cbbd8ce21b22f9f211a333e1142f730703f5a45048430197019fb2578f3aab"
+      "sha256": "b75df5e6f4811a0faedc2cf03339731675901635ba3fbfde161c00a163f0e3a1"
     },
     {
       "path": "selection-history/before.snapshot.json",
       "kind": "snapshot",
-      "sha256": "6c2b20f32f1b17410af4b8f9bba79952be2ab8bda807fce3da9965900be1d18e"
+      "sha256": "3e6c5c39ea65614cf492cd309232bf600e1e6ed396157a53b865facfa64a883f"
     },
     {
       "path": "selection-history/duplicated.png",
       "kind": "screenshot",
-      "sha256": "c3794af7e0d1a0ed63cb38194dfee6c9c72533032657edc66058cd0e92faec13"
+      "sha256": "45261eb91c750f8325f5c65a6b2b4928e5342c6d82d517e056e42c096d6b1543"
     },
     {
       "path": "selection-history/duplicated.snapshot.json",
       "kind": "snapshot",
-      "sha256": "e33ba3c618f7fb5501efb4a89b926ef758bf8a454ee171e70713425340a08ba1"
+      "sha256": "6c952d8aeb6d3864c3b4c94872d6a3ffe0de3ad871f68eaa51147b7051099300"
     },
     {
       "path": "selection-history/after.png",
       "kind": "screenshot",
-      "sha256": "59af1b6a01481cf56d0ea0c417b01e3985fc714739fd99a041f79da39a2b6d13"
+      "sha256": "abb9de8d860d215ced6c24571b0556f52143dd6d16a71f40ee62ecd835473673"
     },
     {
       "path": "selection-history/after.snapshot.json",
       "kind": "snapshot",
-      "sha256": "e4fcb9f9106732f64fe69efb63fd0820d27960ac8cb0062b0712113079ca8f0b"
+      "sha256": "869b68b376f6beff4c05acbe4d432b83a18c186ada435d116190889ddfbd78c8"
     },
     {
       "path": "selection-history/recording.mp4",
       "kind": "recording",
-      "sha256": "efee872f1f34fe796d4afe2874f9ac9a2ab58cdd6b6b13d9a0aa03a8f3c7b19a"
+      "sha256": "7c1ce15c1153f8b0841badaa83435c8a8e4e4e761021cac8040d69f66dfa2177"
     },
     {
       "path": "selection-history/review-encoding.log",
       "kind": "log",
-      "sha256": "764c4fcc55565e017f97504e92d6e1f8e0161ba4d2ec84e2aadec8ab3275c568"
+      "sha256": "79948d81134a63bf3966fb85f428e105f8a810d6649dffe2ab1ab85dfc7cc80c"
     },
     {
       "path": "selection-history/review.mp4",
       "kind": "recording",
-      "sha256": "396d3d60fe478ee1db74b19e9fc0c38b20214df14a2f3f7c1a141a77ba85adab"
+      "sha256": "6c11d521fb01d5c66aa2954935c659009df274eb87dbd887c4792dab0038fc45"
     },
     {
       "path": "selection-history/actions.log",
       "kind": "log",
-      "sha256": "9a5e046333e536c1e514c4df16a26f29f086dfa7875b601674dd408b746e236e"
+      "sha256": "c41a9371187ce3655d5830777769ee5d7bb1d98a4067abcb40ce3b9ecafe1c13"
     }
   ]
 }
