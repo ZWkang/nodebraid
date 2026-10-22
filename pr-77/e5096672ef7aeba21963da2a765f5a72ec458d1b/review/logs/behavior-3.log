@@ -1,0 +1,140 @@
+HEAD 6b9d519cc524fb2c09d3b0deb4ab143f86424fb1
+TREE cba1ce1ca110b6d2910a757f2e2c786388daabc1
+
+$ bun test packages/plugin-session/tests
+exit_code: 0
+bun test v1.4.2 (744846f84)
+
+packages/plugin-session/tests/index.test.ts:
+(pass) @nodebraid/plugin-session > publishes the stable Session diagnostic event catalog [0.97ms]
+(pass) @nodebraid/plugin-session > provides a fresh default Session for an Activation [29.06ms]
+(pass) @nodebraid/plugin-session > publishes a canonical immutable Selection and ignores equivalent input [4.13ms]
+(pass) @nodebraid/plugin-session > rejects every missing Selection entity without changing Session state [2.70ms]
+(pass) @nodebraid/plugin-session > publishes only valid normalized Viewport changes [1.48ms]
+(pass) @nodebraid/plugin-session > reconciles Selection from the exact Kernel Commit after View [1.17ms]
+(pass) @nodebraid/plugin-session > queues reentrant Session mutations until every subscriber sees the current Snapshot [0.72ms]
+(pass) @nodebraid/plugin-session > owns each subscription independently even when listeners share one function [0.59ms]
+(pass) @nodebraid/plugin-session > reports subscriber errors without corrupting Session or blocking later subscribers [1.85ms]
+(pass) @nodebraid/plugin-session > schedules an explicit subscriber error when platform reporting is unavailable [7.07ms]
+(pass) @nodebraid/plugin-session > preserves subscriber and reporter failures when platform reporting throws [0.90ms]
+(pass) @nodebraid/plugin-session > closes old handles and creates a fresh Session when Kernel returns [1.34ms]
+(pass) @nodebraid/plugin-session > rejects an invalid subscriber before it can enter notification state [0.90ms]
+(pass) @nodebraid/plugin-session > rejects malformed Selection input with structured immutable details [0.72ms]
+(pass) @nodebraid/plugin-session > rejects sparse Selection arrays as malformed input [0.47ms]
+(pass) @nodebraid/plugin-session > rejects malformed Viewport input as a structured Session error [0.66ms]
+
+packages/plugin-session/tests/types.test.ts:
+(pass) keeps the public Session Service contract narrow and immutable [0.01ms]
+
+packages/plugin-session/tests/input-values.test.ts:
+(pass) Session publishes the x value accepted during Viewport validation [0.79ms]
+(pass) Session publishes the y value accepted during Viewport validation [0.51ms]
+(pass) Session publishes the zoom value accepted during Viewport validation [7.16ms]
+(pass) Session retains the nodeIds collection accepted during validation [0.71ms]
+(pass) Session retains the edgeIds collection accepted during validation [0.50ms]
+(pass) Session retains the nodeIds element accepted during validation [0.53ms]
+(pass) Session retains the edgeIds element accepted during validation [0.42ms]
+(pass) Session rejects an actual unknown nodeIds member hidden by an iterator [7.04ms]
+(pass) Session rejects an actual unknown edgeIds member hidden by an iterator [0.66ms]
+(pass) Session canonicalizes frozen indexed IDs without consulting caller collection hooks [0.76ms]
+(pass) Session retains original viewport read failures and ordering [1.08ms]
+(pass) Session retains original selection-index read failures and ordering [0.43ms]
+(pass) Session retains original selection-field read failures and ordering [0.39ms]
+(pass) Session owns one native length snapshot before validating and publishing IDs [0.52ms]
+(pass) Session normalizes the captured coercible nodeIds length once [0.56ms]
+(pass) Session normalizes the captured coercible edgeIds length once [0.42ms]
+(pass) Session preserves an indexed read failure before allocating from the incoming length [0.46ms]
+(pass) Session preserves indexed array behavior for inherited [0.53ms]
+(pass) Session preserves indexed array behavior for string-length [0.70ms]
+
+ 36 pass
+ 0 fail
+ 126 expect() calls
+Ran 36 tests across 3 files. [149.00ms]
+
+$ bun - <<'TS'
+import assert from 'node:assert/strict';
+import { nodeId, edgeId } from '@nodebraid/kernel';
+import { kernelPlugin, kernelService } from '@nodebraid/plugin-kernel';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
+import { sessionPlugin, sessionService } from './packages/plugin-session/src/index.ts';
+const a=nodeId('a'),b=nodeId('b'),ab=edgeId('ab');
+let checked=0;
+for(const field of ['nodeIds','edgeIds']) for(const mode of ['bigint','symbol','coercion-error','infinity-index-error']) {
+ const marker=new Error(field+':'+mode);
+ let kernel,session,indexReads=0,lengthReads=0,coercions=0;
+ const consumer=definePlugin({requires:{kernel:kernelService,session:sessionService},setup(context){kernel=context.services.kernel;session=context.services.session;}});
+ const host=createPluginHost();
+ try{
+  const installs=[host.install(kernelPlugin),host.install(sessionPlugin),host.install(consumer)];
+  await Promise.all(installs.map(i=>i.whenActive()));
+  assert.ok(kernel&&session);
+  kernel.transact(tx=>{
+   for(const id of [a,b]) tx.nodes.add({id,type:'task',position:{x:0,y:0},data:null});
+   tx.edges.add({id:ab,type:'flow',source:{nodeId:a},target:{nodeId:b},data:null});
+  });
+  session.setSelection({nodeIds:[a],edgeIds:[]});
+  const before=session.getSnapshot();
+  const incoming=new Proxy(field==='nodeIds'?[b]:[ab],{get(target,key,receiver){
+   if(key==='length'){lengthReads++;
+    if(mode==='bigint') return 1n;
+    if(mode==='symbol') return Symbol('length');
+    if(mode==='coercion-error') return {valueOf(){coercions++;throw marker;}};
+    return Infinity;
+   }
+   if(key==='0'){indexReads++;if(mode==='infinity-index-error') throw marker;}
+   return Reflect.get(target,key,receiver);
+  }});
+  const input={nodeIds:[a],edgeIds:[]};
+  input[field]=incoming;
+  let error;
+  try{session.setSelection(input);}catch(e){error=e;}
+  if(mode==='bigint'||mode==='symbol') assert.ok(error instanceof TypeError);
+  else assert.equal(error,marker);
+  assert.equal(session.getSnapshot(),before);
+  assert.equal(lengthReads,1);
+  assert.equal(indexReads,mode==='infinity-index-error'?1:0);
+  assert.equal(coercions,mode==='coercion-error'?1:0);
+  checked++;
+  console.log(JSON.stringify({field,mode,error:mode==='bigint'||mode==='symbol'?'TypeError':'original marker',lengthReads,indexReads,coercions,snapshotUnchanged:true}));
+ }finally{await host.dispose();}
+}
+assert.equal(checked,8);
+console.log('8 native-length/public Host cases passed');
+TS
+exit_code: 0
+{"field":"nodeIds","mode":"bigint","error":"TypeError","lengthReads":1,"indexReads":0,"coercions":0,"snapshotUnchanged":true}
+{"field":"nodeIds","mode":"symbol","error":"TypeError","lengthReads":1,"indexReads":0,"coercions":0,"snapshotUnchanged":true}
+{"field":"nodeIds","mode":"coercion-error","error":"original marker","lengthReads":1,"indexReads":0,"coercions":1,"snapshotUnchanged":true}
+{"field":"nodeIds","mode":"infinity-index-error","error":"original marker","lengthReads":1,"indexReads":1,"coercions":0,"snapshotUnchanged":true}
+{"field":"edgeIds","mode":"bigint","error":"TypeError","lengthReads":1,"indexReads":0,"coercions":0,"snapshotUnchanged":true}
+{"field":"edgeIds","mode":"symbol","error":"TypeError","lengthReads":1,"indexReads":0,"coercions":0,"snapshotUnchanged":true}
+{"field":"edgeIds","mode":"coercion-error","error":"original marker","lengthReads":1,"indexReads":0,"coercions":1,"snapshotUnchanged":true}
+{"field":"edgeIds","mode":"infinity-index-error","error":"original marker","lengthReads":1,"indexReads":1,"coercions":0,"snapshotUnchanged":true}
+8 native-length/public Host cases passed
+
+$ python3 - <<'PY'
+import json,subprocess,hashlib
+from pathlib import Path
+base='7fd790eef783afb05d9c3a765b9b59018ca8fb82';head='6b9d519cc524fb2c09d3b0deb4ab143f86424fb1';tree='cba1ce1ca110b6d2910a757f2e2c786388daabc1';expected='f631def090171fc90bdbb50bd525138000ac9da572ba9afaba61825de6a85068'
+run=Path('/Users/zhou/.codex/local-workflows/nodebraid/runs/12831587-0f44-446d-8b1e-a2110e1376de')
+assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==head
+assert subprocess.check_output(['git','rev-parse','HEAD^{tree}'],text=True).strip()==tree
+assert not subprocess.check_output(['git','status','--short'],text=True)
+subprocess.run(['git','diff','--check',base,head],check=True)
+patch=subprocess.check_output(['git','diff','--binary',base,head]);assert patch==(run/'complete.patch').read_bytes();assert hashlib.sha256(patch).hexdigest()==expected
+actual=json.loads((run/'inspection.json').read_text());prepared=json.loads((run/'prepared-task.json').read_text())
+assert actual=={'taskDigest':prepared['digest'],'head':head,'tree':tree,'patch':expected}
+assert subprocess.check_output(['git','show','-s','--format=%P',head],text=True).split()==[prepared['expectedParent'],base]
+print('Fixed head/tree, clean worktree, exact saved patch/hash/inspection, task digest and first/second parents verified')
+print(subprocess.check_output(['git','diff','--name-only',base,head],text=True))
+paths=['AGENTS.md','CONTRIBUTING.md','CONTEXT.md','docs/agents/issue-tracker.md','docs/agents/discussion-workflow.md','docs/agents/principles.md']
+assert not subprocess.check_output(['git','diff','1c85d79db1e275e59f84a9bb77d1fe75c0a582e6',base,'--',*paths])
+print('Current standards verified unchanged by the documentation-only main update')
+PY
+exit_code: 0
+Fixed head/tree, clean worktree, exact saved patch/hash/inspection, task digest and first/second parents verified
+packages/plugin-session/src/session-plugin.ts
+packages/plugin-session/tests/input-values.test.ts
+
+Current standards verified unchanged by the documentation-only main update

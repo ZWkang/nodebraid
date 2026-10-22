@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "7fd790eef783afb05d9c3a765b9b59018ca8fb82",
+    "expectedParent": "c504affe05a34444c4c2415a33c60c91833620a4",
+    "head": "e5096672ef7aeba21963da2a765f5a72ec458d1b",
+    "tree": "cba1ce1ca110b6d2910a757f2e2c786388daabc1",
+    "patch": "f631def090171fc90bdbb50bd525138000ac9da572ba9afaba61825de6a85068",
+    "localHead": "6b9d519cc524fb2c09d3b0deb4ab143f86424fb1"
+  },
+  "task": {
+    "run": "12831587-0f44-446d-8b1e-a2110e1376de",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 76
+    },
+    "request": "## Confirmed defect\n\nAt main `99ed305515afaec32ef49494b509446ad9ba998c`, Session validates caller-owned input and then reads it again for publication. A real public-package Host/Kernel/Session probe reproduces:\n\n1. Viewport getters first return `{x:10,y:20,zoom:2}`, then `{x:NaN,y:Infinity,zoom:0}`. `setViewport` returns successfully and publishes the invalid values in a frozen Snapshot; each field was read twice.\n2. A Selection `nodeIds` getter returns `['a']` for validation and `['b']` for construction. Both Nodes exist; Session publishes `['b']`, rather than the collection accepted during validation.\n3. A Node-ID array actually contains unknown `'missing'`, but its custom iterator yields nothing. The ordinary control rejects with `SELECTION_ENTITY_NOT_FOUND`; the hooked array instead clears the previous Selection without error.\n\nThe original public compiled-barrel probe exits 1 at the Viewport invariant assertion and logs all three real outcomes. Sources/output are retained in local run `20261021T190719-discovery` (`session-input-repro.ts`, `session-input-red.log`). Existing Session tests (17 /73 assertions) pass.\n\n## Contract and cause\n\n[ADR 0018](https://github.com/ZWkang/nodebraid/blob/99ed305515afaec32ef49494b509446ad9ba998c/docs/adr/0018-use-logical-screen-units-for-viewport.md) requires finite Viewport coordinates and finite positive zoom. [ADR 0017](https://github.com/ZWkang/nodebraid/blob/99ed305515afaec32ef49494b509446ad9ba998c/docs/adr/0017-bind-selection-to-current-kernel-view.md) rejects unknown Selection entities atomically. [ADR 0022](https://github.com/ZWkang/nodebraid/blob/99ed305515afaec32ef49494b509446ad9ba998c/docs/adr/0022-linearize-session-transitions-breadth-first.md) owns breadth-first transitions and consistent observer Snapshots.\n\nIn [session-plugin.ts](https://github.com/ZWkang/nodebraid/blob/99ed305515afaec32ef49494b509446ad9ba998c/packages/plugin-session/src/session-plugin.ts), Viewport issue collection and later copying consume different reads. Selection validation indexes the input arrays, while later canonicalization re-reads fields and consumes caller iterators.\n\n## Acceptance\n\n- Capture each incoming Viewport field once; validate, normalize negative zero and publish those exact accepted values. Do not publish non-finite coordinates or non-positive zoom after successful validation.\n- Capture Selection collections once into owned indexed arrays; validate, check Kernel membership, canonicalize and publish the same owned values. Incoming iterator/method/constructor/species hooks must not replace the validated IDs.\n- Use native array-like length/index normalization without new caps or fallback. Preserve explicit empty Selection, duplicate/order canonicalization, equivalent-input Snapshot identity, issue aggregation/order, original read exceptions, existing error codes/messages, positive zoom/no-clamp semantics, transition FIFO, reconciliation, subscriber isolation and disposal.\n- Do not add a public API, blanket accessor prohibition, dependency, retry or silent degradation.\n- Public red/green regressions for both mutators, changed properties/elements and hidden unknown IDs; related Session/Kernel/Renderer/Interaction and browser checks, independent Standards + ponytail-review / Spec, full engineering check, actual publication/current-head CI and report/media readback. Keep the Issue open for main integration and final acceptance; human final review/merge.\n\n## Related work\n\nComplete all-state metadata through final short pages (75 Issues/PRs, 39 PRs) found no existing Session repair. Closed #29, #35 and #38 concern Port or factory capture; #74 / PR #75 concerns Duplicate mapping translation. They do not fix these Session mutation boundaries.\n\n## Authorized integration\n\nHuman direct request: pr统一合并一下. Preserve current PR77 source branch and source Issue76. Synchronize fetched main through append-only merge; no product scope changes. Fetched review base: 7fd790eef783afb05d9c3a765b9b59018ca8fb82. Original published head: c504affe05a34444c4c2415a33c60c91833620a4.",
+    "plan": [
+      {
+        "id": "synchronize-main",
+        "blockedBy": [],
+        "acceptance": "Record source/target independently before local merge. Append fetched main to the existing PR77 branch, preserving the reviewed Session fix and original parent; resolve real conflicts only within approved scope."
+      },
+      {
+        "id": "integration-compatibility",
+        "blockedBy": [
+          "synchronize-main"
+        ],
+        "acceptance": "Run fresh Session public checks and affected checks for the integration delta, preserving existing regression evidence at original identities. Capture complete new base/head/tree/patch; no old tests/reviews relabeled as new SHA."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "integration-compatibility"
+        ],
+        "acceptance": "Independent Standards plus ponytail-review and Spec inspect full current PR scope against original Issue76 and actual merged main, with exact new source identities."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Pinned main versioned agents:run verify runs real full bun run check after both axes pass and preserves all attempts."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Append exact reviewed tree with original branch head as first parent and captured main parent, verify publication before local alignment, then current-head CI/full feedback/mergeability and full immutable report/preview readback."
+      },
+      {
+        "id": "authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "Immediately before normal PR merge recheck actual source head, strict CI and all feedback; use expected_head_sha, no bypass/approve/dismiss/force/auto-merge. Read back merge result and fetch main."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "authorized-merge"
+        ],
+        "acceptance": "Prove merged commit in fetched main and whole original Issue76 acceptance with real public checks; only then publish acceptance and close under existing user authorization."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "6b9d519cc524fb2c09d3b0deb4ab143f86424fb1",
+      "tree": "cba1ce1ca110b6d2910a757f2e2c786388daabc1",
+      "patch": "f631def090171fc90bdbb50bd525138000ac9da572ba9afaba61825de6a85068",
+      "verdict": "passed",
+      "report": "What this change does: Session captures Viewport fields and indexed Selection IDs once, then validates and publishes those same values. The appended main update adds only the Renderer documentation fix.\n\nVerdict: passed. Looks good. Ship.\n\nReviewed identity:\n\n- Base: `7fd790eef783afb05d9c3a765b9b59018ca8fb82`\n- Head: `6b9d519cc524fb2c09d3b0deb4ab143f86424fb1`\n- Tree: `cba1ce1ca110b6d2910a757f2e2c786388daabc1`\n- Binary patch SHA256: `f631def090171fc90bdbb50bd525138000ac9da572ba9afaba61825de6a85068`\n\nHard standards: no violations found. Reviewed the complete two-file patch, all 323 regression-test lines, current project rules, applicable principle guidance, Issue #76 with its saved empty discussion, PR #77 context and independent prepared plan. Input capture remains at Session’s boundary. ADR0017 membership rejection, ADR0018 finite coordinates/positive zoom, and ADR0022 FIFO notifications remain intact. Existing validation, error details, canonical frozen values, equivalent-input identity, reconciliation and cleanup are retained.\n\nJudgment checks: no concrete Fowler smell found. Applying ponytail-review for one isolated Host per Canvas, the owned arrays and lazy indexed traversal are necessary. Converting length once prevents changing coercion from hiding an unknown ID. No cap, fallback, dependency or public interface was added. Traced Kernel reads/commits, Duplicate and Clipboard Selection publication, Interaction mutations, Renderer subscriptions and React Snapshot consumers. No new integration conflict was found.\n\nIndependent checks at this head: `bun test packages/plugin-session/tests` passed 36 tests and 126 assertions. Eight additional real Host cases passed for Node/Edge BigInt and Symbol lengths, original coercion errors and Infinity-length first-index errors; failures preserve the exact Snapshot. The saved patch matches the exact Git diff/hash and inspection. Verified the original source as first parent, captured main as second parent, clean worktree and `git diff --check`. Commands and outputs are saved in `standards-command-log.txt`.\n\nNot checked: fresh builds, browser behavior, full engineering gate, live PR feedback/mergeability, current-head remote CI, publication or merge. Previous-head results were not used as current-head verification. This report covers Standards and ponytail-review only.\n"
+    },
+    "spec": {
+      "head": "6b9d519cc524fb2c09d3b0deb4ab143f86424fb1",
+      "tree": "cba1ce1ca110b6d2910a757f2e2c786388daabc1",
+      "patch": "f631def090171fc90bdbb50bd525138000ac9da572ba9afaba61825de6a85068",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n独立重审新 main 基线的完整两文件补丁及 323 行公共回归、原 Issue #76 全文/空讨论、独立 prepared plan、AGENTS/CONTEXT、tracker/讨论规范、code-review、ADR0017/0018/0022 和 Session/Kernel/Renderer/Interaction 调用链。未发现规格遗漏、错误实现或范围扩张。\n\n满足“Capture each incoming Viewport field once”及“publish the same owned values”：Viewport 验证、负零归一化与发布复用捕获值，保持 finite/positive/no-clamp；Selection 集合、length 的一次数值转换及实际索引进入 owned 数组，验证、membership、去重排序和冻结发布复用同值。输入 hooks 不替换 ID，unknown ID 原子拒绝；原始异常/诊断顺序、空选择、等价 Snapshot、FIFO、reconciliation、订阅隔离及 disposal 保留。无 API、cap、accessor ban 或 fallback 新增。\n\n实际 `bun test packages/plugin-session/tests`：36 pass、0 fail、126 assertions；`git diff --check` 通过。另核对 append 第一父为原 published source c504affe、第二父为 main7fd，integration delta 仅两份 Renderer 文档四行；完整 patch/inspection、head/tree 与干净工作树一致。命令与原始输出在 `spec-review-commands.log`，未借用旧 head 结果。\n\n已读 PR77 当前 published head c504affe 的完整空 comments/reviews/threads，未见新增反馈；本地被审 head 尚未发布。未执行本轮 full verify、build/browser、affected/docs 全套、远端新 head CI/反馈、报告回读或最终 merge/main 验收；由后续交付证据分别确认。\n\n- base: `7fd790eef783afb05d9c3a765b9b59018ca8fb82`\n- head: `6b9d519cc524fb2c09d3b0deb4ab143f86424fb1`\n- tree: `cba1ce1ca110b6d2910a757f2e2c786388daabc1`\n- binary patch SHA256: `f631def090171fc90bdbb50bd525138000ac9da572ba9afaba61825de6a85068`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "current-session-input-contract",
+      "acceptance": "At synchronized local head6b9d519, fresh public Session suite passes36 tests/126 assertions covering captured Viewport/Selection values, original errors, membership, immutable Snapshot and lifecycle. Existing original TDD evidence remains at its original identities, not relabeled.",
+      "command": "bun run --filter @nodebraid/plugin-session test",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "main-integration-delta",
+      "acceptance": "Actual delta from previous published parent c504affe is only two Renderer documentation snippets. Affected planner selected docs; content, Quick Start and VitePress passed on synchronized head.",
+      "command": "bun run check:affected --base c504affe05a34444c4c2415a33c60c91833620a4",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "independent-session-boundaries",
+      "acceptance": "Standards reviewer independently ran36 tests/126 assertions and8 real Host BigInt/Symbol/coercion/Infinity-first-index cases at the exact synchronized head, preserving original errors and exact Snapshot on rejection. Not a visual/browser claim.",
+      "command": "See actual commands in standards-command-log.txt",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "dae56dadb3f5db4f2d994a8c2fc99d8df77a73a84be5be1c441ecebf8b69e6a7"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "7890ffbc58bf50d1f8f91d85a7ebd8d4ea478a4aaa5db9f0f9a0fffee3d5b989"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "f706d9691e43eb6cf7abfa02d76f5b14b41c7a46723b91ddd870aca6d6ac7d54"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "d92d04f722398a4c4f16ca5f8abefb05fcb87cda46928b57c98250a5326fb178"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "4893dbc1fea5d0556076548647ab9f649d5e9c87bd1b5610b4832b9a70c122b7"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "3e7f662cb60480b2f42681e0d6625ac8df2ec212ec43afb461f5f77c0e68bb5a"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "da9e880dc5ad031944494982b03ba82dbc0d01c3fbbdc0d61a6f28b34a9a1eeb"
+    }
+  ]
+}

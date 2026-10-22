@@ -1,0 +1,64 @@
+@nodebraid/plugin-session test: $ bun run ../../scripts/build-workspaces.ts --dependencies @nodebraid/plugin-session
+@nodebraid/plugin-session test: [build] @nodebraid/diagnostics
+@nodebraid/plugin-session test: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-session test: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-session test: [build] @nodebraid/kernel
+@nodebraid/plugin-session test: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-session test: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-session test: [build] @nodebraid/runtime-cordis
+@nodebraid/plugin-session test: $ tsgo -p tsconfig.build.json
+@nodebraid/plugin-session test: [build] @nodebraid/plugin-kernel
+@nodebraid/plugin-session test: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-session test: [build] @nodebraid/session-api
+@nodebraid/plugin-session test: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-session test: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-session test: $ bun test ./tests
+@nodebraid/plugin-session test: bun test v1.4.2 (744846f84)
+@nodebraid/plugin-session test: 
+@nodebraid/plugin-session test: tests/index.test.ts:
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > publishes the stable Session diagnostic event catalog [0.80ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > provides a fresh default Session for an Activation [4.95ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > publishes a canonical immutable Selection and ignores equivalent input [2.31ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > rejects every missing Selection entity without changing Session state [2.45ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > publishes only valid normalized Viewport changes [1.45ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > reconciles Selection from the exact Kernel Commit after View [1.13ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > queues reentrant Session mutations until every subscriber sees the current Snapshot [0.59ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > owns each subscription independently even when listeners share one function [0.58ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > reports subscriber errors without corrupting Session or blocking later subscribers [1.58ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > schedules an explicit subscriber error when platform reporting is unavailable [5.35ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > preserves subscriber and reporter failures when platform reporting throws [1.08ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > closes old handles and creates a fresh Session when Kernel returns [1.18ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > rejects an invalid subscriber before it can enter notification state [0.64ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > rejects malformed Selection input with structured immutable details [0.71ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > rejects sparse Selection arrays as malformed input [0.52ms]
+@nodebraid/plugin-session test: (pass) @nodebraid/plugin-session > rejects malformed Viewport input as a structured Session error [0.44ms]
+@nodebraid/plugin-session test: 
+@nodebraid/plugin-session test: tests/types.test.ts:
+@nodebraid/plugin-session test: (pass) keeps the public Session Service contract narrow and immutable
+@nodebraid/plugin-session test: 
+@nodebraid/plugin-session test: tests/input-values.test.ts:
+@nodebraid/plugin-session test: (pass) Session publishes the x value accepted during Viewport validation [0.81ms]
+@nodebraid/plugin-session test: (pass) Session publishes the y value accepted during Viewport validation [0.48ms]
+@nodebraid/plugin-session test: (pass) Session publishes the zoom value accepted during Viewport validation [5.50ms]
+@nodebraid/plugin-session test: (pass) Session retains the nodeIds collection accepted during validation [1.06ms]
+@nodebraid/plugin-session test: (pass) Session retains the edgeIds collection accepted during validation [0.49ms]
+@nodebraid/plugin-session test: (pass) Session retains the nodeIds element accepted during validation [0.49ms]
+@nodebraid/plugin-session test: (pass) Session retains the edgeIds element accepted during validation [0.39ms]
+@nodebraid/plugin-session test: (pass) Session rejects an actual unknown nodeIds member hidden by an iterator [2.24ms]
+@nodebraid/plugin-session test: (pass) Session rejects an actual unknown edgeIds member hidden by an iterator [0.50ms]
+@nodebraid/plugin-session test: (pass) Session canonicalizes frozen indexed IDs without consulting caller collection hooks [0.55ms]
+@nodebraid/plugin-session test: (pass) Session retains original viewport read failures and ordering [0.55ms]
+@nodebraid/plugin-session test: (pass) Session retains original selection-index read failures and ordering [0.41ms]
+@nodebraid/plugin-session test: (pass) Session retains original selection-field read failures and ordering [0.53ms]
+@nodebraid/plugin-session test: (pass) Session owns one native length snapshot before validating and publishing IDs [0.48ms]
+@nodebraid/plugin-session test: (pass) Session normalizes the captured coercible nodeIds length once [0.71ms]
+@nodebraid/plugin-session test: (pass) Session normalizes the captured coercible edgeIds length once [0.38ms]
+@nodebraid/plugin-session test: (pass) Session preserves an indexed read failure before allocating from the incoming length [0.42ms]
+@nodebraid/plugin-session test: (pass) Session preserves indexed array behavior for inherited [0.46ms]
+@nodebraid/plugin-session test: (pass) Session preserves indexed array behavior for string-length [0.41ms]
+@nodebraid/plugin-session test: 
+@nodebraid/plugin-session test:  36 pass
+@nodebraid/plugin-session test:  0 fail
+@nodebraid/plugin-session test:  126 expect() calls
+@nodebraid/plugin-session test: Ran 36 tests across 3 files. [57.00ms]
+@nodebraid/plugin-session test: Exited with code 0
