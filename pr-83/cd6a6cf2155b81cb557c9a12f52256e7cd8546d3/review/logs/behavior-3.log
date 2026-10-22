@@ -1,0 +1,22 @@
+bun test v1.4.2 (744846f84)
+
+packages/kernel/tests/writer-id-values.test.ts:
+16 |       type: 'task',
+17 |       position: { x: 1, y: 2 },
+18 |       data: 'new-a',
+19 |     }),
+20 |   );
+21 |   expect(kernel.read().query.getNode(b)?.data).toBe('original-b');
+                                                    ^
+error: expect(received).toBe(expected)
+
+Expected: "original-b"
+Received: "new-a"
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-82-kernel-ids/cflow/packages/kernel/tests/writer-id-values.test.ts:21:48)
+(fail) Node add retains its accepted ID without overwriting an existing Node [17.73ms]
+
+ 0 pass
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [58.00ms]

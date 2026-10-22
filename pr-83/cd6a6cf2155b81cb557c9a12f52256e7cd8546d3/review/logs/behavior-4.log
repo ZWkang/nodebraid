@@ -1,0 +1,29 @@
+bun test v1.4.2 (744846f84)
+
+packages/kernel/tests/writer-id-values.test.ts:
+(pass) Node add retains its accepted ID without overwriting an existing Node [11.92ms]
+45 |       position: { x: 1, y: 2 },
+46 |       data: 'replacement-a',
+47 |     }),
+48 |   );
+49 |   if (!commit) throw new Error('Expected a replacement commit.');
+50 |   expect(commit.after.snapshot.nodes.map((node) => node.id)).toEqual([a, b]);
+                                                                  ^
+error: expect(received).toEqual(expected)
+
+  [
+-   "a",
++   "b",
+    "b",
+  ]
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-82-kernel-ids/cflow/packages/kernel/tests/writer-id-values.test.ts:50:62)
+(fail) Node replace keeps Query, Snapshot and replayable Change Set identities consistent [7.87ms]
+
+ 1 pass
+ 1 fail
+ 6 expect() calls
+Ran 2 tests across 1 file. [62.00ms]

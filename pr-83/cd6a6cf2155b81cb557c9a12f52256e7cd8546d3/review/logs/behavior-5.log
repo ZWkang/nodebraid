@@ -1,0 +1,92 @@
+bun test v1.4.2 (744846f84)
+
+packages/kernel/tests/revision.test.ts:
+(pass) revision increment refuses to leave the safe-integer range [0.45ms]
+
+packages/kernel/tests/index.test.ts:
+(pass) @nodebraid/kernel > creates one stable revision-zero Canvas View [2.16ms]
+(pass) @nodebraid/kernel > creates distinct Node and Edge identifiers and rejects empty values [4.02ms]
+(pass) @nodebraid/kernel > distinguishes missing entities from relationships of a missing Node [0.32ms]
+(pass) @nodebraid/kernel > commits one Node with matching before and after Canvas Views [2.36ms]
+(pass) @nodebraid/kernel > keeps undeclared caller fields outside committed Node and Edge values [0.90ms]
+(pass) @nodebraid/kernel > rolls back callback and invalid-position failures without replacing the Canvas View [0.65ms]
+(pass) @nodebraid/kernel > rejects an asynchronous Transaction callback and rolls back its staged writes [0.43ms]
+(pass) @nodebraid/kernel > rejects a nested Transaction and rolls back the outer callback when the error escapes [0.14ms]
+(pass) @nodebraid/kernel > closes the Transaction Context and its capabilities after the callback [0.24ms]
+(pass) @nodebraid/kernel > can catch a failed nested or strict operation and continue the outer Transaction [0.21ms]
+(pass) @nodebraid/kernel > strictly replaces and removes an existing Node [0.83ms]
+(pass) @nodebraid/kernel > collapses a Node restored to its original value into a net-zero Transaction [0.19ms]
+(pass) @nodebraid/kernel > reports strict Node writer errors without changing the Draft [0.30ms]
+(pass) @nodebraid/kernel > coalesces Node operation sequences and compares data by reference [0.96ms]
+(pass) @nodebraid/kernel > connects Nodes with an Edge and queries its directed relationships [0.34ms]
+(pass) @nodebraid/kernel > rejects an Edge whose final Endpoint references a missing Node [0.14ms]
+(pass) @nodebraid/kernel > allows temporary Endpoints, self-loops, and separate Node and Edge ID namespaces [0.26ms]
+(pass) @nodebraid/kernel > strictly edits Edges and collapses an identical restoration [0.94ms]
+(pass) @nodebraid/kernel > keeps parent relationships and queries direct children in canonical order [0.40ms]
+(pass) @nodebraid/kernel > updates Draft relationship indexes when Nodes and Edges are replaced [2.61ms]
+(pass) @nodebraid/kernel > reports every missing relationship, parent cycle, and invalid geometry in the final graph [0.81ms]
+(pass) @nodebraid/kernel > requires callers to reparent children explicitly when removing a parent [0.58ms]
+(pass) @nodebraid/kernel > applies a Change Set in reverse and forward through new Transactions [2.21ms]
+(pass) @nodebraid/kernel > rejects a malformed Change Set before changing the Draft [0.88ms]
+(pass) @nodebraid/kernel > rejects stale replay before applying any matching entity changes [1.03ms]
+(pass) @nodebraid/kernel > reverses and reapplies a complete Node and Edge creation Change Set [3.67ms]
+
+packages/kernel/tests/types.test.ts:
+(pass) keeps the public Kernel contract type-safe [0.03ms]
+
+packages/kernel/tests/writer-id-values.test.ts:
+(pass) Node add retains its accepted ID without overwriting an existing Node [0.67ms]
+(pass) Node replace keeps Query, Snapshot and replayable Change Set identities consistent [0.27ms]
+(pass) Edge add retains its accepted ID and relation indexes without overwriting another Edge [0.65ms]
+(pass) Edge replace retains its accepted ID across indexes and reverse/forward replay [1.60ms]
+(pass) duplicate add reports the captured ID before reading other entity fields [2.01ms]
+(pass) replacement mismatch reports the captured ID before reading other entity fields [0.27ms]
+(pass) missing replacement targets fail before reading the incoming ID [0.08ms]
+(pass) add preserves an original ID read failure and committed View [0.10ms]
+(pass) replace preserves an original ID read failure and committed View [0.03ms]
+(pass) a failed owned entity copy leaves no partially added or replaced value [0.19ms]
+(pass) captured replacement IDs retain net-zero View identity [0.09ms]
+(pass) closed Transaction writers fail before reading an incoming ID [0.18ms]
+
+packages/kernel/tests/error-contract.test.ts:
+(pass) Kernel structural failures expose the shared NodeBraid error identity [0.13ms]
+(pass) Kernel identifier failures classify a JavaScript value without copying it [0.09ms]
+(pass) Change Set direction failures classify an unsafe JavaScript value [0.10ms]
+(pass) Change Set revision failures classify unsafe JavaScript values [0.31ms]
+
+packages/kernel/tests/commit-preparation.test.ts:
+(pass) a failing origin read cannot publish a Transaction [1.73ms]
+(pass) a failing commandId read cannot publish a Transaction [0.22ms]
+(pass) commit metadata is captured once after Draft capabilities close and before publication [0.68ms]
+(pass) a net-zero Transaction does not inspect commit-only metadata [0.12ms]
+(pass) commit preparation rejects reentry from metadata [0.26ms]
+(pass) commit preparation rejects reentry from callback result [0.06ms]
+
+packages/kernel/tests/replay-collection.test.ts:
+(pass) a changing replay iterator cannot overwrite a later Node edit [1.76ms]
+(pass) an entries hook cannot hide duplicate replay entries from validation [0.43ms]
+(pass) caught node forward conflict leaves no partial replay [3.19ms]
+(pass) caught node reverse conflict leaves no partial replay [0.37ms]
+(pass) caught edge forward conflict leaves no partial replay [0.39ms]
+(pass) caught edge reverse conflict leaves no partial replay [0.26ms]
+(pass) valid forward and reverse replay ignores input traversal hooks and preserves opaque data [0.42ms]
+(pass) replay captures the outer collection and each indexed entry once [0.14ms]
+(pass) a traversal hook cannot hide a sparse replay entry [0.28ms]
+(pass) replay preserves native length coercion: 1.5 [0.58ms]
+(pass) replay preserves native length coercion: "1.5" [0.09ms]
+(pass) replay preserves native length coercion: {
+  valueOf: [Function: valueOf],
+} [0.65ms]
+(pass) replay preserves native empty iteration for Proxy length 0.5 [0.80ms]
+(pass) replay preserves native empty iteration for Proxy length -1 [0.05ms]
+(pass) replay preserves native empty iteration for Proxy length NaN [0.15ms]
+(pass) replay preserves native empty iteration for Proxy length undefined [0.01ms]
+(pass) replay preserves native empty iteration for Proxy length "0"
+(pass) replay preserves native length conversion failure: 1n [0.38ms]
+(pass) replay preserves native length conversion failure: Symbol(length) [0.05ms]
+(pass) invalid first entry retains its error before an infinite Proxy length could allocate a snapshot [0.22ms]
+
+ 70 pass
+ 0 fail
+ 280 expect() calls
+Ran 70 tests across 7 files. [121.00ms]

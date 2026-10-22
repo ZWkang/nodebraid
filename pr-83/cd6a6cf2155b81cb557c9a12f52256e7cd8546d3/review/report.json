@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "01c4827666dbc089a38eec61925030728411fe9d",
+    "expectedParent": "01c4827666dbc089a38eec61925030728411fe9d",
+    "head": "cd6a6cf2155b81cb557c9a12f52256e7cd8546d3",
+    "tree": "112b395b2f7ffbbcfa17b3c520ec0db83be13187",
+    "patch": "41f9934066885c572e7f7457f47b6ada9f238cc2556b6cf329483bf9e5a45413",
+    "localHead": "4c8984b04a944811f545afb00d3b6fbcb64dee68"
+  },
+  "task": {
+    "run": "2d23ece4-c0e8-4327-81c0-fd5261dca478",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 82
+    },
+    "request": "Retain accepted Kernel writer entity IDs and consistent, replayable commit evidence; revalidate the complete unchanged Kernel patch after externally merged Runtime and Layout repairs advanced fetched main. Source: https://github.com/ZWkang/nodebraid/issues/82",
+    "plan": [
+      {
+        "id": "sync-source-and-public-checks",
+        "blockedBy": [],
+        "acceptance": "Independently retain source/plan and current fetched main01c; conflict-free main sync inspected, full Kernel patch remains41f. Re-run public Kernel tests/types/compiled probes and selected consumers at exact synchronized source. Original reds and old-base wake failure/recovery stay historical."
+      },
+      {
+        "id": "independent-review-and-full-check",
+        "blockedBy": [
+          "sync-source-and-public-checks"
+        ],
+        "acceptance": "Fresh independent Standards+ponytail-review and Spec cover current base01c/exact head/tree/patch, then deployed main01c versioned verify executes actual full check with stable source. Do not reuse old verification/reviews."
+      },
+      {
+        "id": "publication-current-head-acceptance",
+        "blockedBy": [
+          "independent-review-and-full-check"
+        ],
+        "acceptance": "Initial remote source branch still absent; publish exact reviewed tree with independently prepared first parent main01c, one PR for Issue82, real current-head CI/complete feedback and full report/media publication plus immutable readback."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "publication-current-head-acceptance"
+        ],
+        "acceptance": "Actual main integration and whole-Issue public acceptance remain pending prerequisites before authorized closure; human final review/merge."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "4c8984b04a944811f545afb00d3b6fbcb64dee68",
+      "tree": "112b395b2f7ffbbcfa17b3c520ec0db83be13187",
+      "patch": "41f9934066885c572e7f7457f47b6ada9f238cc2556b6cf329483bf9e5a45413",
+      "verdict": "passed",
+      "report": "What this change does: Kernel Node and Edge Writers retain the incoming ID accepted by their strict checks. Owned entity copies, Map keys, relation indexes and replayable Change Set evidence use that same identity.\n\nVerdict: passed.\n\nReviewed identity:\n\n- Base: 01c4827666dbc089a38eec61925030728411fe9d\n- Head: 4c8984b04a944811f545afb00d3b6fbcb64dee68\n- Tree: 112b395b2f7ffbbcfa17b3c520ec0db83be13187\n- Binary patch SHA256: 41f9934066885c572e7f7457f47b6ada9f238cc2556b6cf329483bf9e5a45413\n\nHard standards: No violations found. The complete three-file patch preserves ADR0009–0012 Kernel ownership, immutable entity shells, opaque data references, revision-bound evidence and Transaction replay. AGENTS.md, CONTRIBUTING.md and Boundary Discipline retain their existing requirements; comparing the updated main confirms that the standards, glossary and ADRs did not change.\n\nIntegration review: Read both mechanical merges, the full current product patch and the intervening Runtime diagnostics/Layout production changes. Layout still passes owned, validated positions through Kernel Service Transactions. Runtime diagnostics retains its existing observational interface. Neither introduces another freeze-helper caller or changes EntityWriter contracts. History still replays through the same strict Node/Edge Writers.\n\nJudgment / ponytail: No actionable Fowler smell or correctness, safety, load, speed or testing finding. The explicit private ID argument carries one accepted value without adding policy or abstraction. Closed/missing-target checks retain precedence; duplicate/mismatch failures precede remaining field reads. Copy errors, final graph validation, net-zero identity, canonical ordering, separate namespaces and replay remain intact.\n\nConnected code checked: current Writer/freezer callers, CanvasKernel publication, GraphIndex, Change Set preflight/application, Kernel Plugin propagation, History replay and Layout submission. Assumed load: synchronous in-process Transactions for an isolated Canvas Runtime.\n\nActual checks at this head:\n\n- Independently verified commit history, clean tree, exact head/tree and complete binary patch hash; re-read the full new test file and connected code.\n- `git diff --check`: passed.\n- `bun test packages/kernel/tests`: 70 passed, 0 failed, 280 assertions, including all 12 regressions.\n\nNot checked: current affected consumers, TypeScript checks, builds, browser suites, full engineering gate, remote CI, publication and remote report readback. Earlier-base review and full-check results were not counted as current verification.\n"
+    },
+    "spec": {
+      "head": "4c8984b04a944811f545afb00d3b6fbcb64dee68",
+      "tree": "112b395b2f7ffbbcfa17b3c520ec0db83be13187",
+      "patch": "41f9934066885c572e7f7457f47b6ada9f238cc2556b6cf329483bf9e5a45413",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n对新基线独立审查完整三文件补丁、新增公共测试、Issue #82 全文及空讨论、独立 prepared task、ADR0009–0012/0027，以及 Writer → owned entity → Map/关系索引 → touched IDs → Change Set/replay 调用链，未发现遗漏、错误实现或范围扩张。\n\nIssue 要求“Capture the incoming entity ID once”：Node/Edge 的 add/replace 均只读取一次输入 ID，并将相同值传入私有 freeze helper、Map、索引及提交证据。closed/missing/duplicate/mismatch 的既有读序保持；复制失败先于 Draft 写入；原异常、opaque data 引用、冻结、净零与双向 replay 保持。required ID 参数未进入公共 API。\n\n本轮实际执行 `bun test packages/kernel/tests`：70 pass、0 fail、280 assertions；`git diff --check` 通过。核对精确提交、tree、完整 binary patch 和干净工作树，并确认新 main 的 Runtime/Layout 集成未修改 Kernel。未借用旧 head 的审查或检查结论。\n\n本轮未执行构建、浏览器、affected/full engineering gate，未验证当前 head 的远端 CI、报告发布或 main 最终集成；定向通过不代表交付验收完成。\n\n- base: `01c4827666dbc089a38eec61925030728411fe9d`\n- head: `4c8984b04a944811f545afb00d3b6fbcb64dee68`\n- tree: `112b395b2f7ffbbcfa17b3c520ec0db83be13187`\n- raw binary patch SHA256: `41f9934066885c572e7f7457f47b6ada9f238cc2556b6cf329483bf9e5a45413`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-main710-public-red",
+      "acceptance": "Historical original main710 public compiled Kernel proof: Node/Edge adds overwrite existing IDs, Node replacement violates Query/Snapshot/ChangeSet identity and cannot replay. This is original red provenance, not a current-head check.",
+      "command": "bun kernel-writer-id-repro.ts (original main710 discovery)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "original-edge-replace-red",
+      "acceptance": "Historical original main710 Edge replace also returns a different valid entity ID under its checked key.",
+      "command": "bun original-edge-replace-repro.ts (original main710)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "original-node-add-tracer-red",
+      "acceptance": "Original TDD slice before the ID fix demonstrated existing Node overwrite. Later source/baseline changes do not change this red's original provenance.",
+      "command": "bun test packages/kernel/tests/writer-id-values.test.ts (Node add before fix)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "original-node-replace-tracer-red",
+      "acceptance": "Original TDD replace slice before capture fix published duplicate Snapshot IDs.",
+      "command": "bun test packages/kernel/tests/writer-id-values.test.ts (Node replace before fix)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "current-kernel-public-checks",
+      "acceptance": "New synchronized4c/main01c Kernel public suite:70 pass280assert, including12 ID/strictness/rollback/index/replay/net-zero regressions.",
+      "command": "bun test packages/kernel/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "current-kernel-types",
+      "acceptance": "New synchronized source Kernel types passed; no public signature/export change.",
+      "command": "bun run --filter '@nodebraid/kernel' typecheck:self",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "current-compiled-public-probe",
+      "acceptance": "New synchronized compiled public Kernel probe retains original existing Node/Edge data, consistent IDs and reversible generated evidence, with one ID read.",
+      "command": "bun kernel-writer-id-probe.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "current-affected-consumers",
+      "acceptance": "Current base01c/head4c selected public consumers, browser scenarios, build/declarations and documentation passed; executed mode affected, exit0.",
+      "command": "bun run check:affected --base 01c4827666dbc089a38eec61925030728411fe9d",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "historical-base710-full-failure",
+      "acceptance": "Historical earlier-base full check:583 pass16 process/Git fixture timeout failures during machine sleep/wake. Original failure preserved. Same failed suites subsequently39 pass371 assertions, and full retry passed. Neither this failure nor retry substitutes for current main01c verification.",
+      "command": "bun run agents:run verify (historical run9cf, base710/head926)",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "historical-base710-full-retry",
+      "acceptance": "Historical same-source base710 retry:599 pass2606 assertions plus browsers/build/docs. Source remained926/tree9f13. Later main changed; this is preserved provenance, not current-head acceptance.",
+      "command": "bun run agents:run verify (historical run9cf, base710/head926)",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-10.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "cffd523daf3de5d06b9f0c4780ebc33194d738a9add69cc7912cee7280d28bcf"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "ec59c1d4fd92e124b9c06ed244037d46db090d125d79c99b9fb07ab32bc50afb"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "53db3338dcbf5bce5163c449168c704004d7afab29424d6b0cfb672463b3a260"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "b05b38072e2404d3838f696e67c19470c3b19befa303690be7b844d6285d12bf"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "c5df4fd9fc5378b0e083543319fd6f0976055889df6622818c971b7ff141f14e"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "0202a464f3322b48a23da12488e8ae9d6305c35db601efebb6ca25923fbbbe5d"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "29e28fd83365b3134274f8f6a3e371a7e52e5011acb6e1348ed16615a73d1163"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "37983081660c301f0d38a2f8cd338542c766f683f2b87375e6b6db7d72a33b3d"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "cdaeacdb3a4a8a7ae5e124a9d4c3e5270883fbdd2c58b9ad68567281786b960d"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "ca9e4bd2f5247756ccf296af240b857f75b105615557e13d312b23ef88e8a9ab"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "ca7fd3a1294f5778d1b6b2190a7bc2a6019b77363ab359181b67921f9ccff22c"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "f8b0aa5b7674515586620d8512e0f9830671e6fcc03e36974a9ab194cc5e9adf"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "bee3527b3b001ebbcc24db6f46e38e077f37eeb7a80d6048395b7054d5625c0c"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "fd313e44cfc5ee6c6ed27f20f1af7ac4ee29edc426e714e5f4bc90fa65508ec8"
+    }
+  ]
+}

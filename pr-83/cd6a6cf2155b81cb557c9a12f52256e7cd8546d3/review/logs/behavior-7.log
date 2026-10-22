@@ -1,0 +1,1 @@
+{"add":{"reads":1,"revision":2,"ids":["a","b"],"a":"new-a","b":"original-b","commitId":"a"},"replace":{"reads":1,"ids":["a","b"],"queryAId":"a","changeId":"a","afterId":"a","replayCode":null},"edgeAdd":{"reads":1,"ids":["ea","eb"],"existingData":"original-eb","incidentIds":["ea","eb"]}}

@@ -1,0 +1,24 @@
+{"add":{"reads":2,"revision":2,"ids":["b"],"a":null,"b":"new-a","commitId":"b"},"replace":{"reads":2,"ids":["b","b"],"queryAId":"b","changeId":"a","afterId":"b","replayCode":"INVALID_CHANGE_SET"},"edgeAdd":{"reads":2,"ids":["eb"],"existingData":"new-ea","incidentIds":["eb"]}}
+25 |  let reads=0;
+26 |  kernel.transact(tx=>tx.edges.add({get id(){return ++reads===1?ea:eb;},type:'flow',source:{nodeId:a},target:{nodeId:a},data:'new-ea'}));
+27 |  results.edgeAdd={reads,ids:kernel.read().snapshot.edges.map(e=>e.id),existingData:kernel.read().query.getEdge(eb)?.data,incidentIds:kernel.read().query.getIncidentEdges(a).map(e=>e.id)};
+28 | }
+29 | console.log(JSON.stringify(results));
+30 | assert.equal(results.add.b,'original-b','EntityWriter.add must not overwrite an existing Node');
+            ^
+AssertionError: EntityWriter.add must not overwrite an existing Node
++ actual - expected
+
++ 'new-a'
+- 'original-b'
+
+ generatedMessage: false,
+     actual: "new-a",
+   expected: "original-b",
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261022T020928-kernel-discovery/kernel-writer-id-repro.ts:30:8
+
+Bun v1.4.2 (macOS arm64)

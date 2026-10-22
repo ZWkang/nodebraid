@@ -1,0 +1,22 @@
+{"reads":2,"queryId":"eb","ids":["eb","eb"],"changeId":"ea","afterId":"eb"}
+3 | const kernel=createCanvasKernel(),a=nodeId('a'),ea=edgeId('ea'),eb=edgeId('eb');
+4 | kernel.transact(tx=>{tx.nodes.add({id:a,type:'task',position:{x:0,y:0},data:null});for(const id of [ea,eb])tx.edges.add({id,type:'flow',source:{nodeId:a},target:{nodeId:a},data:'original-'+id});});
+5 | let reads=0;
+6 | const commit=kernel.transact(tx=>tx.edges.replace(ea,{get id(){return ++reads===1?ea:eb;},type:'flow',source:{nodeId:a},target:{nodeId:a},data:'replacement-ea'}));
+7 | console.log(JSON.stringify({reads,queryId:commit?.after.query.getEdge(ea)?.id,ids:commit?.after.snapshot.edges.map(e=>e.id),changeId:commit?.changeSet.changes[0]?.id,afterId:commit?.changeSet.changes[0]?.after?.id}));
+8 | assert.equal(commit?.after.query.getEdge(ea)?.id,ea);
+           ^
+AssertionError: Expected values to be strictly equal:
+
+'eb' !== 'ea'
+
+ generatedMessage: true,
+     actual: "eb",
+   expected: "ea",
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/9cfcb6f1-c101-435b-b7cb-b9ad29d95adc/original-edge-replace-repro.ts:8:8
+
+Bun v1.4.2 (macOS arm64)
