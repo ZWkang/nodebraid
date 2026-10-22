@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+    "head": "efb0d9f4ef66ff198c39c5402c0d6fd8c12f320f",
+    "tree": "d7b34834b717a5ba403b1b22913ad243c6b99490",
+    "patch": "fc5dc07c335630cc6459583ebe85efadf53f4e9b98d268e28a1319f3e4ba463c"
+  },
+  "status": "not-applicable",
+  "limitations": [
+    "Documentation Site changes are outside these Examples Application scenes; run docs:check separately."
+  ],
+  "scenes": [],
+  "artifacts": [],
+  "reason": "No changed Examples Application or Canvas runtime source selects a visible scene."
+}
