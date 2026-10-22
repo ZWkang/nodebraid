@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "710038f0ed0cfc830580241ca1e90fca5f50677e",
+    "expectedParent": "c7621535e3e7484e26153650917e8ab6c1fa91e6",
+    "head": "3f0e991651721f737f9388f7d0804a027f4f6aed",
+    "tree": "4c89643ed1cc7290211b851a29e3de9feea24328",
+    "patch": "c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29",
+    "localHead": "5820f81aad5f07b3ab8f2b3fd6a42b54ab26d745"
+  },
+  "task": {
+    "run": "d46a97bf-b74e-4425-a6a3-0cba573fc83b",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 74
+    },
+    "request": "Revalidate the existing Duplicate Selection ID mapping repair after synchronizing fetched main. Capture Node/Edge collections once and translate actual indexed entries without caller-owned collection hooks; preserve the accepted public behavior. Source: https://github.com/ZWkang/nodebraid/issues/74",
+    "plan": [
+      {
+        "id": "current-source-and-related-checks",
+        "blockedBy": [],
+        "acceptance": "Read actual complete Issue74/PR75 feedback and remote source; inspect conflict-free main sync and unchanged complete two-file product patch; actual Duplicate/Clipboard/Fragment public checks pass."
+      },
+      {
+        "id": "independent-review-and-full-check",
+        "blockedBy": [
+          "current-source-and-related-checks"
+        ],
+        "acceptance": "Fresh Standards+ponytail-review and Spec cover exact synchronized head/tree/patch against main710. Current-main versioned verify executes full check after reviews, preserving failures."
+      },
+      {
+        "id": "append-and-current-head-acceptance",
+        "blockedBy": [
+          "independent-review-and-full-check"
+        ],
+        "acceptance": "Append exact reviewed tree on existing PR75 first-parent c762 plus additional main710 parent; actual current-head CI, complete feedback, full report/media publication and immutable byte readback pass."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "append-and-current-head-acceptance"
+        ],
+        "acceptance": "Human main integration and whole-Issue acceptance remain pending before authorized closure."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "5820f81aad5f07b3ab8f2b3fd6a42b54ab26d745",
+      "tree": "4c89643ed1cc7290211b851a29e3de9feea24328",
+      "patch": "c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29",
+      "verdict": "passed",
+      "report": "# Standards + ponytail-review — Issue #74 / PR #75 main 同步复审\n\nVerdict: passed\n\n- Base: `710038f0ed0cfc830580241ca1e90fca5f50677e`\n- Head: `5820f81aad5f07b3ab8f2b3fd6a42b54ab26d745`\n- Tree: `4c89643ed1cc7290211b851a29e3de9feea24328`\n- Binary patch SHA-256: `c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29`\n\n已重新核验本轮完整 Issue/空反馈快照、当前规范、两文件补丁及本地 merge 双父。当前产品范围仅为 Duplicate 映射所有权修复；本轮结论使用新 head 实际检查结果。\n\n## 硬规范\n\n未发现违反。`packages/plugin-duplicate-selection/src/duplicate-selection-command.ts` 一次捕获 Node/Edge 集合，保留 Node 集合结构校验先于 Edge 字段读取的短路。自有 array-like 描述按实际索引翻译，不调用输入 map、iterator、constructor 或 species；正常长度转换、稀疏拒绝和继承索引回归通过。\n\n已追踪 Duplicate factory/Command → Fragment materialization → Kernel Transaction → Session，以及共享 Clipboard 消费边界。ID 类型、精确覆盖、同 namespace 唯一性、规范排序和冻结仍由 Fragment 验证；提交前 source/Selection/内部 Edge 闭包检查保留，符合 ADR0073/0078。原 materializer/元素读取错误不被统一改写，已知无效映射仍原子拒绝，符合 ADR0077。\n\n真实 Host/Kernel/Command/Session 测试覆盖无效实际元素、变化集合、冻结 hooked arrays、原异常和正常复制；现有 History、stale、并行 Edge/自环及生命周期回归通过，符合 Boundary Discipline、Fix Root Causes、Test Behavior, Not Implementation 和 Prove It Works。\n\n## 判断性 smell / ponytail\n\n未发现有具体后果的可操作 smell。修复集中在应用映射翻译的负责边界，复用既有共享验证而未增加公共 API、依赖、accessor 禁令、cap、retry 或 fallback。按单 Canvas Host 的选中子图负载，所有权复制为线性，范围最小充分。\n\n## 当前提交实际检查及限制\n\n本轮 `bun test packages/plugin-duplicate-selection/tests`：34 pass、117 assertions（Bun 1.4.2）。完整范围 `git diff --check` 通过，工作树干净。\n\n未执行 build、check:affected、仓库 full check、浏览器、真实远端发布、报告上传或当前 head CI；旧提交的结果没有换绑为当前验证。\n"
+    },
+    "spec": {
+      "head": "5820f81aad5f07b3ab8f2b3fd6a42b54ab26d745",
+      "tree": "4c89643ed1cc7290211b851a29e3de9feea24328",
+      "patch": "c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n已在同步后新身份独立审查完整两文件补丁、本轮 Issue74 全文/空评论/blockers、PR75 正文及空反馈、prepared plan、当前 AGENTS/CONTEXT/讨论规范与 ADR0073/0077/0078；未发现明确验收遗漏、错误实现或范围扩张。\n\nNode/Edge 集合分别单次捕获，验证后按实际索引翻译到自有冻结数组，不调用来方 map/iterator/constructor/species。原始数字 duplicateId 等非法映射在现有转换/Fragment 验证边界拒绝，发生于 Transaction 和 Selection 更新前。原始读取/materializer 异常、集合短路、原生长度、稀疏/继承索引、精确覆盖、规范顺序、冻结和同 namespace 校验保持，没有新增公开 API、cap、retry 或 fallback。\n\n实际在新 head 执行：`bun test packages/plugin-duplicate-selection/tests packages/canvas-fragment/tests packages/plugin-clipboard/tests`，109 pass、0 fail、422 assertions。真实 Host 的 Node/Edge 绕过、捕获一次、原异常、hooked 合法映射及共享 Fragment/Clipboard 组合均通过。\n\n已核验新身份/hash/完整 diff/提交列表、c762+main710 合并父链、空 combined diff及 package 文件等同比较；`git diff --check` 通过，工作树干净。结论来自本轮代码检查和执行，旧报告未换绑。\n\n未运行工程构建、类型/声明、浏览器、full check/verify、远端追加发布、当前 head CI/完整反馈或报告/媒体回读。PR 既有历史验证文字不作为本轮全量验收证据；实际 main 集成和完整验收仍待完成。\n\n- base: `710038f0ed0cfc830580241ca1e90fca5f50677e`\n- head: `5820f81aad5f07b3ab8f2b3fd6a42b54ab26d745`\n- tree: `4c89643ed1cc7290211b851a29e3de9feea24328`\n- raw binary patch SHA256: `c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "historical-duplicate-red",
+      "acceptance": "Historical original main99 real Host probe accepted invalid raw duplicateId42 through caller-owned map hook, mutating Document. Preserve its original source identity; this is not a verification receipt for current source.",
+      "command": "bun duplicate-array-hook-repro.ts (original discovery20261021T181732-discovery, main99)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "current-duplicate-consumers",
+      "acceptance": "Synchronized5820f81/main710 public Duplicate, Clipboard and Fragment suites:109 passed,422 assertions. Includes actual mapping hooks, indexed/native semantics, membership, immutable/atomic rejection cases.",
+      "command": "bun test packages/plugin-duplicate-selection/tests packages/plugin-clipboard/tests packages/canvas-fragment/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "f71d7f8fbb64777f6311ab15a19730eb0abdcf3c362923a3b69af6a7e7735dc4"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "086d99cfba4857ae8589a9753ae91cb9b114d417e70a405ce99da3ab93b301b5"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "0a0cd25be9ce9053cc85540fa8d733064f076337362f6529f698adf73f235a9a"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "c73e206f1a43e751259d8c6247de9044dd737a49027bc5d90d92cffb34acdcef"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "171e1d08e1d02d25fe454a7c4226722d84a7959d7bc621143f8fb8e0714f30b2"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "3eeb5e1c44267ad556c3c91735f16deb223e04cba843c88dc88c5ea851dbdcca"
+    }
+  ]
+}

@@ -36,62 +36,62 @@
     {
       "path": "build.log",
       "kind": "log",
-      "sha256": "0d27b1b62b69994d69ea60dd6801272e5df4c3d5a614fede0cdc44d7b2f117de"
+      "sha256": "8047916b0ccc59dd50a3cef388c806d5d910e3a7d47c8b1d986b173960f03ded"
     },
     {
       "path": "ffmpeg.log",
       "kind": "log",
-      "sha256": "5b320c97f515e79171f10a2147d875ffb6b14bd2b25681047b73c46fe0a527ee"
+      "sha256": "a8e768d2591df7eba04d27fcc21b1efd4f11d10a5134bc992125ae97a9d9462f"
     },
     {
       "path": "selection-history/before.png",
       "kind": "screenshot",
-      "sha256": "02cbbd8ce21b22f9f211a333e1142f730703f5a45048430197019fb2578f3aab"
+      "sha256": "a9dac0b64942612ae09164d8034f4faf89c883554666a802f73410bfffaaa805"
     },
     {
       "path": "selection-history/before.snapshot.json",
       "kind": "snapshot",
-      "sha256": "0c1b7e2a9d49424d000905b5f4f029a35c48981fa54f31f6a2116bec9ad9c786"
+      "sha256": "5298946073749d0369926063572caa5fa8f3a2b6ba5651da052f1f06fe5ed4c6"
     },
     {
       "path": "selection-history/duplicated.png",
       "kind": "screenshot",
-      "sha256": "c3794af7e0d1a0ed63cb38194dfee6c9c72533032657edc66058cd0e92faec13"
+      "sha256": "7642395058684531c2f1d37598f717bc493e89c8c7d43ce0fab303e64dfb8df0"
     },
     {
       "path": "selection-history/duplicated.snapshot.json",
       "kind": "snapshot",
-      "sha256": "06f3b045e8c1752dd0ba38f9896f286e5960b5002db2f7d56277b7de12d6af02"
+      "sha256": "9dd76e940abae2ce390c205e6e99e290549f71197741724ac14b6608d6ce64e7"
     },
     {
       "path": "selection-history/after.png",
       "kind": "screenshot",
-      "sha256": "59af1b6a01481cf56d0ea0c417b01e3985fc714739fd99a041f79da39a2b6d13"
+      "sha256": "a9ccef80360c86aeb2103eb004a49938073c97cba166c8855c50cfa50b80b2e9"
     },
     {
       "path": "selection-history/after.snapshot.json",
       "kind": "snapshot",
-      "sha256": "ece32fb33f873846642f1920a3d6af37d46feafa83872afc7dbc2311ce54c7f9"
+      "sha256": "5e25172be68e25c137e38b93eba236847e2daa06d80f3b8c34b21ef412e526b1"
     },
     {
       "path": "selection-history/recording.mp4",
       "kind": "recording",
-      "sha256": "d793c982f6c1a5f18d7e05d6330489799cb4380a438e18b03d8211ce00a8de72"
+      "sha256": "ec20ddadb809cefd875a3fc34a7635a5a95d67d98952d8a3590348438ddce37c"
     },
     {
       "path": "selection-history/review-encoding.log",
       "kind": "log",
-      "sha256": "384400f6a43fad6bb8c2fda736edc40bc5e93e2584c6318d7a19234b35d3e2b7"
+      "sha256": "2d9eef8ca1ba949d62fd3b5ae8e51c277bff9d460c0de3ba4d368730d3623ee7"
     },
     {
       "path": "selection-history/review.mp4",
       "kind": "recording",
-      "sha256": "687a5cf984895660459208bebb218f95f15f7ebe13a50fae80f66d52b207569c"
+      "sha256": "d942388df1a0bd65aca73edefd37c22c10d40324df3f46e9147e3a5699032a1f"
     },
     {
       "path": "selection-history/actions.log",
       "kind": "log",
-      "sha256": "4e7fc6197bfdab762ee31ea042068f6f53b7f4806512f61e6b34e69811dc829b"
+      "sha256": "447fb1292139744f03e056724754badabbef4debe19abbc517c3b69fee8c1cd9"
     }
   ]
 }
