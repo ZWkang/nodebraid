@@ -41,6 +41,7 @@ Document/Session 投影方法和 dispose authority 保持私有。Interaction �
 
 ```ts
 import { kernelPlugin } from '@nodebraid/plugin-kernel';
+import { portPlugin } from '@nodebraid/plugin-port';
 import { createRendererPlugin } from '@nodebraid/plugin-renderer';
 import { sessionPlugin } from '@nodebraid/plugin-session';
 import { createPluginHost } from '@nodebraid/runtime-cordis';
@@ -50,6 +51,7 @@ const rendererPlugin = createRendererPlugin(providerFactory);
 const host = createPluginHost();
 const installations = [
   host.install(kernelPlugin),
+  host.install(portPlugin),
   host.install(sessionPlugin),
   host.install(rendererPlugin, providerConfig),
 ];
