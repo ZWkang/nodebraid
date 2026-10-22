@@ -1,0 +1,10 @@
+packages/kernel/src/change-set.ts 152ms (unchanged)
+packages/kernel/src/entity-values.ts 58ms (unchanged)
+[error] packages/kernel/tests/replay-record-values.test.ts: SyntaxError: Expression expected. (124:3)
+[error]   122 |       ),
+[error]   123 |     ),
+[error] > 124 |   ).toThrow(expect.objectContaining({ code: 'CHANGE_SET_CONFLICT' }));
+[error]       |   ^
+[error]   125 |   expect(kernel.read()).toBe(before);
+[error]   126 |   expect({ xReads, yReads }).toEqual({ xReads: 1, yReads: 1 });
+[error]   127 | });

@@ -1,0 +1,47 @@
+{
+  "head": "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+  "seam": "public Kernel source barrel",
+  "control": {
+    "reads": 3,
+    "sameView": true,
+    "revision": 2,
+    "position": {
+      "x": 999,
+      "y": 999
+    },
+    "code": "CHANGE_SET_CONFLICT"
+  },
+  "actual": {
+    "reads": 4,
+    "sameView": false,
+    "revision": 3,
+    "position": {
+      "x": 100,
+      "y": 100
+    },
+    "code": null
+  }
+}
+20 | }
+21 | const control = reproduce(false), actual = reproduce(true);
+22 | console.log(JSON.stringify({ head, seam: 'public Kernel source barrel', control, actual }, null, 2));
+23 | assert.equal(control.code, 'CHANGE_SET_CONFLICT');
+24 | assert.equal(control.sameView, true);
+25 | assert.equal(actual.code, 'CHANGE_SET_CONFLICT', 'A changing replay source must not bypass stale-state preflight');
+            ^
+AssertionError: A changing replay source must not bypass stale-state preflight
++ actual - expected
+
++ null
+- 'CHANGE_SET_CONFLICT'
+
+ generatedMessage: false,
+     actual: null,
+   expected: "CHANGE_SET_CONFLICT",
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261022T081447-maintenance/kernel-replay-source-repro.ts:25:8
+
+Bun v1.4.2 (macOS arm64)

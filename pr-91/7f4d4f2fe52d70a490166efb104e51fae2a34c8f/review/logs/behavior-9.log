@@ -1,0 +1,24 @@
+{
+  "head": "68683f1311543c6f157390d8020b02992efd17e1",
+  "seam": "compiled public Kernel barrel",
+  "control": {
+    "reads": 1,
+    "sameView": true,
+    "revision": 2,
+    "position": {
+      "x": 999,
+      "y": 999
+    },
+    "code": "CHANGE_SET_CONFLICT"
+  },
+  "actual": {
+    "reads": 1,
+    "sameView": true,
+    "revision": 2,
+    "position": {
+      "x": 999,
+      "y": 999
+    },
+    "code": "CHANGE_SET_CONFLICT"
+  }
+}

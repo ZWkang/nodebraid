@@ -1,0 +1,13 @@
+bun test v1.4.2 (744846f84)
+
+packages/kernel/tests/replay-record-values.test.ts:
+(pass) replay retains the target whose kind and ID passed validation [16.17ms]
+(pass) a changing source record cannot bypass replay conflict preflight [5.52ms]
+(pass) replay retains the entity ID accepted before target materialization [0.40ms]
+(pass) changing source coordinates cannot replace the values checked by replay validation [0.10ms]
+(pass) a stale source rejects before reading opaque source or target data [0.38ms]
+
+ 5 pass
+ 0 fail
+ 17 expect() calls
+Ran 5 tests across 1 file. [69.00ms]

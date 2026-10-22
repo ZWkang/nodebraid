@@ -1,0 +1,28 @@
+{
+  "head": "68683f1311543c6f157390d8020b02992efd17e1",
+  "seam": "compiled public Kernel barrel",
+  "ordinary": {
+    "revision": 1,
+    "ids": [
+      "accepted-a"
+    ],
+    "error": null
+  },
+  "invalidControl": {
+    "revision": 0,
+    "ids": [],
+    "error": {
+      "name": "KernelError",
+      "message": "Change entity must match its kind and ID.",
+      "code": "INVALID_CHANGE_SET"
+    }
+  },
+  "actual": {
+    "revision": 1,
+    "ids": [
+      "accepted-a"
+    ],
+    "error": null
+  },
+  "afterReads": 1
+}

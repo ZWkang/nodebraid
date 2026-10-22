@@ -1,0 +1,47 @@
+Real default-timeout control; no test source, assertions, timeout, flags or acceptance changed.
+command: bun test tests/local-agent-cli.test.ts tests/local-agent-bases.test.ts tests/preview-scenes.test.ts
+head: 1c85d79db1e275e59f84a9bb77d1fe75c0a582e6
+bun test v1.4.2 (744846f84)
+
+tests/local-agent-cli.test.ts:
+(pass) one issue resumes its local ticket frontier without creating child issues [770.36ms]
+Switched to a new branch 'feat/issue-10'
+(pass) a persisted task resumes after a failed real check and never blesses an unrelated head [4483.73ms]
+
+tests/preview-scenes.test.ts:
+(pass) preview commands use an owned empty config and exclude inherited browser configuration [530.72ms]
+(pass) selects visible scenes for changed public capabilities without duplicate runs [1.30ms]
+(pass) the CLI records committed source for a docs-only change and rejects dirty source [1569.96ms]
+(pass) clipboard and preview maintenance select their real scenes, with uncovered Layout made explicit [1.22ms]
+(pass) a base branch that advanced independently selects the common ancestor for the PR diff [945.59ms]
+(pass) shared rendering changes exercise all scenes, while docs and tests have no visible change [0.89ms]
+
+tests/local-agent-bases.test.ts:
+Switched to a new branch 'feat/issue-68'
+(pass) initial delivery keeps the review base separate from the append parent [2006.17ms]
+Switched to a new branch 'feat/issue-68'
+(pass) append delivery keeps the review base separate from the append parent [1751.49ms]
+Switched to a new branch 'feat/issue-68'
+Switched to a new branch 'main'
+Switched to branch 'feat/issue-68'
+killed 1 dangling process
+170 |       expect(JSON.parse(invoke(cli, 'evaluate', '.tmp/run', '.tmp/snapshot.json').stdout).status).toBe('ready');
+171 |       json('.tmp/snapshot.json', { ...snapshot, baseRefOid: mode === 'initial' ? '0'.repeat(40) : parent });
+172 |       expect(JSON.parse(invoke(cli, 'evaluate', '.tmp/run', '.tmp/snapshot.json').stdout).status).toBe(
+173 |         'waiting-verification',
+174 |       );
+175 |       expect(invoke(preview, '--base', base, '--out', join(root, '.tmp/evidence')).status).toBe(0);
+                                                                                                 ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: null
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow/tests/local-agent-bases.test.ts:175:92)
+(fail) main-sync delivery keeps the review base separate from the append parent [5035.49ms]
+  ^ this test timed out after 5000ms.
+
+ 10 pass
+ 1 fail
+ 107 expect() calls
+Ran 11 tests across 3 files. [17.27s]

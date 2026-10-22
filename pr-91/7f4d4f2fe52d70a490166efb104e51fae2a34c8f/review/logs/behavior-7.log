@@ -1,0 +1,2 @@
+@nodebraid/kernel build:self: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/kernel build:self: Exited with code 0

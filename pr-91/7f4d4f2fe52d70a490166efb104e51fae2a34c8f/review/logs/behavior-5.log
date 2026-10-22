@@ -1,0 +1,125 @@
+bun test v1.4.2 (744846f84)
+
+packages/kernel/tests/replay-record-values.test.ts:
+(pass) replay retains the target whose kind and ID passed validation [12.03ms]
+(pass) a changing source record cannot bypass replay conflict preflight [7.10ms]
+77 |       { beforeRevision: 0, revision: 1, changes: [{ entity: 'node', id: acceptedId, before: null, after: target }] },
+78 |       'forward',
+79 |     ),
+80 |   );
+81 | 
+82 |   expect(kernel.read().snapshot.nodes.map((node) => node.id)).toEqual([acceptedId]);
+                                                                   ^
+error: expect(received).toEqual(expected)
+
+  [
+-   "accepted",
++   "substitute",
+  ]
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/kernel-replay-records/cflow/packages/kernel/tests/replay-record-values.test.ts:82:63)
+(fail) replay retains the entity ID accepted before target materialization [6.26ms]
+118 |           changes: [{ entity: 'node', id, before: source, after: { ...original, position: { x: 100, y: 100 } } }],
+119 |         },
+120 |         'forward',
+121 |       ),
+122 |     ),
+123 |   ).toThrow(expect.objectContaining({ code: 'CHANGE_SET_CONFLICT' }));
+          ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: {
+  before: {
+    snapshot: {
+      revision: 2,
+      nodes: [
+        {
+          id: "task",
+          type: "task",
+          position: {
+            x: 999,
+            y: 999,
+          },
+          data: null,
+        }
+      ],
+      edges: [],
+    },
+    query: {
+      getNode: [Function: getNode],
+      getEdge: [Function: getEdge],
+      getIncomingEdges: [Function: getIncomingEdges],
+      getOutgoingEdges: [Function: getOutgoingEdges],
+      getIncidentEdges: [Function: getIncidentEdges],
+      getChildren: [Function: getChildren],
+    },
+  },
+  after: {
+    snapshot: {
+      revision: 3,
+      nodes: [
+        {
+          id: "task",
+          type: "task",
+          position: {
+            x: 100,
+            y: 100,
+          },
+          data: null,
+        }
+      ],
+      edges: [],
+    },
+    query: {
+      getNode: [Function: getNode],
+      getEdge: [Function: getEdge],
+      getIncomingEdges: [Function: getIncomingEdges],
+      getOutgoingEdges: [Function: getOutgoingEdges],
+      getIncidentEdges: [Function: getIncidentEdges],
+      getChildren: [Function: getChildren],
+    },
+  },
+  changeSet: {
+    beforeRevision: 2,
+    revision: 3,
+    changes: [
+      {
+        entity: "node",
+        id: "task",
+        before: {
+          id: "task",
+          type: "task",
+          position: {
+            x: 999,
+            y: 999,
+          },
+          data: null,
+        },
+        after: {
+          id: "task",
+          type: "task",
+          position: {
+            x: 100,
+            y: 100,
+          },
+          data: null,
+        },
+      }
+    ],
+  },
+}
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/kernel-replay-records/cflow/packages/kernel/tests/replay-record-values.test.ts:123:5)
+(fail) changing source coordinates cannot replace the values checked by replay validation [1.51ms]
+(pass) a stale source rejects before reading opaque source or target data [1.92ms]
+
+ 3 pass
+ 2 fail
+ 13 expect() calls
+Ran 5 tests across 1 file. [91.00ms]

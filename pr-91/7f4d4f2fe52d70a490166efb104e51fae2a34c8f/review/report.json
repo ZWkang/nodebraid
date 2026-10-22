@@ -1,0 +1,334 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+    "expectedParent": "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+    "head": "7f4d4f2fe52d70a490166efb104e51fae2a34c8f",
+    "tree": "38029e5cd73cc7d89d2e3808f6ac774008f2ce70",
+    "patch": "300b8e7d7b4b8c95b5e1497b0029281e7f935aef23c6768708152b0593011088",
+    "localHead": "68683f1311543c6f157390d8020b02992efd17e1"
+  },
+  "task": {
+    "run": "17e05cbb-4fb7-42f7-be25-850a8fb227e4",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 89
+    },
+    "request": "## Confirmed defect\n\nOn fetched main `1c85d79db1e275e59f84a9bb77d1fe75c0a582e6`, Change Set replay captures the outer collection and indexed entries but retains each caller-owned Graph Change record. Validation, source-state preflight and application can therefore read different `before` / `after` values from the same accepted record.\n\nTwo real public Kernel source-barrel probes reproduce:\n1. A record has ID `accepted-a`. Its `after` getter returns Node A for the two validation reads, then Node B. Replay succeeds at revision 1 with `unvalidated-b` instead of the Node whose kind/ID passed validation. The stable mismatched-ID control rejects with `INVALID_CHANGE_SET`.\n2. A Node's later edit is `{x:999,y:999}`. A replay record's `before` getter exposes the old source during validation, then the newer Node during conflict preflight. Replay incorrectly succeeds, advances revision 2→3 and replaces the later edit with `{x:100,y:100}`. The stable old-source control rejects with `CHANGE_SET_CONFLICT` and preserves the exact View.\n\nActual stale-state outcome:\n```json\n{\"control\":{\"sameView\":true,\"revision\":2,\"position\":{\"x\":999,\"y\":999},\"code\":\"CHANGE_SET_CONFLICT\"},\"actual\":{\"sameView\":false,\"revision\":3,\"position\":{\"x\":100,\"y\":100},\"code\":null}}\n```\n\nBoth real invariant assertions exit 1. Existing Kernel tests pass (70 tests / 280 assertions). Original executable sources and outputs are retained in run `20261022T081447-maintenance`: `kernel-replay-record-repro.ts`, `kernel-replay-record-red.log`, `kernel-replay-source-repro.ts`, `kernel-replay-source-red.log`. These are source-barrel public-API reproductions, not native-browser or compiled-package acceptance.\n\n## Contract and cause\n\n[ADR0011](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/docs/adr/0011-replay-change-sets-through-transactions.md) requires source-state mismatch to fail without overwriting later changes. [ADR0012](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/docs/adr/0012-keep-domain-data-opaque-to-kernel.md) owns defensive copying/freezing of Kernel shells while leaving domain data opaque.\n\n[validateChangeSet](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/packages/kernel/src/change-set.ts) checks record fields, then stores the original reference with `accepted.push(change)`. The subsequent preflight and write loops reread those fields. Capturing only the array/entry reference does not preserve the record that was validated.\n\n## Acceptance\n\n- Preserve one accepted Graph Change identity and its Kernel-owned before/after entity values across validation, whole-set conflict preflight and forward/reverse application. Later field reads must not substitute a different entity or source state.\n- A stable invalid identity still rejects; a changing target cannot introduce an unvalidated ID. A stale source still rejects with `CHANGE_SET_CONFLICT`, preserves later edits and the original committed View, and leaves no partial replay even when the caller catches the error inside a larger Transaction.\n- Cover Node and Edge, both directions, ordinary valid replay, changing record/value properties, strict error/read precedence and original exceptions. Preserve revision validation, duplicate/sparse checks, ordering, final graph validation, metadata, relation indexes, immutable evidence and opaque data references.\n- Reuse existing ownership/value helpers. Add no public API, accessor ban, dependency, input cap, retry, fallback or weakening of validation.\n- Public red/green regressions, related Kernel/History consumers, independent Standards + ponytail-review / Spec, full engineering verification, exact remote publication, actual current-head CI and complete report/media readback.\n- Keep this Issue open until actual main integration and whole-Issue acceptance.\n\n## Deduplication\n\nComplete all-state metadata through final short pages: 88 Issues/PRs and 45 PRs. Closed #48 / PR #51 explicitly cover array traversal/outer-reference ownership; #82 / PR #83 cover direct Entity Writer ID capture. Their original scopes do not capture replay record fields. This is a separate remaining replay-value ownership defect.",
+    "plan": [
+      {
+        "id": "replay-record-ownership",
+        "blockedBy": [],
+        "acceptance": "Preserve both original real main reds and controls. Add public Kernel red/green tests for Graph Change source/target field substitution, then retain validated entity/kind/id/before/after fields across complete preflight and forward/reverse application."
+      },
+      {
+        "id": "replay-entity-values-and-compatibility",
+        "blockedBy": [
+          "replay-record-ownership"
+        ],
+        "acceptance": "Own Kernel-defined Node/Edge value shells and fields used by validation/preflight/application. Preserve opaque data references and their existing observation phase, strict validation/read/error precedence, caught-conflict atomicity, original exceptions, metadata, ordering, replay directions and graph invariants; pass relevant/affected checks and a fresh compiled public probe."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "replay-entity-values-and-compatibility"
+        ],
+        "acceptance": "Fresh independent Standards plus ponytail-review and Spec review identical complete head/tree/patch against original Issue89, ADR0010/0011/0012 and public Kernel contracts."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Pinned deployed-main agents:run verify runs real full bun run check after targeted checks and dual reviews; retain every original failure log and exact stable source identity."
+      },
+      {
+        "id": "publish-and-current-head-acceptance",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Publish exact checked tree with independently saved first parent, one PR to main; verify current published-head CI, complete feedback, mergeability and full immutable report/media byte readback before ready."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "publish-and-current-head-acceptance"
+        ],
+        "acceptance": "Keep Issue89 open until final human review/merge, real fetched-main integration and complete whole-Issue acceptance."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "68683f1311543c6f157390d8020b02992efd17e1",
+      "tree": "38029e5cd73cc7d89d2e3808f6ac774008f2ce70",
+      "patch": "300b8e7d7b4b8c95b5e1497b0029281e7f935aef23c6768708152b0593011088",
+      "verdict": "passed",
+      "report": "What this change does: Kernel replay retains validated Graph Change fields and copied Node/Edge structural values through conflict preflight and application. Opaque data remains by reference and is read in its existing comparison or materialization phase.\n\nVerdict: passed.\n\nReviewed identity:\n\n- Base: 1c85d79db1e275e59f84a9bb77d1fe75c0a582e6\n- Head: 68683f1311543c6f157390d8020b02992efd17e1\n- Tree: 38029e5cd73cc7d89d2e3808f6ac774008f2ce70\n- Binary patch SHA256: 300b8e7d7b4b8c95b5e1497b0029281e7f935aef23c6768708152b0593011088\n\nHard standards: No violations found in the complete three-file patch. ADR0010 keeps committed View/evidence consistent; ADR0011 requires whole-set source preflight before replay writes; ADR0012 owns structural shells while leaving domain data opaque. Boundary Discipline and Type System Discipline are maintained: private capture helpers validate runtime values, preserve accepted fields and feed the existing Writers without expanding public exports.\n\nThe lazy data property preserves the original receiver and observation phase. It does not leak into committed entities: existing Writer freezing materializes data while copying owned shells. Structural conflicts still reject before opaque data reads when those fields already mismatch. Final graph checks, revision handling, metadata and net-zero coalescing remain at their existing boundaries.\n\nJudgment / ponytail: No actionable Fowler smell or correctness, safety, load, speed or testing finding. The old structural predicates are replaced at their sole caller rather than duplicated as another public validation layer. Read all changed production code and all 568 regression-test lines, every capture-helper caller, equality/preflight/write paths, GraphIndex, CanvasKernel publication and History replay. Assumed load: synchronous in-process Transactions for isolated Canvas Runtimes.\n\nDiscussion/evidence: Original and refreshed Issue89 bodies match and both contain no comments; no PR or unresolved human review is present. The original record and entity-value behavioral red logs were reviewed independently.\n\nActual checks at this head:\n\n- Verified clean tree, commit history, exact head/tree/hash, independent prepared-task/inspection identity and byte-identical complete.patch.\n- `git diff --check`: passed.\n- `bun test packages/kernel/tests packages/plugin-history/tests`: 147 passed, 0 failed, 648 assertions. Forward/reverse values, source conflicts, inherited fields, original failures, opaque data, caught-conflict atomicity and History controls pass.\n\nNot checked: other affected consumers, TypeScript checks, builds, compiled-package probes, browser suites, full engineering gate, current-head CI, publication and remote evidence readback.\n"
+    },
+    "spec": {
+      "head": "68683f1311543c6f157390d8020b02992efd17e1",
+      "tree": "38029e5cd73cc7d89d2e3808f6ac774008f2ce70",
+      "patch": "300b8e7d7b4b8c95b5e1497b0029281e7f935aef23c6768708152b0593011088",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n独立审查完整三文件补丁和 568 行新增公共回归、Issue #89 原文及 prereview 全文/空讨论、独立 prepared plan、ADR0010/0011/0012、Kernel 公共契约与 History 调用链。未发现验收遗漏、错误实现或范围扩张。\n\n满足“Preserve one accepted Graph Change identity and its Kernel-owned before/after entity values”：kind/id/before/after 及 Node/Edge 已接受字段进入自有冻结 shell，后续 preflight/application 不重读调用方结构字段。完整集合先检查冲突，再按方向应用；caught conflict 不留下部分 replay，后续明确写入仍可继续。既有 revision、重复/稀疏、顺序、最终图校验、metadata、索引及不可变提交证据保留。\n\nopaque data 仅保留引用，不深复制/冻结；内部 forwarding getter 保留原 receiver 及 comparison/materialization 读取阶段，已知结构冲突仍先于 data getter。原始字段/data 异常和结构校验短路保留；无公共 API、accessor ban、cap、依赖、retry 或 fallback 新增。\n\n实际执行 `bun test packages/kernel/tests packages/plugin-history/tests`：147 pass、0 fail、648 assertions；原始命令、head/tree、输出及 exit 0 保存于 `spec-targeted-tests.log`。`git diff --check` 通过；commit 列表、完整 binary patch、inspection/complete.patch 与干净工作树身份一致。\n\n未独立运行类型/构建、affected、browser/full engineering gate 或 compiled public probes；未验证当前 head 的远端 CI、报告/媒体发布回读及 main 集成。其他执行者结果不计为本轮实际检查。\n\n- base: `1c85d79db1e275e59f84a9bb77d1fe75c0a582e6`\n- head: `68683f1311543c6f157390d8020b02992efd17e1`\n- tree: `38029e5cd73cc7d89d2e3808f6ac774008f2ce70`\n- binary patch SHA256: `300b8e7d7b4b8c95b5e1497b0029281e7f935aef23c6768708152b0593011088`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "main-target-record-red",
+      "acceptance": "On pinned main1c85, changing after returns accepted-a during validation but unvalidated-b during application. The real invariant assertion fails; stable mismatched-ID control rejects. This original probe uses the source public barrel.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/17e05cbb-4fb7-42f7-be25-850a8fb227e4/kernel-replay-record-repro.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "main-source-record-red",
+      "acceptance": "On pinned main1c85, changing before bypasses conflict preflight and replaces the later999,999 edit, advancing revision2 to3. Stable stale control rejects and preserves exact View. Real invariant assertion fails; source public barrel.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/17e05cbb-4fb7-42f7-be25-850a8fb227e4/kernel-replay-source-repro.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "record-tdd-red",
+      "acceptance": "Before production edit, new public record regressions fail for target substitution and stale-source overwrite:70pass2fail. Saved test-only patch is tdd-record-red-test.patch; this is an earlier development snapshot, not final head.",
+      "command": "bun run --filter '@nodebraid/kernel' test",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "record-tdd-green",
+      "acceptance": "Record capture repair passes the initial2 public regressions at its development snapshot; final current-head evidence follows.",
+      "command": "bun test packages/kernel/tests/replay-record-values.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "entity-values-tdd-red",
+      "acceptance": "Record-only repair still fails nested entity ID and source-coordinate substitution:3pass2fail; opaque-data stale-source control passes. Original development snapshot, not final head.",
+      "command": "bun test packages/kernel/tests/replay-record-values.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "entity-values-tdd-green",
+      "acceptance": "Owned entity shells pass all5 initial record/value regressions at development snapshot. Final expanded current-head suite follows.",
+      "command": "bun test packages/kernel/tests/replay-record-values.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "compiled-kernel-build",
+      "acceptance": "Build actual68683 current Kernel public JS/declarations and validate package artifacts.",
+      "command": "bun run --filter '@nodebraid/kernel' build:self",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "compiled-target-record-green",
+      "acceptance": "At68683 compiled public barrel, changing after is read once and replay retains accepted-a; stable invalid ID rejects. This proves the original target case on actual compiled output.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/17e05cbb-4fb7-42f7-be25-850a8fb227e4/current-kernel-replay-record-repro.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "compiled-source-record-green",
+      "acceptance": "At68683 compiled public barrel, both changing and stable stale source records rejectCHANGE_SET_CONFLICT, preserve exact View/revision2/later999,999; before readonce.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/17e05cbb-4fb7-42f7-be25-850a8fb227e4/current-kernel-replay-source-repro.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "current-related-public-suites",
+      "acceptance": "At68683,160pass/779assert:Kernel123 plus Kernel/History Runtime and root preparation/Layout consumers. New53 public tests cover Node/Edge both directions, known fields, read/error precedence, opaque-data phases/identity and caught-conflict atomicity.",
+      "command": "bun test packages/kernel/tests packages/plugin-kernel/tests packages/plugin-history/tests tests/kernel-commit-preparation.test.ts tests/layout-providers.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-10.log"
+    },
+    {
+      "id": "affected-engineering",
+      "acceptance": "Actual affected check against1c85 passes Kernel and23 consumers including real React/Renderer/Examples browser suites, build/type checks and docs; this does not replace formal fullcheck.",
+      "command": "bun run check:affected --base 1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-11.log"
+    },
+    {
+      "id": "historical-test-edit-parse-failure",
+      "acceptance": "A development test-only assertion edit temporarily broke syntax; formatter caught it before engineering checks. Original failed source/log retained; corrected and final123/160test suites, types and affected checks subsequently pass. This is a tooling failure, NOT a behavior red.",
+      "command": "bunx prettier --write packages/kernel/src/change-set.ts packages/kernel/src/entity-values.ts packages/kernel/tests/replay-record-values.test.ts",
+      "exitCode": 2,
+      "phase": "check",
+      "status": "failed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-12.log"
+    },
+    {
+      "id": "formal-full-check-attempt-1",
+      "acceptance": "Current68683 full verify exit1, source stable:713pass4fail/717tests. Four unchanged workflow CLI fixtures hit existing5000ms watchdog; Kernel123pass. Browser/docs stages not reached. Original failure and receipt retained; investigation/reverification required.",
+      "command": "bun /Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow/scripts/local-agent.ts verify /Users/zhou/.codex/local-workflows/nodebraid/runs/17e05cbb-4fb7-42f7-be25-850a8fb227e4 /Users/zhou/.codex/local-workflows/nodebraid/runs/17e05cbb-4fb7-42f7-be25-850a8fb227e4/reviews.json /Users/zhou/.codex/local-workflows/nodebraid/runs/17e05cbb-4fb7-42f7-be25-850a8fb227e4/decisions.json",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-13.log"
+    },
+    {
+      "id": "unchanged-main-timeout-control",
+      "acceptance": "Exact same workflow fixture blobs on main1c85 reproduce main-sync5000ms timeout:10pass1fail. This proves failure exists without the Kernel patch; no timeout/assertions/settings changed. Hostload is supporting context, not a proven sole cause.",
+      "command": "bun test tests/local-agent-cli.test.ts tests/local-agent-bases.test.ts tests/preview-scenes.test.ts",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-14.log"
+    },
+    {
+      "id": "repair-timeout-focused-control",
+      "acceptance": "At68683 same three workflow fixture files pass under unchanged default timeout:11pass112assert,12.60s. Full-check still must pass; focused control does not waive original failure.",
+      "command": "bun test tests/local-agent-cli.test.ts tests/local-agent-bases.test.ts tests/preview-scenes.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-15.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "9d9b9358e4fe9e370aff81b6f2c4c0b656d13cb2eb644928c99ad162bb31a1dd"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "4b978998981714827b1b710bf48cbdc9f62685990e7eed1136ce3a080b927c7f"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "7402c9be50eaf25f8f5c64de121c66a7cbbfc235c95ac5283dafc40faf5bd80a"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "58016ef7af2841ad222d50675f3c2665f16c0ddab7a540e9c2844cb34bea5f18"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "51cadbbd82331ec70a9985f2c18b268fe27ecc574b7beca6cd962d274a4cb7a8"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "09f5b3ce1572e7aaf393a6474d1ff3be2a49133a2c35b62e94d5588e52ef522b"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "6774284fe93b753a537bd256e276e8f909a76635536385ec5a3ebd5c747e9a03"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "a594eb6038820828f46dcd19516158165faa806b50bc47881ad8a40d7ae55c57"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "8df84d64d54e5ffd56b56144d9144fd99ce7d6a716ea67632870f85a00ee4a00"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "333ceca01b433766a94dfe1d4b34f1ee188ee49773bc1d97f5ea6232206f1b69"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "e6ef08c88345f66ec78b744fbe98d6faee96488b8c4bf5b8ae07d3d67dc5f7bb"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "558102e990fc7083682eed210d602ccd9eb4868bc824b1b51790d6a69354ac90"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "2900220f617cc36f82bd5a6fc42e583cc107ac6ba63b03e0e0c2834603269eaf"
+    },
+    {
+      "path": "logs/behavior-11.log",
+      "kind": "log",
+      "sha256": "d8ba987352c8fcc586566d7121c8b8faf356f31bb1e975b79c865655a0913558"
+    },
+    {
+      "path": "logs/behavior-12.log",
+      "kind": "log",
+      "sha256": "1a30f4420c0bf6264bfa67f5557fd0f916baff44b26e88f40384c6c4c21446b3"
+    },
+    {
+      "path": "logs/behavior-13.log",
+      "kind": "log",
+      "sha256": "d15ace9d44102645379d573c7edd5257862c4707f1e8d9609c1240fda705d2fa"
+    },
+    {
+      "path": "logs/behavior-14.log",
+      "kind": "log",
+      "sha256": "59e4cf57b83f26bfbcc0ddd150ba72933b96aba8872092d3caf6caf0e899f404"
+    },
+    {
+      "path": "logs/behavior-15.log",
+      "kind": "log",
+      "sha256": "9d2d540c50ec71b6a47f899a6b3e9a889c2380766f904ab762a05c4f980d04fe"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "10b4c0612db381c17b94b8784d76495266b8db86649208cc6e0a6300e8c16903"
+    }
+  ]
+}
