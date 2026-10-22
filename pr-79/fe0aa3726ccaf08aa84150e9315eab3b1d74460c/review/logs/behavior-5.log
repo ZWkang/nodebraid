@@ -1,0 +1,3 @@
+67ac72702760081093265d585cbe66f880dc9fa9 4b17d60e90aaf7e20e0237ddf0c37e320ae15747
+{"originalBaseline":"99ed305515afaec32ef49494b509446ad9ba998c","result":[{"accepted":"full","published":"full","reads":1,"frozen":true},{"accepted":"incremental","published":"incremental","reads":1,"frozen":true}],"documentRevision":1}
+{"originalBaseline":"99ed305515afaec32ef49494b509446ad9ba998c","publicCompute":{"xReads":1,"xFinite":true,"x":"10","frozen":true},"collection":{"reads":1,"expectedCount":1,"actualCount":1},"revision":{"reads":1,"expected":1,"actual":1},"documentRevision":1}

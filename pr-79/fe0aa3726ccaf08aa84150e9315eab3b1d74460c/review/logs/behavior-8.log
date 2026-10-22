@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-22T00:56:25.061Z",
+  "head": "67ac72702760081093265d585cbe66f880dc9fa9",
+  "failure": "SVG browser fixture global __nodebraidRendererSvgReadViewportPanInteraction missing at the pan/wheel assertion. Full check stopped after 614 Bun tests passed. Stable source.",
+  "failedLog": "check-ab6f6ae7-b510-454d-bc09-12449f82d68b.log",
+  "diagnosis": "Current unchanged entire Renderer suite separately passed, recorded in renderer-browser-diagnostic.log. No root cause established for the disappeared page global; do not attribute it to Layout or claim a browser fix. No source/assertion/environment changes made. Failed receipt retained before new real full verification.",
+  "next": "A new formal verification reruns the complete existing check with a distinct original log, no fallback."
+}

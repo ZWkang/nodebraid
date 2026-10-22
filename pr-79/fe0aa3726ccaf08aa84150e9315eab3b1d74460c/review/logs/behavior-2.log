@@ -1,0 +1,19 @@
+{"head":"99ed305515afaec32ef49494b509446ad9ba998c","result":[{"accepted":"full","published":"invalid","reads":3,"frozen":true},{"accepted":"incremental","published":"invalid","reads":4,"frozen":true}],"documentRevision":1}
+12 |     fixedNodeIds: [],
+13 |   });
+14 |   result.push({ accepted: mode, published: input.mode, reads, frozen: Object.isFrozen(input) });
+15 | }
+16 | console.log(JSON.stringify({ head: '99ed305515afaec32ef49494b509446ad9ba998c', result, documentRevision: kernel.read().snapshot.revision }));
+17 | assert(result.every(row => row.published === row.accepted), 'Layout projection must publish the same legal mode it validates');
+     ^
+AssertionError: Layout projection must publish the same legal mode it validates
+ generatedMessage: false,
+     actual: false,
+   expected: true,
+   operator: "==",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261021T204642-discovery/layout-request-mode-repro.ts:17:1
+
+Bun v1.4.2 (macOS arm64)
