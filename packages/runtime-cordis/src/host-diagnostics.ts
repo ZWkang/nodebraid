@@ -36,16 +36,17 @@ export class HostDiagnostics {
   readonly #diagnosedErrors = new WeakSet<object>();
 
   constructor(options: PluginHostDiagnosticsOptions = {}) {
-    if (options.hostId !== undefined && (typeof options.hostId !== 'string' || options.hostId.length === 0)) {
+    const hostId = options.hostId;
+    if (hostId !== undefined && (typeof hostId !== 'string' || hostId.length === 0)) {
       throw new DiagnosticsError(
         'INVALID_DIAGNOSTIC_VALUE',
         'Diagnostic Host ID must be a non-empty string.',
-        typeof options.hostId === 'string'
-          ? { field: 'hostId', value: options.hostId }
-          : { field: 'hostId', receivedType: options.hostId === null ? 'null' : typeof options.hostId },
+        typeof hostId === 'string'
+          ? { field: 'hostId', value: hostId }
+          : { field: 'hostId', receivedType: hostId === null ? 'null' : typeof hostId },
       );
     }
-    this.#hostId = options.hostId ?? `nodebraid.host.${++nextHostId}`;
+    this.#hostId = hostId ?? `nodebraid.host.${++nextHostId}`;
     this.#hostScope = Object.freeze({ hostId: this.#hostId });
     this.#sink = options.sink;
     this.#faultReporter = options.faultReporter ?? reportFaultToPlatform;
@@ -81,8 +82,10 @@ export class HostDiagnostics {
         this.#emit(scope, input, false);
       },
       reportFault: (error: unknown, input: Omit<DiagnosticEventInput, 'level' | 'error'>) => {
+        let name: DiagnosticEventInput['name'] | undefined;
         try {
-          const event = this.#emit(scope, { ...input, level: 'error', error }, true)!;
+          name = input.name;
+          const event = this.#emit(scope, { name, attributes: input.attributes, level: 'error', error }, true)!;
           this.#reportFault(Object.freeze({ event, error }));
         } catch (contractError) {
           const reportedError = new AggregateError([error, contractError], 'Fault reporting input was invalid.');
@@ -90,10 +93,10 @@ export class HostDiagnostics {
             name: diagnosticEvents.faultReportingFault,
             level: 'error',
             attributes: {
-              ...(typeof input.name === 'string'
-                ? { attemptedEventName: input.name }
+              ...(typeof name === 'string'
+                ? { attemptedEventName: name }
                 : {
-                    attemptedEventType: input.name === null ? 'null' : typeof input.name,
+                    attemptedEventType: name === null ? 'null' : typeof name,
                   }),
               contractCode: contractError instanceof DiagnosticsError ? contractError.code : 'UNKNOWN_CONTRACT_FAILURE',
             },
@@ -106,22 +109,24 @@ export class HostDiagnostics {
   }
 
   #emit(scope: DiagnosticScope, input: DiagnosticEventInput, required: boolean): DiagnosticEvent | undefined {
-    if (typeof input.name !== 'string' || input.name.length === 0) {
+    const name = input.name;
+    if (typeof name !== 'string' || name.length === 0) {
       throw new DiagnosticsError(
         'INVALID_EVENT',
         'Diagnostic Event name must be a non-empty string.',
-        typeof input.name === 'string'
-          ? { field: 'name', value: input.name }
-          : { field: 'name', receivedType: input.name === null ? 'null' : typeof input.name },
+        typeof name === 'string'
+          ? { field: 'name', value: name }
+          : { field: 'name', receivedType: name === null ? 'null' : typeof name },
       );
     }
-    if (!(['debug', 'info', 'warn', 'error'] as const).includes(input.level)) {
+    const level = input.level;
+    if (!(['debug', 'info', 'warn', 'error'] as const).includes(level)) {
       throw new DiagnosticsError(
         'INVALID_EVENT',
         'Diagnostic Event level must be debug, info, warn, or error.',
-        typeof input.level === 'string'
-          ? { field: 'level', value: input.level }
-          : { field: 'level', receivedType: input.level === null ? 'null' : typeof input.level },
+        typeof level === 'string'
+          ? { field: 'level', value: level }
+          : { field: 'level', receivedType: level === null ? 'null' : typeof level },
       );
     }
     let attributes;
@@ -139,22 +144,22 @@ export class HostDiagnostics {
       throw error;
     }
     if (!this.#sink && !required) return undefined;
-    const event = this.#createEvent(scope, { ...input, attributes });
+    const event = this.#createEvent(scope, { name, level, attributes, error: input.error });
     if (this.#sink) {
       try {
         const result = this.#sink(event) as unknown;
         if (isPromiseLike(result)) {
           this.#reportSinkFault(
             scope,
-            input.name,
-            new DiagnosticsError('ASYNC_SINK', 'Diagnostic Sink must return synchronously.', { eventName: input.name }),
+            name,
+            new DiagnosticsError('ASYNC_SINK', 'Diagnostic Sink must return synchronously.', { eventName: name }),
           );
           void Promise.resolve(result).catch((sinkError: unknown) => {
-            this.#reportSinkFault(scope, input.name, sinkError);
+            this.#reportSinkFault(scope, name, sinkError);
           });
         }
       } catch (sinkError) {
-        this.#reportSinkFault(scope, input.name, sinkError);
+        this.#reportSinkFault(scope, name, sinkError);
       }
     }
     return event;
