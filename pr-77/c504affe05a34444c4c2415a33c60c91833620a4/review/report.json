@@ -1,0 +1,238 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+    "expectedParent": "2c1cc4b78f5d85530c1ce7ff94ff3c615bb866a9",
+    "head": "c504affe05a34444c4c2415a33c60c91833620a4",
+    "tree": "ee6c00bd97da199489fdf439422bd51d699313a5",
+    "patch": "f631def090171fc90bdbb50bd525138000ac9da572ba9afaba61825de6a85068",
+    "localHead": "f3c41d9f95cefb7f21424ba0b62ad729663fae5d"
+  },
+  "task": {
+    "run": "b2e72f0b-5b5a-4649-a665-b5d3807a6be5",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 76
+    },
+    "request": "Complete the Session input ownership repair on current main1c85, preserving the externally synchronized source2c1 and the verified local correction that converts an incoming length object once to an owned native number before lazy indexed capture. Retain accepted Viewport/Selection values and the original Issue76 validation, atomic membership, normalization, transition and failure contracts. Source: https://github.com/ZWkang/nodebraid/issues/76",
+    "plan": [
+      {
+        "id": "sync-source-and-public-checks",
+        "blockedBy": [],
+        "acceptance": "Refresh full Issue76/PR77 and true dependencies/feedback; independently capture source2c1 and target main1c85. Preserve external main sync and committed local native-length fix without overwriting work. Inspect complete current patch; actual current public Session/Kernel/Renderer/Interaction and affected consumer/browser/type/build checks pass. Keep original main99 and local53a length-red provenance under their actual identities."
+      },
+      {
+        "id": "independent-review-and-full-check",
+        "blockedBy": [
+          "sync-source-and-public-checks"
+        ],
+        "acceptance": "Fresh independent Standards+ponytail-review and Spec review exact new base/head/tree/complete patch including the coercible-length repair and new Duplicate integration. Then deployed main1c85 versioned verify runs actual full check with stable source; no old review/fullcheck is relabeled."
+      },
+      {
+        "id": "append-current-head-acceptance",
+        "blockedBy": [
+          "independent-review-and-full-check"
+        ],
+        "acceptance": "Append exact checked tree on existing PR77 with independently captured first parent2c1 and actual inherited main1c85. Verify new source blobs, actual remote tree/parents, published-head CI, all feedback, full report/media publication and immutable byte readback before ready."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "append-current-head-acceptance"
+        ],
+        "acceptance": "Human final review/merge, actual main integration and whole-Issue acceptance are pending prerequisites before authorized closure; keep Issue76 open until they pass."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "f3c41d9f95cefb7f21424ba0b62ad729663fae5d",
+      "tree": "ee6c00bd97da199489fdf439422bd51d699313a5",
+      "patch": "f631def090171fc90bdbb50bd525138000ac9da572ba9afaba61825de6a85068",
+      "verdict": "passed",
+      "report": "What this change does: Session validates and publishes owned Viewport fields and indexed Selection values. The incoming array length is converted once before lazy traversal, preventing caller-controlled coercion from hiding IDs.\n\nVerdict: passed.\n\nReviewed identity:\n\n- Base: 1c85d79db1e275e59f84a9bb77d1fe75c0a582e6\n- Head: f3c41d9f95cefb7f21424ba0b62ad729663fae5d\n- Tree: ee6c00bd97da199489fdf439422bd51d699313a5\n- Binary patch SHA256: f631def090171fc90bdbb50bd525138000ac9da572ba9afaba61825de6a85068\n\nHard standards: No violations found in the complete two-file patch. ADR0017 atomic membership checks, ADR0018 finite coordinates/positive zoom and ADR0022 consistent breadth-first notification remain intact. Boundary Discipline and Type System Discipline keep runtime normalization at Session's ownership boundary. Issue aggregation, original read errors, no-op Snapshot identity and disposal remain covered. No public API, input cap, fallback or dependency was added.\n\nNew main integration: Reviewed Duplicate's merged indexed-mapping translation and its full path through Fragment materialization, Kernel commit, Session evidence check and setSelection. Fragment supplies frozen ID arrays; Session copies their actual values, checks current Kernel membership and publishes canonically. History retains the original single Document Commit and replays through Kernel; Session changes do not enter History. Renderer and Interaction still observe consistent queued Snapshots.\n\nJudgment / ponytail: No actionable Fowler smell or correctness, safety, load, speed or testing finding. The private helper serves both ID namespaces without another abstraction. Original length-coercion P2 remains resolved at this identity: the unchanged public probe reads both IDs, performs one coercion, rejects the unknown entity and preserves the Snapshot. Assumed load: an isolated Canvas Runtime with synchronous mutations and reentrant observers.\n\nActual checks at this head:\n\n- Verified complete history, clean tree, exact head/tree/hash, independent prepared-task/inspection identity and byte-identical complete.patch.\n- Read the full current production change, all 323 regression-test lines, refreshed source/feedback and connected callers; diff --check passed.\n- `bun test packages/plugin-session/tests packages/plugin-duplicate-selection/tests`: 70 passed, 243 assertions.\n- Replayed the original public Host stdin probe: exit 0; coercions=1, indices=[0,1], SELECTION_ENTITY_NOT_FOUND, unchanged=true.\n\nNot checked: other affected consumers, TypeScript checks, builds, browsers, full engineering gate, published-head CI, publication and remote evidence readback. Historical checks and reports were not accepted as current results.\n"
+    },
+    "spec": {
+      "head": "f3c41d9f95cefb7f21424ba0b62ad729663fae5d",
+      "tree": "ee6c00bd97da199489fdf439422bd51d699313a5",
+      "patch": "f631def090171fc90bdbb50bd525138000ac9da572ba9afaba61825de6a85068",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n对新 main/source 同步后的完整两文件补丁（含 323 行公共回归）独立审查，重读 Issue #76 全部验收、最新空分页反馈/依赖、独立 prepared plan、ADR0017/0018/0022，并核对 Session → Kernel/Renderer/Interaction 及新 Duplicate 调用。未发现验收遗漏、错误实现或范围扩张。\n\n满足“Capture Selection collections once into owned indexed arrays”与原生长度要求：捕获的 length 只经一次 ToNumber，再以自有数值执行原生 ToLength/惰性索引读取；变化的 coercible length 不能隐藏未知 Node/Edge，Infinity 第一项原始异常不被预分配掩盖。验证、membership、规范化及发布复用同一 owned 值。Viewport 单次字段捕获、负零、finite/positive/no-clamp 规则保持；issue 顺序、原始异常、错误码/消息、空选择、等价 Snapshot、FIFO、reconciliation、订阅隔离和 disposal 保留。Duplicate 在一个 Commit 后传入冻结 ID 集合，与该捕获和 membership 边界兼容；无新 API、cap、依赖或 fallback。\n\n本轮实际运行 `bun test packages/plugin-session/tests`：36 pass、0 fail、126 assertions。另以 `bun --eval` 在当前工作树实际运行 8 个真实 Host/Kernel/Session 长度场景（BigInt、Symbol、转换抛错、分数、boxed number、负值、NaN、undefined），全部通过。`git diff --check` 通过；实际 commit 列表、head/tree、完整及保存的 binary patch/inspection、干净工作树均核对。旧 run 结果未计入本轮。\n\n未执行 build、browser、affected/full engineering gate 或消费者整套；未验证当前新 head 的远端 CI、报告/媒体发布回读及最终 main 集成。定向通过不代表完整交付验收。\n\n- base: `1c85d79db1e275e59f84a9bb77d1fe75c0a582e6`\n- head: `f3c41d9f95cefb7f21424ba0b62ad729663fae5d`\n- tree: `ee6c00bd97da199489fdf439422bd51d699313a5`\n- raw binary patch SHA256: `f631def090171fc90bdbb50bd525138000ac9da572ba9afaba61825de6a85068`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "historical-main99-public-red",
+      "acceptance": "Original main99 compiled public Session probe published invalid Viewport coordinates/zoom and substituted Selection IDs; original rejection assertion exit1. Historical original defect provenance, not current-source acceptance.",
+      "command": "bun session-input-repro.ts (original main99 discovery)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "historical-53a-independent-length-red",
+      "acceptance": "Actual independent Standards probe at53a/tree8dc found a second unknown ID omitted when a retained length object was coerced twice. Native control visited both indices once; Session incorrectly changed Snapshot. Original report and raw output keep53a identity.",
+      "command": "bun run - < standards-coercible-length-probe.ts (historical53a root)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "tdd-node-edge-length-red",
+      "acceptance": "Before changing the helper, two new public Node/Edge length-coercion regressions failed because Session did not reject the unknown ID. Only the regression test was uncommitted on53a; original red patch and log retained.",
+      "command": "bun test packages/plugin-session/tests/input-values.test.ts --test-name-pattern captured coercible (before fix)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "tdd-node-edge-length-green",
+      "acceptance": "The same two public regressions passed10 assertions after capturing native numeric length once. This is the actual TDD working-tree green before final source/main integration, not the final-head verification.",
+      "command": "bun test packages/plugin-session/tests/input-values.test.ts --test-name-pattern captured coercible (after fix)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "current-public-consumers",
+      "acceptance": "Fresh main1c85/currentf3c dependency build and Session/Kernel/Renderer/Interaction public suites passed153 tests650 assertions. Local native-length repair remains intact alongside the external source sync and newly integrated Duplicate fix.",
+      "command": "bun test packages/plugin-session/tests packages/kernel/tests packages/plugin-renderer/tests packages/plugin-interaction/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "current-native-length-host-probe",
+      "acceptance": "Actual current-source Host probe: one length getter, one coercion, indices0/1 retained, SELECTION_ENTITY_NOT_FOUND and original Session Snapshot preserved; independent native control agrees.",
+      "command": "bun run - < standards-coercible-length-probe.ts (currentf3c root)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "current-affected-consumers",
+      "acceptance": "Current complete patch selected types/build/declarations, affected public consumers, real React/SVG/Examples browsers and documentation; actual exit0. Prior f0e/8a checks remain historical.",
+      "command": "bun run check:affected --base 1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "current-compiled-session-public-probe",
+      "acceptance": "Actual freshly built public package barrels retain finite accepted Viewport10/20/2, one field read each, the accepted Selection collection and atomic rejection of iterator-hidden unknown IDs. Compiled probe checks actual pinned Git headf3c.",
+      "command": "bun compiled-session-public-probe.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "current-compiled-native-length-probe",
+      "acceptance": "Fresh compiled public Session package retains both indexed IDs, one native length coercion, SELECTION_ENTITY_NOT_FOUND and the original Snapshot, matching independent native control.",
+      "command": "bun run - < compiled-length-public-probe.ts (current root)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "independent-current-native-boundary-cases",
+      "acceptance": "Independent Spec reviewer persisted and reran eight real public Host length cases at exactf3c/head/tree: BigInt, Symbol, conversion error, fractional, boxed number, negative, NaN and undefined; actual exit0. This log contains commands and source identity.",
+      "command": "bun run - < spec-native-length-probe.ts (independent current-source run)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-10.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "c306d963b4bae91fc17d3faa208c3b1c42e7f5eb30ec12b51fec9588cd212904"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "327679aece9e8c94e3f69e633b4f9f58914ccbb99f55daae226305edbc962aaf"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "5571db7dc6f8527c3038ac30ffc79b47c59f6615310aeb31d1fe50d6d89730bd"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "3a15d60635b946a20f52bb0d337f3f378309760ed7c0764355703d5f8ab7d5a1"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "f6591335f4f02d2560dd7248a23aefbcea67ce625c0f9d9cf9a935b8dbb45f0f"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "ab35a818d6d3add92a2dbbf4919c834be04c53743afdc1b27034854a9d027b6b"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "13fcfc156ef0b8f2908c83641be2e51f6763d72011397c42015a3c3e7d0c52c7"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "90101e90677b3864b2c1882bba6838e31b59249fb7a5d71d5ef623b59b4866a8"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "bcf68fd86466c9e62f8a00818d291d09af2227e398c6da5da13f89cda8069225"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "f1a96c060e58960065cea1d7aa1e4e2d2acc9de83d9d812f514eca9c2d7c043b"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "2cbc3334585ece015b2e3e8581c48937960921c932d6af0c7b5af36032b10a00"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "bcf68fd86466c9e62f8a00818d291d09af2227e398c6da5da13f89cda8069225"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "e647f89321817fb4d00e0c4376adde3b31077bc756b09b69b7a38fabbe75709f"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "852edefff94aa07d76f880e0640bb3a3bff0bad706cf1e35e63b1bcd12687b58"
+    }
+  ]
+}

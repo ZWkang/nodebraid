@@ -1,0 +1,41 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-session/tests/input-values.test.ts:
+255 |     const input = { nodeIds: [a], edgeIds: [] };
+256 |     Object.defineProperty(input, field, { value: values });
+257 |     const h = await harness();
+258 |     try {
+259 |       const before = h.session.getSnapshot();
+260 |       expect(() => h.session.setSelection(input)).toThrow(
+                                                        ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-76-session-inputs/cflow/packages/plugin-session/tests/input-values.test.ts:260:51)
+(fail) Session normalizes the captured coercible nodeIds length once [57.07ms]
+255 |     const input = { nodeIds: [a], edgeIds: [] };
+256 |     Object.defineProperty(input, field, { value: values });
+257 |     const h = await harness();
+258 |     try {
+259 |       const before = h.session.getSnapshot();
+260 |       expect(() => h.session.setSelection(input)).toThrow(
+                                                        ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-76-session-inputs/cflow/packages/plugin-session/tests/input-values.test.ts:260:51)
+(fail) Session normalizes the captured coercible edgeIds length once [4.18ms]
+
+ 0 pass
+ 17 filtered out
+ 2 fail
+ 2 expect() calls
+Ran 2 tests across 1 file. [244.00ms]

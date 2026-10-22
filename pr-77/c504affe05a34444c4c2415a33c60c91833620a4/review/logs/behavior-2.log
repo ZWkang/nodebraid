@@ -1,0 +1,4 @@
+Command: bun run - (probe source supplied on stdin from repository root)
+Reviewed head: 53a9f5cbbc46641f80a49105e9d717647e1e969b
+Exit code: 1
+{"lengthReads":1,"coercions":2,"indices":["0"],"nativeIndices":[0,1],"controlCoercions":1,"code":null,"unchanged":false,"selected":["a"]}

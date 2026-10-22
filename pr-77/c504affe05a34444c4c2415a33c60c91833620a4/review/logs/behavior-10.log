@@ -1,0 +1,15 @@
+actual_command: bun ../../../local-workflows/nodebraid/runs/b2e72f0b-5b5a-4649-a665-b5d3807a6be5/spec-native-length-probe.ts
+working_directory: reviewed repository root; exact source is asserted below
+command: bun spec-native-length-probe.ts (from the reviewed repository root)
+{"base":"1c85d79db1e275e59f84a9bb77d1fe75c0a582e6","head":"f3c41d9f95cefb7f21424ba0b62ad729663fae5d","tree":"ee6c00bd97da199489fdf439422bd51d699313a5","patch":"f631def090171fc90bdbb50bd525138000ac9da572ba9afaba61825de6a85068","bun":"1.4.2"}
+PASS bigint: original/native error; zero index reads; identical Snapshot
+PASS symbol: original/native error; zero index reads; identical Snapshot
+PASS coercion-throws: original/native error; zero index reads; identical Snapshot
+PASS fractional: ["a"]
+PASS boxed: ["a"]
+PASS negative: []
+PASS nan: []
+PASS undefined: []
+8 real Host/Kernel/Session native-length cases passed
+
+actual_exit_code: 0

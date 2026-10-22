@@ -1,0 +1,11 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-session/tests/input-values.test.ts:
+(pass) Session normalizes the captured coercible nodeIds length once [50.18ms]
+(pass) Session normalizes the captured coercible edgeIds length once [4.07ms]
+
+ 2 pass
+ 17 filtered out
+ 0 fail
+ 10 expect() calls
+Ran 2 tests across 1 file. [148.00ms]
