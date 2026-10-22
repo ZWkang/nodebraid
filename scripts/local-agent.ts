@@ -55,6 +55,7 @@ if (mode === 'archive-issue') {
   if (!second) throw new Error('prepare requires input.json and run-dir');
   const task = prepareRun(read(first));
   if (!task.baseRefName?.trim()) throw new Error('prepare requires the current PR baseRefName.');
+  if (!task.expectedParent) throw new Error('prepare requires the independently captured expectedParent.');
   const directory = resolve(second),
     path = join(directory, 'prepared-task.json');
   mkdirSync(directory, { recursive: true });
@@ -75,9 +76,11 @@ if (mode === 'archive-issue') {
     console.log(JSON.stringify(planFrontier(task.plan, read(second))));
   } else if (mode === 'verify') {
     if (!task.baseRefName?.trim()) throw new Error('Legacy run has no PR baseRefName; prepare a new run.');
+    if (!task.expectedParent) throw new Error('Legacy run has no expectedParent; prepare a new run.');
     if (!second || !third) throw new Error('verify requires independent review reports and feedback decisions');
     if (git('branch', '--show-current') !== task.branch) throw new Error('Verification is on another branch.');
     git('merge-base', '--is-ancestor', task.base, 'HEAD');
+    git('merge-base', '--is-ancestor', task.expectedParent, 'HEAD');
     const before = snapshot(task.base);
     const reviews = read<VerifiedRun['reviews']>(second),
       decisions = read<VerifiedRun['decisions']>(third);
@@ -118,6 +121,8 @@ if (mode === 'archive-issue') {
     validateVerification(task, verified as VerifiedRun);
     console.log(JSON.stringify(verified));
   } else if (mode === 'publication') {
+    if (!task.baseRefName?.trim() || !task.expectedParent)
+      throw new Error('Legacy run lacks baseRefName or expectedParent; prepare a new run.');
     if (!second) throw new Error('publication requires the actual GitHub Git commit JSON');
     const verified = read<VerifiedRun>(join(directory, 'verification.json'));
     validateVerification(task, verified);
@@ -127,8 +132,20 @@ if (mode === 'archive-issue') {
     )
       throw new Error('Local source changed after verification.');
     const remote = read<{ sha: string; tree: { sha: string }; parents: { sha: string }[] }>(second);
-    if (!/^[a-f0-9]{40}$/.test(remote.sha) || remote.tree.sha !== verified.tree || remote.parents[0]?.sha !== task.base)
+    if (
+      !/^[a-f0-9]{40}$/.test(remote.sha) ||
+      remote.tree.sha !== verified.tree ||
+      remote.parents[0]?.sha !== task.expectedParent
+    )
       throw new Error('Remote tree or append-only parent differs from the prepared/verified source.');
+    const inheritsBase = remote.parents.some(({ sha }) => {
+      const ancestry = spawnSync('git', ['merge-base', '--is-ancestor', task.base, sha], { encoding: 'utf8' });
+      if (ancestry.error) throw ancestry.error;
+      if (ancestry.status === 0) return true;
+      if (ancestry.status === 1) return false;
+      throw new Error(`Cannot verify remote parent ancestry: ${ancestry.stderr}`);
+    });
+    if (!inheritsBase) throw new Error('Remote parents do not inherit the prepared review base.');
     const publication = {
       taskDigest: task.digest,
       head: remote.sha,

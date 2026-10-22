@@ -12,6 +12,7 @@ const snapshot: FeedbackSnapshot = {
   headRefOid: sha('b'),
   headRepository: { nameWithOwner: 'ZWkang/nodebraid' },
   baseRefName: 'main',
+  baseRefOid: sha('a'),
   mergeable: 'MERGEABLE',
   mergeStateStatus: 'CLEAN',
   reviewDecision: '',
@@ -30,6 +31,7 @@ test('a new green head cannot inherit the previous tree, reviews or test evidenc
     branch: 'feat/issue-10',
     baseRefName: 'feat/issue-9',
     base: sha('a'),
+    expectedParent: sha('f'),
     request: 'approved-scope',
     pending: [],
     plan: [{ id: 'fix', blockedBy: [], acceptance: 'Regression red then green' }],
@@ -57,13 +59,26 @@ test('a new green head cannot inherit the previous tree, reviews or test evidenc
     head: sha('b'),
     tree: sha('d'),
     localHead: sha('c'),
-    parent: sha('a'),
+    parent: sha('f'),
   };
   expect(evaluateVerifiedRun(task, verified, publication, { ...snapshot, baseRefName: 'feat/issue-9' }).status).toBe(
     'needs-integration',
   );
   expect(evaluateVerifiedRun(task, verified, publication, snapshot).status).toBe('waiting-verification');
-  const { baseRefName: _, digest: __, ...legacyInput } = task;
+  expect(
+    evaluateVerifiedRun(task, verified, publication, {
+      ...snapshot,
+      baseRefName: 'feat/issue-9',
+      baseRefOid: sha('f'),
+    }).status,
+  ).toBe('waiting-verification');
+  expect(() => evaluateVerifiedRun(task, verified, { ...publication, parent: task.base }, snapshot)).toThrow(
+    'append parent',
+  );
+  expect(() => validateVerification({ ...task, expectedParent: task.base }, verified)).toThrow(
+    'independent prepared task',
+  );
+  const { baseRefName: _, expectedParent: _parent, digest: __, ...legacyInput } = task;
   const legacy = prepareRun(legacyInput);
   expect(Object.hasOwn(legacy, 'baseRefName')).toBe(false);
   expect(legacy.digest).toBe('bcda8468a65cc217787611b585e374580213e1125f96f0d30f14a1ee70f116ce');
@@ -74,6 +89,16 @@ test('a new green head cannot inherit the previous tree, reviews or test evidenc
     snapshot,
   );
   expect(legacyResult.status).toBe('waiting-verification');
+  const legacyWithBase = prepareRun({ ...legacyInput, baseRefName: 'feat/issue-9' });
+  expect(Object.hasOwn(legacyWithBase, 'expectedParent')).toBe(false);
+  expect(
+    evaluateVerifiedRun(
+      legacyWithBase,
+      { ...verified, taskDigest: legacyWithBase.digest },
+      { ...publication, taskDigest: legacyWithBase.digest },
+      { ...snapshot, baseRefName: 'feat/issue-9' },
+    ).status,
+  ).toBe('waiting-verification');
   expect(() => validateVerification({ ...task, request: 'unprepared-request' }, verified)).toThrow(
     'independent prepared task',
   );

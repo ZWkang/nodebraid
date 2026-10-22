@@ -147,6 +147,11 @@ existing `GITHUB_TOKEN` and `GITHUB_REPOSITORY`, `bun run agents:publish-evidenc
 <dir> <pr> <head>` publishes directly; otherwise use the prepared plan with connected
 GitHub tools. Preparing files does not publish them.
 
+Run inputs independently capture the target review `base` and the source head
+`expectedParent` to append to. Preview/report use that review base; publication
+checks the actual first parent. Legacy runs stay historical and require a new
+prepared run for delivery. See the [execution contract](./docs/agents/agentic-workflows.md#执行命令和恢复).
+
 The PR preview job uses read-only permissions. The `workflow_run` publisher runs
 trusted default-branch code and accepts preview data, not independent review reports
 from PR code. It starts triggering only after the workflow reaches the default

@@ -41,7 +41,7 @@ export interface GitHubFeedback {
     state: string;
     draft: boolean;
     head: { sha: string; ref: string; repo: { full_name: string } | null };
-    base: { ref: string };
+    base: { ref: string; sha: string };
     mergeable: boolean | null;
     mergeable_state: string;
   };
@@ -70,6 +70,8 @@ export function normalizeFeedback(
   const pr = raw.pr,
     comments = restPages(raw.comments),
     reviews = restPages(raw.reviews);
+  if (typeof pr.base.sha !== 'string' || !/^[a-f0-9]{40}$/.test(pr.base.sha))
+    throw new Error('PR target base SHA is unverified.');
   if (
     !raw.threads.length ||
     raw.threads.some((page, index) => page.pageInfo.hasNextPage !== index < raw.threads.length - 1)
@@ -132,6 +134,7 @@ export function normalizeFeedback(
     headRefOid: pr.head.sha,
     headRepository: pr.head.repo ? { nameWithOwner: pr.head.repo.full_name } : null,
     baseRefName: pr.base.ref,
+    baseRefOid: pr.base.sha,
     mergeable: pr.mergeable === null ? 'UNKNOWN' : pr.mergeable ? 'MERGEABLE' : 'CONFLICTING',
     mergeStateStatus: pr.mergeable_state.toUpperCase(),
     reviewDecision: [...latest.values()].some((review) => review.state === 'CHANGES_REQUESTED')

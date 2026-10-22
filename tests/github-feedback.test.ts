@@ -16,7 +16,7 @@ test('edited and resolved-thread replies enter feedback while current-head workf
       state: 'open',
       draft: false,
       head: { sha: head, ref: 'feat/issue-10', repo: { full_name: 'ZWkang/nodebraid' } },
-      base: { ref: 'main' },
+      base: { ref: 'main', sha: 'b'.repeat(40) },
       mergeable: true,
       mergeable_state: 'clean',
     },
@@ -66,6 +66,10 @@ test('edited and resolved-thread replies enter feedback while current-head workf
     },
   };
   const normalized = normalizeFeedback(raw, []);
+  expect(normalized.baseRefOid).toBe('b'.repeat(40));
+  expect(() => normalizeFeedback({ ...raw, pr: { ...raw.pr, base: { ref: 'main', sha: '' } } }, [])).toThrow(
+    'target base SHA',
+  );
   expect(normalized.feedback.map((item) => item.key)).toEqual(['comment:1', 'thread']);
   expect(normalized.statusCheckRollup[0]!.workflowName).toBe('Checks');
   const requested = normalizeFeedback(
