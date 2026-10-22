@@ -1,0 +1,22 @@
+bun test v1.4.2 (744846f84)
+
+packages/preset-basic/tests/readiness.test.ts:
+92 |   connection.materializeEdge = null as never;
+93 |   const host = createPluginHost();
+94 |   const composition = host.install(plugin, { targetId: 'changing-connection' });
+95 | 
+96 |   try {
+97 |     await expect(composition.whenActive()).resolves.toBeUndefined();
+                                                         ^
+error: expect(received).resolves.toBeUndefined()
+
+Expected promise that resolves
+Received promise that rejected: Promise { <rejected> }
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-connection-capture/cflow/packages/preset-basic/tests/readiness.test.ts:97:53)
+(fail) Composition keeps the Connection value captured before a caller getter changes [35.01ms]
+
+ 0 pass
+ 6 filtered out
+ 1 fail
+Ran 1 test across 1 file. [111.00ms]

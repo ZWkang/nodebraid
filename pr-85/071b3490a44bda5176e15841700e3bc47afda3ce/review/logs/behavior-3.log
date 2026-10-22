@@ -1,0 +1,10 @@
+bun test v1.4.2 (744846f84)
+
+packages/preset-basic/tests/readiness.test.ts:
+(pass) Composition keeps the Connection value captured before a caller getter changes [27.78ms]
+
+ 1 pass
+ 6 filtered out
+ 0 fail
+ 3 expect() calls
+Ran 1 test across 1 file. [99.00ms]

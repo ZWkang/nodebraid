@@ -1,0 +1,154 @@
+$ bun run scripts/check-affected.ts --base "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6"
+{
+  "mode": "affected",
+  "files": [
+    "packages/preset-basic/src/preset-basic-plugin.ts",
+    "packages/preset-basic/tests/readiness.test.ts"
+  ],
+  "packages": [
+    "@nodebraid/core",
+    "@nodebraid/examples",
+    "@nodebraid/preset-basic"
+  ],
+  "tests": [
+    "tests/layout-providers.test.ts"
+  ],
+  "browser": [
+    "@nodebraid/examples"
+  ],
+  "docs": true,
+  "shared": []
+}
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install prettier --check --ignore-unknown packages/preset-basic/src/preset-basic-plugin.ts packages/preset-basic/tests/readiness.test.ts
+Checking formatting...
+All matched files use Prettier code style!
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install oxlint packages/preset-basic/src/preset-basic-plugin.ts packages/preset-basic/tests/readiness.test.ts
+[build] @nodebraid/diagnostics
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/kernel
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/canvas-fragment
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/port-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/session-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/interaction-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-api
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/runtime-cordis
+$ tsgo -p tsconfig.build.json
+[build] @nodebraid/plugin-command
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-kernel
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-port
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-session
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-renderer
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-interaction
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-clipboard
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-duplicate-selection
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-history
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-layout
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/preset-basic
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/core
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/adapter-react
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-dagre
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-svg
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/examples
+$ vite build
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 2185 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                              0.62 kB │ gzip:   0.34 kB
+dist/assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2    7.42 kB
+dist/assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2      8.00 kB
+dist/assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2       15.08 kB
+dist/assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2      16.51 kB
+dist/assets/geist-latin-wght-normal-BgDaEnEv.woff2          29.40 kB
+dist/assets/index-B7yrd1ul.css                              38.29 kB │ gzip:   8.10 kB
+dist/assets/routes-B4xYCOml.js                               0.56 kB │ gzip:   0.41 kB
+dist/assets/rolldown-runtime-CbXtAM7H.js                     0.58 kB │ gzip:   0.36 kB
+dist/assets/preload-helper-nlOK6TZ5.js                      35.01 kB │ gzip:  12.63 kB
+dist/assets/basic-svg-B-Qw7g3D.js                          241.82 kB │ gzip:  72.26 kB
+dist/assets/index-DWo0KpgJ.js                              348.54 kB │ gzip: 113.55 kB
+
+✓ built in 541ms
+[build] @nodebraid/layout-elk
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) @nodebraid/core > publishes Port values and Runtime contribution seams [0.02ms]
+(pass) @nodebraid/core > publishes Canvas Fragment and Clipboard through the public facade
+(pass) @nodebraid/core > publishes Duplicate Selection through the public facade
+(pass) @nodebraid/core > publishes the shared Diagnostics seam [0.25ms]
+(pass) @nodebraid/core > publishes the typed Plugin Host seam [2.79ms]
+(pass) @nodebraid/core > publishes the reversible Kernel seam [0.68ms]
+(pass) @nodebraid/core > publishes the Kernel Runtime Plugin seam [0.97ms]
+(pass) @nodebraid/core > publishes the Session Runtime Plugin seam [0.79ms]
+(pass) @nodebraid/core > publishes the backend-neutral Renderer and Runtime integration seams [0.03ms]
+(pass) @nodebraid/core > publishes backend-neutral Interaction values and Runtime behavior [0.01ms]
+(pass) @nodebraid/core > composes asynchronous Command preparation with a synchronous Kernel Transaction [0.98ms]
+(pass) @nodebraid/core > publishes the History Runtime Plugin seam [0.01ms]
+
+tests/preset-basic.test.ts:
+(pass) Core facade exports Basic Canvas Composition without a concrete Renderer
+
+tests/layout.test.ts:
+(pass) the Core facade exports generic Layout seams without concrete Providers
+
+ 14 pass
+ 0 fail
+ 39 expect() calls
+Ran 14 tests across 3 files. [21.00ms]
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/preset-basic: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+tests/readiness.test.ts(149,13): error TS2322: Type 'void' is not assignable to type 'ConnectionConfig | undefined'.
+error: script "typecheck:self" exited with code 1
+error: script "check:affected" exited with code 1

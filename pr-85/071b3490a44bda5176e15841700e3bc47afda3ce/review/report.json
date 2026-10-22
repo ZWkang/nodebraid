@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+    "expectedParent": "1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+    "head": "071b3490a44bda5176e15841700e3bc47afda3ce",
+    "tree": "1c34b75138a968e79597081f5128f3ee0a59b4b4",
+    "patch": "3e55c16602f7f28e1bf3c04cb4a8d23949a567c57c04763a7d78665da9e1a528",
+    "localHead": "f963eb19fc691ce21a60e92ba3cd6b09042e4c52"
+  },
+  "task": {
+    "run": "e917bc1d-c2a0-4628-a04c-bb205faae8ff",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 84
+    },
+    "request": "Repair Issue84 factory-time Interaction/Connection ownership on the existing public Basic Canvas Composition seam. Capture one consistent configuration at createBasicCanvasPlugin, copy/freeze the captured Connection shell, preserve valid/default/malformed config and original failure/lifecycle contracts. Source: https://github.com/ZWkang/nodebraid/issues/84",
+    "plan": [
+      {
+        "id": "public-regression-and-minimal-repair",
+        "blockedBy": [],
+        "acceptance": "Preserve real compiled public red and ordinary snapshot control. Add one existing Host/Composition readiness regression before implementation; repair only shared config capture and retain property/error/default controls. Relevant public consumers and affected checks pass."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "public-regression-and-minimal-repair"
+        ],
+        "acceptance": "Independent Standards with ponytail-review and Spec inspect exact complete head/tree/patch and original Issue/ADR/public contract, with no remaining findings."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Versioned deployed-main agents:run verify executes actual full bun run check once after targeted checks/reviews; preserve actual log, exit and stable source."
+      },
+      {
+        "id": "publish-and-current-head-acceptance",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Actual GitHub source tree and first parent match independently prepared base/parent; create one delivery PR to main. Exact-current-head CI, complete feedback/mergeability and full report/media publication/immutable readback pass before ready."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "publish-and-current-head-acceptance"
+        ],
+        "acceptance": "After actual final review/merge, verify fetched main integration and complete Issue acceptance; keep Issue84 open until then."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "f963eb19fc691ce21a60e92ba3cd6b09042e4c52",
+      "tree": "1c34b75138a968e79597081f5128f3ee0a59b4b4",
+      "patch": "3e55c16602f7f28e1bf3c04cb4a8d23949a567c57c04763a7d78665da9e1a528",
+      "verdict": "passed",
+      "report": "What this change does: Basic Canvas captures Interaction.connection once and excludes it from the remaining property copy. The same captured value determines nested copying and is retained for later Child Interaction activation.\n\nVerdict: passed.\n\nReviewed identity:\n\n- Base: 1c85d79db1e275e59f84a9bb77d1fe75c0a582e6\n- Head: f963eb19fc691ce21a60e92ba3cd6b09042e4c52\n- Tree: 1c34b75138a968e79597081f5128f3ee0a59b4b4\n- Binary patch SHA256: 3e55c16602f7f28e1bf3c04cb4a8d23949a567c57c04763a7d78665da9e1a528\n\nHard standards: No violations found in the complete two-file patch. AGENTS.md and CONTRIBUTING.md require public behavioral regressions and original failure exposure; the retained readiness red records the real rejected activation. ADR0066 preserves application-owned Host/Renderer and Child Composition ownership; ADR0068 retains Interaction's single validation/gesture authority. ADR0075/0081 composition boundaries remain unchanged.\n\nSupported inherited and non-enumerable Connection properties are still captured and copied. Absent/undefined Connection retains defaults; malformed values reach Interaction's existing INVALID_CONFIG path. Other property-copy behavior and top-level unknown-option checks remain unchanged. Original Connection getter and Renderer failures retain their identities. No documented valid contract was found to change.\n\nJudgment / ponytail: No actionable Fowler smell or correctness, safety, load, speed or testing finding. Object rest removes the repeated external read without adding policy, state or abstraction. Reviewed creation-time normalization, Interaction resolution/runtime use, Child readiness and rollback, reverse cleanup, Core re-export and Examples factory caller. Assumed load: isolated per-Canvas Hosts, including repeated installations from one stable Plugin definition.\n\nActual checks at this head:\n\n- Verified clean tree, commit history, exact head/tree/hash, prepared-task/inspection identity and complete.patch byte-for-byte against Git.\n- Read the full production helper, existing readiness/lifecycle tests and all new readiness additions, relevant ADRs/principles and original source with empty comments/blockers.\n- `git diff --check`: passed.\n- `bun test packages/preset-basic/tests`: 20 passed, 0 failed, 57 assertions. This includes fresh-Host property controls, defaults, malformed config, asynchronous readiness, Provider conflict/rollback and cleanup failures.\n\nNot checked: broader affected consumers, TypeScript checks, builds, full engineering gate, real browser/Connection Gesture input, current-head CI, publication or remote evidence readback. The existing test Renderer is a public adapter fixture, not browser evidence.\n"
+    },
+    "spec": {
+      "head": "f963eb19fc691ce21a60e92ba3cd6b09042e4c52",
+      "tree": "1c34b75138a968e79597081f5128f3ee0a59b4b4",
+      "patch": "3e55c16602f7f28e1bf3c04cb4a8d23949a567c57c04763a7d78665da9e1a528",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n独立审查完整两文件补丁、103 行新增 readiness 回归、原 Issue #84 全文/空讨论与真实依赖、独立 prepared plan、ADR0066/0068/0075/0081，以及 factory → Child Composition → Interaction validation/Renderer readiness 调用链。未发现规格遗漏、错误实现或未请求的扩张。\n\n满足“the Connection value used to decide ownership must be the same value retained”：解构只读取一次 Connection，rest 保留其余配置的既有 own-enumerable 复制语义，record Connection 从同一捕获值复制/冻结；首次 absent 值不能被后续 getter 替换为借用 shell。后续应用 mutation 和 fresh Host installation 不改变 factory 配置；原有 inherited/non-enumerable Connection、默认配置及原始 getter 异常保持。malformed/unknown 配置仍由既有 Interaction 校验表达，Composition 等待全部 Child active，Provider conflict、rollback、Renderer 错误身份和逆序 cleanup 路径未改。无 API、依赖、accessor ban、cap 或 fallback 新增。\n\n本轮实际执行 `bun test packages/preset-basic/tests`：20 pass、0 fail、57 assertions；使用真实 Host/Composition 和现有公共 CanvasRenderer adapter，验证范围是 readiness/lifecycle，不宣称浏览器输入证据。`git diff --check` 通过；实际 commit 列表、head/tree、完整 binary patch、保存的 inspection/complete.patch 与干净工作树均核对。\n\n未独立运行连接消费者整套、affected、类型/构建、browser 或 full engineering gate；未执行当前 head 的 compiled public probe、远端 CI、报告/媒体发布及回读、main 集成验收。其他执行者的结果未计为本轮实际命令。\n\n- base: `1c85d79db1e275e59f84a9bb77d1fe75c0a582e6`\n- head: `f963eb19fc691ce21a60e92ba3cd6b09042e4c52`\n- tree: `1c34b75138a968e79597081f5128f3ee0a59b4b4`\n- raw binary patch SHA256: `3e55c16602f7f28e1bf3c04cb4a8d23949a567c57c04763a7d78665da9e1a528`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-main-public-red",
+      "acceptance": "Original actual compiled public main1c85 Host/Composition probe: ordinary snapshot control remainsactive, changing getter retains a borrowed Connection and fails after caller mutation. Expected assertionexit1; historical original defect, not current-head execution.",
+      "command": "bun preset-connection-repro.ts (original clean main1c85)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "tdd-public-readiness-red",
+      "acceptance": "Before changing production helper, new public Host readiness regression rejected instead of retaining captured config. Actual original red patch preserved; expectedexit1.",
+      "command": "bun test packages/preset-basic/tests/readiness.test.ts --test-name-pattern 'before a caller getter changes' (before repair)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "tdd-public-readiness-green",
+      "acceptance": "Same public regression passed after single capture; one caller getter read and active Composition. Actual working-tree green before final controls/commit.",
+      "command": "bun test packages/preset-basic/tests/readiness.test.ts --test-name-pattern 'before a caller getter changes' (after repair)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "initial-test-type-failure",
+      "acceptance": "Initial source tests passed, but test-only always-throwing getter inferredvoid and package typecheck failedTS2322. Original failure retained; next record fixes its type without runtime/condition/assertion change.",
+      "command": "bun run --filter '@nodebraid/preset-basic' typecheck (before explicit never return)",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "initial-affected-type-failure",
+      "acceptance": "First actual affected attempt failed at the same test getter TS2322 before browser stage; retained unchanged.",
+      "command": "bun run check:affected --base 1c85d79db1e275e59f84a9bb77d1fe75c0a582e6 (initial test inference failure)",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "corrected-public-test-types",
+      "acceptance": "Explicit never annotation accurately models the getter that always throws. Package public typecheck passes with unchanged runtime and assertions.",
+      "command": "bun run --filter '@nodebraid/preset-basic' typecheck:self",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "current-compiled-public-green",
+      "acceptance": "Actual compiled public packages on pinnedf963eb19fc691ce21a60e92ba3cd6b09042e4c52 create active Composition in both ordinary and changing-getter cases after caller mutation; changinggetter readexactlyonce.",
+      "command": "bun current-public-probe.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "current-connected-public-services",
+      "acceptance": "Actual pinned currenthead public Composition/Interaction/Runtime/Renderer suites passed194tests845assertions, including20Composition tests57assertions, fresh Host config/property/exception/validation controls.",
+      "command": "bun test packages/preset-basic/tests packages/plugin-interaction/tests packages/runtime-cordis/tests packages/plugin-renderer/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "affected-public-consumers",
+      "acceptance": "After the test-only never annotation, affectedcheck passed public dependents, types/artifacts, realExamples browser andDocumentation. Exact source files were then committed unchanged byhooks. This is the real developmentgate, separate from formal fullcheck.",
+      "command": "bun run check:affected --base 1c85d79db1e275e59f84a9bb77d1fe75c0a582e6",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-9.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "b15f4e2618d66b430fabf77c8469c2fd90bec5077850be779ee5b4acb9756beb"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "c03cea6e5fae99a8e2d0e9687ec726ee0f11a84662cd8068b0188f18e0172ff5"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "974fe15d784cd317c7c730a6081228373b9629f78a593d1681412433221edf8f"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "4830c0558887f3d7303c4a79f0867b15d16372d05dc0ed2847ca18596a2a8d6f"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "2e3132b7e7ef912d0e939e8756529bef6ebdecee11457c5363a68e77bde9f3bc"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "7b6a6f8bd6c9b4f68084877e62129a184ac9fbc74d37fa0dbbf59e017c47cf70"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "c1c635c5a954c38ffef9ee21ea5c36ad29bfe83e09b4f2237f9a22aa5ce87a89"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "eb3599ab559fc12f89dbc6a3616c07692811f99267eb56be50fdbe544f3a398a"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "6da1ced357919713b036c0b44f959527f69e2a1ac7c50627ea09a8d7d0283a6d"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "c61dd9157a494cd41be21c37939a7742aef326ab871429d1c3ec26775d741253"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "a9a9af19ec80217dd58c710373cc96d51541bc716d5d599c83007dab2d8c2b88"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "cbf0632a2e3b57e1844714209a9f471a904e3dec2774fc9e94a88721853f8f50"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "7f0a5d2b0905c0e61abb31a9a78616e0e12874d93ed108f1359ce47c5508fea6"
+    }
+  ]
+}

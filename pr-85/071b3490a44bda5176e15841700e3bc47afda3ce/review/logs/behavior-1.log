@@ -1,0 +1,22 @@
+{"head":"1c85d79db1e275e59f84a9bb77d1fe75c0a582e6","control":{"kind":"ordinary object","readsAtCreation":0,"readsAfterActivation":0,"state":"active","error":null},"actual":{"kind":"changing getter","readsAtCreation":2,"readsAfterActivation":2,"state":"failed","error":{"domain":"interaction","code":"INVALID_CONFIG","message":"InteractionError: Interaction connection materializeEdge must be a function."}}}
+26 |  }finally{await host.dispose()}
+27 | }
+28 | const control=await run(false),actual=await run(true);
+29 | console.log(JSON.stringify({head,control,actual}));
+30 | assert.equal(control.state,'active','Existing ordinary nested-snapshot control must be active');
+31 | assert.equal(actual.state,'active','Caller mutation after createBasicCanvasPlugin must not change its captured Connection config');
+            ^
+AssertionError: Caller mutation after createBasicCanvasPlugin must not change its captured Connection config
+
+'failed' !== 'active'
+
+ generatedMessage: false,
+     actual: "failed",
+   expected: "active",
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261022T055513-discovery/preset-connection-repro.ts:31:8
+
+Bun v1.4.2 (macOS arm64)

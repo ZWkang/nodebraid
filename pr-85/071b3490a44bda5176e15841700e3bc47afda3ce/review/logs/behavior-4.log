@@ -1,0 +1,45 @@
+@nodebraid/preset-basic typecheck: $ bun run ../../scripts/build-workspaces.ts @nodebraid/preset-basic
+@nodebraid/preset-basic typecheck: [build] @nodebraid/diagnostics
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/preset-basic typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: [build] @nodebraid/runtime-cordis
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json
+@nodebraid/preset-basic typecheck: [build] @nodebraid/plugin-command
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: [build] @nodebraid/kernel
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/preset-basic typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: [build] @nodebraid/plugin-kernel
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: [build] @nodebraid/plugin-history
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: [build] @nodebraid/port-api
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/preset-basic typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: [build] @nodebraid/session-api
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/preset-basic typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: [build] @nodebraid/interaction-api
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/preset-basic typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: [build] @nodebraid/plugin-port
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/preset-basic typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: [build] @nodebraid/plugin-session
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: [build] @nodebraid/renderer-api
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/preset-basic typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: [build] @nodebraid/plugin-renderer
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/preset-basic typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: [build] @nodebraid/plugin-interaction
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/preset-basic typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: [build] @nodebraid/preset-basic
+@nodebraid/preset-basic typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/preset-basic typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/preset-basic typecheck: $ tsgo --noEmit -p tsconfig.json
+@nodebraid/preset-basic typecheck: tests/readiness.test.ts(151,15): error TS2322: Type 'void' is not assignable to type 'ConnectionConfig | undefined'.
+@nodebraid/preset-basic typecheck: error: script "typecheck:self" exited with code 1
+@nodebraid/preset-basic typecheck: Exited with code 1
