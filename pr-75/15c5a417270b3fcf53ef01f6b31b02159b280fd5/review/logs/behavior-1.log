@@ -1,0 +1,24 @@
+{"head":"99ed305515afaec32ef49494b509446ad9ba998c","expected":"INVALID_MATERIALIZATION and unchanged Document","actualError":null,"hookCalls":1,"beforeRevision":1,"afterRevision":2,"nodes":["copy","source"],"actualDuplicateId":42}
+21 |  before=services.kernel.read().snapshot;
+22 |  try {await services.commands.execute(duplicateSelectionCommand,undefined);}catch(error){failure=error;}
+23 |  after=services.kernel.read().snapshot;
+24 |  console.log(JSON.stringify({head:'99ed305515afaec32ef49494b509446ad9ba998c',expected:'INVALID_MATERIALIZATION and unchanged Document',actualError:failure instanceof Error?{name:failure.name,...failure}:null,hookCalls,beforeRevision:before.revision,afterRevision:after.revision,nodes:after.nodes.map((n:any)=>n.id),actualDuplicateId:mappings[0]?.duplicateId}));
+25 | } finally {await host.dispose();}
+26 | assert.equal((failure as {code?:string}|undefined)?.code,'INVALID_MATERIALIZATION','actual invalid mapping must be rejected instead of replaced by a custom array.map result');
+            ^
+AssertionError: actual invalid mapping must be rejected instead of replaced by a custom array.map result
++ actual - expected
+
++ undefined
+- 'INVALID_MATERIALIZATION'
+
+ generatedMessage: false,
+     actual: undefined,
+   expected: "INVALID_MATERIALIZATION",
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261021T181732-discovery/duplicate-array-hook-repro.ts:26:8
+
+Bun v1.4.2 (macOS arm64)

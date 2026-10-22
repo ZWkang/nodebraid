@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "f0e3fc12e3118b9a3b3d9502940b22f516302b13",
+    "expectedParent": "59c8d7c8e74eedd426d60ce14ee3db73f7839824",
+    "head": "15c5a417270b3fcf53ef01f6b31b02159b280fd5",
+    "tree": "761b37081d75d6994d43b54b70b696d7344037b7",
+    "patch": "c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29",
+    "localHead": "74160ef20e9acf06a032ab0f4171398d6748fee4"
+  },
+  "task": {
+    "run": "12953ebc-8af8-4fc1-b968-bfb9c29b9017",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 74
+    },
+    "request": "Revalidate the existing Duplicate Selection ID mapping repair after the Kernel writer identity repair reached fetched mainf0e. Capture Node/Edge mapping collections once and translate actual indexed entries into owned arrays without caller-owned collection hooks; preserve the confirmed Issue74 public contract. Source: https://github.com/ZWkang/nodebraid/issues/74",
+    "plan": [
+      {
+        "id": "sync-source-and-public-checks",
+        "blockedBy": [],
+        "acceptance": "Fresh full Issue74/PR75 source and feedback, independently captured current source59c8 and target mainf0e. Inspect main sync, unchanged complete two-file product patch and connected new Kernel behavior; actual Duplicate/Clipboard/Fragment public tests and affected consumers pass at new exact source."
+      },
+      {
+        "id": "independent-review-and-full-check",
+        "blockedBy": [
+          "sync-source-and-public-checks"
+        ],
+        "acceptance": "Fresh independent Standards+ponytail-review and Spec review same complete head/tree/patch versus mainf0e. Deployed mainf0e executor then performs actual full check with stable source; prior base01c receipts remain historical."
+      },
+      {
+        "id": "append-current-head-acceptance",
+        "blockedBy": [
+          "independent-review-and-full-check"
+        ],
+        "acceptance": "Append exact checked tree on original PR75 with independent first parent59c8 and inherited mainf0e. Verify actual published-head CI, complete feedback, full report/media publication and immutable byte readback before ready."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "append-current-head-acceptance"
+        ],
+        "acceptance": "Human final review/merge, actual main integration and whole-Issue acceptance remain prerequisites before authorized closure."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "74160ef20e9acf06a032ab0f4171398d6748fee4",
+      "tree": "761b37081d75d6994d43b54b70b696d7344037b7",
+      "patch": "c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29",
+      "verdict": "passed",
+      "report": "What this change does: Duplicate Selection translates the actual indexed application mappings into owned arrays after capturing each collection once. Caller-owned array methods cannot replace the records validated by the shared Fragment boundary.\n\nVerdict: passed.\n\nReviewed identity:\n\n- Base: f0e3fc12e3118b9a3b3d9502940b22f516302b13\n- Head: 74160ef20e9acf06a032ab0f4171398d6748fee4\n- Tree: 761b37081d75d6994d43b54b70b696d7344037b7\n- Binary patch SHA256: c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29\n\nHard standards: No violations found. The full two-file patch follows ADR0073 ownership and exact same-namespace mapping requirements, ADR0077 external-error identity, and the public-regression requirements in AGENTS.md and CONTRIBUTING.md. Structural collection validation remains local; shared Fragment validation still owns mapping coverage, uniqueness and canonical immutable outputs.\n\nNew Kernel integration: Re-read the merged ID-capture changes and their callers. Fragment materialization produces frozen entities with ordinary ID properties. Kernel now forwards one captured ID through its freeze helpers, Map keys and touched IDs, preserving matching Change Set identities. Duplicate still performs one Transaction and then updates Session; History replays that evidence through ordinary Transactions. The Clipboard consumer retains the same Fragment/Kernel seam. No public signature or additional policy is required.\n\nJudgment / ponytail: No actionable Fowler smell, correctness, safety, load, speed or testing finding. The translation change remains minimal and preserves original element-read failures, structural Node-before-Edge rejection, native array-like conversion, inherited entries, invalid-hole rejection and hook-free frozen inputs. Existing collision, stale-source, post-Commit Selection, lifecycle and Undo/Redo behavior remains covered. Assumed load: synchronous materialization in one isolated Canvas Runtime.\n\nActual checks at this head:\n\n- Independently verified complete commit history, clean tree and exact head/tree/hash.\n- Verified inspection/prepared-task identity and complete.patch byte-for-byte against the fixed Git diff.\n- Read both full changed files, all 201 regression-test lines, refreshed Issue/PR source and empty feedback, and connected Fragment/Kernel/Session/History/Clipboard paths.\n- `git diff --check`: passed.\n- `bun test packages/plugin-duplicate-selection/tests`: 34 passed, 0 failed, 117 assertions.\n\nNot checked: remaining affected consumers, typecheck, builds, browsers, full engineering gate, current published-head CI, publication or remote report readback. Earlier-head reports and checks were not reused as current acceptance.\n"
+    },
+    "spec": {
+      "head": "74160ef20e9acf06a032ab0f4171398d6748fee4",
+      "tree": "761b37081d75d6994d43b54b70b696d7344037b7",
+      "patch": "c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n独立审查新 main 基线的完整两文件补丁、新增公共测试、Issue #74 全文、空 Issue/PR 分页反馈及外部依赖、独立 prepared plan、ADR0073/0077，并核对 Duplicate → Fragment → 新 Kernel writer → Session/History 及 Clipboard 调用边界。未发现规格遗漏、错误实现或范围扩张。\n\n满足“Capture each incoming Node/Edge mapping collection once”：校验捕获的同一数组，按原生归一化长度读取实际索引，输出自有冻结数组，不调用输入 map、iterator、constructor/species。无效映射在 Transaction 前以既有 `INVALID_MATERIALIZATION` 原子拒绝；继承项、缺失项、原始读取/应用异常与验证短路保持。Fragment 的精确覆盖、规范排序、namespace 和冻结规则继续生效。新 Kernel 捕获自有实体的稳定 ID，与 Duplicate 提交、关系索引及 History replay 无冲突；无 API、依赖、cap 或 fallback 新增。\n\n本轮实际执行 `bun test packages/plugin-duplicate-selection/tests`：34 pass、0 fail、117 assertions，包括真实 Host/Kernel/Command/Session、单 Commit、Undo/Redo、Lifecycle 和全部新增回归；`git diff --check` 通过。核对精确 commit/tree、完整 binary patch、保存的 patch/inspection 与干净工作树；旧基线结果不计入本轮。\n\n未独立运行 Clipboard/Fragment 整套、affected、build、browser 或 full engineering gate；未验证当前新 head 的远端 CI、证据发布/回读及最终 main 集成。定向通过不代表整体验收完成。\n\n- base: `f0e3fc12e3118b9a3b3d9502940b22f516302b13`\n- head: `74160ef20e9acf06a032ab0f4171398d6748fee4`\n- tree: `761b37081d75d6994d43b54b70b696d7344037b7`\n- raw binary patch SHA256: `c80710dd719e3c7d6b912f57184ec907f4f64d82242dd47096548aacafccbb29`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "historical-main99-public-red",
+      "acceptance": "Historical original public Host probe on main99 accepted invalid duplicateId42 substituted by a caller-owned map, violating atomic rejection. Original exit1 remains red provenance, not current-base verification.",
+      "command": "bun duplicate-array-hook-repro.ts (original main99 discovery)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "current-duplicate-clipboard-fragment",
+      "acceptance": "New mainf0e/head741 public real Host/Command/Kernel/Session/History composition passed109 tests422 assertions, retaining indexed mapping translation and strict exceptions with the new Kernel identity ownership.",
+      "command": "bun test packages/plugin-duplicate-selection/tests packages/plugin-clipboard/tests packages/canvas-fragment/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "current-affected-consumers",
+      "acceptance": "Actual selected consumers, types/declarations/builds, real Example browser suites and documentation passed at current synchronized source, exit0. Old base01c results were not reused.",
+      "command": "bun run check:affected --base f0e3fc12e3118b9a3b3d9502940b22f516302b13",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "fe8e0bb41431071eff3629d49bcbe1f5fee565f183e60851f6439c84b2fdebca"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "cce0124f3e5cf6c7d2be89580fd427ff9ab1457ceae36bb0fc4f4b0c50d536de"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "10eb19a1a50c7a17838009da73bdcba15915f9e4d9636a8713c0ad6a91b59b69"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "c73e206f1a43e751259d8c6247de9044dd737a49027bc5d90d92cffb34acdcef"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "daa2cf14ee1154c5c69d39e58df10a349d124588affcb7e9e8db629d0c760d21"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "63692671bc4705d36d3d48fabb177428df7d2be6b45f635d92799aeca64f660a"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "c07ff27885afd60029dc81f09d869fb063fe4f81f7160a5aa2620bd59b639b7b"
+    }
+  ]
+}
