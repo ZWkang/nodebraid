@@ -12,7 +12,7 @@ interface WriterOptions<Id extends string, Entity extends Identified<Id>> {
   readonly kind: EntityKind;
   readonly draft: Map<Id, Entity>;
   readonly touchedIds: Set<Id>;
-  readonly freeze: (entity: Entity) => Entity;
+  readonly freeze: (entity: Entity, id: Id) => Entity;
   readonly assertOpen: () => void;
   readonly onAdd: (entity: Entity) => void;
   readonly onReplace: (before: Entity, after: Entity) => void;
@@ -26,17 +26,18 @@ export function createEntityWriter<Id extends string, Entity extends Identified<
   return Object.freeze({
     add(entity: Entity): void {
       options.assertOpen();
-      if (options.draft.has(entity.id)) {
+      const id = entity.id;
+      if (options.draft.has(id)) {
         throw new KernelError(
           'ENTITY_ALREADY_EXISTS',
-          `${label} "${entity.id}" already exists.`,
-          Object.freeze({ entity: options.kind, id: entity.id }),
+          `${label} "${id}" already exists.`,
+          Object.freeze({ entity: options.kind, id }),
         );
       }
-      const frozen = options.freeze(entity);
-      options.draft.set(frozen.id, frozen);
+      const frozen = options.freeze(entity, id);
+      options.draft.set(id, frozen);
       options.onAdd(frozen);
-      options.touchedIds.add(frozen.id);
+      options.touchedIds.add(id);
     },
     replace(id: Id, entity: Entity): void {
       options.assertOpen();
@@ -48,14 +49,15 @@ export function createEntityWriter<Id extends string, Entity extends Identified<
           Object.freeze({ entity: options.kind, id }),
         );
       }
-      if (entity.id !== id) {
+      const actualId = entity.id;
+      if (actualId !== id) {
         throw new KernelError(
           'ENTITY_ID_MISMATCH',
-          `Replacement ${label} ID "${entity.id}" does not match "${id}".`,
-          Object.freeze({ entity: options.kind, id, actualId: entity.id }),
+          `Replacement ${label} ID "${actualId}" does not match "${id}".`,
+          Object.freeze({ entity: options.kind, id, actualId }),
         );
       }
-      const frozen = options.freeze(entity);
+      const frozen = options.freeze(entity, actualId);
       options.draft.set(id, frozen);
       options.onReplace(before, frozen);
       options.touchedIds.add(id);

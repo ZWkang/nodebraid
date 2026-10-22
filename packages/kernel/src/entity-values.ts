@@ -1,9 +1,10 @@
 import type { CanvasEdge, CanvasNode, EdgeEndpoint, Point, Size } from './contracts';
+import type { EdgeId, NodeId } from './identifiers';
 
-export function freezeCanvasNode(node: CanvasNode): CanvasNode {
+export function freezeCanvasNode(node: CanvasNode, id: NodeId): CanvasNode {
   // Copy and freeze only NodeBraid-owned shells. Arbitrary data intentionally keeps its original reference.
   return Object.freeze({
-    id: node.id,
+    id,
     type: node.type,
     position: Object.freeze({ x: node.position.x, y: node.position.y }),
     ...(node.size === undefined ? {} : { size: Object.freeze({ width: node.size.width, height: node.size.height }) }),
@@ -12,10 +13,10 @@ export function freezeCanvasNode(node: CanvasNode): CanvasNode {
   });
 }
 
-export function freezeCanvasEdge(edge: CanvasEdge): CanvasEdge {
+export function freezeCanvasEdge(edge: CanvasEdge, id: EdgeId): CanvasEdge {
   // Endpoints are Kernel-owned values; edge.data remains opaque just like node.data.
   return Object.freeze({
-    id: edge.id,
+    id,
     type: edge.type,
     source: freezeEdgeEndpoint(edge.source),
     target: freezeEdgeEndpoint(edge.target),
