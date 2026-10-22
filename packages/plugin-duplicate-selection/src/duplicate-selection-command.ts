@@ -92,12 +92,20 @@ export function createDuplicateSelectionHandler(
 }
 
 function translateMaterialization(value: unknown): CanvasFragmentIdMaterialization {
-  if (!isRecord(value) || !Array.isArray(value.nodes) || !Array.isArray(value.edges)) {
+  if (!isRecord(value)) {
     throwInvalidMaterialization('Duplicate ID Materialization is malformed.');
   }
+  const nodes = value.nodes;
+  if (!Array.isArray(nodes)) throwInvalidMaterialization('Duplicate ID Materialization is malformed.');
+  const edges = value.edges;
+  if (!Array.isArray(edges)) throwInvalidMaterialization('Duplicate ID Materialization is malformed.');
   return Object.freeze({
-    nodes: Object.freeze(value.nodes.map((mapping) => translateMapping<NodeId>(mapping, 'Node'))),
-    edges: Object.freeze(value.edges.map((mapping) => translateMapping<EdgeId>(mapping, 'Edge'))),
+    nodes: Object.freeze(
+      Array.from({ length: nodes.length }, (_, index) => translateMapping<NodeId>(nodes[index], 'Node')),
+    ),
+    edges: Object.freeze(
+      Array.from({ length: edges.length }, (_, index) => translateMapping<EdgeId>(edges[index], 'Edge')),
+    ),
   });
 }
 
