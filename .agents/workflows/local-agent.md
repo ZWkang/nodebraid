@@ -143,8 +143,9 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    reproduce a defect red, implement the smallest complete fix, then show green.
    New requirements, public contracts or ADR changes return to the user.
    Before implementation, call `bun run agents:run prepare <input.json> <run-dir>`.
-   It independently saves the approved source, expected remote base, current PR
-   `baseRefName`, request, feedback and `plan: [{id, blockedBy, acceptance}]`.
+   It independently saves the approved source, current PR `baseRefName`, review
+   `base` SHA, `expectedParent` SHA, request, feedback and
+   `plan: [{id, blockedBy, acceptance}]`.
    Write the draft plan in `input.json`; after prepare, use the immutable
    `prepared-task.json.plan` as the ticket plan. Keep `completed-steps.json` and
    each step's actual evidence in that run outside the worktree. Optional
@@ -155,6 +156,14 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    a changed task requires another run. Do not derive the prepared task from the
    result receipt or replace it after execution. Reassess earlier step evidence
    before carrying completion into a changed plan.
+   `base` is the fetched target tip used by review, check, preview and report;
+   `expectedParent` is the source branch head to append to (the fetched target
+   for an initial branch). They may differ after repair or main synchronization.
+   Capture both independently before execution; verification requires both in
+   the local ancestry. Publication also verifies that an actual remote parent
+   inherits the review `base`, retaining the main parent after synchronization;
+   have those parent objects locally available and surface Git read errors.
+   Preview always uses the prepared review `base`.
    During development, run `bun run check:affected` for changes against `HEAD`,
    including staged, unstaged and untracked files. Use `--base main` to include
    branch changes, or `--plan` to inspect the scope without executing checks.
@@ -200,8 +209,9 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    replace an existing open PR, or report a local commit as a successful push.
    Save the actual GitHub Git commit response and run
    `agents:run publication <run-dir> <remote-commit.json>` before moving the local
-   branch to an API-generated SHA. It verifies tree and append-only parent against
-   the checked source. One run cannot be rebound to another publication.
+   branch to an API-generated SHA. It verifies tree and first parent against the
+   independently saved `expectedParent` of the checked source. One run cannot be
+   rebound to another publication.
 6. Record the actual published head in the local receipt; Git-data API commit SHAs
    may differ from local SHAs even when trees match. Collect preview at the actual
    published head and generate `agents:report` from the verified run. Publish and
@@ -241,10 +251,14 @@ reviews include every 100-item page through the final short/empty page; check,
 status and workflow arrays match their reported totals; thread comments finish
 their cursors. Normalization includes resolved-thread replies and active human
 change requests, and binds job checks to actual current-head workflow identities.
+Read the actual PR `base.sha` as `baseRefOid`; missing target identity is an error.
 Use `evaluate <run-dir> <snapshot.json>` for readiness. A changed published head
-or target branch returns `waiting-verification`; never reuse the old verification
-after retargeting, even at the same head. Legacy runs without `baseRefName`
-remain readable historical evidence but require a new prepared run for delivery.
+or target branch/name/SHA returns `waiting-verification`; never reuse the old
+verification after target changes, even at the same head. Legacy runs without
+`baseRefName` or `expectedParent` remain readable historical evidence, with their
+original digests and published reports intact. New verification, publication,
+reporting and readiness require a new independently prepared run; never fill
+missing fields in the old task.
 Do not replace context with empty feedback arrays to obtain ready.
 `evaluate` does not yet validate the presentation publication receipt. Its `ready`
 result still requires the report/media publication and current-head readback above;

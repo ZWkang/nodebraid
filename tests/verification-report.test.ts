@@ -4,6 +4,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { prepareRun } from '../scripts/local-agent-run';
 
 const reporter = resolve('scripts/verification-report.ts');
 const runner = resolve('scripts/local-agent.ts');
@@ -42,6 +43,7 @@ function fixture() {
       branch: 'feat/issue-45',
       baseRefName: 'main',
       base,
+      expectedParent: base,
       request: 'approved report scope',
       pending: [],
       plan: [{ id: 'report', blockedBy: [], acceptance: 'Reviewer can inspect actual verification evidence' }],
@@ -82,6 +84,28 @@ function fixture() {
   }
 }
 
+test.each(['expectedParent', 'baseRefName'])(
+  'legacy runs without %s stay historical and are not rewritten by reporting',
+  (missing) => {
+    const f = fixture();
+    try {
+      const input = JSON.parse(readFileSync(join(f.run, 'input.json'), 'utf8'));
+      delete input[missing];
+      const legacy = join(f.directory, '.tmp/legacy');
+      mkdirSync(legacy);
+      f.json(join(legacy, 'prepared-task.json'), prepareRun(input));
+      const original = readFileSync(join(legacy, 'prepared-task.json'), 'utf8');
+      const result = spawnSync(process.execPath, [reporter, legacy, f.output], { cwd: f.directory, encoding: 'utf8' });
+      expect(result.status).not.toBe(0);
+      expect(result.stderr).toContain('Legacy run lacks baseRefName or expectedParent');
+      expect(readFileSync(join(legacy, 'prepared-task.json'), 'utf8')).toBe(original);
+      expect(existsSync(f.output)).toBe(false);
+    } finally {
+      f.cleanup();
+    }
+  },
+);
+
 test('repeating report generation preserves the previous proof rather than overwriting it', () => {
   const f = fixture();
   try {
@@ -105,6 +129,7 @@ test('the public report command preserves both reviews, real logs and published 
     expect(report.schemaVersion).toBe(1);
     expect(report.source).toEqual({
       base: f.base,
+      expectedParent: f.base,
       head: f.publishedHead,
       localHead: f.identity.head,
       tree: f.identity.tree,
