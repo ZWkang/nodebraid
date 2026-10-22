@@ -1,9 +1,10 @@
 import { expect, test } from 'bun:test';
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { prepareRun, type RunInput } from '../scripts/local-agent-run';
 
 const cli = resolve('scripts/local-agent.ts');
 
@@ -26,13 +27,15 @@ test('one issue resumes its local ticket frontier without creating child issues'
       '-qm',
       'fixture',
     );
+    const base = git('rev-parse', 'HEAD');
     json('input.json', {
       run: 'single-spec',
       repository: 'ZWkang/nodebraid',
       source: { kind: 'issue', number: 71 },
       branch: 'feat/issue-71',
       baseRefName: 'main',
-      base: git('rev-parse', 'HEAD'),
+      base,
+      expectedParent: base,
       request: 'Deliver the approved spec in one PR with local implementation tickets.',
       pending: [],
       plan: [
@@ -86,13 +89,14 @@ test('a persisted task resumes after a failed real check and never blesses an un
     );
     const base = git('rev-parse', 'HEAD');
     mkdirSync(join(dir, '.tmp'));
-    const input = {
+    const input: RunInput = {
       run: 'run-1',
       repository: 'ZWkang/nodebraid',
       source: { kind: 'issue', number: 10 },
       branch: 'feat/issue-10',
       baseRefName: 'main',
       base,
+      expectedParent: base,
       request: 'approved-scope',
       pending: [],
       plan: [{ id: 'fix', blockedBy: [], acceptance: 'Public regression red then green' }],
@@ -100,6 +104,8 @@ test('a persisted task resumes after a failed real check and never blesses an un
     json('.tmp/input.json', input);
     json('.tmp/unbound.json', { ...input, baseRefName: undefined });
     expect(invoke('prepare', '.tmp/unbound.json', '.tmp/unbound-run').stderr).toContain('baseRefName');
+    json('.tmp/no-parent.json', { ...input, expectedParent: undefined });
+    expect(invoke('prepare', '.tmp/no-parent.json', '.tmp/no-parent-run').stderr).toContain('expectedParent');
     expect(invoke('prepare', '.tmp/input.json', '.tmp/run').status).toBe(0);
     expect(invoke('prepare', '.tmp/input.json', '.tmp/run').status).toBe(0);
     json('.tmp/input.json', { ...input, request: 'different' });
@@ -114,6 +120,16 @@ test('a persisted task resumes after a failed real check and never blesses an un
       spec: { head, tree, patch, verdict: 'passed', report: 'Spec fixture review' },
     });
     json('.tmp/decisions.json', []);
+    const { expectedParent: _parent, ...legacyInput } = input;
+    mkdirSync(join(dir, '.tmp/legacy-run'));
+    json('.tmp/legacy-run/prepared-task.json', prepareRun(legacyInput));
+    const legacyText = readFileSync(join(dir, '.tmp/legacy-run/prepared-task.json'), 'utf8');
+    expect(invoke('verify', '.tmp/legacy-run', '.tmp/reviews.json', '.tmp/decisions.json').stderr).toContain(
+      'expectedParent',
+    );
+    expect(invoke('publication', '.tmp/legacy-run', '.tmp/not-a-commit.json').stderr).toContain('expectedParent');
+    expect(existsSync(join(dir, '.tmp/legacy-run/verification.json'))).toBe(false);
+    expect(readFileSync(join(dir, '.tmp/legacy-run/prepared-task.json'), 'utf8')).toBe(legacyText);
     writeFileSync(join(dir, '.tmp/fail'), 'real child process exits nonzero');
     expect(invoke('verify', '.tmp/run', '.tmp/reviews.json', '.tmp/decisions.json').status).not.toBe(0);
     expect(JSON.parse(readFileSync(join(dir, '.tmp/run/verification.json'), 'utf8')).checks.exitCode).toBe(1);
@@ -136,6 +152,7 @@ test('a persisted task resumes after a failed real check and never blesses an un
       headRefOid: 'b'.repeat(40),
       headRepository: { nameWithOwner: 'ZWkang/nodebraid' },
       baseRefName: 'main',
+      baseRefOid: base,
       mergeable: 'MERGEABLE',
       mergeStateStatus: 'CLEAN',
       reviewDecision: '',

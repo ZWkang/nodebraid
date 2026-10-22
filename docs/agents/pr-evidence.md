@@ -8,7 +8,7 @@
 ## 入口与产物
 
 ```bash
-bun run agents:preview --base <base-sha> --out <empty-output-dir> [--all]
+bun run agents:preview --base <review-base-sha> --out <empty-output-dir> [--all]
 bun run agents:report <run-dir> <output-dir>
 bun run agents:publish-evidence prepare <output-dir> ZWkang/nodebraid <pr-number> <published-head-sha>
 ```
@@ -25,12 +25,16 @@ bun run agents:publish-evidence prepare <output-dir> ZWkang/nodebraid <pr-number
   `publication-input.json`，供已连接的 GitHub 工具发布。它本身不写 GitHub。
 
 两个 manifest 的 `source` 都含 `base`、`head`、`tree`、完整 binary patch 的 SHA-256；
-report 另保留 `localHead`，其中 `head` 是 `publication.json` 的实际发布提交。
+其中 `base` 使用 prepared task 的目标分支审查起点，追加修复时也不改用源分支 head。
+report 另保留 `localHead` 与独立保存并经实际第一父提交验证的 `expectedParent`；
+其中 `head` 是 `publication.json` 的实际发布提交。
 同一 bundle 的 base/head/tree/patch 必须一致。若 Git-data API 生成了不同于本地的 SHA，
 先按本地协议记录 `publication`，再在实际发布 head 上采集 preview；不能手改 manifest
 给旧证据换一个 SHA。所有 artifact 都声明相对路径、类型与 SHA-256；缺失文件、路径逃逸、
 symlink、hash 不符或身份不一致直接报错。只复制明确声明的日志与报告，不扫描打包整个 run
 或用户配置目录；发布前确认这些材料可公开，不把凭据放入日志、截图或 JSON。
+旧 run 缺少 `expectedParent` 时保留其原文件和已发布报告，当前报告命令明确拒绝重生成；
+另建新 run，不能给旧结果补写父提交或改变其审查起点。
 
 ## 场景与覆盖边界
 

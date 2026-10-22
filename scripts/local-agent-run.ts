@@ -15,6 +15,7 @@ export interface RunInput {
   branch: string;
   baseRefName?: string;
   base: string;
+  expectedParent?: string;
   request: string;
   pending: FeedbackItem[];
   plan: PlanStep[];
@@ -70,6 +71,8 @@ export function prepareRun(input: RunInput): PreparedRun {
     !/^[\w.-]+\/[\w.-]+$/.test(input.repository) ||
     !/^feat\/[\w.-]+$/.test(input.branch) ||
     !/^[a-f0-9]{40}$/.test(input.base) ||
+    (input.expectedParent !== undefined &&
+      (typeof input.expectedParent !== 'string' || !/^[a-f0-9]{40}$/.test(input.expectedParent))) ||
     !['issue', 'pr'].includes(input.source.kind) ||
     !Number.isSafeInteger(input.source.number) ||
     input.source.number < 1 ||
@@ -83,6 +86,7 @@ export function prepareRun(input: RunInput): PreparedRun {
     branch: input.branch,
     ...(input.baseRefName === undefined ? {} : { baseRefName: input.baseRefName }),
     base: input.base,
+    ...(input.expectedParent === undefined ? {} : { expectedParent: input.expectedParent }),
     request: input.request,
     pending: input.pending,
     plan: input.plan,
@@ -148,7 +152,6 @@ export function evaluateVerifiedRun(
     publication.taskDigest !== task.digest ||
     publication.localHead !== verified.head ||
     publication.tree !== verified.tree ||
-    publication.parent !== task.base ||
     !/^[a-f0-9]{40}$/.test(publication.head)
   ) {
     throw new Error('Publication does not match the verified tree and expected remote parent.');
@@ -159,12 +162,14 @@ export function evaluateVerifiedRun(
     (task.source.kind === 'pr' && task.source.number !== pr.number)
   )
     throw new Error('Task belongs to another PR.');
-  if (!task.baseRefName)
+  if (!task.baseRefName || !task.expectedParent)
     return {
       status: 'waiting-verification' as const,
-      reason: 'Legacy run has no verified PR base; prepare a new run.',
+      reason: 'Legacy run lacks baseRefName or expectedParent; prepare a new run.',
     };
-  if (pr.headRefOid !== publication.head || pr.baseRefName !== task.baseRefName)
+  if (publication.parent !== task.expectedParent)
+    throw new Error('Publication does not match the independently prepared append parent.');
+  if (pr.headRefOid !== publication.head || pr.baseRefName !== task.baseRefName || pr.baseRefOid !== task.base)
     return {
       status: 'waiting-verification' as const,
       reason: 'PR head or base changed; prepare and verify a new run.',

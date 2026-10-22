@@ -41,6 +41,7 @@ export interface FeedbackSnapshot {
   headRefOid: string;
   headRepository: { nameWithOwner: string } | null;
   baseRefName: string;
+  baseRefOid?: string;
   mergeable: string;
   mergeStateStatus: string;
   reviewDecision: string;
@@ -131,6 +132,7 @@ export function evaluateFeedback(pr: FeedbackSnapshot, repository: string, decis
   const request = digest({
     head: pr.headRefOid,
     base: pr.baseRefName,
+    baseOid: pr.baseRefOid,
     feedback: pending.map((item) => [item.key, item.digest]).sort(),
     failed,
     updateBase,
