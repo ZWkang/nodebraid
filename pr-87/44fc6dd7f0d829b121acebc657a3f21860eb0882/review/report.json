@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "63e11db27145a2cb50123bd3727883905249d0c1",
+    "expectedParent": "a0deed7cf576e7af80555daaf206943432e5fb63",
+    "head": "44fc6dd7f0d829b121acebc657a3f21860eb0882",
+    "tree": "fe967ca7a98576c7abe9b10f717f115bd6218f98",
+    "patch": "892ccbbeee271106b76da8fabd408917cdff328f7ea557bc4166d5cfc32bfbb1",
+    "localHead": "c8c6dea0c0329ae94559c6e841c141bb9f80bb97"
+  },
+  "task": {
+    "run": "2298fe08-989f-4762-bb5b-b0ee49c384c2",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 86
+    },
+    "request": "## Confirmed defect\n\nOn fetched main `1c85d79db1e275e59f84a9bb77d1fe75c0a582e6`, Interaction validates a caller-owned `connection.materializeEdge` getter, then reads it again when creating the effective Connection configuration.\n\nA real compiled public-package Host/Kernel/Renderer/Interaction probe supplies a getter that first returns a valid synchronous materializer and then `null`. Activation succeeds, but the next valid public Renderer Input Connection Gesture cannot create an Edge.\n\nActual outcomes:\n\n```json\n{\"control\":{\"activation\":\"active\",\"calls\":1,\"revision\":2,\"edgeIds\":[\"accepted-edge\"],\"released\":1,\"faults\":[]},\"actual\":{\"activation\":\"active\",\"readsAfterActivation\":2,\"calls\":0,\"revision\":1,\"edgeIds\":[],\"released\":1,\"faults\":[{\"name\":\"nodebraid.plugin.interaction.connection-materializer.fault\",\"error\":\"TypeError: materializeEdge is not a function\"}]}}\n```\n\nThe ordinary materializer control commits the expected Edge. The assertion that an active Interaction must retain the materializer accepted during validation exits 1. Existing Interaction tests pass (35 tests / 200 assertions). The original compiled public source/output remain in run `20261022T063044-discovery` (`interaction-materializer-repro.ts`, `interaction-materializer-red.log`).\n\nThis is a public Renderer Input/Service/Command reproduction, not a claim of native browser input.\n\n## Contract and cause\n\n[ConnectionConfig](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/packages/plugin-interaction/src/contracts.ts) requires a synchronous materializer function. Existing public [config tests](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/packages/plugin-interaction/tests/config.test.ts) reject non-functions as `InteractionError / INVALID_CONFIG`; [Port Connection tests](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/packages/plugin-interaction/tests/port-connection.test.ts) exercise one materialization and one committed Edge. ADR 0068 retains Interaction's single validation and gesture authority.\n\nIn [resolveInteractionConfig](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/packages/plugin-interaction/src/interaction-config.ts), the function-type check and the subsequent frozen-shell construction consume separate property reads. The frozen result can therefore contain a value that was never accepted by the function check.\n\n## Acceptance\n\n- Capture `materializeEdge` once per Interaction Activation, after existing Connection shape/key checks. Validate and retain that same function in the owned frozen effective configuration.\n- Keep ordinary/getter-backed valid materializers usable through the public Connection Gesture, with exact Endpoints, one application call, one Edge Commit and normal terminal cleanup.\n- Preserve malformed/unknown config rejection and error precedence, first-read exception identity, callback failure reporting/cleanup, disposal, and fresh-Activation revalidation. Add no API, dependency, accessor ban, cap, retry or fallback.\n- Add a public red/green regression on the existing Host/Renderer Input/Kernel seam and relevant invalid/getter/fresh-Activation controls. Run connected Interaction/Renderer/Session/Runtime/Composition checks, independent Standards + ponytail-review / Spec, full engineering verification, actual current-head CI and complete report/media publication/readback.\n- Keep this Issue open until actual main integration and final acceptance.\n\n## Deduplication\n\nComplete all-state metadata through final short pages (85 Issues/PRs, 44 PRs) found no existing direct Interaction materializer capture repair. #84 / PR #85 repair Basic Canvas's factory-time Connection shell capture; direct `interactionPlugin` installation bypasses that Composition and remains affected. #76 concerns Session mutators.",
+    "plan": [
+      {
+        "id": "synchronize-main",
+        "blockedBy": [],
+        "acceptance": "Independently capture fetched main and actual published head before an append-only local merge into existing PR87. Preserve approved Interaction materializer capture semantics; no new product behavior."
+      },
+      {
+        "id": "integration-compatibility",
+        "blockedBy": [
+          "synchronize-main"
+        ],
+        "acceptance": "Run fresh public Interaction tests and affected checks for the integration delta. Save complete new base/head/tree/patch; historical evidence remains historical."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "integration-compatibility"
+        ],
+        "acceptance": "Fresh independent Standards plus ponytail-review and Spec inspect full current PR scope against original Issue86 and current main."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Pinned main versioned agents:run verify executes real full bun run check after both axes pass; preserve all attempts."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Publish exact checked tree with original published head first parent and captured main parent; validate actual current-head CI, complete feedback and immutable report/preview before readiness."
+      },
+      {
+        "id": "authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "Recheck actual head/base, strict checks and all feedback immediately before normal expected-head PR merge. No bypass, approve/dismiss, force push or auto-merge setting."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "authorized-merge"
+        ],
+        "acceptance": "Fetch actual merged main, verify ancestry and complete original Issue86 public behavior acceptance, publish summary and close only after all criteria pass."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "c8c6dea0c0329ae94559c6e841c141bb9f80bb97",
+      "tree": "fe967ca7a98576c7abe9b10f717f115bd6218f98",
+      "patch": "892ccbbeee271106b76da8fabd408917cdff328f7ea557bc4166d5cfc32bfbb1",
+      "verdict": "passed",
+      "report": "What this change does: Interaction saves the Connection materializer that passed validation and uses that same callback for the Activation. This revision also incorporates main’s Session input-capture repair.\n\nVerdict: passed. Looks good. Ship.\n\nReviewed identity:\n\n- Base: `63e11db27145a2cb50123bd3727883905249d0c1`\n- Head: `c8c6dea0c0329ae94559c6e841c141bb9f80bb97`\n- Tree: `fe967ca7a98576c7abe9b10f717f115bd6218f98`\n- Binary patch SHA256: `892ccbbeee271106b76da8fabd408917cdff328f7ea557bc4166d5cfc32bfbb1`\n\nHard standards: no violations found. Re-read the complete three-file patch, regression cases, Issue #86, its empty discussion, prepared plan and supplied PR #87 checkpoint. Current AGENTS, CONTRIBUTING, CONTEXT, tracker/discussion rules and applicable principle guidance remain unchanged.\n\nThe callback is read after existing shape/key checks. Its validated identity is retained in a frozen configuration, without changing original read errors or fresh-Activation revalidation. This follows Boundary Discipline and Type System Discipline. Traced terminal cleanup, materialization, Port checks, typed Command, Kernel commit and History observation against ADR0068/0069 and ADR0028/0029. Current Session’s owned IDs, Snapshot identity and FIFO notifications remain compatible with Interaction mutations and Renderer subscriptions.\n\nJudgment checks: no concrete Fowler smell found. For one isolated Host per Canvas, one local capture is sufficient. No wrapper, cache, new interface, dependency, input cap or fallback is needed or added.\n\nIndependent check: `bun test packages/plugin-interaction/tests packages/plugin-session/tests packages/plugin-renderer/tests` passed 85 tests / 383 assertions at this head. This includes the changed-getter Connection regression, recovery/read-error controls, Session capture/FIFO and Renderer reconciliation. These use real Runtime services with a boundary Renderer fixture, not native browser input.\n\nVerified saved patch bytes/hash, inspection/task binding, clean worktree and `git diff --check`. Local parents are the earlier unpublished sync and captured main; the published source remains an ancestor. The independent remote append parent is preserved in the prepared task and need not equal the local immediate parent. Confirmed the compiled Session dependency includes the current capture implementation. Commands/output are in `standards-command-log.txt`.\n\nNot checked: fresh builds, browsers, full engineering gate, new-head CI, live feedback refresh, API publication/tree readback or merge. Earlier reports and checks were not relabeled for this identity. This review covers Standards and ponytail-review only.\n"
+    },
+    "spec": {
+      "head": "c8c6dea0c0329ae94559c6e841c141bb9f80bb97",
+      "tree": "fe967ca7a98576c7abe9b10f717f115bd6218f98",
+      "patch": "892ccbbeee271106b76da8fabd408917cdff328f7ea557bc4166d5cfc32bfbb1",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n独立重审新 main 基线的完整三文件补丁及全部 config/Gesture/recovery 回归、原 Issue #86 全文/空讨论/依赖、独立 prepared plan、AGENTS/CONTEXT、tracker/讨论规范、code-review、ADR0068/0028 及当前 config → Activation → Connection → Command → Kernel/History/Session 链。未发现规格遗漏、错误实现或范围扩张。\n\n满足“Capture materializeEdge once per Interaction Activation, after existing Connection shape/key checks”：原 shape/key 检查后只读一次，同一函数用于类型验证和 owned frozen effective config。准确 Endpoints、单次应用调用/Edge Commit、原始 getter/callback 异常、清理/故障报告和 fresh Activation 重新校验保持，无跨 Activation 缓存或新 API、cap、accessor ban、retry/fallback。新 main 的 Session ownership 与这些公开调用和订阅路径兼容。\n\n本轮实际运行 `bun test packages/plugin-interaction/tests packages/plugin-session/tests packages/plugin-renderer/tests`：85 pass、0 fail、383 assertions；`git diff --check` 通过。核对完整 patch/inspection、head/tree、干净工作树；本地 parents 为 bcde801/main63e，published a0deed7 确为祖先，新增 integration delta 仅已合入的 Session 两文件。未把 local immediate parent 误记为远端追加父。命令/原始输出在 `spec-review-commands.log`，旧报告结果未换绑。\n\n当前 published a0deed7 的完整 comments/reviews/threads 均空，无新增反馈；被审 head 尚未发布。未执行 full verify、build/browser、affected/docs 全套，未验证最终 API 发布 parents/tree、新 head CI/反馈、证据回读及 merge/main 验收。公共 Renderer Input adapter 不代表 native browser 验证。\n\n- base: `63e11db27145a2cb50123bd3727883905249d0c1`\n- head: `c8c6dea0c0329ae94559c6e841c141bb9f80bb97`\n- tree: `fe967ca7a98576c7abe9b10f717f115bd6218f98`\n- binary patch SHA256: `892ccbbeee271106b76da8fabd408917cdff328f7ea557bc4166d5cfc32bfbb1`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "current-interaction-contract",
+      "acceptance": "Fresh public Interaction37 tests/213 assertions, including accepted materializer identity and real Port-qualified Connection/History behavior. Historical TDD stays at original identities.",
+      "command": "bun run --filter @nodebraid/plugin-interaction test",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "session-renderer-consumer-integration",
+      "acceptance": "Fresh Interaction+Session+Renderer public tests at the combined head pass85 tests/383 assertions after actual Session main integration.",
+      "command": "bun test packages/plugin-interaction/tests packages/plugin-session/tests packages/plugin-renderer/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "main-integration-affected",
+      "acceptance": "Actual delta from prior local bcde sync includes Session changes. Planned affected packages, public root composition tests, actual browser suites and docs all pass; original output preserved.",
+      "command": "bun run check:affected --base bcde801296e7d81f3062866ff4b7b197788d8e90",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "3daa2e006d5fa93d54925cea53620e380c8dc498a6c4a25b67f819b4c28aa238"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "a3309b11c75c8e58961b84be7b55234df5248ecba240394a963073c6199ac1b0"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "86eb2bd6d9f5883178f4957465eaf9c82ff896cac4113202cab3af43c6cd7662"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "60296029385a680c0ab934d8d3936c0eba7489b84c2066f42b790f099629f764"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "77a1ec707e17bde663b2c93196575271e3b65fb2e63776d91751404c6664db37"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "803c6d2dfe401115b9d20adef92f3dfdeeadb56c500be3e1ce6babca0c58fbc4"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "1feda2553b3fe7cc6fce30689e7d4009c1de612573709495e46874bf3893013a"
+    }
+  ]
+}
