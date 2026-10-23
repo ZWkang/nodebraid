@@ -1,7 +1,13 @@
 import { describeNonFiniteNumber, type DiagnosticAttributes } from '@nodebraid/diagnostics';
 
 import type { CanvasEdge, CanvasNode, ChangeDirection, ChangeSet, EntityWriter, GraphChange } from './contracts';
-import { canvasEdgesEqual, canvasNodesEqual, isCanvasEdgeValue, isCanvasNodeValue, isRecord } from './entity-values';
+import {
+  canvasEdgesEqual,
+  canvasNodesEqual,
+  captureCanvasEdgeValue,
+  captureCanvasNodeValue,
+  isRecord,
+} from './entity-values';
 import type { EdgeId, NodeId } from './identifiers';
 import { KernelError } from './kernel-error';
 
@@ -88,41 +94,47 @@ function validateChangeSet(changeSet: ChangeSet, direction: ChangeDirection): re
   // Keep native Array length coercion without invoking the input's traversal hooks.
   for (const index of Array.prototype.keys.call({ length })) {
     const change: GraphChange = changes[index];
-    if (!isRecord(change) || (change.entity !== 'node' && change.entity !== 'edge')) {
+    if (!isRecord(change)) {
       throwInvalidChangeSet('Change must identify a Node or Edge.', { index });
     }
-    if (typeof change.id !== 'string' || change.id.length === 0) {
+    const entityKind = change.entity;
+    if (entityKind !== 'node' && entityKind !== 'edge') {
+      throwInvalidChangeSet('Change must identify a Node or Edge.', { index });
+    }
+    const id = change.id;
+    if (typeof id !== 'string' || id.length === 0) {
       throwInvalidChangeSet('Change entity ID must be a non-empty string.', { index });
     }
-    const identity = `${change.entity}\u0000${change.id}`;
+    const identity = `${entityKind}\u0000${id}`;
     if (identities.has(identity)) {
       throwInvalidChangeSet('Change Set must not contain duplicate entity changes.', {
         index,
-        entity: change.entity,
-        id: change.id,
+        entity: entityKind,
+        id,
       });
     }
     identities.add(identity);
-    if (change.before === null && change.after === null) {
+    const before = change.before;
+    const after = change.after;
+    if (before === null && after === null) {
       throwInvalidChangeSet('Change must contain a before or after entity.', { index });
     }
-    for (const [side, entity] of [
-      ['before', change.before],
-      ['after', change.after],
-    ] as const) {
-      if (entity === null) continue;
-      const validNode = change.entity === 'node' && isCanvasNodeValue(entity) && entity.id === change.id;
-      const validEdge = change.entity === 'edge' && isCanvasEdgeValue(entity) && entity.id === change.id;
-      if (!validNode && !validEdge) {
+    const captureSide = (entity: unknown, side: 'before' | 'after') => {
+      if (entity === null) return null;
+      const captured = entityKind === 'node' ? captureCanvasNodeValue(entity) : captureCanvasEdgeValue(entity);
+      if (!captured || captured.id !== id) {
         throwInvalidChangeSet('Change entity must match its kind and ID.', {
           index,
           side,
-          entity: change.entity,
-          id: change.id,
+          entity: entityKind,
+          id,
         });
       }
-    }
-    accepted.push(change);
+      return captured;
+    };
+    const ownedBefore = captureSide(before, 'before');
+    const ownedAfter = captureSide(after, 'after');
+    accepted.push(Object.freeze({ entity: entityKind, id, before: ownedBefore, after: ownedAfter }) as GraphChange);
   }
   return accepted;
 }

@@ -24,10 +24,9 @@ export function createLayoutPlugin<Config>(options: CreateLayoutPluginOptions<Co
             fixedNodeIds: input.fixedNodeIds,
           });
           assertLayoutCapabilities(options.engine.id, options.engine.capabilities, layoutInput);
-          const proposal = validateLayoutProposal(
-            layoutInput,
-            await options.engine.compute(layoutInput, input.config, { signal: execution.signal }),
-          );
+          const computed = await options.engine.compute(layoutInput, input.config, { signal: execution.signal });
+          execution.signal.throwIfAborted();
+          const proposal = validateLayoutProposal(layoutInput, computed);
           execution.signal.throwIfAborted();
           const currentRevision = context.services.kernel.read().snapshot.revision;
           if (currentRevision !== proposal.sourceRevision) {
