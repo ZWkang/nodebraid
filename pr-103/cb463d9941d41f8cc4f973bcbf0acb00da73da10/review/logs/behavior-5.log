@@ -1,0 +1,301 @@
+actual_base: e21c917b170b37ff60418d76a0bbcc65b8799d17
+actual_head: 723b81124050862940abcb8feb729e0c8baa7737
+actual_tree: 67f3b505dae06ba0effc38ba653ea8c757d6f2a0
+actual_binary_patch_sha256: 7c9f62f023b8e1b714c8b5316323cd175e060fae488071b87de4b08cc104f6c2
+actual_parents: 6f7b8247208a1decb943cd2c4ff8d39d38aa8707 e21c917b170b37ff60418d76a0bbcc65b8799d17
+prepared_request_matches_full_issue_body: true
+
+actual_command: git status --short --branch
+## feat/issue-102
+actual_exit_code: 0
+
+actual_command: bun test packages/kernel/tests packages/plugin-kernel/tests packages/plugin-history/tests
+bun test v1.4.2 (744846f84)
+
+packages/plugin-history/tests/index.test.ts:
+(pass) @nodebraid/plugin-history > publishes the stable History diagnostic event catalog [1.14ms]
+(pass) @nodebraid/plugin-history > records the first post-Baseline Commit and undoes it through Command Service [27.32ms]
+(pass) @nodebraid/plugin-history > redoes the most recently undone History Entry with diagnostic metadata [2.77ms]
+(pass) @nodebraid/plugin-history > records a Recordable Commit that uses History-like diagnostic metadata [1.28ms]
+(pass) @nodebraid/plugin-history > records Command-originated work but not net-zero or failed Transactions [3.56ms]
+(pass) @nodebraid/plugin-history > clears Redo when a new Recordable Commit creates a branch [0.91ms]
+(pass) @nodebraid/plugin-history > rejects an empty Undo without changing Kernel or History [0.92ms]
+(pass) @nodebraid/plugin-history > publishes only meaningful History Snapshot changes [0.77ms]
+(pass) @nodebraid/plugin-history > snapshots subscriber recipients and isolates their errors [2.09ms]
+(pass) @nodebraid/plugin-history > allows an aligned Recordable Commit subscriber to Undo immediately [0.81ms]
+(pass) @nodebraid/plugin-history > rejects Undo before History catches up to the current Kernel revision [0.72ms]
+(pass) @nodebraid/plugin-history > keeps one queued Replay in flight and rejects a reentrant second Undo [0.65ms]
+(pass) @nodebraid/plugin-history > records a reentrant Recordable Commit and publishes only after catching up [0.77ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy while publishing its History Snapshot [6.90ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through later Kernel Observers [1.09ms]
+(pass) @nodebraid/plugin-history > returns the exact Replay Commit delivered to Kernel Observers [0.68ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through the final caught-up Snapshot publication [0.85ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Kernel Provider disappears before delivery [0.70ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Command Provider disappears before delivery [0.50ms]
+(pass) @nodebraid/plugin-history > preserves caller cancellation before starting a Replay [0.50ms]
+(pass) @nodebraid/plugin-history > prioritizes caller cancellation over an empty Undo stack [0.56ms]
+(pass) @nodebraid/plugin-history > closes old History state and reactivates from a fresh Kernel Baseline [0.91ms]
+(pass) @nodebraid/plugin-history > starts a new Baseline when Command Service returns to a retained Kernel [0.77ms]
+
+packages/plugin-history/tests/types.test.ts:
+(pass) keeps the public History seam narrow and type-safe
+
+packages/plugin-kernel/tests/index.test.ts:
+(pass) @nodebraid/plugin-kernel > publishes the stable Kernel Plugin diagnostic event catalog
+(pass) @nodebraid/plugin-kernel > provides one revision-zero Kernel Service for an Activation [0.68ms]
+(pass) @nodebraid/plugin-kernel > synchronously observes only successful net-changing Transactions [0.55ms]
+(pass) @nodebraid/plugin-kernel > reports Observer errors without rolling back or blocking later Observers [0.48ms]
+(pass) @nodebraid/plugin-kernel > schedules an explicit Observer error when platform reporting is unavailable [5.96ms]
+(pass) @nodebraid/plugin-kernel > queues reentrant Commits until every Observer sees the current revision [0.50ms]
+(pass) @nodebraid/plugin-kernel > stops Consumers before closing the Service and reinstalls a fresh Kernel [0.71ms]
+
+packages/plugin-kernel/tests/types.test.ts:
+(pass) keeps the public Kernel Service contract type-safe
+
+packages/kernel/tests/node-owned-values.test.ts:
+(pass) Node add retains first invalid position for final graph validation [0.34ms]
+(pass) Node add retains first invalid size for final graph validation [0.06ms]
+(pass) Node add retains first invalid parentId for final graph validation [0.04ms]
+(pass) Node replace retains first invalid position for final graph validation [0.14ms]
+(pass) Node replace retains first invalid size for final graph validation [0.03ms]
+(pass) Node replace retains first invalid parentId for final graph validation [0.03ms]
+(pass) Node add copies first valid position from enumerable without later reads [0.12ms]
+(pass) Node add copies first valid position from non-enumerable without later reads [0.03ms]
+(pass) Node add copies first valid position from inherited without later reads [0.03ms]
+(pass) Node add copies first valid size from enumerable without later reads [0.02ms]
+(pass) Node add copies first valid size from non-enumerable without later reads [0.01ms]
+(pass) Node add copies first valid size from inherited without later reads [0.02ms]
+(pass) Node add copies first valid parentId from enumerable without later reads [0.03ms]
+(pass) Node add copies first valid parentId from non-enumerable without later reads [0.02ms]
+(pass) Node add copies first valid parentId from inherited without later reads [0.02ms]
+(pass) Node add retains absent size without another read [0.06ms]
+(pass) Node add retains absent parentId without another read [0.01ms]
+(pass) Node replace copies first valid position from enumerable without later reads [0.06ms]
+(pass) Node replace copies first valid position from non-enumerable without later reads [0.02ms]
+(pass) Node replace copies first valid position from inherited without later reads [0.02ms]
+(pass) Node replace copies first valid size from enumerable without later reads [0.02ms]
+(pass) Node replace copies first valid size from non-enumerable without later reads [0.02ms]
+(pass) Node replace copies first valid size from inherited without later reads [0.02ms]
+(pass) Node replace copies first valid parentId from enumerable without later reads [0.02ms]
+(pass) Node replace copies first valid parentId from non-enumerable without later reads [0.01ms]
+(pass) Node replace copies first valid parentId from inherited without later reads [0.01ms]
+(pass) Node replace retains absent size without another read [0.01ms]
+(pass) Node replace retains absent parentId without another read [0.01ms]
+(pass) Node add preserves the original type failure, order and caught Draft state [0.15ms]
+(pass) Node add preserves the original position failure, order and caught Draft state [0.03ms]
+(pass) Node add preserves the original position.x failure, order and caught Draft state [0.02ms]
+(pass) Node add preserves the original position.y failure, order and caught Draft state [0.02ms]
+(pass) Node add preserves the original size failure, order and caught Draft state [0.02ms]
+(pass) Node add preserves the original size.width failure, order and caught Draft state [0.02ms]
+(pass) Node add preserves the original size.height failure, order and caught Draft state [0.02ms]
+(pass) Node add preserves the original parentId failure, order and caught Draft state [0.02ms]
+(pass) Node add preserves the original data failure, order and caught Draft state [0.02ms]
+(pass) Node add preserves an opaque data thrown value %s [0.03ms]
+(pass) Node add preserves an opaque data thrown value %s [0.02ms]
+(pass) Node add preserves an opaque data thrown value %s [0.02ms]
+(pass) Node add preserves an opaque data thrown value %s [0.02ms]
+(pass) Node add keeps invalid geometry provisional until explicit later repair [0.07ms]
+(pass) Node replace preserves the original type failure, order and caught Draft state [0.26ms]
+(pass) Node replace preserves the original position failure, order and caught Draft state [0.05ms]
+(pass) Node replace preserves the original position.x failure, order and caught Draft state [0.02ms]
+(pass) Node replace preserves the original position.y failure, order and caught Draft state [0.02ms]
+(pass) Node replace preserves the original size failure, order and caught Draft state [0.02ms]
+(pass) Node replace preserves the original size.width failure, order and caught Draft state [0.02ms]
+(pass) Node replace preserves the original size.height failure, order and caught Draft state [0.02ms]
+(pass) Node replace preserves the original parentId failure, order and caught Draft state [0.02ms]
+(pass) Node replace preserves the original data failure, order and caught Draft state [0.02ms]
+(pass) Node replace preserves an opaque data thrown value %s [0.02ms]
+(pass) Node replace preserves an opaque data thrown value %s [0.02ms]
+(pass) Node replace preserves an opaque data thrown value %s [0.93ms]
+(pass) Node replace preserves an opaque data thrown value %s [0.06ms]
+(pass) Node replace keeps invalid geometry provisional until explicit later repair [0.03ms]
+
+packages/kernel/tests/revision.test.ts:
+(pass) revision increment refuses to leave the safe-integer range [0.04ms]
+
+packages/kernel/tests/index.test.ts:
+(pass) @nodebraid/kernel > creates one stable revision-zero Canvas View [0.05ms]
+(pass) @nodebraid/kernel > creates distinct Node and Edge identifiers and rejects empty values [0.47ms]
+(pass) @nodebraid/kernel > distinguishes missing entities from relationships of a missing Node [0.09ms]
+(pass) @nodebraid/kernel > commits one Node with matching before and after Canvas Views [0.07ms]
+(pass) @nodebraid/kernel > keeps undeclared caller fields outside committed Node and Edge values [0.11ms]
+(pass) @nodebraid/kernel > rolls back callback and invalid-position failures without replacing the Canvas View [0.08ms]
+(pass) @nodebraid/kernel > rejects an asynchronous Transaction callback and rolls back its staged writes [0.06ms]
+(pass) @nodebraid/kernel > rejects a nested Transaction and rolls back the outer callback when the error escapes [0.03ms]
+(pass) @nodebraid/kernel > closes the Transaction Context and its capabilities after the callback [0.05ms]
+(pass) @nodebraid/kernel > can catch a failed nested or strict operation and continue the outer Transaction [0.06ms]
+(pass) @nodebraid/kernel > strictly replaces and removes an existing Node [0.06ms]
+(pass) @nodebraid/kernel > collapses a Node restored to its original value into a net-zero Transaction [0.05ms]
+(pass) @nodebraid/kernel > reports strict Node writer errors without changing the Draft [0.07ms]
+(pass) @nodebraid/kernel > coalesces Node operation sequences and compares data by reference [0.08ms]
+(pass) @nodebraid/kernel > connects Nodes with an Edge and queries its directed relationships [0.12ms]
+(pass) @nodebraid/kernel > rejects an Edge whose final Endpoint references a missing Node [0.04ms]
+(pass) @nodebraid/kernel > allows temporary Endpoints, self-loops, and separate Node and Edge ID namespaces [0.08ms]
+(pass) @nodebraid/kernel > strictly edits Edges and collapses an identical restoration [0.09ms]
+(pass) @nodebraid/kernel > keeps parent relationships and queries direct children in canonical order [0.06ms]
+(pass) @nodebraid/kernel > updates Draft relationship indexes when Nodes and Edges are replaced [0.10ms]
+(pass) @nodebraid/kernel > reports every missing relationship, parent cycle, and invalid geometry in the final graph [0.09ms]
+(pass) @nodebraid/kernel > requires callers to reparent children explicitly when removing a parent [0.08ms]
+(pass) @nodebraid/kernel > applies a Change Set in reverse and forward through new Transactions [0.23ms]
+(pass) @nodebraid/kernel > rejects a malformed Change Set before changing the Draft [0.09ms]
+(pass) @nodebraid/kernel > rejects stale replay before applying any matching entity changes [0.15ms]
+(pass) @nodebraid/kernel > reverses and reapplies a complete Node and Edge creation Change Set [0.12ms]
+
+packages/kernel/tests/replay-record-values.test.ts:
+(pass) replay retains the target whose kind and ID passed validation [0.06ms]
+(pass) a changing source record cannot bypass replay conflict preflight [0.08ms]
+(pass) replay retains the entity ID accepted before target materialization [0.04ms]
+(pass) changing source coordinates cannot replace the values checked by replay validation [0.08ms]
+(pass) a stale source rejects before reading opaque source or target data [0.07ms]
+(pass) forward replay captures Node id once [0.15ms]
+(pass) forward replay captures Node type once [0.03ms]
+(pass) forward replay captures Node position once [0.02ms]
+(pass) forward replay captures Node position.x once [0.02ms]
+(pass) forward replay captures Node position.y once [0.03ms]
+(pass) forward replay captures Node size once [0.02ms]
+(pass) forward replay captures Node size.width once [0.02ms]
+(pass) forward replay captures Node size.height once [0.02ms]
+(pass) forward replay captures Node parentId once [0.02ms]
+(pass) reverse replay captures Node id once [0.02ms]
+(pass) reverse replay captures Node type once [0.02ms]
+(pass) reverse replay captures Node position once [0.01ms]
+(pass) reverse replay captures Node position.x once [0.01ms]
+(pass) reverse replay captures Node position.y once [0.01ms]
+(pass) reverse replay captures Node size once [0.01ms]
+(pass) reverse replay captures Node size.width once [0.01ms]
+(pass) reverse replay captures Node size.height once [0.01ms]
+(pass) reverse replay captures Node parentId once [0.01ms]
+(pass) forward replay captures Edge id once [0.12ms]
+(pass) forward replay captures Edge type once [0.03ms]
+(pass) forward replay captures Edge source once [0.02ms]
+(pass) forward replay captures Edge source.nodeId once [0.02ms]
+(pass) forward replay captures Edge source.portId once [0.02ms]
+(pass) forward replay captures Edge target once [0.02ms]
+(pass) forward replay captures Edge target.nodeId once [0.02ms]
+(pass) forward replay captures Edge target.portId once [0.02ms]
+(pass) reverse replay captures Edge id once [0.02ms]
+(pass) reverse replay captures Edge type once [0.03ms]
+(pass) reverse replay captures Edge source once [0.04ms]
+(pass) reverse replay captures Edge source.nodeId once [0.02ms]
+(pass) reverse replay captures Edge source.portId once [0.02ms]
+(pass) reverse replay captures Edge target once [0.02ms]
+(pass) reverse replay captures Edge target.nodeId once [0.03ms]
+(pass) reverse replay captures Edge target.portId once [0.03ms]
+(pass) a later replay record cannot mutate a previously accepted target shell [0.07ms]
+(pass) replay observes opaque data in its existing comparison and write phases [0.07ms]
+(pass) replay preserves the original opaque source data error [0.08ms]
+(pass) replay preserves the original opaque target data error [0.02ms]
+(pass) replay captures the record entity before later reads can replace it [0.04ms]
+(pass) replay captures the record id before later reads can replace it [0.01ms]
+(pass) replay retains the original Node id read exception [0.04ms]
+(pass) replay retains the original Node type read exception
+(pass) replay retains the original Node position read exception
+(pass) replay retains the original Node size read exception
+(pass) replay retains the original Node parentId read exception
+(pass) invalid first geometry keeps its structural error before a later getter failure [0.06ms]
+(pass) inherited values and the opaque data getter keep their original receiver [0.05ms]
+(pass) a caught value-based conflict leaves only subsequent deliberate writes [0.11ms]
+
+packages/kernel/tests/replay-revision-values.test.ts:
+(pass) a later revision read cannot make an initially non-adjacent Change Set valid [0.14ms]
+(pass) node reverse rejects the first invalid revision value [0.13ms]
+(pass) edge forward rejects the first invalid revision value [0.03ms]
+(pass) edge reverse rejects the first invalid revision value [0.03ms]
+(pass) node forward rejects the first invalid beforeRevision value
+(pass) node reverse rejects the first invalid beforeRevision value [0.01ms]
+(pass) edge forward rejects the first invalid beforeRevision value [0.01ms]
+(pass) edge reverse rejects the first invalid beforeRevision value [0.01ms]
+(pass) node forward retains the first valid header pair without later reads [0.08ms]
+(pass) node reverse retains the first valid header pair without later reads [0.02ms]
+(pass) edge forward retains the first valid header pair without later reads [0.02ms]
+(pass) edge reverse retains the first valid header pair without later reads [0.03ms]
+(pass) beforeRevision header diagnostics retain the first negative value [0.08ms]
+(pass) beforeRevision header diagnostics retain the first fractional value [0.01ms]
+(pass) beforeRevision header diagnostics retain the first unsafe integer value
+(pass) beforeRevision header diagnostics retain the first NaN value
+(pass) beforeRevision header diagnostics retain the first positive infinity value
+(pass) beforeRevision header diagnostics retain the first negative infinity value
+(pass) beforeRevision header diagnostics retain the first string value
+(pass) beforeRevision header diagnostics retain the first null value
+(pass) beforeRevision header diagnostics retain the first bigint value
+(pass) beforeRevision header diagnostics retain the first object value
+(pass) revision header diagnostics retain the first negative value
+(pass) revision header diagnostics retain the first fractional value
+(pass) revision header diagnostics retain the first unsafe integer value
+(pass) revision header diagnostics retain the first NaN value
+(pass) revision header diagnostics retain the first positive infinity value
+(pass) revision header diagnostics retain the first negative infinity value
+(pass) revision header diagnostics retain the first string value
+(pass) revision header diagnostics retain the first null value
+(pass) revision header diagnostics retain the first bigint value
+(pass) revision header diagnostics retain the first object value
+(pass) the largest valid adjacent header pair does not restore the input revision [0.03ms]
+(pass) replay preserves the original beforeRevision read exception [0.04ms]
+(pass) replay preserves the original revision read exception
+(pass) direction and object guards precede revision property reads [0.05ms]
+(pass) inherited revision getters keep their original receiver [0.04ms]
+(pass) a caught invalid header leaves only the caller's subsequent deliberate write [0.06ms]
+
+packages/kernel/tests/types.test.ts:
+(pass) keeps the public Kernel contract type-safe
+
+packages/kernel/tests/writer-id-values.test.ts:
+(pass) Node add retains its accepted ID without overwriting an existing Node [0.05ms]
+(pass) Node replace keeps Query, Snapshot and replayable Change Set identities consistent [0.09ms]
+(pass) Edge add retains its accepted ID and relation indexes without overwriting another Edge [0.10ms]
+(pass) Edge replace retains its accepted ID across indexes and reverse/forward replay [0.17ms]
+(pass) duplicate add reports the captured ID before reading other entity fields [0.06ms]
+(pass) replacement mismatch reports the captured ID before reading other entity fields [0.05ms]
+(pass) missing replacement targets fail before reading the incoming ID [0.03ms]
+(pass) add preserves an original ID read failure and committed View [0.04ms]
+(pass) replace preserves an original ID read failure and committed View
+(pass) a failed owned entity copy leaves no partially added or replaced value [0.05ms]
+(pass) captured replacement IDs retain net-zero View identity [0.04ms]
+(pass) closed Transaction writers fail before reading an incoming ID [0.04ms]
+
+packages/kernel/tests/error-contract.test.ts:
+(pass) Kernel structural failures expose the shared NodeBraid error identity [0.04ms]
+(pass) Kernel identifier failures classify a JavaScript value without copying it [0.02ms]
+(pass) Change Set direction failures classify an unsafe JavaScript value [0.02ms]
+(pass) Change Set revision failures classify unsafe JavaScript values [0.02ms]
+
+packages/kernel/tests/commit-preparation.test.ts:
+(pass) a failing origin read cannot publish a Transaction [0.04ms]
+(pass) a failing commandId read cannot publish a Transaction [0.01ms]
+(pass) commit metadata is captured once after Draft capabilities close and before publication [0.07ms]
+(pass) a net-zero Transaction does not inspect commit-only metadata [0.01ms]
+(pass) commit preparation rejects reentry from metadata [0.05ms]
+(pass) commit preparation rejects reentry from callback result [0.02ms]
+
+packages/kernel/tests/replay-collection.test.ts:
+(pass) a changing replay iterator cannot overwrite a later Node edit [0.12ms]
+(pass) an entries hook cannot hide duplicate replay entries from validation [0.05ms]
+(pass) caught node forward conflict leaves no partial replay [0.18ms]
+(pass) caught node reverse conflict leaves no partial replay [0.04ms]
+(pass) caught edge forward conflict leaves no partial replay [0.07ms]
+(pass) caught edge reverse conflict leaves no partial replay [0.05ms]
+(pass) valid forward and reverse replay ignores input traversal hooks and preserves opaque data [0.07ms]
+(pass) replay captures the outer collection and each indexed entry once [0.06ms]
+(pass) a traversal hook cannot hide a sparse replay entry [0.04ms]
+(pass) replay preserves native length coercion: 1.5 [0.06ms]
+(pass) replay preserves native length coercion: "1.5" [0.03ms]
+(pass) replay preserves native length coercion: {
+  valueOf: [Function: valueOf],
+} [0.02ms]
+(pass) replay preserves native empty iteration for Proxy length 0.5 [0.03ms]
+(pass) replay preserves native empty iteration for Proxy length -1
+(pass) replay preserves native empty iteration for Proxy length NaN
+(pass) replay preserves native empty iteration for Proxy length undefined
+(pass) replay preserves native empty iteration for Proxy length "0"
+(pass) replay preserves native length conversion failure: 1n [0.02ms]
+(pass) replay preserves native length conversion failure: Symbol(length)
+(pass) invalid first entry retains its error before an infinite Proxy length could allocate a snapshot [0.03ms]
+
+ 249 pass
+ 0 fail
+ 1276 expect() calls
+Ran 249 tests across 14 files. [173.00ms]
+actual_exit_code: 0
+
+actual_command: git diff --check e21c917b170b37ff60418d76a0bbcc65b8799d17...723b81124050862940abcb8feb729e0c8baa7737
+actual_exit_code: 0
