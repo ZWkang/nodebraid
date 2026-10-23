@@ -171,12 +171,12 @@
     {
       "path": "reviews/standards.md",
       "kind": "report",
-      "sha256": "c25c9262ffe4d7f7c0d748c27dac38c252e81957ca7da1743fa7523774b5a77c"
+      "sha256": "f35815c27a77b9503f3f5d1db04f270b600fc79940cb81916467a42753f6c2ad"
     },
     {
       "path": "reviews/spec.md",
       "kind": "report",
-      "sha256": "504cb407340622511854ab968c3eb710d1486eac2cebffd4650c2d493a948dc9"
+      "sha256": "4b261905b642879ac03ea94be6517658a6014915bf188389e5f008eddb05da17"
     },
     {
       "path": "logs/behavior-1.log",
@@ -216,7 +216,17 @@
     {
       "path": "report.md",
       "kind": "report",
-      "sha256": "a8e18d3cdb1888ca87ab9d1af0fe5e4100958d8432349a3cd948424c91cd25a2"
+      "sha256": "4e4ae8615aecd0bb602da4c0ded81da1833914d34e380ffe62af8d68050dbe13"
+    },
+    {
+      "path": "reviews/standards-tests.log",
+      "kind": "log",
+      "sha256": "3e7b13febdcfd9a806d6a46c62149ea66a97c39b48029bc8283c13be937bfdfb"
+    },
+    {
+      "path": "reviews/spec-commands.log",
+      "kind": "log",
+      "sha256": "ba7efd924626f1a9f91cde16b009faaee2d5b6362e4c8fd9e923729207795489"
     }
   ]
 }

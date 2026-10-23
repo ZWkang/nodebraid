@@ -1,0 +1,79 @@
+actual_base: dcf13482b68bc2422fc4d714df1226ab0ef259aa
+actual_head: 65b1da44adec388fd586d9806670ce3895972752
+actual_tree: a4c45edaf0ef9ec63f3e0bdeb3ee6e9983adde93
+actual_binary_patch_sha256: bda03b6671b10f555d74473aff2fa4f39350bf84019c7a4bcb0a67f91fa0221f
+
+actual_command: git status --short --branch
+## feat/issue-100
+actual_exit_code: 0
+
+actual_command: bun test packages/preset-basic/tests
+bun test v1.4.2 (744846f84)
+
+packages/preset-basic/tests/index.test.ts:
+(pass) Composition readiness publishes every base Service through static bindings [44.07ms]
+
+packages/preset-basic/tests/types.test.ts:
+(pass) Basic Canvas Composition preserves required Renderer config and provides no Service [8.70ms]
+
+packages/preset-basic/tests/numeric-policy.test.ts:
+(pass) Composition preserves invalid dragThreshold from enumerable policy fields [4.86ms]
+(pass) Composition preserves invalid dragThreshold from inherited policy fields [3.00ms]
+(pass) Composition preserves invalid dragThreshold from non-enumerable policy fields [1.64ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from enumerable policy fields [1.32ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from inherited policy fields [2.04ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from non-enumerable policy fields [12.46ms]
+(pass) Composition preserves invalid minZoom from enumerable policy fields [2.42ms]
+(pass) Composition preserves invalid minZoom from inherited policy fields [0.98ms]
+(pass) Composition preserves invalid minZoom from non-enumerable policy fields [1.54ms]
+(pass) Composition preserves invalid maxZoom from enumerable policy fields [2.33ms]
+(pass) Composition preserves invalid maxZoom from inherited policy fields [1.13ms]
+(pass) Composition preserves invalid maxZoom from non-enumerable policy fields [1.85ms]
+(pass) Composition retains valid enumerable policies across mutation and fresh Hosts [6.43ms]
+(pass) Composition retains valid inherited policies across mutation and fresh Hosts [4.44ms]
+(pass) Composition retains valid non-enumerable policies across mutation and fresh Hosts [3.17ms]
+(pass) Composition preserves the original enumerable dragThreshold getter failure [0.15ms]
+(pass) Composition preserves the original inherited dragThreshold getter failure
+(pass) Composition preserves the original non-enumerable dragThreshold getter failure
+(pass) Composition preserves the original enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original inherited wheelZoomSensitivity getter failure
+(pass) Composition preserves the original non-enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original enumerable minZoom getter failure
+(pass) Composition preserves the original inherited minZoom getter failure
+(pass) Composition preserves the original non-enumerable minZoom getter failure
+(pass) Composition preserves the original enumerable maxZoom getter failure
+(pass) Composition preserves the original inherited maxZoom getter failure [0.01ms]
+(pass) Composition preserves the original non-enumerable maxZoom getter failure
+
+packages/preset-basic/tests/readiness.test.ts:
+(pass) invalid Interaction options fail the Composition with the original Interaction error [1.29ms]
+(pass) Composition snapshots Interaction options when the Plugin is created [1.21ms]
+(pass) Composition snapshots nested Connection options when the Plugin is created [2.56ms]
+(pass) Composition keeps the Connection value captured before a caller getter changes [1.64ms]
+(pass) Composition owns inherited Connection options across fresh Host installations [2.23ms]
+(pass) Composition owns non-enumerable Connection options across fresh Host installations [3.12ms]
+(pass) Composition preserves the original Connection getter failure at creation [0.15ms]
+(pass) Composition leaves malformed Connection validation with Interaction [1.49ms]
+(pass) Composition creation rejects malformed or unknown top-level options [1.65ms]
+(pass) Composition waits for an asynchronous Renderer before becoming active [1.23ms]
+(pass) Renderer Factory failure keeps its identity and releases the Child tree for reinstall [1.76ms]
+
+packages/preset-basic/tests/lifecycle.test.ts:
+(pass) existing standard Provider makes Basic Canvas Composition fail explicitly [1.02ms]
+(pass) second Basic Canvas Composition conflicts without disturbing the active one [2.83ms]
+(pass) a later Renderer Provider conflict rolls back earlier Child reservations [2.15ms]
+(pass) Composition disposes consumers before Renderer and awaits asynchronous Renderer cleanup [1.54ms]
+(pass) Composition cleanup attempts every Renderer resource and preserves all failures [1.46ms]
+(pass) Composition diagnostics expose the complete reverse Child cleanup order [3.17ms]
+
+packages/preset-basic/tests/package-import.test.ts:
+(pass) package-name import exposes the Basic Canvas Composition factory [2.51ms]
+
+ 47 pass
+ 0 fail
+ 147 expect() calls
+Ran 47 tests across 6 files. [233.00ms]
+actual_exit_code: 0
+
+actual_command: git diff --check dcf13482b68bc2422fc4d714df1226ab0ef259aa...65b1da44adec388fd586d9806670ce3895972752
+actual_exit_code: 0

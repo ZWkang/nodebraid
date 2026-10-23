@@ -109,13 +109,55 @@ Dependencies: human-merge
 
 Verdict: passed. [Original report](reviews/standards.md)
 
-/Users/zhou/.codex/local-workflows/nodebraid/runs/6effc8e5-4000-4e99-a7db-33a105722045/reviews/65b1da44adec388fd586d9806670ce3895972752/standards.md
+What this change does: Basic Canvas captures all four numeric Interaction policy properties through normal property reads when creating the Plugin. Inherited and non-enumerable values are retained in the owned snapshot instead of being replaced by defaults.
+
+Reviewed identity:
+
+- Base: `dcf13482b68bc2422fc4d714df1226ab0ef259aa`
+- Head: `65b1da44adec388fd586d9806670ce3895972752`
+- Tree: `a4c45edaf0ef9ec63f3e0bdeb3ee6e9983adde93`
+- Binary patch SHA256: `bda03b6671b10f555d74473aff2fa4f39350bf84019c7a4bcb0a67f91fa0221f`
+
+Scope: complete three-dot base-to-head diff, the preset factory and all 159 lines of `numeric-policy.test.ts`. Read the fresh canonical Issue #100 with its complete empty discussion, independent plan and fixture-correction record. Applied current project rules, local workflow, code-review/ponytail-review and relevant principles.
+
+Hard standards: no violations found. The preset captures values; Interaction still validates them, consistent with ADR0066 and Boundary Discipline. Each known property is read once with its original receiver. Connection remains the first capture and its nested snapshot logic is unchanged. Unknown enumerable fields remain available to existing Interaction validation. Default/undefined handling, Renderer configuration identity and lifecycle ownership remain intact.
+
+Traced Examples → Composition → Interaction normalization → wheel/pan → Session → Renderer observation, plus readiness/rollback cleanup. The public tests use real Host/Runtime services and an explicit Renderer backend fixture; they do not claim native browser input. Original getter failures are checked by strict object identity.
+
+Judgment checks: no concrete Fowler smell found. For one isolated Host per Canvas, the existing small snapshot helper is the correct owner. The change adds no validator, interface, dependency, fallback, new policy or speculative abstraction.
+
+Actual independent check: `bun test packages/preset-basic/tests` passed 47 tests / 147 assertions at this head. It covers all four invalid policies across enumerable/inherited/non-enumerable properties, effective zoom/drag behavior, one-time capture across mutation and fresh Hosts, original errors, Connection and existing lifecycle controls. Raw output is saved in `standards-tests.log`.
+
+Also verified exact head/tree/base, full saved patch bytes/hash, prepared-task/inspection binding, clean worktree and `git diff --check`. Implementer red/green and affected results were not relabeled as independent execution.
+
+Not checked independently: typecheck/builds, browsers, full engineering gate, live GitHub refresh, current-head CI, publication or merge.
+
+Verdict: passed. Looks good. Ship.
+
 
 ## Spec review
 
 Verdict: passed. [Original report](reviews/spec.md)
 
-/Users/zhou/.codex/local-workflows/nodebraid/runs/6effc8e5-4000-4e99-a7db-33a105722045/reviews/65b1da44adec388fd586d9806670ce3895972752/spec.md
+# Spec review — Issue #100
+
+Verdict: **passed**. 未发现规格遗漏、错误实现或未请求的范围扩张。
+
+- Base: `dcf13482b68bc2422fc4d714df1226ab0ef259aa`
+- Head: `65b1da44adec388fd586d9806670ce3895972752`
+- Tree: `a4c45edaf0ef9ec63f3e0bdeb3ee6e9983adde93`
+- Complete binary patch SHA256: `bda03b6671b10f555d74473aff2fa4f39350bf84019c7a4bcb0a67f91fa0221f`
+
+已独立读取 Issue100 完整原文及全部零评论、prepared/input 计划和 fixture-corrections，核验完整两文件补丁、唯一提交、inspection/complete.patch。依据当前 AGENTS/CONTEXT、tracker/discussion、code-review、ADR0066/0029，以及 Preset → Interaction normalization/runtime → Renderer/Session 的公共契约审查。
+
+Issue 要求 “Capture all four existing numeric Interaction policy properties … once each”。共享 factory 显式以正常属性读取捕获 dragThreshold、wheelZoomSensitivity、minZoom、maxZoom，随后只保存并冻结该值；rest 排除这些已捕获字段，不会重复执行其 getter。继承、non-enumerable 与 enumerable 的数值均到达同一 Interaction validator，invalid 值不再丢失为默认值。默认/nullish 语义仍由原 validator 处理，未增加 preset 校验或改变错误域。
+
+Issue 同时要求保留原 first-read getter identity、Connection snapshot、unknown/malformed handling、Renderer config identity 与 lifecycle。新 getter 回归使用捕获后 toBe 验证原对象；既有 Connection 单次读取及 nested copy/freeze 分支不变。非法整体配置继续交 Interaction，剩余 enumerable shell 保留原未知字段处理；Renderer Config 仍按原引用转交。Child 安装、readiness、rollback、逆序 cleanup 和可选 sibling 能力未改变，无新 API、Registry、策略、依赖或 fallback。
+
+独立执行当前 head 的 `bun test packages/preset-basic/tests`：**47 pass / 147 assertions，exit 0**，包括数值策略、fresh Hosts、Connection/readiness、Renderer Config identity 与 cleanup 控制；`git diff --check BASE...HEAD` exit 0，完整 raw patch/hash 与记录一致。命令和原始输出保存在同目录 `spec-commands.log`。Recording Renderer 是公开应用 backend seam，此结果不证明原生浏览器交互。
+
+未独立运行构建、类型检查、affected、浏览器或完整工程检查，未将已有协调器日志计为独立执行。当前 head 远端发布/CI、完整报告/media readback、人工合并及 main 全 Issue 验收仍未由本审查验证。
+
 
 ## Behavior evidence
 
@@ -201,3 +243,11 @@ The two original review reports above retain their scope, evidence and untested 
 Only explicitly recorded commands and reports are included. Missing behavior evidence, browser coverage or platform checks are not inferred to have passed.
 
 A red result records the supplied behavior explanation and expected nonzero exit. The original output must still be reviewed to distinguish a behavior assertion from a compile, setup or infrastructure failure.
+
+## Review text publication correction
+
+The first generated bundle rendered local review-file paths as text. This correction publishes the complete original independent reviews above and at the same review links, with their original reviewed identities and verification limits. Original prepared, verification and publication receipts are unchanged. It does not represent a new review, engineering check or source revision. Earlier immutable publications remain available in Git history.
+
+[Original independent check output](reviews/standards-tests.log)
+
+[Original independent check output](reviews/spec-commands.log)

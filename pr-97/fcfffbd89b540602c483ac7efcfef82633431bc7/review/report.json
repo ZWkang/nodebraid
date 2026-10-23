@@ -191,12 +191,12 @@
     {
       "path": "reviews/standards.md",
       "kind": "report",
-      "sha256": "f5c0a3a96b6849777aa2c6ee2260a076ebb0887f873eb41978affb89e8956a5f"
+      "sha256": "32d285b0eebcfc9379fa033a8b033b2028c9b7ece519f3d754beceead607980c"
     },
     {
       "path": "reviews/spec.md",
       "kind": "report",
-      "sha256": "e64898a61bffd5c71586106d9f06915c69d2f835c7330c41e5be58dfa04446e8"
+      "sha256": "de44d7c7311569cd27e0b2f28b2e854f5230ad4c4394db4afd4104b5ead93373"
     },
     {
       "path": "logs/behavior-1.log",
@@ -251,7 +251,7 @@
     {
       "path": "report.md",
       "kind": "report",
-      "sha256": "05dcea2f167ede28b179e7a29bbd4be67d94946ace081729af2cf5be50095006"
+      "sha256": "b7b9d0ac84573decd3a1f8352d38c7c8b549371e89f4701a374916c6d784de2e"
     }
   ]
 }

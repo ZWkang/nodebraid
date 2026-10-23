@@ -169,12 +169,12 @@
     {
       "path": "reviews/standards.md",
       "kind": "report",
-      "sha256": "c4c444bea2fe07126a0693c0d2e12d07c0f9fe98b17ebec2f2836b77f34ba428"
+      "sha256": "587caf295a30bde63d81fa2f38ede3fce037919e81c4265129d98b19dbc79335"
     },
     {
       "path": "reviews/spec.md",
       "kind": "report",
-      "sha256": "478aa9b0b99ac1c232f4667cd448eed5311a057defbefcf4aaf610bb820ac461"
+      "sha256": "acc75aeb549fd267b3873fb1e9f32e6fb4b791f0c991144ed54b0f327d1f003a"
     },
     {
       "path": "logs/behavior-1.log",
@@ -209,7 +209,7 @@
     {
       "path": "report.md",
       "kind": "report",
-      "sha256": "0ae40f2852127d92a64d04613c10f0773aea88a09dab8d2d354d6298e2696ae9"
+      "sha256": "174d72738afcf4698f352130a28ff5b7d50da541d0ec4eed2a4495eaa5021480"
     },
     {
       "path": "layout-native/before.png",
