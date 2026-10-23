@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "nodebraid",
@@ -81,6 +82,7 @@
       "dependencies": {
         "@nodebraid/canvas-fragment": "workspace:*",
         "@nodebraid/diagnostics": "workspace:*",
+        "@nodebraid/document": "workspace:*",
         "@nodebraid/interaction-api": "workspace:*",
         "@nodebraid/kernel": "workspace:*",
         "@nodebraid/layout-api": "workspace:*",
@@ -104,6 +106,14 @@
     "packages/diagnostics": {
       "name": "@nodebraid/diagnostics",
       "version": "0.0.1",
+    },
+    "packages/document": {
+      "name": "@nodebraid/document",
+      "version": "0.0.1",
+      "dependencies": {
+        "@nodebraid/diagnostics": "workspace:*",
+        "@nodebraid/kernel": "workspace:*",
+      },
     },
     "packages/interaction-api": {
       "name": "@nodebraid/interaction-api",
@@ -576,6 +586,8 @@
     "@nodebraid/core": ["@nodebraid/core@workspace:packages/core"],
 
     "@nodebraid/diagnostics": ["@nodebraid/diagnostics@workspace:packages/diagnostics"],
+
+    "@nodebraid/document": ["@nodebraid/document@workspace:packages/document"],
 
     "@nodebraid/examples": ["@nodebraid/examples@workspace:examples/app"],
 

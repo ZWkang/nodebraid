@@ -31,3 +31,13 @@ The screenshot uses the separate Fit view control after manual layout to show th
 A layout with net changes creates one History Entry: one Undo restores the pre-layout positions, and one Redo restores the laid-out positions. Repeating the same deterministic layout with no net changes adds no revision or history. A connection created afterward has its own History Entry.
 
 Page initialization and ordinary edits such as dragging, connecting, copying, and pasting never trigger automatic rearrangement. The button uses the existing Command execution and error card. Failures remain visible, without automatic queueing or retries; the user decides whether to trigger layout again.
+
+## Save and restore files
+
+Click **Export document** to download a complete graph JSON file. Reopen the page, then use **Import document** to select that file.
+A successful import replaces the graph and clears previous Undo/Redo; later edits start new History. A failed import displays its error and retains the old graph and History.
+The current Viewport remains; Selection follows existing ID reconciliation instead of being restored from the file.
+
+The Example application Data Codec accepts only `null` or `{ label: string, tags: string[] }`; Clipboard uses the same business-data constraint.
+The framework [Document](/en/modules/document) contract accepts other application codecs. Files omit Runtime revision and Session/History.
+The page does not save automatically. Cancelling file selection leaves the Canvas unchanged, and the same file can be imported again.

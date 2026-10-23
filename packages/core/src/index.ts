@@ -1,5 +1,6 @@
 export * from '@nodebraid/canvas-fragment';
 export * from '@nodebraid/diagnostics';
+export * from '@nodebraid/document';
 export * from '@nodebraid/interaction-api';
 export * from '@nodebraid/kernel';
 export * from '@nodebraid/layout-api';

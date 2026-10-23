@@ -93,6 +93,14 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
     },
     modules: [
       {
+        name: '@nodebraid/document',
+        slug: 'document',
+        summary: {
+          zh: '版本化完整 Document 文本与应用 Data Codec。',
+          en: 'Versioned complete Document text and application Data Codecs.',
+        },
+      },
+      {
         name: '@nodebraid/kernel',
         slug: 'kernel',
         summary: { zh: 'Renderer-independent 图内核。', en: 'The renderer-independent graph kernel.' },
