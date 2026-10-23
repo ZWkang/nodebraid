@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "dcf13482b68bc2422fc4d714df1226ab0ef259aa",
+    "expectedParent": "dcf13482b68bc2422fc4d714df1226ab0ef259aa",
+    "head": "6f7b8247208a1decb943cd2c4ff8d39d38aa8707",
+    "tree": "607dd464004b2f845876d7a0f06792cd3a84fb9a",
+    "patch": "7c9f62f023b8e1b714c8b5316323cd175e060fae488071b87de4b08cc104f6c2",
+    "localHead": "234a304c34c84b65a24786b48650a294666d892d"
+  },
+  "task": {
+    "run": "d1ab6451-478a-4351-8c15-ae7bc43236c0",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 102
+    },
+    "request": "## Confirmed defect\n\nOn fetched main `dcf13482b68bc2422fc4d714df1226ab0ef259aa`, direct Kernel Node Writers reread caller-owned `position`, `size` and `parentId` while copying the Node. A later read can replace the first invalid owned value before final graph validation.\n\nA typechecked probe executes **18 actual compiled public `createCanvasKernel().transact()` cases**: three fields × add/replace × stable valid/stable invalid/changing invalid. Stable invalid values reject with `INVALID_GRAPH` and preserve the exact View. Changing inputs with the same first invalid value instead commit:\n\n- `position`: first `{x:10,y:NaN}`, then `{x:20,y:30}`. Two reads produce the mixed committed position `{x:10,y:30}`.\n- `size`: first `{width:40,height:-1}`, then `{width:50,height:60}`. Three reads discard the invalid first Size and commit the later valid one.\n- `parentId`: first the valid branded ID of an absent parent, then `undefined`. Two reads drop the missing-parent relationship and commit.\n- Both public `nodes.add()` and `nodes.replace()` are affected. All getters have values compatible with the public readonly field types; no malformed-ID cast, mocked collaborator or private API is required.\n\nThe assertion requiring invalid first values to reject exits 1. The exact reproduction typechecks before execution. Original source/output remain in local run `20261023T091255-discovery-kernel-value-errors`: `kernel-node-value-repro.ts`, `node-value-red.log`, `node-repro-typecheck.log`. The current compiled Kernel came from normal prepack/build and declaration checks at the same clean main; prior focused Query baseline passed9 tests/53 assertions.\n\n## Contract and cause\n\n[ADR0012](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/docs/adr/0012-keep-domain-data-opaque-to-kernel.md) assigns copying/freezing of NodeBraid-owned entity shells to Kernel while retaining opaque data references. [ADR0010](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/docs/adr/0010-bind-canvas-query-to-snapshot-revision.md) binds Snapshot, Query and Change Set to consistent committed evidence. [Graph validation](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/packages/kernel/src/graph-validation.ts) rejects non-finite positions, invalid sizes and absent parents.\n\nIn `freezeCanvasNode()`, `node.position` is read separately for x/y; `node.size` is read for presence, width and height; `node.parentId` is read for presence and copying. The copied Node can therefore contain geometry or a relationship that was not the first supplied value. Direct Writers pass that copy into Draft Maps/indexes and final validation.\n\n## Acceptance\n\n- Capture each incoming Node-owned Position reference, optional Size reference and optional parent ID once per direct add/replace, and retain that value during copying and final validation. Preserve one read of each Point/Size scalar within its captured shell.\n- Invalid first Position, Size and missing-parent values must not be replaced by later reads; both Writers must reject at the existing final graph validation boundary and preserve the committed View/revision.\n- Valid first values must remain usable if later reads would change or throw. Retain optional absence, inherited/non-enumerable getters and frozen owned shells; preserve opaque data references and its existing read phase.\n- Keep existing read/error precedence: Writer closed/duplicate/missing/mismatched-ID checks first; Node type before Position and its scalars, then Size and its scalars, parent, and opaque data. Preserve original external thrown-value identity and no partial Writer/Draft/index change when an external getter failure is caught within a larger Transaction.\n- Preserve temporary/final graph semantics, explicit later repair in a Transaction, strict ID capture, Node/Edge namespaces, Edge copying behavior, immutable historical Query/Snapshot/Change Set, canonical ordering, net-zero coalescing, metadata and forward/reverse replay.\n- Repair the shared Node copy owner only. No public API, eager geometry validation, new policy, accessor ban, dependency, cap, retry or fallback. Do not expand this into Edge Endpoint/Port policy or replay normalization redesign.\n- Public red/green and valid/invalid/getter/error controls, relevant Kernel/History consumers and affected checks, independent Standards with ponytail-review and Spec, the versioned formal full check, exact tree/append-parent publication, current-head CI and complete immutable reports/media.\n- Keep this Issue open until human merge, actual main integration and whole-Issue acceptance.\n\n## Deduplication\n\nComplete all-state collections contain **101 Issue/PR records and52 PRs**, through final short pages. Full #82, #89 and #92 bodies/discussions were read and archived. #82 / PR #83 capture direct Writer IDs; #89 / PR #91 capture incoming replay record/entity values; #92 / PR #93 capture replay revision headers. They do not retain these three root fields while a direct Node Writer copies its owned shell. Current open #96, #98 and #100 own unrelated Runtime, Layout and Basic Canvas boundaries.\n",
+    "plan": [
+      {
+        "id": "public-node-value-regression-and-fix",
+        "blockedBy": [],
+        "acceptance": "Public Kernel add/replace red-green retains first Position/Size/parent field values, preserves read/error phases and caught external-error Draft atomicity."
+      },
+      {
+        "id": "affected-consumers",
+        "blockedBy": [
+          "public-node-value-regression-and-fix"
+        ],
+        "acceptance": "Complete current Kernel/public consumer suites, original compiled18-case reproduction, relevant types and affected checks pass with immutable Query/replay/opaque-data behavior."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "affected-consumers"
+        ],
+        "acceptance": "Independent Standards with ponytail-review and Spec inspect the same exact committed head/tree/full binary patch against original Issue102 and ADR0010/0012/0029."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Pinned deployed main agents:run verify executes the sole formal full bun run check after both independent reviews pass and retains original logs."
+      },
+      {
+        "id": "source-publication",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Actual remote source tree and first parent match checked tree and independently captured append parent before local branch mapping."
+      },
+      {
+        "id": "current-head-ci-and-reports",
+        "blockedBy": [
+          "source-publication"
+        ],
+        "acceptance": "Current-head real CI, all paginated feedback, full actual independent review Markdown and report/preview bytes pass immutable publication/readback before readiness."
+      },
+      {
+        "id": "human-merge",
+        "blockedBy": [
+          "current-head-ci-and-reports"
+        ],
+        "acceptance": "Human final review and normal protected merge into main."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "human-merge"
+        ],
+        "acceptance": "Fetched actual main contains delivery merge and passes fresh whole-Issue public acceptance before closure."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "234a304c34c84b65a24786b48650a294666d892d",
+      "tree": "607dd464004b2f845876d7a0f06792cd3a84fb9a",
+      "patch": "7c9f62f023b8e1b714c8b5316323cd175e060fae488071b87de4b08cc104f6c2",
+      "report": "What this change does: Kernel Node copying retains the first Position, optional Size and parent values supplied to add/replace. Geometry scalars are copied once from their captured shells before final graph validation.\n\nReviewed identity:\n\n- Base: `dcf13482b68bc2422fc4d714df1226ab0ef259aa`\n- Head: `234a304c34c84b65a24786b48650a294666d892d`\n- Tree: `607dd464004b2f845876d7a0f06792cd3a84fb9a`\n- Binary patch SHA256: `7c9f62f023b8e1b714c8b5316323cd175e060fae488071b87de4b08cc104f6c2`\n\nScope: complete three-dot base-to-head diff, `packages/kernel/src/entity-values.ts` and all 230 lines of `node-owned-values.test.ts`. Read the canonical Issue #102 with its complete empty discussion, independent plan and fixture-correction record. Applied current project rules, local workflow, review skills and applicable principles.\n\nHard standards: no violations found. Strict Writer ID/availability checks still precede copying. Read order remains type → Position/scalars → Size/scalars → parent → opaque data. The copy completes before Draft Maps or indexes change. Getter failures preserve exact thrown values, including falsy values; inherited receivers and absent optional properties remain supported.\n\nThe repair stays in the shared copy owner under Boundary Discipline and ADR0012. It freezes owned shells without copying or freezing domain data. It adds no eager geometry validation: invalid provisional values still reach final graph validation and can be explicitly repaired inside the Transaction. Historical Query/Snapshot/Change Set evidence remains consistent under ADR0010/0011, and original external failures retain identity under ADR0029.\n\nTraced direct Writers, replay capture/materialization, graph/index validation, equality/net-zero coalescing, commit publication and History consumers. Edge copying and Port/data policy are unchanged.\n\nJudgment checks: no concrete Fowler smell found. For one synchronous Kernel per Canvas, local captured values are sufficient. No abstraction, interface, dependency, cap, retry or fallback was added.\n\nActual independent check: `bun test packages/kernel/tests packages/plugin-history/tests tests/layout-providers.test.ts` passed 245 tests / 1339 assertions at this head. This includes Node ownership/error phases, caught-write atomicity, strict IDs, replay, immutable evidence, net-zero and real Dagre/ELK History integration. Raw output is saved in `standards-tests.log`.\n\nAlso verified exact revisions, full saved patch bytes/hash, task/inspection binding, clean worktree and `git diff --check`. Implementer checks were not counted as independent execution.\n\nNot checked independently: typecheck/builds, browsers, full engineering gate, live GitHub refresh, current-head CI, publication or merge.\n\nVerdict: passed. Looks good. Ship.\n"
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "234a304c34c84b65a24786b48650a294666d892d",
+      "tree": "607dd464004b2f845876d7a0f06792cd3a84fb9a",
+      "patch": "7c9f62f023b8e1b714c8b5316323cd175e060fae488071b87de4b08cc104f6c2",
+      "report": "# Spec review — Issue #102\n\nVerdict: **passed**. 未发现要求遗漏、错误实现或未请求的范围扩张。\n\n- Base: `dcf13482b68bc2422fc4d714df1226ab0ef259aa`\n- Head: `234a304c34c84b65a24786b48650a294666d892d`\n- Tree: `607dd464004b2f845876d7a0f06792cd3a84fb9a`\n- Complete binary patch SHA256: `7c9f62f023b8e1b714c8b5316323cd175e060fae488071b87de4b08cc104f6c2`\n\n已独立读取完整 Issue102、全部零评论、prepared/input 计划与 fixture 类型修正记录；request 与原始 Issue 正文一致。核验完整两文件补丁、唯一提交和 inspection/complete.patch；依据 AGENTS/CONTEXT、tracker/discussion、code-review、ADR0010/0011/0012/0029，追踪共享 Writer、Draft/关系索引、最终图校验、Change Set 回放及历史 evidence。\n\nIssue 要求 “Capture each incoming Node-owned Position reference, optional Size reference and optional parent ID once”。freezeCanvasNode 现在按 type → Position/x/y → Size/width/height → parent → data 顺序读取，三个根字段及各 scalar 均只读取一次；undefined Size/parent 仍省略属性。先前无效值不会被后续读取替换；未新增 eager validation，错误仍在原最终图校验边界产生，允许同一 Transaction 显式后续修复。\n\nIssue 要求保留 “original external thrown-value identity and no partial Writer/Draft/index change”。共享 Writer 的 closed/duplicate/missing/ID-mismatch guards 仍先于复制；freeze 完成后才更新 Map、关系索引和 touched IDs。新增公共回归检查每个读阶段、非 Error thrown values、caught failure 后继续写入、继承/non-enumerable getter、原 receiver、冻结壳和 opaque data 引用。data 仍末尾读取，不深复制/冻结；Edge copy、严格 ID capture、回放 capture/preflight、canonical order、net-zero 与 metadata 未改变，无 API、策略、cap 或 fallback 新增。\n\n独立执行当前 head 的 `bun test packages/kernel/tests`：**217 pass / 1152 assertions，exit 0**；`git diff --check BASE...HEAD` exit 0。实际 HEAD/tree、完整 binary patch/hash 与保存记录一致；原始输出见同目录 `spec-commands.log`。fixture 的 this:CanvasNode 注解不削弱运行时断言。\n\n未独立执行构建、类型检查、18-case compiled probe、affected、浏览器或完整工程检查；协调器日志未计为本审查实跑。远端发布/当前 head CI、完整报告/media、人工合并及 main 全 Issue 验收仍未由本审查验证。\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "public-first-owned-value-red",
+      "acceptance": "Six initial type-valid public add/replace regressions against original main reject first invalid Position/Size/parent values. Actual original implementation failed all6, while stable invalid and valid controls in the18-case compiled discovery probe establish the observation. Original failed output retained.",
+      "command": "bun test packages/kernel/tests/node-owned-values.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "current-complete-kernel",
+      "acceptance": "Current source passes217 public Kernel tests/1152 assertions, including56 new cases for the3 root fields, add/replace, property forms, first valid/invalid values, Node receiver, exact external thrown values/order, caught-error Draft atomicity and explicit final graph repair. Includes existing strict IDs, Query, replay, metadata, net-zero and opaque-data controls.",
+      "command": "bun test packages/kernel/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "current-original-compiled18-repro",
+      "acceptance": "Original18 real compiled-package comparisons rerun with only the current public entry path changed. Each owned root field is read once; every first-invalid case rejects and preserves View/revision; stable valid controls commit.",
+      "command": "bun compiled-node-value-repro.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "current-affected-consumers",
+      "acceptance": "Actual corrected fixture/current source affected checks pass connected packages, types, real React/SVG/Examples browser suites and documentation. This is not a substitute for the later formal full verify.",
+      "command": "bun run check:affected --base origin/main",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "historical-fixture-receiver-type-failure",
+      "acceptance": "Initial extra test descriptor getter inferred the descriptor object for this, so expect(this).toBe(input) failed TypeScript. First annotation hit another getter; both type logs and this affected failure are retained. Final actual descriptor declares this:CanvasNode, keeping all runtime assertions/inputs unchanged. Current types and affected check pass; this is not a current delivery failure.",
+      "command": "bun run check:affected --base origin/main",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "independent-standards-execution",
+      "acceptance": "Original Standards reviewer output at exact reviewed local head:245 tests/1339 assertions, covering Kernel, History and Layout integration; implementer execution is separate.",
+      "command": "bun test packages/kernel/tests packages/plugin-history/tests tests/layout-providers.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "independent-spec-execution",
+      "acceptance": "Original Spec reviewer output at exact reviewed local head:217 Kernel tests/1152 assertions, with exact source and patch identity checks.",
+      "command": "bun test packages/kernel/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "a9ad72057efabccd154730d4e2f2c294ba21ca6b1a943d19cf7c879dbe53b6e2"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "922c49beef2c25b86d543f6dc8c98b6b2fd63236b5213091aaf13de50593897a"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "0a609ab903b018835b2a40777b765e213b5e300fdaaad727b9b712b682fff2a4"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "4a45ea008c923257dd1b5c1f49cbd18b00ddbf22c8e16f9f3ecba9f4d50fee6a"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "80dd94ebdb81458fbd8e8e4223dcf0bcc14208a9b1d083d5d589409bcc519c3d"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "e2c684362ff8895be6e1064c88f0348c8088b3eb1288ae7de14eb197fbe8882d"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "a733ad459cfc49072ec925aa816c16bd3f1519301d41af070c3b1a57e91c2624"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "0854a01a247e1f83bfc8c5900a72b8de92768d99458697b21e03e1b02cc1d91a"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "2e5cf825951d130bed9a122de35a9f1d53920bcb3666bd834b02e0fe9752552c"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "8ccb16060eb1e333c0f2234ca84bec013aafddf21cbd9906275259c03ff0ea64"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "6fcf6b43da3e50f6922c53e3cd922a87e069bed6c6237b6eff6be36d1f9a02f3"
+    }
+  ]
+}

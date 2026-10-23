@@ -1,0 +1,92 @@
+bun test v1.4.2 (744846f84)
+
+packages/kernel/tests/node-owned-values.test.ts:
+21 |     let completed = false;
+22 |     let received: unknown;
+23 |     try { kernel.transact(tx => { write(tx, input, writer); completed = true; }); }
+24 |     catch (error) { received = error; }
+25 |     expect(completed).toBeTrue();
+26 |     expect(received).toBeInstanceOf(KernelError);
+                          ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class KernelError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/kernel-replay-revisions/cflow/packages/kernel/tests/node-owned-values.test.ts:26:22)
+(fail) Node add retains first invalid position for final graph validation [25.52ms]
+21 |     let completed = false;
+22 |     let received: unknown;
+23 |     try { kernel.transact(tx => { write(tx, input, writer); completed = true; }); }
+24 |     catch (error) { received = error; }
+25 |     expect(completed).toBeTrue();
+26 |     expect(received).toBeInstanceOf(KernelError);
+                          ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class KernelError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/kernel-replay-revisions/cflow/packages/kernel/tests/node-owned-values.test.ts:26:22)
+(fail) Node add retains first invalid size for final graph validation [2.17ms]
+21 |     let completed = false;
+22 |     let received: unknown;
+23 |     try { kernel.transact(tx => { write(tx, input, writer); completed = true; }); }
+24 |     catch (error) { received = error; }
+25 |     expect(completed).toBeTrue();
+26 |     expect(received).toBeInstanceOf(KernelError);
+                          ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class KernelError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/kernel-replay-revisions/cflow/packages/kernel/tests/node-owned-values.test.ts:26:22)
+(fail) Node add retains first invalid parentId for final graph validation [0.47ms]
+21 |     let completed = false;
+22 |     let received: unknown;
+23 |     try { kernel.transact(tx => { write(tx, input, writer); completed = true; }); }
+24 |     catch (error) { received = error; }
+25 |     expect(completed).toBeTrue();
+26 |     expect(received).toBeInstanceOf(KernelError);
+                          ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class KernelError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/kernel-replay-revisions/cflow/packages/kernel/tests/node-owned-values.test.ts:26:22)
+(fail) Node replace retains first invalid position for final graph validation [1.01ms]
+21 |     let completed = false;
+22 |     let received: unknown;
+23 |     try { kernel.transact(tx => { write(tx, input, writer); completed = true; }); }
+24 |     catch (error) { received = error; }
+25 |     expect(completed).toBeTrue();
+26 |     expect(received).toBeInstanceOf(KernelError);
+                          ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class KernelError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/kernel-replay-revisions/cflow/packages/kernel/tests/node-owned-values.test.ts:26:22)
+(fail) Node replace retains first invalid size for final graph validation [0.09ms]
+21 |     let completed = false;
+22 |     let received: unknown;
+23 |     try { kernel.transact(tx => { write(tx, input, writer); completed = true; }); }
+24 |     catch (error) { received = error; }
+25 |     expect(completed).toBeTrue();
+26 |     expect(received).toBeInstanceOf(KernelError);
+                          ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class KernelError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/kernel-replay-revisions/cflow/packages/kernel/tests/node-owned-values.test.ts:26:22)
+(fail) Node replace retains first invalid parentId for final graph validation [0.06ms]
+
+ 0 pass
+ 6 fail
+ 12 expect() calls
+Ran 6 tests across 1 file. [138.00ms]

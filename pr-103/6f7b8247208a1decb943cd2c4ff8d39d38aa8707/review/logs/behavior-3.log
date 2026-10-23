@@ -1,0 +1,19 @@
+{"kind":"position","writer":"add","mode":"valid","reads":1,"code":null,"viewChanged":true,"revision":1,"position":{"x":20,"y":30}}
+{"kind":"position","writer":"add","mode":"invalid","reads":1,"code":"INVALID_GRAPH","viewChanged":false,"revision":0}
+{"kind":"position","writer":"add","mode":"changing","reads":1,"code":"INVALID_GRAPH","viewChanged":false,"revision":0}
+{"kind":"position","writer":"replace","mode":"valid","reads":1,"code":null,"viewChanged":true,"revision":2,"position":{"x":20,"y":30}}
+{"kind":"position","writer":"replace","mode":"invalid","reads":1,"code":"INVALID_GRAPH","viewChanged":false,"revision":1,"position":{"x":0,"y":0}}
+{"kind":"position","writer":"replace","mode":"changing","reads":1,"code":"INVALID_GRAPH","viewChanged":false,"revision":1,"position":{"x":0,"y":0}}
+{"kind":"size","writer":"add","mode":"valid","reads":1,"code":null,"viewChanged":true,"revision":1,"position":{"x":10,"y":20},"size":{"width":50,"height":60}}
+{"kind":"size","writer":"add","mode":"invalid","reads":1,"code":"INVALID_GRAPH","viewChanged":false,"revision":0}
+{"kind":"size","writer":"add","mode":"changing","reads":1,"code":"INVALID_GRAPH","viewChanged":false,"revision":0}
+{"kind":"size","writer":"replace","mode":"valid","reads":1,"code":null,"viewChanged":true,"revision":2,"position":{"x":10,"y":20},"size":{"width":50,"height":60}}
+{"kind":"size","writer":"replace","mode":"invalid","reads":1,"code":"INVALID_GRAPH","viewChanged":false,"revision":1,"position":{"x":0,"y":0}}
+{"kind":"size","writer":"replace","mode":"changing","reads":1,"code":"INVALID_GRAPH","viewChanged":false,"revision":1,"position":{"x":0,"y":0}}
+{"kind":"parentId","writer":"add","mode":"valid","reads":1,"code":null,"viewChanged":true,"revision":1,"position":{"x":10,"y":20}}
+{"kind":"parentId","writer":"add","mode":"invalid","reads":1,"code":"INVALID_GRAPH","viewChanged":false,"revision":0}
+{"kind":"parentId","writer":"add","mode":"changing","reads":1,"code":"INVALID_GRAPH","viewChanged":false,"revision":0}
+{"kind":"parentId","writer":"replace","mode":"valid","reads":1,"code":null,"viewChanged":true,"revision":2,"position":{"x":10,"y":20}}
+{"kind":"parentId","writer":"replace","mode":"invalid","reads":1,"code":"INVALID_GRAPH","viewChanged":false,"revision":1,"position":{"x":0,"y":0}}
+{"kind":"parentId","writer":"replace","mode":"changing","reads":1,"code":"INVALID_GRAPH","viewChanged":false,"revision":1,"position":{"x":0,"y":0}}
+All first invalid owned Node values rejected.

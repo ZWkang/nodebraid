@@ -1,0 +1,255 @@
+$ bun run scripts/check-affected.ts --base origin/main
+{
+  "mode": "affected",
+  "files": [
+    "packages/kernel/src/entity-values.ts",
+    "packages/kernel/tests/node-owned-values.test.ts"
+  ],
+  "packages": [
+    "@nodebraid/adapter-react",
+    "@nodebraid/canvas-fragment",
+    "@nodebraid/core",
+    "@nodebraid/examples",
+    "@nodebraid/interaction-api",
+    "@nodebraid/kernel",
+    "@nodebraid/layout-api",
+    "@nodebraid/layout-dagre",
+    "@nodebraid/layout-elk",
+    "@nodebraid/plugin-clipboard",
+    "@nodebraid/plugin-duplicate-selection",
+    "@nodebraid/plugin-history",
+    "@nodebraid/plugin-interaction",
+    "@nodebraid/plugin-kernel",
+    "@nodebraid/plugin-layout",
+    "@nodebraid/plugin-port",
+    "@nodebraid/plugin-renderer",
+    "@nodebraid/plugin-session",
+    "@nodebraid/port-api",
+    "@nodebraid/preset-basic",
+    "@nodebraid/renderer-api",
+    "@nodebraid/renderer-svg",
+    "@nodebraid/session-api"
+  ],
+  "tests": [
+    "tests/kernel-commit-preparation.test.ts",
+    "tests/layout-providers.test.ts"
+  ],
+  "browser": [
+    "@nodebraid/adapter-react",
+    "@nodebraid/examples",
+    "@nodebraid/renderer-svg"
+  ],
+  "docs": true,
+  "shared": []
+}
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install prettier --check --ignore-unknown packages/kernel/src/entity-values.ts packages/kernel/tests/node-owned-values.test.ts
+Checking formatting...
+All matched files use Prettier code style!
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install oxlint packages/kernel/src/entity-values.ts packages/kernel/tests/node-owned-values.test.ts
+[build] @nodebraid/diagnostics
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/kernel
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/runtime-cordis
+$ tsgo -p tsconfig.build.json
+[build] @nodebraid/plugin-command
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-kernel
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-history
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/session-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-session
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/adapter-react
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/canvas-fragment
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/port-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/interaction-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-api
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-port
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-renderer
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-interaction
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-clipboard
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-duplicate-selection
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-layout
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/preset-basic
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/core
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-dagre
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-svg
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/examples
+$ vite build
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 2185 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                              0.62 kB │ gzip:   0.34 kB
+dist/assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2    7.42 kB
+dist/assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2      8.00 kB
+dist/assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2       15.08 kB
+dist/assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2      16.51 kB
+dist/assets/geist-latin-wght-normal-BgDaEnEv.woff2          29.40 kB
+dist/assets/index-B7yrd1ul.css                              38.29 kB │ gzip:   8.10 kB
+dist/assets/routes-kXAShKJD.js                               0.56 kB │ gzip:   0.41 kB
+dist/assets/rolldown-runtime-CbXtAM7H.js                     0.58 kB │ gzip:   0.36 kB
+dist/assets/preload-helper-nlOK6TZ5.js                      35.01 kB │ gzip:  12.63 kB
+dist/assets/basic-svg-CPSlTNuv.js                          242.74 kB │ gzip:  72.52 kB
+dist/assets/index-DE0TJduI.js                              348.54 kB │ gzip: 113.55 kB
+
+✓ built in 642ms
+[build] @nodebraid/layout-elk
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+
+[check:affected] packages/adapter-react: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/adapter-react: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/server-rendering.test.tsx:
+(pass) fails explicitly when a Snapshot Hook is server-rendered without a hydration contract [1.92ms]
+
+tests/index.test.ts:
+(pass) exports the React Adapter hooks through its public entrypoint [0.24ms]
+
+tests/types.test.ts:
+(pass) keeps the React Adapter interface narrow and type-safe
+
+ 3 pass
+ 0 fail
+ 5 expect() calls
+Ran 3 tests across 3 files. [26.00ms]
+
+[check:affected] packages/canvas-fragment: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/canvas-fragment: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) captures the selected-node induced subgraph and explicit Selection in canonical order [1.75ms]
+(pass) materializes nested Nodes and port-qualified Edges with fresh IDs and one world offset [0.81ms]
+(pass) accepts one decoded Fragment shell and rejects edges outside its Node set [1.96ms]
+
+tests/array-input.test.ts:
+(pass) rejects an empty normalized Node collection for length %s [0.15ms]
+(pass) rejects an empty normalized Node collection for length %s [0.01ms]
+(pass) rejects an empty normalized Node collection for length %s [0.01ms]
+(pass) rejects an empty normalized Node collection for length 0
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length %s
+(pass) returns the same Node collection that passed Fragment validation [0.16ms]
+(pass) rejects malformed Fragment elements even when the array defines map [0.04ms]
+(pass) materializes the actual mapping elements even when the array defines map [0.06ms]
+(pass) validates every element within a Proxy array length [0.04ms]
+(pass) accepts frozen array data without invoking method, iterator or constructor hooks [0.14ms]
+(pass) rejects a missing Fragment nodes element [0.04ms]
+(pass) rejects a missing Fragment edges element
+(pass) rejects a missing Fragment selectionNodes element [0.02ms]
+(pass) rejects a missing Fragment selectionEdges element [0.02ms]
+(pass) rejects a missing nodes materialization element [0.04ms]
+(pass) rejects a missing edges materialization element [0.05ms]
+(pass) preserves an array element read failure [0.04ms]
+
+ 23 pass
+ 0 fail
+ 43 expect() calls
+Ran 23 tests across 2 files. [14.00ms]
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) @nodebraid/core > publishes Port values and Runtime contribution seams [0.04ms]
+(pass) @nodebraid/core > publishes Canvas Fragment and Clipboard through the public facade [0.01ms]
+(pass) @nodebraid/core > publishes Duplicate Selection through the public facade
+(pass) @nodebraid/core > publishes the shared Diagnostics seam [1.59ms]
+(pass) @nodebraid/core > publishes the typed Plugin Host seam [5.19ms]
+(pass) @nodebraid/core > publishes the reversible Kernel seam [0.92ms]
+(pass) @nodebraid/core > publishes the Kernel Runtime Plugin seam [1.68ms]
+(pass) @nodebraid/core > publishes the Session Runtime Plugin seam [1.17ms]
+(pass) @nodebraid/core > publishes the backend-neutral Renderer and Runtime integration seams [0.06ms]
+(pass) @nodebraid/core > publishes backend-neutral Interaction values and Runtime behavior [0.02ms]
+(pass) @nodebraid/core > composes asynchronous Command preparation with a synchronous Kernel Transaction [3.02ms]
+(pass) @nodebraid/core > publishes the History Runtime Plugin seam [0.03ms]
+
+tests/preset-basic.test.ts:
+(pass) Core facade exports Basic Canvas Composition without a concrete Renderer [0.02ms]
+
+tests/layout.test.ts:
+(pass) the Core facade exports generic Layout seams without concrete Providers [0.01ms]
+
+ 14 pass
+ 0 fail
+ 39 expect() calls
+Ran 14 tests across 3 files. [36.00ms]
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/interaction-api: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/interaction-api: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) describes backend-neutral Interaction Projection values [0.11ms]
+(pass) creates immutable direction-independent World Rect values including zero area [0.10ms]
+
+ 2 pass
+ 0 fail
+ 7 expect() calls
+Ran 2 tests across 1 file. [6.00ms]
+
+[check:affected] packages/kernel: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+tests/node-owned-values.test.ts(76,29): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type 'CanvasNode' is missing the following properties from type '{ enumerable: boolean; get(): { width?: undefined; height?: undefined; x: number; y: number; } | { x?: undefined; y?: undefined; width: number; height: number; } | NodeId; }': enumerable, get
+error: script "typecheck:self" exited with code 1
+error: script "check:affected" exited with code 1
