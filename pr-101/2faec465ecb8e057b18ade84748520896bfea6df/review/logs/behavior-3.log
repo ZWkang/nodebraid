@@ -1,0 +1,256 @@
+$ bun run scripts/check-affected.ts --base "227192241e003231e2b939fe7b814bdc075ba2a3"
+{
+  "mode": "affected",
+  "files": [
+    "packages/preset-basic/src/preset-basic-plugin.ts",
+    "packages/preset-basic/tests/numeric-policy.test.ts"
+  ],
+  "packages": [
+    "@nodebraid/core",
+    "@nodebraid/examples",
+    "@nodebraid/preset-basic"
+  ],
+  "tests": [
+    "tests/layout-providers.test.ts"
+  ],
+  "browser": [
+    "@nodebraid/examples"
+  ],
+  "docs": true,
+  "shared": []
+}
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install prettier --check --ignore-unknown packages/preset-basic/src/preset-basic-plugin.ts packages/preset-basic/tests/numeric-policy.test.ts
+Checking formatting...
+All matched files use Prettier code style!
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install oxlint packages/preset-basic/src/preset-basic-plugin.ts packages/preset-basic/tests/numeric-policy.test.ts
+[build] @nodebraid/diagnostics
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/kernel
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/canvas-fragment
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/port-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/session-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/interaction-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-api
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/runtime-cordis
+$ tsgo -p tsconfig.build.json
+[build] @nodebraid/plugin-command
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-kernel
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-port
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-session
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-renderer
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-interaction
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-clipboard
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-duplicate-selection
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-history
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-layout
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/preset-basic
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/core
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/adapter-react
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-dagre
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-svg
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/examples
+$ vite build
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 2185 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                              0.62 kB │ gzip:   0.34 kB
+dist/assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2    7.42 kB
+dist/assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2      8.00 kB
+dist/assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2       15.08 kB
+dist/assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2      16.51 kB
+dist/assets/geist-latin-wght-normal-BgDaEnEv.woff2          29.40 kB
+dist/assets/index-B7yrd1ul.css                              38.29 kB │ gzip:   8.10 kB
+dist/assets/routes-KeXczhJD.js                               0.56 kB │ gzip:   0.41 kB
+dist/assets/rolldown-runtime-CbXtAM7H.js                     0.58 kB │ gzip:   0.36 kB
+dist/assets/preload-helper-nlOK6TZ5.js                      35.01 kB │ gzip:  12.63 kB
+dist/assets/basic-svg-DILOfLfW.js                          242.84 kB │ gzip:  72.52 kB
+dist/assets/index-BXDNAvx8.js                              348.54 kB │ gzip: 113.55 kB
+
+✓ built in 970ms
+[build] @nodebraid/layout-elk
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) @nodebraid/core > publishes Port values and Runtime contribution seams [0.03ms]
+(pass) @nodebraid/core > publishes Canvas Fragment and Clipboard through the public facade [0.02ms]
+(pass) @nodebraid/core > publishes Duplicate Selection through the public facade
+(pass) @nodebraid/core > publishes the shared Diagnostics seam [0.55ms]
+(pass) @nodebraid/core > publishes the typed Plugin Host seam [52.17ms]
+(pass) @nodebraid/core > publishes the reversible Kernel seam [3.05ms]
+(pass) @nodebraid/core > publishes the Kernel Runtime Plugin seam [13.40ms]
+(pass) @nodebraid/core > publishes the Session Runtime Plugin seam [6.71ms]
+(pass) @nodebraid/core > publishes the backend-neutral Renderer and Runtime integration seams [0.18ms]
+(pass) @nodebraid/core > publishes backend-neutral Interaction values and Runtime behavior [0.37ms]
+(pass) @nodebraid/core > composes asynchronous Command preparation with a synchronous Kernel Transaction [8.67ms]
+(pass) @nodebraid/core > publishes the History Runtime Plugin seam [0.03ms]
+
+tests/preset-basic.test.ts:
+(pass) Core facade exports Basic Canvas Composition without a concrete Renderer [0.18ms]
+
+tests/layout.test.ts:
+(pass) the Core facade exports generic Layout seams without concrete Providers [0.34ms]
+
+ 14 pass
+ 0 fail
+ 39 expect() calls
+Ran 14 tests across 3 files. [222.00ms]
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/preset-basic: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/preset-basic: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) Composition readiness publishes every base Service through static bindings [7.31ms]
+
+tests/types.test.ts:
+(pass) Basic Canvas Composition preserves required Renderer config and provides no Service [2.15ms]
+
+tests/numeric-policy.test.ts:
+(pass) Composition preserves invalid dragThreshold from enumerable policy fields [2.34ms]
+(pass) Composition preserves invalid dragThreshold from inherited policy fields [1.32ms]
+(pass) Composition preserves invalid dragThreshold from non-enumerable policy fields [1.37ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from enumerable policy fields [1.48ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from inherited policy fields [1.69ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from non-enumerable policy fields [3.88ms]
+(pass) Composition preserves invalid minZoom from enumerable policy fields [1.30ms]
+(pass) Composition preserves invalid minZoom from inherited policy fields [1.31ms]
+(pass) Composition preserves invalid minZoom from non-enumerable policy fields [1.29ms]
+(pass) Composition preserves invalid maxZoom from enumerable policy fields [1.32ms]
+(pass) Composition preserves invalid maxZoom from inherited policy fields [1.80ms]
+(pass) Composition preserves invalid maxZoom from non-enumerable policy fields [1.12ms]
+(pass) Composition retains valid enumerable policies across mutation and fresh Hosts [3.71ms]
+(pass) Composition retains valid inherited policies across mutation and fresh Hosts [4.56ms]
+(pass) Composition retains valid non-enumerable policies across mutation and fresh Hosts [2.08ms]
+(pass) Composition preserves the original enumerable dragThreshold getter failure [0.14ms]
+(pass) Composition preserves the original inherited dragThreshold getter failure
+(pass) Composition preserves the original non-enumerable dragThreshold getter failure
+(pass) Composition preserves the original enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original inherited wheelZoomSensitivity getter failure
+(pass) Composition preserves the original non-enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original enumerable minZoom getter failure
+(pass) Composition preserves the original inherited minZoom getter failure
+(pass) Composition preserves the original non-enumerable minZoom getter failure
+(pass) Composition preserves the original enumerable maxZoom getter failure
+(pass) Composition preserves the original inherited maxZoom getter failure
+(pass) Composition preserves the original non-enumerable maxZoom getter failure
+
+tests/readiness.test.ts:
+(pass) invalid Interaction options fail the Composition with the original Interaction error [1.42ms]
+(pass) Composition snapshots Interaction options when the Plugin is created [1.09ms]
+(pass) Composition snapshots nested Connection options when the Plugin is created [0.96ms]
+(pass) Composition keeps the Connection value captured before a caller getter changes [0.94ms]
+(pass) Composition owns inherited Connection options across fresh Host installations [2.76ms]
+(pass) Composition owns non-enumerable Connection options across fresh Host installations [3.24ms]
+(pass) Composition preserves the original Connection getter failure at creation [0.15ms]
+(pass) Composition leaves malformed Connection validation with Interaction [1.21ms]
+(pass) Composition creation rejects malformed or unknown top-level options [0.10ms]
+(pass) Composition waits for an asynchronous Renderer before becoming active [1.46ms]
+(pass) Renderer Factory failure keeps its identity and releases the Child tree for reinstall [1.84ms]
+
+tests/lifecycle.test.ts:
+(pass) existing standard Provider makes Basic Canvas Composition fail explicitly [1.40ms]
+(pass) second Basic Canvas Composition conflicts without disturbing the active one [2.46ms]
+(pass) a later Renderer Provider conflict rolls back earlier Child reservations [2.87ms]
+(pass) Composition disposes consumers before Renderer and awaits asynchronous Renderer cleanup [2.36ms]
+(pass) Composition cleanup attempts every Renderer resource and preserves all failures [1.62ms]
+(pass) Composition diagnostics expose the complete reverse Child cleanup order [2.54ms]
+
+tests/package-import.test.ts:
+(pass) package-name import exposes the Basic Canvas Composition factory [8.04ms]
+
+ 47 pass
+ 0 fail
+ 147 expect() calls
+Ran 47 tests across 6 files. [95.00ms]
+
+[check:affected] .: /Users/zhou/.bun/bin/bun test tests/layout-providers.test.ts
+bun test v1.4.2 (744846f84)
+
+tests/layout-providers.test.ts:
+(pass) Dagre lays out Port topology with one undoable commit and a no-op repeat [18.80ms]
+(pass) ELK lays out Port topology with one undoable commit and a no-op repeat [149.25ms]
+(pass) accepted getter-backed Layout values survive Runtime revalidation and History replay [1.75ms]
+(pass) Dagre and ELK compose with Provider-specific typed Runtime Commands [7.29ms]
+
+ 4 pass
+ 0 fail
+ 92 expect() calls
+Ran 4 tests across 1 file. [222.00ms]
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run test:browser:self
+$ bun run ./browser-tests/basic-svg.browser.ts && bun run ./browser-tests/clipboard.browser.ts
+
+[check:affected] .: /Users/zhou/.bun/bin/bun run docs:check:self
+$ bun run docs:verify && bun run website/examples/quick-start.ts && bun run docs:build
+$ bun run website/scripts/verify-content.ts
+documentation content verified (25 modules)
+revision=1 nodes=1
+$ NODEBRAID_DOCS_BASE=/nodebraid/ vitepress build website
+
+  vitepress v1.6.4
+
+- building client + server bundles...
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[32m✓[0m building client + server bundles...
+- rendering pages...
+[32m✓[0m rendering pages...
+build complete in 19.57s.
