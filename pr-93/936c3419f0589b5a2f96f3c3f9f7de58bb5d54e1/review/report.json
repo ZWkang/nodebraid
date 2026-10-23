@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "2b54295f82eec2f08f8b0b34a34352c2b5d94e08",
+    "expectedParent": "7b1fbc09ae7c8dca18153369a3b62402aa5935e8",
+    "head": "936c3419f0589b5a2f96f3c3f9f7de58bb5d54e1",
+    "tree": "16862e6483263a3ac59f39f0c406ad7e984ae1ed",
+    "patch": "47bc25a1cd9ad2f5f8baee434d06dfc0ea13ca20fadcb960935600dc0ce6098b",
+    "localHead": "baa7147beeed1cfd66eb1aa6ba2670c92cbbcfe3"
+  },
+  "task": {
+    "run": "c143cf74-a459-4419-a8bf-d880ae669e87",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 92
+    },
+    "request": "## Confirmed defect\n\nOn fetched main `1c85d79db1e275e59f84a9bb77d1fe75c0a582e6`, replay validation rereads caller-owned `beforeRevision` and `revision` across safe-integer, range and adjacency checks. A changing getter can replace the first revision tuple with later values and make an invalid tuple pass.\n\nA fresh compiled public Kernel probe executes both directions:\n- Stable `(0,1)` replays normally.\n- Stable non-adjacent `(0,5)` rejects with `INVALID_CHANGE_SET / INVALID_REVISIONS`, preserves the exact View and never reads `changes`.\n- A `revision` getter returning `5` then `1` exposes the same first tuple `(0,5)`, but replay succeeds. Forward inserts a Node at revision 1; reverse removes it and advances revision 1→2.\n- A `beforeRevision` getter returning `0` then `1`, with revision `2`, similarly accepts first tuple `(0,2)`.\n- Actual changing cases read beforeRevision 3 times, revision 2 times and changes once. The real rejection invariant fails with exit 1.\n\nOriginal executable source/output: run `20261022T101847-maintenance`, `kernel-replay-header-repro.ts` and `kernel-replay-header-red.log`. The compiled build and existing focused Kernel suites pass (27 tests / 116 assertions); a separate compiled Query/Snapshot/artifact probe passes. These are public Kernel API checks, not browser input acceptance.\n\n## Contract and cause\n\nThe [domain definition](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/CONTEXT.md) defines a Change Set between adjacent revisions. Existing [replay validation](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/packages/kernel/src/change-set.ts) requires adjacent non-negative safe integers and reports bounded `INVALID_REVISIONS` details. [ADR0011](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/docs/adr/0011-replay-change-sets-through-transactions.md) keeps replay inside the existing Transaction boundary; [ADR0029](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/docs/adr/0029-preserve-domain-and-external-error-identity.md) preserves original external errors.\n\n`validateChangeSet` performs guards against repeated property reads and rereads those properties again while describing errors. There is no retained pair shared by validation and diagnostics.\n\nMinimal public reproduction after `bun run --filter '@nodebraid/kernel' build`:\n\n```ts\nimport assert from 'node:assert/strict';\nimport { createCanvasKernel, nodeId } from '@nodebraid/kernel';\nconst kernel = createCanvasKernel();\nconst before = kernel.read();\nconst id = nodeId('header-accepted');\nlet reads = 0;\nconst input = {\n  beforeRevision: 0,\n  get revision() { return ++reads === 1 ? 5 : 1; },\n  changes: [{\n    entity: 'node' as const, id, before: null,\n    after: { id, type: 'task', position: { x: 1, y: 2 }, data: null },\n  }],\n};\nassert.throws(\n  () => kernel.transact(tx => tx.applyChangeSet(input, 'forward')),\n  e => e instanceof Error && Reflect.get(e, 'code') === 'INVALID_CHANGE_SET',\n);\nassert.equal(kernel.read(), before);\n```\n\nActual: no error; the Node is committed. The assertion fails.\n\n## Acceptance\n\n- Read each revision header field once and retain that accepted pair across numeric/range/adjacency validation and error details.\n- A first non-adjacent pair cannot become valid through later property reads; a first valid pair cannot be invalidated by later substitutions. Rejected headers precede changes/value reads and writes, preserve exact View/revision, and leave no partial replay when caught inside a larger Transaction.\n- Cover both header fields, Node/Edge and forward/reverse public replay; valid and invalid stable controls, non-negative safe-integer limits, bounded diagnostic values, inherited/getter inputs, original read exceptions, guard ordering and caught-error atomicity.\n- Preserve existing direction/object checks, collection and record semantics, duplicate/sparse checks, conflict preflight, ordering, graph validation, metadata, History replay, immutable evidence and opaque data references. No new public API, accessor ban, cap, retry, dependency or fallback.\n- Public red/green, related consumers/affected checks, independent Standards + ponytail-review / Spec, formal full engineering check, exact remote tree/append-parent, current-head CI and full report/media readback.\n- Keep this Issue open until actual main integration and whole-Issue acceptance.\n\n## Deduplication\n\nAll-state metadata through final short pages: 91 Issues/PRs (4 pages), 47 PRs (2 pages). Complete original bodies and empty discussions read for #18, #48, #82 and #89. Their scopes are commit metadata publication, replay collection traversal, direct Writer IDs and replay Graph Change/entity-value ownership. Open #89 / PR #91 explicitly preserve existing revision validation and do not change the header reads. This remaining header-validation defect is separate; no replacement for those deliveries is created.\n",
+    "plan": [
+      {
+        "id": "synchronize-main",
+        "blockedBy": [],
+        "acceptance": "Capture current fetched main and published source head independently before append-only synchronization of the existing delivery branch. Preserve original Issue scope."
+      },
+      {
+        "id": "integration-compatibility",
+        "blockedBy": [
+          "synchronize-main"
+        ],
+        "acceptance": "Fresh public affected consumers and integration checks pass. Save complete current head/tree/binary patch; historical evidence retains its original source."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "integration-compatibility"
+        ],
+        "acceptance": "Fresh independent Standards with ponytail-review and Spec inspect the complete current patch against original Issue, ADRs and current main."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Pinned main versioned agents:run verify executes the real full bun run check after both review axes pass; preserve every attempt."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Actual remote tree and original append parent match verification; current-head CI, complete feedback, immutable full report/media publication and readback pass."
+      },
+      {
+        "id": "authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "Recheck current source/base, strict checks and all feedback immediately before a normal expected-head merge. Preserve review disputes and protection."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "authorized-merge"
+        ],
+        "acceptance": "Verify actual fetched main ancestry and the whole original Issue through fresh public acceptance; publish outcomes and close only after complete acceptance."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "baa7147beeed1cfd66eb1aa6ba2670c92cbbcfe3",
+      "tree": "16862e6483263a3ac59f39f0c406ad7e984ae1ed",
+      "patch": "47bc25a1cd9ad2f5f8baee434d06dfc0ea13ca20fadcb960935600dc0ce6098b",
+      "verdict": "passed",
+      "report": "What this change does: Kernel replay retains the first beforeRevision/revision pair for all checks and error details. This revision combines that header repair with main’s deployed record and entity-shell capture.\n\nVerdict: passed. Looks good. Ship.\n\nReviewed identity:\n\n- Base: `2b54295f82eec2f08f8b0b34a34352c2b5d94e08`\n- Head: `baa7147beeed1cfd66eb1aa6ba2670c92cbbcfe3`\n- Tree: `16862e6483263a3ac59f39f0c406ad7e984ae1ed`\n- Binary patch SHA256: `47bc25a1cd9ad2f5f8baee434d06dfc0ea13ca20fadcb960935600dc0ce6098b`\n\nHard standards: no violations found. Re-read the complete two-file patch, all 336 added test lines, Issue #92, empty discussion/blockers, independent prepared plan and supplied PR #93 checkpoint. Current AGENTS, CONTRIBUTING, CONTEXT, tracker/discussion rules, review skills and applicable principle guidance match the checked project documents.\n\nHeader capture remains after direction/object guards and before changes, record capture or opaque data access. Invalid first values produce bounded details without collection reads; valid first values cannot be replaced later. Original read errors and inherited receivers remain intact. This follows Boundary Discipline and ADR0029. The integrated capture helpers retain structural values while preserving opaque data’s reference and read phase under ADR0012. Whole-set preflight, final graph validation and new local commit revisions preserve ADR0011; pure Kernel validation does not add Runtime observation under ADR0028.\n\nJudgment checks: no concrete Fowler smell found. For one synchronous Kernel per Canvas, two local constants solve the header boundary with constant overhead and no new abstraction or policy. Traced header → collection → owned records/entities → conflict preflight → writer → commit → History, including current Layout consumers.\n\nIndependent checks after dependency construction completed: `bun test packages/kernel/tests packages/plugin-history/tests tests/layout-providers.test.ts` passed 189 tests / 911 assertions at this head. Both header and record regression suites passed, including Node/Edge, both directions, original errors, caught-conflict atomicity, opaque-data phases and real Dagre/ELK Undo/Redo.\n\nVerified clean head/tree, exact saved patch/hash, task/inspection binding and `git diff --check`. Local parents are the earlier unpublished sync and new main; the separately captured remote append parent remains an ancestor. Prepared compiled Kernel contains both repairs. Commands/raw output are in `standards-command-log.txt`.\n\nNot checked: fresh builds/typecheck, browsers, full engineering gate, live feedback refresh, new-head CI, API publication/tree readback or merge. Earlier reports/results retain their original identities. This report covers independent Standards and ponytail-review only.\n"
+    },
+    "spec": {
+      "head": "baa7147beeed1cfd66eb1aa6ba2670c92cbbcfe3",
+      "tree": "16862e6483263a3ac59f39f0c406ad7e984ae1ed",
+      "patch": "47bc25a1cd9ad2f5f8baee434d06dfc0ea13ca20fadcb960935600dc0ce6098b",
+      "verdict": "passed",
+      "report": "# Spec review — Issue #92 / PR #93\n\nVerdict: **passed**. 未发现验收遗漏、错误实现或范围扩张。\n\n- Base: `2b54295f82eec2f08f8b0b34a34352c2b5d94e08`\n- Head: `baa7147beeed1cfd66eb1aa6ba2670c92cbbcfe3`\n- Tree: `16862e6483263a3ac59f39f0c406ad7e984ae1ed`\n- Complete binary patch SHA256: `47bc25a1cd9ad2f5f8baee434d06dfc0ea13ca20fadcb960935600dc0ce6098b`\n\n已独立核验完整两文件补丁、实际提交及父节点、Issue #92 全文和当前分页反馈；Issue comments/blockers、PR comments/reviews/threads 均为空。复核 AGENTS、CONTEXT、tracker/discussion、code-review、ADR0011/0012/0028/0029，以及 Kernel、History、Session/Layout 调用链。\n\nIssue 要求 “Read each revision header field once” 且 “Rejected headers precede changes/value reads and writes”。实现先保留两个 header，numeric/range/adjacency 与 bounded details 全部使用同一首 tuple；direction/object guards、原 getter receiver/异常及 exact View 保持。新增公共回归覆盖首有效/无效、两字段、Node/Edge、正反方向、安全整数边界、继承 getter、诊断和 caught-error 原子性。\n\n新 main 已部署的 record/entity owned shells、whole-set conflict preflight、应用顺序和 immutable evidence 保持；opaque data 仍在原比较/物化阶段按原引用读取。未改变公开 API、验证政策、依赖或新增 fallback。\n\n独立执行：`bun test packages/kernel/tests packages/plugin-history/tests tests/layout-providers.test.ts`，**189 pass / 911 assertions，exit 0**；`git diff --check BASE...HEAD` 与 remote append parent 的 ancestor 检查均 exit 0。即时本地父为 `2f182d3`，真实远端追加父为 `7b1fbc0`，已区分。完整原始命令输出见 `spec-review-commands.log`。\n\n本审查未运行 build、browser、affected 或完整工程检查，未验证本 head 远端发布、CI、报告/media readback 或 main 合入；旧 head 检查不计作本轮验证。\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "public-integration",
+      "acceptance": "Fresh current-head combined Kernel/History/Command/Session/root Layout public suites pass: both first revision-header tuples and the actually deployed record/entity shell capture are exercised together. Preserve exact View, guard/read/error ordering, opaque data phases and caught-error atomicity. Historical2092 tests/reviews are not reused.",
+      "command": "bun test packages/kernel/tests packages/plugin-kernel/tests packages/plugin-history/tests packages/plugin-command/tests packages/plugin-session/tests tests/layout-providers.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "affected-integration",
+      "acceptance": "Actual affected checks for integrated Kernel record/value capture cover public consumers, real browsers and documentation. Canvas media supplements public API assertions.",
+      "command": "bun run check:affected --base 2f182d3059ec21d6466affb4362821ceccda9098",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "39cce902d3a5d3ca16b1688d84c888c2ea2b7535883432ad984735b100d36d54"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "607e496dce211681c660704f424b8c254c02b42a02482cb7b6cedaa7c2876e4b"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "41f889b91e192d992fca7161e6691f22f9fe710ac38aa06c4f8b58c67743fc98"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "834316de0ee9be8a56c9cc638fca67e0ae4a09d44a7bb91f7c87591870126503"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "f160d7e9249262b354e92ddb7cca2355462c9b139c4059466779a864573a31a2"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "54226fa75b862302d92b1aa12edaed1972b21df75cd5b97ebbfb29fb1f3ac90a"
+    }
+  ]
+}
