@@ -1,0 +1,51 @@
+{
+  "source": {
+    "base": "8d185d1fe2cdbe53af51bd69f600cfc43552b77e",
+    "head": "5d554c9f309b3067b1257eb4896445fd0bafac99",
+    "tree": "c6410b3c252ab1e98bc2038fcf25334ed8a048a3",
+    "patch": "30897c7363497cddaa543f825c64a7a6af564998ce18e2f84082809966616bfe"
+  },
+  "accepted": {
+    "before": {
+      "edgeIds": [
+        "example-initial-edge"
+      ],
+      "positions": {
+        "example-compose": {
+          "x": 360,
+          "y": 260
+        },
+        "example-discover": {
+          "x": 80,
+          "y": 100
+        },
+        "example-ship": {
+          "x": 660,
+          "y": 120
+        }
+      },
+      "transform": "matrix(1 0 0 1 0 0)"
+    },
+    "after": {
+      "edgeIds": [
+        "example-initial-edge"
+      ],
+      "positions": {
+        "example-compose": {
+          "x": 210,
+          "y": 0
+        },
+        "example-discover": {
+          "x": 0,
+          "y": 0
+        },
+        "example-ship": {
+          "x": 0,
+          "y": 138
+        }
+      },
+      "transform": "matrix(1 0 0 1 0 0)"
+    }
+  },
+  "coverage": "Real native Auto layout click, Node movement, unchanged Edge/Viewport and repeat/no-op/Undo/Redo. Does not exercise cancellation or all Providers."
+}

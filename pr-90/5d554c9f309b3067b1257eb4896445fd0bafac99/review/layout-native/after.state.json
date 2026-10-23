@@ -1,0 +1,20 @@
+{
+  "edgeIds": [
+    "example-initial-edge"
+  ],
+  "positions": {
+    "example-compose": {
+      "x": 210,
+      "y": 0
+    },
+    "example-discover": {
+      "x": 0,
+      "y": 0
+    },
+    "example-ship": {
+      "x": 0,
+      "y": 138
+    }
+  },
+  "transform": "matrix(1 0 0 1 0 0)"
+}
