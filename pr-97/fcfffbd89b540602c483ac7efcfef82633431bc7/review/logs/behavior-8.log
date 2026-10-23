@@ -1,0 +1,14 @@
+bun test v1.4.2 (744846f84)
+
+packages/runtime-cordis/tests/binding-records.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+error: Cannot find module '@nodebraid/diagnostics' from '/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/runtime-cordis/src/plugin-host-error.ts'
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [14.00ms]

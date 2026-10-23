@@ -1,0 +1,62 @@
+{
+  "head": "52d1b084845d66bdc93c54b9a6c6a3b03ebf2ece",
+  "seam": "compiled public definePlugin",
+  "results": [
+    {
+      "field": "requires",
+      "kind": "valid",
+      "reads": 0,
+      "error": null
+    },
+    {
+      "field": "requires",
+      "kind": "non-enumerable",
+      "reads": 0,
+      "error": {
+        "name": "PluginHostError",
+        "code": "INVALID_DEFINITION",
+        "message": "Plugin requires must contain only enumerable string Service Bindings.",
+        "structural": true
+      }
+    },
+    {
+      "field": "requires",
+      "kind": "phantom-key",
+      "reads": 0,
+      "error": {
+        "name": "PluginHostError",
+        "code": "INVALID_DEFINITION",
+        "message": "Plugin requires must contain only enumerable string Service Bindings.",
+        "structural": true
+      }
+    },
+    {
+      "field": "provides",
+      "kind": "valid",
+      "reads": 0,
+      "error": null
+    },
+    {
+      "field": "provides",
+      "kind": "non-enumerable",
+      "reads": 0,
+      "error": {
+        "name": "PluginHostError",
+        "code": "INVALID_DEFINITION",
+        "message": "Plugin provides must contain only enumerable string Service Bindings.",
+        "structural": true
+      }
+    },
+    {
+      "field": "provides",
+      "kind": "phantom-key",
+      "reads": 0,
+      "error": {
+        "name": "PluginHostError",
+        "code": "INVALID_DEFINITION",
+        "message": "Plugin provides must contain only enumerable string Service Bindings.",
+        "structural": true
+      }
+    }
+  ]
+}

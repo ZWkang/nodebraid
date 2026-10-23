@@ -1,0 +1,64 @@
+bun test v1.4.2 (744846f84)
+
+packages/runtime-cordis/tests/binding-records.test.ts:
+12 |         valueReads++;
+13 |         throw new Error('an absent Binding value must not be read');
+14 |       },
+15 |     });
+16 | 
+17 |     expect(() => definePlugin({ [field]: bindings, setup() {} } as PluginDefinition)).toThrow(
+                                                                                           ^
+error: expect(received).toThrow(expected)
+
+Expected value: ObjectContaining {
+  domain: "runtime.plugin-host",
+  code: "INVALID_DEFINITION",
+}
+Received value: 75 |     );
+76 |   }
+77 | 
+78 |   const normalized: Record<string, ServiceTokenBase> = {};
+79 |   for (const binding of inspection.keys) {
+80 |     const descriptor = Object.getOwnPropertyDescriptor(inspection.record, binding)!;
+                                                                                      ^
+TypeError: undefined is not an object (evaluating 'Object.getOwnPropertyDescriptor(inspection.record, binding).enumerable')
+      at normalizeServiceBindings (/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/runtime-cordis/src/plugin-definition.ts:80:82)
+      at definePlugin (/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/runtime-cordis/src/plugin-definition.ts:34:20)
+      at <anonymous> (/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/runtime-cordis/tests/binding-records.test.ts:17:87)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/runtime-cordis/tests/binding-records.test.ts:17:87)
+(fail) rejects a listed requires Binding without an own descriptor [15.52ms]
+12 |         valueReads++;
+13 |         throw new Error('an absent Binding value must not be read');
+14 |       },
+15 |     });
+16 | 
+17 |     expect(() => definePlugin({ [field]: bindings, setup() {} } as PluginDefinition)).toThrow(
+                                                                                           ^
+error: expect(received).toThrow(expected)
+
+Expected value: ObjectContaining {
+  domain: "runtime.plugin-host",
+  code: "INVALID_DEFINITION",
+}
+Received value: 75 |     );
+76 |   }
+77 | 
+78 |   const normalized: Record<string, ServiceTokenBase> = {};
+79 |   for (const binding of inspection.keys) {
+80 |     const descriptor = Object.getOwnPropertyDescriptor(inspection.record, binding)!;
+                                                                                      ^
+TypeError: undefined is not an object (evaluating 'Object.getOwnPropertyDescriptor(inspection.record, binding).enumerable')
+      at normalizeServiceBindings (/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/runtime-cordis/src/plugin-definition.ts:80:82)
+      at definePlugin (/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/runtime-cordis/src/plugin-definition.ts:35:20)
+      at <anonymous> (/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/runtime-cordis/tests/binding-records.test.ts:17:87)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/runtime-cordis/tests/binding-records.test.ts:17:87)
+(fail) rejects a listed provides Binding without an own descriptor [0.10ms]
+
+ 0 pass
+ 2 fail
+ 2 expect() calls
+Ran 2 tests across 1 file. [83.00ms]

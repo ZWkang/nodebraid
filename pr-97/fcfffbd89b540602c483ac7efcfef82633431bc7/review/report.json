@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "dcf13482b68bc2422fc4d714df1226ab0ef259aa",
+    "expectedParent": "dcf13482b68bc2422fc4d714df1226ab0ef259aa",
+    "head": "fcfffbd89b540602c483ac7efcfef82633431bc7",
+    "tree": "0c18884e64538f7f35fe06d705b7616fa04ede14",
+    "patch": "97060c5f0836d17173abb889d652e2a5e77423273017335d3926a9ef0de4532d",
+    "localHead": "52d1b084845d66bdc93c54b9a6c6a3b03ebf2ece"
+  },
+  "task": {
+    "run": "2f1cec56-3d1d-4c7d-8bb4-f34f02b359c0",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 96
+    },
+    "request": "## Confirmed defect\n\nOn fetched main `dcf13482b68bc2422fc4d714df1226ab0ef259aa`, public `definePlugin()` exposes an internal `TypeError` when a Service Binding record lists a string key whose own property descriptor is absent. The same malformed input fails in both `requires` and `provides`.\n\nAfter a fresh `@nodebraid/runtime-cordis` build, a compiled public API probe compared ordinary valid bindings, non-enumerable bindings and a legal JavaScript Proxy with `ownKeys() => ['service']` and `getOwnPropertyDescriptor() => undefined`. Valid bindings succeed; non-enumerable bindings correctly reject with `PluginHostError / INVALID_DEFINITION`; the absent-descriptor input instead fails on `.enumerable` with `TypeError`. No supplied getter or Proxy trap throws, and the binding value is never read. The actual structural-error assertion exits 1 in both fields. Existing Runtime tests pass: **127 tests / 544 assertions**.\n\nMinimal reproduction:\n\n```ts\nimport { definePlugin, PluginHostError } from '@nodebraid/runtime-cordis';\nconst bindings = new Proxy({}, {\n  ownKeys: () => ['missing'],\n  getOwnPropertyDescriptor: () => undefined,\n});\ntry {\n  definePlugin({ requires: bindings, setup() {} });\n} catch (error) {\n  if (!(error instanceof PluginHostError) || error.code !== 'INVALID_DEFINITION') throw error;\n}\n```\n\nOriginal executable and output are retained in discovery run `20261023T051654-discovery-runtime-adversarial`: `binding-descriptor-repro.ts`, `binding-descriptor-red.log`, `runtime-build.log`, `runtime-existing-tests.log`. This is a compiled public Runtime API reproduction; no browser behavior is claimed.\n\n## Contract and cause\n\n[ADR 0007](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/docs/adr/0007-use-a-small-nodebraid-plugin-host-interface.md) and [ADR 0029](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/docs/adr/0029-preserve-domain-and-external-error-identity.md) distinguish NodeBraid structural errors from original caller failures. The existing `definePlugin()` public tests reject malformed Binding records with `INVALID_DEFINITION`. The shared `normalizeServiceBindings()` assumes every `Reflect.ownKeys()` result still has an own descriptor and dereferences a non-null assertion at runtime. A disappearing own key or lawful Proxy can violate that assumption without throwing an external error.\n\n## Acceptance\n\n- Reject a listed Binding with no own descriptor through the existing `PluginHostError / INVALID_DEFINITION` path, in both `requires` and `provides`, before reading its value.\n- Keep valid ordinary, null-prototype and accessor Bindings working; preserve capture/read ordering and existing non-enumerable, symbol and forged-token rejection.\n- Preserve original failures thrown by prototype, own-key, descriptor and value reflection; do not catch or wrap external exceptions.\n- Reuse the shared Binding normalizer and existing public Runtime test seam. No public API, Proxy/accessor ban, fallback, retry, dependency or unrelated refactor.\n- Public failing/passing regressions, affected consumers, independent Standards with ponytail-review and Spec, formal full engineering verification, exact publication, current-head CI and complete immutable report/preview readback.\n- Keep this Issue open until actual main integration and whole-Issue acceptance. Future delivery PR remains for human merge.\n\n## Deduplication\n\nRead all-state Issues/PR metadata and bodies through final short pages: **95 records and 49 PRs**. Existing Runtime #20/#21/#24 cover duplicate Provided Tokens, disposal reentry and Provided-result rollback; #69/#80 cover diagnostic traversal/capture. None covers missing Service Binding descriptors during `definePlugin()` normalization.",
+    "plan": [
+      {
+        "id": "public-regression-and-fix",
+        "blockedBy": [],
+        "acceptance": "First add a real public definePlugin missing-descriptor regression; preserve its failing log, then fix the shared normalizer and verify both fields, valid controls and original reflection failures."
+      },
+      {
+        "id": "affected-consumers",
+        "blockedBy": [
+          "public-regression-and-fix"
+        ],
+        "acceptance": "Actual affected Runtime consumers pass; preserve the complete current source head/tree/binary patch."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "affected-consumers"
+        ],
+        "acceptance": "Independent Standards with ponytail-review and Spec both review the exact fixed diff against the original Issue, ADRs and current main."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Pinned main versioned agents:run verify runs the actual full bun run check once after both reviews pass, preserving all original logs."
+      },
+      {
+        "id": "published-evidence",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Exact source tree/first parent publication, current-head CI, full paginated feedback and immutable report/preview readback pass."
+      },
+      {
+        "id": "human-merge",
+        "blockedBy": [
+          "published-evidence"
+        ],
+        "acceptance": "Human review and normal protected main merge."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "human-merge"
+        ],
+        "acceptance": "Fetch actual main, verify merge ancestry and whole original Issue through fresh public compiled API acceptance; keep Issue open before this."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "52d1b084845d66bdc93c54b9a6c6a3b03ebf2ece",
+      "tree": "0c18884e64538f7f35fe06d705b7616fa04ede14",
+      "patch": "97060c5f0836d17173abb889d652e2a5e77423273017335d3926a9ef0de4532d",
+      "report": "/Users/zhou/.codex/local-workflows/nodebraid/runs/2f1cec56-3d1d-4c7d-8bb4-f34f02b359c0/reviews/52d1b084845d66bdc93c54b9a6c6a3b03ebf2ece/standards.md"
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "52d1b084845d66bdc93c54b9a6c6a3b03ebf2ece",
+      "tree": "0c18884e64538f7f35fe06d705b7616fa04ede14",
+      "patch": "97060c5f0836d17173abb889d652e2a5e77423273017335d3926a9ef0de4532d",
+      "report": "/Users/zhou/.codex/local-workflows/nodebraid/runs/2f1cec56-3d1d-4c7d-8bb4-f34f02b359c0/reviews/52d1b084845d66bdc93c54b9a6c6a3b03ebf2ece/spec.md"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "missing-descriptor-red",
+      "acceptance": "Both public requires/provides bindings with absent descriptors must expose runtime.plugin-host/INVALID_DEFINITION before value access. Original implementation actually throws TypeError; assertion failure is retained. Earlier environment and incorrect-domain attempts are separately retained and are not this definitive regression.",
+      "command": "bun test packages/runtime-cordis/tests/binding-records.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "runtime-public-green",
+      "acceptance": "Historical 5bb3528 public Runtime tests passed before the independent identity-matcher finding; original log retains that scope. Current strict-identity tests are a separate entry.",
+      "command": "bun test packages/runtime-cordis/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "original-compiled-repro",
+      "acceptance": "Historical 5bb3528 compiled public reproduction passed with its exact source SHA; original source/path adaptations recorded. Current head is separately executed.",
+      "command": "bun run /Users/zhou/.codex/local-workflows/nodebraid/runs/2f1cec56-3d1d-4c7d-8bb4-f34f02b359c0/compiled-green-repro.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "affected-consumers",
+      "acceptance": "Historical 5bb3528 affected Runtime consumers, browsers and docs passed; original check retained. Do not bind this log to the corrected52d1 head.",
+      "command": "bun run check:affected --base dcf13482b68bc2422fc4d714df1226ab0ef259aa",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "runtime-current-identity-green",
+      "acceptance": "Current52d1 source executes all140 Runtime public tests/561 assertions, including strict identity assertions for all eight external reflection failures.",
+      "command": "bun test packages/runtime-cordis/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "compiled-current-repro",
+      "acceptance": "Current52d1 freshly built public Runtime barrel reruns the original absent-descriptor assertion and ordinary/non-enumerable controls with exact current SHA. No assertion changed.",
+      "command": "bun run /Users/zhou/.codex/local-workflows/nodebraid/runs/2f1cec56-3d1d-4c7d-8bb4-f34f02b359c0/compiled-current-repro.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "affected-current-consumers",
+      "acceptance": "Current52d1 actual affected Runtime consumers, real React/SVG/Example browsers and documentation pass after strict-identity correction.",
+      "command": "bun run check:affected --base dcf13482b68bc2422fc4d714df1226ab0ef259aa",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "environment-first-attempt",
+      "acceptance": "First new-worktree attempt failed before assertions because generated @nodebraid/diagnostics was absent. Preserved as an environment failure; it is not a TDD regression. Documented dependency build resolved it without changing assertions.",
+      "command": "bun test packages/runtime-cordis/tests/binding-records.test.ts",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "test-domain-first-attempt",
+      "acceptance": "Early test mistakenly expected domain runtime, so even corrected production failed against the existing runtime.plugin-host identity. This actual failed attempt is retained. Corrected the assertion, restored original production for definitive red, then applied the same fix for definitive green.",
+      "command": "bun test packages/runtime-cordis/tests/binding-records.test.ts",
+      "exitCode": 1,
+      "phase": "green",
+      "status": "failed",
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "matcher-gap-reproduction",
+      "acceptance": "Real Bun matcher probe proves a distinct same-message Error satisfies toThrow(Error); independent review rejected that weak assertion. Current committed toBe(original) tests close the gap. This is matcher-observation evidence, not product-success evidence.",
+      "command": "bun run /Users/zhou/.codex/local-workflows/nodebraid/runs/2f1cec56-3d1d-4c7d-8bb4-f34f02b359c0/assertion-identity-probe.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-10.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "b437a9101fc6c8986bddc8656a6cef717c6504d29e2661af0878d68471e18654"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "f5c0a3a96b6849777aa2c6ee2260a076ebb0887f873eb41978affb89e8956a5f"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "e64898a61bffd5c71586106d9f06915c69d2f835c7330c41e5be58dfa04446e8"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "4e3b0540afefcf8190be65aef182c26b3a602e10a5da8f1ef00917b4a10535e6"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "8b6b038069caeaa8090c8ff9ef3b7f18e9d0efaa399658fd9a34d4431536f155"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "7aafb5e88fd30a631c07ba923da52be67be5e31d8a7da9e0100d149b08ebbca1"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "d3930a5c233941069e42dfab491022290db19bd0a92af4fb90df3efb87b2234f"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "bebdbb01f4de9ece800fd7a5a36107d685198f413477f8e771bd32082f7a2f70"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "a347dd1ff165b344dd6ff52c0aff4e40ff30aea74103bd1674387c67ad7e9350"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "a05a08029fa6e4c2c51f6808d4d4c9dba5e99d9f99a1e0619e03a372122a9d5f"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "d9e7dafb76ab588ef56f642a203a7fd66a16b0e13b636a1dfda06f3f1f1405f7"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "8d08397a3e629855276f1fb286ce4fd4f7d9b23150e5d82107a576ee9338e9b5"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "0bb48b95048882351a92505f1febc2dfbfa369dac6c9d0324956ac3680f5b0b8"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "05dcea2f167ede28b179e7a29bbd4be67d94946ace081729af2cf5be50095006"
+    }
+  ]
+}
