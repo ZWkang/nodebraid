@@ -23,6 +23,7 @@ NodeBraid 处于早期实现阶段，但已经形成一条可运行的 headless 
 - 后端无关的 `@nodebraid/preset-basic` Basic Canvas Composition，以及真实 SVG canonical example；
 - 公开 `@nodebraid/adapter-react` Runtime Mount 与稳定 Snapshot Hooks，以及真实 Chromium lifecycle 验证；
 - 私有 `@nodebraid/examples` React/TanStack Router Examples Application；Basic SVG 提供手动 Dagre/full/LR 整图布局，保留 Selection、Viewport 与原 Port 连接，并通过真实 UI + Canvas Chromium 验收；
+- 纯 `@nodebraid/document` 完整图文本格式与应用 Data Codec、原子 History Baseline，以及 Example 手动文件导出/导入；
 - 通过 `@nodebraid/core` 聚合的公共 facade。
 
 完整清单见 [全部模块](/modules/)。
@@ -30,10 +31,10 @@ NodeBraid 处于早期实现阶段，但已经形成一条可运行的 headless 
 ## 当前缺口
 
 ::: warning 尚无产品级编辑器外壳
-当前分支已经交付 Basic Canvas Composition、Duplicate/Delete Selection、显式 Clipboard Copy/Paste、Port Capability、Port-aware/Node-level Edge Connection、SVG Renderer 闭环、React Adapter 与开发者参考 Examples Application，但仍没有 Vue 或其他 framework adapter，也没有产品级编辑器外壳。当前不包含 Document Serialization/Persistence、跨版本 Clipboard 格式、Edge/Port 框选、lasso、snapping、pinch/touch 工具、文本编辑、产品节点 UI 或可扩展 Tool Registry。
+当前分支已经交付 Basic Canvas Composition、Duplicate/Delete Selection、显式 Clipboard Copy/Paste、Port Capability、Port-aware/Node-level Edge Connection、SVG Renderer 闭环、React Adapter 与开发者参考 Examples Application，但仍没有 Vue 或其他 framework adapter，也没有产品级编辑器外壳。当前不包含自动/云端 Persistence、跨版本 Clipboard 格式、Edge/Port 框选、lasso、snapping、pinch/touch 工具、文本编辑、产品节点 UI 或可扩展 Tool Registry。
 :::
 
-当前也没有 Persistence、Collaboration、序列化 schema 或远程同步能力。目标架构中出现某个名称，不代表它已经成为公共 package。
+完整 Document 的版本化序列化与 Example 手动文件导出/导入已提供；当前没有自动/云端 Persistence、Collaboration 或远程同步能力。目标架构中出现某个名称，不代表它已经成为公共 package。
 
 带 Port 图的 Layout 仅排列 Node；Port 方位、顺序和 Geometry 参与算法的 Port-aware Layout 仍未实现，Renderer 继续拥有 Port Geometry。
 

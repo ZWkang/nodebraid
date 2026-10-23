@@ -1,10 +1,17 @@
 import { test } from 'bun:test';
 
-import type { CanvasCommit } from '@nodebraid/kernel';
+import type { CanvasCommit, TransactionContext } from '@nodebraid/kernel';
 import type { Command } from '@nodebraid/plugin-command';
 import { createPluginHost } from '@nodebraid/runtime-cordis';
 
-import { historyPlugin, redoCommand, undoCommand, type HistoryService, type HistorySnapshot } from '../src';
+import {
+  establishHistoryBaselineCommand,
+  historyPlugin,
+  redoCommand,
+  undoCommand,
+  type HistoryService,
+  type HistorySnapshot,
+} from '../src';
 
 test('keeps the public History seam narrow and type-safe', () => {
   const verifyServiceTypes = (service: HistoryService) => {
@@ -16,10 +23,15 @@ test('keeps the public History seam narrow and type-safe', () => {
     service.undo();
     const undo: Command<void, CanvasCommit> = undoCommand;
     const redo: Command<void, CanvasCommit> = redoCommand;
+    const baseline: Command<(transaction: TransactionContext) => void, CanvasCommit | null> =
+      establishHistoryBaselineCommand;
+    // @ts-expect-error Establishing a baseline remains a Command rather than a Service method.
+    service.establishBaseline();
     // @ts-expect-error Command input remains void.
     const wrongInput: Command<string, CanvasCommit> = undoCommand;
     void undo;
     void redo;
+    void baseline;
     void wrongInput;
   };
   const verifyPluginTypes = () => {

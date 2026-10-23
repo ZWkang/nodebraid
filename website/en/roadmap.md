@@ -17,7 +17,7 @@ The SVG Renderer Provider has now proven a real Target, Document/Session synchro
 
 ## Interaction extensions and framework integration
 
-Independent Behavior and Shortcut Plugins now deliver Duplicate Selection and explicit Clipboard Copy/Paste over a shared in-memory Canvas Fragment. Selection, Box Selection, Delete Selection, multi-Node dragging, Pan, Wheel Zoom, the Port Capability, and Port-aware/node-level Edge Connection are also present. The public React Adapter now delivers Runtime Mounting and stable Snapshot projection. Vue or other framework adapters still require independent designs that follow their own framework conventions while remaining between the Runtime and UI framework without acquiring a second source of Document authority. Serialized Document, Persistence, a cross-version Clipboard format, Edge/Port box selection, lasso, snapping, pinch/touch, text editing, and an extensible Tool Registry remain separate future designs.
+Independent Behavior and Shortcut Plugins now deliver Duplicate Selection and explicit Clipboard Copy/Paste over a shared in-memory Canvas Fragment. Selection, Box Selection, Delete Selection, multi-Node dragging, Pan, Wheel Zoom, the Port Capability, and Port-aware/node-level Edge Connection are also present. The public React Adapter now delivers Runtime Mounting and stable Snapshot projection. Vue or other framework adapters still require independent designs that follow their own framework conventions while remaining between the Runtime and UI framework without acquiring a second source of Document authority. Automatic/cloud Persistence, a cross-version Clipboard format, Edge/Port box selection, lasso, snapping, pinch/touch, text editing, and an extensible Tool Registry remain separate future designs.
 
 ## Composition and examples
 
@@ -25,4 +25,4 @@ The backend-neutral Basic Canvas Composition, React Adapter, and private Example
 
 ## Later exploration
 
-Persistence, Collaboration, serialization schemas, remote synchronization, and additional Layout or Renderer Providers each require their own use cases, contracts, and verification. They are exploration directions today, not shipped or committed modules.
+Automatic/cloud Persistence, Collaboration, cross-version file migrations, remote synchronization, and additional Layout or Renderer Providers each require their own use cases, contracts, and verification. They are exploration directions today, not shipped or committed modules.

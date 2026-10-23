@@ -44,6 +44,14 @@ _Avoid_: Async Transaction, Mutation Session, Direct Write
 Document 在一个本地 revision 上的不可变读取表示，不等同于可持久化的 Serialized Document。
 _Avoid_: Serialized Document, Mutable State, Renderer Snapshot
 
+**Serialized Document**:
+完整 Document 的版本化文本表示，保留图实体、关系与应用编码的业务数据，但不携带本地 revision、Session、History 或派生 Port Snapshot。
+_Avoid_: Canvas Snapshot, Canvas Fragment, History Backup
+
+**Document Data Codec**:
+由应用拥有、以明确格式身份在不透明业务 data 与文本之间转换的同步契约。
+_Avoid_: Generic JSON Codec, Kernel Serializer, Storage Provider
+
 **Canvas Query**:
 按实体与图关系读取状态的只读能力；Canvas View 中的 Query 绑定一个已提交 revision，Transaction 中的 Query 反映当前暂存状态。
 _Avoid_: Live Query, Mutable Store, Document Handle
@@ -469,7 +477,7 @@ _Avoid_: Command Log, Document Backup, Persistent Timeline
 _Avoid_: Command Entry, Snapshot Copy, Undo Action
 
 **Recordable Commit**:
-History 应当建立 History Entry 的 Canvas Commit；包括当前 Activation 观察到的所有非 Replay Commit。
+History 应当建立 History Entry 的 Canvas Commit；包括当前 Activation 观察到的所有非 Replay、非 Baseline Commit。
 _Avoid_: User Commit, Command Commit, Ordinary Commit
 
 **Replay Commit**:
@@ -485,5 +493,9 @@ _Avoid_: History Stack, Entry List, Mutable History State
 _Avoid_: Undo Manager, History Controller, History Command Bus
 
 **History Baseline**:
-一次 History Activation 开始记录时的 Kernel revision；更早的 Canvas Commit 不形成该 Activation 的 History Entry。
+一次 History Activation 开始记录，或显式成功重建记录起点时的 Kernel revision；更早的 Canvas Commit 不形成当前 History Entry。
 _Avoid_: Initial Snapshot, Restored History, Revision Zero
+
+**Baseline Commit**:
+一次显式建立新 History Baseline 的成功 Transaction 所产生的 Canvas Commit；它替换历史起点，自身不成为可撤销 Entry，revision 继续单调递增。
+_Avoid_: Replay Commit, Ignored Commit, Restored Revision

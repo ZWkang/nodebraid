@@ -8,7 +8,7 @@ description: 用纯 Kernel 与本地 Session 组合一份权威 Document 和可�
 NodeBraid 把“图里有什么”与“当前用户怎么看这张图”分成两套边界清晰的状态：Kernel 维护权威 Document，Session 维护 Selection 与 Viewport。两者通过 Runtime Service 显式组合，但不会混成一个全局 Store。
 
 ::: info 当前状态
-Graph State 能力族的四个 package 均已实现并接入公共 facade；当前请从仓库源码使用，尚未以本项目身份发布到 npm。
+Graph State 能力族的 package 均已实现并接入公共 facade；当前请从仓库源码使用，尚未以本项目身份发布到 npm。
 :::
 
 ## 解决什么问题
@@ -19,6 +19,8 @@ Graph State 能力族用两个所有权边界解决这个问题：
 
 - **Document**：由 Kernel 独占，只有同步 Transaction 可以原子修改。
 - **Session**：与 Document 分离，只保存当前 Canvas Runtime 的 Selection 与 Viewport。
+
+纯 [Document](/modules/document) 模块在这份图状态之上提供版本化完整文件文本；业务 data 的格式由应用 Codec 拥有，文件 I/O 留给应用。
 
 ## 适用场景
 
@@ -32,12 +34,13 @@ Graph State 能力族用两个所有权边界解决这个问题：
 
 | 模块                                                   | 角色                   | 关键能力                                                                              |
 | ------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------- |
+| [`@nodebraid/document`](/modules/document)             | 完整图文本             | 显式应用 Data Codec、版本与完整图验证、文件往返                                       |
 | [`@nodebraid/kernel`](/modules/kernel)                 | 纯图内核               | Document、同步 Transaction、revision-bound Canvas View、Canvas Query、可逆 Change Set |
 | [`@nodebraid/plugin-kernel`](/modules/plugin-kernel)   | Kernel Runtime adapter | 每次 Activation 一份新 Kernel、窄 `KernelService`、有序 Canvas Commit 观察            |
 | [`@nodebraid/session-api`](/modules/session-api)       | Session 值契约         | Renderer-independent 的 `SelectionSnapshot`、`Viewport`、`SessionSnapshot`            |
 | [`@nodebraid/plugin-session`](/modules/plugin-session) | Session Runtime Plugin | Selection/Viewport mutation、订阅、Selection 与 Kernel View 协调                      |
 
-四个模块允许调用方按层级选择：纯算法代码可以只使用 Kernel；Renderer Provider 可以只依赖 Session 值契约；Canvas Runtime 则安装两个 Runtime Plugin，获得完整的 Document 与 Session 生命周期。
+这些模块允许调用方按层级选择：纯算法代码可以只使用 Kernel；Renderer Provider 可以只依赖 Session 值契约；Canvas Runtime 则安装两个 Runtime Plugin，获得完整的 Document 与 Session 生命周期。
 
 ## 依赖与组合
 
@@ -80,7 +83,7 @@ import { sessionPlugin, sessionService } from '@nodebraid/plugin-session';
 
 - Session 不是 Document、History、Persistence 或 Collaboration 状态。
 - Kernel 不负责 Selection、Viewport、Renderer、Command 或 Plugin 生命周期。
-- Graph State 不提供数据库序列化、远程同步、CRDT、Schema migration 或业务数据解释。
+- Graph State 不提供数据库存储、远程同步、CRDT、Schema migration 或业务数据解释。
 - Selection 不表达主选项或选择先后；Viewport 不包含产品级缩放上下限。
 - Node/Edge `data` 对 Kernel 是不透明值；领域层必须自行保持不可变使用方式。
 - 当前已交付 Renderer contract、Runtime adapter 与 SVG Provider；Graph State 本身仍不拥有或绘制可见画布。

@@ -20,9 +20,11 @@ with unified navigation, live Runtime state, Edge Connection, viewport controls,
 manual Dagre/full/LR Auto layout, and History actions. Layout preserves Selection,
 Viewport, and original Port connections without automatically fitting the view.
 
+Versioned complete Document files and application-owned data codecs support manual export/import,
+with atomic replacement and a fresh History Baseline in the Examples Application.
+
 NodeBraid is still pre-release. It does not yet provide a product-level editor
-shell, non-React framework adapters, persistence, collaboration, or a
-serialization schema. The source packages use the `@nodebraid/*` namespace but
+shell, non-React framework adapters, automatic/cloud persistence or collaboration. The source packages use the `@nodebraid/*` namespace but
 have not been published to npm.
 
 ## Documentation
@@ -607,6 +609,9 @@ Run a script for one workspace package from the repository root:
 bun run --filter '@nodebraid/core' build
 bun run --filter '@nodebraid/core' test
 ```
+
+The Document package follows the same workspace entries: `bun run --filter '@nodebraid/document' test`,
+`build`, `typecheck`, and `build:dependencies`. Its tests cover complete-file round trips and invalid inputs.
 
 ## License
 

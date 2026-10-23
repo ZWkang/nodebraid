@@ -36,7 +36,10 @@ Session values from `@nodebraid/session-api`, immutable Port values from
 Port, Session, Renderer, Interaction, and History Runtime Plugins from their corresponding
 `@nodebraid/plugin-*` packages, plus generic Layout contracts and Runtime
 integration from `@nodebraid/layout-api` and `@nodebraid/plugin-layout`.
-The facade also publishes the pure `@nodebraid/canvas-fragment` value seam and
+The facade publishes `serializeCanvasDocument` / `deserializeCanvasDocument` and
+application Data Codec types from `@nodebraid/document`, plus
+`establishHistoryBaselineCommand` for atomic graph restoration with fresh History.
+It also publishes the pure `@nodebraid/canvas-fragment` value seam and
 the explicit `@nodebraid/plugin-clipboard` Behavior/Shortcut factories without
 selecting a text codec or browser transport.
 Cordis remains an implementation dependency and does not appear in the public

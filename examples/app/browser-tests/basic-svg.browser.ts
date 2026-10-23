@@ -68,6 +68,8 @@ try {
       'Zoom out',
       'Fit view',
       'Reset view',
+      'Export document',
+      'Import document',
       'Reset example',
       'Disable clipboard shortcuts',
       'Disable duplicate shortcut',

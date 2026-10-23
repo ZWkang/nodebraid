@@ -31,6 +31,7 @@ If you are building an internal NodeBraid package or need only one narrow low-le
 
 - structured errors and Diagnostic Event contracts from `@nodebraid/diagnostics`;
 - the pure graph model, Transactions, Canvas View, Canvas Query, and Change Set from `@nodebraid/kernel`;
+- complete Document text and application Data Codecs from `@nodebraid/document`;
 - pure in-memory selected-Node subgraph values from `@nodebraid/canvas-fragment`;
 - immutable Session values from `@nodebraid/session-api`;
 - backend-neutral Renderer contracts from `@nodebraid/renderer-api`;
@@ -71,7 +72,7 @@ The package has one public subpath: `@nodebraid/core`. Representative public ent
 | Kernel      | `createCanvasKernel`, `kernelPlugin`, `kernelService`                                                                 |
 | Command     | `defineCommand`, `commandPlugin`, `commandService`                                                                    |
 | Session     | `sessionPlugin`, `sessionService`                                                                                     |
-| History     | `historyPlugin`, `historyService`, `undoCommand`, `redoCommand`                                                       |
+| History     | `historyPlugin`, `historyService`, `undoCommand`, `redoCommand`, `establishHistoryBaselineCommand`                    |
 | Layout      | `createLayoutInput`, `defineLayoutEngine`, `createLayoutPlugin`, `LayoutError`                                        |
 | Renderer    | `createRendererPlugin`, `rendererService`, `RendererError`                                                            |
 | Interaction | `interactionPlugin`, `moveNodesCommand`, `createEdgeCommand`, `deleteSelectionCommand`, `interactionDiagnosticEvents` |
@@ -99,7 +100,7 @@ Facade tests exercise the types and behavior of these objects through `@nodebrai
 - Does not install the Basic Canvas Composition implicitly and does not select a default Renderer.
 - Does not re-export concrete Layout Providers such as Dagre or ELK.
 - Does not select or re-export concrete Renderer Providers such as `@nodebraid/renderer-svg`.
-- Does not provide framework Adapters, UI components, persistence, or collaboration.
+- Does not provide framework Adapters, UI components, automatic/cloud persistence, or collaboration.
 - Does not expose Cordis types to applications.
 - Cannot currently be installed from npm as a NodeBraid package.
 
