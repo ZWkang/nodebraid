@@ -1,0 +1,256 @@
+bun test v1.4.2 (744846f84)
+
+tests/layout-providers.test.ts:
+(pass) Dagre lays out Port topology with one undoable commit and a no-op repeat [134.06ms]
+(pass) ELK lays out Port topology with one undoable commit and a no-op repeat [203.81ms]
+(pass) accepted getter-backed Layout values survive Runtime revalidation and History replay [2.55ms]
+(pass) Dagre and ELK compose with Provider-specific typed Runtime Commands [8.82ms]
+
+packages/plugin-history/tests/index.test.ts:
+(pass) @nodebraid/plugin-history > publishes the stable History diagnostic event catalog [0.01ms]
+(pass) @nodebraid/plugin-history > records the first post-Baseline Commit and undoes it through Command Service [1.91ms]
+(pass) @nodebraid/plugin-history > redoes the most recently undone History Entry with diagnostic metadata [1.41ms]
+(pass) @nodebraid/plugin-history > records a Recordable Commit that uses History-like diagnostic metadata [0.82ms]
+(pass) @nodebraid/plugin-history > records Command-originated work but not net-zero or failed Transactions [3.93ms]
+(pass) @nodebraid/plugin-history > clears Redo when a new Recordable Commit creates a branch [0.93ms]
+(pass) @nodebraid/plugin-history > rejects an empty Undo without changing Kernel or History [0.85ms]
+(pass) @nodebraid/plugin-history > publishes only meaningful History Snapshot changes [0.67ms]
+(pass) @nodebraid/plugin-history > snapshots subscriber recipients and isolates their errors [1.81ms]
+(pass) @nodebraid/plugin-history > allows an aligned Recordable Commit subscriber to Undo immediately [1.50ms]
+(pass) @nodebraid/plugin-history > rejects Undo before History catches up to the current Kernel revision [1.26ms]
+(pass) @nodebraid/plugin-history > keeps one queued Replay in flight and rejects a reentrant second Undo [0.75ms]
+(pass) @nodebraid/plugin-history > records a reentrant Recordable Commit and publishes only after catching up [1.14ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy while publishing its History Snapshot [0.72ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through later Kernel Observers [0.65ms]
+(pass) @nodebraid/plugin-history > returns the exact Replay Commit delivered to Kernel Observers [0.49ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through the final caught-up Snapshot publication [1.81ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Kernel Provider disappears before delivery [0.69ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Command Provider disappears before delivery [0.56ms]
+(pass) @nodebraid/plugin-history > preserves caller cancellation before starting a Replay [0.52ms]
+(pass) @nodebraid/plugin-history > prioritizes caller cancellation over an empty Undo stack [0.43ms]
+(pass) @nodebraid/plugin-history > closes old History state and reactivates from a fresh Kernel Baseline [0.88ms]
+(pass) @nodebraid/plugin-history > starts a new Baseline when Command Service returns to a retained Kernel [0.80ms]
+
+packages/plugin-history/tests/types.test.ts:
+(pass) keeps the public History seam narrow and type-safe
+
+packages/plugin-session/tests/index.test.ts:
+(pass) @nodebraid/plugin-session > publishes the stable Session diagnostic event catalog [0.01ms]
+(pass) @nodebraid/plugin-session > provides a fresh default Session for an Activation [0.84ms]
+(pass) @nodebraid/plugin-session > publishes a canonical immutable Selection and ignores equivalent input [0.84ms]
+(pass) @nodebraid/plugin-session > rejects every missing Selection entity without changing Session state [0.51ms]
+(pass) @nodebraid/plugin-session > publishes only valid normalized Viewport changes [0.49ms]
+(pass) @nodebraid/plugin-session > reconciles Selection from the exact Kernel Commit after View [0.97ms]
+(pass) @nodebraid/plugin-session > queues reentrant Session mutations until every subscriber sees the current Snapshot [0.54ms]
+(pass) @nodebraid/plugin-session > owns each subscription independently even when listeners share one function [0.45ms]
+(pass) @nodebraid/plugin-session > reports subscriber errors without corrupting Session or blocking later subscribers [0.61ms]
+(pass) @nodebraid/plugin-session > schedules an explicit subscriber error when platform reporting is unavailable [4.49ms]
+(pass) @nodebraid/plugin-session > preserves subscriber and reporter failures when platform reporting throws [0.49ms]
+(pass) @nodebraid/plugin-session > closes old handles and creates a fresh Session when Kernel returns [0.62ms]
+(pass) @nodebraid/plugin-session > rejects an invalid subscriber before it can enter notification state [0.35ms]
+(pass) @nodebraid/plugin-session > rejects malformed Selection input with structured immutable details [0.35ms]
+(pass) @nodebraid/plugin-session > rejects sparse Selection arrays as malformed input [0.36ms]
+(pass) @nodebraid/plugin-session > rejects malformed Viewport input as a structured Session error [0.31ms]
+
+packages/plugin-session/tests/types.test.ts:
+(pass) keeps the public Session Service contract narrow and immutable
+
+packages/plugin-session/tests/input-values.test.ts:
+(pass) Session publishes the x value accepted during Viewport validation [0.82ms]
+(pass) Session publishes the y value accepted during Viewport validation [0.42ms]
+(pass) Session publishes the zoom value accepted during Viewport validation [0.45ms]
+(pass) Session retains the nodeIds collection accepted during validation [0.53ms]
+(pass) Session retains the edgeIds collection accepted during validation [1.62ms]
+(pass) Session retains the nodeIds element accepted during validation [4.84ms]
+(pass) Session retains the edgeIds element accepted during validation [0.46ms]
+(pass) Session rejects an actual unknown nodeIds member hidden by an iterator [0.94ms]
+(pass) Session rejects an actual unknown edgeIds member hidden by an iterator [0.38ms]
+(pass) Session canonicalizes frozen indexed IDs without consulting caller collection hooks [0.49ms]
+(pass) Session retains original viewport read failures and ordering [0.47ms]
+(pass) Session retains original selection-index read failures and ordering [0.33ms]
+(pass) Session retains original selection-field read failures and ordering [0.30ms]
+(pass) Session owns one native length snapshot before validating and publishing IDs [0.62ms]
+(pass) Session normalizes the captured coercible nodeIds length once [1.01ms]
+(pass) Session normalizes the captured coercible edgeIds length once [0.38ms]
+(pass) Session preserves an indexed read failure before allocating from the incoming length [0.43ms]
+(pass) Session preserves indexed array behavior for inherited [0.38ms]
+(pass) Session preserves indexed array behavior for string-length [0.34ms]
+
+packages/plugin-command/tests/index.test.ts:
+(pass) @nodebraid/plugin-command > rejects an empty Command ID with a stable structural error [0.11ms]
+(pass) @nodebraid/plugin-command > classifies a non-string JavaScript Command ID without copying it [0.04ms]
+(pass) @nodebraid/plugin-command > registers and executes one typed Command in an Activation [0.88ms]
+(pass) @nodebraid/plugin-command > preserves asynchronous Command results and handler errors [0.53ms]
+(pass) @nodebraid/plugin-command > enforces Command token identity and diagnostic ID uniqueness [0.36ms]
+(pass) @nodebraid/plugin-command > unregisters, aborts, and awaits in-flight Command executions [0.36ms]
+(pass) @nodebraid/plugin-command > keeps Registration disposal idempotent when abort handling reenters dispose [0.27ms]
+(pass) @nodebraid/plugin-command > closes residual registrations before disposing the Command Service Activation [1.41ms]
+(pass) @nodebraid/plugin-command > isolates caller cancellation to one Command execution [0.35ms]
+(pass) @nodebraid/plugin-command > preserves the original caller signal after execution options are reused [0.28ms]
+(pass) @nodebraid/plugin-command > detaches the original caller signal after reused-options execution settles [0.24ms]
+(pass) @nodebraid/plugin-command > does not start a Command when execution options dispose its Registration [0.27ms]
+(pass) @nodebraid/plugin-command > keeps existing executions owned while options dispose their Registration [0.32ms]
+(pass) @nodebraid/plugin-command > preserves structural errors before reading execution options [0.27ms]
+(pass) @nodebraid/plugin-command > preserves option failures and permits unrelated Registration disposal [0.28ms]
+(pass) @nodebraid/plugin-command > reinstalls an empty Command Service after Provider disposal [0.60ms]
+
+packages/plugin-command/tests/types.test.ts:
+(pass) keeps Command input and output types invariant
+
+packages/plugin-kernel/tests/index.test.ts:
+(pass) @nodebraid/plugin-kernel > publishes the stable Kernel Plugin diagnostic event catalog
+(pass) @nodebraid/plugin-kernel > provides one revision-zero Kernel Service for an Activation [0.54ms]
+(pass) @nodebraid/plugin-kernel > synchronously observes only successful net-changing Transactions [0.42ms]
+(pass) @nodebraid/plugin-kernel > reports Observer errors without rolling back or blocking later Observers [0.41ms]
+(pass) @nodebraid/plugin-kernel > schedules an explicit Observer error when platform reporting is unavailable [0.35ms]
+(pass) @nodebraid/plugin-kernel > queues reentrant Commits until every Observer sees the current revision [0.29ms]
+(pass) @nodebraid/plugin-kernel > stops Consumers before closing the Service and reinstalls a fresh Kernel [0.55ms]
+
+packages/plugin-kernel/tests/types.test.ts:
+(pass) keeps the public Kernel Service contract type-safe
+
+packages/kernel/tests/revision.test.ts:
+(pass) revision increment refuses to leave the safe-integer range [0.04ms]
+
+packages/kernel/tests/index.test.ts:
+(pass) @nodebraid/kernel > creates one stable revision-zero Canvas View [0.07ms]
+(pass) @nodebraid/kernel > creates distinct Node and Edge identifiers and rejects empty values [0.08ms]
+(pass) @nodebraid/kernel > distinguishes missing entities from relationships of a missing Node [0.11ms]
+(pass) @nodebraid/kernel > commits one Node with matching before and after Canvas Views [0.15ms]
+(pass) @nodebraid/kernel > keeps undeclared caller fields outside committed Node and Edge values [0.13ms]
+(pass) @nodebraid/kernel > rolls back callback and invalid-position failures without replacing the Canvas View [0.09ms]
+(pass) @nodebraid/kernel > rejects an asynchronous Transaction callback and rolls back its staged writes [0.07ms]
+(pass) @nodebraid/kernel > rejects a nested Transaction and rolls back the outer callback when the error escapes [0.04ms]
+(pass) @nodebraid/kernel > closes the Transaction Context and its capabilities after the callback [0.06ms]
+(pass) @nodebraid/kernel > can catch a failed nested or strict operation and continue the outer Transaction [0.07ms]
+(pass) @nodebraid/kernel > strictly replaces and removes an existing Node [0.07ms]
+(pass) @nodebraid/kernel > collapses a Node restored to its original value into a net-zero Transaction [0.06ms]
+(pass) @nodebraid/kernel > reports strict Node writer errors without changing the Draft [0.08ms]
+(pass) @nodebraid/kernel > coalesces Node operation sequences and compares data by reference [0.10ms]
+(pass) @nodebraid/kernel > connects Nodes with an Edge and queries its directed relationships [0.14ms]
+(pass) @nodebraid/kernel > rejects an Edge whose final Endpoint references a missing Node [0.05ms]
+(pass) @nodebraid/kernel > allows temporary Endpoints, self-loops, and separate Node and Edge ID namespaces [0.08ms]
+(pass) @nodebraid/kernel > strictly edits Edges and collapses an identical restoration [0.14ms]
+(pass) @nodebraid/kernel > keeps parent relationships and queries direct children in canonical order [0.08ms]
+(pass) @nodebraid/kernel > updates Draft relationship indexes when Nodes and Edges are replaced [0.09ms]
+(pass) @nodebraid/kernel > reports every missing relationship, parent cycle, and invalid geometry in the final graph [0.10ms]
+(pass) @nodebraid/kernel > requires callers to reparent children explicitly when removing a parent [0.08ms]
+(pass) @nodebraid/kernel > applies a Change Set in reverse and forward through new Transactions [0.24ms]
+(pass) @nodebraid/kernel > rejects a malformed Change Set before changing the Draft [0.08ms]
+(pass) @nodebraid/kernel > rejects stale replay before applying any matching entity changes [0.16ms]
+(pass) @nodebraid/kernel > reverses and reapplies a complete Node and Edge creation Change Set [0.14ms]
+
+packages/kernel/tests/replay-record-values.test.ts:
+(pass) replay retains the target whose kind and ID passed validation [0.06ms]
+(pass) a changing source record cannot bypass replay conflict preflight [0.10ms]
+(pass) replay retains the entity ID accepted before target materialization [0.04ms]
+(pass) changing source coordinates cannot replace the values checked by replay validation [0.07ms]
+(pass) a stale source rejects before reading opaque source or target data [0.06ms]
+(pass) forward replay captures Node id once [0.13ms]
+(pass) forward replay captures Node type once [0.03ms]
+(pass) forward replay captures Node position once [0.03ms]
+(pass) forward replay captures Node position.x once [0.03ms]
+(pass) forward replay captures Node position.y once [0.02ms]
+(pass) forward replay captures Node size once [0.02ms]
+(pass) forward replay captures Node size.width once [0.02ms]
+(pass) forward replay captures Node size.height once [0.02ms]
+(pass) forward replay captures Node parentId once [0.03ms]
+(pass) reverse replay captures Node id once [0.03ms]
+(pass) reverse replay captures Node type once [0.02ms]
+(pass) reverse replay captures Node position once [0.02ms]
+(pass) reverse replay captures Node position.x once [0.01ms]
+(pass) reverse replay captures Node position.y once [0.02ms]
+(pass) reverse replay captures Node size once [0.02ms]
+(pass) reverse replay captures Node size.width once [0.02ms]
+(pass) reverse replay captures Node size.height once [0.02ms]
+(pass) reverse replay captures Node parentId once [0.01ms]
+(pass) forward replay captures Edge id once [0.12ms]
+(pass) forward replay captures Edge type once [0.03ms]
+(pass) forward replay captures Edge source once [0.20ms]
+(pass) forward replay captures Edge source.nodeId once [0.07ms]
+(pass) forward replay captures Edge source.portId once [0.05ms]
+(pass) forward replay captures Edge target once [0.03ms]
+(pass) forward replay captures Edge target.nodeId once [0.04ms]
+(pass) forward replay captures Edge target.portId once [0.03ms]
+(pass) reverse replay captures Edge id once [0.02ms]
+(pass) reverse replay captures Edge type once [0.03ms]
+(pass) reverse replay captures Edge source once [0.02ms]
+(pass) reverse replay captures Edge source.nodeId once [0.02ms]
+(pass) reverse replay captures Edge source.portId once [0.02ms]
+(pass) reverse replay captures Edge target once [0.02ms]
+(pass) reverse replay captures Edge target.nodeId once [0.02ms]
+(pass) reverse replay captures Edge target.portId once [0.02ms]
+(pass) a later replay record cannot mutate a previously accepted target shell [0.10ms]
+(pass) replay observes opaque data in its existing comparison and write phases [0.08ms]
+(pass) replay preserves the original opaque source data error [0.09ms]
+(pass) replay preserves the original opaque target data error [0.02ms]
+(pass) replay captures the record entity before later reads can replace it [0.04ms]
+(pass) replay captures the record id before later reads can replace it [0.01ms]
+(pass) replay retains the original Node id read exception [0.06ms]
+(pass) replay retains the original Node type read exception
+(pass) replay retains the original Node position read exception
+(pass) replay retains the original Node size read exception
+(pass) replay retains the original Node parentId read exception
+(pass) invalid first geometry keeps its structural error before a later getter failure [0.06ms]
+(pass) inherited values and the opaque data getter keep their original receiver [0.07ms]
+(pass) a caught value-based conflict leaves only subsequent deliberate writes [0.12ms]
+
+packages/kernel/tests/types.test.ts:
+(pass) keeps the public Kernel contract type-safe
+
+packages/kernel/tests/writer-id-values.test.ts:
+(pass) Node add retains its accepted ID without overwriting an existing Node [0.17ms]
+(pass) Node replace keeps Query, Snapshot and replayable Change Set identities consistent [0.12ms]
+(pass) Edge add retains its accepted ID and relation indexes without overwriting another Edge [0.15ms]
+(pass) Edge replace retains its accepted ID across indexes and reverse/forward replay [0.16ms]
+(pass) duplicate add reports the captured ID before reading other entity fields [0.08ms]
+(pass) replacement mismatch reports the captured ID before reading other entity fields [0.05ms]
+(pass) missing replacement targets fail before reading the incoming ID [0.04ms]
+(pass) add preserves an original ID read failure and committed View [0.05ms]
+(pass) replace preserves an original ID read failure and committed View [0.01ms]
+(pass) a failed owned entity copy leaves no partially added or replaced value [0.06ms]
+(pass) captured replacement IDs retain net-zero View identity [0.04ms]
+(pass) closed Transaction writers fail before reading an incoming ID [0.05ms]
+
+packages/kernel/tests/error-contract.test.ts:
+(pass) Kernel structural failures expose the shared NodeBraid error identity [0.04ms]
+(pass) Kernel identifier failures classify a JavaScript value without copying it [0.02ms]
+(pass) Change Set direction failures classify an unsafe JavaScript value [0.04ms]
+(pass) Change Set revision failures classify unsafe JavaScript values [0.06ms]
+
+packages/kernel/tests/commit-preparation.test.ts:
+(pass) a failing origin read cannot publish a Transaction [0.05ms]
+(pass) a failing commandId read cannot publish a Transaction [0.01ms]
+(pass) commit metadata is captured once after Draft capabilities close and before publication [0.07ms]
+(pass) a net-zero Transaction does not inspect commit-only metadata [0.02ms]
+(pass) commit preparation rejects reentry from metadata [0.06ms]
+(pass) commit preparation rejects reentry from callback result [0.02ms]
+
+packages/kernel/tests/replay-collection.test.ts:
+(pass) a changing replay iterator cannot overwrite a later Node edit [0.16ms]
+(pass) an entries hook cannot hide duplicate replay entries from validation [0.05ms]
+(pass) caught node forward conflict leaves no partial replay [0.37ms]
+(pass) caught node reverse conflict leaves no partial replay [0.04ms]
+(pass) caught edge forward conflict leaves no partial replay [0.07ms]
+(pass) caught edge reverse conflict leaves no partial replay [0.13ms]
+(pass) valid forward and reverse replay ignores input traversal hooks and preserves opaque data [0.13ms]
+(pass) replay captures the outer collection and each indexed entry once [0.08ms]
+(pass) a traversal hook cannot hide a sparse replay entry [0.05ms]
+(pass) replay preserves native length coercion: 1.5 [0.07ms]
+(pass) replay preserves native length coercion: "1.5" [0.03ms]
+(pass) replay preserves native length coercion: {
+  valueOf: [Function: valueOf],
+} [0.03ms]
+(pass) replay preserves native empty iteration for Proxy length 0.5 [0.03ms]
+(pass) replay preserves native empty iteration for Proxy length -1
+(pass) replay preserves native empty iteration for Proxy length NaN
+(pass) replay preserves native empty iteration for Proxy length undefined
+(pass) replay preserves native empty iteration for Proxy length "0"
+(pass) replay preserves native length conversion failure: 1n [0.03ms]
+(pass) replay preserves native length conversion failure: Symbol(length)
+(pass) invalid first entry retains its error before an infinite Proxy length could allocate a snapshot [0.03ms]
+
+ 212 pass
+ 0 fail
+ 956 expect() calls
+Ran 212 tests across 18 files. [554.00ms]
