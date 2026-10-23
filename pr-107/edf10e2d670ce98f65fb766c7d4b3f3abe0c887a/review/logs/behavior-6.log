@@ -1,0 +1,3 @@
+@nodebraid/plugin-interaction typecheck:self: tests/create-edge-input-values.test.ts(188,9): error TS2322: Type 'string' is not assignable to type 'ConnectionAnchorRole'.
+@nodebraid/plugin-interaction typecheck:self: tests/create-edge-input-values.test.ts(199,9): error TS2322: Type 'string' is not assignable to type 'ConnectionAnchorRole'.
+@nodebraid/plugin-interaction typecheck:self: Exited with code 1

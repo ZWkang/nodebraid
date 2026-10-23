@@ -1,0 +1,150 @@
+actual_base: dcf13482b68bc2422fc4d714df1226ab0ef259aa
+actual_head: 1d1d86af6d647a0ef2ef0b6cd6c6839deb3e8fdd
+actual_tree: f4a32721d5036a2e22a2c27d2a217eb7db10280e
+actual_binary_patch_sha256: 6552a9093fbf333280dfc261414c04e6d3a4b48c77b93a19259366715aed66e5
+prepared_request_matches_full_issue_body: true
+
+actual_command: git status --short --branch
+## feat/issue-106
+actual_exit_code: 0
+
+actual_command: bun test packages/plugin-interaction/tests packages/plugin-history/tests
+bun test v1.4.2 (744846f84)
+
+packages/plugin-history/tests/index.test.ts:
+(pass) @nodebraid/plugin-history > publishes the stable History diagnostic event catalog [1.77ms]
+(pass) @nodebraid/plugin-history > records the first post-Baseline Commit and undoes it through Command Service [49.88ms]
+(pass) @nodebraid/plugin-history > redoes the most recently undone History Entry with diagnostic metadata [4.69ms]
+(pass) @nodebraid/plugin-history > records a Recordable Commit that uses History-like diagnostic metadata [3.02ms]
+(pass) @nodebraid/plugin-history > records Command-originated work but not net-zero or failed Transactions [4.65ms]
+(pass) @nodebraid/plugin-history > clears Redo when a new Recordable Commit creates a branch [2.05ms]
+(pass) @nodebraid/plugin-history > rejects an empty Undo without changing Kernel or History [1.18ms]
+(pass) @nodebraid/plugin-history > publishes only meaningful History Snapshot changes [0.92ms]
+(pass) @nodebraid/plugin-history > snapshots subscriber recipients and isolates their errors [3.68ms]
+(pass) @nodebraid/plugin-history > allows an aligned Recordable Commit subscriber to Undo immediately [1.05ms]
+(pass) @nodebraid/plugin-history > rejects Undo before History catches up to the current Kernel revision [0.82ms]
+(pass) @nodebraid/plugin-history > keeps one queued Replay in flight and rejects a reentrant second Undo [0.73ms]
+(pass) @nodebraid/plugin-history > records a reentrant Recordable Commit and publishes only after catching up [0.93ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy while publishing its History Snapshot [15.26ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through later Kernel Observers [9.79ms]
+(pass) @nodebraid/plugin-history > returns the exact Replay Commit delivered to Kernel Observers [1.03ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through the final caught-up Snapshot publication [1.07ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Kernel Provider disappears before delivery [3.05ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Command Provider disappears before delivery [0.71ms]
+(pass) @nodebraid/plugin-history > preserves caller cancellation before starting a Replay [0.59ms]
+(pass) @nodebraid/plugin-history > prioritizes caller cancellation over an empty Undo stack [1.28ms]
+(pass) @nodebraid/plugin-history > closes old History state and reactivates from a fresh Kernel Baseline [1.49ms]
+(pass) @nodebraid/plugin-history > starts a new Baseline when Command Service returns to a retained Kernel [1.52ms]
+
+packages/plugin-history/tests/types.test.ts:
+(pass) keeps the public History seam narrow and type-safe [0.01ms]
+
+packages/plugin-interaction/tests/input-cleanup.test.ts:
+(pass) a failed Selection transition releases Pointer Capture before reporting the Input fault [4.59ms]
+
+packages/plugin-interaction/tests/types.test.ts:
+(pass) publishes Interaction as a Runtime Plugin with a narrow Shortcut contribution Service [0.03ms]
+
+packages/plugin-interaction/tests/create-edge-input-values.test.ts:
+(pass) Create Edge cannot replace a validated forward Edge with a later self-loop [3.19ms]
+(pass) Create Edge retains first values, receivers and late opaque data from own properties [2.95ms]
+(pass) Create Edge retains first values, receivers and late opaque data from non-enumerable properties [2.52ms]
+(pass) Create Edge retains first values, receivers and late opaque data from inherited properties [1.56ms]
+(pass) Create Edge preserves the original edge read failure and exact committed state [1.84ms]
+(pass) Create Edge preserves the original edge.id read failure and exact committed state [2.10ms]
+(pass) Create Edge preserves the original edge.type read failure and exact committed state [1.69ms]
+(pass) Create Edge preserves the original edge.source read failure and exact committed state [0.96ms]
+(pass) Create Edge preserves the original edge.source.nodeId read failure and exact committed state [0.95ms]
+(pass) Create Edge preserves the original edge.source.portId read failure and exact committed state [1.04ms]
+(pass) Create Edge preserves the original edge.target read failure and exact committed state [3.32ms]
+(pass) Create Edge preserves the original edge.target.nodeId read failure and exact committed state [0.96ms]
+(pass) Create Edge preserves the original edge.target.portId read failure and exact committed state [0.89ms]
+(pass) Create Edge preserves the original edge.data.presence read failure and exact committed state [1.28ms]
+(pass) Create Edge preserves the original source read failure and exact committed state [1.20ms]
+(pass) Create Edge preserves the original source.nodeId read failure and exact committed state [1.13ms]
+(pass) Create Edge preserves the original source.portId read failure and exact committed state [2.87ms]
+(pass) Create Edge preserves the original source.role read failure and exact committed state [1.84ms]
+(pass) Create Edge preserves the original target read failure and exact committed state [2.23ms]
+(pass) Create Edge preserves the original target.nodeId read failure and exact committed state [1.02ms]
+(pass) Create Edge preserves the original target.portId read failure and exact committed state [1.04ms]
+(pass) Create Edge preserves the original target.role read failure and exact committed state [3.22ms]
+(pass) Create Edge preserves the original edge.data read failure and exact committed state [1.08ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [1.12ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [1.06ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.89ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [3.31ms]
+(pass) Create Edge observes abort before input getters [1.86ms]
+(pass) Create Edge self-loop preflight wins before the opaque-data getter [1.54ms]
+(pass) Create Edge mismatched-endpoint preflight wins before the opaque-data getter [0.95ms]
+(pass) Create Edge wrong-role preflight wins before the opaque-data getter [0.87ms]
+(pass) Create Edge missing-node preflight wins before the opaque-data getter [2.25ms]
+(pass) Create Edge missing-port preflight wins before the opaque-data getter [2.13ms]
+(pass) Create Edge duplicate-id preflight wins before the opaque-data getter [1.03ms]
+(pass) Create Edge finishes every shape check before semantic role checks [1.20ms]
+(pass) Create Edge preserves invalid-ID short circuit before Edge type reads [1.86ms]
+(pass) Create Edge validates data presence before reading Anchor roots [2.37ms]
+(pass) Create Edge retains Anchor empty-Port short circuit before the target root [1.54ms]
+(pass) Create Edge keeps an empty Endpoint Port distinct from an absent Anchor Port [1.05ms]
+(pass) Create Edge retains captured Port evidence across application Definition and data callbacks [1.41ms]
+
+packages/plugin-interaction/tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [3.03ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [1.72ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [3.35ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [8.26ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [4.42ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [1.13ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [1.82ms]
+
+packages/plugin-interaction/tests/create-edge-command.test.ts:
+(pass) Create Edge commits one complete Node-level Edge [3.38ms]
+
+packages/plugin-interaction/tests/selection-transition.test.ts:
+(pass) a Port click selects its owning Node without inventing a Port selection [0.08ms]
+
+packages/plugin-interaction/tests/config.test.ts:
+(pass) Interaction accepts an explicit synchronous Connection materializer [1.00ms]
+(pass) Interaction rejects unknown config fields through Plugin installation [1.74ms]
+(pass) Interaction rejects malformed numeric config without coercion [3.52ms]
+(pass) Interaction revalidates the materializer on recovery and preserves its read failure [1.89ms]
+
+packages/plugin-interaction/tests/lifecycle.test.ts:
+(pass) Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh [2.16ms]
+(pass) Delete Selection registration follows dependency reactivation and disposal lifecycle [2.54ms]
+(pass) Connection materializer failure keeps identity and reports exactly once after terminal cleanup [5.01ms]
+(pass) Connection dependency recovery creates a fresh idle Activation [1.18ms]
+(pass) Connection final Hit Test failure still clears Preview and releases Capture [3.37ms]
+(pass) Connection Escape attempts every terminal cleanup and never materializes after cleanup failure [1.16ms]
+(pass) Box Selection disposal continues after every public Renderer cleanup failure [1.45ms]
+(pass) Box Selection escape exposes every terminal cleanup failure [0.80ms]
+(pass) Box Selection pointer-cancel exposes every terminal cleanup failure [0.63ms]
+(pass) Interaction dependency recovery creates a fresh idle Activation [2.16ms]
+(pass) an input-driven Command rejection is reported exactly once while Interaction is active [2.33ms]
+(pass) a late Command rejection cannot report through an ended Interaction Activation [1.95ms]
+(pass) a recovered Renderer reset receives the still-compatible Active Gesture again [2.13ms]
+
+packages/plugin-interaction/tests/move-nodes-command.test.ts:
+(pass) Move Nodes rejects an empty input without changing Document [1.97ms]
+
+packages/plugin-interaction/tests/diagnostic-events.test.ts:
+(pass) publishes the stable Interaction diagnostic event catalog [0.01ms]
+
+packages/plugin-interaction/tests/port-connection.test.ts:
+(pass) Port Gesture tracks target loss, materializes exact Endpoints once, and cancels on source loss [2.79ms]
+(pass) Connection Gesture uses the materializer accepted before its getter changes [4.28ms]
+
+packages/plugin-interaction/tests/delete-selection-input.test.ts:
+(pass) a live Interaction Shortcut Binding executes its Command and prevents the matched input default [3.81ms]
+(pass) logical Delete key removes the current Selection through the public Renderer Input seam [5.09ms]
+(pass) physical Delete accepts modifiers and repeat while empty Selection and Backspace remain no-ops [4.98ms]
+(pass) Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connection without cancelling them [11.60ms]
+(pass) Delete Transaction failure preserves state and reports the original diagnostic identity exactly once [2.43ms]
+
+ 101 pass
+ 0 fail
+ 576 expect() calls
+Ran 101 tests across 14 files. [425.00ms]
+actual_exit_code: 0
+
+actual_command: git diff --check dcf13482b68bc2422fc4d714df1226ab0ef259aa...1d1d86af6d647a0ef2ef0b6cd6c6839deb3e8fdd
+actual_exit_code: 0

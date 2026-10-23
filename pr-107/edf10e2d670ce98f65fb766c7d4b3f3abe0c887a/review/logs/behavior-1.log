@@ -1,0 +1,22 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/create-edge-input-values.test.ts:
+26 |  try{
+27 |   const accepted=validInput(),selfLoop:CanvasEdge={...accepted.edge,target:{nodeId:a}};let reads=0;
+28 |   const input:CreateEdgeInput={...accepted,get edge(){reads++;return reads<7?accepted.edge:selfLoop;}};
+29 |   const commit=await commands.execute(createEdgeCommand,input);
+30 |   expect(commit.changeSet).toMatchObject({origin:'interaction',commandId:'interaction.edge.create'});
+31 |   expect(kernel.read().query.getEdge(connectionId)?.target.nodeId).toBe(b);
+                                                                        ^
+error: expect(received).toBe(expected)
+
+Expected: "b"
+Received: "a"
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/renderer-doc-port-composition/cflow/packages/plugin-interaction/tests/create-edge-input-values.test.ts:31:68)
+(fail) Create Edge cannot replace a validated forward Edge with a later self-loop [41.22ms]
+
+ 0 pass
+ 1 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [119.00ms]
