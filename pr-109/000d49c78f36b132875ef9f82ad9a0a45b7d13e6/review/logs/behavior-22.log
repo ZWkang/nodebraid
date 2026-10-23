@@ -1,0 +1,34 @@
+bun test v1.4.2 (744846f84)
+
+examples/app/tests/example-data-codec.test.ts:
+(pass) Example document data round trips null and the explicit application record [0.57ms]
+(pass) Example data rejects values outside the application schema rather than dropping them [0.10ms]
+(pass) Example data validates and serializes the same captured tags [0.03ms]
+(pass) Clipboard accepts the same business data as the Document file [0.69ms]
+64 |     nodes: [{ id: 'business', type: 'step', position: { x: 1, y: 2 }, data: { label: 'A', tags } }],
+65 |     edges: [],
+66 |     selection: { nodeIds: ['business'], edgeIds: [] },
+67 |   });
+68 |   const encoded = exampleCanvasFragmentTextCodec.encode(fragment);
+69 |   expect(JSON.parse(encoded).fragment.nodes[0].data).toEqual({ label: 'A', tags: ['saved'] });
+                                                          ^
+error: expect(received).toEqual(expected)
+
+  {
+    "label": "A",
+    "tags": [
+-     "saved",
++     42,
+    ],
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/examples/app/tests/example-data-codec.test.ts:69:54)
+(fail) Clipboard serializes the application data snapshot that passed validation [4.16ms]
+
+ 4 pass
+ 1 fail
+ 15 expect() calls
+Ran 5 tests across 1 file. [67.00ms]

@@ -1,0 +1,15 @@
+@nodebraid/plugin-history typecheck: $ bun run ../../scripts/build-workspaces.ts --dependencies @nodebraid/plugin-history
+@nodebraid/plugin-history typecheck: [build] @nodebraid/diagnostics
+@nodebraid/plugin-history typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-history typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-history typecheck: [build] @nodebraid/kernel
+@nodebraid/plugin-history typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-history typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-history typecheck: [build] @nodebraid/runtime-cordis
+@nodebraid/plugin-history typecheck: $ tsgo -p tsconfig.build.json
+@nodebraid/plugin-history typecheck: [build] @nodebraid/plugin-command
+@nodebraid/plugin-history typecheck: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-history typecheck: [build] @nodebraid/plugin-kernel
+@nodebraid/plugin-history typecheck: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-history typecheck: $ tsgo --noEmit -p tsconfig.json
+@nodebraid/plugin-history typecheck: Exited with code 0

@@ -1,0 +1,33 @@
+bun test v1.4.2 (744846f84)
+
+examples/app/tests/example-data-codec.test.ts:
+(pass) Example document data round trips null and the explicit application record [4.24ms]
+(pass) Example data rejects values outside the application schema rather than dropping them [3.30ms]
+34 |       iteration += 1;
+35 |       yield iteration === 1 ? 'saved' : 42;
+36 |     },
+37 |   });
+38 |   const text = exampleDataCodec.encode({ label: 'Captured', tags });
+39 |   expect(JSON.parse(text)).toEqual({ label: 'Captured', tags: ['saved'] });
+                                ^
+error: expect(received).toEqual(expected)
+
+  {
+    "label": "Captured",
+    "tags": [
+-     "saved",
++     42,
+    ],
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/examples/app/tests/example-data-codec.test.ts:39:28)
+(fail) Example data validates and serializes the same captured tags [11.11ms]
+(pass) Clipboard accepts the same business data as the Document file [2.74ms]
+
+ 3 pass
+ 1 fail
+ 13 expect() calls
+Ran 4 tests across 1 file. [120.00ms]

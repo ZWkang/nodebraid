@@ -1,0 +1,29 @@
+bun test v1.4.2 (744846f84)
+
+packages/core/tests/index.test.ts:
+(pass) @nodebraid/core > publishes Port values and Runtime contribution seams [0.05ms]
+(pass) @nodebraid/core > publishes Canvas Fragment and Clipboard through the public facade [0.02ms]
+(pass) @nodebraid/core > publishes Duplicate Selection through the public facade [0.01ms]
+(pass) @nodebraid/core > publishes the shared Diagnostics seam [0.34ms]
+(pass) @nodebraid/core > publishes the typed Plugin Host seam [3.40ms]
+(pass) @nodebraid/core > publishes the reversible Kernel seam [0.87ms]
+(pass) @nodebraid/core > publishes the Kernel Runtime Plugin seam [1.16ms]
+(pass) @nodebraid/core > publishes the Session Runtime Plugin seam [0.91ms]
+(pass) @nodebraid/core > publishes the backend-neutral Renderer and Runtime integration seams [0.04ms]
+(pass) @nodebraid/core > publishes backend-neutral Interaction values and Runtime behavior [0.02ms]
+(pass) @nodebraid/core > composes asynchronous Command preparation with a synchronous Kernel Transaction [1.34ms]
+(pass) @nodebraid/core > publishes the History Runtime Plugin seam [0.01ms]
+
+packages/core/tests/preset-basic.test.ts:
+(pass) Core facade exports Basic Canvas Composition without a concrete Renderer [0.02ms]
+
+packages/core/tests/layout.test.ts:
+(pass) the Core facade exports generic Layout seams without concrete Providers [0.02ms]
+
+packages/core/tests/document-roundtrip.test.ts:
+(pass) the public facade restores a file and records only subsequent editing [2.13ms]
+
+ 15 pass
+ 0 fail
+ 44 expect() calls
+Ran 15 tests across 4 files. [33.00ms]

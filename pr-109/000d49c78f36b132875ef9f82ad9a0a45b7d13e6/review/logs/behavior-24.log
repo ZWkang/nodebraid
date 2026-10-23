@@ -1,0 +1,2 @@
+$ bun run ./browser-tests/basic-svg.browser.ts && bun run ./browser-tests/clipboard.browser.ts && bun run ./browser-tests/document.browser.ts
+Document file workflow passed; evidence: /Users/zhou/.codex/worktrees/f3e3/cflow/.tmp/document-browser-auXFZr

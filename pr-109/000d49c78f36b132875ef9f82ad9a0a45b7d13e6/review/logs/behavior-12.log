@@ -1,0 +1,33 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-history/tests/baseline.test.ts:
+(pass) replaces the Document as a new baseline and only undoes subsequent edits [29.71ms]
+(pass) establishes a baseline without a net Document change and publishes the cleared history [2.25ms]
+75 |       attempt = commands.execute(establishHistoryBaselineCommand, () => {});
+76 |       void attempt.catch(() => {});
+77 |       kernel.transact((transaction) => addNode(transaction, 'after-baseline'));
+78 |     });
+79 |     expect(await commands.execute(establishHistoryBaselineCommand, () => {})).toBeNull();
+80 |     await expect(attempt).rejects.toMatchObject({ code: 'HISTORY_BUSY' });
+                                       ^
+error: expect(received).rejects.toMatchObject(expected)
+
+Expected promise that rejects
+Received promise that resolved: Promise { <resolved> }
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/plugin-history/tests/baseline.test.ts:80:35)
+(fail) keeps a net-zero baseline busy through publication while recording a subsequent Commit [8.03ms]
+(pass) preserves the original Document and History after callback rejection [1.69ms]
+(pass) preserves the original Document and History after invalid-graph rejection [1.56ms]
+(pass) preserves the original Document and History after async-callback rejection [0.97ms]
+(pass) rejects an already aborted baseline before invoking its update [0.98ms]
+(pass) rejects overlapping baseline and replay Commands before writing [1.70ms]
+(pass) rejects a baseline when an earlier observer runs before History catches up [1.78ms]
+(pass) records an ordinary reentrant Commit after the exact baseline Commit [1.13ms]
+(pass) settles a committed queued baseline when its kernel Provider disappears [1.09ms]
+(pass) settles a committed queued baseline when its command Provider disappears [0.70ms]
+
+ 11 pass
+ 1 fail
+ 53 expect() calls
+Ran 12 tests across 1 file. [132.00ms]

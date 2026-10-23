@@ -1,0 +1,22 @@
+Document file workflow failed; evidence: /Users/zhou/.codex/worktrees/f3e3/cflow/.tmp/document-browser-s5HklM
+53 | };
+54 | 
+55 | try {
+56 |   await browser(['open', `${server.url.origin}/basic-svg?lang=en`]);
+57 |   await waitForMetrics({ nodes: '3', edges: '1', history: 'Undo / —' });
+58 |   assert.equal(await evaluate(`document.querySelector('[aria-label="Document file"]')?.type`), 'file');
+              ^
+AssertionError: Expected values to be strictly equal:
+
+null !== 'file'
+
+ generatedMessage: true,
+     actual: null,
+   expected: "file",
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/worktrees/f3e3/cflow/examples/app/browser-tests/document.browser.ts:58:10
+
+Bun v1.4.2 (macOS arm64)

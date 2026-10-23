@@ -1,0 +1,48 @@
+@nodebraid/document test:self: bun test v1.4.2 (744846f84)
+@nodebraid/document test:self: 
+@nodebraid/document test:self: tests/index.test.ts:
+@nodebraid/document test:self: (pass) round-trips a complete Document and opaque application data without persisting runtime state [17.76ms]
+@nodebraid/document test:self: (pass) supports an empty Document and uses no codec calls when there are no entities [1.57ms]
+@nodebraid/document test:self: (pass) rejects wrong envelope type before interpreting any application data [4.24ms]
+@nodebraid/document test:self: (pass) rejects unknown version before interpreting any application data [0.05ms]
+@nodebraid/document test:self: (pass) rejects wrong data format before interpreting any application data [0.04ms]
+@nodebraid/document test:self: (pass) rejects non-object envelope before interpreting any application data
+@nodebraid/document test:self: (pass) rejects unknown envelope field before interpreting any application data [0.01ms]
+@nodebraid/document test:self: (pass) rejects missing array before interpreting any application data
+@nodebraid/document test:self: (pass) rejects non-array nodes before interpreting any application data
+@nodebraid/document test:self: (pass) rejects invalid node type before interpreting any application data [0.03ms]
+@nodebraid/document test:self: (pass) rejects empty node ID before interpreting any application data [0.01ms]
+@nodebraid/document test:self: (pass) rejects string position before interpreting any application data [0.69ms]
+@nodebraid/document test:self: (pass) rejects unknown node field before interpreting any application data [0.95ms]
+@nodebraid/document test:self: (pass) rejects malformed size before interpreting any application data [0.91ms]
+@nodebraid/document test:self: (pass) rejects invalid parent ID before interpreting any application data [0.02ms]
+@nodebraid/document test:self: (pass) rejects malformed edge before interpreting any application data [0.02ms]
+@nodebraid/document test:self: (pass) rejects invalid port ID before interpreting any application data
+@nodebraid/document test:self: (pass) rejects non-text data on later edge before interpreting any application data
+@nodebraid/document test:self: (pass) rejects duplicate Node ID through the Kernel complete-graph contract [0.96ms]
+@nodebraid/document test:self: (pass) rejects duplicate Edge ID through the Kernel complete-graph contract [0.10ms]
+@nodebraid/document test:self: (pass) rejects missing parent through the Kernel complete-graph contract [0.32ms]
+@nodebraid/document test:self: (pass) rejects self parent cycle through the Kernel complete-graph contract [0.06ms]
+@nodebraid/document test:self: (pass) rejects missing endpoint through the Kernel complete-graph contract [0.03ms]
+@nodebraid/document test:self: (pass) rejects negative size through the Kernel complete-graph contract [0.04ms]
+@nodebraid/document test:self: (pass) rejects malformed JSON and non-finite JSON geometry [1.75ms]
+@nodebraid/document test:self: (pass) preserves original application codec exceptions and rejects non-text encoding [0.63ms]
+@nodebraid/document test:self: (pass) rejects invalid codec configuration [0.02ms]
+@nodebraid/document test:self: (pass) rejects invalid codec configuration [0.05ms]
+@nodebraid/document test:self: (pass) rejects invalid codec configuration
+@nodebraid/document test:self: (pass) rejects invalid codec configuration
+@nodebraid/document test:self: (pass) rejects invalid codec configuration
+@nodebraid/document test:self: 
+@nodebraid/document test:self: tests/types.test.ts:
+@nodebraid/document test:self: (pass) keeps decoded Document structure readonly and business data opaque
+@nodebraid/document test:self: 
+@nodebraid/document test:self: tests/capture.test.ts:
+@nodebraid/document test:self: (pass) captures getters once and preserves the graph even when application encoding changes its source [1.54ms]
+@nodebraid/document test:self: (pass) normalizes valid graph ordering and ignores caller array iteration hooks [0.27ms]
+@nodebraid/document test:self: (pass) rejects sparse arrays and malformed owned export fields instead of losing information [0.90ms]
+@nodebraid/document test:self: 
+@nodebraid/document test:self:  35 pass
+@nodebraid/document test:self:  0 fail
+@nodebraid/document test:self:  84 expect() calls
+@nodebraid/document test:self: Ran 35 tests across 3 files. [87.00ms]
+@nodebraid/document test:self: Exited with code 0

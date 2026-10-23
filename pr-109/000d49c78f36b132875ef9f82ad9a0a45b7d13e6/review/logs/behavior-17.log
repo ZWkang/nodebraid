@@ -1,0 +1,60 @@
+@nodebraid/core build: [build] @nodebraid/diagnostics
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/kernel
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/canvas-fragment
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/port-api
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/session-api
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/interaction-api
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/layout-api
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/runtime-cordis
+@nodebraid/core build: $ tsgo -p tsconfig.build.json
+@nodebraid/core build: [build] @nodebraid/plugin-command
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/plugin-kernel
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/plugin-port
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/plugin-session
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/renderer-api
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/plugin-renderer
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/plugin-interaction
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/plugin-clipboard
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/plugin-duplicate-selection
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/plugin-history
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/plugin-layout
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/preset-basic
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/document
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: [build] @nodebraid/core
+@nodebraid/core build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/core build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/core build: Exited with code 0

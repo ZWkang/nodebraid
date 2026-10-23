@@ -1,0 +1,481 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "a81b3fdc348e1d9d0aa78a6576eec5ad9e1a8688",
+    "expectedParent": "dfc2f222167ec342201d253ddf9a7ce17310d742",
+    "head": "000d49c78f36b132875ef9f82ad9a0a45b7d13e6",
+    "tree": "992d05a73fc309a7b06c6f7d07bc7dc2700f6081",
+    "patch": "c0c48dd815345418f018f407704a5911a18ca9cfbbfe96234db3038656049173",
+    "localHead": "427f91fe383bf619feea2ceeac50646e0e452b58"
+  },
+  "task": {
+    "run": "issue-108-document-final-2",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "pr",
+      "number": 109
+    },
+    "request": "Synchronize existing PR #109 with fetched main a81b3fdc348e1d9d0aa78a6576eec5ad9e1a8688 because current-head CI passed but strict merge state is BEHIND; preserve approved Issue #108 complete Document save/restore scope and repeat source-bound review, full verification, CI and evidence publication.",
+    "plan": [
+      {
+        "id": "synchronize-main",
+        "blockedBy": [],
+        "acceptance": "Merge the independently captured current main into the existing PR branch without changing approved Document behavior; keep the existing published head as first parent."
+      },
+      {
+        "id": "review-and-verification",
+        "blockedBy": [
+          "synchronize-main"
+        ],
+        "acceptance": "Independent Standards/Spec review of the complete feature patch against current main; formal full check at exact resulting head/tree."
+      },
+      {
+        "id": "publish-and-ready",
+        "blockedBy": [
+          "review-and-verification"
+        ],
+        "acceptance": "Append verified tree to PR #109, then pass current-head CI/feedback and publish/read back complete current-head report/media."
+      },
+      {
+        "id": "main-integration",
+        "blockedBy": [
+          "publish-and-ready"
+        ],
+        "acceptance": "POST-MERGE ONLY with user authorization: verify actual main integration and whole-Issue acceptance."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "427f91fe383bf619feea2ceeac50646e0e452b58",
+      "tree": "992d05a73fc309a7b06c6f7d07bc7dc2700f6081",
+      "patch": "c0c48dd815345418f018f407704a5911a18ca9cfbbfe96234db3038656049173",
+      "report": "# Standards review — Issue #108\n\nWhat this change does: 完整 Document 通过应用明确提供的 Data Codec 保存为文件，恢复通过一次 Kernel Transaction 建立新的 History Baseline；Example 提供真实文件下载、导入与错误展示。\n\n## Source identity\n\n- Base: `a81b3fdc348e1d9d0aa78a6576eec5ad9e1a8688`\n- Head: `427f91fe383bf619feea2ceeac50646e0e452b58`\n- Tree: `992d05a73fc309a7b06c6f7d07bc7dc2700f6081`\n- Binary diff SHA-256: `c0c48dd815345418f018f407704a5911a18ca9cfbbfe96234db3038656049173`\n- Reviewed command: `git diff --binary a81b3fdc348e1d9d0aa78a6576eec5ad9e1a8688...427f91fe383bf619feea2ceeac50646e0e452b58`\n\n## Findings\n\n硬性 Standards 违反：0；有具体反例的 ponytail/smell finding：0。\n\n重新核对完整功能的 Document → Kernel 校验、Example → Command → History → Kernel 提交与有序通知链，并对照 AGENTS、CONTEXT、ADR-0011/0012/0013/0015/0016/0084/0085 及适用工程原则。文件验证与业务 codec、图一致性、History 记录边界各有明确所有者；没有新增静默降级或推测性框架。\n\n本次重点重评 main 的 `freezeCanvasNode` 修复：position、size、parentId 单次捕获仍在 Draft 写入前完成，抛错不会留下部分实体。Document 先捕获自己的输入，交给 Kernel 的值是已稳定的普通字段；解码后的冻结结构和 opaque data 引用继续保留。History Baseline callback 使用修复后的同一 writer，失败仍不会提交或清空历史；净零、重入 Commit、后续 Undo/Redo 与依赖释放语义不受字段读取修复影响。按单个交互式 Canvas Runtime 的实际负载评估，未发现需删除的抽象或可复现的性能问题。\n\n已读取刷新后的完整 Issue #108 与接受范围评论 `6365145631`；GitHub 实时讨论刷新由协调者完成。\n\n## Verification\n\n在该 head 执行：\n\n`bun test packages/kernel/tests/node-owned-values.test.ts packages/document/tests packages/plugin-history/tests packages/core/tests/document-roundtrip.test.ts examples/app/tests/example-data-codec.test.ts`\n\n结果：137 pass、0 fail，9 个文件；日志为 `standards-targeted.log`。其中包含新增 Kernel 回归及完整 Document/History 测试。确认当前 Kernel 依赖产物包含新字段捕获实现；本审查未并行重建产物。\n\n固定区间 `git diff --check` 通过，工作区干净，实际 HEAD/tree/binary patch hash 与上述身份一致。\n\nVerdict: passed.\n\nNot checked: 未重跑浏览器、全量工程验证或远端发布回读；本审查结论不替代当前 head 的正式交付验证。\n"
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "427f91fe383bf619feea2ceeac50646e0e452b58",
+      "tree": "992d05a73fc309a7b06c6f7d07bc7dc2700f6081",
+      "patch": "c0c48dd815345418f018f407704a5911a18ca9cfbbfe96234db3038656049173",
+      "report": "# Spec review — Issue #108 / PR #109, synchronized main\n\n**Verdict: passed.** No concrete missing/partial requirement, scope creep, or incorrectly implemented behavior found at this source.\n\nReassessed the complete feature against [Issue #108](https://github.com/ZWkang/nodebraid/issues/108) and its [accepted scope](https://github.com/ZWkang/nodebraid/issues/108#issuecomment-6365145631). The supplied complete Issue snapshot was refreshed at `2026-10-23T13:32:54.143Z`; requirements and the sole accepted discussion remain unchanged. Repository instructions, domain vocabulary and applicable ADRs are unchanged.\n\nThe feature patch is byte-identical to the prior review, but its Kernel dependency changed. I read the complete main delta: `freezeCanvasNode` now captures position, size and parentId once, with new public regression coverage. I traced both affected consumers: Document's independent validation Kernel receives already captured ordinary structures; restore inserts the decoded frozen entities through the live Kernel inside the Baseline Transaction. Neither path relies on repeated getter reads. Opaque data remains the original reference, and graph validation still occurs before commit.\n\nThe specification's “failed preparation/Transaction leaves the current graph and existing History unchanged” and “successful net-zero transactions still reset History” remain satisfied. The unchanged History state machine retains exact Commit identity, reentry, caught-up/busy, cancellation and disposal behavior. File download/reopen/upload assertions, continued editing with occupied generated IDs, public exports, bilingual documentation and capability maps remain aligned with the accepted complete-Document scope.\n\nSource identity:\n\n- Base: `a81b3fdc348e1d9d0aa78a6576eec5ad9e1a8688`\n- Head: `427f91fe383bf619feea2ceeac50646e0e452b58`\n- First parent: `dfc2f222167ec342201d253ddf9a7ce17310d742`\n- Tree: `992d05a73fc309a7b06c6f7d07bc7dc2700f6081`\n- Patch SHA-256: `c0c48dd815345418f018f407704a5911a18ca9cfbbfe96234db3038656049173`\n- Diff: `git diff a81b3fdc348e1d9d0aa78a6576eec5ad9e1a8688...427f91fe383bf619feea2ceeac50646e0e452b58`\n- Commits: `dfc2f22 feat: save and restore documents`; `427f91f Merge remote-tracking branch 'origin/main' into feat/issue-108`.\n\nIndependent current-head check: `bun test packages/kernel/tests/node-owned-values.test.ts packages/document/tests packages/plugin-history/tests packages/core/tests/document-roundtrip.test.ts examples/app/tests/example-data-codec.test.ts` — **137 passed, 0 failed**, exit 0; `spec-contracts.log`. Confirmed refreshed Kernel artifacts contain the new capture implementation. Patch hash and `git diff --check` passed; worktree stayed clean.\n\nLimits: no build, Chromium rerun, full check or remote mutation performed by this reviewer. Prior-head CI/media publication does not verify this head; formal verification, current-head CI and report/media publication/readback remain pending, as does authorized post-merge acceptance. npm release is not claimed.\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "document-roundtrip-red",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Complete graph and opaque bigint Map round trip initially failed because the new public serializer was explicitly unimplemented.",
+      "command": "bun test packages/document/tests/index.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "document-validation-red",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Malformed envelopes, wrong versions/data formats and codec configuration/results initially violated their rejection contract (22 failing tests).",
+      "command": "bun test packages/document/tests/index.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "document-codec-green",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. 35 tests pass for full/empty graph round trip, explicit codec, rejection, Kernel invariants, capture consistency, owned-shell freezing and public types.",
+      "command": "bun run --filter '@nodebraid/document' test:self",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "document-build-artifact",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Build, declaration isolation and real @nodebraid/document package-name bigint round trip pass.",
+      "command": "bun run --filter '@nodebraid/document' build",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "document-typecheck",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Package implementation and public type tests typecheck. Dependencies were prepared by the preceding build.",
+      "command": "bun run --filter '@nodebraid/document' typecheck:self",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "document-oxlint",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Package oxlint passes without warnings.",
+      "command": "./node_modules/.bin/oxlint packages/document",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "document-format",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Package format check passes.",
+      "command": "./node_modules/.bin/prettier --check packages/document",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "document-method-capture-red",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Original codec methods were bypassed through caller-owned bind; typed class graph getters were rejected. Two public regressions failed before correction.",
+      "command": "bun test packages/document/tests/capture.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "document-method-capture-green",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Public regressions now invoke original codec methods with their receiver, capture readable inherited fields once, omit extra application fields, and retain strict file/missing-field validation. Full package suite passes.",
+      "command": "bun run --filter '@nodebraid/document' test:self",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "document-method-capture-build",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Updated build, declaration isolation and real package-name consumer pass.",
+      "command": "bun run --filter '@nodebraid/document' build",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-10.log"
+    },
+    {
+      "id": "document-method-capture-types",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Typed class getter regression and all package source/tests typecheck.",
+      "command": "bun run --filter '@nodebraid/document' typecheck:self",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-11.log"
+    },
+    {
+      "id": "history-net-zero-red",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Net-zero baseline publication incorrectly accepted a reentrant History baseline; the public behavior assertion failed before correction.",
+      "command": "bun test packages/plugin-history/tests/baseline.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-12.log"
+    },
+    {
+      "id": "history-green",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. 37 public History tests and 155 assertions pass, including atomic full replacement, failure identity, net-zero baseline, subsequent reentrant Commit recording and lifecycle.",
+      "command": "bun run --filter @nodebraid/plugin-history test:self",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-13.log"
+    },
+    {
+      "id": "history-artifacts",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. History package builds and its public declaration/package-name consumer checks pass.",
+      "command": "bun run --filter @nodebraid/plugin-history build",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-14.log"
+    },
+    {
+      "id": "history-types",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. History public input/output type tests pass.",
+      "command": "bun run --filter @nodebraid/plugin-history typecheck",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-15.log"
+    },
+    {
+      "id": "core-roundtrip",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Public facade tests pass, including serialized file restore, fresh History and Undo of only the subsequent edit.",
+      "command": "bun test packages/core/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-16.log"
+    },
+    {
+      "id": "core-artifacts",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. The facade declaration and actual package-name consumer include Document and History baseline APIs.",
+      "command": "bun run --filter @nodebraid/core build",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-17.log"
+    },
+    {
+      "id": "preview-selection-red",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Document changes did not select an actual document-files scene before adding the scene selection contract.",
+      "command": "bun test tests/preview-scenes.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-18.log"
+    },
+    {
+      "id": "preview-selection-green",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Preview scene selection and existing collector protocol tests pass. This does not itself prove the browser file scene.",
+      "command": "bun test tests/preview-scenes.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-19.log"
+    },
+    {
+      "id": "example-file-red",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Actual Example was ready but lacked the Document file input.",
+      "command": "bun run examples/app/browser-tests/document.browser.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-20.log"
+    },
+    {
+      "id": "example-data-capture-red",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Repeated source iteration allowed data to change after validation.",
+      "command": "bun test examples/app/tests/example-data-codec.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-21.log"
+    },
+    {
+      "id": "example-clipboard-capture-red",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Clipboard serialized original data after accepting a different data snapshot.",
+      "command": "bun test examples/app/tests/example-data-codec.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-22.log"
+    },
+    {
+      "id": "example-data-green",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Five application codec tests verify accepted data snapshot use by Document and Clipboard.",
+      "command": "bun test examples/app/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-23.log"
+    },
+    {
+      "id": "example-browsers",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Basic SVG, Clipboard and Document suites passed with actual Chromium input and file transfer.",
+      "command": "bun run --cwd examples/app test:browser:self",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-24.log"
+    },
+    {
+      "id": "example-file-chooser",
+      "acceptance": "Historical development evidence from the unchanged feature patch before subsequent main merges. Development evidence before synchronization with main e21c917; final source is verified by the formal check. Actual Import click opens the native file chooser; cancellation and invalid files preserve graph/history/session; full file workflow passes.",
+      "command": "bun run examples/app/browser-tests/document.browser.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-25.log"
+    },
+    {
+      "id": "current-standards",
+      "acceptance": "Current merged source passes 137 Kernel/Document/History/facade/Example data tests in independent Standards review.",
+      "command": "bun test packages/kernel/tests/node-owned-values.test.ts packages/document/tests packages/plugin-history/tests packages/core/tests/document-roundtrip.test.ts examples/app/tests/example-data-codec.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-26.log"
+    },
+    {
+      "id": "current-spec",
+      "acceptance": "Current source independently passes Kernel capture and Document/History integration regressions in Spec review.",
+      "command": "bun test packages/kernel/tests/node-owned-values.test.ts packages/document/tests packages/plugin-history/tests packages/core/tests/document-roundtrip.test.ts examples/app/tests/example-data-codec.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-27.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "c85f1425c076cc2870ad78f32c9c5165ce5fb09a439c4a9d7d18065946ade624"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "d30c0088aaff9c073c137b4cf94da88175c57bd7a1503d62775efb6ab9a6c0e6"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "4c467e8fc89fa6037fc16dc5cb25bcd41bbcc0e385c3e274ccc35cce98bc4d94"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "676c5a45ae31cf32734e70735f7d506bf84da93fcd7c5143fcf933b09ddfb28a"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "908ff0327b3caf0040992de222631421f320abc84b3912aad85acd9168ef4517"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "4024e1f0879e8d159888c7cf4db2e8b64e9b6aaa8fcf71ed9ef20a1a80a67abd"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "951985ca7b44fed8cfcd4d251d9f832758de601c3faf229a42a34137b30fb3d3"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "ec7d34f86639c3b565df3f14370ad41c60901e9f13f90223c9e461c349c2fc13"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "67a223b0051437dc120d389cadd0cbd9722eb4dc6adb884eb0c9197e2dea85ed"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "676ff2933caf830cc58680df9eeb418770d8894282e2e92119ba0acd33971f8f"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "951985ca7b44fed8cfcd4d251d9f832758de601c3faf229a42a34137b30fb3d3"
+    },
+    {
+      "path": "logs/behavior-11.log",
+      "kind": "log",
+      "sha256": "ec7d34f86639c3b565df3f14370ad41c60901e9f13f90223c9e461c349c2fc13"
+    },
+    {
+      "path": "logs/behavior-12.log",
+      "kind": "log",
+      "sha256": "49fc200070385f24286833ea536f6742a354da607a7bf17280266376f2ac1f35"
+    },
+    {
+      "path": "logs/behavior-13.log",
+      "kind": "log",
+      "sha256": "108513dc05014e5e7dc41b3b3f3a9f5617aac2051b50d80a7cf5052a421d3180"
+    },
+    {
+      "path": "logs/behavior-14.log",
+      "kind": "log",
+      "sha256": "fb1398e8a0332510e4b8bf00bf2f9ac7d0d12adf9d1a4534e96e3965d7dbb5a0"
+    },
+    {
+      "path": "logs/behavior-15.log",
+      "kind": "log",
+      "sha256": "d57a2a05a543e4200c2a42b16795ea90cb930d4ee8799e0606c62d98d67966d7"
+    },
+    {
+      "path": "logs/behavior-16.log",
+      "kind": "log",
+      "sha256": "ac92093b3c7ab9f2a5283ed1c6b98c000471f2983067e5354a2fa71f46d3fcfb"
+    },
+    {
+      "path": "logs/behavior-17.log",
+      "kind": "log",
+      "sha256": "ff587c841a85832c2c6069151eae1a07f395eb02a1112dc5ffd63f43bcaebc51"
+    },
+    {
+      "path": "logs/behavior-18.log",
+      "kind": "log",
+      "sha256": "5e1313c8259f7ceb623a813c8cd493f8e04b81bd31480a0ad7a15030bc7c9178"
+    },
+    {
+      "path": "logs/behavior-19.log",
+      "kind": "log",
+      "sha256": "bc81a36163e5c9f4c32c4c7b8dd4862ef95a31250036da8fd4dca977e7f98719"
+    },
+    {
+      "path": "logs/behavior-20.log",
+      "kind": "log",
+      "sha256": "8e83bab265fc936b535b75f64bca4413c9cd93c68ca26feb8e6559bb27eb7307"
+    },
+    {
+      "path": "logs/behavior-21.log",
+      "kind": "log",
+      "sha256": "05698d88dcc97e48e3a1512a166ec627f855c784fb5adac335b3efe90e3fb8db"
+    },
+    {
+      "path": "logs/behavior-22.log",
+      "kind": "log",
+      "sha256": "28f03d988da1f802b2c0536d21ce444463b179eea32eeaf1de84ba0785ae767b"
+    },
+    {
+      "path": "logs/behavior-23.log",
+      "kind": "log",
+      "sha256": "8ee72c9c909ed6aec17ef052cbaec51d9245c5e1d79b48ad109cbef102d82ddd"
+    },
+    {
+      "path": "logs/behavior-24.log",
+      "kind": "log",
+      "sha256": "94e3ff1d72d062a180436943f79a92b733178d31966871fbb3bd6b08ad3a1403"
+    },
+    {
+      "path": "logs/behavior-25.log",
+      "kind": "log",
+      "sha256": "9c9e4c35daf720b4e926ac22c469c780d9606e14fc0e792a787087c8263aacb2"
+    },
+    {
+      "path": "logs/behavior-26.log",
+      "kind": "log",
+      "sha256": "37cf774c2186ca99b57e28facf3e617426c4633b99c4f0601a940dad41eb3018"
+    },
+    {
+      "path": "logs/behavior-27.log",
+      "kind": "log",
+      "sha256": "c516d647031f0342b4dae294bfe664206b5b42b6c11f848d720030230bd6844e"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "9cb36ebd07b0e35799d872b7bb406a03e46bbfe3352a664dfdc76680c5777151"
+    }
+  ]
+}

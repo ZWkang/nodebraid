@@ -1,0 +1,18 @@
+bun test v1.4.2 (744846f84)
+
+packages/document/tests/index.test.ts:
+2 | import type { CanvasDocumentDataCodec, DecodedCanvasDocument } from './contracts';
+3 | 
+4 | export type { CanvasDocumentDataCodec, DecodedCanvasDocument } from './contracts';
+5 | 
+6 | export function serializeCanvasDocument(_snapshot: CanvasSnapshot, _codec: CanvasDocumentDataCodec): string {
+7 |   throw new Error('Document serialization has not been implemented.');
+                                                                        ^
+error: Document serialization has not been implemented.
+      at serializeCanvasDocument (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:7:69)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:26:16)
+(fail) round-trips a complete Document and opaque application data without persisting runtime state [10.23ms]
+
+ 0 pass
+ 1 fail
+Ran 1 test across 1 file. [40.00ms]

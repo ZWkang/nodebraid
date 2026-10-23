@@ -1,0 +1,161 @@
+bun test v1.4.2 (744846f84)
+
+examples/app/tests/example-data-codec.test.ts:
+(pass) Example document data round trips null and the explicit application record [0.12ms]
+(pass) Example data rejects values outside the application schema rather than dropping them [0.10ms]
+(pass) Example data validates and serializes the same captured tags [0.03ms]
+(pass) Clipboard accepts the same business data as the Document file [0.50ms]
+(pass) Clipboard serializes the application data snapshot that passed validation [0.13ms]
+
+packages/plugin-history/tests/index.test.ts:
+(pass) @nodebraid/plugin-history > publishes the stable History diagnostic event catalog [0.01ms]
+(pass) @nodebraid/plugin-history > records the first post-Baseline Commit and undoes it through Command Service [6.41ms]
+(pass) @nodebraid/plugin-history > redoes the most recently undone History Entry with diagnostic metadata [1.28ms]
+(pass) @nodebraid/plugin-history > records a Recordable Commit that uses History-like diagnostic metadata [0.92ms]
+(pass) @nodebraid/plugin-history > records Command-originated work but not net-zero or failed Transactions [0.91ms]
+(pass) @nodebraid/plugin-history > clears Redo when a new Recordable Commit creates a branch [0.78ms]
+(pass) @nodebraid/plugin-history > rejects an empty Undo without changing Kernel or History [0.64ms]
+(pass) @nodebraid/plugin-history > publishes only meaningful History Snapshot changes [0.71ms]
+(pass) @nodebraid/plugin-history > snapshots subscriber recipients and isolates their errors [0.97ms]
+(pass) @nodebraid/plugin-history > allows an aligned Recordable Commit subscriber to Undo immediately [0.75ms]
+(pass) @nodebraid/plugin-history > rejects Undo before History catches up to the current Kernel revision [0.67ms]
+(pass) @nodebraid/plugin-history > keeps one queued Replay in flight and rejects a reentrant second Undo [0.65ms]
+(pass) @nodebraid/plugin-history > records a reentrant Recordable Commit and publishes only after catching up [1.80ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy while publishing its History Snapshot [0.94ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through later Kernel Observers [0.64ms]
+(pass) @nodebraid/plugin-history > returns the exact Replay Commit delivered to Kernel Observers [0.52ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through the final caught-up Snapshot publication [0.79ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Kernel Provider disappears before delivery [0.67ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Command Provider disappears before delivery [0.68ms]
+(pass) @nodebraid/plugin-history > preserves caller cancellation before starting a Replay [0.56ms]
+(pass) @nodebraid/plugin-history > prioritizes caller cancellation over an empty Undo stack [0.49ms]
+(pass) @nodebraid/plugin-history > closes old History state and reactivates from a fresh Kernel Baseline [1.32ms]
+(pass) @nodebraid/plugin-history > starts a new Baseline when Command Service returns to a retained Kernel [0.88ms]
+
+packages/plugin-history/tests/types.test.ts:
+(pass) keeps the public History seam narrow and type-safe
+
+packages/plugin-history/tests/baseline.test.ts:
+(pass) replaces the Document as a new baseline and only undoes subsequent edits [0.83ms]
+(pass) establishes a baseline without a net Document change and publishes the cleared history [0.60ms]
+(pass) keeps a net-zero baseline busy through publication while recording a subsequent Commit [0.58ms]
+(pass) preserves the original Document and History after callback rejection [0.61ms]
+(pass) preserves the original Document and History after invalid-graph rejection [0.56ms]
+(pass) preserves the original Document and History after async-callback rejection [0.44ms]
+(pass) rejects an already aborted baseline before invoking its update [1.35ms]
+(pass) rejects overlapping baseline and replay Commands before writing [0.69ms]
+(pass) returns the committed baseline when a later observer aborts the caller [0.50ms]
+(pass) rejects a baseline when an earlier observer runs before History catches up [0.59ms]
+(pass) records an ordinary reentrant Commit after the exact baseline Commit [0.64ms]
+(pass) settles a committed queued baseline when its kernel Provider disappears [0.57ms]
+(pass) settles a committed queued baseline when its command Provider disappears [0.45ms]
+
+packages/core/tests/document-roundtrip.test.ts:
+(pass) the public facade restores a file and records only subsequent editing [1.32ms]
+
+packages/document/tests/index.test.ts:
+(pass) round-trips a complete Document and opaque application data without persisting runtime state [0.57ms]
+(pass) supports an empty Document and uses no codec calls when there are no entities [0.03ms]
+(pass) rejects wrong envelope type before interpreting any application data [0.08ms]
+(pass) rejects unknown version before interpreting any application data [0.03ms]
+(pass) rejects wrong data format before interpreting any application data [0.02ms]
+(pass) rejects non-object envelope before interpreting any application data
+(pass) rejects unknown envelope field before interpreting any application data
+(pass) rejects missing array before interpreting any application data
+(pass) rejects non-array nodes before interpreting any application data
+(pass) rejects invalid node type before interpreting any application data [0.02ms]
+(pass) rejects empty node ID before interpreting any application data [0.01ms]
+(pass) rejects string position before interpreting any application data [0.01ms]
+(pass) rejects unknown node field before interpreting any application data
+(pass) rejects malformed size before interpreting any application data [0.01ms]
+(pass) rejects invalid parent ID before interpreting any application data [0.01ms]
+(pass) rejects malformed edge before interpreting any application data [0.02ms]
+(pass) rejects invalid port ID before interpreting any application data [0.02ms]
+(pass) rejects non-text data on later edge before interpreting any application data [0.02ms]
+(pass) rejects duplicate Node ID through the Kernel complete-graph contract [0.10ms]
+(pass) rejects duplicate Edge ID through the Kernel complete-graph contract [0.04ms]
+(pass) rejects missing parent through the Kernel complete-graph contract [0.04ms]
+(pass) rejects self parent cycle through the Kernel complete-graph contract [0.04ms]
+(pass) rejects missing endpoint through the Kernel complete-graph contract [0.04ms]
+(pass) rejects negative size through the Kernel complete-graph contract [0.03ms]
+(pass) rejects malformed JSON and non-finite JSON geometry [0.12ms]
+(pass) preserves original application codec exceptions and rejects non-text encoding [0.22ms]
+(pass) rejects invalid codec configuration [0.01ms]
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+
+packages/document/tests/types.test.ts:
+(pass) keeps decoded Document structure readonly and business data opaque
+
+packages/document/tests/capture.test.ts:
+(pass) captures getters once and preserves the graph even when application encoding changes its source [0.23ms]
+(pass) normalizes valid graph ordering and ignores caller array iteration hooks [0.14ms]
+(pass) rejects sparse arrays and malformed owned export fields instead of losing information [0.11ms]
+(pass) calls the original codec methods with their receiver when their bind property is overridden [0.10ms]
+(pass) captures typed class getters and extra application fields without requiring own enumerable storage [0.31ms]
+(pass) still rejects a genuinely missing required source field [0.08ms]
+
+packages/kernel/tests/node-owned-values.test.ts:
+(pass) Node add retains first invalid position for final graph validation [0.25ms]
+(pass) Node add retains first invalid size for final graph validation [0.05ms]
+(pass) Node add retains first invalid parentId for final graph validation [0.03ms]
+(pass) Node replace retains first invalid position for final graph validation [0.07ms]
+(pass) Node replace retains first invalid size for final graph validation [0.03ms]
+(pass) Node replace retains first invalid parentId for final graph validation [0.02ms]
+(pass) Node add copies first valid position from enumerable without later reads [0.13ms]
+(pass) Node add copies first valid position from non-enumerable without later reads [0.02ms]
+(pass) Node add copies first valid position from inherited without later reads [0.02ms]
+(pass) Node add copies first valid size from enumerable without later reads [0.02ms]
+(pass) Node add copies first valid size from non-enumerable without later reads [0.03ms]
+(pass) Node add copies first valid size from inherited without later reads [0.02ms]
+(pass) Node add copies first valid parentId from enumerable without later reads [0.02ms]
+(pass) Node add copies first valid parentId from non-enumerable without later reads [0.02ms]
+(pass) Node add copies first valid parentId from inherited without later reads [0.04ms]
+(pass) Node add retains absent size without another read [0.05ms]
+(pass) Node add retains absent parentId without another read [0.02ms]
+(pass) Node replace copies first valid position from enumerable without later reads [0.05ms]
+(pass) Node replace copies first valid position from non-enumerable without later reads [0.02ms]
+(pass) Node replace copies first valid position from inherited without later reads [0.02ms]
+(pass) Node replace copies first valid size from enumerable without later reads [0.02ms]
+(pass) Node replace copies first valid size from non-enumerable without later reads [0.02ms]
+(pass) Node replace copies first valid size from inherited without later reads [0.02ms]
+(pass) Node replace copies first valid parentId from enumerable without later reads [0.02ms]
+(pass) Node replace copies first valid parentId from non-enumerable without later reads [0.02ms]
+(pass) Node replace copies first valid parentId from inherited without later reads [0.01ms]
+(pass) Node replace retains absent size without another read [0.01ms]
+(pass) Node replace retains absent parentId without another read [0.01ms]
+(pass) Node add preserves the original type failure, order and caught Draft state [0.15ms]
+(pass) Node add preserves the original position failure, order and caught Draft state [0.03ms]
+(pass) Node add preserves the original position.x failure, order and caught Draft state [0.02ms]
+(pass) Node add preserves the original position.y failure, order and caught Draft state [0.02ms]
+(pass) Node add preserves the original size failure, order and caught Draft state [0.02ms]
+(pass) Node add preserves the original size.width failure, order and caught Draft state [0.02ms]
+(pass) Node add preserves the original size.height failure, order and caught Draft state [0.02ms]
+(pass) Node add preserves the original parentId failure, order and caught Draft state [0.03ms]
+(pass) Node add preserves the original data failure, order and caught Draft state [0.02ms]
+(pass) Node add preserves an opaque data thrown value %s [0.02ms]
+(pass) Node add preserves an opaque data thrown value %s [0.01ms]
+(pass) Node add preserves an opaque data thrown value %s [0.01ms]
+(pass) Node add preserves an opaque data thrown value %s [0.01ms]
+(pass) Node add keeps invalid geometry provisional until explicit later repair [0.06ms]
+(pass) Node replace preserves the original type failure, order and caught Draft state [0.03ms]
+(pass) Node replace preserves the original position failure, order and caught Draft state [0.02ms]
+(pass) Node replace preserves the original position.x failure, order and caught Draft state [0.03ms]
+(pass) Node replace preserves the original position.y failure, order and caught Draft state [0.02ms]
+(pass) Node replace preserves the original size failure, order and caught Draft state [0.02ms]
+(pass) Node replace preserves the original size.width failure, order and caught Draft state [0.02ms]
+(pass) Node replace preserves the original size.height failure, order and caught Draft state [0.02ms]
+(pass) Node replace preserves the original parentId failure, order and caught Draft state [0.01ms]
+(pass) Node replace preserves the original data failure, order and caught Draft state [0.02ms]
+(pass) Node replace preserves an opaque data thrown value %s [0.01ms]
+(pass) Node replace preserves an opaque data thrown value %s [0.02ms]
+(pass) Node replace preserves an opaque data thrown value %s [0.02ms]
+(pass) Node replace preserves an opaque data thrown value %s [0.01ms]
+(pass) Node replace keeps invalid geometry provisional until explicit later repair [0.02ms]
+
+ 137 pass
+ 0 fail
+ 707 expect() calls
+Ran 137 tests across 9 files. [66.00ms]

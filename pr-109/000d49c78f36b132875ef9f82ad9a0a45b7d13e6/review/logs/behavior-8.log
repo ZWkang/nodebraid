@@ -1,0 +1,41 @@
+bun test v1.4.2 (744846f84)
+
+packages/document/tests/capture.test.ts:
+(pass) captures getters once and preserves the graph even when application encoding changes its source [1.30ms]
+(pass) normalizes valid graph ordering and ignores caller array iteration hooks [0.30ms]
+(pass) rejects sparse arrays and malformed owned export fields instead of losing information [0.63ms]
+167 |   };
+168 |   Object.defineProperty(applicationCodec.encode, 'bind', { value: () => () => 'replacement encoder' });
+169 |   Object.defineProperty(applicationCodec.decode, 'bind', { value: () => () => ({ business: 'replacement decoder' }) });
+170 |   const text = serializeCanvasDocument(snapshot(), applicationCodec);
+171 |   const restored = deserializeCanvasDocument(text, applicationCodec);
+172 |   expect(JSON.parse(text).nodes[0].data).toBe('original');
+                                               ^
+error: expect(received).toBe(expected)
+
+Expected: "original"
+Received: "replacement encoder"
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/capture.test.ts:172:42)
+(fail) calls the original codec methods with their receiver when their bind property is overridden [0.80ms]
+170 |   if (!id.length) invalid('Document entity references must not be empty.');
+171 |   return id;
+172 | }
+173 | 
+174 | function invalid(message: string): never {
+175 |   throw new CanvasDocumentError('INVALID_DOCUMENT', message);
+                                                                 ^
+CanvasDocumentError: Document contains an unknown field.
+      at invalid (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/document.ts:175:60)
+      at captureRecord (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/document.ts:140:5)
+      at captureNode (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/document.ts:90:16)
+      at from (1:11)
+      at captureGraph (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/document.ts:78:17)
+      at serializeCanvasDocument (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/document.ts:20:17)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/capture.test.ts:222:16)
+(fail) captures typed class getters and extra application fields without requiring own enumerable storage [0.16ms]
+
+ 3 pass
+ 2 fail
+ 17 expect() calls
+Ran 5 tests across 1 file. [29.00ms]
