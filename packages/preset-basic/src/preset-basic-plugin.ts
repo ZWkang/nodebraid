@@ -51,9 +51,14 @@ function resolveInteractionOptions(options: BasicCanvasPluginOptions | undefined
 function snapshotInteractionConfig(config: InteractionConfig | undefined): InteractionConfig | undefined {
   const input: unknown = config;
   if (input === undefined || input === null || typeof input !== 'object' || Array.isArray(input)) return config;
-  const { connection, ...snapshot } = config as InteractionConfig;
+  const { connection, dragThreshold, wheelZoomSensitivity, minZoom, maxZoom, ...snapshot } =
+    config as InteractionConfig;
   return Object.freeze({
     ...snapshot,
+    dragThreshold,
+    wheelZoomSensitivity,
+    minZoom,
+    maxZoom,
     connection:
       connection !== undefined && connection !== null && typeof connection === 'object' && !Array.isArray(connection)
         ? Object.freeze({ ...connection })
