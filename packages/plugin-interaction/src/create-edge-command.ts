@@ -1,13 +1,12 @@
+import { type ConnectionAnchorIdentity } from '@nodebraid/interaction-api';
+import { edgeId, nodeId, type CanvasEdge, type EdgeEndpoint } from '@nodebraid/kernel';
 import { defineCommand, type CommandHandler } from '@nodebraid/plugin-command';
 import type { KernelService } from '@nodebraid/plugin-kernel';
 import type { PortService } from '@nodebraid/plugin-port';
-
 import type { CreateEdgeInput, CreateEdgeResult } from './contracts';
-import { isCanvasEdge, isRecord } from './canvas-value-validation';
+import { isRecord } from './canvas-value-validation';
 import { InteractionError } from './interaction-error';
-
 export const createEdgeCommand = defineCommand<CreateEdgeInput, CreateEdgeResult>('interaction.edge.create');
-
 /** @internal */
 export function createEdgeHandler(
   kernel: KernelService,
@@ -15,34 +14,30 @@ export function createEdgeHandler(
 ): CommandHandler<CreateEdgeInput, CreateEdgeResult> {
   return (input, execution) => {
     execution.signal.throwIfAborted();
-    assertCreateEdgeInput(input);
+    const { edge, source, target } = captureCreateEdgeInput(input);
     const commit = kernel.transact(
       (transaction) => {
-        if (input.source.role !== 'source' || input.target.role !== 'target') throwInvalidConnection();
+        if (source.role !== 'source' || target.role !== 'target') throwInvalidConnection();
         if (
-          input.edge.source.nodeId !== input.source.nodeId ||
-          input.edge.target.nodeId !== input.target.nodeId ||
-          input.edge.source.portId !== input.source.portId ||
-          input.edge.target.portId !== input.target.portId ||
-          input.source.nodeId === input.target.nodeId
-        ) {
+          edge.source.nodeId !== source.nodeId ||
+          edge.target.nodeId !== target.nodeId ||
+          edge.source.portId !== source.portId ||
+          edge.target.portId !== target.portId ||
+          source.nodeId === target.nodeId
+        )
           throwInvalidConnection();
-        }
-        const sourceNode = transaction.query.getNode(input.source.nodeId);
-        const targetNode = transaction.query.getNode(input.target.nodeId);
-        if (!sourceNode || !targetNode) {
+        const sourceNode = transaction.query.getNode(source.nodeId),
+          targetNode = transaction.query.getNode(target.nodeId);
+        if (!sourceNode || !targetNode)
           throw new InteractionError('STALE_GESTURE', 'Create Edge Command Endpoint Node disappeared.');
-        }
         if (
-          !ports.isConnectionTargetDefined(sourceNode, input.source) ||
-          !ports.isConnectionTargetDefined(targetNode, input.target)
-        ) {
+          !ports.isConnectionTargetDefined(sourceNode, source) ||
+          !ports.isConnectionTargetDefined(targetNode, target)
+        )
           throw new InteractionError('STALE_GESTURE', 'Create Edge Command Port Definition changed.');
-        }
-        if (transaction.query.getEdge(input.edge.id)) {
+        if (transaction.query.getEdge(edge.id))
           throw new InteractionError('STALE_GESTURE', 'Create Edge Command Edge ID is no longer available.');
-        }
-        transaction.edges.add(input.edge);
+        transaction.edges.add(edge);
       },
       { origin: 'interaction', commandId: execution.commandId },
     );
@@ -50,28 +45,51 @@ export function createEdgeHandler(
     return commit;
   };
 }
-
-function assertCreateEdgeInput(value: unknown): asserts value is CreateEdgeInput {
-  if (
-    !isRecord(value) ||
-    !isCanvasEdge(value.edge) ||
-    !isConnectionAnchor(value.source) ||
-    !isConnectionAnchor(value.target)
-  ) {
-    throwInvalidConnection();
-  }
+function captureCreateEdgeInput(value: unknown): CreateEdgeInput {
+  if (!isRecord(value)) throwInvalidConnection();
+  const edge = captureEdge(value.edge);
+  const source = captureConnectionAnchor(value.source);
+  const target = captureConnectionAnchor(value.target);
+  return { edge, source, target };
 }
-
-function isConnectionAnchor(value: unknown): value is CreateEdgeInput['source'] {
-  return (
-    isRecord(value) &&
-    typeof value.nodeId === 'string' &&
-    value.nodeId.length > 0 &&
-    (value.portId === undefined || (typeof value.portId === 'string' && value.portId.length > 0)) &&
-    (value.role === 'source' || value.role === 'target')
-  );
+function captureEdge(value: unknown): CanvasEdge {
+  if (!isRecord(value)) throwInvalidConnection();
+  const id = value.id;
+  if (typeof id !== 'string' || id.length === 0) throwInvalidConnection();
+  const type = value.type;
+  if (typeof type !== 'string') throwInvalidConnection();
+  const source = captureEndpoint(value.source),
+    target = captureEndpoint(value.target);
+  if (!('data' in value)) throwInvalidConnection();
+  return {
+    id: edgeId(id),
+    type,
+    source,
+    target,
+    // Keep opaque data at the Kernel Writer read phase after Command preflight.
+    get data() {
+      return value.data;
+    },
+  };
 }
-
+function captureEndpoint(value: unknown): EdgeEndpoint {
+  if (!isRecord(value)) throwInvalidConnection();
+  const id = value.nodeId;
+  if (typeof id !== 'string' || id.length === 0) throwInvalidConnection();
+  const portId = value.portId;
+  if (portId !== undefined && typeof portId !== 'string') throwInvalidConnection();
+  return { nodeId: nodeId(id), ...(portId === undefined ? {} : { portId }) };
+}
+function captureConnectionAnchor(value: unknown): ConnectionAnchorIdentity {
+  if (!isRecord(value)) throwInvalidConnection();
+  const id = value.nodeId;
+  if (typeof id !== 'string' || id.length === 0) throwInvalidConnection();
+  const portId = value.portId;
+  if (portId !== undefined && (typeof portId !== 'string' || portId.length === 0)) throwInvalidConnection();
+  const role = value.role;
+  if (role !== 'source' && role !== 'target') throwInvalidConnection();
+  return { nodeId: nodeId(id), ...(portId === undefined ? {} : { portId }), role };
+}
 function throwInvalidConnection(): never {
   throw new InteractionError('INVALID_CONNECTION', 'Create Edge Command input is invalid.');
 }
