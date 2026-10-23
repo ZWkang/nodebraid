@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "dcf13482b68bc2422fc4d714df1226ab0ef259aa",
+    "expectedParent": "dcf13482b68bc2422fc4d714df1226ab0ef259aa",
+    "head": "bef165a67f17d2cbc28519baa4efe6da11d6c56f",
+    "tree": "a4c45edaf0ef9ec63f3e0bdeb3ee6e9983adde93",
+    "patch": "bda03b6671b10f555d74473aff2fa4f39350bf84019c7a4bcb0a67f91fa0221f",
+    "localHead": "65b1da44adec388fd586d9806670ce3895972752"
+  },
+  "task": {
+    "run": "6effc8e5-4000-4e99-a7db-33a105722045",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 100
+    },
+    "request": "## Confirmed defect\n\nOn fetched main `dcf13482b68bc2422fc4d714df1226ab0ef259aa`, Basic Canvas silently discards inherited or non-enumerable numeric Interaction policy fields. A legal class with `minZoom = 2` and `maxZoom = 1` exposed through prototype getters is rejected by direct Interaction installation, but becomes active through `createBasicCanvasPlugin()`.\n\nA fresh compiled public-package probe creates real Plugin Hosts, Kernel, Port, Command, Session, Renderer Plugin and Interaction. A public-interface recording Renderer supplies the external backend seam; no Runtime collaborator or configuration validator is mocked. Six comparisons complete with Host cleanup:\n\n| Policy fields | Direct Interaction | Basic preset |\n| --- | --- | --- |\n| own enumerable minZoom 2 / maxZoom 1 | INVALID_CONFIG | INVALID_CONFIG |\n| inherited class getters, same values | INVALID_CONFIG | **active** |\n| own non-enumerable fields, same values | INVALID_CONFIG | **active** |\n\nThe invariant that the preset preserves the supplied invalid policy fails with exit 1. The exact reproduction also typechecks against current compiled public declarations. Existing preset tests still pass: **20 tests / 57 assertions**. Fresh preset build and declaration/artifact checks pass.\n\nOriginal executable source and outputs: local run `20261023T072954-discovery-preset-basic`, `preset-policy-repro.ts`, `preset-policy-red.log`, `preset-policy-types.log`, `preset-build.log`, and `preset-tests.log`.\n\n## Contract and cause\n\n[ADR0066](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/docs/adr/0066-publish-a-backend-neutral-basic-canvas-composition.md) keeps the preset an ordinary Composition with Interaction owning policy validation. The existing public [readiness tests](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/packages/preset-basic/tests/readiness.test.ts) require creation-time Interaction snapshots, original Interaction failures, and supported inherited/non-enumerable Connection fields. [InteractionConfig](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/packages/plugin-interaction/src/contracts.ts) is a readonly structural interface. Direct [Interaction normalization](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/packages/plugin-interaction/src/interaction-config.ts) reads its known numeric properties normally.\n\nThe preset's `snapshotInteractionConfig()` explicitly captures Connection, but obtains `dragThreshold`, `wheelZoomSensitivity`, `minZoom` and `maxZoom` only from object rest/spread. Rest/spread excludes inherited and non-enumerable properties. Interaction therefore validates defaults instead of the supplied policy. The defect belongs to the preset's ownership transfer, not Interaction validation.\n\n## Acceptance\n\n- Capture all four existing numeric Interaction policy properties through their normal public property reads at Composition creation, once each, and retain those values in the owned snapshot across caller mutation and fresh Host installations.\n- Inherited, non-enumerable and ordinary enumerable policies must retain the same supported values. Invalid supplied policies must still fail through Interaction's existing INVALID_CONFIG validation instead of becoming defaults.\n- Preserve the original first-read getter exception identity; valid/default/undefined behavior; existing Connection single capture and nested snapshot; unknown/malformed field handling; Renderer config identity and ordinary readiness, rollback and cleanup.\n- Repair the shared preset factory with the smallest sufficient change. Do not change public interfaces, validation ownership, optional Plugin installation, algorithm policies, security rules or Runtime behavior. No accessor ban, retry, cap, fallback or dependency.\n- Use the existing public Host/Composition/Renderer seam for red/green and relevant valid/invalid/getter/fresh-Host controls, then connected consumers and affected checks, independent Standards with ponytail-review and Spec, the versioned formal full check, exact source/tree/first-parent publication, current-head CI and complete immutable report/media readback.\n- Keep this Issue open until human merge, actual main integration and whole-Issue acceptance. Public API policy regressions and ordinary browser Canvas scenes establish different coverage.\n\n## Deduplication\n\nComplete all-state collections contain **99 Issue/PR records and 51 PRs**, both through final short pages. Full #84 and #86 bodies and all discussion were read: #84 / PR #85 retain the Connection object across changing getters; #86 / PR #87 retain its validated materializer in direct Interaction. Neither preserves these four numeric policy properties through the preset. Current #96 / PR #97 and #98 / PR #99 repair Runtime Binding descriptors and Layout Engine identity, respectively; they do not touch this factory.\n",
+    "plan": [
+      {
+        "id": "public-policy-regression-and-fix",
+        "blockedBy": [],
+        "acceptance": "Public Host/Composition red-green retains four numeric policies for inherited/non-enumerable fields; original getter failures and one capture per property remain observable."
+      },
+      {
+        "id": "affected-consumers",
+        "blockedBy": [
+          "public-policy-regression-and-fix"
+        ],
+        "acceptance": "Current affected consumers/types and compiled original reproduction pass; valid policies, fresh Hosts, defaults and prior Connection/lifecycle behavior preserved."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "affected-consumers"
+        ],
+        "acceptance": "Independent Standards with ponytail-review and Spec inspect exact committed head/tree/full binary patch against original Issue100 and applicable ADRs."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Pinned deployed main agents:run verify executes the actual full check after both reviews pass and retains original logs."
+      },
+      {
+        "id": "source-publication",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Actual remote tree equals verified tree and first parent matches independently saved append parent."
+      },
+      {
+        "id": "current-head-ci-and-reports",
+        "blockedBy": [
+          "source-publication"
+        ],
+        "acceptance": "Current published-head CI, complete paginated feedback, full report and applicable preview artifacts pass immutable byte/hash readback."
+      },
+      {
+        "id": "human-merge",
+        "blockedBy": [
+          "current-head-ci-and-reports"
+        ],
+        "acceptance": "Human review and normal protected merge to main."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "human-merge"
+        ],
+        "acceptance": "Fetched actual main includes delivery merge and passes fresh whole-Issue public acceptance before closure."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "65b1da44adec388fd586d9806670ce3895972752",
+      "tree": "a4c45edaf0ef9ec63f3e0bdeb3ee6e9983adde93",
+      "patch": "bda03b6671b10f555d74473aff2fa4f39350bf84019c7a4bcb0a67f91fa0221f",
+      "report": "/Users/zhou/.codex/local-workflows/nodebraid/runs/6effc8e5-4000-4e99-a7db-33a105722045/reviews/65b1da44adec388fd586d9806670ce3895972752/standards.md"
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "65b1da44adec388fd586d9806670ce3895972752",
+      "tree": "a4c45edaf0ef9ec63f3e0bdeb3ee6e9983adde93",
+      "patch": "bda03b6671b10f555d74473aff2fa4f39350bf84019c7a4bcb0a67f91fa0221f",
+      "report": "/Users/zhou/.codex/local-workflows/nodebraid/runs/6effc8e5-4000-4e99-a7db-33a105722045/reviews/65b1da44adec388fd586d9806670ce3895972752/spec.md"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "conformant-public-policy-red",
+      "acceptance": "Type-valid public regressions against original main factory reject bad policy but fail because inherited/non-enumerable fields are dropped. Source was restored in finally; unchanged final fixtures then pass the fixed factory. Retained original failing execution.",
+      "command": "bun test packages/preset-basic/tests/numeric-policy.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "current-public-composition",
+      "acceptance": "Current 65b1 source passes47 Composition public tests/147 assertions. Real public Renderer Input verifies sensitivity/clamps/drag threshold for enumerable/inherited/non-enumerable fields, caller mutation, two fresh Hosts, exact original getter errors and actual cleanup. This is public API input, not native browser input.",
+      "command": "bun test packages/preset-basic/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "current-connected-public-seams",
+      "acceptance": "Current exact committed source passes connected preset, direct Interaction and Renderer public seam suites, preserving configuration ownership, original domain errors, lifecycle and actual backend seam behavior.",
+      "command": "bun test packages/preset-basic/tests packages/plugin-interaction/tests packages/plugin-renderer/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "current-original-compiled-repro",
+      "acceptance": "Original six real public-package comparisons repeated with only nine compiled package paths adapted to the task checkout. Both direct Interaction and preset now reject all three invalid-policy property forms with INVALID_CONFIG; every actual Host is disposed.",
+      "command": "bun compiled-policy-repro.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "current-affected-consumers",
+      "acceptance": "Actual affected checks include core facade/preset/root Layout composition, Example browser suites and documentation. Passed before commit at byte-identical source; committed identity recorded independently in inspection.json.",
+      "command": "bun run check:affected --base origin/main",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "historical-test-literal-failure",
+      "acceptance": "Initial supplemental test used a transposed literal for exp(0.1). Original failure retained; corrected expected literal to1.1051709180756477 without changing tolerance/production, then real conformant red/green rerun. Not a current-source delivery failure.",
+      "command": "bun test packages/preset-basic/tests",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "historical-bun-each-types",
+      "acceptance": "Initial readonly literal tuple was passed directly to Bun test.each, whose declarations require a mutable array. Original type error retained; use a mutable copy without changing inputs. Corrected fixtures typecheck even with original production before definitive red replay.",
+      "command": "bunx tsgo --noEmit -p packages/preset-basic/tsconfig.json",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-7.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "278dfe68cdb4127e75856f2e87a68b82b282dabf030a7f62da5889115dabf6b0"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "c25c9262ffe4d7f7c0d748c27dac38c252e81957ca7da1743fa7523774b5a77c"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "504cb407340622511854ab968c3eb710d1486eac2cebffd4650c2d493a948dc9"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "85dbec45fadebf78e26b6f1b0ca72dfcc872ae123a88efa3b1f9ee40eb154fcc"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "1bcc1fc124c30f4246441cc2475160fcfc816d038cc4c74465768008e17a7652"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "eaf9ceea3979f259c79ce59b5536df4612e62b7e264197abb688091b2f53525e"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "b8d04da39e31f5b8f2d25c2adf3b441fda37b53b6aca63438ae4788dae8aaf6a"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "909ccc9761982c0fa20c92109366d0fe213372b28a041ef3a9c66c5aded588a9"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "9afdd9fe6b821d35738a8732cce0385890f1e0b897c41f81a0a45fc8fcae35db"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "8b8ed97484aa7d118ea2c9b7a080eea9c20f8db9bb37136b11ab2506bc41c282"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "a8e18d3cdb1888ca87ab9d1af0fe5e4100958d8432349a3cd948424c91cd25a2"
+    }
+  ]
+}

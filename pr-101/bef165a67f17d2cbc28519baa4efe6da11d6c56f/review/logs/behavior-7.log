@@ -1,0 +1,9 @@
+packages/preset-basic/tests/numeric-policy.test.ts(18,13): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    The type 'readonly ["enumerable", "inherited", "non-enumerable"]' is 'readonly' and cannot be assigned to the mutable type 'unknown[]'.
+packages/preset-basic/tests/numeric-policy.test.ts(38,11): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    The type 'readonly ["enumerable", "inherited", "non-enumerable"]' is 'readonly' and cannot be assigned to the mutable type 'unknown[]'.
+packages/preset-basic/tests/numeric-policy.test.ts(88,13): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    The type 'readonly ["enumerable", "inherited", "non-enumerable"]' is 'readonly' and cannot be assigned to the mutable type 'unknown[]'.

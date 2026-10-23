@@ -1,0 +1,7 @@
+{"route":"direct","kind":"enumerable","status":"failed","code":"INVALID_CONFIG"}
+{"route":"preset","kind":"enumerable","status":"failed","code":"INVALID_CONFIG"}
+{"route":"direct","kind":"inherited","status":"failed","code":"INVALID_CONFIG"}
+{"route":"preset","kind":"inherited","status":"failed","code":"INVALID_CONFIG"}
+{"route":"direct","kind":"non-enumerable","status":"failed","code":"INVALID_CONFIG"}
+{"route":"preset","kind":"non-enumerable","status":"failed","code":"INVALID_CONFIG"}
+All invalid policy routes rejected.

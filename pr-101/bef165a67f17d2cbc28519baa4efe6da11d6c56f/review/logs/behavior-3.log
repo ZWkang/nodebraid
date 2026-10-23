@@ -1,0 +1,140 @@
+bun test v1.4.2 (744846f84)
+
+packages/preset-basic/tests/index.test.ts:
+(pass) Composition readiness publishes every base Service through static bindings [34.92ms]
+
+packages/preset-basic/tests/types.test.ts:
+(pass) Basic Canvas Composition preserves required Renderer config and provides no Service [6.00ms]
+
+packages/preset-basic/tests/numeric-policy.test.ts:
+(pass) Composition preserves invalid dragThreshold from enumerable policy fields [3.41ms]
+(pass) Composition preserves invalid dragThreshold from inherited policy fields [2.58ms]
+(pass) Composition preserves invalid dragThreshold from non-enumerable policy fields [1.97ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from enumerable policy fields [1.64ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from inherited policy fields [2.04ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from non-enumerable policy fields [6.61ms]
+(pass) Composition preserves invalid minZoom from enumerable policy fields [1.30ms]
+(pass) Composition preserves invalid minZoom from inherited policy fields [0.94ms]
+(pass) Composition preserves invalid minZoom from non-enumerable policy fields [1.37ms]
+(pass) Composition preserves invalid maxZoom from enumerable policy fields [2.99ms]
+(pass) Composition preserves invalid maxZoom from inherited policy fields [1.25ms]
+(pass) Composition preserves invalid maxZoom from non-enumerable policy fields [0.94ms]
+(pass) Composition retains valid enumerable policies across mutation and fresh Hosts [3.60ms]
+(pass) Composition retains valid inherited policies across mutation and fresh Hosts [3.97ms]
+(pass) Composition retains valid non-enumerable policies across mutation and fresh Hosts [2.12ms]
+(pass) Composition preserves the original enumerable dragThreshold getter failure [0.17ms]
+(pass) Composition preserves the original inherited dragThreshold getter failure
+(pass) Composition preserves the original non-enumerable dragThreshold getter failure
+(pass) Composition preserves the original enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original inherited wheelZoomSensitivity getter failure
+(pass) Composition preserves the original non-enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original enumerable minZoom getter failure
+(pass) Composition preserves the original inherited minZoom getter failure
+(pass) Composition preserves the original non-enumerable minZoom getter failure
+(pass) Composition preserves the original enumerable maxZoom getter failure
+(pass) Composition preserves the original inherited maxZoom getter failure
+(pass) Composition preserves the original non-enumerable maxZoom getter failure
+
+packages/preset-basic/tests/readiness.test.ts:
+(pass) invalid Interaction options fail the Composition with the original Interaction error [1.31ms]
+(pass) Composition snapshots Interaction options when the Plugin is created [1.04ms]
+(pass) Composition snapshots nested Connection options when the Plugin is created [0.99ms]
+(pass) Composition keeps the Connection value captured before a caller getter changes [2.62ms]
+(pass) Composition owns inherited Connection options across fresh Host installations [2.89ms]
+(pass) Composition owns non-enumerable Connection options across fresh Host installations [2.63ms]
+(pass) Composition preserves the original Connection getter failure at creation [0.10ms]
+(pass) Composition leaves malformed Connection validation with Interaction [0.86ms]
+(pass) Composition creation rejects malformed or unknown top-level options [1.15ms]
+(pass) Composition waits for an asynchronous Renderer before becoming active [1.72ms]
+(pass) Renderer Factory failure keeps its identity and releases the Child tree for reinstall [2.05ms]
+
+packages/preset-basic/tests/lifecycle.test.ts:
+(pass) existing standard Provider makes Basic Canvas Composition fail explicitly [1.15ms]
+(pass) second Basic Canvas Composition conflicts without disturbing the active one [1.38ms]
+(pass) a later Renderer Provider conflict rolls back earlier Child reservations [2.10ms]
+(pass) Composition disposes consumers before Renderer and awaits asynchronous Renderer cleanup [2.46ms]
+(pass) Composition cleanup attempts every Renderer resource and preserves all failures [1.66ms]
+(pass) Composition diagnostics expose the complete reverse Child cleanup order [2.67ms]
+
+packages/preset-basic/tests/package-import.test.ts:
+(pass) package-name import exposes the Basic Canvas Composition factory [1.95ms]
+
+packages/plugin-interaction/tests/input-cleanup.test.ts:
+(pass) a failed Selection transition releases Pointer Capture before reporting the Input fault [4.22ms]
+
+packages/plugin-interaction/tests/types.test.ts:
+(pass) publishes Interaction as a Runtime Plugin with a narrow Shortcut contribution Service [0.03ms]
+
+packages/plugin-interaction/tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [4.96ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [2.33ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [6.22ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [7.63ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [3.70ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [1.21ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [0.91ms]
+
+packages/plugin-interaction/tests/create-edge-command.test.ts:
+(pass) Create Edge commits one complete Node-level Edge [2.62ms]
+
+packages/plugin-interaction/tests/selection-transition.test.ts:
+(pass) a Port click selects its owning Node without inventing a Port selection [0.05ms]
+
+packages/plugin-interaction/tests/config.test.ts:
+(pass) Interaction accepts an explicit synchronous Connection materializer [1.83ms]
+(pass) Interaction rejects unknown config fields through Plugin installation [1.24ms]
+(pass) Interaction rejects malformed numeric config without coercion [3.47ms]
+(pass) Interaction revalidates the materializer on recovery and preserves its read failure [1.12ms]
+
+packages/plugin-interaction/tests/lifecycle.test.ts:
+(pass) Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh [2.79ms]
+(pass) Delete Selection registration follows dependency reactivation and disposal lifecycle [1.37ms]
+(pass) Connection materializer failure keeps identity and reports exactly once after terminal cleanup [3.93ms]
+(pass) Connection dependency recovery creates a fresh idle Activation [1.45ms]
+(pass) Connection final Hit Test failure still clears Preview and releases Capture [0.84ms]
+(pass) Connection Escape attempts every terminal cleanup and never materializes after cleanup failure [0.93ms]
+(pass) Box Selection disposal continues after every public Renderer cleanup failure [2.71ms]
+(pass) Box Selection escape exposes every terminal cleanup failure [2.04ms]
+(pass) Box Selection pointer-cancel exposes every terminal cleanup failure [0.90ms]
+(pass) Interaction dependency recovery creates a fresh idle Activation [1.58ms]
+(pass) an input-driven Command rejection is reported exactly once while Interaction is active [2.88ms]
+(pass) a late Command rejection cannot report through an ended Interaction Activation [2.20ms]
+(pass) a recovered Renderer reset receives the still-compatible Active Gesture again [2.86ms]
+
+packages/plugin-interaction/tests/move-nodes-command.test.ts:
+(pass) Move Nodes rejects an empty input without changing Document [1.65ms]
+
+packages/plugin-interaction/tests/diagnostic-events.test.ts:
+(pass) publishes the stable Interaction diagnostic event catalog [0.02ms]
+
+packages/plugin-interaction/tests/port-connection.test.ts:
+(pass) Port Gesture tracks target loss, materializes exact Endpoints once, and cancels on source loss [3.17ms]
+(pass) Connection Gesture uses the materializer accepted before its getter changes [2.77ms]
+
+packages/plugin-interaction/tests/delete-selection-input.test.ts:
+(pass) a live Interaction Shortcut Binding executes its Command and prevents the matched input default [4.37ms]
+(pass) logical Delete key removes the current Selection through the public Renderer Input seam [2.97ms]
+(pass) physical Delete accepts modifiers and repeat while empty Selection and Backspace remain no-ops [6.17ms]
+(pass) Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connection without cancelling them [11.52ms]
+(pass) Delete Transaction failure preserves state and reports the original diagnostic identity exactly once [3.61ms]
+
+packages/plugin-renderer/tests/index.test.ts:
+(pass) @nodebraid/plugin-renderer > publishes the stable Renderer diagnostic event catalog [0.02ms]
+(pass) @nodebraid/plugin-renderer > creates one Renderer and publishes only the narrow Runtime Service [2.03ms]
+(pass) @nodebraid/plugin-renderer > keeps every delivered Session resolvable while Document entities are removed [1.01ms]
+(pass) @nodebraid/plugin-renderer > waits for reentrant Session reconciliation before delivering a deleting Commit [0.72ms]
+(pass) @nodebraid/plugin-renderer > delegates input, hit testing, capture and focus without exposing update methods [0.67ms]
+(pass) @nodebraid/plugin-renderer > binds one exclusive Interaction Projection writer for the Renderer Activation [0.57ms]
+(pass) @nodebraid/plugin-renderer > isolates Input listener faults through Host diagnostics [0.76ms]
+(pass) @nodebraid/plugin-renderer > reports an out-of-sync Renderer and re-establishes its current baseline [2.16ms]
+(pass) @nodebraid/plugin-renderer > attempts one full recovery after an arbitrary internal synchronization fault [0.63ms]
+(pass) @nodebraid/plugin-renderer > enters terminal Sync Failure when the single full recovery also fails [1.27ms]
+(pass) @nodebraid/plugin-renderer > does not report queued Commits already subsumed by an out-of-sync reset [1.07ms]
+
+packages/plugin-renderer/tests/types.test.ts:
+(pass) binds Provider config without exposing CanvasRenderer update authority
+
+ 96 pass
+ 0 fail
+ 404 expect() calls
+Ran 96 tests across 19 files. [350.00ms]

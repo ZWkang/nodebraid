@@ -1,0 +1,363 @@
+bun test v1.4.2 (744846f84)
+
+packages/preset-basic/tests/numeric-policy.test.ts:
+(pass) Composition preserves invalid dragThreshold from enumerable policy fields [49.02ms]
+24 |     const plugin = createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+25 |     const host = createPluginHost();
+26 |     const composition = host.install(plugin);
+27 |     try {
+28 |       const error = await composition.whenActive().catch((reason: unknown) => reason);
+29 |       expect(error).toBeInstanceOf(InteractionError);
+                         ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class InteractionError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:29:21)
+(fail) Composition preserves invalid dragThreshold from inherited policy fields [9.25ms]
+24 |     const plugin = createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+25 |     const host = createPluginHost();
+26 |     const composition = host.install(plugin);
+27 |     try {
+28 |       const error = await composition.whenActive().catch((reason: unknown) => reason);
+29 |       expect(error).toBeInstanceOf(InteractionError);
+                         ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class InteractionError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:29:21)
+(fail) Composition preserves invalid dragThreshold from non-enumerable policy fields [2.95ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from enumerable policy fields [1.34ms]
+24 |     const plugin = createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+25 |     const host = createPluginHost();
+26 |     const composition = host.install(plugin);
+27 |     try {
+28 |       const error = await composition.whenActive().catch((reason: unknown) => reason);
+29 |       expect(error).toBeInstanceOf(InteractionError);
+                         ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class InteractionError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:29:21)
+(fail) Composition preserves invalid wheelZoomSensitivity from inherited policy fields [1.50ms]
+24 |     const plugin = createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+25 |     const host = createPluginHost();
+26 |     const composition = host.install(plugin);
+27 |     try {
+28 |       const error = await composition.whenActive().catch((reason: unknown) => reason);
+29 |       expect(error).toBeInstanceOf(InteractionError);
+                         ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class InteractionError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:29:21)
+(fail) Composition preserves invalid wheelZoomSensitivity from non-enumerable policy fields [5.97ms]
+(pass) Composition preserves invalid minZoom from enumerable policy fields [2.40ms]
+24 |     const plugin = createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+25 |     const host = createPluginHost();
+26 |     const composition = host.install(plugin);
+27 |     try {
+28 |       const error = await composition.whenActive().catch((reason: unknown) => reason);
+29 |       expect(error).toBeInstanceOf(InteractionError);
+                         ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class InteractionError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:29:21)
+(fail) Composition preserves invalid minZoom from inherited policy fields [7.46ms]
+24 |     const plugin = createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+25 |     const host = createPluginHost();
+26 |     const composition = host.install(plugin);
+27 |     try {
+28 |       const error = await composition.whenActive().catch((reason: unknown) => reason);
+29 |       expect(error).toBeInstanceOf(InteractionError);
+                         ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class InteractionError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:29:21)
+(fail) Composition preserves invalid minZoom from non-enumerable policy fields [1.40ms]
+(pass) Composition preserves invalid maxZoom from enumerable policy fields [1.80ms]
+24 |     const plugin = createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+25 |     const host = createPluginHost();
+26 |     const composition = host.install(plugin);
+27 |     try {
+28 |       const error = await composition.whenActive().catch((reason: unknown) => reason);
+29 |       expect(error).toBeInstanceOf(InteractionError);
+                         ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class InteractionError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:29:21)
+(fail) Composition preserves invalid maxZoom from inherited policy fields [1.09ms]
+24 |     const plugin = createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+25 |     const host = createPluginHost();
+26 |     const composition = host.install(plugin);
+27 |     try {
+28 |       const error = await composition.whenActive().catch((reason: unknown) => reason);
+29 |       expect(error).toBeInstanceOf(InteractionError);
+                         ^
+error: expect(received).toBeInstanceOf(expected)
+
+Expected constructor: [class InteractionError extends NodeBraidError]
+Received value: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:29:21)
+(fail) Composition preserves invalid maxZoom from non-enumerable policy fields [1.19ms]
+(pass) Composition retains valid enumerable policies across mutation and fresh Hosts [5.04ms]
+54 |     kind === 'inherited'
+55 |       ? Object.create(Object.defineProperties({}, properties))
+56 |       : Object.defineProperties({}, properties);
+57 |   let renderer: PolicyRenderer;
+58 |   const plugin = createBasicCanvasPlugin(() => (renderer = new PolicyRenderer()), { interaction });
+59 |   expect(reads).toEqual({ dragThreshold: 1, wheelZoomSensitivity: 1, minZoom: 1, maxZoom: 1 });
+                     ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "dragThreshold": 1,
+-   "maxZoom": 1,
+-   "minZoom": 1,
+-   "wheelZoomSensitivity": 1,
++   "dragThreshold": 0,
++   "maxZoom": 0,
++   "minZoom": 0,
++   "wheelZoomSensitivity": 0,
+  }
+
+- Expected  - 4
++ Received  + 4
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:59:17)
+(fail) Composition retains valid inherited policies across mutation and fresh Hosts [2.04ms]
+54 |     kind === 'inherited'
+55 |       ? Object.create(Object.defineProperties({}, properties))
+56 |       : Object.defineProperties({}, properties);
+57 |   let renderer: PolicyRenderer;
+58 |   const plugin = createBasicCanvasPlugin(() => (renderer = new PolicyRenderer()), { interaction });
+59 |   expect(reads).toEqual({ dragThreshold: 1, wheelZoomSensitivity: 1, minZoom: 1, maxZoom: 1 });
+                     ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "dragThreshold": 1,
+-   "maxZoom": 1,
+-   "minZoom": 1,
+-   "wheelZoomSensitivity": 1,
++   "dragThreshold": 0,
++   "maxZoom": 0,
++   "minZoom": 0,
++   "wheelZoomSensitivity": 0,
+  }
+
+- Expected  - 4
++ Received  + 4
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:59:17)
+(fail) Composition retains valid non-enumerable policies across mutation and fresh Hosts [0.14ms]
+(pass) Composition preserves the original enumerable dragThreshold getter failure [0.14ms]
+103 |     try {
+104 |       createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+105 |     } catch (error) {
+106 |       actual = error;
+107 |     }
+108 |     expect(actual).toBe(original);
+                         ^
+error: expect(received).toBe(expected)
+
+Expected: 84 |   expect(reads).toEqual({ dragThreshold: 1, wheelZoomSensitivity: 1, minZoom: 1, maxZoom: 1 });
+85 | });
+86 | 
+87 | for (const [field] of fields) {
+88 |   test.each([...propertyKinds])(`Composition preserves the original %s ${field} getter failure`, (kind) => {
+89 |     const original = new Error(`${field} read failed`);
+                              ^
+error: dragThreshold read failed
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:89:26)
+
+Received: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:108:20)
+(fail) Composition preserves the original inherited dragThreshold getter failure [0.57ms]
+103 |     try {
+104 |       createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+105 |     } catch (error) {
+106 |       actual = error;
+107 |     }
+108 |     expect(actual).toBe(original);
+                         ^
+error: expect(received).toBe(expected)
+
+Expected: 84 |   expect(reads).toEqual({ dragThreshold: 1, wheelZoomSensitivity: 1, minZoom: 1, maxZoom: 1 });
+85 | });
+86 | 
+87 | for (const [field] of fields) {
+88 |   test.each([...propertyKinds])(`Composition preserves the original %s ${field} getter failure`, (kind) => {
+89 |     const original = new Error(`${field} read failed`);
+                              ^
+error: dragThreshold read failed
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:89:26)
+
+Received: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:108:20)
+(fail) Composition preserves the original non-enumerable dragThreshold getter failure [0.06ms]
+(pass) Composition preserves the original enumerable wheelZoomSensitivity getter failure
+103 |     try {
+104 |       createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+105 |     } catch (error) {
+106 |       actual = error;
+107 |     }
+108 |     expect(actual).toBe(original);
+                         ^
+error: expect(received).toBe(expected)
+
+Expected: 84 |   expect(reads).toEqual({ dragThreshold: 1, wheelZoomSensitivity: 1, minZoom: 1, maxZoom: 1 });
+85 | });
+86 | 
+87 | for (const [field] of fields) {
+88 |   test.each([...propertyKinds])(`Composition preserves the original %s ${field} getter failure`, (kind) => {
+89 |     const original = new Error(`${field} read failed`);
+                              ^
+error: wheelZoomSensitivity read failed
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:89:26)
+
+Received: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:108:20)
+(fail) Composition preserves the original inherited wheelZoomSensitivity getter failure [0.05ms]
+103 |     try {
+104 |       createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+105 |     } catch (error) {
+106 |       actual = error;
+107 |     }
+108 |     expect(actual).toBe(original);
+                         ^
+error: expect(received).toBe(expected)
+
+Expected: 84 |   expect(reads).toEqual({ dragThreshold: 1, wheelZoomSensitivity: 1, minZoom: 1, maxZoom: 1 });
+85 | });
+86 | 
+87 | for (const [field] of fields) {
+88 |   test.each([...propertyKinds])(`Composition preserves the original %s ${field} getter failure`, (kind) => {
+89 |     const original = new Error(`${field} read failed`);
+                              ^
+error: wheelZoomSensitivity read failed
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:89:26)
+
+Received: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:108:20)
+(fail) Composition preserves the original non-enumerable wheelZoomSensitivity getter failure [0.07ms]
+(pass) Composition preserves the original enumerable minZoom getter failure
+103 |     try {
+104 |       createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+105 |     } catch (error) {
+106 |       actual = error;
+107 |     }
+108 |     expect(actual).toBe(original);
+                         ^
+error: expect(received).toBe(expected)
+
+Expected: 84 |   expect(reads).toEqual({ dragThreshold: 1, wheelZoomSensitivity: 1, minZoom: 1, maxZoom: 1 });
+85 | });
+86 | 
+87 | for (const [field] of fields) {
+88 |   test.each([...propertyKinds])(`Composition preserves the original %s ${field} getter failure`, (kind) => {
+89 |     const original = new Error(`${field} read failed`);
+                              ^
+error: minZoom read failed
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:89:26)
+
+Received: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:108:20)
+(fail) Composition preserves the original inherited minZoom getter failure [0.05ms]
+103 |     try {
+104 |       createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+105 |     } catch (error) {
+106 |       actual = error;
+107 |     }
+108 |     expect(actual).toBe(original);
+                         ^
+error: expect(received).toBe(expected)
+
+Expected: 84 |   expect(reads).toEqual({ dragThreshold: 1, wheelZoomSensitivity: 1, minZoom: 1, maxZoom: 1 });
+85 | });
+86 | 
+87 | for (const [field] of fields) {
+88 |   test.each([...propertyKinds])(`Composition preserves the original %s ${field} getter failure`, (kind) => {
+89 |     const original = new Error(`${field} read failed`);
+                              ^
+error: minZoom read failed
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:89:26)
+
+Received: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:108:20)
+(fail) Composition preserves the original non-enumerable minZoom getter failure [0.07ms]
+(pass) Composition preserves the original enumerable maxZoom getter failure
+103 |     try {
+104 |       createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+105 |     } catch (error) {
+106 |       actual = error;
+107 |     }
+108 |     expect(actual).toBe(original);
+                         ^
+error: expect(received).toBe(expected)
+
+Expected: 84 |   expect(reads).toEqual({ dragThreshold: 1, wheelZoomSensitivity: 1, minZoom: 1, maxZoom: 1 });
+85 | });
+86 | 
+87 | for (const [field] of fields) {
+88 |   test.each([...propertyKinds])(`Composition preserves the original %s ${field} getter failure`, (kind) => {
+89 |     const original = new Error(`${field} read failed`);
+                              ^
+error: maxZoom read failed
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:89:26)
+
+Received: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:108:20)
+(fail) Composition preserves the original inherited maxZoom getter failure [0.06ms]
+103 |     try {
+104 |       createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction });
+105 |     } catch (error) {
+106 |       actual = error;
+107 |     }
+108 |     expect(actual).toBe(original);
+                         ^
+error: expect(received).toBe(expected)
+
+Expected: 84 |   expect(reads).toEqual({ dragThreshold: 1, wheelZoomSensitivity: 1, minZoom: 1, maxZoom: 1 });
+85 | });
+86 | 
+87 | for (const [field] of fields) {
+88 |   test.each([...propertyKinds])(`Composition preserves the original %s ${field} getter failure`, (kind) => {
+89 |     const original = new Error(`${field} read failed`);
+                              ^
+error: maxZoom read failed
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:89:26)
+
+Received: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/tests/numeric-policy.test.ts:108:20)
+(fail) Composition preserves the original non-enumerable maxZoom getter failure [0.06ms]
+
+ 9 pass
+ 18 fail
+ 48 expect() calls
+Ran 27 tests across 1 file. [179.00ms]
