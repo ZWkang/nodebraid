@@ -46,10 +46,11 @@ export function resolveInteractionConfig(config: InteractionConfig | undefined):
         throw new InteractionError('INVALID_CONFIG', 'Interaction connection config contains an unknown field.');
       }
     }
-    if (typeof resolved.connection.materializeEdge !== 'function') {
+    const materializeEdge = resolved.connection.materializeEdge;
+    if (typeof materializeEdge !== 'function') {
       throw new InteractionError('INVALID_CONFIG', 'Interaction connection materializeEdge must be a function.');
     }
-    resolved.connection = Object.freeze({ materializeEdge: resolved.connection.materializeEdge });
+    resolved.connection = Object.freeze({ materializeEdge });
   }
   return Object.freeze(resolved);
 }
