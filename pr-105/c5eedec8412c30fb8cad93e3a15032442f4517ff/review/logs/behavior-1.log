@@ -1,0 +1,21 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/move-input-values.test.ts:
+28 |  try{
+29 |   const before=kernel.read(),historyBefore=history.getSnapshot(),allowed=validMove();
+30 |   const stale:MoveNodeInput={nodeId:b,basePosition:{x:99,y:0},position:{x:120,y:0}};
+31 |   const moves=[allowed,stale];let traversals=0;
+32 |   Object.defineProperty(moves,Symbol.iterator,{value:function*(){traversals++;yield traversals<4?allowed:stale;}});
+33 |   await expect(commands.execute(moveNodesCommand,{moves})).rejects.toMatchObject({domain:'interaction',code:'STALE_GESTURE'});
+                                                                        ^
+error: expect(received).rejects.toMatchObject(expected)
+
+Expected promise that rejects
+Received promise that resolved: Promise { <resolved> }
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/move-input-values.test.ts:33:68)
+(fail) Move Nodes cannot substitute a stale target through repeated caller array traversal [59.46ms]
+
+ 0 pass
+ 1 fail
+Ran 1 test across 1 file. [190.00ms]
