@@ -51,12 +51,12 @@ function resolveInteractionOptions(options: BasicCanvasPluginOptions | undefined
 function snapshotInteractionConfig(config: InteractionConfig | undefined): InteractionConfig | undefined {
   const input: unknown = config;
   if (input === undefined || input === null || typeof input !== 'object' || Array.isArray(input)) return config;
-  const accepted = config as InteractionConfig;
-  const connection = accepted.connection;
+  const { connection, ...snapshot } = config as InteractionConfig;
   return Object.freeze({
-    ...accepted,
-    ...(connection !== undefined && connection !== null && typeof connection === 'object' && !Array.isArray(connection)
-      ? { connection: Object.freeze({ ...connection }) }
-      : {}),
+    ...snapshot,
+    connection:
+      connection !== undefined && connection !== null && typeof connection === 'object' && !Array.isArray(connection)
+        ? Object.freeze({ ...connection })
+        : connection,
   });
 }
