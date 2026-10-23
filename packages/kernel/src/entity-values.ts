@@ -2,13 +2,19 @@ import type { CanvasEdge, CanvasNode, EdgeEndpoint, Point, Size } from './contra
 import { edgeId, nodeId, type EdgeId, type NodeId } from './identifiers';
 
 export function freezeCanvasNode(node: CanvasNode, id: NodeId): CanvasNode {
+  const type = node.type;
+  const position = node.position;
+  const ownedPosition = Object.freeze({ x: position.x, y: position.y });
+  const size = node.size;
+  const ownedSize = size === undefined ? undefined : Object.freeze({ width: size.width, height: size.height });
+  const parentId = node.parentId;
   // Copy and freeze only NodeBraid-owned shells. Arbitrary data intentionally keeps its original reference.
   return Object.freeze({
     id,
-    type: node.type,
-    position: Object.freeze({ x: node.position.x, y: node.position.y }),
-    ...(node.size === undefined ? {} : { size: Object.freeze({ width: node.size.width, height: node.size.height }) }),
-    ...(node.parentId === undefined ? {} : { parentId: node.parentId }),
+    type,
+    position: ownedPosition,
+    ...(ownedSize === undefined ? {} : { size: ownedSize }),
+    ...(parentId === undefined ? {} : { parentId }),
     data: node.data,
   });
 }
