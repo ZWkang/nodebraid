@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "45ac648f687b969463aec6a5ffde89b573e55052",
+    "expectedParent": "071b3490a44bda5176e15841700e3bc47afda3ce",
+    "head": "bca341cfc0082ef3319158405c8954013fe4e525",
+    "tree": "8ef16925fedfaf3ec393a939252f70f63aaa8e39",
+    "patch": "3e55c16602f7f28e1bf3c04cb4a8d23949a567c57c04763a7d78665da9e1a528",
+    "localHead": "f8d35f08ecf5f4b5ae26f4d291ebb38ee998ec49"
+  },
+  "task": {
+    "run": "d28eba0c-b3ca-4c2d-8e51-6f247099a1a3",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 84
+    },
+    "request": "## Confirmed defect\n\nOn fetched main `1c85d79db1e275e59f84a9bb77d1fe75c0a582e6`, Basic Canvas can retain a caller-owned nested Connection object after `createBasicCanvasPlugin()` has returned.\n\nA real compiled public-package Host/Composition probe compares two cases. In both, the application mutates `connection.materializeEdge` to an invalid value **after** creating the Plugin but **before** installing it:\n\n- Ordinary `{ interaction: { connection } }`: Composition becomes active, as expected from the existing creation-time snapshot contract.\n- A legal `interaction.connection` getter returns `undefined` on its first read and a valid mutable Connection object on its second read. Creation reads it twice and keeps the second object by reference; subsequent caller mutation makes Composition fail with `InteractionError / INVALID_CONFIG`.\n\nActual outcome:\n```json\n{\"control\":{\"readsAtCreation\":0,\"state\":\"active\",\"error\":null},\"actual\":{\"readsAtCreation\":2,\"state\":\"failed\",\"error\":{\"domain\":\"interaction\",\"code\":\"INVALID_CONFIG\",\"message\":\"Interaction connection materializeEdge must be a function.\"}}}\n```\n\nThe public assertion requiring the captured configuration to remain independent exits 1. Existing Basic Canvas tests pass (15 tests / 44 assertions). The original compiled-package source/output are retained in run `20261022T055513-discovery` (`preset-connection-repro.ts`, `preset-connection-red.log`).\n\n## Contract and cause\n\n[ADR 0066](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/docs/adr/0066-publish-a-backend-neutral-basic-canvas-composition.md) establishes the application-owned Renderer/Host and child Composition boundary. Existing public [readiness regressions](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/packages/preset-basic/tests/readiness.test.ts) explicitly require Interaction and nested Connection options to be snapshotted when the Plugin is created. Interaction remains the validation and input/gesture authority under ADR 0068.\n\nIn [snapshotInteractionConfig](https://github.com/ZWkang/nodebraid/blob/1c85d79db1e275e59f84a9bb77d1fe75c0a582e6/packages/preset-basic/src/preset-basic-plugin.ts), the first `accepted.connection` read decides whether to copy/freeze the nested shell, but spreading `accepted` reads the property again. When the first value is absent, a later object is inserted without an owned snapshot.\n\n## Acceptance\n\n- Capture a consistent Interaction configuration at Composition creation; the Connection value used to decide ownership must be the same value retained. Caller getters must not replace it during copying.\n- Preserve owned, frozen Connection options across later caller mutation and fresh Host installations. Retain the existing absent/default configuration and public lifecycle/readiness behavior.\n- Preserve malformed/unknown options, original getter/Renderer/Interaction failures, validation ownership and order, supported property semantics, Provider conflict/rollback and reverse cleanup. Add no API, dependency, accessor ban, cap, retry or fallback.\n- Add a public Host/Composition regression that fails before the repair and passes afterward, plus relevant stable/getter/default and original-error controls. Reuse the existing public Renderer adapter; it is not browser input evidence.\n- Run relevant Composition and connected Interaction/Runtime/Renderer checks, independent Standards + ponytail-review / Spec, full engineering verification, actual current-head CI and complete report/media publication/readback.\n- Keep this Issue open until actual main integration and final acceptance.\n\n## Deduplication\n\nComplete all-state metadata through the final short pages (83 Issues/PRs, 43 PRs) found no existing Composition Connection snapshot repair. #76 concerns Session mutators; #74 concerns Duplicate mappings; neither repairs this factory-time ownership boundary.",
+    "plan": [
+      {
+        "id": "synchronize-main",
+        "blockedBy": [],
+        "acceptance": "Capture current fetched main and published source head independently before append-only synchronization of the existing delivery branch. Preserve original Issue scope."
+      },
+      {
+        "id": "integration-compatibility",
+        "blockedBy": [
+          "synchronize-main"
+        ],
+        "acceptance": "Fresh public affected consumers and integration checks pass. Save complete current head/tree/binary patch; historical evidence retains its original source."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "integration-compatibility"
+        ],
+        "acceptance": "Fresh independent Standards with ponytail-review and Spec inspect the complete current patch against original Issue, ADRs and current main."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Pinned main versioned agents:run verify executes the real full bun run check after both review axes pass; preserve every attempt."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Actual remote tree and original append parent match verification; current-head CI, complete feedback, immutable full report/media publication and readback pass."
+      },
+      {
+        "id": "authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "Recheck current source/base, strict checks and all feedback immediately before a normal expected-head merge. Preserve review disputes and protection."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "authorized-merge"
+        ],
+        "acceptance": "Verify actual fetched main ancestry and the whole original Issue through fresh public acceptance; publish outcomes and close only after complete acceptance."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "f8d35f08ecf5f4b5ae26f4d291ebb38ee998ec49",
+      "tree": "8ef16925fedfaf3ec393a939252f70f63aaa8e39",
+      "patch": "3e55c16602f7f28e1bf3c04cb4a8d23949a567c57c04763a7d78665da9e1a528",
+      "verdict": "passed",
+      "report": "What this change does: Basic Canvas captures the Connection option once when creating the Plugin. It copies and freezes that captured value for later Host installations instead of reading the caller’s getter again.\n\nVerdict: passed. Looks good. Ship.\n\nReviewed identity:\n\n- Base: `45ac648f687b969463aec6a5ffde89b573e55052`\n- Head: `f8d35f08ecf5f4b5ae26f4d291ebb38ee998ec49`\n- Tree: `8ef16925fedfaf3ec393a939252f70f63aaa8e39`\n- Binary patch SHA256: `3e55c16602f7f28e1bf3c04cb4a8d23949a567c57c04763a7d78665da9e1a528`\n\nHard standards: no violations found. Read the complete two-file patch, all added readiness cases, Issue #84 with its empty discussion/blockers, prepared plan and supplied PR #85 context with complete empty comments/reviews/threads. Applied current AGENTS, CONTRIBUTING, CONTEXT, tracker/discussion rules, code-review and applicable principle guidance.\n\nThe factory keeps ownership of its captured configuration. Interaction still owns configuration validation and gesture behavior. Absent defaults, inherited/non-enumerable Connection properties, malformed values and original getter failures retain their intended treatment. Traced Examples → Composition → Child Installations → current Interaction capture and Session owned inputs, plus Renderer readiness and Runtime rollback/cleanup. This remains consistent with ADR0066/0068/0069 and ADR0028/0029.\n\nJudgment checks: no concrete Fowler smell found. Under one isolated Host per Canvas, reused across fresh installations as documented, the destructuring change is small and sufficient. It introduces no new abstraction, public interface, dependency, cap or fallback.\n\nIndependent checks: waited until dependency construction finished, then ran `bun test packages/preset-basic/tests packages/plugin-interaction/tests packages/plugin-session/tests packages/plugin-renderer/tests`: 105 tests / 440 assertions passed at this head. Coverage includes changing getters, inherited/non-enumerable Connection, multiple Hosts, defaults, original errors, current Interaction recovery, Session capture/FIFO, Provider conflicts and reverse cleanup. Renderer fixtures prove API/lifecycle behavior, not native browser input.\n\nVerified exact saved patch/hash, inspection/prepared-task binding, original remote head as first parent, captured main as second parent, clean worktree and `git diff --check`. Commands and raw results are in `standards-command-log.txt`.\n\nNot checked: fresh builds or typecheck, native browsers, full engineering gate, live feedback refresh, current-head remote CI, publication or merge. Historical TDD and previous-head results remain historical. This report covers independent Standards and ponytail-review only.\n"
+    },
+    "spec": {
+      "head": "f8d35f08ecf5f4b5ae26f4d291ebb38ee998ec49",
+      "tree": "8ef16925fedfaf3ec393a939252f70f63aaa8e39",
+      "patch": "3e55c16602f7f28e1bf3c04cb4a8d23949a567c57c04763a7d78665da9e1a528",
+      "verdict": "passed",
+      "report": "verdict: **passed**\n\n独立重审完整 Preset Basic source/readiness 两文件补丁及全部新增回归、原 Issue #84 全文/空讨论/依赖、独立 prepared plan、AGENTS/CONTEXT、tracker/讨论/code-review、ADR0066/0068/0069/0028/0029 与 Composition → Interaction → Command/Kernel/Session/Renderer 链。未发现规格遗漏、错误实现或范围扩张。\n\n满足“the Connection value used to decide ownership must be the same value retained”：factory 解构只读 Connection 一次，rest 保留其余 own-enumerable 配置，record Connection 从该值复制/冻结。后续 caller mutation 与 fresh Host 安装不能替换该 nested shell；absent/default、继承/非枚举 Connection、原始 getter/Renderer/Interaction 错误与既有校验顺序保持。Composition 等待全部 Child active，Provider conflict rollback 和 reverse cleanup 未改。与新 main 的 Interaction materializer 单次读取、Session ownership 兼容，无新 API、cache、accessor ban、cap 或 fallback。\n\n本轮实际运行 `bun test packages/preset-basic/tests packages/plugin-interaction/tests packages/plugin-session/tests packages/plugin-renderer/tests`：105 pass、0 fail、440 assertions；`git diff --check` 通过。命令、head/tree 和原始输出在 `spec-review-commands.log`。核对完整 patch/inspection、干净源码及 merge parents 071b349/main45ac，身份一致；历史 TDD 与旧报告保持原身份。\n\n当前 published 071b349 的完整 comments/reviews/threads 均空，无新增反馈；本地被审 head 尚未发布。公共 Recording Renderer 仅验证 seam/lifecycle，不代表 native browser。未独立执行 build、affected/docs 全套、full verify、新 head 远端 CI/反馈、报告发布回读或最终 merge/main 验收。\n\n- base: `45ac648f687b969463aec6a5ffde89b573e55052`\n- head: `f8d35f08ecf5f4b5ae26f4d291ebb38ee998ec49`\n- tree: `8ef16925fedfaf3ec393a939252f70f63aaa8e39`\n- binary patch SHA256: `3e55c16602f7f28e1bf3c04cb4a8d23949a567c57c04763a7d78665da9e1a528`\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "public-integration",
+      "acceptance": "Fresh current-head Preset Basic/Interaction/Session/Renderer public controls and regressions after main integration. Original TDD remains historical.",
+      "command": "bun test packages/preset-basic/tests packages/plugin-interaction/tests packages/plugin-session/tests packages/plugin-renderer/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "affected-integration",
+      "acceptance": "Fresh production/dev consumers, connected root composition tests, actual browser suites and documentation for integrated Interaction/Session and docs delta.",
+      "command": "bun run check:affected --base 071b3490a44bda5176e15841700e3bc47afda3ce",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "d6f68adf9c36bb15a2a3674ea3f3ec4ec09225b010112153525b6ce452fde286"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "efe337deafa4860f46d7b56118c449f5b4707a1e8600a353138bfac695a26592"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "a312a73467418246bfbb534ad1baa3408a07d695dc4ad1526cb8f8608814b118"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "d4ae97ae34622e155c64eb1f4e31410e7f3fe7886aaf8caed3a17b990020e821"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "974cc8fcae1423e585dbce1b92884b1e6a3f0464782f358393b1405cb44b7f36"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "ddadbcf8873184dd73ec2b15e63747ff6647c52cf06360d7bf19e37da04048d9"
+    }
+  ]
+}
