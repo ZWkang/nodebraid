@@ -11,8 +11,9 @@ import { definePlugin } from '@nodebraid/runtime-cordis';
 import type { CreateLayoutPluginOptions, LayoutCommandInput, LayoutCommandResult } from './contracts';
 
 export function createLayoutPlugin<Config>(options: CreateLayoutPluginOptions<Config>) {
+  const engine = options.engine;
   return definePlugin({
-    name: `@nodebraid/plugin-layout:${options.engine.id}`,
+    name: `@nodebraid/plugin-layout:${engine.id}`,
     requires: { kernel: kernelService, commands: commandService },
     setup(context) {
       const registration = context.services.commands.register(
@@ -23,8 +24,8 @@ export function createLayoutPlugin<Config>(options: CreateLayoutPluginOptions<Co
             mode: input.mode,
             fixedNodeIds: input.fixedNodeIds,
           });
-          assertLayoutCapabilities(options.engine.id, options.engine.capabilities, layoutInput);
-          const computed = await options.engine.compute(layoutInput, input.config, { signal: execution.signal });
+          assertLayoutCapabilities(engine.id, engine.capabilities, layoutInput);
+          const computed = await engine.compute(layoutInput, input.config, { signal: execution.signal });
           execution.signal.throwIfAborted();
           const proposal = validateLayoutProposal(layoutInput, computed);
           execution.signal.throwIfAborted();
