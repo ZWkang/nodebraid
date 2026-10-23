@@ -1,0 +1,792 @@
+bun test v1.4.2 (744846f84)
+
+packages/document/tests/index.test.ts:
+(pass) round-trips a complete Document and opaque application data without persisting runtime state [2.46ms]
+(pass) supports an empty Document and uses no codec calls when there are no entities [0.04ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: {
+  nodes: [
+    {
+      id: "node",
+      type: "task",
+      position: {
+        x: 3,
+        y: 4,
+      },
+      data: "decoded",
+    }
+  ],
+  edges: [
+    {
+      id: "edge",
+      type: "flow",
+      source: {
+        nodeId: "node",
+        portId: "out",
+      },
+      target: {
+        nodeId: "node",
+      },
+      data: "decoded",
+    }
+  ],
+}
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects wrong envelope type before interpreting any application data [3.37ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: {
+  nodes: [
+    {
+      id: "node",
+      type: "task",
+      position: {
+        x: 3,
+        y: 4,
+      },
+      data: "decoded",
+    }
+  ],
+  edges: [
+    {
+      id: "edge",
+      type: "flow",
+      source: {
+        nodeId: "node",
+        portId: "out",
+      },
+      target: {
+        nodeId: "node",
+      },
+      data: "decoded",
+    }
+  ],
+}
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects unknown version before interpreting any application data [0.20ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: {
+  nodes: [
+    {
+      id: "node",
+      type: "task",
+      position: {
+        x: 3,
+        y: 4,
+      },
+      data: "decoded",
+    }
+  ],
+  edges: [
+    {
+      id: "edge",
+      type: "flow",
+      source: {
+        nodeId: "node",
+        portId: "out",
+      },
+      target: {
+        nodeId: "node",
+      },
+      data: "decoded",
+    }
+  ],
+}
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects wrong data format before interpreting any application data [0.10ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected value: ObjectContaining {
+  domain: "document",
+  code: "INVALID_DOCUMENT",
+}
+Received value: 18 |     nodes: CanvasSnapshot['nodes'];
+19 |     edges: CanvasSnapshot['edges'];
+20 |   };
+21 |   const kernel = createCanvasKernel();
+22 |   kernel.transact(({ nodes, edges }) => {
+23 |     for (const node of envelope.nodes) nodes.add({ ...node, data: codec.decode(node.data as string) });
+                            ^
+TypeError: null is not an object (evaluating 'envelope.nodes')
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:23:24)
+      at transact (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/canvas-kernel.js:68:38)
+      at deserializeCanvasDocument (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:22:10)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects non-object envelope before interpreting any application data [1.05ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: {
+  nodes: [
+    {
+      id: "node",
+      type: "task",
+      position: {
+        x: 3,
+        y: 4,
+      },
+      data: "decoded",
+    }
+  ],
+  edges: [
+    {
+      id: "edge",
+      type: "flow",
+      source: {
+        nodeId: "node",
+        portId: "out",
+      },
+      target: {
+        nodeId: "node",
+      },
+      data: "decoded",
+    }
+  ],
+}
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects unknown envelope field before interpreting any application data [0.19ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected value: ObjectContaining {
+  domain: "document",
+  code: "INVALID_DOCUMENT",
+}
+Received value: 18 |     nodes: CanvasSnapshot['nodes'];
+19 |     edges: CanvasSnapshot['edges'];
+20 |   };
+21 |   const kernel = createCanvasKernel();
+22 |   kernel.transact(({ nodes, edges }) => {
+23 |     for (const node of envelope.nodes) nodes.add({ ...node, data: codec.decode(node.data as string) });
+                    ^
+TypeError: undefined is not an object (evaluating 'node of envelope.nodes')
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:23:16)
+      at transact (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/canvas-kernel.js:68:38)
+      at deserializeCanvasDocument (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:22:10)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects missing array before interpreting any application data [0.19ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected value: ObjectContaining {
+  domain: "document",
+  code: "INVALID_DOCUMENT",
+}
+Received value: 18 |     nodes: CanvasSnapshot['nodes'];
+19 |     edges: CanvasSnapshot['edges'];
+20 |   };
+21 |   const kernel = createCanvasKernel();
+22 |   kernel.transact(({ nodes, edges }) => {
+23 |     for (const node of envelope.nodes) nodes.add({ ...node, data: codec.decode(node.data as string) });
+                    ^
+TypeError: {} is not iterable
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:23:16)
+      at transact (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/canvas-kernel.js:68:38)
+      at deserializeCanvasDocument (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:22:10)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects non-array nodes before interpreting any application data [1.14ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: {
+  nodes: [
+    {
+      id: "node",
+      type: false,
+      position: {
+        x: 3,
+        y: 4,
+      },
+      data: "decoded",
+    }
+  ],
+  edges: [
+    {
+      id: "edge",
+      type: "flow",
+      source: {
+        nodeId: "node",
+        portId: "out",
+      },
+      target: {
+        nodeId: "node",
+      },
+      data: "decoded",
+    }
+  ],
+}
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects invalid node type before interpreting any application data [1.26ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected value: ObjectContaining {
+  domain: "document",
+  code: "INVALID_DOCUMENT",
+}
+Received value: 75 |                     throw new KernelError('ASYNC_TRANSACTION', 'Transaction callback must complete synchronously.', Object.freeze({}));
+76 |                 }
+77 |                 // Intermediate states may be incomplete; only the final Draft is subject to structural validation.
+78 |                 const issues = validateGraph(draftNodes, draftEdges);
+79 |                 if (issues.length > 0) {
+80 |                     throw new KernelError('INVALID_GRAPH', 'The final graph is invalid.', Object.freeze({ issues: describeGraphIssues(issues) }));
+                               ^
+KernelError: The final graph is invalid.
+  domain: "kernel",
+   cause: undefined,
+ details: {
+  issues: [
+    [Object ...], [Object ...]
+  ],
+},
+    code: "INVALID_GRAPH"
+
+      at transact (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/canvas-kernel.js:80:27)
+      at deserializeCanvasDocument (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:22:10)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects empty node ID before interpreting any application data [6.79ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected value: ObjectContaining {
+  domain: "document",
+  code: "INVALID_DOCUMENT",
+}
+Received value: 3 |         return 'nan';
+4 |     if (value === Number.POSITIVE_INFINITY)
+5 |         return 'positive-infinity';
+6 |     if (value === Number.NEGATIVE_INFINITY)
+7 |         return 'negative-infinity';
+8 |     throw new RangeError(`Expected a non-finite number; received ${String(value)}.`);
+                  ^
+RangeError: Expected a non-finite number; received 3.
+      at describeNonFiniteNumber (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/diagnostics/dist/diagnostic-value.js:8:15)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/graph-validation.js:54:37)
+      at map (1:11)
+      at transact (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/canvas-kernel.js:80:115)
+      at deserializeCanvasDocument (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:22:10)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects string position before interpreting any application data [11.92ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: {
+  nodes: [
+    {
+      id: "node",
+      type: "task",
+      position: {
+        x: 3,
+        y: 4,
+      },
+      data: "decoded",
+    }
+  ],
+  edges: [
+    {
+      id: "edge",
+      type: "flow",
+      source: {
+        nodeId: "node",
+        portId: "out",
+      },
+      target: {
+        nodeId: "node",
+      },
+      data: "decoded",
+    }
+  ],
+}
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects unknown node field before interpreting any application data [0.29ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected value: ObjectContaining {
+  domain: "document",
+  code: "INVALID_DOCUMENT",
+}
+Received value: 3 |         return 'nan';
+4 |     if (value === Number.POSITIVE_INFINITY)
+5 |         return 'positive-infinity';
+6 |     if (value === Number.NEGATIVE_INFINITY)
+7 |         return 'negative-infinity';
+8 |     throw new RangeError(`Expected a non-finite number; received ${String(value)}.`);
+                  ^
+RangeError: Expected a non-finite number; received undefined.
+      at describeNonFiniteNumber (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/diagnostics/dist/diagnostic-value.js:8:15)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/graph-validation.js:63:45)
+      at map (1:11)
+      at transact (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/canvas-kernel.js:80:115)
+      at deserializeCanvasDocument (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:22:10)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects malformed size before interpreting any application data [0.13ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected value: ObjectContaining {
+  domain: "document",
+  code: "INVALID_DOCUMENT",
+}
+Received value: 75 |                     throw new KernelError('ASYNC_TRANSACTION', 'Transaction callback must complete synchronously.', Object.freeze({}));
+76 |                 }
+77 |                 // Intermediate states may be incomplete; only the final Draft is subject to structural validation.
+78 |                 const issues = validateGraph(draftNodes, draftEdges);
+79 |                 if (issues.length > 0) {
+80 |                     throw new KernelError('INVALID_GRAPH', 'The final graph is invalid.', Object.freeze({ issues: describeGraphIssues(issues) }));
+                               ^
+KernelError: The final graph is invalid.
+  domain: "kernel",
+   cause: undefined,
+ details: {
+  issues: [
+    [Object ...]
+  ],
+},
+    code: "INVALID_GRAPH"
+
+      at transact (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/canvas-kernel.js:80:27)
+      at deserializeCanvasDocument (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:22:10)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects invalid parent ID before interpreting any application data [1.13ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected value: ObjectContaining {
+  domain: "document",
+  code: "INVALID_DOCUMENT",
+}
+Received value: 109 | export function isRecord(value) {
+110 |     return typeof value === 'object' && value !== null;
+111 | }
+112 | function freezeEdgeEndpoint(endpoint) {
+113 |     return Object.freeze({
+114 |         nodeId: endpoint.nodeId,
+                      ^
+TypeError: null is not an object (evaluating 'endpoint.nodeId')
+      at freezeEdgeEndpoint (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/entity-values.js:114:17)
+      at freezeCanvasEdge (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/entity-values.js:19:17)
+      at add (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/entity-collection.js:12:36)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:24:46)
+      at transact (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/canvas-kernel.js:68:38)
+      at deserializeCanvasDocument (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:22:10)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects malformed edge before interpreting any application data [0.19ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: {
+  nodes: [
+    {
+      id: "node",
+      type: "task",
+      position: {
+        x: 3,
+        y: 4,
+      },
+      data: "decoded",
+    }
+  ],
+  edges: [
+    {
+      id: "edge",
+      type: "flow",
+      source: {
+        nodeId: "node",
+        portId: 3,
+      },
+      target: {
+        nodeId: "node",
+      },
+      data: "decoded",
+    }
+  ],
+}
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects invalid port ID before interpreting any application data [0.09ms]
+93 | ])('rejects %s before interpreting any application data', (_name, value, code) => {
+94 |   let interpreted = false;
+95 |   expect(() => deserializeCanvasDocument(JSON.stringify(value), {
+96 |     ...textCodec,
+97 |     decode() { interpreted = true; return 'decoded'; },
+98 |   })).toThrow(expect.objectContaining({ domain: 'document', code }));
+           ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: {
+  nodes: [
+    {
+      id: "node",
+      type: "task",
+      position: {
+        x: 3,
+        y: 4,
+      },
+      data: "decoded",
+    }
+  ],
+  edges: [
+    {
+      id: "edge",
+      type: "flow",
+      source: {
+        nodeId: "node",
+        portId: "out",
+      },
+      target: {
+        nodeId: "node",
+      },
+      data: "decoded",
+    }
+  ],
+}
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:98:7)
+(fail) rejects non-text data on later edge before interpreting any application data [0.05ms]
+(pass) rejects duplicate Node ID through the Kernel complete-graph contract [0.10ms]
+(pass) rejects duplicate Edge ID through the Kernel complete-graph contract [0.02ms]
+(pass) rejects missing parent through the Kernel complete-graph contract [0.03ms]
+(pass) rejects self parent cycle through the Kernel complete-graph contract [0.03ms]
+(pass) rejects missing endpoint through the Kernel complete-graph contract [0.02ms]
+(pass) rejects negative size through the Kernel complete-graph contract [0.03ms]
+(pass) rejects malformed JSON and non-finite JSON geometry [2.19ms]
+123 |   const view = snapshot.read();
+124 |   expect(() => serializeCanvasDocument(view.snapshot, { ...textCodec, encode() { throw failure; } })).toThrow(failure);
+125 |   expect(() => deserializeCanvasDocument(JSON.stringify(file()), { ...textCodec, decode() { throw failure; } })).toThrow(failure);
+126 |   try { serializeCanvasDocument(view.snapshot, { ...textCodec, encode() { throw failure; } }); } catch (error) { expect(error).toBe(failure); }
+127 |   try { deserializeCanvasDocument(JSON.stringify(file()), { ...textCodec, decode() { throw failure; } }); } catch (error) { expect(error).toBe(failure); }
+128 |   expect(() => serializeCanvasDocument(view.snapshot, { ...textCodec, encode: (() => undefined) as unknown as CanvasDocumentDataCodec['encode'] })).toThrow(expect.objectContaining({ code: 'INVALID_CODEC' }));
+                                                                                                                                                          ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: "{\"type\":\"nodebraid/document\",\"version\":1,\"dataFormat\":\"test/text-v1\",\"nodes\":[{\"id\":\"node\",\"type\":\"task\",\"position\":{\"x\":0,\"y\":0}}],\"edges\":[]}"
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:128:149)
+(fail) preserves original application codec exceptions and rejects non-text encoding [3.05ms]
+128 |   expect(() => serializeCanvasDocument(view.snapshot, { ...textCodec, encode: (() => undefined) as unknown as CanvasDocumentDataCodec['encode'] })).toThrow(expect.objectContaining({ code: 'INVALID_CODEC' }));
+129 |   expect(snapshot.read()).toBe(view);
+130 | });
+131 | 
+132 | test.each([null, {}, { ...textCodec, format: '' }, { ...textCodec, encode: null }, { ...textCodec, decode: null }])('rejects invalid codec configuration', (codec) => {
+133 |   expect(() => deserializeCanvasDocument(JSON.stringify(file()), codec as CanvasDocumentDataCodec)).toThrow(expect.objectContaining({ code: 'INVALID_CODEC' }));
+                                                                                                          ^
+error: expect(received).toThrow(expected)
+
+Expected value: ObjectContaining {
+  code: "INVALID_CODEC",
+}
+Received value: 18 |     nodes: CanvasSnapshot['nodes'];
+19 |     edges: CanvasSnapshot['edges'];
+20 |   };
+21 |   const kernel = createCanvasKernel();
+22 |   kernel.transact(({ nodes, edges }) => {
+23 |     for (const node of envelope.nodes) nodes.add({ ...node, data: codec.decode(node.data as string) });
+                                                                       ^
+TypeError: null is not an object (evaluating 'codec.decode')
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:23:67)
+      at transact (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/canvas-kernel.js:68:38)
+      at deserializeCanvasDocument (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:22:10)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:133:101)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:133:101)
+(fail) rejects invalid codec configuration [0.57ms]
+128 |   expect(() => serializeCanvasDocument(view.snapshot, { ...textCodec, encode: (() => undefined) as unknown as CanvasDocumentDataCodec['encode'] })).toThrow(expect.objectContaining({ code: 'INVALID_CODEC' }));
+129 |   expect(snapshot.read()).toBe(view);
+130 | });
+131 | 
+132 | test.each([null, {}, { ...textCodec, format: '' }, { ...textCodec, encode: null }, { ...textCodec, decode: null }])('rejects invalid codec configuration', (codec) => {
+133 |   expect(() => deserializeCanvasDocument(JSON.stringify(file()), codec as CanvasDocumentDataCodec)).toThrow(expect.objectContaining({ code: 'INVALID_CODEC' }));
+                                                                                                          ^
+error: expect(received).toThrow(expected)
+
+Expected value: ObjectContaining {
+  code: "INVALID_CODEC",
+}
+Received value: 18 |     nodes: CanvasSnapshot['nodes'];
+19 |     edges: CanvasSnapshot['edges'];
+20 |   };
+21 |   const kernel = createCanvasKernel();
+22 |   kernel.transact(({ nodes, edges }) => {
+23 |     for (const node of envelope.nodes) nodes.add({ ...node, data: codec.decode(node.data as string) });
+                                                                             ^
+TypeError: codec.decode is not a function. (In 'codec.decode(node.data)', 'codec.decode' is undefined)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:23:73)
+      at transact (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/canvas-kernel.js:68:38)
+      at deserializeCanvasDocument (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:22:10)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:133:101)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:133:101)
+(fail) rejects invalid codec configuration [1.22ms]
+128 |   expect(() => serializeCanvasDocument(view.snapshot, { ...textCodec, encode: (() => undefined) as unknown as CanvasDocumentDataCodec['encode'] })).toThrow(expect.objectContaining({ code: 'INVALID_CODEC' }));
+129 |   expect(snapshot.read()).toBe(view);
+130 | });
+131 | 
+132 | test.each([null, {}, { ...textCodec, format: '' }, { ...textCodec, encode: null }, { ...textCodec, decode: null }])('rejects invalid codec configuration', (codec) => {
+133 |   expect(() => deserializeCanvasDocument(JSON.stringify(file()), codec as CanvasDocumentDataCodec)).toThrow(expect.objectContaining({ code: 'INVALID_CODEC' }));
+                                                                                                          ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: {
+  nodes: [
+    {
+      id: "node",
+      type: "task",
+      position: {
+        x: 3,
+        y: 4,
+      },
+      data: "value",
+    }
+  ],
+  edges: [
+    {
+      id: "edge",
+      type: "flow",
+      source: {
+        nodeId: "node",
+        portId: "out",
+      },
+      target: {
+        nodeId: "node",
+      },
+      data: "edge value",
+    }
+  ],
+}
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:133:101)
+(fail) rejects invalid codec configuration [0.43ms]
+128 |   expect(() => serializeCanvasDocument(view.snapshot, { ...textCodec, encode: (() => undefined) as unknown as CanvasDocumentDataCodec['encode'] })).toThrow(expect.objectContaining({ code: 'INVALID_CODEC' }));
+129 |   expect(snapshot.read()).toBe(view);
+130 | });
+131 | 
+132 | test.each([null, {}, { ...textCodec, format: '' }, { ...textCodec, encode: null }, { ...textCodec, decode: null }])('rejects invalid codec configuration', (codec) => {
+133 |   expect(() => deserializeCanvasDocument(JSON.stringify(file()), codec as CanvasDocumentDataCodec)).toThrow(expect.objectContaining({ code: 'INVALID_CODEC' }));
+                                                                                                          ^
+error: expect(received).toThrow(expected)
+
+Expected constructor: ExpectObjectContaining
+
+Received function did not throw
+Received value: {
+  nodes: [
+    {
+      id: "node",
+      type: "task",
+      position: {
+        x: 3,
+        y: 4,
+      },
+      data: "value",
+    }
+  ],
+  edges: [
+    {
+      id: "edge",
+      type: "flow",
+      source: {
+        nodeId: "node",
+        portId: "out",
+      },
+      target: {
+        nodeId: "node",
+      },
+      data: "edge value",
+    }
+  ],
+}
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:133:101)
+(fail) rejects invalid codec configuration [0.26ms]
+128 |   expect(() => serializeCanvasDocument(view.snapshot, { ...textCodec, encode: (() => undefined) as unknown as CanvasDocumentDataCodec['encode'] })).toThrow(expect.objectContaining({ code: 'INVALID_CODEC' }));
+129 |   expect(snapshot.read()).toBe(view);
+130 | });
+131 | 
+132 | test.each([null, {}, { ...textCodec, format: '' }, { ...textCodec, encode: null }, { ...textCodec, decode: null }])('rejects invalid codec configuration', (codec) => {
+133 |   expect(() => deserializeCanvasDocument(JSON.stringify(file()), codec as CanvasDocumentDataCodec)).toThrow(expect.objectContaining({ code: 'INVALID_CODEC' }));
+                                                                                                          ^
+error: expect(received).toThrow(expected)
+
+Expected value: ObjectContaining {
+  code: "INVALID_CODEC",
+}
+Received value: 18 |     nodes: CanvasSnapshot['nodes'];
+19 |     edges: CanvasSnapshot['edges'];
+20 |   };
+21 |   const kernel = createCanvasKernel();
+22 |   kernel.transact(({ nodes, edges }) => {
+23 |     for (const node of envelope.nodes) nodes.add({ ...node, data: codec.decode(node.data as string) });
+                                                                             ^
+TypeError: codec.decode is not a function. (In 'codec.decode(node.data)', 'codec.decode' is null)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:23:73)
+      at transact (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/kernel/dist/canvas-kernel.js:68:38)
+      at deserializeCanvasDocument (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/src/index.ts:22:10)
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:133:101)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/f3e3/cflow/packages/document/tests/index.test.ts:133:101)
+(fail) rejects invalid codec configuration [0.13ms]
+
+ 9 pass
+ 22 fail
+ 51 expect() calls
+Ran 31 tests across 1 file. [80.00ms]

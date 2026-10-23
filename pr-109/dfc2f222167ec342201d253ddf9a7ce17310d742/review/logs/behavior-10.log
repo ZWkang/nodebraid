@@ -1,0 +1,10 @@
+@nodebraid/document build: [build] @nodebraid/diagnostics
+@nodebraid/document build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/document build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/document build: [build] @nodebraid/kernel
+@nodebraid/document build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/document build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/document build: [build] @nodebraid/document
+@nodebraid/document build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/document build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/document build: Exited with code 0

@@ -1,0 +1,13 @@
+bun test v1.4.2 (744846f84)
+
+examples/app/tests/example-data-codec.test.ts:
+(pass) Example document data round trips null and the explicit application record [0.12ms]
+(pass) Example data rejects values outside the application schema rather than dropping them [0.09ms]
+(pass) Example data validates and serializes the same captured tags [0.03ms]
+(pass) Clipboard accepts the same business data as the Document file [0.45ms]
+(pass) Clipboard serializes the application data snapshot that passed validation [0.06ms]
+
+ 5 pass
+ 0 fail
+ 15 expect() calls
+Ran 5 tests across 1 file. [43.00ms]
