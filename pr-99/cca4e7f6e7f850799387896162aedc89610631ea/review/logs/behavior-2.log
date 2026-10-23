@@ -1,0 +1,200 @@
+bun test v1.4.2 (744846f84)
+
+tests/layout-providers.test.ts:
+(pass) Dagre lays out Port topology with one undoable commit and a no-op repeat [67.25ms]
+(pass) ELK lays out Port topology with one undoable commit and a no-op repeat [201.76ms]
+(pass) accepted getter-backed Layout values survive Runtime revalidation and History replay [2.85ms]
+(pass) Dagre and ELK compose with Provider-specific typed Runtime Commands [26.13ms]
+
+packages/plugin-history/tests/index.test.ts:
+(pass) @nodebraid/plugin-history > publishes the stable History diagnostic event catalog [0.02ms]
+(pass) @nodebraid/plugin-history > records the first post-Baseline Commit and undoes it through Command Service [4.97ms]
+(pass) @nodebraid/plugin-history > redoes the most recently undone History Entry with diagnostic metadata [4.11ms]
+(pass) @nodebraid/plugin-history > records a Recordable Commit that uses History-like diagnostic metadata [5.84ms]
+(pass) @nodebraid/plugin-history > records Command-originated work but not net-zero or failed Transactions [6.12ms]
+(pass) @nodebraid/plugin-history > clears Redo when a new Recordable Commit creates a branch [4.16ms]
+(pass) @nodebraid/plugin-history > rejects an empty Undo without changing Kernel or History [1.82ms]
+(pass) @nodebraid/plugin-history > publishes only meaningful History Snapshot changes [5.04ms]
+(pass) @nodebraid/plugin-history > snapshots subscriber recipients and isolates their errors [1.68ms]
+(pass) @nodebraid/plugin-history > allows an aligned Recordable Commit subscriber to Undo immediately [1.02ms]
+(pass) @nodebraid/plugin-history > rejects Undo before History catches up to the current Kernel revision [0.79ms]
+(pass) @nodebraid/plugin-history > keeps one queued Replay in flight and rejects a reentrant second Undo [0.85ms]
+(pass) @nodebraid/plugin-history > records a reentrant Recordable Commit and publishes only after catching up [1.95ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy while publishing its History Snapshot [1.43ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through later Kernel Observers [1.14ms]
+(pass) @nodebraid/plugin-history > returns the exact Replay Commit delivered to Kernel Observers [2.14ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through the final caught-up Snapshot publication [1.41ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Kernel Provider disappears before delivery [1.89ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Command Provider disappears before delivery [1.61ms]
+(pass) @nodebraid/plugin-history > preserves caller cancellation before starting a Replay [1.09ms]
+(pass) @nodebraid/plugin-history > prioritizes caller cancellation over an empty Undo stack [0.59ms]
+(pass) @nodebraid/plugin-history > closes old History state and reactivates from a fresh Kernel Baseline [1.32ms]
+(pass) @nodebraid/plugin-history > starts a new Baseline when Command Service returns to a retained Kernel [1.26ms]
+
+packages/plugin-history/tests/types.test.ts:
+(pass) keeps the public History seam narrow and type-safe [0.01ms]
+
+packages/plugin-layout/tests/engine-binding.test.ts:
+(pass) Layout keeps its concrete Engine when options change during capability validation [3.65ms]
+(pass) Layout keeps its concrete Engine when options change after Plugin creation [0.84ms]
+(pass) Layout preserves the original Engine option read failure at creation [0.10ms]
+
+packages/plugin-layout/tests/index.test.ts:
+(pass) a typed Layout Command commits all Node positions in one Canvas Commit [1.19ms]
+
+packages/plugin-layout/tests/commit-protection.test.ts:
+(pass) a stale Layout Proposal cannot overwrite a newer Kernel revision [2.22ms]
+(pass) cancellation after Provider execution starts preserves the reason and prevents commit [1.84ms]
+(pass) a pre-aborted Layout Command does not invoke the Provider [0.82ms]
+
+packages/plugin-layout/tests/request-validation.test.ts:
+(pass) a Node without Size rejects the Layout Request before the Provider runs [0.96ms]
+(pass) unsupported incremental, Fixed Node, and self-loop capabilities fail before the Provider runs [1.36ms]
+
+packages/plugin-layout/tests/port-commit-protection.test.ts:
+(pass) a pending Port topology Layout preserves a newer Port Endpoint commit [2.82ms]
+(pass) a pending Port topology Layout preserves a newer Layout commit [0.75ms]
+
+packages/plugin-layout/tests/cancellation-boundary.test.ts:
+(pass) direct Engine cancellation skips resolved Proposal reads [1.07ms]
+(pass) helper Engine cancellation skips resolved Proposal reads [6.85ms]
+(pass) an uncancelled direct Engine commits normally and preserves net-zero results [1.13ms]
+(pass) an uncancelled direct Engine still rejects an incomplete Proposal [0.81ms]
+(pass) an uncancelled direct Engine preserves the original Proposal read error [0.71ms]
+(pass) a rejected Engine preserves its original failure when cancellation is false [0.83ms]
+(pass) a rejected Engine preserves its original failure when cancellation is true [0.98ms]
+(pass) cancellation during Proposal validation still prevents the commit [1.01ms]
+
+packages/layout-dagre/tests/index.test.ts:
+(pass) Dagre computes deterministic top-left world positions for a full Layout Input [1.77ms]
+(pass) Dagre full layout supports the baseline graph shapes [6.64ms]
+(pass) Dagre preserves every edge constraint when opaque IDs contain graphlib delimiters [1.41ms]
+(pass) Dagre rejects a non-finite Provider configuration before layout [0.17ms]
+
+packages/layout-elk/tests/incremental.test.ts:
+(pass) ELK Stress keeps multiple Fixed Nodes at their absolute world positions [8.06ms]
+(pass) ELK Stress incremental layout uses current positions as a deterministic soft constraint [24.14ms]
+(pass) ELK rejects incremental and Fixed Node requests for unproven algorithms [0.49ms]
+
+packages/layout-elk/tests/index.test.ts:
+(pass) ELK computes deterministic top-left world positions for a full Layout Input [6.11ms]
+(pass) ELK layered full treats seed zero as the fixed default seed [163.15ms]
+(pass) ELK stress full treats seed zero as the fixed default seed [93.02ms]
+(pass) ELK stress incremental treats seed zero as the fixed default seed [31.11ms]
+(pass) ELK rejects non-integer and unsafe seeds [0.41ms]
+(pass) ELK full layout supports the baseline graph shapes [22.21ms]
+(pass) ELK rejects a non-finite Provider configuration before layout [0.20ms]
+
+packages/plugin-command/tests/index.test.ts:
+(pass) @nodebraid/plugin-command > rejects an empty Command ID with a stable structural error [0.10ms]
+(pass) @nodebraid/plugin-command > classifies a non-string JavaScript Command ID without copying it [1.02ms]
+(pass) @nodebraid/plugin-command > registers and executes one typed Command in an Activation [0.92ms]
+(pass) @nodebraid/plugin-command > preserves asynchronous Command results and handler errors [0.69ms]
+(pass) @nodebraid/plugin-command > enforces Command token identity and diagnostic ID uniqueness [0.94ms]
+(pass) @nodebraid/plugin-command > unregisters, aborts, and awaits in-flight Command executions [0.96ms]
+(pass) @nodebraid/plugin-command > keeps Registration disposal idempotent when abort handling reenters dispose [1.05ms]
+(pass) @nodebraid/plugin-command > closes residual registrations before disposing the Command Service Activation [1.63ms]
+(pass) @nodebraid/plugin-command > isolates caller cancellation to one Command execution [0.39ms]
+(pass) @nodebraid/plugin-command > preserves the original caller signal after execution options are reused [0.31ms]
+(pass) @nodebraid/plugin-command > detaches the original caller signal after reused-options execution settles [0.26ms]
+(pass) @nodebraid/plugin-command > does not start a Command when execution options dispose its Registration [1.26ms]
+(pass) @nodebraid/plugin-command > keeps existing executions owned while options dispose their Registration [1.14ms]
+(pass) @nodebraid/plugin-command > preserves structural errors before reading execution options [0.38ms]
+(pass) @nodebraid/plugin-command > preserves option failures and permits unrelated Registration disposal [0.48ms]
+(pass) @nodebraid/plugin-command > reinstalls an empty Command Service after Provider disposal [0.63ms]
+
+packages/plugin-command/tests/types.test.ts:
+(pass) keeps Command input and output types invariant
+
+packages/plugin-kernel/tests/index.test.ts:
+(pass) @nodebraid/plugin-kernel > publishes the stable Kernel Plugin diagnostic event catalog [0.01ms]
+(pass) @nodebraid/plugin-kernel > provides one revision-zero Kernel Service for an Activation [0.76ms]
+(pass) @nodebraid/plugin-kernel > synchronously observes only successful net-changing Transactions [0.58ms]
+(pass) @nodebraid/plugin-kernel > reports Observer errors without rolling back or blocking later Observers [0.53ms]
+(pass) @nodebraid/plugin-kernel > schedules an explicit Observer error when platform reporting is unavailable [7.22ms]
+(pass) @nodebraid/plugin-kernel > queues reentrant Commits until every Observer sees the current revision [0.43ms]
+(pass) @nodebraid/plugin-kernel > stops Consumers before closing the Service and reinstalls a fresh Kernel [0.68ms]
+
+packages/plugin-kernel/tests/types.test.ts:
+(pass) keeps the public Kernel Service contract type-safe [0.04ms]
+
+packages/layout-api/tests/index.test.ts:
+(pass) a custom Layout Engine computes a full Layout Proposal from a committed Canvas View [0.42ms]
+(pass) Layout data crossing the computation seam is frozen [0.23ms]
+(pass) a pre-aborted Layout Engine preserves the reason without invoking its Provider [0.14ms]
+
+packages/layout-api/tests/proposal-values.test.ts:
+(pass) Layout compute retains the finite coordinate accepted during validation [0.14ms]
+(pass) Layout validation retains the source revision accepted before reading positions [0.04ms]
+(pass) Layout retains the accepted id property [0.06ms]
+(pass) Layout retains the accepted position property [0.02ms]
+(pass) Layout retains the accepted y property [0.01ms]
+(pass) Layout retains its accepted collection without another field read or iteration [0.08ms]
+(pass) Layout publishes the Fixed Node coordinates that passed validation [0.03ms]
+(pass) Layout preserves revision validation precedence over later read errors [0.13ms]
+(pass) Layout preserves duplicate validation precedence over later read errors [0.03ms]
+(pass) Layout preserves unknown validation precedence over later read errors [0.01ms]
+(pass) Layout preserves x validation precedence over later read errors [0.08ms]
+(pass) Layout propagates the original collection read failure [0.05ms]
+(pass) Layout propagates the original id read failure [0.02ms]
+(pass) Layout propagates the original position read failure [0.01ms]
+(pass) Layout propagates the original x read failure [0.01ms]
+(pass) Layout propagates the original y read failure
+
+packages/layout-api/tests/input-validation.test.ts:
+(pass) invalid mode and Fixed Node identities are rejected as invalid Layout Requests [0.25ms]
+(pass) nested Nodes are rejected as unsupported Layout Inputs [0.15ms]
+(pass) mixed Port Endpoints project to Node topology without changing the Document [0.17ms]
+
+packages/layout-api/tests/error-contract.test.ts:
+(pass) Layout structural failures expose the shared NodeBraid error identity [0.04ms]
+
+packages/layout-api/tests/input-values.test.ts:
+(pass) Layout Input retains the Request mode accepted during validation [0.18ms]
+(pass) Layout Input retains an accepted incremental Request mode [0.04ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: "wrong",
+  details: {
+    issue: "INVALID_MODE",
+    mode: "wrong",
+  },
+} [0.11ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: null,
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "null",
+  },
+} [0.02ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: 42,
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "number",
+  },
+} [0.02ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: {
+    privateValue: "must-not-escape",
+  },
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "object",
+  },
+} [0.01ms]
+(pass) Layout preserves the original mode read failure before Fixed Node processing [0.04ms]
+(pass) Layout rejects an invalid mode before later Fixed Node read failures [0.03ms]
+(pass) Fixed Node resolution cannot replace the Request mode already accepted [0.04ms]
+(pass) Layout preserves a Fixed Node iterator failure after one mode capture [0.05ms]
+
+packages/layout-api/tests/proposal-validation.test.ts:
+(pass) a Layout Engine rejects incomplete, foreign, invalid, or constraint-breaking positions [0.37ms]
+(pass) a Proposal must identify the Layout Input revision [0.09ms]
+
+packages/layout-api/tests/capability-validation.test.ts:
+(pass) a low-level Layout Engine rejects unsupported Input capabilities before its Provider runs [0.34ms]
+
+ 122 pass
+ 0 fail
+ 439 expect() calls
+Ran 122 tests across 23 files. [941.00ms]

@@ -1,0 +1,51 @@
+{
+  "head": "cd18e1f097b6fb38cadd432bfa82931029eed58c",
+  "seam": "compiled public Runtime Layout Command",
+  "results": [
+    {
+      "variant": "stable-capable",
+      "pluginName": "@nodebraid/plugin-layout:first-capable",
+      "engineReads": 0,
+      "firstCalls": 1,
+      "secondCalls": 0,
+      "code": null,
+      "details": null,
+      "revision": 2,
+      "position": {
+        "x": 10,
+        "y": 20
+      }
+    },
+    {
+      "variant": "stable-unsupported",
+      "pluginName": "@nodebraid/plugin-layout:second-unsupported",
+      "engineReads": 0,
+      "firstCalls": 0,
+      "secondCalls": 0,
+      "code": "UNSUPPORTED_FEATURE",
+      "details": {
+        "feature": "incremental",
+        "providerId": "second-unsupported"
+      },
+      "revision": 1,
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "variant": "changing-engine",
+      "pluginName": "@nodebraid/plugin-layout:first-capable",
+      "engineReads": 1,
+      "firstCalls": 1,
+      "secondCalls": 0,
+      "code": null,
+      "details": null,
+      "revision": 2,
+      "position": {
+        "x": 10,
+        "y": 20
+      }
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "source": {
+    "base": "dcf13482b68bc2422fc4d714df1226ab0ef259aa",
+    "head": "cca4e7f6e7f850799387896162aedc89610631ea",
+    "tree": "d2d7e8ceefafaec243840ac318ea699b73a92dc9",
+    "patch": "50f0622fe0fe29d74744f01660840841c10ff8d59ccc7fa34fd8d42c0131dc69"
+  },
+  "accepted": {
+    "before": {
+      "edgeIds": [
+        "example-initial-edge"
+      ],
+      "positions": {
+        "example-compose": {
+          "x": 360,
+          "y": 260
+        },
+        "example-discover": {
+          "x": 80,
+          "y": 100
+        },
+        "example-ship": {
+          "x": 660,
+          "y": 120
+        }
+      },
+      "transform": "matrix(1 0 0 1 0 0)"
+    },
+    "after": {
+      "edgeIds": [
+        "example-initial-edge"
+      ],
+      "positions": {
+        "example-compose": {
+          "x": 210,
+          "y": 0
+        },
+        "example-discover": {
+          "x": 0,
+          "y": 0
+        },
+        "example-ship": {
+          "x": 0,
+          "y": 138
+        }
+      },
+      "transform": "matrix(1 0 0 1 0 0)"
+    }
+  },
+  "coverage": "Real native Auto layout click, Node movement, unchanged Edge/Viewport and repeat/no-op/Undo/Redo. Does not exercise Engine getter substitution or all Providers."
+}

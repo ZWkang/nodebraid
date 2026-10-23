@@ -1,0 +1,45 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-layout/tests/engine-binding.test.ts:
+83 |           data: null,
+84 |         });
+85 |       });
+86 |       await commands.execute(command, { mode: 'incremental', fixedNodeIds: [], config: {} });
+87 | 
+88 |       expect(secondCalls).toBe(0);
+                               ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/plugin-layout/tests/engine-binding.test.ts:88:27)
+(fail) Layout keeps its concrete Engine when options change during capability validation [12.83ms]
+ 9 |     if (input.edges.some((edge) => edge.sourceNodeId === edge.targetNodeId) && !capabilities.selfLoops) {
+10 |         throwUnsupportedFeature(providerId, 'selfLoops');
+11 |     }
+12 | }
+13 | function throwUnsupportedFeature(providerId, feature) {
+14 |     throw new LayoutError('UNSUPPORTED_FEATURE', `Layout Provider "${providerId}" does not support ${feature}.`, Object.freeze({ feature, providerId }));
+               ^
+LayoutError: Layout Provider "second-unsupported" does not support incremental.
+  domain: "layout",
+   cause: undefined,
+ details: {
+  feature: "incremental",
+  providerId: "second-unsupported",
+},
+    code: "UNSUPPORTED_FEATURE"
+
+      at throwUnsupportedFeature (/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/layout-api/dist/capability-validation.js:14:11)
+      at assertLayoutCapabilities (/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/layout-api/dist/capability-validation.js:4:9)
+      at <anonymous> (/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/plugin-layout/src/layout-plugin.ts:26:11)
+      at execute (/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/plugin-command/dist/command-plugin.js:97:65)
+      at <anonymous> (/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/plugin-layout/tests/engine-binding.test.ts:86:22)
+(fail) Layout keeps its concrete Engine when options change after Plugin creation [2.53ms]
+(pass) Layout preserves the original Engine option read failure at creation [0.20ms]
+
+ 1 pass
+ 2 fail
+ 4 expect() calls
+Ran 3 tests across 1 file. [68.00ms]

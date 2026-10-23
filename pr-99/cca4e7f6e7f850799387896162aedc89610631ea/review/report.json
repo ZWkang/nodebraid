@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "dcf13482b68bc2422fc4d714df1226ab0ef259aa",
+    "expectedParent": "dcf13482b68bc2422fc4d714df1226ab0ef259aa",
+    "head": "cca4e7f6e7f850799387896162aedc89610631ea",
+    "tree": "d2d7e8ceefafaec243840ac318ea699b73a92dc9",
+    "patch": "50f0622fe0fe29d74744f01660840841c10ff8d59ccc7fa34fd8d42c0131dc69",
+    "localHead": "cd18e1f097b6fb38cadd432bfa82931029eed58c"
+  },
+  "task": {
+    "run": "396bfc5e-12d1-4854-8bb4-0726f49d7476",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 98
+    },
+    "request": "## Confirmed defect\n\nOn fetched main `dcf13482b68bc2422fc4d714df1226ab0ef259aa`, `createLayoutPlugin()` can validate capabilities against one Engine and then compute with a different Engine. A legal readonly `options.engine` getter is read again between those operations.\n\nA fresh compiled public Host/Kernel/Command/Layout probe uses real direct Engine implementations:\n\n- A stable capable Engine computes once and commits `{x:10,y:20}` at revision 2.\n- A stable Engine with `incremental:false` rejects an incremental Request with `UNSUPPORTED_FEATURE`; it is never called and revision stays 1.\n- The first Engine's capability getter makes the outer options getter return the second Engine on later reads. Runtime accepts the first Engine's `incremental:true`, then invokes the second Engine despite its `incremental:false`. The unsupported Engine computes once and commits `{x:100,y:200}` at revision 2. The Plugin is still named for the first Engine.\n\nActual changing case:\n\n```json\n{\"pluginName\":\"@nodebraid/plugin-layout:first-capable\",\"engineReads\":4,\"firstCalls\":0,\"secondCalls\":1,\"code\":null,\"revision\":2,\"position\":{\"x\":100,\"y\":200}}\n```\n\nThe public invariant that an unsupported Engine cannot be invoked by a check against another Engine fails with exit 1. No internal Runtime collaborator is mocked. Original source/output are preserved in run `20261023T062254-discovery-layout-binding`: `layout-engine-binding-repro.ts`, `layout-binding-red.log`. Fresh package build and existing Runtime Layout suites pass: **16 tests / 36 assertions**.\n\n## Contract and cause\n\n[ADR0024](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/docs/adr/0024-use-provider-specific-layout-commands-without-a-registry.md) binds Provider-specific Commands without a dynamic Registry. The [public Runtime module contract](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/website/en/modules/plugin-layout.md) states that the factory statically binds a concrete Engine to a typed Command. [ADR0026](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/docs/adr/0026-validate-layout-contracts-at-their-ownership-boundaries.md) and existing public Request tests require unsupported capabilities to fail before Provider execution.\n\nThe factory reads `options.engine` for the Plugin name, Runtime diagnostic ID, capability check and computation. Those reads can select different Engine objects, so the guard does not necessarily describe the implementation that runs.\n\n## Acceptance\n\n- Capture the concrete Engine when `createLayoutPlugin()` is called and retain that object for the Plugin name, capability validation and computation throughout its Installations/Activations. Use the same public Engine receiver for `compute()`.\n- The changing getter reproduction must keep the first Engine bound: its supported computation runs, the substituted unsupported Engine is not called, and its result is not committed. Ordinary unsupported Engines still reject before execution.\n- Preserve direct and helper Engine support; original options-read and computation failures; full/incremental/Fixed Node/self-loop validation; pre/post-computation cancellation; Proposal validation; live-revision stale protection; single-Commit metadata; net-zero and lifecycle behavior.\n- Fix the existing shared factory without a Registry, new API, helper requirement, accessor ban, fallback, cap, retry or dependency. Command-token configuration and algorithm implementations remain outside this repair.\n- Use the existing public Host/Command/Kernel seam for actual red/green and controls, then relevant Layout/Provider/History consumers, independent Standards with ponytail-review and Spec, formal full engineering verification, exact source publication, current-head CI and complete immutable report/media readback.\n- Keep this Issue open until actual main integration and whole-Issue acceptance; delivery remains for human review/merge.\n\n## Deduplication\n\nComplete all-state metadata/body pages contain **97 Issue/PR records and 50 PRs**. Read the full relevant #78, #88, #37 and #15 bodies/discussions. #78 owns Request/Proposal value capture; #88 owns post-computation cancellation; #37 owns Port topology and manual layout; #15 owns ELK seed normalization. None repairs Runtime Engine-object binding between capability validation and computation.",
+    "plan": [
+      {
+        "id": "public-regression-and-fix",
+        "blockedBy": [],
+        "acceptance": "Public Host/Command/Kernel red/green proves the factory retains one concrete Engine through capability validation, computation and reactivation; preserve original errors and valid controls."
+      },
+      {
+        "id": "affected-consumers",
+        "blockedBy": [
+          "public-regression-and-fix"
+        ],
+        "acceptance": "Actual affected Layout/Provider/History consumers, types and related checks pass at the complete current source."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "affected-consumers"
+        ],
+        "acceptance": "Independent Standards with ponytail-review and Spec inspect the exact head/tree/binary patch against original Issue and ADRs."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Pinned main versioned agents:run verify executes the actual full bun run check after both axes pass and retains original logs."
+      },
+      {
+        "id": "source-publication",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Actual remote source tree and independently prepared first parent match verification; record publication before mapping local branch to any API-created SHA."
+      },
+      {
+        "id": "native-layout-evidence",
+        "blockedBy": [
+          "source-publication"
+        ],
+        "acceptance": "On the actual published source, collect real native Auto layout before/after, repeat/no-op and Undo/Redo evidence with owned browser/server cleanup. These scenes supplement the Engine identity API assertions."
+      },
+      {
+        "id": "current-head-ci-and-reports",
+        "blockedBy": [
+          "native-layout-evidence"
+        ],
+        "acceptance": "Current-head real CI, full paginated feedback, exact report/preview/native artifacts publication and complete immutable byte readback pass before readiness."
+      },
+      {
+        "id": "human-merge",
+        "blockedBy": [
+          "current-head-ci-and-reports"
+        ],
+        "acceptance": "Human review and normal protected main merge."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "human-merge"
+        ],
+        "acceptance": "Fetch actual main, verify merge ancestry and fresh whole-Issue public acceptance; keep Issue open until complete."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "cd18e1f097b6fb38cadd432bfa82931029eed58c",
+      "tree": "d2d7e8ceefafaec243840ac318ea699b73a92dc9",
+      "patch": "50f0622fe0fe29d74744f01660840841c10ff8d59ccc7fa34fd8d42c0131dc69",
+      "report": "/Users/zhou/.codex/local-workflows/nodebraid/runs/396bfc5e-12d1-4854-8bb4-0726f49d7476/reviews/cd18e1f097b6fb38cadd432bfa82931029eed58c/standards.md"
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "cd18e1f097b6fb38cadd432bfa82931029eed58c",
+      "tree": "d2d7e8ceefafaec243840ac318ea699b73a92dc9",
+      "patch": "50f0622fe0fe29d74744f01660840841c10ff8d59ccc7fa34fd8d42c0131dc69",
+      "report": "/Users/zhou/.codex/local-workflows/nodebraid/runs/396bfc5e-12d1-4854-8bb4-0726f49d7476/reviews/cd18e1f097b6fb38cadd432bfa82931029eed58c/spec.md"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "promise-conformant-tdd-red",
+      "acceptance": "Correct async Engine fixtures typecheck against the exact original production file, then fail the real Engine binding behavior. Original production restored only for this explicit red experiment; fixed bytes restored afterward. This is the definitive valid-interface regression, not the earlier synchronous fixture.",
+      "command": "bun test packages/plugin-layout/tests/engine-binding.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "current-connected-layout",
+      "acceptance": "Currentcd18 exact source passes122 public tests/439 assertions across Layout API, direct/helper Runtime, real Dagre/ELK, Command/Kernel/History and root Layout composition.",
+      "command": "bun test packages/layout-api/tests packages/plugin-layout/tests packages/layout-dagre/tests packages/layout-elk/tests packages/plugin-command/tests packages/plugin-kernel/tests packages/plugin-history/tests tests/layout-providers.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "current-compiled-original-repro",
+      "acceptance": "Currentcd18 freshly built public Runtime repeats the original Promise-conformant reproduction with only paths/exact expected head adapted: first Engine called1, substituted Engine0, position10/20; unsupported ordinary control still rejects with no commit.",
+      "command": "bun run /Users/zhou/.codex/local-workflows/nodebraid/runs/396bfc5e-12d1-4854-8bb4-0726f49d7476/compiled-current-repro.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "current-affected-consumers",
+      "acceptance": "Currentcd18 actual affected consumer types, tests, native Example browser suites and docs pass after async fixture correction.",
+      "command": "bun run check:affected --base dcf13482b68bc2422fc4d714df1226ab0ef259aa",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "historical-fixture-type-failure",
+      "acceptance": "Initial ebd affected attempt failed TS2322 because two new direct Engine fixtures synchronously returned Proposal rather than Promise<LayoutProposal>. The original failure is retained, both methods were corrected to async, and fresh affected/reviews cover the new committed source. This is not a passing check or current-head failure.",
+      "command": "bun run check:affected --base dcf13482b68bc2422fc4d714df1226ab0ef259aa",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "native-layout-published-source",
+      "acceptance": "Actual published cca4 source: real production App, native Auto layout changes Node positions once, preserves actual SVG projection transform and Edge IDs, repeats net-zero, and Undo/Redo restores before/after states. Browser/server cleanup completed. This ordinary scene supplements Engine identity API assertions; it does not exercise getter substitution.",
+      "command": "bun run example:build && bun run /Users/zhou/.codex/local-workflows/nodebraid/runs/396bfc5e-12d1-4854-8bb4-0726f49d7476/capture-layout-native.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "8a6341acde8205d39662e53e9e5b6834e0e0d906ea21579a74416599ccad6686"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "c4c444bea2fe07126a0693c0d2e12d07c0f9fe98b17ebec2f2836b77f34ba428"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "478aa9b0b99ac1c232f4667cd448eed5311a057defbefcf4aaf610bb820ac461"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "abba8b14308ce3f369136b56990952599ce497ee9bab632a6d5f62c57f7230c9"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "c4eba1196e73a1eaadee0e2cba09e0a93a766ddaa7d2a59bf10aebc253cebc53"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "cc8f1a9311f90240d11ac1e36292fa1489a215ad55106675606e8acfdcc872d1"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "ec9abf1e4d2cc4da1ead2201dc8ebf995f0219c146bdb8fcae95ce1bfebfcecc"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "54fc9be49d9878ce7a48ec4a6337c93077b99dd1e6a22fd610075f1a1ba40428"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "c58fb6223523ca7299ba4066c7d0d8dce870f7e8ed9177761459bbba90045f45"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "0ae40f2852127d92a64d04613c10f0773aea88a09dab8d2d354d6298e2696ae9"
+    },
+    {
+      "path": "layout-native/before.png",
+      "kind": "screenshot",
+      "sha256": "b75df5e6f4811a0faedc2cf03339731675901635ba3fbfde161c00a163f0e3a1"
+    },
+    {
+      "path": "layout-native/after.png",
+      "kind": "screenshot",
+      "sha256": "872910975955da705168c54e411019c13ad8702d00b51adc283b8cd099321d54"
+    },
+    {
+      "path": "layout-native/before.snapshot.json",
+      "kind": "snapshot",
+      "sha256": "9eccdd0b41c4005b393ff27bdb06a88ea6cf4e425b674d7ff79a33fc2794f728"
+    },
+    {
+      "path": "layout-native/after.snapshot.json",
+      "kind": "snapshot",
+      "sha256": "c5ac90a367fd84749b1b47aeea0e56c25116dc5dd4a232da6b92419f21418269"
+    },
+    {
+      "path": "layout-native/before.state.json",
+      "kind": "snapshot",
+      "sha256": "f20ce0573b7856c06af6a19a72aaeae2df73941b03d301c0e0ba52b4bac975f5"
+    },
+    {
+      "path": "layout-native/after.state.json",
+      "kind": "snapshot",
+      "sha256": "84c85a209c6fa2866ca057d334a906093f088444477dfd8612e411bf2a5bd1c2"
+    },
+    {
+      "path": "layout-native/actions.log",
+      "kind": "log",
+      "sha256": "27cb56cab1e85930b1283ca2ad01076d47133cc5e375c9a6c4dc793dc959a3c3"
+    },
+    {
+      "path": "layout-native/source.json",
+      "kind": "report",
+      "sha256": "3585acf9e3d654dc3945d3c333f1c7cb044073fbc15785006eff80a288dbbbbc"
+    }
+  ]
+}
