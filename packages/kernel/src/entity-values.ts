@@ -1,5 +1,5 @@
 import type { CanvasEdge, CanvasNode, EdgeEndpoint, Point, Size } from './contracts';
-import type { EdgeId, NodeId } from './identifiers';
+import { edgeId, nodeId, type EdgeId, type NodeId } from './identifiers';
 
 export function freezeCanvasNode(node: CanvasNode, id: NodeId): CanvasNode {
   // Copy and freeze only NodeBraid-owned shells. Arbitrary data intentionally keeps its original reference.
@@ -54,24 +54,52 @@ export function canvasEdgesEqual(left: CanvasEdge | null, right: CanvasEdge | nu
   );
 }
 
-export function isCanvasNodeValue(value: unknown): value is CanvasNode {
-  if (!isRecord(value) || typeof value.id !== 'string' || typeof value.type !== 'string' || !('data' in value)) {
-    return false;
-  }
-  if (!isPointValue(value.position)) return false;
-  if (value.size !== undefined && !isSizeValue(value.size)) return false;
-  return value.parentId === undefined || (typeof value.parentId === 'string' && value.parentId.length > 0);
+export function captureCanvasNodeValue(value: unknown): CanvasNode | undefined {
+  if (!isRecord(value)) return undefined;
+  const id = value.id;
+  if (typeof id !== 'string') return undefined;
+  const type = value.type;
+  if (typeof type !== 'string' || !('data' in value)) return undefined;
+  const position = capturePointValue(value.position);
+  if (!position) return undefined;
+  const receivedSize = value.size;
+  const size = receivedSize === undefined ? undefined : captureSizeValue(receivedSize);
+  if (receivedSize !== undefined && size === undefined) return undefined;
+  const parentId = value.parentId;
+  if (parentId !== undefined && (typeof parentId !== 'string' || parentId.length === 0)) return undefined;
+  if (id.length === 0) return undefined;
+  return Object.freeze({
+    id: nodeId(id),
+    type,
+    position,
+    ...(size === undefined ? {} : { size }),
+    ...(parentId === undefined ? {} : { parentId: nodeId(parentId) }),
+    // Opaque data keeps its existing preflight or materialization read phase.
+    get data() {
+      return value.data;
+    },
+  });
 }
 
-export function isCanvasEdgeValue(value: unknown): value is CanvasEdge {
-  return (
-    isRecord(value) &&
-    typeof value.id === 'string' &&
-    typeof value.type === 'string' &&
-    'data' in value &&
-    isEndpointValue(value.source) &&
-    isEndpointValue(value.target)
-  );
+export function captureCanvasEdgeValue(value: unknown): CanvasEdge | undefined {
+  if (!isRecord(value)) return undefined;
+  const id = value.id;
+  if (typeof id !== 'string') return undefined;
+  const type = value.type;
+  if (typeof type !== 'string' || !('data' in value)) return undefined;
+  const source = captureEndpointValue(value.source);
+  if (!source) return undefined;
+  const target = captureEndpointValue(value.target);
+  if (!target || id.length === 0) return undefined;
+  return Object.freeze({
+    id: edgeId(id),
+    type,
+    source,
+    target,
+    get data() {
+      return value.data;
+    },
+  });
 }
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
@@ -85,19 +113,29 @@ function freezeEdgeEndpoint(endpoint: EdgeEndpoint): EdgeEndpoint {
   });
 }
 
-function isPointValue(value: unknown): value is Point {
-  return isRecord(value) && typeof value.x === 'number' && typeof value.y === 'number';
+function capturePointValue(value: unknown): Point | undefined {
+  if (!isRecord(value)) return undefined;
+  const x = value.x;
+  if (typeof x !== 'number') return undefined;
+  const y = value.y;
+  if (typeof y !== 'number') return undefined;
+  return Object.freeze({ x, y });
 }
 
-function isSizeValue(value: unknown): value is Size {
-  return isRecord(value) && typeof value.width === 'number' && typeof value.height === 'number';
+function captureSizeValue(value: unknown): Size | undefined {
+  if (!isRecord(value)) return undefined;
+  const width = value.width;
+  if (typeof width !== 'number') return undefined;
+  const height = value.height;
+  if (typeof height !== 'number') return undefined;
+  return Object.freeze({ width, height });
 }
 
-function isEndpointValue(value: unknown): value is EdgeEndpoint {
-  return (
-    isRecord(value) &&
-    typeof value.nodeId === 'string' &&
-    value.nodeId.length > 0 &&
-    (value.portId === undefined || typeof value.portId === 'string')
-  );
+function captureEndpointValue(value: unknown): EdgeEndpoint | undefined {
+  if (!isRecord(value)) return undefined;
+  const id = value.nodeId;
+  if (typeof id !== 'string' || id.length === 0) return undefined;
+  const portId = value.portId;
+  if (portId !== undefined && typeof portId !== 'string') return undefined;
+  return Object.freeze({ nodeId: nodeId(id), ...(portId === undefined ? {} : { portId }) });
 }
