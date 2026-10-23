@@ -83,6 +83,21 @@ test('Interaction rejects malformed numeric config without coercion', async () =
     { connection: {} },
     { connection: { materializeEdge: 'not-a-function' } },
     { connection: { materializeEdge: () => undefined, unexpected: true } },
+    {
+      connection: {
+        get materializeEdge() {
+          return null;
+        },
+      },
+    },
+    {
+      connection: {
+        get materializeEdge(): never {
+          throw new Error('Unknown Connection fields must be rejected before reading the materializer.');
+        },
+        unexpected: true,
+      },
+    },
   ];
   for (const config of invalidConfigs) {
     const interaction = host.install(interactionPlugin, config as never);
@@ -94,6 +109,49 @@ test('Interaction rejects malformed numeric config without coercion', async () =
   }
 
   await host.dispose();
+});
+
+test('Interaction revalidates the materializer on recovery and preserves its read failure', async () => {
+  const host = createPluginHost();
+  const originalError = new Error('recovered Connection materializer read failed');
+  let reads = 0;
+  const renderer = host.install(createRendererPlugin(() => new ConfigRenderer()));
+  const interaction = host.install(interactionPlugin, {
+    connection: {
+      get materializeEdge() {
+        reads += 1;
+        if (reads === 1) {
+          return () => {
+            throw new Error('Connection materialization is not requested by this recovery test.');
+          };
+        }
+        throw originalError;
+      },
+    },
+  });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    renderer,
+    interaction,
+  ];
+
+  try {
+    await Promise.all(installations.map((installation) => installation.whenActive()));
+    expect(reads).toBe(1);
+    await renderer.dispose();
+    expect(interaction.getSnapshot().status).toBe('pending');
+    const replacement = host.install(createRendererPlugin(() => new ConfigRenderer()));
+    await replacement.whenActive();
+    const error = await interaction.whenActive().catch((reason: unknown) => reason);
+    expect(error).toBe(originalError);
+    expect(reads).toBe(2);
+    expect(interaction.getSnapshot()).toEqual({ status: 'failed', error: originalError });
+  } finally {
+    await host.dispose();
+  }
 });
 
 class ConfigRenderer implements CanvasRenderer {

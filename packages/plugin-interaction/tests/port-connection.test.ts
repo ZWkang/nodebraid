@@ -17,7 +17,7 @@ import type { InteractionProjection } from '@nodebraid/interaction-api';
 import type { SessionSnapshot } from '@nodebraid/session-api';
 import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
-import { interactionPlugin } from '../src';
+import { interactionPlugin, type ConnectionMaterializationInput } from '../src';
 
 test('Port Gesture tracks target loss, materializes exact Endpoints once, and cancels on source loss', async () => {
   const renderer = new PortConnectionRenderer();
@@ -151,6 +151,68 @@ test('Port Gesture tracks target loss, materializes exact Endpoints once, and ca
   expect(renderer.releasedPointers).toEqual([1, 1]);
   expect(materialized).toHaveLength(1);
   await host.dispose();
+});
+
+test('Connection Gesture uses the materializer accepted before its getter changes', async () => {
+  const renderer = new PortConnectionRenderer();
+  const faults: unknown[] = [];
+  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
+  let kernel: KernelService | undefined;
+  let reads = 0;
+  const materialized: ConnectionMaterializationInput[] = [];
+  const materializeEdge = (input: ConnectionMaterializationInput) => {
+    materialized.push(input);
+    return { id: edgeId('captured-edge'), type: 'flow', ...input, data: null };
+  };
+  const interaction = host.install(interactionPlugin, {
+    connection: {
+      get materializeEdge() {
+        return ++reads === 1 ? materializeEdge : (null as never);
+      },
+    },
+  });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => renderer)),
+    interaction,
+    host.install(
+      definePlugin({
+        requires: { kernel: kernelService },
+        setup(context) {
+          kernel = context.services.kernel;
+        },
+      }),
+    ),
+  ];
+
+  try {
+    await Promise.all(installations.map((installation) => installation.whenActive()));
+    if (!kernel) throw new Error('Expected Kernel Service.');
+    const sourceId = nodeId('captured-source');
+    const targetId = nodeId('captured-target');
+    kernel.transact((transaction) => {
+      transaction.nodes.add({ id: sourceId, type: 'task', position: { x: 0, y: 0 }, data: null });
+      transaction.nodes.add({ id: targetId, type: 'task', position: { x: 100, y: 0 }, data: null });
+    });
+    renderer.hit = { type: 'connection-anchor', nodeId: sourceId, role: 'source', worldPoint: { x: 0, y: 0 } };
+    renderer.emit(pointerInput('pointer.down', { x: 0, y: 0 }));
+    renderer.hit = { type: 'connection-anchor', nodeId: targetId, role: 'target', worldPoint: { x: 100, y: 0 } };
+    renderer.emit(pointerInput('pointer.move', { x: 100, y: 0 }));
+    renderer.emit(pointerInput('pointer.up', { x: 100, y: 0 }));
+    await settleCommands();
+
+    expect(materialized).toEqual([{ source: { nodeId: sourceId }, target: { nodeId: targetId } }]);
+    expect(kernel.read().snapshot).toMatchObject({ revision: 2, edges: [{ id: edgeId('captured-edge') }] });
+    expect(reads).toBe(1);
+    expect(renderer.releasedPointers).toEqual([1]);
+    expect(renderer.projections.at(-1)).toBeNull();
+    expect(faults).toEqual([]);
+  } finally {
+    await host.dispose();
+  }
 });
 
 class PortConnectionRenderer implements CanvasRenderer {
