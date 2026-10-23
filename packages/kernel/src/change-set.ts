@@ -67,16 +67,18 @@ function validateChangeSet(changeSet: ChangeSet, direction: ChangeDirection): re
   if (!isRecord(changeSet)) {
     throwInvalidChangeSet('Change Set must be an object.', {});
   }
+  const beforeRevision = changeSet.beforeRevision;
+  const revision = changeSet.revision;
   if (
-    !Number.isSafeInteger(changeSet.beforeRevision) ||
-    changeSet.beforeRevision < 0 ||
-    !Number.isSafeInteger(changeSet.revision) ||
-    changeSet.revision !== changeSet.beforeRevision + 1
+    !Number.isSafeInteger(beforeRevision) ||
+    beforeRevision < 0 ||
+    !Number.isSafeInteger(revision) ||
+    revision !== beforeRevision + 1
   ) {
     throwInvalidChangeSet('Change Set revisions must be adjacent non-negative safe integers.', {
       issue: 'INVALID_REVISIONS',
-      beforeRevision: describeInvalidRevision(changeSet.beforeRevision),
-      revision: describeInvalidRevision(changeSet.revision),
+      beforeRevision: describeInvalidRevision(beforeRevision),
+      revision: describeInvalidRevision(revision),
     });
   }
   const changes = changeSet.changes;
