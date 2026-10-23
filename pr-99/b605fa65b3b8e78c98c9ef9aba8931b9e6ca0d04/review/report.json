@@ -1,0 +1,212 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "efc9a639f967718ef2e8c199e07d7ba49629a057",
+    "expectedParent": "cca4e7f6e7f850799387896162aedc89610631ea",
+    "head": "b605fa65b3b8e78c98c9ef9aba8931b9e6ca0d04",
+    "tree": "f5d6e555c7fad38e2ae589234be80e3201db6415",
+    "patch": "50f0622fe0fe29d74744f01660840841c10ff8d59ccc7fa34fd8d42c0131dc69",
+    "localHead": "b605fa65b3b8e78c98c9ef9aba8931b9e6ca0d04"
+  },
+  "task": {
+    "run": "bfe611cd-4043-4a36-9b90-5da911fc283a",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 98
+    },
+    "request": "## Confirmed defect\n\nOn fetched main `dcf13482b68bc2422fc4d714df1226ab0ef259aa`, `createLayoutPlugin()` can validate capabilities against one Engine and then compute with a different Engine. A legal readonly `options.engine` getter is read again between those operations.\n\nA fresh compiled public Host/Kernel/Command/Layout probe uses real direct Engine implementations:\n\n- A stable capable Engine computes once and commits `{x:10,y:20}` at revision 2.\n- A stable Engine with `incremental:false` rejects an incremental Request with `UNSUPPORTED_FEATURE`; it is never called and revision stays 1.\n- The first Engine's capability getter makes the outer options getter return the second Engine on later reads. Runtime accepts the first Engine's `incremental:true`, then invokes the second Engine despite its `incremental:false`. The unsupported Engine computes once and commits `{x:100,y:200}` at revision 2. The Plugin is still named for the first Engine.\n\nActual changing case:\n\n```json\n{\"pluginName\":\"@nodebraid/plugin-layout:first-capable\",\"engineReads\":4,\"firstCalls\":0,\"secondCalls\":1,\"code\":null,\"revision\":2,\"position\":{\"x\":100,\"y\":200}}\n```\n\nThe public invariant that an unsupported Engine cannot be invoked by a check against another Engine fails with exit 1. No internal Runtime collaborator is mocked. Original source/output are preserved in run `20261023T062254-discovery-layout-binding`: `layout-engine-binding-repro.ts`, `layout-binding-red.log`. Fresh package build and existing Runtime Layout suites pass: **16 tests / 36 assertions**.\n\n## Contract and cause\n\n[ADR0024](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/docs/adr/0024-use-provider-specific-layout-commands-without-a-registry.md) binds Provider-specific Commands without a dynamic Registry. The [public Runtime module contract](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/website/en/modules/plugin-layout.md) states that the factory statically binds a concrete Engine to a typed Command. [ADR0026](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/docs/adr/0026-validate-layout-contracts-at-their-ownership-boundaries.md) and existing public Request tests require unsupported capabilities to fail before Provider execution.\n\nThe factory reads `options.engine` for the Plugin name, Runtime diagnostic ID, capability check and computation. Those reads can select different Engine objects, so the guard does not necessarily describe the implementation that runs.\n\n## Acceptance\n\n- Capture the concrete Engine when `createLayoutPlugin()` is called and retain that object for the Plugin name, capability validation and computation throughout its Installations/Activations. Use the same public Engine receiver for `compute()`.\n- The changing getter reproduction must keep the first Engine bound: its supported computation runs, the substituted unsupported Engine is not called, and its result is not committed. Ordinary unsupported Engines still reject before execution.\n- Preserve direct and helper Engine support; original options-read and computation failures; full/incremental/Fixed Node/self-loop validation; pre/post-computation cancellation; Proposal validation; live-revision stale protection; single-Commit metadata; net-zero and lifecycle behavior.\n- Fix the existing shared factory without a Registry, new API, helper requirement, accessor ban, fallback, cap, retry or dependency. Command-token configuration and algorithm implementations remain outside this repair.\n- Use the existing public Host/Command/Kernel seam for actual red/green and controls, then relevant Layout/Provider/History consumers, independent Standards with ponytail-review and Spec, formal full engineering verification, exact source publication, current-head CI and complete immutable report/media readback.\n- Keep this Issue open until actual main integration and whole-Issue acceptance; delivery remains for human review/merge.\n\n## Deduplication\n\nComplete all-state metadata/body pages contain **97 Issue/PR records and 50 PRs**. Read the full relevant #78, #88, #37 and #15 bodies/discussions. #78 owns Request/Proposal value capture; #88 owns post-computation cancellation; #37 owns Port topology and manual layout; #15 owns ELK seed normalization. None repairs Runtime Engine-object binding between capability validation and computation.",
+    "plan": [
+      {
+        "id": "synchronize-main",
+        "blockedBy": [],
+        "acceptance": "Capture current fetched main and published source head independently before append-only synchronization of the existing delivery branch. Preserve original Issue scope."
+      },
+      {
+        "id": "integration-compatibility",
+        "blockedBy": [
+          "synchronize-main"
+        ],
+        "acceptance": "Fresh public affected consumers and integration checks pass. Save complete current head/tree/binary patch; historical evidence retains its original source."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "integration-compatibility"
+        ],
+        "acceptance": "Fresh independent Standards with ponytail-review and Spec inspect the complete current patch against original Issue, ADRs and current main."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Pinned main versioned agents:run verify executes the real full bun run check after both review axes pass; preserve every attempt."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Actual remote tree and original append parent match verification; current-head CI, complete feedback, immutable full report/media publication and readback pass."
+      },
+      {
+        "id": "authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "Recheck current source/base, strict checks and all feedback immediately before a normal expected-head merge. Preserve review disputes and protection."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "authorized-merge"
+        ],
+        "acceptance": "Verify actual fetched main ancestry and the whole original Issue through fresh public acceptance; publish outcomes and close only after complete acceptance."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "b605fa65b3b8e78c98c9ef9aba8931b9e6ca0d04",
+      "tree": "f5d6e555c7fad38e2ae589234be80e3201db6415",
+      "patch": "50f0622fe0fe29d74744f01660840841c10ff8d59ccc7fa34fd8d42c0131dc69",
+      "report": "What this change does: Layout binds one concrete Engine when its Plugin is created. The name, capability checks and computation keep using that Engine, including after dependency recovery.\n\nSource identity:\n- Base: efc9a639f967718ef2e8c199e07d7ba49629a057\n- Head: b605fa65b3b8e78c98c9ef9aba8931b9e6ca0d04\n- Tree: f5d6e555c7fad38e2ae589234be80e3201db6415\n- Binary patch SHA256: 50f0622fe0fe29d74744f01660840841c10ff8d59ccc7fa34fd8d42c0131dc69\n\nScope: the complete base...head diff, both files and all 140 new test lines. Commits are cca4e7f and synchronization b605fa6. Both merge parents and prepared/inspection identities agree. `complete.patch` matches canonical `git diff --binary BASE HEAD` byte for byte. `complete-full-index.patch` preserves `git diff --binary --full-index BASE HEAD`, with SHA256 a828316f647642fae44ad6c40347533db417be39855496e53e683605b64c876f. I read Issue #98 and its complete one-comment discussion, including the async-fixture correction.\n\nHard standards: No violations found. ADR0024 and the public Runtime contract require a statically bound Engine. Capturing the object once establishes that identity without changing Command configuration or Engine internals. ADR0026's Request, capability, cancellation, Proposal and live-revision checks stay at their existing boundaries. Getter and computation failures retain their original values under ADR0029.\n\nJudgment-only smells: No concrete finding across the full Fowler baseline. The local alias fixes the shared factory directly, adds no abstraction or fallback, and keeps the compute method's original receiver.\n\nPonytail assessment: Looks good for isolated Canvas Hosts with asynchronous computation and synchronous commits. I traced Examples, direct/helper Engines, Dagre/ELK, Command registration/disposal, Kernel commits and History replay. Tests cover both substitution timings, a second Activation, receiver identity and original getter failures.\n\nIndependent command at this head:\n`bun test packages/layout-api/tests packages/plugin-layout/tests packages/layout-dagre/tests packages/layout-elk/tests packages/plugin-history/tests tests/layout-providers.test.ts`\n\nResult: exit 0; 97 tests, 349 assertions. Final identity, clean-status and whitespace audits passed.\n\nNot checked independently: TypeScript, builds, browsers, full engineering check, remote CI, publication or main integration. Earlier execution evidence was not counted as this review's execution.\n\nVerdict: passed. Looks good. Ship.\n"
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "b605fa65b3b8e78c98c9ef9aba8931b9e6ca0d04",
+      "tree": "f5d6e555c7fad38e2ae589234be80e3201db6415",
+      "patch": "50f0622fe0fe29d74744f01660840841c10ff8d59ccc7fa34fd8d42c0131dc69",
+      "report": "# Spec review — Issue #98 / PR #99 synchronization\n\nVerdict: **passed**. 未发现需求缺漏、错误实现或范围扩张。\n\n- Base: `efc9a639f967718ef2e8c199e07d7ba49629a057`\n- Head: `b605fa65b3b8e78c98c9ef9aba8931b9e6ca0d04`\n- Tree: `f5d6e555c7fad38e2ae589234be80e3201db6415`\n- Canonical binary patch SHA256: `50f0622fe0fe29d74744f01660840841c10ff8d59ccc7fa34fd8d42c0131dc69`\n\n已独立重读 Issue98 全文及唯一评论6359256086、prepared request/plan、空反馈/依赖记录；完整审阅当前两文件 diff、实际 fix/merge 提交和140行 Engine 回归。评论的 async 接口修正不改变验收；两个直接 Engine fixture 均保持 Promise 契约及原断言。依据当前 AGENTS/CONTEXT、tracker/discussion、code-review、ADR0024/0026/0029 和双语公共 Runtime 文档复核。\n\nIssue 要求 “Capture the concrete Engine when createLayoutPlugin() is called” 并 “Use the same public Engine receiver”。工厂在创建时只读取一次 options.engine；命名、capability validation、compute 及后续 Activation 共享该闭包对象，成员调用保留 receiver。两种替换时机和依赖失去/恢复的公共回归验证实际 Node 位置及调用次数；原始 options getter 异常用 toBe 保留对象身份。能力拒绝仍先于计算，direct/helper 支持、取消、Proposal/live-revision、metadata、net-zero、History 与 registration cleanup 路径未改；没有新增 Registry/API 或扩张 Command/算法范围。\n\n新 main 相对旧基线仅加入 Runtime Binding descriptor 修复；Layout 的普通静态 requires 声明仍沿相同 normalizer 接入，未引入冲突。\n\n独立执行当前 head：`bun test packages/layout-api/tests packages/plugin-layout/tests packages/plugin-history/tests tests/layout-providers.test.ts` **83 pass /320 assertions，exit0**；`git diff --check BASE...HEAD` exit0。`complete.patch` 与 canonical diff 逐字节一致；保留的 `complete-full-index.patch` 与 --full-index diff 逐字节一致，SHA256 `a828316f647642fae44ad6c40347533db417be39855496e53e683605b64c876f`。格式纠正未改变源码；两次测试前 metadata helper 中止及所有原始测试输出已记录于 `spec-commands.log`，不计为产品失败。\n\n未独立执行构建、类型检查、affected、compiled probe、浏览器或完整工程检查；远端发布/current-head CI、完整报告/media、合并与 main 全 Issue 验收未由本审查验证。旧 head 结果未换绑。\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "current-integration-tests",
+      "acceptance": "Current synchronized b605 actual public Layout API/Plugin/Dagre/ELK/Command/Kernel/History consumers pass122 tests439 assertions.",
+      "command": "bun test packages/plugin-layout/tests packages/layout-api/tests packages/layout-dagre/tests packages/layout-elk/tests packages/plugin-command/tests packages/plugin-kernel/tests packages/plugin-history/tests tests/layout-providers.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "current-original-compiled-controls",
+      "acceptance": "Current synchronized b605 compiled public Host/Kernel/Command/Layout repeats original three controls; accepted Engine retained, unsupported substitution never invoked. Source differs only by exact head assertion.",
+      "command": "bun run /Users/zhou/.codex/local-workflows/nodebraid/runs/bfe611cd-4043-4a36-9b90-5da911fc283a/compiled-current-repro.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "current-affected-consumers",
+      "acceptance": "Actual affected workspace types/public tests, native Example tests and docs at current synchronized b605 complete successfully.",
+      "command": "bun run check:affected --base efc9a639f967718ef2e8c199e07d7ba49629a057",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "current-native-layout",
+      "acceptance": "Actual published b605 native Auto layout moves Nodes once, preserves Edge/Viewport, repeats net-zero, and Undo/Redo restores exact before/after state; actual browser and owned server cleanup complete. Does not exercise Engine substitution.",
+      "command": "bun run /Users/zhou/.codex/local-workflows/nodebraid/runs/bfe611cd-4043-4a36-9b90-5da911fc283a/capture-layout-native.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "475db1d5b5f03ce87cb4295485bc57dcdf9094b065a652ed4b4693791b781f85"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "60b62ba634f3f0539b43d863f669a0b56b13f30e70120dd7d60ab4b9c54c0ed1"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "e592de104c342aa942b6e5467d5ada2f687dea507a9630b80c8c7cab1dbbe2c3"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "a3ca4eba1a8a801b24122380736f7f7e71cdf965ce20a3d9962f9251c8527527"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "4549daf9205db2e98c928a24d773b15513a89b63fe517ca604c95de579e2a2e5"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "523368ba6513f72a6e6be902c7d11dff26f18183c3cae1c0a07c3cf48ed3509a"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "95b0c374e8cea41363938b720e8e6149e3ab87cc87ac8b35ce86e9a89f5ff2ef"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "76188f3a2ae9c93c43b685aa7e2bd75c17af95fc2a6365b21dec7eacd36088cf"
+    },
+    {
+      "path": "layout-native/before.png",
+      "kind": "screenshot",
+      "sha256": "a9dac0b64942612ae09164d8034f4faf89c883554666a802f73410bfffaaa805"
+    },
+    {
+      "path": "layout-native/after.png",
+      "kind": "screenshot",
+      "sha256": "1cc5f903373647ab429ce5791ac93ac435f5495b05fe70f08c0a244f9d8d25b6"
+    },
+    {
+      "path": "layout-native/before.snapshot.json",
+      "kind": "snapshot",
+      "sha256": "cb8729401d10539bc353693dc1bb160ffd8a816930e49c64a07fe3a6f04ce7bb"
+    },
+    {
+      "path": "layout-native/after.snapshot.json",
+      "kind": "snapshot",
+      "sha256": "c329c25cd4e8c96603a0e59f807f78095fcd0f51292fd58718a6655ba672d7ff"
+    },
+    {
+      "path": "layout-native/before.state.json",
+      "kind": "snapshot",
+      "sha256": "f20ce0573b7856c06af6a19a72aaeae2df73941b03d301c0e0ba52b4bac975f5"
+    },
+    {
+      "path": "layout-native/after.state.json",
+      "kind": "snapshot",
+      "sha256": "84c85a209c6fa2866ca057d334a906093f088444477dfd8612e411bf2a5bd1c2"
+    },
+    {
+      "path": "layout-native/actions.log",
+      "kind": "log",
+      "sha256": "bf90cd41e0dea8420d1b5b65938c8b18be65849684c0603ae5bded313bc121e4"
+    },
+    {
+      "path": "layout-native/source.json",
+      "kind": "report",
+      "sha256": "db660ec595524ea5dd674d859a895eb2b78d708844923f83f8ab144276a81b5d"
+    }
+  ]
+}
