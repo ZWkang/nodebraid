@@ -1,9 +1,9 @@
-import type { CanvasEdge, CanvasNode, EdgeId, NodeId } from '@nodebraid/kernel';
+import { edgeId, nodeId, type CanvasEdge, type CanvasNode, type EdgeId, type NodeId } from '@nodebraid/kernel';
 import { defineCommand, type CommandHandler } from '@nodebraid/plugin-command';
 import type { KernelService } from '@nodebraid/plugin-kernel';
 
 import type { DeleteSelectionInput, DeleteSelectionResult } from './contracts';
-import { isCanvasEdge, isCanvasNode, isIdArray, isRecord } from './canvas-value-validation';
+import { isCanvasEdge, isCanvasNode, isRecord } from './canvas-value-validation';
 import { InteractionError } from './interaction-error';
 
 export const deleteSelectionCommand = defineCommand<DeleteSelectionInput, DeleteSelectionResult>(
@@ -16,9 +16,9 @@ export function createDeleteSelectionHandler(
 ): CommandHandler<DeleteSelectionInput, DeleteSelectionResult> {
   return (input, execution) => {
     execution.signal.throwIfAborted();
-    const evidence = captureDeleteSelectionEvidence(input);
-    const nodeIds = canonicalIds(input.selection.nodeIds);
-    const selectedEdgeIds = canonicalIds(input.selection.edgeIds);
+    const { selection, evidence } = captureDeleteSelectionInput(input);
+    const nodeIds = canonicalIds(selection.nodeIds);
+    const selectedEdgeIds = canonicalIds(selection.edgeIds);
     if (nodeIds.length === 0 && selectedEdgeIds.length === 0) return null;
 
     const evidenceNodes = new Map(evidence.nodes.map((node) => [node.id, node]));
@@ -59,17 +59,31 @@ export function createDeleteSelectionHandler(
   };
 }
 
-function captureDeleteSelectionEvidence(value: unknown): DeleteSelectionInput['evidence'] {
-  if (!isRecord(value) || !isSelection(value.selection)) {
-    throwInvalidDelete('Delete Selection Command input is malformed.');
-  }
+function captureDeleteSelectionInput(value: unknown): DeleteSelectionInput {
+  if (!isRecord(value)) throwInvalidDeleteInput();
+  const selection = value.selection;
+  if (!isRecord(selection)) throwInvalidDeleteInput();
+  const nodeIds = captureSelectionIds(selection.nodeIds, nodeId);
+  const edgeIds = captureSelectionIds(selection.edgeIds, edgeId);
   const evidence = value.evidence;
-  if (!isSnapshot(evidence)) throwInvalidDelete('Delete Selection Command input is malformed.');
-  return evidence;
+  if (!isSnapshot(evidence)) throwInvalidDeleteInput();
+  return { selection: { nodeIds, edgeIds }, evidence };
 }
 
-function isSelection(value: unknown): value is DeleteSelectionInput['selection'] {
-  return isRecord(value) && isIdArray(value.nodeIds) && isIdArray(value.edgeIds);
+function captureSelectionIds<Id extends string>(value: unknown, createId: (id: string) => Id): readonly Id[] {
+  if (!Array.isArray(value)) throwInvalidDeleteInput();
+  const length = +value.length;
+  const captured: Id[] = [];
+  for (const index of Array.prototype.keys.call({ length })) {
+    const id: unknown = value[index];
+    if (typeof id !== 'string' || id.length === 0) throwInvalidDeleteInput();
+    captured.push(createId(id));
+  }
+  return captured;
+}
+
+function throwInvalidDeleteInput(): never {
+  throwInvalidDelete('Delete Selection Command input is malformed.');
 }
 
 function isSnapshot(value: unknown): value is DeleteSelectionInput['evidence'] {
