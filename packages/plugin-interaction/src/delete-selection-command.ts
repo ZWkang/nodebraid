@@ -65,19 +65,22 @@ function captureDeleteSelectionInput(value: unknown): DeleteSelectionInput {
   if (!isRecord(selection)) throwInvalidDeleteInput();
   const nodeIds = captureSelectionIds(selection.nodeIds, nodeId);
   const edgeIds = captureSelectionIds(selection.edgeIds, edgeId);
-  const evidence = value.evidence;
-  if (!isSnapshot(evidence)) throwInvalidDeleteInput();
+  const evidence = captureSnapshot(value.evidence);
   return { selection: { nodeIds, edgeIds }, evidence };
 }
 
 function captureSelectionIds<Id extends string>(value: unknown, createId: (id: string) => Id): readonly Id[] {
+  return captureArray(value, (id): id is string => typeof id === 'string' && id.length > 0).map(createId);
+}
+
+function captureArray<Value>(value: unknown, isValue: (value: unknown) => value is Value): readonly Value[] {
   if (!Array.isArray(value)) throwInvalidDeleteInput();
   const length = +value.length;
-  const captured: Id[] = [];
+  const captured: Value[] = [];
   for (const index of Array.prototype.keys.call({ length })) {
-    const id: unknown = value[index];
-    if (typeof id !== 'string' || id.length === 0) throwInvalidDeleteInput();
-    captured.push(createId(id));
+    const entry: unknown = value[index];
+    if (!isValue(entry)) throwInvalidDeleteInput();
+    captured.push(entry);
   }
   return captured;
 }
@@ -86,17 +89,13 @@ function throwInvalidDeleteInput(): never {
   throwInvalidDelete('Delete Selection Command input is malformed.');
 }
 
-function isSnapshot(value: unknown): value is DeleteSelectionInput['evidence'] {
-  return (
-    isRecord(value) &&
-    Number.isSafeInteger(value.revision) &&
-    typeof value.revision === 'number' &&
-    value.revision >= 0 &&
-    Array.isArray(value.nodes) &&
-    value.nodes.every(isCanvasNode) &&
-    Array.isArray(value.edges) &&
-    value.edges.every(isCanvasEdge)
-  );
+function captureSnapshot(value: unknown): DeleteSelectionInput['evidence'] {
+  if (!isRecord(value)) throwInvalidDeleteInput();
+  const revision = value.revision;
+  if (typeof revision !== 'number' || !Number.isSafeInteger(revision) || revision < 0) throwInvalidDeleteInput();
+  const nodes = captureArray(value.nodes, isCanvasNode);
+  const edges = captureArray(value.edges, isCanvasEdge);
+  return { revision, nodes, edges };
 }
 
 function requireEvidenceNode(nodes: ReadonlyMap<NodeId, CanvasNode>, id: NodeId): CanvasNode {
