@@ -28,6 +28,8 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 
 实现阶段应用项目级 `ponytail` 的 full 模式，先读真实调用链并优先复用，再完成最小充分改动。Standards review 同时使用 `ponytail-review`；按已确认的 spec、ADR 和公共契约判断简化，不删必要的错误处理、验证或框架 seam。
 
+PR 分级以项目级 [pr-risk](.agents/skills/pr-risk/SKILL.md) 为唯一规则入口。原有 Standards/Spec 两轴分别记录绑定当前 head/tree/patch 的风险依据与回滚方案，最终取高等级并应用路径最低等级。low 在全部既有交付条件通过后可免人工即时合并；medium 重点人工审阅，high 完整人工审阅。分级规则及执行权限变更本身属于 high，不能自行使用豁免。`evaluate` 的风险与自动合并候选不替代报告发布回读及合并前验收；Issue 关闭仍需独立授权。
+
 可见 Canvas 变更和浏览器验证维护使用项目级 [verify-nodebraid](.agents/skills/verify-nodebraid/SKILL.md)，通过锁定的 `agent-browser` 采集真实证据。完整审查报告与媒体的生成、连接器发布和权限边界见 [PR 证据](docs/agents/pr-evidence.md)；每次 ready 前必须实际发布并回读当前 head 的报告，保留报告 URL、source head 与 evidence commit。`agents:run evaluate` 尚未自动校验展示回执。
 
 开发循环使用 `bun run check:affected`，定向通过不算完成交付。托管任务先完成定向检查与双轴 review，再由 `agents:run verify` 执行本次交付验证的全量 `bun run check`，不提前人工重复执行相同全量检查。同一 head 的新验证尝试仍真实执行，保留独立日志；GitHub CI 继续全量检查。
@@ -54,7 +56,7 @@ GitHub 写入使用已连接工具或已认证 Git client，不复制订阅登�
 
 托管 PR 以 `[local-agent] `（兼容 `[agent] `）标题和 `feat/issue-N` 分支加入本地 CI／review 修复闭环，直接关联同一个 spec Issue。有合并后验收时用 `Refs #N` 保持 Issue 开放；只有合并是最后剩余条件且关闭已获授权时才用 `Fixes #N`，并核对提交消息和自动关闭关联。
 规格标题使用 `spec: `；获准实施后同一 Issue 可标记 `approved-spec` 和 `ready-for-agent`，批准范围内自主拆分本地 ticket。暂停、本地执行与其他活跃负责人保持可见。
-Agent 在原 PR 上追加修复并验证，需求变化返回讨论；默认由用户最终审阅与合并，已有明确授权可执行验证后的合并与关闭。ready 前核对合并前 ticket/验收和当前 head 的检查、审查、报告，并列明待合并后才能执行的步骤。关闭 Issue 再核对实际 main 集成、全部 ticket 证据和剩余验收。旧父子 Issue、叠加 PR 及 `feat/issue-N-integration` 保留为历史恢复路径，不用于新需求拆票。
+Agent 在原 PR 上追加修复并验证，需求变化返回讨论；按 pr-risk 路由执行合并，已有单 PR 明确授权仍适用。ready 前核对合并前 ticket/验收和当前 head 的检查、审查、报告，并列明待合并后才能执行的步骤。关闭 Issue 再核对独立关闭授权、实际 main 集成、全部 ticket 证据和剩余验收。旧父子 Issue、叠加 PR 及 `feat/issue-N-integration` 保留为历史恢复路径，不用于新需求拆票。
 
 修改本地工作流后格式化并执行 `agents:check` 及相关状态测试。GitHub 不保留 API Agent 或 gh-aw 编译入口。
 

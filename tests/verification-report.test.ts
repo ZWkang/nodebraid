@@ -56,9 +56,15 @@ function fixture() {
     const standards = 'Read the report command and callers.\nNot checked: Windows.\nSource: review-session-standards';
     const spec =
       'The approved report requirements are covered.\nNot checked: remote publication.\nSource: review-session-spec';
+    const risk = {
+      level: 'low',
+      rationale: 'The fixture changes one isolated text document.',
+      evidence: 'The fixture check executes; production code is unchanged.',
+      rollback: 'Revert the isolated text change.',
+    };
     json(join(run, 'reviews.json'), {
-      standards: { ...identity, verdict: 'passed', report: standards },
-      spec: { ...identity, verdict: 'passed', report: spec },
+      standards: { ...identity, verdict: 'passed', report: standards, risk },
+      spec: { ...identity, verdict: 'passed', report: spec, risk },
     });
     json(join(run, 'decisions.json'), []);
     execute('verify', run, join(run, 'reviews.json'), join(run, 'decisions.json'));
@@ -138,6 +144,11 @@ test('the public report command preserves both reviews, real logs and published 
     const markdown = readFileSync(join(f.output, 'report.md'), 'utf8');
     expect(markdown).toContain(f.standards);
     expect(markdown).toContain(f.spec);
+    expect(report.risk.level).toBe('low');
+    expect(report.risk.route).toBe('automatic');
+    expect(report.changedFiles).toEqual(['changed.txt']);
+    expect(markdown).toContain('Revert the isolated text change.');
+    expect(markdown).toContain('candidate');
     expect(markdown).toContain('Reviewer can inspect actual verification evidence');
     expect(markdown).toContain('Behavior evidence: not provided');
     expect(markdown).toContain('exit 0');
@@ -153,6 +164,28 @@ test('the public report command preserves both reviews, real logs and published 
     f.cleanup();
   }
 }, 30_000);
+
+test('historical reports expose missing risk evidence instead of claiming automatic merge eligibility', () => {
+  const f = fixture();
+  try {
+    const path = join(f.run, 'verification.json');
+    const verified = JSON.parse(readFileSync(path, 'utf8'));
+    delete verified.reviews.standards.risk;
+    delete verified.reviews.spec.risk;
+    delete verified.changedFiles;
+    f.json(path, verified);
+    const original = readFileSync(path, 'utf8');
+    expect(f.report().status).toBe(0);
+    const report = JSON.parse(readFileSync(join(f.output, 'report.json'), 'utf8'));
+    expect(report.risk.level).toBe('unclassified');
+    expect(report.risk.route).toBe('full-human');
+    expect(report.changedFiles).toBeNull();
+    expect(readFileSync(join(f.output, 'report.md'), 'utf8')).toContain('unclassified');
+    expect(readFileSync(path, 'utf8')).toBe(original);
+  } finally {
+    f.cleanup();
+  }
+});
 
 test('declared behavior results retain real red/green logs, failures and explicit unrun checks', () => {
   const f = fixture();

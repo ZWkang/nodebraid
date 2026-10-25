@@ -26,6 +26,14 @@ Refs #<spec-issue>
 
 ## Merge Danger
 
+**Risk / Route:** <final pr-risk level and route; reviewed head>
+
+**Basis:** <both independent assessments and report link>
+
+**Rollback:** <concrete recovery and irreversible effects>
+
+**Human attention:** <required decisions or none under the verified low-risk route>
+
 **Door:** <one-way or two-way>
 
 <optional: description>
@@ -186,6 +194,13 @@ Screenshots are S-tier - when the environment is set up for it and the change is
 Execution-based evidence is A-tier. Test results, console output. Show the exact test that now fails and passes, using pseudocode.
 
 ### Merge Danger
+
+Use the canonical [pr-risk policy](../pr-risk/SKILL.md) and the current-head
+Standards/Spec assessments. Show the final level, route and concrete reasons;
+do not derive a low classification from PR size, CI or the author alone. Preserve
+the distinction between `autoMergeCandidate` and the coordinator's completed
+report-readback and pre-merge acceptance checks. Keep remaining human decisions
+and post-merge acceptance visible.
 
 Describe whether it's a one-way or two-way door. You can walk back through two-way doors, but not one-way doors. A PR that is cheap to roll back is lower risk. Changes that involve destructive actions or hard-to-reverse decisions are one-way doors.
 

@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { closeSync, constants, lstatSync, mkdirSync, openSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { validateVerification, type PreparedRun, type Publication, type VerifiedRun } from './local-agent-run';
+import { summarizeRisk, type RiskSummary } from './pr-risk';
 
 export interface ReportArtifact {
   path: string;
@@ -26,6 +27,8 @@ export interface VerificationReportContent {
   task: Pick<PreparedRun, 'run' | 'repository' | 'source' | 'request' | 'plan'>;
   checks: VerifiedRun['checks'];
   reviews: VerifiedRun['reviews'];
+  changedFiles: string[] | null;
+  risk: RiskSummary;
   decisions: VerifiedRun['decisions'];
   behaviorEvidence: BehaviorEvidence[] | null;
 }
@@ -53,6 +56,29 @@ export function renderVerificationReport(report: VerificationReportContent): str
     `- Complete binary patch SHA-256: \`${source.patch}\``,
     '',
     'The publication record matches the reviewed tree and expected parent. Remote PR freshness is checked separately by the publisher.',
+    '',
+    '## PR risk and merge route',
+    '',
+    `Risk: ${report.risk.level}. Route: ${report.risk.route}.`,
+    '',
+    ...report.risk.reasons.map((reason) => `- ${reason}`),
+    '',
+    ...(['standards', 'spec'] as const).flatMap((axis) => {
+      const risk = reviews[axis].risk;
+      return risk
+        ? [
+            `### ${axis} risk: ${risk.level}`,
+            '',
+            `Impact and reasoning: ${risk.rationale}`,
+            '',
+            `Evidence: ${risk.evidence}`,
+            '',
+            `Rollback: ${risk.rollback}`,
+            '',
+          ]
+        : [`${axis}: unclassified; no risk assessment was recorded.`, ''];
+    }),
+    'Automatic routing is a candidate only. The coordinator still checks current PR status, report publication, pre-merge acceptance and authorization immediately before a head-bound merge.',
     '',
     '## Acceptance plan',
     '',
@@ -177,6 +203,8 @@ export function collectVerificationReport(runDirectory: string): CollectedVerifi
     task: { run: task.run, repository: task.repository, source: task.source, request: task.request, plan: task.plan },
     checks: { ...verified.checks, log: 'logs/full-check.log' },
     reviews: verified.reviews,
+    changedFiles: verified.changedFiles ?? null,
+    risk: summarizeRisk(verified.reviews, verified.changedFiles),
     decisions: verified.decisions,
     behaviorEvidence,
   };

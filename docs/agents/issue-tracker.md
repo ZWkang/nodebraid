@@ -261,9 +261,14 @@ The existing `feat/issue-N-integration` form remains recognized for historical r
 the existing PR into current-head CI/review maintenance. New feedback is
 investigated, verified fixes append to the same branch, and evidence returns
 to the PR. Design changes and disputed reviews remain visible for discussion.
-Human review and merge remain the default. Explicit user authorization can permit
-merge and issue closure after verification; it does not permit self-approval,
-dismissing reviews, bypassing checks or enabling auto-merge.
+Review and merge follow the canonical [PR risk policy](../../.agents/skills/pr-risk/SKILL.md).
+Only a verified low-risk candidate may use the immediate merge exemption after
+the coordinator confirms current-head report readback and all pre-merge acceptance.
+Medium/high and unclassified PRs retain human review and merge. Existing explicit
+single-PR authorization remains applicable, but never permits self-approval,
+dismissing reviews, bypassing checks or enabling GitHub auto-merge queues.
+The exemption grants no Issue-closing authority: apply the independent closure
+and automatic-closing-link rules above.
 
 Workflow setup, credentials, event behavior and verification are documented in
 [agentic-workflows.md](./agentic-workflows.md).

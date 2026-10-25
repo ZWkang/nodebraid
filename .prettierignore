@@ -1,7 +1,8 @@
 # Existing vendored skills preserve their upstream formatting.
-# Project-maintained principles use the repository formatter.
+# Project-maintained skills use the repository formatter.
 .agents/skills/*/
 !.agents/skills/principle-*/
+!.agents/skills/pr-risk/
 
 # Generated tool adapter skill trees mirror the vendored sources above.
 .claude/skills/

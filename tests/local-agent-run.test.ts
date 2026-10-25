@@ -89,6 +89,7 @@ test('a new green head cannot inherit the previous tree, reviews or test evidenc
     snapshot,
   );
   expect(legacyResult.status).toBe('waiting-verification');
+  expect(legacyResult.autoMergeCandidate).toBe(false);
   const legacyWithBase = prepareRun({ ...legacyInput, baseRefName: 'feat/issue-9' });
   expect(Object.hasOwn(legacyWithBase, 'expectedParent')).toBe(false);
   expect(
@@ -119,4 +120,108 @@ test('a new green head cannot inherit the previous tree, reviews or test evidenc
       statusCheckRollup: snapshot.statusCheckRollup.map((c) => ({ ...c, headSha: sha('f') })),
     }).status,
   ).toBe('waiting-verification');
+});
+
+test('risk routes a verified current head without replacing feedback or CI readiness', () => {
+  const task = prepareRun({
+    run: 'risk-run',
+    repository: 'ZWkang/nodebraid',
+    source: { kind: 'issue', number: 10 },
+    branch: snapshot.headRefName,
+    baseRefName: 'main',
+    base: sha('a'),
+    expectedParent: sha('a'),
+    request: 'Correct a documentation example without changing its contract.',
+    pending: [],
+    plan: [{ id: 'docs', blockedBy: [], acceptance: 'The corrected example matches the existing contract.' }],
+  });
+  const risk = {
+    level: 'low' as const,
+    rationale: 'Only explanatory prose changes; runtime and public contracts are unchanged.',
+    evidence: 'Read the complete patch and checked the example against its existing test.',
+    rollback: 'Revert the documentation commit; no persisted state is affected.',
+  };
+  const review = {
+    head: sha('c'),
+    tree: sha('d'),
+    patch: 'e'.repeat(64),
+    verdict: 'passed' as const,
+    report: 'Reviewed complete change',
+    risk,
+  };
+  const verified: VerifiedRun = {
+    taskDigest: task.digest,
+    head: review.head,
+    tree: review.tree,
+    patch: review.patch,
+    changedFiles: ['docs/example.md'],
+    checks: { command: 'bun run check', exitCode: 0, log: 'checks.log', stable: true },
+    reviews: { standards: review, spec: review },
+    decisions: [],
+  };
+  const publication = {
+    taskDigest: task.digest,
+    head: snapshot.headRefOid,
+    tree: verified.tree,
+    localHead: verified.head,
+    parent: task.base,
+  };
+  const evaluate = (current = snapshot, run = verified) => evaluateVerifiedRun(task, run, publication, current);
+  expect(evaluate()).toMatchObject({
+    status: 'ready',
+    risk: { level: 'low', route: 'automatic' },
+    autoMergeCandidate: true,
+  });
+  for (const [level, route] of [
+    ['medium', 'quick-human'],
+    ['high', 'full-human'],
+  ] as const) {
+    expect(
+      evaluate(snapshot, {
+        ...verified,
+        reviews: { ...verified.reviews, spec: { ...review, risk: { ...risk, level } } },
+      }),
+    ).toMatchObject({
+      status: 'ready',
+      risk: { level, route },
+      autoMergeCandidate: false,
+    });
+  }
+  for (const current of [
+    { ...snapshot, statusCheckRollup: [] },
+    { ...snapshot, reviewDecision: 'REVIEW_REQUIRED' },
+    { ...snapshot, reviewDecision: 'CHANGES_REQUESTED' },
+    { ...snapshot, mergeStateStatus: 'BEHIND' },
+    {
+      ...snapshot,
+      feedback: [
+        { key: 'comment:1', digest: 'new', body: 'A correction is needed.', url: 'https://github.com/comment/1' },
+      ],
+    },
+    { ...snapshot, isDraft: true },
+    { ...snapshot, baseRefOid: sha('f') },
+    { ...snapshot, headRefOid: sha('f') },
+  ])
+    expect(evaluate(current).autoMergeCandidate).toBe(false);
+  expect(evaluate(snapshot, { ...verified, changedFiles: ['AGENTS.md'] })).toMatchObject({
+    risk: { level: 'high' },
+    autoMergeCandidate: false,
+  });
+  for (const run of [
+    { ...verified, changedFiles: undefined },
+    { ...verified, reviews: { ...verified.reviews, spec: { ...review, risk: undefined } } },
+  ]) {
+    expect(() => validateVerification(task, run)).not.toThrow();
+    expect(evaluate(snapshot, run)).toMatchObject({
+      status: 'ready',
+      risk: { level: 'unclassified', route: 'full-human' },
+      autoMergeCandidate: false,
+    });
+  }
+  expect(() =>
+    validateVerification(task, {
+      ...verified,
+      reviews: { ...verified.reviews, spec: { ...review, risk: { ...risk, evidence: '' } } },
+    }),
+  ).toThrow('Risk assessment');
 });

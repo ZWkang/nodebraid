@@ -74,7 +74,12 @@ test('a persisted task resumes after a failed real check and never blesses an un
     git('switch', '-c', 'feat/issue-10');
     writeFileSync(join(dir, '.gitignore'), '.tmp/\n');
     json('package.json', { scripts: { check: 'bun check.ts' } });
-    writeFileSync(join(dir, 'check.ts'), "if (await Bun.file('.tmp/fail').exists()) process.exit(1);\n");
+    writeFileSync(
+      join(dir, 'check.ts'),
+      "await Bun.write('.tmp/check-started', 'real check');\nif (await Bun.file('.tmp/fail').exists()) process.exit(1);\n",
+    );
+    mkdirSync(join(dir, '.agents'));
+    writeFileSync(join(dir, '.agents/review.md'), 'Review policy must retain human review.\n');
     git('add', '.');
     git(
       '-c',
@@ -110,15 +115,29 @@ test('a persisted task resumes after a failed real check and never blesses an un
     expect(invoke('prepare', '.tmp/input.json', '.tmp/run').status).toBe(0);
     json('.tmp/input.json', { ...input, request: 'different' });
     expect(invoke('prepare', '.tmp/input.json', '.tmp/run').status).not.toBe(0);
+    mkdirSync(join(dir, 'docs'));
+    git('mv', '.agents/review.md', 'docs/renamed policy.md');
+    git(
+      '-c',
+      'user.name=Test',
+      '-c',
+      'user.email=test@example.invalid',
+      '-c',
+      'core.hooksPath=.git/hooks',
+      'commit',
+      '-qm',
+      'move policy',
+    );
     const head = git('rev-parse', 'HEAD'),
       tree = git('rev-parse', 'HEAD^{tree}');
     const patch = createHash('sha256')
       .update(execFileSync('git', ['diff', '--binary', base, head], { cwd: dir }))
       .digest('hex');
-    json('.tmp/reviews.json', {
+    const reviews = {
       standards: { head, tree, patch, verdict: 'passed', report: 'Standards fixture review' },
       spec: { head, tree, patch, verdict: 'passed', report: 'Spec fixture review' },
-    });
+    };
+    json('.tmp/reviews.json', reviews);
     json('.tmp/decisions.json', []);
     const { expectedParent: _parent, ...legacyInput } = input;
     mkdirSync(join(dir, '.tmp/legacy-run'));
@@ -130,11 +149,31 @@ test('a persisted task resumes after a failed real check and never blesses an un
     expect(invoke('publication', '.tmp/legacy-run', '.tmp/not-a-commit.json').stderr).toContain('expectedParent');
     expect(existsSync(join(dir, '.tmp/legacy-run/verification.json'))).toBe(false);
     expect(readFileSync(join(dir, '.tmp/legacy-run/prepared-task.json'), 'utf8')).toBe(legacyText);
+    expect(invoke('verify', '.tmp/run', '.tmp/reviews.json', '.tmp/decisions.json').stderr).toContain(
+      'Risk assessment',
+    );
+    expect(existsSync(join(dir, '.tmp/check-started'))).toBe(false);
+    const risk = {
+      level: 'low',
+      rationale: 'The fixture declares a localized documentation change.',
+      evidence: 'Both paths in the rename were reviewed.',
+      rollback: 'Revert the rename commit.',
+    };
+    const classified = { standards: { ...reviews.standards, risk }, spec: { ...reviews.spec, risk } };
+    json('.tmp/reviews.json', { ...classified, spec: { ...classified.spec, risk: { ...risk, rollback: '' } } });
+    expect(invoke('verify', '.tmp/run', '.tmp/reviews.json', '.tmp/decisions.json').stderr).toContain(
+      'Risk assessment',
+    );
+    expect(existsSync(join(dir, '.tmp/check-started'))).toBe(false);
+    json('.tmp/reviews.json', classified);
     writeFileSync(join(dir, '.tmp/fail'), 'real child process exits nonzero');
     expect(invoke('verify', '.tmp/run', '.tmp/reviews.json', '.tmp/decisions.json').status).not.toBe(0);
     expect(JSON.parse(readFileSync(join(dir, '.tmp/run/verification.json'), 'utf8')).checks.exitCode).toBe(1);
     rmSync(join(dir, '.tmp/fail'));
     expect(invoke('verify', '.tmp/run', '.tmp/reviews.json', '.tmp/decisions.json').status).toBe(0);
+    const verification = JSON.parse(readFileSync(join(dir, '.tmp/run/verification.json'), 'utf8'));
+    expect(verification.changedFiles).toEqual(['.agents/review.md', 'docs/renamed policy.md']);
+    expect(existsSync(join(dir, '.tmp/check-started'))).toBe(true);
     json('.tmp/remote.json', {
       sha: 'b'.repeat(40),
       tree: { sha: tree },
@@ -142,6 +181,9 @@ test('a persisted task resumes after a failed real check and never blesses an un
     });
     expect(invoke('publication', '.tmp/run', '.tmp/remote.json').status).not.toBe(0);
     json('.tmp/remote.json', { sha: 'b'.repeat(40), tree: { sha: tree }, parents: [{ sha: base }] });
+    json('.tmp/run/verification.json', { ...verification, changedFiles: ['docs/renamed policy.md'] });
+    expect(invoke('publication', '.tmp/run', '.tmp/remote.json').stderr).toContain('source changed');
+    json('.tmp/run/verification.json', verification);
     expect(invoke('publication', '.tmp/run', '.tmp/remote.json').status).toBe(0);
     json('.tmp/snapshot.json', {
       number: 11,
@@ -162,7 +204,11 @@ test('a persisted task resumes after a failed real check and never blesses an un
         { name: 'checks', workflowName: 'Checks', headSha: 'b'.repeat(40), status: 'COMPLETED', conclusion: 'SUCCESS' },
       ],
     });
-    expect(JSON.parse(invoke('evaluate', '.tmp/run', '.tmp/snapshot.json').stdout).status).toBe('ready');
+    expect(JSON.parse(invoke('evaluate', '.tmp/run', '.tmp/snapshot.json').stdout)).toMatchObject({
+      status: 'ready',
+      risk: { level: 'high', route: 'full-human' },
+      autoMergeCandidate: false,
+    });
     const newer = JSON.parse(readFileSync(join(dir, '.tmp/snapshot.json'), 'utf8'));
     json('.tmp/snapshot.json', { ...newer, baseRefName: 'feat/issue-9' });
     expect(JSON.parse(invoke('evaluate', '.tmp/run', '.tmp/snapshot.json').stdout).status).toBe('waiting-verification');
