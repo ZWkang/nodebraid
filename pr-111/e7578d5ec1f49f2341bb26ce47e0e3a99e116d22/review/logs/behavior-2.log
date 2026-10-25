@@ -1,0 +1,59 @@
+bun test v1.4.2 (744846f84)
+
+tests/pr-risk.test.ts:
+(pass) both reviewers and changed-file evidence are required before a low risk route [11.81ms]
+(pass) control or verification path AGENTS.md cannot be downgraded by low assessments [0.05ms]
+(pass) control or verification path packages/core/AGENTS.md cannot be downgraded by low assessments [0.24ms]
+(pass) control or verification path CLAUDE.md cannot be downgraded by low assessments
+(pass) control or verification path .agents/skills/review/SKILL.md cannot be downgraded by low assessments
+(pass) control or verification path .claude/settings.json cannot be downgraded by low assessments
+(pass) control or verification path .codebuddy/settings.json cannot be downgraded by low assessments
+(pass) control or verification path .github/workflows/test.yml cannot be downgraded by low assessments
+(pass) control or verification path docs/agents/pr-risk.md cannot be downgraded by low assessments
+(pass) control or verification path scripts/check.ts cannot be downgraded by low assessments
+(pass) control or verification path website/scripts/check.ts cannot be downgraded by low assessments
+(pass) control or verification path package.json cannot be downgraded by low assessments
+(pass) control or verification path packages/core/package.json cannot be downgraded by low assessments
+(pass) control or verification path bun.lock cannot be downgraded by low assessments
+(pass) control or verification path tsconfig.agents.json cannot be downgraded by low assessments
+(pass) control or verification path packages/core/tsconfig.build.json cannot be downgraded by low assessments
+(pass) control or verification path examples/app/vite.config.ts cannot be downgraded by low assessments
+44 |   'packages/core/tsconfig.build.json',
+45 |   'examples/app/vite.config.ts',
+46 |   'website/.vitepress/config.mts',
+47 |   '.prettierignore',
+48 | ])('control or verification path %s cannot be downgraded by low assessments', (path) => {
+49 |   expect(summarizeRisk(reviews, [path])).toMatchObject({ level: 'high', route: 'full-human' });
+                                              ^
+error: expect(received).toMatchObject(expected)
+
+  {
+-   "level": "high",
+-   "route": "full-human",
++   "level": "low",
++   "reasons": [
++     "standards: low — The correction is isolated and preserves existing behavior and public contracts.",
++     "spec: low — The correction is isolated and preserves existing behavior and public contracts.",
++   ],
++   "route": "automatic",
+  }
+
+- Expected  - 2
++ Received  + 6
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/6d72/cflow/tests/pr-risk.test.ts:49:42)
+(fail) control or verification path website/.vitepress/config.mts cannot be downgraded by low assessments [10.09ms]
+(pass) control or verification path .prettierignore cannot be downgraded by low assessments [2.13ms]
+(pass) public implementation src/index.ts needs at least quick human review [0.07ms]
+(pass) public implementation packages/kernel/src/index.ts needs at least quick human review [0.01ms]
+(pass) reviewer risk can raise a path minimum and missing assessments never infer safety from file names [0.04ms]
+(pass) a symlink at a protected directory path retains that directory risk [0.04ms]
+(pass) malformed assessments and non-Git paths fail explicitly instead of becoming low risk [0.67ms]
+
+1 tests failed:
+(fail) control or verification path website/.vitepress/config.mts cannot be downgraded by low assessments [10.09ms]
+
+ 23 pass
+ 1 fail
+ 46 expect() calls
+Ran 24 tests across 1 file. [79.00ms]

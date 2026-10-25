@@ -1,0 +1,89 @@
+bun test v1.4.2 (744846f84)
+
+tests/local-agent-run.test.ts:
+(pass) a new green head cannot inherit the previous tree, reviews or test evidence [2.49ms]
+(pass) risk routes a verified current head without replacing feedback or CI readiness [3.81ms]
+
+tests/verification-report.test.ts:
+Switched to a new branch 'feat/issue-45'
+(pass) legacy runs without expectedParent stay historical and are not rewritten by reporting [683.58ms]
+Switched to a new branch 'feat/issue-45'
+(pass) legacy runs without baseRefName stay historical and are not rewritten by reporting [687.44ms]
+Switched to a new branch 'feat/issue-45'
+(pass) repeating report generation preserves the previous proof rather than overwriting it [719.55ms]
+Switched to a new branch 'feat/issue-45'
+(pass) the public report command preserves both reviews, real logs and published identity without inventing regressions [682.32ms]
+Switched to a new branch 'feat/issue-45'
+(pass) historical reports expose missing risk evidence instead of claiming automatic merge eligibility [746.05ms]
+Switched to a new branch 'feat/issue-45'
+(pass) declared behavior results retain real red/green logs, failures and explicit unrun checks [717.59ms]
+Switched to a new branch 'feat/issue-45'
+(pass) the report refuses log paths outside the run and every symlink, including metadata and output files [761.30ms]
+Switched to a new branch 'feat/issue-45'
+(pass) stale publication or reviews and missing original logs fail before a report is written [820.31ms]
+Switched to a new branch 'feat/issue-45'
+(pass) behavior declarations cannot turn missing execution, unexplained red or contradictory exits into a pass [978.59ms]
+
+tests/local-agent-cli.test.ts:
+(pass) one issue resumes its local ticket frontier without creating child issues [215.55ms]
+Switched to a new branch 'feat/issue-10'
+(pass) a persisted task resumes after a failed real check and never blesses an unrelated head [1652.90ms]
+
+tests/pr-feedback.test.ts:
+(pass) local evidence comments do not trigger themselves, while later edits still enter the queue [0.48ms]
+(pass) only a verified current PR head is ready for human review [0.06ms]
+(pass) stacked PRs retain feedback maintenance and integration branches can deliver to main [0.03ms]
+(pass) the same failed check requests one repair; a rerun or new head requests new work [0.04ms]
+(pass) addressed review feedback is not repeated, but edits and design questions remain actionable [0.04ms]
+(pass) green CI does not dismiss a human change request or ignore a conflicting base [0.02ms]
+(pass) a handoff cannot omit feedback, invent dispositions, or claim a different request [0.35ms]
+(pass) CI result order does not cause duplicate repair dispatches [0.05ms]
+(pass) an unresolved thread must be revalidated at the new head before automatic resolution [0.10ms]
+(pass) removing opt-in or switching to draft excludes even otherwise actionable feedback [0.04ms]
+(pass) a receipt from another PR or an old head cannot hide current feedback [0.02ms]
+(pass) an incomplete resolved thread cannot hide a newer reply on its next page [0.26ms]
+
+tests/github-feedback.test.ts:
+(pass) pagination must finish, including the empty page after an exact page boundary [0.85ms]
+(pass) edited and resolved-thread replies enter feedback while current-head workflow identity is checked [1.30ms]
+
+tests/local-agent-bases.test.ts:
+Switched to a new branch 'feat/issue-68'
+(pass) initial delivery keeps the review base separate from the append parent [1419.60ms]
+Switched to a new branch 'feat/issue-68'
+(pass) append delivery keeps the review base separate from the append parent [1488.31ms]
+Switched to a new branch 'feat/issue-68'
+Switched to a new branch 'main'
+Switched to branch 'feat/issue-68'
+(pass) main-sync delivery keeps the review base separate from the append parent [1831.25ms]
+
+tests/pr-risk.test.ts:
+(pass) both reviewers and changed-file evidence are required before a low risk route [0.39ms]
+(pass) control or verification path AGENTS.md cannot be downgraded by low assessments [0.02ms]
+(pass) control or verification path packages/core/AGENTS.md cannot be downgraded by low assessments
+(pass) control or verification path CLAUDE.md cannot be downgraded by low assessments
+(pass) control or verification path .agents/skills/review/SKILL.md cannot be downgraded by low assessments
+(pass) control or verification path .claude/settings.json cannot be downgraded by low assessments
+(pass) control or verification path .codebuddy/settings.json cannot be downgraded by low assessments
+(pass) control or verification path .github/workflows/test.yml cannot be downgraded by low assessments
+(pass) control or verification path docs/agents/pr-risk.md cannot be downgraded by low assessments
+(pass) control or verification path scripts/check.ts cannot be downgraded by low assessments
+(pass) control or verification path website/scripts/check.ts cannot be downgraded by low assessments
+(pass) control or verification path package.json cannot be downgraded by low assessments
+(pass) control or verification path packages/core/package.json cannot be downgraded by low assessments
+(pass) control or verification path bun.lock cannot be downgraded by low assessments
+(pass) control or verification path tsconfig.agents.json cannot be downgraded by low assessments
+(pass) control or verification path packages/core/tsconfig.build.json cannot be downgraded by low assessments
+(pass) control or verification path examples/app/vite.config.ts cannot be downgraded by low assessments
+(pass) control or verification path website/.vitepress/config.mts cannot be downgraded by low assessments
+(pass) control or verification path .prettierignore cannot be downgraded by low assessments
+(pass) public implementation src/index.ts needs at least quick human review [0.01ms]
+(pass) public implementation packages/kernel/src/index.ts needs at least quick human review
+(pass) reviewer risk can raise a path minimum and missing assessments never infer safety from file names [0.03ms]
+(pass) a symlink at a protected directory path retains that directory risk [0.03ms]
+(pass) malformed assessments and non-Git paths fail explicitly instead of becoming low risk [0.45ms]
+
+ 54 pass
+ 0 fail
+ 313 expect() calls
+Ran 54 tests across 7 files. [13.45s]

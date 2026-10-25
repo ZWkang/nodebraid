@@ -1,0 +1,44 @@
+bun test v1.4.2 (744846f84)
+
+tests/verification-report.test.ts:
+Switched to a new branch 'feat/issue-45'
+(pass) legacy runs without expectedParent stay historical and are not rewritten by reporting [945.65ms]
+Switched to a new branch 'feat/issue-45'
+(pass) legacy runs without baseRefName stay historical and are not rewritten by reporting [676.48ms]
+Switched to a new branch 'feat/issue-45'
+(pass) repeating report generation preserves the previous proof rather than overwriting it [783.94ms]
+Switched to a new branch 'feat/issue-45'
+142 |       patch: f.identity.patch,
+143 |     });
+144 |     const markdown = readFileSync(join(f.output, 'report.md'), 'utf8');
+145 |     expect(markdown).toContain(f.standards);
+146 |     expect(markdown).toContain(f.spec);
+147 |     expect(report.risk.level).toBe('low');
+                        ^
+TypeError: undefined is not an object (evaluating 'report.risk.level')
+      at <anonymous> (/Users/zhou/.codex/worktrees/6d72/cflow/tests/verification-report.test.ts:147:19)
+(fail) the public report command preserves both reviews, real logs and published identity without inventing regressions [736.50ms]
+Switched to a new branch 'feat/issue-45'
+175 |     delete verified.changedFiles;
+176 |     f.json(path, verified);
+177 |     const original = readFileSync(path, 'utf8');
+178 |     expect(f.report().status).toBe(0);
+179 |     const report = JSON.parse(readFileSync(join(f.output, 'report.json'), 'utf8'));
+180 |     expect(report.risk.level).toBe('unclassified');
+                        ^
+TypeError: undefined is not an object (evaluating 'report.risk.level')
+      at <anonymous> (/Users/zhou/.codex/worktrees/6d72/cflow/tests/verification-report.test.ts:180:19)
+(fail) historical reports expose missing risk evidence instead of claiming automatic merge eligibility [632.31ms]
+Switched to a new branch 'feat/issue-45'
+(pass) declared behavior results retain real red/green logs, failures and explicit unrun checks [655.80ms]
+Switched to a new branch 'feat/issue-45'
+(pass) the report refuses log paths outside the run and every symlink, including metadata and output files [761.48ms]
+Switched to a new branch 'feat/issue-45'
+(pass) stale publication or reviews and missing original logs fail before a report is written [775.73ms]
+Switched to a new branch 'feat/issue-45'
+(pass) behavior declarations cannot turn missing execution, unexplained red or contradictory exits into a pass [818.47ms]
+
+ 7 pass
+ 2 fail
+ 79 expect() calls
+Ran 9 tests across 1 file. [6.86s]
