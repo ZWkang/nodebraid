@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "58889a92b7cc7a3c953efe115ff6d8664924e094",
+    "expectedParent": "26e6d48c8d43494db72d20b1dc4d919b06a28f04",
+    "head": "47647275982f9aed5ccf595c14096a72a25c018c",
+    "tree": "abd83973678bfdf50b852efdb8c4a77067a75e4b",
+    "patch": "ef11b89e48d00e77457c1c825a6f270804c73bc44437773f3b9624d9178497e4",
+    "localHead": "d27ee24eaec5add059be9d413b4fcdf347256ab4"
+  },
+  "task": {
+    "run": "7a9bde03-a107-49db-bfd2-0cd5bc8b49e9",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 104
+    },
+    "request": "## Confirmed defect\n\nFetched main `dcf13482b68bc2422fc4d714df1226ab0ef259aa` traverses the caller's Move Nodes array four times: shape checks, unique/order/finite checks, stale-position checks, then writes. A typechecked actual compiled public Host/Kernel/Command/Interaction probe supplies an ordinary `MoveNodeInput[]` containing `a` and a stale move for `b`, with its legal custom iterator yielding `a` on the first three passes and stale `b` on the fourth.\n\n- Node a starts at x=0; its valid move targets x=10.\n- Node b starts at x=100; its supplied basePosition.x is99 and target x=120.\n- Stable valid b input commits at revision2.\n- Stable stale b input rejects `interaction / STALE_GESTURE`, preserving the exact View at revision1.\n- The changing iterator instead runs4 times, commits **only b at x=120 / revision2**, and never rejects its stale basePosition. The stale-check phase inspected a different move from the one written.\n\nThe assertion requiring stale evidence to reject exits1. The reproduction typechecks before execution and uses only public exported packages, real Host/Services and an explicitly application-owned in-memory Renderer Provider; no malformed IDs, internal handler, mocked Kernel or browser/native-input claim. Original source/output: local run `20261023T101255-discovery-interaction-command-inputs` (`move-iterator-repro.ts`, `move-iterator-red.log`, `move-iterator-observations.json`, `repro-typecheck.log`). Existing14 public Command/input tests pass110 assertions.\n\n## Contract and cause\n\n[The public MoveNodeInput/MoveNodesInput contract](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/packages/plugin-interaction/src/contracts.ts) accepts readonly array/Point values and carries each Node's base position. [The current handler](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/packages/plugin-interaction/src/move-nodes-command.ts) explicitly requires nonempty unique canonical IDs, finite coordinates, and matching current source positions before one synchronous Transaction. [Module documentation](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/website/modules/plugin-interaction.md) states that competing writes are rejected using each Node's base position. [ADR0014](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/docs/adr/0014-keep-command-dependencies-in-feature-plugins.md) keeps the feature handler responsible for its own Kernel operations; [ADR0029](https://github.com/ZWkang/nodebraid/blob/dcf13482b68bc2422fc4d714df1226ab0ef259aa/docs/adr/0029-preserve-domain-and-external-error-identity.md) preserves external failures.\n\nThe handler rereads `input.moves`, entries and their nodeId/basePosition/position fields between validation and application, so iterator/property changes can substitute the target/evidence after admission. The accepted Session capture repair #76 owns a different mutator; it does not repair this Command.\n\n## Acceptance\n\n- At the existing Move Nodes handler boundary, capture the incoming moves collection and native array-like length once, read owned indices lazily without caller iterator/method/constructor/species hooks, and capture each entry's Node ID, Point shells and x/y scalars once. Use exactly those owned values for every existing validation, stale check and write.\n- The real stale-b iterator reproduction must reject `STALE_GESTURE` and preserve the exact committed View, revision and History; valid first values remain usable when later reads would change or throw. Validate every captured indexed entry, including sparse/hidden invalid/stale entries.\n- Preserve abort-before-input reads, shape/error short circuits and read order (Node ID, basePosition x/y, position x/y), whole-input shape validation before unique/canonical/finite checks, original thrown-value identity, native length coercion and lazy first-entry failure. No eager bulk allocation, cap, accessor prohibition or silent fallback.\n- Preserve empty/duplicate/out-of-order/nonfinite/missing/stale rejection, exact errors, all-or-nothing multi-Node movement, current unrelated Node fields/opaque data, no-op identity, metadata and History undo/redo. Do not sort or silently repair invalid Command input.\n- Repair only Move Nodes input capture in its shared handler. Do not change Kernel, Create Edge/Delete Selection, Gesture/Shortcut policy, public API, dependencies or Runtime lifecycle. Pending adjacent interfaces stay queued.\n- Public test-first red/green, stable valid/invalid controls and getter/array/error regressions; original compiled public reproduction; related Interaction/History/consumer checks; independent Standards with ponytail-review and Spec on exact source; versioned formal full check; actual remote tree/first-parent, current-head CI, complete original review Markdown and immutable report/media readback.\n- Keep this Issue open until human final review/merge, actual main integration and whole-Issue acceptance.\n\n## Deduplication\n\nRead complete all-state103 Issue/PR records (100+3) and53 PRs through final short pages. No Move Nodes capture repair exists. Read #76 and its complete discussion: its accepted indexed capture is confined to Session. #86 owns Connection materializer capture, #100 Basic Canvas policy and #102 direct Kernel Node-owned fields. Their existing implementations/PRs do not capture this Command's moves, and unmerged branch capabilities are not counted as deployed main.\n",
+    "plan": [
+      {
+        "id": "synchronize-main",
+        "blockedBy": [],
+        "acceptance": "Capture current fetched main and published source head independently before append-only synchronization of the existing delivery branch. Preserve original Issue scope."
+      },
+      {
+        "id": "integration-compatibility",
+        "blockedBy": [
+          "synchronize-main"
+        ],
+        "acceptance": "Fresh public affected consumers and integration checks pass. Save complete current head/tree/binary patch; historical evidence retains its original source."
+      },
+      {
+        "id": "independent-review",
+        "blockedBy": [
+          "integration-compatibility"
+        ],
+        "acceptance": "Fresh independent Standards with ponytail-review and Spec inspect the complete current patch against original Issue, ADRs and current main."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "independent-review"
+        ],
+        "acceptance": "Pinned main versioned agents:run verify executes the real full bun run check after both review axes pass; preserve every attempt."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Actual remote tree and original append parent match verification; current-head CI, complete feedback, immutable full report/media publication and readback pass."
+      },
+      {
+        "id": "authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "Recheck current source/base, strict checks and all feedback immediately before a normal expected-head merge. Preserve review disputes and protection."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "authorized-merge"
+        ],
+        "acceptance": "Verify actual fetched main ancestry and the whole original Issue through fresh public acceptance; publish outcomes and close only after complete acceptance."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "d27ee24eaec5add059be9d413b4fcdf347256ab4",
+      "tree": "abd83973678bfdf50b852efdb8c4a77067a75e4b",
+      "patch": "ef11b89e48d00e77457c1c825a6f270804c73bc44437773f3b9624d9178497e4",
+      "report": "What this change does: Move Nodes captures the incoming collection, IDs and coordinates once. All validation, stale-position checks and writes then use those private values.\n\nSource identity:\n- Base: 58889a92b7cc7a3c953efe115ff6d8664924e094\n- Head: d27ee24eaec5add059be9d413b4fcdf347256ab4\n- Tree: abd83973678bfdf50b852efdb8c4a77067a75e4b\n- Binary patch SHA256: ef11b89e48d00e77457c1c825a6f270804c73bc44437773f3b9624d9178497e4\n\nScope: complete base...head diff, both files and all 465 new public test lines. Commits c5eedec, 26e6d48 and d27ee24 were inspected. Canonical saved patch bytes, merge parents, independent base, append parent and prepared/inspection digest agree. Read Issue #104, its complete empty discussion and the new plan.\n\nHard standards: No violations found. Boundary Discipline and ADR0014 keep capture in the shared feature handler. Abort precedes input reads. Whole-input shape checks precede duplicate/order/finite checks; every stale check precedes any write. Length conversion happens once, followed by native lazy indexed traversal. Original failures remain unwrapped under ADR0029, including falsey thrown values. Node fields and opaque data keep ADR0012's ownership boundary.\n\nJudgment-only smells: No concrete finding across the full Fowler baseline. One Point helper serves both Point fields. Sharing it with Kernel/replay parsing would change validation ownership and error timing, so no extra abstraction is justified.\n\nPonytail assessment: Correct and lean for isolated Canvas Hosts and synchronous transactions. I traced Gesture completion, Command registration, current Kernel copying, Document restoration, History Baseline/recordable-commit handling and the existing Create Edge path under ADR0084/0085. Captured moves remain independent of caller getters while existing canonical order, metadata and no-op behavior remain intact.\n\nIndependent checks at this head:\n- `bun test packages/plugin-interaction/tests packages/plugin-history/tests packages/document/tests packages/core/tests/document-roundtrip.test.ts`: exit 0; 191 tests, 916 assertions.\n- Separate compiled public-package stdin control: file round trip → Baseline → no-op Move → two-Node Move → Undo/Redo, exit 0. Collection/length/x/y each read once; restored graph, parent/size and opaque Map identities survived replay. This control is additional to the Bun counts.\n- Final identity, clean-status and whitespace audits passed.\n\nNot checked independently: TypeScript, builds, native browsers, full engineering check, remote CI, publication or main acceptance. The external Renderer fixture is not browser evidence.\n\nVerdict: passed. Looks good. Ship.\n"
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "d27ee24eaec5add059be9d413b4fcdf347256ab4",
+      "tree": "abd83973678bfdf50b852efdb8c4a77067a75e4b",
+      "patch": "ef11b89e48d00e77457c1c825a6f270804c73bc44437773f3b9624d9178497e4",
+      "report": "# Spec review — Issue #104 / PR #105 final synchronization\n\nVerdict: **passed**. 未发现功能验收遗漏、错误实现或范围扩张。\n\n- Base: `58889a92b7cc7a3c953efe115ff6d8664924e094`\n- Head: `d27ee24eaec5add059be9d413b4fcdf347256ab4`\n- Tree: `abd83973678bfdf50b852efdb8c4a77067a75e4b`\n- Complete binary patch SHA256: `ef11b89e48d00e77457c1c825a6f270804c73bc44437773f3b9624d9178497e4`\n\n已独立重读 Issue104 全文/零评论、prepared request/同步计划、完整两文件补丁及465行回归；核验实际提交和有序父节点 `26e6d48c8d43494db72d20b1dc4d919b06a28f04`、上述 base。依据当前 AGENTS/CONTEXT/code-review、ADR0014/0029/0012、0084/0085，追踪 Move→Kernel/History，以及当前 Create Edge、Document restore 和 Example materializer。\n\nIssue 要求 “Use exactly those owned values for every existing validation, stale check and write”。moves、native length、索引、ID/Point/scalar 一次捕获后，所有阶段复用本地值；真实 stale/sparse 条目不能被 caller traversal 隐藏。shape 仍整批先于 unique/order/finite，保持 ID→base x/y→position x/y 短路、原 receiver/继承属性/外部 thrown-value。长度只转换一次且惰性访问，保留 BigInt/Symbol、Infinity 首条失败等原生行为，没有预分配、cap、排序修复或 fallback。\n\n一次同步 Transaction 先检查全部来源，再只替换当前 Node.position；type/size/parent/opaque data、metadata、no-op identity 和失败原子性保持。新 History 按实际操作及 Commit identity 识别 Baseline，恢复后的 Move 仍是普通可撤销编辑。Document codec 没有进入 Move 数据路径；新 Create Edge 捕获位于独立 handler。相对当前 base 未扩张 Kernel、其他 Command、Gesture/Shortcut、公开 API 或依赖。\n\n依赖稳定后独立执行：`bun test packages/plugin-interaction/tests packages/plugin-history/tests packages/document/tests packages/core/tests/document-roundtrip.test.ts` **191 pass /916 assertions，exit0**，包含额外 Core roundtrip 的1 test/5 assertions。`git diff --check BASE...HEAD` exit0；HEAD/tree、完整 canonical patch/hash 与 inspection/complete.patch 一致。原始输出见 `spec-commands.log`，已回读。\n\n未独立运行构建、类型检查、compiled probe、affected、浏览器或完整工程检查；五个 native preview、远端发布/current-head CI、完整报告/media readback、合并及 main 全 Issue 验收未由本审查验证。旧 head 的报告与结果未换绑。\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "current-complete-affected",
+      "acceptance": "Current source affected checks include types, consumers, native SVG/Example Document browsers and docs; exit0.",
+      "command": "bun run check:affected --base 58889a92b7cc7a3c953efe115ff6d8664924e094",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "current-public-integration",
+      "acceptance": "Current public Interaction/History/Document and Core roundtrip suites191tests916assertions pass with explicit Baseline and current Kernel/CreateEdge contracts.",
+      "command": "bun test packages/plugin-interaction/tests packages/plugin-history/tests packages/document/tests packages/core/tests/document-roundtrip.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "current-original-compiled-controls",
+      "acceptance": "Original three Move controls execute against actual current compiled public packages and shared Runtime tokens: stable valid succeeds, stable stale rejects, custom iterator cannot hide stale indexed entry; exact View preserved. Separate TypeScript check passed.",
+      "command": "bun run /Users/zhou/.codex/local-workflows/nodebraid/runs/7a9bde03-a107-49db-bfd2-0cd5bc8b49e9/build-and-run-current.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "independent-standards-commands",
+      "acceptance": "Independent exact-source four-package/Core suites191tests916assertions; separate real public file restore/Baseline/no-op/MoveTwo/UndoRedo stdin control source and output preserved in original log, not counted as Bun tests. No native browser claim.",
+      "command": "bun test packages/plugin-interaction/tests packages/plugin-history/tests packages/document/tests packages/core/tests/document-roundtrip.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "independent-spec-commands",
+      "acceptance": "Independent exact-source four-package/Core suites191tests916assertions, including Core roundtrip1test5assertions. No native browser claim.",
+      "command": "bun test packages/plugin-interaction/tests packages/plugin-history/tests packages/document/tests packages/core/tests/document-roundtrip.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "a47e558aa2b5a3e7d7e646632da6c75794b94a9237bd3017d109d86b71dff01f"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "cb9482d213dcd4117671c88e4494df945fac75a8880a30eea89d68005b36c2ef"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "5eed93e308152bb248ac0d97b547fd802462ab88a7847ffe0693485e9b245e86"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "7ba8fd6d2a6d11e0c16ae9f9caa28523b92ba709396117d423d44def3beb7013"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "60df2e4ac3ae7a07b1b914bcbaaabf31a75e606868cfe9782284e076b4385ce6"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "29126c67681f15a9d45919529732ca74566bbbd4302088aace4660f0563dd9e8"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "c9b387bcb3fc43ad9695c16d60731afca8715b1f4d4eaf7127ede0b18d49582b"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "a9fd507c0c1ee8d855b3e5ec17eab4a7b030156221d6ed03faa5947aae27b24d"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "823bb4a2aed8d05efc7f3a6f244b93f1fbd9bc26d07ed6030990ed05c85521fe"
+    }
+  ]
+}
