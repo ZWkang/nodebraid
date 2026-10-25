@@ -64,6 +64,7 @@ History Installation 在 Kernel 或 Command Service 缺失时保持 pending。�
 
 ```ts
 import {
+  establishHistoryBaselineCommand,
   historyDiagnosticEvents,
   historyPlugin,
   historyService,
@@ -82,7 +83,7 @@ import {
 
 Activation 建立时，History 读取一次当前 Kernel revision 作为 Baseline；Baseline 以前的 Commit 不会被猜测或补录。公开 Snapshot 只在 History 已观察到 Kernel 当前 revision 时替换并通知，因此 subscriber 不会看到已知过期的 Undo/Redo 可用性。
 
-Replay 只在 History 已追平 Kernel 且没有其他 Replay 时开始。请求不会排队：延后执行可能作用于另一个栈顶，模块选择显式失败。调用方 signal 在 Transaction 前检查；一旦 Replay 已真实提交，晚到取消不会伪造失败或补偿已经发生的 Commit。
+Replay 只在 History 已追平 Kernel 且没有其他 Replay 或 Baseline 操作时开始。请求不会排队：延后执行可能作用于另一个栈顶，模块选择显式失败。调用方 signal 在 Transaction 前检查；一旦 Replay 已真实提交，晚到取消不会伪造失败或补偿已经发生的 Commit。
 
 失去 Kernel 或 Command Service 会立即结束当前 Activation：旧 Service 失效、Command 被注销、Kernel observer 与 subscriber 被释放、Entry 引用被清空。依赖恢复后，新 Activation 从当时 Kernel revision 建立全新空 Baseline，不继承旧栈。`host.dispose()` 会等待 Command registration 与其他 Owned Resource 清理完成。
 
@@ -90,7 +91,7 @@ Replay 只在 History 已追平 Kernel 且没有其他 Replay 时开始。请求
 | ----------------------- | ----------------------------------------- |
 | `UNDO_EMPTY`            | 当前没有可撤销 History Entry              |
 | `REDO_EMPTY`            | 当前没有可重做 History Entry              |
-| `HISTORY_BUSY`          | 另一个 Replay 尚未完成                    |
+| `HISTORY_BUSY`          | 另一个 Replay 或 Baseline 尚未完成        |
 | `HISTORY_NOT_CAUGHT_UP` | History 尚未观察到 Kernel 当前 revision   |
 | `SERVICE_DISPOSED`      | 旧 History Service 所属 Activation 已结束 |
 
@@ -108,3 +109,10 @@ Kernel replay error 保持原始身份，不会被包装为 History 成功。sub
 ## 验证依据
 
 package tests 通过真实 Plugin Host、Kernel Plugin 与 Command Plugin 验证非零 Baseline、首个 Recordable Commit、Undo/Redo 返回值、revision metadata、Redo 分支失效、空栈错误、Snapshot identity、subscriber fault、observer 重入、catch-up publication、单飞 Replay、取消、已提交 Replay 的收口、Kernel/Command Provider 消失与全新 Activation。类型测试锁定只读 Snapshot、窄 Service surface 与 `void -> CanvasCommit` Command 类型。
+
+## 显式重建 History Baseline
+
+`establishHistoryBaselineCommand` 接受同步 `(transaction: TransactionContext) => void`，返回 `CanvasCommit | null`。
+它在同一次成功 Transaction 的边界清空旧 Undo/Redo，自身 Baseline Commit 不入栈；后继普通 Commit 继续记录。
+失败不改变旧图或旧历史，净零事务也清空旧历史。此操作与 Undo/Redo 共用 busy/caught-up、取消与释放语义；
+不能传异步 callback，也不通过 `origin` 标记跳过记录。完整文件恢复用法见 [Document](/modules/document)。

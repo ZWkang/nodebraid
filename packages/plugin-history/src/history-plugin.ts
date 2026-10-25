@@ -1,25 +1,34 @@
-import type { CanvasCommit, ChangeSet } from '@nodebraid/kernel';
+import type { CanvasCommit, ChangeSet, TransactionContext } from '@nodebraid/kernel';
 import { commandService, type CommandRegistration } from '@nodebraid/plugin-command';
 import { kernelService } from '@nodebraid/plugin-kernel';
 import { definePlugin, defineService } from '@nodebraid/runtime-cordis';
 
 import type { HistoryService, HistorySnapshot } from './contracts';
 import { historyDiagnosticEvents } from './diagnostic-events';
-import { redoCommand, undoCommand } from './history-commands';
+import { establishHistoryBaselineCommand, redoCommand, undoCommand } from './history-commands';
 import { HistoryError } from './history-error';
 
-interface PendingReplay {
+interface PendingReplay extends PendingCommit<CanvasCommit> {
+  readonly kind: 'replay';
   readonly direction: 'undo' | 'redo';
   readonly entry: ChangeSet;
-  readonly commandId: string;
-  readonly completion: Promise<CanvasCommit>;
-  readonly complete: (commit: CanvasCommit) => void;
-  readonly fail: (error: unknown) => void;
-  state: PendingReplayState;
 }
 
-type PendingReplayState =
+interface PendingBaseline extends PendingCommit<CanvasCommit | null> {
+  readonly kind: 'baseline';
+}
+
+interface PendingCommit<Result> {
+  readonly commandId: string;
+  readonly completion: Promise<Result>;
+  readonly complete: (commit: Result) => void;
+  readonly fail: (error: unknown) => void;
+  state: PendingCommitState;
+}
+
+type PendingCommitState =
   | { readonly phase: 'transacting' }
+  | { readonly phase: 'unchanged' }
   | { readonly phase: 'observed-before-return'; readonly observedCommit: CanvasCommit }
   | { readonly phase: 'committed'; readonly expectedCommit: CanvasCommit }
   | { readonly phase: 'observed'; readonly expectedCommit: CanvasCommit; readonly observedCommit: CanvasCommit };
@@ -37,29 +46,30 @@ export const historyPlugin = definePlugin({
     const redoEntries: ChangeSet[] = [];
     const listeners = new Set<() => void>();
     let snapshot = createSnapshot(false, false);
-    let pendingReplay: PendingReplay | undefined;
+    let pendingOperation: PendingReplay | PendingBaseline | undefined;
     let observedRevision = kernel.read().snapshot.revision;
     let disposed = false;
     let unsubscribe: (() => void) | undefined;
     let undoRegistration: CommandRegistration | undefined;
     let redoRegistration: CommandRegistration | undefined;
+    let baselineRegistration: CommandRegistration | undefined;
 
-    const completeCommittedReplayAfterClose = (): void => {
-      const replay = pendingReplay;
-      if (!disposed || replay?.state.phase !== 'committed') return;
-      pendingReplay = undefined;
-      replay.complete(replay.state.expectedCommit);
+    const completeCommittedOperationAfterClose = (): void => {
+      const operation = pendingOperation;
+      if (!disposed || operation?.state.phase !== 'committed') return;
+      pendingOperation = undefined;
+      operation.complete(operation.state.expectedCommit);
     };
     const close = (): void => {
       if (disposed) return;
       disposed = true;
       listeners.clear();
-      completeCommittedReplayAfterClose();
+      completeCommittedOperationAfterClose();
     };
     const releaseState = (): void => {
       undoEntries.length = 0;
       redoEntries.length = 0;
-      pendingReplay = undefined;
+      pendingOperation = undefined;
     };
     context.signal.addEventListener('abort', close, { once: true });
     context.own(async () => {
@@ -71,7 +81,7 @@ export const historyPlugin = definePlugin({
       } catch (error) {
         errors.push(error);
       }
-      for (const registration of [redoRegistration, undoRegistration]) {
+      for (const registration of [baselineRegistration, redoRegistration, undoRegistration]) {
         try {
           await registration?.dispose();
         } catch (error) {
@@ -115,33 +125,39 @@ export const historyPlugin = definePlugin({
         );
       }
       observedRevision = commit.changeSet.revision;
-      const replay = pendingReplay;
-      const replayState = replay?.state;
-      const matchesReplay =
-        replay !== undefined &&
-        replayState !== undefined &&
-        (replayState.phase === 'transacting' ||
-          (replayState.phase === 'committed' && replayState.expectedCommit === commit));
-      if (matchesReplay) {
-        replay.state =
-          replayState.phase === 'committed'
-            ? { phase: 'observed', expectedCommit: replayState.expectedCommit, observedCommit: commit }
+      const operation = pendingOperation;
+      const operationState = operation?.state;
+      const matchesOperation =
+        operation !== undefined &&
+        operationState !== undefined &&
+        (operationState.phase === 'transacting' ||
+          (operationState.phase === 'committed' && operationState.expectedCommit === commit));
+      if (matchesOperation) {
+        operation.state =
+          operationState.phase === 'committed'
+            ? { phase: 'observed', expectedCommit: operationState.expectedCommit, observedCommit: commit }
             : { phase: 'observed-before-return', observedCommit: commit };
-        if (replay.direction === 'undo') {
+        if (operation.kind === 'baseline') {
+          undoEntries.length = 0;
+          redoEntries.length = 0;
+        } else if (operation.direction === 'undo') {
           undoEntries.pop();
-          redoEntries.push(replay.entry);
+          redoEntries.push(operation.entry);
         } else {
           redoEntries.pop();
-          undoEntries.push(replay.entry);
+          undoEntries.push(operation.entry);
         }
         queueMicrotask(() => {
-          if (replay.state.phase !== 'observed' || replay.state.expectedCommit !== replay.state.observedCommit) {
-            if (pendingReplay === replay) pendingReplay = undefined;
-            replay.fail(new Error('History observed a different Commit while replaying a Change Set.'));
+          if (
+            operation.state.phase !== 'observed' ||
+            operation.state.expectedCommit !== operation.state.observedCommit
+          ) {
+            if (pendingOperation === operation) pendingOperation = undefined;
+            operation.fail(new Error('History observed a different Commit while executing its Command.'));
             return;
           }
-          if (pendingReplay === replay) pendingReplay = undefined;
-          replay.complete(commit);
+          if (pendingOperation === operation) pendingOperation = undefined;
+          operation.complete(commit);
         });
       } else {
         undoEntries.push(commit.changeSet);
@@ -150,14 +166,14 @@ export const historyPlugin = definePlugin({
       if (observedRevision === kernel.read().snapshot.revision) publishSnapshot();
     });
 
-    const replay = (direction: 'undo' | 'redo', commandId: string, signal: AbortSignal): Promise<CanvasCommit> => {
+    const assertCanExecute = (commandId: string, signal: AbortSignal): void => {
       assertActive();
       signal.throwIfAborted();
-      if (pendingReplay) {
+      if (pendingOperation) {
         throw new HistoryError(
           'HISTORY_BUSY',
-          'Another History replay is still in progress.',
-          Object.freeze({ activeCommandId: pendingReplay.commandId, requestedCommandId: commandId }),
+          'Another History Command is still in progress.',
+          Object.freeze({ activeCommandId: pendingOperation.commandId, requestedCommandId: commandId }),
         );
       }
       const kernelRevision = kernel.read().snapshot.revision;
@@ -168,6 +184,25 @@ export const historyPlugin = definePlugin({
           Object.freeze({ observedRevision, kernelRevision }),
         );
       }
+    };
+
+    const acceptCommittedOperation = (pending: PendingReplay | PendingBaseline, commit: CanvasCommit): void => {
+      if (pending.state.phase === 'transacting') {
+        pending.state = { phase: 'committed', expectedCommit: commit };
+      } else if (pending.state.phase === 'observed-before-return') {
+        pending.state = {
+          phase: 'observed',
+          expectedCommit: commit,
+          observedCommit: pending.state.observedCommit,
+        };
+      } else {
+        throw new Error(`History Command entered unexpected phase "${pending.state.phase}" before Transaction return.`);
+      }
+      completeCommittedOperationAfterClose();
+    };
+
+    const replay = (direction: 'undo' | 'redo', commandId: string, signal: AbortSignal): Promise<CanvasCommit> => {
+      assertCanExecute(commandId, signal);
       const entries = direction === 'undo' ? undoEntries : redoEntries;
       const entry = entries.at(-1);
       if (!entry) {
@@ -176,31 +211,23 @@ export const historyPlugin = definePlugin({
         }
         throw new HistoryError('UNDO_EMPTY', 'No History Entry is available to undo.');
       }
-      const pending = createPendingReplay(direction, entry, commandId);
-      pendingReplay = pending;
+      const pending: PendingReplay = {
+        ...createPendingCommit<CanvasCommit>(commandId),
+        kind: 'replay',
+        direction,
+        entry,
+      };
+      pendingOperation = pending;
       try {
         const commit = kernel.transact(
           (transaction) => transaction.applyChangeSet(entry, direction === 'undo' ? 'reverse' : 'forward'),
           { origin: 'history', commandId },
         );
         if (!commit) throw new Error(`${direction} replay did not produce a Canvas Commit.`);
-        if (pending.state.phase === 'transacting') {
-          pending.state = { phase: 'committed', expectedCommit: commit };
-        } else if (pending.state.phase === 'observed-before-return') {
-          pending.state = {
-            phase: 'observed',
-            expectedCommit: commit,
-            observedCommit: pending.state.observedCommit,
-          };
-        } else {
-          throw new Error(
-            `History Replay entered unexpected phase "${pending.state.phase}" before Transaction return.`,
-          );
-        }
-        completeCommittedReplayAfterClose();
+        acceptCommittedOperation(pending, commit);
         return pending.completion;
       } catch (error) {
-        if (pendingReplay === pending) pendingReplay = undefined;
+        if (pendingOperation === pending) pendingOperation = undefined;
         throw error;
       }
     };
@@ -211,6 +238,36 @@ export const historyPlugin = definePlugin({
     redoRegistration = commands.register(redoCommand, (_input, execution): Promise<CanvasCommit> => {
       return replay('redo', execution.commandId, execution.signal);
     });
+    baselineRegistration = commands.register(
+      establishHistoryBaselineCommand,
+      (update: (transaction: TransactionContext) => void, execution): Promise<CanvasCommit | null> => {
+        assertCanExecute(execution.commandId, execution.signal);
+        const pending: PendingBaseline = {
+          ...createPendingCommit<CanvasCommit | null>(execution.commandId),
+          kind: 'baseline',
+        };
+        pendingOperation = pending;
+        try {
+          const commit = kernel.transact(update, { origin: 'history', commandId: execution.commandId });
+          if (commit) {
+            acceptCommittedOperation(pending, commit);
+          } else {
+            undoEntries.length = 0;
+            redoEntries.length = 0;
+            pending.state = { phase: 'unchanged' };
+            if (!disposed) publishSnapshot();
+            queueMicrotask(() => {
+              if (pendingOperation === pending) pendingOperation = undefined;
+              pending.complete(null);
+            });
+          }
+          return pending.completion;
+        } catch (error) {
+          if (pendingOperation === pending) pendingOperation = undefined;
+          throw error;
+        }
+      },
+    );
 
     const service: HistoryService = Object.freeze({
       getSnapshot() {
@@ -231,16 +288,12 @@ function createSnapshot(canUndo: boolean, canRedo: boolean): HistorySnapshot {
   return Object.freeze({ canUndo, canRedo });
 }
 
-function createPendingReplay(
-  direction: PendingReplay['direction'],
-  entry: ChangeSet,
-  commandId: string,
-): PendingReplay {
-  let complete!: (commit: CanvasCommit) => void;
+function createPendingCommit<Result>(commandId: string): PendingCommit<Result> {
+  let complete!: (commit: Result) => void;
   let fail!: (error: unknown) => void;
-  const completion = new Promise<CanvasCommit>((resolve, reject) => {
+  const completion = new Promise<Result>((resolve, reject) => {
     complete = resolve;
     fail = reject;
   });
-  return { direction, entry, commandId, completion, complete, fail, state: { phase: 'transacting' } };
+  return { commandId, completion, complete, fail, state: { phase: 'transacting' } };
 }

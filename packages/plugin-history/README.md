@@ -51,7 +51,7 @@ await host.dispose();
 ```
 
 Each Plugin Activation starts an empty History at the current Kernel revision.
-Every later non-replay Canvas Commit becomes one History Entry. Undo and Redo
+Every later ordinary Canvas Commit becomes one History Entry. Undo and Redo
 replay its Change Set through the same synchronous Kernel Transaction seam and
 return the new Canvas Commit through strongly typed Commands.
 
@@ -60,7 +60,7 @@ subscription seam. It does not expose internal entries, stack depth, or duplicat
 imperative undo and redo methods. New Recordable Commits clear redo, while
 History's own Replay Commits do not create additional entries.
 
-History replay is single-flight. A concurrent replay fails with `HISTORY_BUSY`,
+Replay and baseline Commands are single-flight. A concurrent invocation fails with `HISTORY_BUSY`,
 and an invocation made before History observes the current Kernel revision fails
 with `HISTORY_NOT_CAUGHT_UP`. Requests are never queued against a later stack
 top. Subscriber publication waits until History has caught up with Kernel.
@@ -72,6 +72,37 @@ The Plugin requires both Kernel Service and Command Service. Losing either
 dependency ends the current Activation, closes old Service handles, removes the
 Commands and discards all entries. A later Activation establishes a fresh empty
 History Baseline.
+
+## Establish a new baseline
+
+`establishHistoryBaselineCommand` runs a synchronous Transaction callback and
+establishes its result as a fresh History Baseline. It is suitable for replacing a
+Document after the application has decoded a saved file:
+
+```ts
+import { establishHistoryBaselineCommand } from '@nodebraid/plugin-history';
+
+await commands.execute(establishHistoryBaselineCommand, (transaction) => {
+  for (const edge of kernel.read().snapshot.edges) transaction.edges.remove(edge.id);
+  for (const node of kernel.read().snapshot.nodes) transaction.nodes.remove(node.id);
+  for (const node of restoredDocument.nodes) transaction.nodes.add(node);
+  for (const edge of restoredDocument.edges) transaction.edges.add(edge);
+});
+```
+
+The Command returns the exact `CanvasCommit`, or `null` when the Document has no
+net change. Both successful outcomes clear old Undo and Redo entries; the baseline
+Commit itself is not recorded, while subsequent edits remain undoable. Callback
+failure, invalid graphs and asynchronous callbacks preserve both the original
+Document and History. An already aborted call is rejected before the callback runs.
+The Command remains busy through Snapshot publication, including a net-zero update,
+and ordinary reentrant Commits after its baseline are recorded normally.
+
+Cancellation and dependency loss after a successful commit do not undo that commit
+or turn it into a failed result. If the Activation ends before a queued baseline
+Commit is observed, the Command still returns that exact commit without publishing
+discarded History state. File formats, domain data codecs, Selection and Viewport
+remain outside History's ownership.
 
 ## Development
 

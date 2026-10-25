@@ -77,8 +77,8 @@ function normalizeServiceBindings(bindings: ServiceBindings | undefined, field: 
 
   const normalized: Record<string, ServiceTokenBase> = {};
   for (const binding of inspection.keys) {
-    const descriptor = Object.getOwnPropertyDescriptor(inspection.record, binding)!;
-    if (!descriptor.enumerable) {
+    const descriptor = Object.getOwnPropertyDescriptor(inspection.record, binding);
+    if (descriptor === undefined || !descriptor.enumerable) {
       throw new PluginHostError(
         'INVALID_DEFINITION',
         `Plugin ${field} must contain only enumerable string Service Bindings.`,

@@ -10,6 +10,7 @@ const forbiddenCordisType = /\b(?:Context|CordisError|Effect|Fiber|FiberState)\b
 
 const coreDist = fileURLToPath(new URL('../dist/', import.meta.url));
 const canvasFragmentDist = fileURLToPath(new URL('../../canvas-fragment/dist/', import.meta.url));
+const documentDist = fileURLToPath(new URL('../../document/dist/', import.meta.url));
 const diagnosticsDist = fileURLToPath(new URL('../../diagnostics/dist/', import.meta.url));
 const interactionApiDist = fileURLToPath(new URL('../../interaction-api/dist/', import.meta.url));
 const kernelDist = fileURLToPath(new URL('../../kernel/dist/', import.meta.url));
@@ -34,6 +35,7 @@ const declarationFiles = await Promise.all([
   collectDeclarations(coreDist),
   collectDeclarations(canvasFragmentDist),
   collectDeclarations(diagnosticsDist),
+  collectDeclarations(documentDist),
   collectDeclarations(interactionApiDist),
   collectDeclarations(kernelDist),
   collectDeclarations(layoutApiDist),
@@ -87,6 +89,10 @@ const corePackage = (await import(corePackageName)) as typeof import('../src/ind
 const kernel = corePackage.createCanvasKernel();
 assert.equal(kernel.read().snapshot.revision, 0);
 assert.ok(corePackage.NodeBraidError);
+const documentCodec = { format: 'artifact/null-v1', encode: () => 'null', decode: () => null };
+const documentText = corePackage.serializeCanvasDocument(kernel.read().snapshot, documentCodec);
+assert.deepEqual(corePackage.deserializeCanvasDocument(documentText, documentCodec), { nodes: [], edges: [] });
+assert.equal(corePackage.establishHistoryBaselineCommand.id, 'history.establish-baseline');
 assert.equal(corePackage.diagnosticEvents.sinkFault, 'nodebraid.diagnostics.sink.fault');
 assert.ok(corePackage.kernelPlugin);
 assert.ok(corePackage.kernelService);

@@ -4,6 +4,11 @@ NodeBraid 是一个插件化、渲染器无关的流程画布引擎。它提供�
 
 本文定义目标架构，不表示其中列出的能力已经实现。
 
+完整 Document 文件首版通过纯 `@nodebraid/document` 与应用 Data Codec 交付；
+恢复使用现有 History Plugin 的原子 Baseline Command，不新增 Serialization Runtime Plugin。
+当前决定见 [ADR-0084](docs/adr/0084-serialize-complete-documents-with-application-data-codecs.md)
+与 [ADR-0085](docs/adr/0085-establish-history-baselines-with-atomic-transactions.md)。
+
 ## 设计目标
 
 NodeBraid 需要满足以下目标：

@@ -41,7 +41,7 @@ symlink、hash 不符或身份不一致直接报错。只复制明确声明的�
 可见 Canvas 变更和场景维护使用项目
 [verify-nodebraid](../../.agents/skills/verify-nodebraid/SKILL.md) 及其
 [feature map](../../.agents/skills/verify-nodebraid/features/README.md)。当前场景为 Viewport、
-Selection/Duplicate/History、Port Connection 和系统 Clipboard。场景选择来自
+Selection/Duplicate/History、Port Connection、系统 Clipboard 和 Document 文件往返。场景选择来自
 [`preview-scenarios.ts`](../../scripts/preview-scenarios.ts)，`--all` 执行全部场景。
 
 采集器为每个场景建立独立 session，固定偶数尺寸页面并开始录制后检查真实页面 ready 状态和初始
@@ -52,8 +52,8 @@ Canvas metrics，再使用原生鼠标、键盘操作；截图之外还断言结
 原始 `recording.mp4` 保留 agent-browser 输出；`review.mp4` 将同一批真实帧的时间轴
 放慢 15 倍，便于审阅。它不改变应用操作或断言，不能用于测量性能；两份文件分别保存 hash。
 
-四个场景不等于全部公共 API 覆盖。Examples Application 的手动 Auto layout 控件由
-Basic SVG 浏览器 suite 验证；这四个 preview 场景不点击该按钮，不能用它们的截图宣称
+这些场景不等于全部公共 API 覆盖。Examples Application 的手动 Auto layout 控件由
+Basic SVG 浏览器 suite 验证；这些 preview 场景不点击该按钮，不能用它们的截图宣称
 执行了 Layout。布局变更需另外保存实际点击前后的证据。Documentation Site 也不在这些
 场景内。`bun run check`、任务特定验证与独立审查仍分别执行，未覆盖项保留在报告中。
 
