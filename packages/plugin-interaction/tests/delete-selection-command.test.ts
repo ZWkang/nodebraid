@@ -654,6 +654,442 @@ test('Delete Selection preserves abort and malformed Selection short circuits be
   await runtime.host.dispose();
 });
 
+test('Delete Selection applies the first Selection when later root reads would choose another Node', async () => {
+  const runtime = await activateDeleteCommandRuntime();
+  try {
+    const a = nodeId('first-selection-a');
+    const b = nodeId('first-selection-b');
+    runtime.kernel.transact((transaction) => {
+      transaction.nodes.add({ id: a, type: 'task', position: { x: 0, y: 0 }, data: null });
+      transaction.nodes.add({ id: b, type: 'task', position: { x: 100, y: 0 }, data: null });
+    });
+    runtime.session.setSelection({ nodeIds: [a], edgeIds: [] });
+    const first = runtime.session.getSnapshot().selection;
+    runtime.session.setSelection({ nodeIds: [b], edgeIds: [] });
+    const later = runtime.session.getSnapshot().selection;
+    const evidence = runtime.kernel.read().snapshot;
+    let reads = 0;
+    const commit = await runtime.commands.execute(deleteSelectionCommand, {
+      get selection() {
+        reads += 1;
+        return reads === 1 ? first : later;
+      },
+      evidence,
+    });
+    expect(commit).not.toBeNull();
+    expect(runtime.kernel.read().query.getNode(a)).toBeUndefined();
+    expect(runtime.kernel.read().query.getNode(b)).toBe(evidence.nodes.find((node) => node.id === b));
+    expect(runtime.session.getSnapshot().selection).toBe(later);
+    expect(reads).toBe(1);
+  } finally {
+    await runtime.host.dispose();
+  }
+});
+
+for (const kind of ['node', 'edge'] as const) {
+  test.each([
+    'root-own',
+    'root-inherited',
+    'root-non-enumerable',
+    'collection-root',
+    'inherited-collection',
+    'iterator',
+    'array-hooks',
+    'index-once',
+    'evidence-mutates-ids',
+  ] as const)('Delete Selection captures %s for ' + kind + ' targets', async (mode) => {
+    const fixture = await activateSelectionValueRuntime(kind);
+    try {
+      let rootReads = 0,
+        fieldReads = 0,
+        indexReads = 0,
+        hookReads = 0,
+        evidenceReads = 0;
+      const ids = [fixture.firstId];
+      if (mode === 'iterator') {
+        Object.defineProperty(ids, Symbol.iterator, {
+          value: function* () {
+            hookReads += 1;
+            yield fixture.secondId;
+          },
+        });
+      } else if (mode === 'array-hooks') {
+        const constructor = Object.defineProperty(function () {}, Symbol.species, {
+          get() {
+            hookReads += 1;
+            throw new Error('Unexpected caller species');
+          },
+        });
+        for (const key of [Symbol.iterator, 'every', 'map', 'slice', 'keys', 'values']) {
+          Object.defineProperty(ids, key, {
+            get() {
+              hookReads += 1;
+              throw new Error('Unexpected caller traversal');
+            },
+          });
+        }
+        Object.defineProperty(ids, 'constructor', {
+          get() {
+            hookReads += 1;
+            return constructor;
+          },
+        });
+      } else if (mode === 'index-once') {
+        Object.defineProperty(ids, '0', {
+          get() {
+            expect(this).toBe(ids);
+            indexReads += 1;
+            return indexReads === 1 ? fixture.firstId : fixture.secondId;
+          },
+        });
+      }
+      const selectionBase = { ...fixture.first };
+      Object.defineProperty(selectionBase, fixture.field, {
+        get() {
+          expect(this).toBe(selection);
+          fieldReads += 1;
+          return mode === 'collection-root' && fieldReads > 1 ? fixture.later[fixture.field] : ids;
+        },
+        enumerable: false,
+      });
+      const selection: DeleteSelectionInput['selection'] =
+        mode === 'inherited-collection' ? Object.create(selectionBase) : selectionBase;
+      const source: DeleteSelectionInput = {
+        get selection() {
+          expect(this).toBe(input);
+          rootReads += 1;
+          if (rootReads > 1) throw new Error('Later Selection root must not be consumed');
+          return selection;
+        },
+        get evidence() {
+          evidenceReads += 1;
+          if (evidenceReads > 1) throw new Error('Later evidence root must not be consumed');
+          if (mode === 'evidence-mutates-ids') ids[0] = fixture.secondId;
+          return fixture.evidence;
+        },
+      };
+      const input: DeleteSelectionInput = mode === 'root-inherited' ? Object.create(source) : source;
+      if (mode === 'root-non-enumerable') Object.defineProperty(input, 'selection', { enumerable: false });
+      const commit = await fixture.commands.execute(deleteSelectionCommand, input);
+      expect(commit?.changeSet).toMatchObject({ origin: 'interaction', commandId: deleteSelectionCommand.id });
+      expectFirstSelectionDeleted(fixture);
+      expect(rootReads).toBe(1);
+      expect(fieldReads).toBe(1);
+      expect(evidenceReads).toBe(1);
+      expect(hookReads).toBe(0);
+      expect(indexReads).toBe(mode === 'index-once' ? 1 : 0);
+      await fixture.commands.execute(undoCommand, undefined);
+      const restored =
+        kind === 'node'
+          ? fixture.kernel.read().query.getNode(fixture.a)
+          : fixture.kernel.read().query.getEdge(fixture.firstEdgeId);
+      expect(restored).toBeDefined();
+      expect(restored?.data).toBe(fixture.data);
+      await fixture.commands.execute(redoCommand, undefined);
+      expectFirstSelectionDeleted(fixture);
+      expect(rootReads).toBe(1);
+      expect(fieldReads).toBe(1);
+      expect(evidenceReads).toBe(1);
+      expect(Object.isFrozen(fixture.data)).toBe(false);
+      expect([...fixture.data]).toEqual([['opaque', 'selection capture']]);
+    } finally {
+      await fixture.host.dispose();
+    }
+  });
+
+  test.each([
+    1.5,
+    '1.5',
+    {
+      valueOf() {
+        return 1.5;
+      },
+    },
+  ])('Delete Selection keeps native fractional length %p for ' + kind + ' targets', async (length) => {
+    const fixture = await activateSelectionValueRuntime(kind);
+    try {
+      let reads = 0;
+      const ids = new Proxy([fixture.firstId, fixture.secondId], {
+        get(target, key, receiver) {
+          if (key === 'length') {
+            reads += 1;
+            return length;
+          }
+          return Reflect.get(target, key, receiver);
+        },
+      });
+      const selection = { ...fixture.first };
+      Object.defineProperty(selection, fixture.field, { value: ids });
+      await fixture.commands.execute(deleteSelectionCommand, { selection, evidence: fixture.evidence });
+      expectFirstSelectionDeleted(fixture);
+      expect(reads).toBe(1);
+    } finally {
+      await fixture.host.dispose();
+    }
+  });
+
+  test.each([0.5, -1, NaN, undefined, '0'])(
+    'Delete Selection validates evidence and preserves native empty length %p for ' + kind + ' targets',
+    async (length) => {
+      const fixture = await activateSelectionValueRuntime(kind);
+      try {
+        let lengthReads = 0,
+          indexReads = 0,
+          evidenceReads = 0;
+        const ids = new Proxy([fixture.firstId], {
+          get(target, key, receiver) {
+            if (key === 'length') {
+              lengthReads += 1;
+              return length;
+            }
+            if (key === '0') {
+              indexReads += 1;
+              throw new Error('Empty native traversal must not read an entry');
+            }
+            return Reflect.get(target, key, receiver);
+          },
+        });
+        const selection = { nodeIds: [], edgeIds: [] };
+        Object.defineProperty(selection, fixture.field, { value: ids });
+        const before = fixture.kernel.read(),
+          historyBefore = fixture.history.getSnapshot(),
+          sessionBefore = fixture.session.getSnapshot();
+        await expect(
+          fixture.commands.execute(deleteSelectionCommand, {
+            selection,
+            get evidence() {
+              evidenceReads += 1;
+              return fixture.evidence;
+            },
+          }),
+        ).resolves.toBeNull();
+        expect(lengthReads).toBe(1);
+        expect(indexReads).toBe(0);
+        expect(evidenceReads).toBe(1);
+        expect(fixture.kernel.read()).toBe(before);
+        expect(fixture.history.getSnapshot()).toBe(historyBefore);
+        expect(fixture.session.getSnapshot()).toBe(sessionBefore);
+      } finally {
+        await fixture.host.dispose();
+      }
+    },
+  );
+
+  test.each([1n, Symbol('length')])(
+    'Delete Selection preserves native length failure %p for ' + kind,
+    async (length) => {
+      const fixture = await activateSelectionValueRuntime(kind);
+      try {
+        let evidenceReads = 0;
+        const ids = new Proxy([fixture.firstId], {
+          get(target, key, receiver) {
+            return key === 'length' ? length : Reflect.get(target, key, receiver);
+          },
+        });
+        const selection = { ...fixture.first };
+        Object.defineProperty(selection, fixture.field, { value: ids });
+        const before = fixture.kernel.read(),
+          historyBefore = fixture.history.getSnapshot();
+        await expect(
+          fixture.commands.execute(deleteSelectionCommand, {
+            selection,
+            get evidence() {
+              evidenceReads += 1;
+              return fixture.evidence;
+            },
+          }),
+        ).rejects.toBeInstanceOf(TypeError);
+        expect(evidenceReads).toBe(0);
+        expect(fixture.kernel.read()).toBe(before);
+        expect(fixture.history.getSnapshot()).toBe(historyBefore);
+      } finally {
+        await fixture.host.dispose();
+      }
+    },
+  );
+}
+
+test.each(['selection', 'length', 'index'] as const)(
+  'Delete Selection preserves original %s read failures',
+  async (stage) => {
+    for (const failure of [undefined, null, false, 0, '', Symbol('owned read'), new Error('owned read')]) {
+      const fixture = await activateSelectionValueRuntime('node');
+      try {
+        const ids = new Proxy([fixture.a], {
+          get(target, key, receiver) {
+            if ((stage === 'length' && key === 'length') || (stage === 'index' && key === '0')) throw failure;
+            return Reflect.get(target, key, receiver);
+          },
+        });
+        const input: DeleteSelectionInput = {
+          get selection() {
+            if (stage === 'selection') throw failure;
+            return { nodeIds: ids, edgeIds: [] };
+          },
+          get evidence(): DeleteSelectionInput['evidence'] {
+            throw new Error('Evidence must follow owned-value admission');
+          },
+        };
+        const before = fixture.kernel.read(),
+          historyBefore = fixture.history.getSnapshot(),
+          sessionBefore = fixture.session.getSnapshot();
+        let caught = false,
+          actual: unknown;
+        try {
+          await fixture.commands.execute(deleteSelectionCommand, input);
+        } catch (error) {
+          caught = true;
+          actual = error;
+        }
+        expect(caught).toBe(true);
+        expect(actual).toBe(failure);
+        expect(fixture.kernel.read()).toBe(before);
+        expect(fixture.history.getSnapshot()).toBe(historyBefore);
+        expect(fixture.session.getSnapshot()).toBe(sessionBefore);
+      } finally {
+        await fixture.host.dispose();
+      }
+    }
+  },
+);
+
+test('Delete Selection rejects sparse and invalid indexed IDs before evidence and preserves lazy first failure', async () => {
+  for (const kind of ['node', 'edge'] as const) {
+    for (const mode of ['sparse', 'invalid', 'infinite-length'] as const) {
+      const fixture = await activateSelectionValueRuntime(kind);
+      try {
+        let reads = 0;
+        const bad = mode === 'sparse' ? new Array(1) : [undefined];
+        const ids =
+          mode === 'infinite-length'
+            ? new Proxy(bad, {
+                get(target, key, receiver) {
+                  return key === 'length' ? Infinity : Reflect.get(target, key, receiver);
+                },
+              })
+            : bad;
+        const selection = { nodeIds: [], edgeIds: [] };
+        Object.defineProperty(selection, fixture.field, { value: ids });
+        const before = fixture.kernel.read(),
+          historyBefore = fixture.history.getSnapshot();
+        await expect(
+          fixture.commands.execute(deleteSelectionCommand, {
+            selection,
+            get evidence() {
+              reads += 1;
+              return fixture.evidence;
+            },
+          }),
+        ).rejects.toMatchObject({ domain: 'interaction', code: 'INVALID_DELETE' });
+        expect(reads).toBe(0);
+        expect(fixture.kernel.read()).toBe(before);
+        expect(fixture.history.getSnapshot()).toBe(historyBefore);
+      } finally {
+        await fixture.host.dispose();
+      }
+    }
+  }
+});
+
+test('Delete Selection admits node IDs before edge IDs and evidence and retains the first coercion', async () => {
+  const fixture = await activateSelectionValueRuntime('node');
+  try {
+    const calls: string[] = [];
+    let coercions = 0;
+    const length = {
+      valueOf() {
+        expect(this).toBe(length);
+        coercions += 1;
+        return coercions === 1 ? 1.5 : 2;
+      },
+    };
+    const ids = new Proxy([fixture.a, fixture.b], {
+      get(target, key, receiver) {
+        if (key === 'length') {
+          calls.push('length');
+          return length;
+        }
+        if (key === '0') calls.push('index');
+        return Reflect.get(target, key, receiver);
+      },
+    });
+    await fixture.commands.execute(deleteSelectionCommand, {
+      get selection() {
+        calls.push('selection');
+        return {
+          get nodeIds() {
+            calls.push('nodeIds');
+            return ids;
+          },
+          get edgeIds() {
+            calls.push('edgeIds');
+            return [];
+          },
+        };
+      },
+      get evidence() {
+        calls.push('evidence');
+        return fixture.evidence;
+      },
+    });
+    expectFirstSelectionDeleted(fixture);
+    expect(coercions).toBe(1);
+    expect(calls).toEqual(['selection', 'nodeIds', 'length', 'index', 'edgeIds', 'evidence']);
+  } finally {
+    await fixture.host.dispose();
+  }
+});
+
+async function activateSelectionValueRuntime(kind: 'node' | 'edge') {
+  const runtime = await activateDeleteCommandRuntime();
+  const a = nodeId('capture-a'),
+    b = nodeId('capture-b');
+  const firstEdgeId = edgeId('capture-edge-a'),
+    secondEdgeId = edgeId('capture-edge-b');
+  const data = new Map([['opaque', 'selection capture']]);
+  runtime.kernel.transact((transaction) => {
+    transaction.nodes.add({ id: a, type: 'task', position: { x: 0, y: 0 }, data });
+    transaction.nodes.add({ id: b, type: 'task', position: { x: 100, y: 0 }, data: null });
+    transaction.edges.add({ id: firstEdgeId, type: 'loop', source: { nodeId: a }, target: { nodeId: a }, data });
+    transaction.edges.add({ id: secondEdgeId, type: 'loop', source: { nodeId: b }, target: { nodeId: b }, data: null });
+  });
+  runtime.session.setSelection({ nodeIds: kind === 'node' ? [a] : [], edgeIds: kind === 'edge' ? [firstEdgeId] : [] });
+  const first = runtime.session.getSnapshot().selection;
+  runtime.session.setSelection({ nodeIds: kind === 'node' ? [b] : [], edgeIds: kind === 'edge' ? [secondEdgeId] : [] });
+  const later = runtime.session.getSnapshot().selection;
+  return {
+    ...runtime,
+    kind,
+    a,
+    b,
+    firstEdgeId,
+    secondEdgeId,
+    data,
+    first,
+    later,
+    evidence: runtime.kernel.read().snapshot,
+    firstId: kind === 'node' ? a : firstEdgeId,
+    secondId: kind === 'node' ? b : secondEdgeId,
+    field: kind === 'node' ? ('nodeIds' as const) : ('edgeIds' as const),
+  };
+}
+
+function expectFirstSelectionDeleted(fixture: Awaited<ReturnType<typeof activateSelectionValueRuntime>>): void {
+  const view = fixture.kernel.read();
+  if (fixture.kind === 'node') {
+    expect(view.query.getNode(fixture.a)).toBeUndefined();
+    expect(view.query.getNode(fixture.b)).toBe(fixture.evidence.nodes.find((node) => node.id === fixture.b));
+  } else {
+    expect(view.query.getNode(fixture.a)).toBe(fixture.evidence.nodes.find((node) => node.id === fixture.a));
+    expect(view.snapshot.nodes).toHaveLength(2);
+  }
+  expect(view.query.getEdge(fixture.firstEdgeId)).toBeUndefined();
+  expect(view.query.getEdge(fixture.secondEdgeId)).toBe(
+    fixture.evidence.edges.find((edge) => edge.id === fixture.secondEdgeId),
+  );
+  expect(fixture.session.getSnapshot().selection).toBe(fixture.later);
+}
+
 async function activateDeleteCommandRuntime(): Promise<{
   readonly host: ReturnType<typeof createPluginHost>;
   readonly commands: CommandService;
