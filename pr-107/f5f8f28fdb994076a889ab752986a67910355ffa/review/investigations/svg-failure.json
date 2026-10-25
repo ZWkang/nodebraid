@@ -1,0 +1,29 @@
+{
+  "readAt": "2026-10-25T19:43:48.855Z",
+  "source": {
+    "base": "aba0795079c6e3182d14b698f212c437092ed844",
+    "head": "4ecbeb33f7753079be127693fb3c7d2fc55d0e6e",
+    "tree": "170f9438e1204675c9973a945cb84416c1d454fc",
+    "patch": "6552a9093fbf333280dfc261414c04e6d3a4b48c77b93a19259366715aed66e5"
+  },
+  "original": {
+    "command": "bun run check:affected --base aba0795079c6e3182d14b698f212c437092ed844",
+    "exitCode": 1,
+    "log": "affected.log",
+    "failure": "RuntimeInteractionProjection fixture function absent from browser global, before that public scenario could run",
+    "failedLogModifiedUTC": "2026-10-23T14:06:07.503751+00:00",
+    "bundle": "svg-original-failure/renderer-contract.js",
+    "bundleSha256": "4dd32eb15d48a70f458460be08929819acdd6e679e010795d8d884305b98cea8",
+    "expectedFunctionExistsInBundle": true
+  },
+  "reproduction": {
+    "command": "bun run --filter '@nodebraid/renderer-svg' test:browser:self",
+    "exitCode": 0,
+    "log": "svg-focused-reproduction-20261025.log",
+    "sameBundleBytes": true,
+    "noSourceOrAssertionChanges": true,
+    "wholeOriginalSuiteExecuted": true
+  },
+  "conclusion": "Original browser fixture/CLI context failure was not reproduced with the exact same bundle. No source bug or exact environmental trigger is proven; no fix, fallback or automatic retry was added. Retain this limit and the original failure. Fresh affected and formal full/remote checks remain required.",
+  "rootCauseProven": false
+}

@@ -1,0 +1,343 @@
+Source revision: 4ecbeb33f7753079be127693fb3c7d2fc55d0e6e
+Independent command: bun test packages/plugin-interaction/tests packages/plugin-history/tests packages/document/tests packages/core/tests/document-roundtrip.test.ts
+
+bun test v1.4.2 (744846f84)
+
+packages/plugin-history/tests/index.test.ts:
+(pass) @nodebraid/plugin-history > publishes the stable History diagnostic event catalog [0.04ms]
+(pass) @nodebraid/plugin-history > records the first post-Baseline Commit and undoes it through Command Service [21.21ms]
+(pass) @nodebraid/plugin-history > redoes the most recently undone History Entry with diagnostic metadata [5.19ms]
+(pass) @nodebraid/plugin-history > records a Recordable Commit that uses History-like diagnostic metadata [5.11ms]
+(pass) @nodebraid/plugin-history > records Command-originated work but not net-zero or failed Transactions [5.56ms]
+(pass) @nodebraid/plugin-history > clears Redo when a new Recordable Commit creates a branch [3.45ms]
+(pass) @nodebraid/plugin-history > rejects an empty Undo without changing Kernel or History [5.41ms]
+(pass) @nodebraid/plugin-history > publishes only meaningful History Snapshot changes [5.33ms]
+(pass) @nodebraid/plugin-history > snapshots subscriber recipients and isolates their errors [5.31ms]
+(pass) @nodebraid/plugin-history > allows an aligned Recordable Commit subscriber to Undo immediately [5.46ms]
+(pass) @nodebraid/plugin-history > rejects Undo before History catches up to the current Kernel revision [4.99ms]
+(pass) @nodebraid/plugin-history > keeps one queued Replay in flight and rejects a reentrant second Undo [2.60ms]
+(pass) @nodebraid/plugin-history > records a reentrant Recordable Commit and publishes only after catching up [2.80ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy while publishing its History Snapshot [3.40ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through later Kernel Observers [2.28ms]
+(pass) @nodebraid/plugin-history > returns the exact Replay Commit delivered to Kernel Observers [2.73ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through the final caught-up Snapshot publication [1.55ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Kernel Provider disappears before delivery [1.63ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Command Provider disappears before delivery [2.52ms]
+(pass) @nodebraid/plugin-history > preserves caller cancellation before starting a Replay [3.09ms]
+(pass) @nodebraid/plugin-history > prioritizes caller cancellation over an empty Undo stack [1.58ms]
+(pass) @nodebraid/plugin-history > closes old History state and reactivates from a fresh Kernel Baseline [2.12ms]
+(pass) @nodebraid/plugin-history > starts a new Baseline when Command Service returns to a retained Kernel [2.42ms]
+
+packages/plugin-history/tests/types.test.ts:
+(pass) keeps the public History seam narrow and type-safe [0.02ms]
+
+packages/plugin-history/tests/baseline.test.ts:
+(pass) replaces the Document as a new baseline and only undoes subsequent edits [2.10ms]
+(pass) establishes a baseline without a net Document change and publishes the cleared history [1.49ms]
+(pass) keeps a net-zero baseline busy through publication while recording a subsequent Commit [1.58ms]
+(pass) preserves the original Document and History after callback rejection [1.20ms]
+(pass) preserves the original Document and History after invalid-graph rejection [1.98ms]
+(pass) preserves the original Document and History after async-callback rejection [0.91ms]
+(pass) rejects an already aborted baseline before invoking its update [1.14ms]
+(pass) rejects overlapping baseline and replay Commands before writing [3.09ms]
+(pass) returns the committed baseline when a later observer aborts the caller [1.56ms]
+(pass) rejects a baseline when an earlier observer runs before History catches up [1.55ms]
+(pass) records an ordinary reentrant Commit after the exact baseline Commit [1.94ms]
+(pass) settles a committed queued baseline when its kernel Provider disappears [1.56ms]
+(pass) settles a committed queued baseline when its command Provider disappears [2.16ms]
+
+packages/core/tests/document-roundtrip.test.ts:
+(pass) the public facade restores a file and records only subsequent editing [2.35ms]
+
+packages/plugin-interaction/tests/input-cleanup.test.ts:
+(pass) a failed Selection transition releases Pointer Capture before reporting the Input fault [3.50ms]
+
+packages/plugin-interaction/tests/types.test.ts:
+(pass) publishes Interaction as a Runtime Plugin with a narrow Shortcut contribution Service [0.04ms]
+
+packages/plugin-interaction/tests/create-edge-input-values.test.ts:
+(pass) Create Edge cannot replace a validated forward Edge with a later self-loop [5.83ms]
+(pass) Create Edge retains first values, receivers and late opaque data from own properties [2.91ms]
+(pass) Create Edge retains first values, receivers and late opaque data from non-enumerable properties [4.72ms]
+(pass) Create Edge retains first values, receivers and late opaque data from inherited properties [3.20ms]
+(pass) Create Edge preserves the original edge read failure and exact committed state [8.58ms]
+(pass) Create Edge preserves the original edge.id read failure and exact committed state [3.89ms]
+(pass) Create Edge preserves the original edge.type read failure and exact committed state [4.60ms]
+(pass) Create Edge preserves the original edge.source read failure and exact committed state [8.03ms]
+(pass) Create Edge preserves the original edge.source.nodeId read failure and exact committed state [8.95ms]
+(pass) Create Edge preserves the original edge.source.portId read failure and exact committed state [5.46ms]
+(pass) Create Edge preserves the original edge.target read failure and exact committed state [3.74ms]
+(pass) Create Edge preserves the original edge.target.nodeId read failure and exact committed state [12.31ms]
+(pass) Create Edge preserves the original edge.target.portId read failure and exact committed state [6.50ms]
+(pass) Create Edge preserves the original edge.data.presence read failure and exact committed state [1.84ms]
+(pass) Create Edge preserves the original source read failure and exact committed state [2.22ms]
+(pass) Create Edge preserves the original source.nodeId read failure and exact committed state [3.42ms]
+(pass) Create Edge preserves the original source.portId read failure and exact committed state [4.66ms]
+(pass) Create Edge preserves the original source.role read failure and exact committed state [4.12ms]
+(pass) Create Edge preserves the original target read failure and exact committed state [3.97ms]
+(pass) Create Edge preserves the original target.nodeId read failure and exact committed state [4.28ms]
+(pass) Create Edge preserves the original target.portId read failure and exact committed state [7.33ms]
+(pass) Create Edge preserves the original target.role read failure and exact committed state [2.31ms]
+(pass) Create Edge preserves the original edge.data read failure and exact committed state [1.70ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [3.73ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [4.36ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [3.96ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [3.38ms]
+(pass) Create Edge observes abort before input getters [2.23ms]
+(pass) Create Edge self-loop preflight wins before the opaque-data getter [21.54ms]
+(pass) Create Edge mismatched-endpoint preflight wins before the opaque-data getter [3.99ms]
+(pass) Create Edge wrong-role preflight wins before the opaque-data getter [5.50ms]
+(pass) Create Edge missing-node preflight wins before the opaque-data getter [3.31ms]
+(pass) Create Edge missing-port preflight wins before the opaque-data getter [6.53ms]
+(pass) Create Edge duplicate-id preflight wins before the opaque-data getter [5.82ms]
+(pass) Create Edge finishes every shape check before semantic role checks [3.10ms]
+(pass) Create Edge preserves invalid-ID short circuit before Edge type reads [5.36ms]
+(pass) Create Edge validates data presence before reading Anchor roots [4.30ms]
+(pass) Create Edge retains Anchor empty-Port short circuit before the target root [4.71ms]
+(pass) Create Edge keeps an empty Endpoint Port distinct from an absent Anchor Port [12.64ms]
+(pass) Create Edge retains captured Port evidence across application Definition and data callbacks [7.75ms]
+
+packages/plugin-interaction/tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [43.90ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [41.08ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [25.73ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [29.81ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [8.87ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [2.31ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [1.28ms]
+
+packages/plugin-interaction/tests/create-edge-command.test.ts:
+(pass) Create Edge commits one complete Node-level Edge [4.71ms]
+
+packages/plugin-interaction/tests/selection-transition.test.ts:
+(pass) a Port click selects its owning Node without inventing a Port selection [0.10ms]
+
+packages/plugin-interaction/tests/config.test.ts:
+(pass) Interaction accepts an explicit synchronous Connection materializer [4.23ms]
+(pass) Interaction rejects unknown config fields through Plugin installation [3.62ms]
+(pass) Interaction rejects malformed numeric config without coercion [26.41ms]
+(pass) Interaction revalidates the materializer on recovery and preserves its read failure [3.97ms]
+
+packages/plugin-interaction/tests/lifecycle.test.ts:
+(pass) Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh [6.29ms]
+(pass) Delete Selection registration follows dependency reactivation and disposal lifecycle [2.27ms]
+(pass) Connection materializer failure keeps identity and reports exactly once after terminal cleanup [5.57ms]
+(pass) Connection dependency recovery creates a fresh idle Activation [8.19ms]
+(pass) Connection final Hit Test failure still clears Preview and releases Capture [2.16ms]
+(pass) Connection Escape attempts every terminal cleanup and never materializes after cleanup failure [1.89ms]
+(pass) Box Selection disposal continues after every public Renderer cleanup failure [7.90ms]
+(pass) Box Selection escape exposes every terminal cleanup failure [4.43ms]
+(pass) Box Selection pointer-cancel exposes every terminal cleanup failure [10.78ms]
+(pass) Interaction dependency recovery creates a fresh idle Activation [5.23ms]
+(pass) an input-driven Command rejection is reported exactly once while Interaction is active [4.16ms]
+(pass) a late Command rejection cannot report through an ended Interaction Activation [5.33ms]
+(pass) a recovered Renderer reset receives the still-compatible Active Gesture again [5.75ms]
+
+packages/plugin-interaction/tests/move-nodes-command.test.ts:
+(pass) Move Nodes rejects an empty input without changing Document [3.87ms]
+
+packages/plugin-interaction/tests/diagnostic-events.test.ts:
+(pass) publishes the stable Interaction diagnostic event catalog [0.08ms]
+
+packages/plugin-interaction/tests/port-connection.test.ts:
+(pass) Port Gesture tracks target loss, materializes exact Endpoints once, and cancels on source loss [6.79ms]
+(pass) Connection Gesture uses the materializer accepted before its getter changes [5.57ms]
+
+packages/plugin-interaction/tests/delete-selection-input.test.ts:
+(pass) a live Interaction Shortcut Binding executes its Command and prevents the matched input default [10.25ms]
+(pass) logical Delete key removes the current Selection through the public Renderer Input seam [5.22ms]
+(pass) physical Delete accepts modifiers and repeat while empty Selection and Backspace remain no-ops [14.93ms]
+(pass) Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connection without cancelling them [17.94ms]
+(pass) Delete Transaction failure preserves state and reports the original diagnostic identity exactly once [5.65ms]
+
+packages/document/tests/index.test.ts:
+(pass) round-trips a complete Document and opaque application data without persisting runtime state [1.52ms]
+(pass) supports an empty Document and uses no codec calls when there are no entities [0.06ms]
+(pass) rejects wrong envelope type before interpreting any application data [0.11ms]
+(pass) rejects unknown version before interpreting any application data [0.01ms]
+(pass) rejects wrong data format before interpreting any application data
+(pass) rejects non-object envelope before interpreting any application data
+(pass) rejects unknown envelope field before interpreting any application data
+(pass) rejects missing array before interpreting any application data
+(pass) rejects non-array nodes before interpreting any application data
+(pass) rejects invalid node type before interpreting any application data [0.02ms]
+(pass) rejects empty node ID before interpreting any application data [0.01ms]
+(pass) rejects string position before interpreting any application data [0.01ms]
+(pass) rejects unknown node field before interpreting any application data
+(pass) rejects malformed size before interpreting any application data [0.01ms]
+(pass) rejects invalid parent ID before interpreting any application data [0.01ms]
+(pass) rejects malformed edge before interpreting any application data [0.02ms]
+(pass) rejects invalid port ID before interpreting any application data [0.04ms]
+(pass) rejects non-text data on later edge before interpreting any application data [0.02ms]
+(pass) rejects duplicate Node ID through the Kernel complete-graph contract [1.12ms]
+(pass) rejects duplicate Edge ID through the Kernel complete-graph contract [0.35ms]
+(pass) rejects missing parent through the Kernel complete-graph contract [0.21ms]
+(pass) rejects self parent cycle through the Kernel complete-graph contract [0.09ms]
+(pass) rejects missing endpoint through the Kernel complete-graph contract [0.04ms]
+(pass) rejects negative size through the Kernel complete-graph contract [0.09ms]
+(pass) rejects malformed JSON and non-finite JSON geometry [0.70ms]
+(pass) preserves original application codec exceptions and rejects non-text encoding [0.86ms]
+(pass) rejects invalid codec configuration [0.10ms]
+(pass) rejects invalid codec configuration [0.01ms]
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+
+packages/document/tests/types.test.ts:
+(pass) keeps decoded Document structure readonly and business data opaque [0.05ms]
+
+packages/document/tests/capture.test.ts:
+(pass) captures getters once and preserves the graph even when application encoding changes its source [1.49ms]
+(pass) normalizes valid graph ordering and ignores caller array iteration hooks [0.96ms]
+(pass) rejects sparse arrays and malformed owned export fields instead of losing information [0.64ms]
+(pass) calls the original codec methods with their receiver when their bind property is overridden [0.39ms]
+(pass) captures typed class getters and extra application fields without requiring own enumerable storage [0.97ms]
+(pass) still rejects a genuinely missing required source field [0.16ms]
+
+ 153 pass
+ 0 fail
+ 745 expect() calls
+Ran 153 tests across 19 files. [875.00ms]
+
+Exit code: 0
+
+Independent public-package probe command (Bun stdin):
+bun - <<'JS'
+import assert from 'node:assert/strict';
+import { createCanvasKernel, nodeId, edgeId } from '@nodebraid/kernel';
+import { serializeCanvasDocument, deserializeCanvasDocument } from '@nodebraid/document';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
+import { commandPlugin, commandService } from '@nodebraid/plugin-command';
+import { kernelPlugin, kernelService } from '@nodebraid/plugin-kernel';
+import { historyPlugin, historyService, establishHistoryBaselineCommand, undoCommand, redoCommand } from '@nodebraid/plugin-history';
+import { portPlugin } from '@nodebraid/plugin-port';
+import { sessionPlugin } from '@nodebraid/plugin-session';
+import { createRendererPlugin } from '@nodebraid/plugin-renderer';
+import { interactionPlugin, createEdgeCommand } from '@nodebraid/plugin-interaction';
+
+const a = nodeId('saved-a'), b = nodeId('saved-b'), old = nodeId('old');
+const source = createCanvasKernel();
+source.transact(tx => {
+  tx.nodes.add({ id: a, type: 'task', position: { x: 0, y: 0 }, data: null });
+  tx.nodes.add({ id: b, type: 'task', position: { x: 120, y: 0 }, data: null });
+});
+const codec = {
+  format: 'review/null-v1',
+  encode(value) { assert.equal(value, null); return 'null'; },
+  decode(text) { assert.equal(text, 'null'); return null; },
+};
+const document = deserializeCanvasDocument(serializeCanvasDocument(source.read().snapshot, codec), codec);
+let services;
+const consumer = definePlugin({
+  requires: { commands: commandService, kernel: kernelService, history: historyService },
+  setup(context) { services = context.services; },
+});
+// Explicit external Renderer backend. All Host/Kernel/Command/History/Interaction services are real.
+const renderer = {
+  updateDocument() {}, updateSession() {}, updateInteraction() {},
+  subscribeInput() { return () => {}; }, hitTest() { return null; },
+  capturePointer() {}, releasePointer() {}, focus() {}, async dispose() {},
+};
+const host = createPluginHost();
+let observed;
+try {
+  await Promise.all([
+    host.install(kernelPlugin), host.install(commandPlugin), host.install(historyPlugin),
+    host.install(portPlugin), host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => renderer)), host.install(interactionPlugin), host.install(consumer),
+  ].map(installation => installation.whenActive()));
+  assert.ok(services);
+  const { commands, kernel, history } = services;
+  kernel.transact(tx => tx.nodes.add({ id: old, type: 'old', position: { x: 0, y: 0 }, data: null }));
+  await commands.execute(undoCommand, undefined);
+  assert.deepEqual(history.getSnapshot(), { canUndo: false, canRedo: true });
+  const baseline = await commands.execute(establishHistoryBaselineCommand, tx => {
+    const current = kernel.read().snapshot;
+    for (const edge of current.edges) tx.edges.remove(edge.id);
+    for (const node of current.nodes) tx.nodes.remove(node.id);
+    for (const node of document.nodes) tx.nodes.add(node);
+    for (const edge of document.edges) tx.edges.add(edge);
+  });
+  assert.ok(baseline);
+  const restored = kernel.read();
+  assert.strictEqual(baseline.after, restored);
+  assert.deepEqual(history.getSnapshot(), { canUndo: false, canRedo: false });
+  await assert.rejects(commands.execute(redoCommand, undefined), error => error.code === 'REDO_EMPTY');
+  let rootReads = 0, dataReads = 0;
+  const opaque = new Map([['domain', { value: 7 }]]);
+  const id = edgeId('after-baseline');
+  const accepted = {
+    id, type: 'flow', source: { nodeId: a }, target: { nodeId: b },
+    get data() { assert.strictEqual(this, accepted); dataReads++; return opaque; },
+  };
+  const substituted = { id, type: 'flow', source: { nodeId: a }, target: { nodeId: a }, data: opaque };
+  const input = {
+    get edge() { rootReads++; return rootReads === 1 ? accepted : substituted; },
+    source: { nodeId: a, role: 'source' }, target: { nodeId: b, role: 'target' },
+  };
+  const commit = await commands.execute(createEdgeCommand, input);
+  assert.strictEqual(commit.before, restored);
+  assert.equal(commit.changeSet.origin, 'interaction');
+  assert.equal(commit.changeSet.commandId, 'interaction.edge.create');
+  assert.equal(commit.changeSet.changes.length, 1);
+  assert.equal(commit.changeSet.changes[0].entity, 'edge');
+  assert.equal(kernel.read().query.getEdge(id).target.nodeId, b);
+  assert.strictEqual(kernel.read().query.getEdge(id).data, opaque);
+  assert.equal(Object.isFrozen(opaque), false);
+  assert.deepEqual(history.getSnapshot(), { canUndo: true, canRedo: false });
+  assert.equal(rootReads, 1); assert.equal(dataReads, 1);
+  await commands.execute(undoCommand, undefined);
+  assert.equal(kernel.read().query.getEdge(id), undefined);
+  assert.strictEqual(kernel.read().query.getNode(a), restored.query.getNode(a));
+  assert.strictEqual(kernel.read().query.getNode(b), restored.query.getNode(b));
+  assert.deepEqual(history.getSnapshot(), { canUndo: false, canRedo: true });
+  await commands.execute(redoCommand, undefined);
+  assert.equal(kernel.read().query.getEdge(id).target.nodeId, b);
+  assert.strictEqual(kernel.read().query.getEdge(id).data, opaque);
+  assert.deepEqual(history.getSnapshot(), { canUndo: true, canRedo: false });
+  assert.equal(rootReads, 1); assert.equal(dataReads, 1);
+  observed = { baselineRevision: baseline.after.snapshot.revision, edgeCommitRevision: commit.after.snapshot.revision,
+    rootReads, dataReads, baselineNodesPreserved: true, redoDataIdentity: true };
+} finally {
+  await host.dispose();
+}
+console.log(JSON.stringify(observed));
+JS
+
+Original probe output:
+{"baselineRevision":3,"edgeCommitRevision":4,"rootReads":1,"dataReads":1,"baselineNodesPreserved":true,"redoDataIdentity":true}
+
+Exit code: 0
+
+Final identity / patch / parents / clean-status / whitespace audit:
+{
+  "base": "aba0795079c6e3182d14b698f212c437092ed844",
+  "head": "4ecbeb33f7753079be127693fb3c7d2fc55d0e6e",
+  "tree": "170f9438e1204675c9973a945cb84416c1d454fc",
+  "patch": "6552a9093fbf333280dfc261414c04e6d3a4b48c77b93a19259366715aed66e5",
+  "parents": [
+    "edf10e2d670ce98f65fb766c7d4b3f3abe0c887a",
+    "aba0795079c6e3182d14b698f212c437092ed844"
+  ],
+  "savedPatchEqualsGit": true,
+  "taskDigest": "b1e49a4f995cc9cd021aa6b4dc628ece6877db921c57a4cabf4b40c28824e206",
+  "clean": true,
+  "diffCheckExit": 0
+}
+
+Exit code: 0
+
+Readback of pre-existing affected failure; browser not rerun by this reviewer:
+524-1780 |   ]);
+525-1781 |   assert.equal(exitCode, 0, stderr || stdout);
+526-                ^
+527:AssertionError: {"success":false,"data":null,"error":"Evaluation error: TypeError: globalThis.__nodebraidRendererSvgRuntimeInteractionProjection is not a function\n    at <anonymous>:1:12"}
+528-
+529-
+530-1 !== 0
+--
+541-      at assertBrowserScenario (/Users/zhou/.codex/worktrees/renderer-doc-port-composition/cflow/packages/renderer-svg/browser-tests/renderer-contract.browser.ts:1794:26)
+542-
+543-Bun v1.4.2 (macOS arm64)
+544:error: script "test:browser:self" exited with code 1
+545:error: script "check:affected" exited with code 1
