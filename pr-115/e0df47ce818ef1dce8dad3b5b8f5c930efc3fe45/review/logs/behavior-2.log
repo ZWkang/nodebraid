@@ -1,0 +1,64 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [30.13ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [3.41ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [5.37ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [11.38ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [3.29ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [1.17ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [2.01ms]
+(pass) Delete Selection rejects the first stale Snapshot when later evidence reads would return current state [1.17ms]
+(pass) Delete Selection retains the first Snapshot for explicit-edge preflight [1.04ms]
+(pass) Delete Selection retains the first Snapshot for incident-edge preflight [0.95ms]
+(pass) Delete Selection retains the first Snapshot for new-incident-edge preflight [0.90ms]
+(pass) Delete Selection accepts the first valid own evidence getter and preserves replay data [1.22ms]
+(pass) Delete Selection accepts the first valid inherited evidence getter and preserves replay data [0.94ms]
+(pass) Delete Selection accepts the first valid non-enumerable evidence getter and preserves replay data [0.86ms]
+(pass) Delete Selection rejects malformed first evidence before a later valid Snapshot can replace it [1.01ms]
+(pass) Delete Selection preserves the original evidence getter failure undefined [1.85ms]
+(pass) Delete Selection preserves the original evidence getter failure null [0.90ms]
+(pass) Delete Selection preserves the original evidence getter failure false [0.82ms]
+(pass) Delete Selection preserves the original evidence getter failure 0 [0.78ms]
+(pass) Delete Selection preserves the original evidence getter failure "" [0.97ms]
+(pass) Delete Selection preserves the original evidence getter failure Symbol(evidence failure) [0.82ms]
+(pass) Delete Selection preserves the original evidence getter failure 578 |   expect(runtime.kernel.read()).toBe(before);
+579 |   expect(runtime.history.getSnapshot()).toBe(historyBefore);
+580 |   await runtime.host.dispose();
+581 | });
+582 | 
+583 | test.each([undefined, null, false, 0, '', Symbol('evidence failure'), new Error('evidence failure')])(
+                                                                                ^
+error: evidence failure
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:583:75
+ [0.73ms]
+(pass) Delete Selection preserves abort and malformed Selection short circuits before evidence reads [0.92ms]
+675 |         return reads === 1 ? first : later;
+676 |       },
+677 |       evidence,
+678 |     });
+679 |     expect(commit).not.toBeNull();
+680 |     expect(runtime.kernel.read().query.getNode(a)).toBeUndefined();
+                                                         ^
+error: expect(received).toBeUndefined()
+
+Received: {
+  id: "first-selection-a",
+  type: "task",
+  position: {
+    x: 0,
+    y: 0,
+  },
+  data: null,
+}
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:680:52)
+(fail) Delete Selection applies the first Selection when later root reads would choose another Node [3.01ms]
+
+1 tests failed:
+(fail) Delete Selection applies the first Selection when later root reads would choose another Node [3.01ms]
+
+ 23 pass
+ 1 fail
+ 138 expect() calls
+Ran 24 tests across 1 file. [185.00ms]
