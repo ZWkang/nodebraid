@@ -1,0 +1,29 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [30.34ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [3.54ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [5.10ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [11.95ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [3.29ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [1.95ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [1.10ms]
+441 |       get evidence() {
+442 |         reads += 1;
+443 |         return reads === 1 ? evidence : before.snapshot;
+444 |       },
+445 |     }),
+446 |   ).rejects.toMatchObject({ domain: 'interaction', code: 'STALE_SELECTION' });
+                  ^
+error: expect(received).rejects.toMatchObject(expected)
+
+Expected promise that rejects
+Received promise that resolved: Promise { <resolved> }
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:446:13)
+(fail) Delete Selection rejects the first stale Snapshot when later evidence reads would return current state [4.03ms]
+
+ 7 pass
+ 1 fail
+ 40 expect() calls
+Ran 8 tests across 1 file. [150.00ms]

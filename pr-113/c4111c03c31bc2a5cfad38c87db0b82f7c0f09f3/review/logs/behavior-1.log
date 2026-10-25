@@ -1,0 +1,26 @@
+[{"mode":"stable-current","reads":5,"rejected":false,"errorCode":null,"revision":4,"nodeDeleted":true,"viewPreserved":false,"actualFrozenSnapshots":true,"staleRevision":1,"currentRevision":3},{"mode":"stable-stale","reads":4,"rejected":true,"errorCode":"STALE_SELECTION","revision":3,"nodeDeleted":false,"viewPreserved":true,"actualFrozenSnapshots":true,"staleRevision":1,"currentRevision":3},{"mode":"changing-evidence","reads":5,"rejected":false,"errorCode":null,"revision":4,"nodeDeleted":true,"viewPreserved":false,"actualFrozenSnapshots":true,"staleRevision":1,"currentRevision":3}]
+5776 | writeFileSync("/Users/zhou/.codex/local-workflows/nodebraid/runs/20261025T204252-discovery-delete-selection-current-main" + "/delete-selection-observations.json", JSON.stringify(rows, null, 2) + `
+5777 | `);
+5778 | console.log(JSON.stringify(rows));
+5779 | var changed = rows[2];
+5780 | assert.ok(changed && typeof changed === "object");
+5781 | assert.equal(Reflect.get(changed, "errorCode"), "STALE_SELECTION", "Delete Selection must reject the originally supplied stale target evidence");
+                   ^
+AssertionError: Delete Selection must reject the originally supplied stale target evidence
++ actual - expected
+
++ null
+- 'STALE_SELECTION'
+
+ generatedMessage: false,
+     actual: null,
+   expected: "STALE_SELECTION",
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261025T204252-discovery-delete-selection-current-main/build/delete-selection-repro.js:5781:13
+note: missing sourcemaps for /Users/zhou/.codex/local-workflows/nodebraid/runs/20261025T204252-discovery-delete-selection-current-main/build/delete-selection-repro.js
+note: consider bundling with '--sourcemap' to get unminified traces
+
+Bun v1.4.2 (macOS arm64)
