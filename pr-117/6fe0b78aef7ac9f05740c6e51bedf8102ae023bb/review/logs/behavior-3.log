@@ -1,0 +1,89 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [8.34ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [1.89ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [4.50ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [6.93ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [3.55ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [1.14ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [2.21ms]
+(pass) Delete Selection rejects the first stale Snapshot when later evidence reads would return current state [1.33ms]
+(pass) Delete Selection retains the first Snapshot for explicit-edge preflight [1.15ms]
+(pass) Delete Selection retains the first Snapshot for incident-edge preflight [1.07ms]
+(pass) Delete Selection retains the first Snapshot for new-incident-edge preflight [1.03ms]
+(pass) Delete Selection accepts the first valid own evidence getter and preserves replay data [1.51ms]
+(pass) Delete Selection accepts the first valid inherited evidence getter and preserves replay data [0.97ms]
+(pass) Delete Selection accepts the first valid non-enumerable evidence getter and preserves replay data [0.92ms]
+(pass) Delete Selection rejects malformed first evidence before a later valid Snapshot can replace it [1.15ms]
+(pass) Delete Selection preserves the original evidence getter failure undefined [1.93ms]
+(pass) Delete Selection preserves the original evidence getter failure null [1.00ms]
+(pass) Delete Selection preserves the original evidence getter failure false [0.95ms]
+(pass) Delete Selection preserves the original evidence getter failure 0 [0.80ms]
+(pass) Delete Selection preserves the original evidence getter failure "" [0.77ms]
+(pass) Delete Selection preserves the original evidence getter failure Symbol(evidence failure) [1.00ms]
+(pass) Delete Selection preserves the original evidence getter failure 578 |   expect(runtime.kernel.read()).toBe(before);
+579 |   expect(runtime.history.getSnapshot()).toBe(historyBefore);
+580 |   await runtime.host.dispose();
+581 | });
+582 | 
+583 | test.each([undefined, null, false, 0, '', Symbol('evidence failure'), new Error('evidence failure')])(
+                                                                                ^
+error: evidence failure
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:583:75
+ [0.69ms]
+(pass) Delete Selection preserves abort and malformed Selection short circuits before evidence reads [1.02ms]
+(pass) Delete Selection applies the first Selection when later root reads would choose another Node [1.09ms]
+(pass) Delete Selection captures root-own for node targets [1.49ms]
+(pass) Delete Selection captures root-inherited for node targets [2.22ms]
+(pass) Delete Selection captures root-non-enumerable for node targets [1.02ms]
+(pass) Delete Selection captures collection-root for node targets [1.04ms]
+(pass) Delete Selection captures inherited-collection for node targets [1.03ms]
+(pass) Delete Selection captures iterator for node targets [0.93ms]
+(pass) Delete Selection captures array-hooks for node targets [0.85ms]
+(pass) Delete Selection captures index-once for node targets [0.90ms]
+(pass) Delete Selection captures evidence-mutates-ids for node targets [0.81ms]
+(pass) Delete Selection keeps native fractional length 1.5 for node targets [0.95ms]
+(pass) Delete Selection keeps native fractional length "1.5" for node targets [2.04ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for node targets [0.98ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for node targets [0.88ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for node targets [0.75ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for node targets [0.73ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for node targets [1.39ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for node targets [0.98ms]
+(pass) Delete Selection preserves native length failure 1n for node [1.44ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for node [0.84ms]
+(pass) Delete Selection captures root-own for edge targets [1.08ms]
+(pass) Delete Selection captures root-inherited for edge targets [3.53ms]
+(pass) Delete Selection captures root-non-enumerable for edge targets [1.21ms]
+(pass) Delete Selection captures collection-root for edge targets [0.91ms]
+(pass) Delete Selection captures inherited-collection for edge targets [0.86ms]
+(pass) Delete Selection captures iterator for edge targets [0.82ms]
+(pass) Delete Selection captures array-hooks for edge targets [0.83ms]
+(pass) Delete Selection captures index-once for edge targets [0.81ms]
+(pass) Delete Selection captures evidence-mutates-ids for edge targets [0.81ms]
+(pass) Delete Selection keeps native fractional length 1.5 for edge targets [0.76ms]
+(pass) Delete Selection keeps native fractional length "1.5" for edge targets [0.78ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for edge targets [2.28ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for edge targets [0.92ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for edge targets [0.76ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for edge targets [0.86ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for edge targets [0.77ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for edge targets [0.76ms]
+(pass) Delete Selection preserves native length failure 1n for edge [0.72ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for edge [0.71ms]
+(pass) Delete Selection preserves original selection read failures [8.97ms]
+(pass) Delete Selection preserves original length read failures [8.23ms]
+(pass) Delete Selection preserves original index read failures [4.97ms]
+(pass) Delete Selection rejects sparse and invalid indexed IDs before evidence and preserves lazy first failure [6.40ms]
+(pass) Delete Selection admits node IDs before edge IDs and evidence and retains the first coercion [0.96ms]
+(pass) Delete Selection rejects stale first evidence Nodes when later collection reads return current roots [0.94ms]
+
+ 68 pass
+ 0 fail
+ 859 expect() calls
+Ran 68 tests across 1 file. [159.00ms]

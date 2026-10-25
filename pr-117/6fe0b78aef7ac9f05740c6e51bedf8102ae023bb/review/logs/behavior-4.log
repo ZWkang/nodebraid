@@ -1,0 +1,220 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [27.12ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [3.02ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [4.37ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [10.71ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [3.15ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [1.05ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [1.91ms]
+(pass) Delete Selection rejects the first stale Snapshot when later evidence reads would return current state [1.01ms]
+(pass) Delete Selection retains the first Snapshot for explicit-edge preflight [0.95ms]
+(pass) Delete Selection retains the first Snapshot for incident-edge preflight [0.85ms]
+(pass) Delete Selection retains the first Snapshot for new-incident-edge preflight [0.84ms]
+(pass) Delete Selection accepts the first valid own evidence getter and preserves replay data [1.10ms]
+(pass) Delete Selection accepts the first valid inherited evidence getter and preserves replay data [0.87ms]
+(pass) Delete Selection accepts the first valid non-enumerable evidence getter and preserves replay data [0.81ms]
+(pass) Delete Selection rejects malformed first evidence before a later valid Snapshot can replace it [0.84ms]
+(pass) Delete Selection preserves the original evidence getter failure undefined [1.87ms]
+(pass) Delete Selection preserves the original evidence getter failure null [0.74ms]
+(pass) Delete Selection preserves the original evidence getter failure false [0.80ms]
+(pass) Delete Selection preserves the original evidence getter failure 0 [0.73ms]
+(pass) Delete Selection preserves the original evidence getter failure "" [0.77ms]
+(pass) Delete Selection preserves the original evidence getter failure Symbol(evidence failure) [0.76ms]
+(pass) Delete Selection preserves the original evidence getter failure 578 |   expect(runtime.kernel.read()).toBe(before);
+579 |   expect(runtime.history.getSnapshot()).toBe(historyBefore);
+580 |   await runtime.host.dispose();
+581 | });
+582 | 
+583 | test.each([undefined, null, false, 0, '', Symbol('evidence failure'), new Error('evidence failure')])(
+                                                                                ^
+error: evidence failure
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:583:75
+ [0.71ms]
+(pass) Delete Selection preserves abort and malformed Selection short circuits before evidence reads [0.85ms]
+(pass) Delete Selection applies the first Selection when later root reads would choose another Node [0.87ms]
+(pass) Delete Selection captures root-own for node targets [1.16ms]
+(pass) Delete Selection captures root-inherited for node targets [1.60ms]
+(pass) Delete Selection captures root-non-enumerable for node targets [0.79ms]
+(pass) Delete Selection captures collection-root for node targets [0.83ms]
+(pass) Delete Selection captures inherited-collection for node targets [0.72ms]
+(pass) Delete Selection captures iterator for node targets [0.72ms]
+(pass) Delete Selection captures array-hooks for node targets [0.79ms]
+(pass) Delete Selection captures index-once for node targets [0.72ms]
+(pass) Delete Selection captures evidence-mutates-ids for node targets [0.74ms]
+(pass) Delete Selection keeps native fractional length 1.5 for node targets [0.79ms]
+(pass) Delete Selection keeps native fractional length "1.5" for node targets [2.54ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for node targets [0.85ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for node targets [0.90ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for node targets [0.68ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for node targets [0.62ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for node targets [0.64ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for node targets [0.68ms]
+(pass) Delete Selection preserves native length failure 1n for node [0.82ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for node [0.66ms]
+(pass) Delete Selection captures root-own for edge targets [0.80ms]
+(pass) Delete Selection captures root-inherited for edge targets [2.70ms]
+(pass) Delete Selection captures root-non-enumerable for edge targets [0.83ms]
+(pass) Delete Selection captures collection-root for edge targets [0.79ms]
+(pass) Delete Selection captures inherited-collection for edge targets [0.71ms]
+(pass) Delete Selection captures iterator for edge targets [0.68ms]
+(pass) Delete Selection captures array-hooks for edge targets [0.70ms]
+(pass) Delete Selection captures index-once for edge targets [0.70ms]
+(pass) Delete Selection captures evidence-mutates-ids for edge targets [0.71ms]
+(pass) Delete Selection keeps native fractional length 1.5 for edge targets [0.75ms]
+(pass) Delete Selection keeps native fractional length "1.5" for edge targets [0.81ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for edge targets [1.74ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for edge targets [0.74ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for edge targets [0.72ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for edge targets [0.71ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for edge targets [0.64ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for edge targets [0.61ms]
+(pass) Delete Selection preserves native length failure 1n for edge [0.62ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for edge [0.64ms]
+(pass) Delete Selection preserves original selection read failures [10.02ms]
+(pass) Delete Selection preserves original length read failures [5.56ms]
+(pass) Delete Selection preserves original index read failures [4.11ms]
+(pass) Delete Selection rejects sparse and invalid indexed IDs before evidence and preserves lazy first failure [4.91ms]
+(pass) Delete Selection admits node IDs before edge IDs and evidence and retains the first coercion [0.85ms]
+(pass) Delete Selection rejects stale first evidence Nodes when later collection reads return current roots [0.85ms]
+(pass) Delete Selection rejects first stale node evidence through root collection access [0.93ms]
+(pass) Delete Selection rejects first stale node evidence through index collection access [0.80ms]
+(pass) Delete Selection rejects first stale node evidence through map collection access [0.85ms]
+(pass) Delete Selection rejects first stale node evidence through hooks collection access [1.62ms]
+(pass) Delete Selection rejects first stale node evidence through later-field-mutation collection access [0.72ms]
+(pass) Delete Selection accepts first valid own node evidence and preserves Undo data [1.00ms]
+(pass) Delete Selection accepts first valid inherited node evidence and preserves Undo data [1.06ms]
+(pass) Delete Selection accepts first valid non-enumerable node evidence and preserves Undo data [0.93ms]
+(pass) Delete Selection uses valid first node entities independently of caller iterator [0.91ms]
+(pass) Delete Selection uses valid first node entities independently of caller methods [0.74ms]
+(pass) Delete Selection uses valid first node entities independently of caller index [0.75ms]
+(pass) Delete Selection uses valid first node entities independently of caller length [1.69ms]
+(pass) Delete Selection rejects first stale edge evidence through root collection access [1.11ms]
+(pass) Delete Selection rejects first stale edge evidence through index collection access [0.88ms]
+(pass) Delete Selection rejects first stale edge evidence through map collection access [0.75ms]
+(pass) Delete Selection rejects first stale edge evidence through hooks collection access [0.77ms]
+1252 |         const before = fixture.kernel.read(),
+1253 |           session = fixture.session.getSnapshot(),
+1254 |           history = fixture.history.getSnapshot();
+1255 |         await expect(
+1256 |           fixture.commands.execute(deleteSelectionCommand, { selection: fixture.first, evidence }),
+1257 |         ).rejects.toMatchObject({ domain: 'interaction', code: 'STALE_SELECTION' });
+                         ^
+error: expect(received).toMatchObject(expected)
+
+- {
+-   "code": "STALE_SELECTION",
+-   "domain": "interaction",
+- }
++ [TypeError: Attempted to assign to readonly property.]
+
+- Expected  - 4
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1257:19)
+(fail) Delete Selection rejects first stale edge evidence through later-field-mutation collection access [4.50ms]
+(pass) Delete Selection accepts first valid own edge evidence and preserves Undo data [1.25ms]
+(pass) Delete Selection accepts first valid inherited edge evidence and preserves Undo data [0.92ms]
+(pass) Delete Selection accepts first valid non-enumerable edge evidence and preserves Undo data [3.14ms]
+(pass) Delete Selection uses valid first edge entities independently of caller iterator [1.15ms]
+(pass) Delete Selection uses valid first edge entities independently of caller methods [0.84ms]
+(pass) Delete Selection uses valid first edge entities independently of caller index [0.78ms]
+(pass) Delete Selection uses valid first edge entities independently of caller length [0.83ms]
+(pass) Delete Selection validates the first malformed evidence revision before later valid values [0.91ms]
+(pass) Delete Selection validates the first malformed evidence nodes before later valid values [0.68ms]
+(pass) Delete Selection validates the first malformed evidence edges before later valid values [0.63ms]
+(pass) Delete Selection preserves original revision evidence failure undefined [1.54ms]
+(pass) Delete Selection preserves original revision evidence failure null [0.74ms]
+(pass) Delete Selection preserves original revision evidence failure false [0.69ms]
+(pass) Delete Selection preserves original revision evidence failure 0 [0.67ms]
+(pass) Delete Selection preserves original revision evidence failure "" [0.65ms]
+(pass) Delete Selection preserves original revision evidence failure Symbol(evidence read) [0.65ms]
+(pass) Delete Selection preserves original revision evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.65ms]
+(pass) Delete Selection preserves original nodes evidence failure undefined [0.58ms]
+(pass) Delete Selection preserves original nodes evidence failure null [1.21ms]
+(pass) Delete Selection preserves original nodes evidence failure false [2.96ms]
+(pass) Delete Selection preserves original nodes evidence failure 0 [0.73ms]
+(pass) Delete Selection preserves original nodes evidence failure "" [0.65ms]
+(pass) Delete Selection preserves original nodes evidence failure Symbol(evidence read) [0.62ms]
+(pass) Delete Selection preserves original nodes evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.64ms]
+(pass) Delete Selection preserves original edges evidence failure undefined [0.69ms]
+(pass) Delete Selection preserves original edges evidence failure null [0.67ms]
+(pass) Delete Selection preserves original edges evidence failure false [0.63ms]
+(pass) Delete Selection preserves original edges evidence failure 0 [0.74ms]
+(pass) Delete Selection preserves original edges evidence failure "" [1.58ms]
+(pass) Delete Selection preserves original edges evidence failure Symbol(evidence read) [0.66ms]
+(pass) Delete Selection preserves original edges evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.65ms]
+(pass) Delete Selection preserves original length evidence failure undefined [0.70ms]
+(pass) Delete Selection preserves original length evidence failure null [0.62ms]
+(pass) Delete Selection preserves original length evidence failure false [0.58ms]
+(pass) Delete Selection preserves original length evidence failure 0 [0.58ms]
+(pass) Delete Selection preserves original length evidence failure "" [0.72ms]
+(pass) Delete Selection preserves original length evidence failure Symbol(evidence read) [0.68ms]
+(pass) Delete Selection preserves original length evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.63ms]
+(pass) Delete Selection preserves original index evidence failure undefined [1.57ms]
+(pass) Delete Selection preserves original index evidence failure null [0.65ms]
+(pass) Delete Selection preserves original index evidence failure false [0.59ms]
+(pass) Delete Selection preserves original index evidence failure 0 [0.57ms]
+(pass) Delete Selection preserves original index evidence failure "" [0.56ms]
+(pass) Delete Selection preserves original index evidence failure Symbol(evidence read) [0.57ms]
+(pass) Delete Selection preserves original index evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.57ms]
+(pass) Delete Selection rejects sparse, hidden-invalid and lazily invalid evidence entities [0.90ms]
+(pass) Delete Selection captures evidence revision before Nodes before Edges and rejects malformed empty Selection evidence [0.75ms]
+
+1 tests failed:
+(fail) Delete Selection rejects first stale edge evidence through later-field-mutation collection access [4.50ms]
+
+ 131 pass
+ 1 fail
+ 1325 expect() calls
+Ran 132 tests across 1 file. [269.00ms]
