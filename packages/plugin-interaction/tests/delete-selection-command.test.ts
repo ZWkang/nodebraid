@@ -23,7 +23,7 @@ import type {
 import type { SessionSnapshot } from '@nodebraid/session-api';
 import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
-import { deleteSelectionCommand, interactionPlugin } from '../src';
+import { deleteSelectionCommand, interactionPlugin, type DeleteSelectionInput } from '../src';
 
 test('Delete Selection removes a selected Node and its incident Edge as one undoable Commit', async () => {
   const { commands, history, host, kernel, session } = await activateDeleteCommandRuntime();
@@ -408,6 +408,247 @@ test('Delete Selection validates malformed evidence and returns null for an empt
       evidence: before.snapshot,
     }),
   ).resolves.toBeNull();
+  expect(runtime.kernel.read()).toBe(before);
+  expect(runtime.history.getSnapshot()).toEqual({ canUndo: false, canRedo: false });
+  await runtime.host.dispose();
+});
+
+test('Delete Selection rejects the first stale Snapshot when later evidence reads would return current state', async () => {
+  const runtime = await activateDeleteCommandRuntime();
+  const id = nodeId('changing-evidence');
+  runtime.kernel.transact((transaction) => {
+    transaction.nodes.add({ id, type: 'task', position: { x: 0, y: 0 }, data: null });
+  });
+  runtime.session.setSelection({ nodeIds: [id], edgeIds: [] });
+  const evidence = runtime.kernel.read().snapshot;
+  for (const x of [10, 0]) {
+    runtime.kernel.transact((transaction) => {
+      const node = transaction.query.getNode(id);
+      if (!node) throw new Error('Expected changing-evidence target.');
+      transaction.nodes.replace(id, { ...node, position: { x, y: 0 } });
+    });
+  }
+  const before = runtime.kernel.read();
+  const historyBefore = runtime.history.getSnapshot();
+  const sessionBefore = runtime.session.getSnapshot();
+  expect(evidence.nodes[0]).toEqual(before.snapshot.nodes[0]);
+  expect(evidence.nodes[0]).not.toBe(before.snapshot.nodes[0]);
+  let reads = 0;
+
+  await expect(
+    runtime.commands.execute(deleteSelectionCommand, {
+      selection: sessionBefore.selection,
+      get evidence() {
+        reads += 1;
+        return reads === 1 ? evidence : before.snapshot;
+      },
+    }),
+  ).rejects.toMatchObject({ domain: 'interaction', code: 'STALE_SELECTION' });
+  expect(reads).toBe(1);
+  expect(runtime.kernel.read()).toBe(before);
+  expect(runtime.session.getSnapshot()).toBe(sessionBefore);
+  expect(runtime.history.getSnapshot()).toBe(historyBefore);
+  await runtime.host.dispose();
+});
+
+test.each(['explicit-edge', 'incident-edge', 'new-incident-edge'] as const)(
+  'Delete Selection retains the first Snapshot for %s preflight',
+  async (scenario) => {
+    const runtime = await activateDeleteCommandRuntime();
+    const sourceId = nodeId('evidence-source');
+    const targetId = nodeId('evidence-target');
+    const id = edgeId('evidence-edge');
+    runtime.kernel.transact((transaction) => {
+      transaction.nodes.add({ id: sourceId, type: 'task', position: { x: 0, y: 0 }, data: null });
+      transaction.nodes.add({ id: targetId, type: 'task', position: { x: 100, y: 0 }, data: null });
+      if (scenario !== 'new-incident-edge') {
+        transaction.edges.add({
+          id,
+          type: 'flow',
+          source: { nodeId: sourceId },
+          target: { nodeId: targetId },
+          data: null,
+        });
+      }
+    });
+    runtime.session.setSelection({
+      nodeIds: scenario === 'explicit-edge' ? [] : [sourceId],
+      edgeIds: scenario === 'explicit-edge' ? [id] : [],
+    });
+    const selection = runtime.session.getSnapshot().selection;
+    const evidence = runtime.kernel.read().snapshot;
+    if (scenario !== 'new-incident-edge') {
+      runtime.kernel.transact((transaction) => transaction.edges.remove(id));
+    }
+    runtime.kernel.transact((transaction) => {
+      transaction.edges.add({
+        id,
+        type: 'flow',
+        source: { nodeId: sourceId },
+        target: { nodeId: targetId },
+        data: null,
+      });
+    });
+    const before = runtime.kernel.read();
+    const sessionBefore = runtime.session.getSnapshot();
+    const historyBefore = runtime.history.getSnapshot();
+    let reads = 0;
+    await expect(
+      runtime.commands.execute(deleteSelectionCommand, {
+        selection,
+        get evidence() {
+          reads += 1;
+          return reads === 1 ? evidence : before.snapshot;
+        },
+      }),
+    ).rejects.toMatchObject({ domain: 'interaction', code: 'STALE_SELECTION' });
+    expect(reads).toBe(1);
+    expect(runtime.kernel.read()).toBe(before);
+    expect(runtime.session.getSnapshot()).toBe(sessionBefore);
+    expect(runtime.history.getSnapshot()).toBe(historyBefore);
+    await runtime.host.dispose();
+  },
+);
+
+test.each(['own', 'inherited', 'non-enumerable'] as const)(
+  'Delete Selection accepts the first valid %s evidence getter and preserves replay data',
+  async (kind) => {
+    const runtime = await activateDeleteCommandRuntime();
+    const parentId = nodeId('evidence-parent');
+    const id = nodeId('evidence-child');
+    const data = new Map([['opaque', 'retained']]);
+    runtime.kernel.transact((transaction) => {
+      transaction.nodes.add({ id: parentId, type: 'group', position: { x: 0, y: 0 }, data: null });
+      transaction.nodes.add({
+        id,
+        type: 'task',
+        position: { x: 10, y: 20 },
+        size: { width: 80, height: 40 },
+        parentId,
+        data,
+      });
+    });
+    runtime.session.setSelection({ nodeIds: [id], edgeIds: [] });
+    const evidence = runtime.kernel.read().snapshot;
+    let reads = 0;
+    const source: DeleteSelectionInput = {
+      selection: runtime.session.getSnapshot().selection,
+      get evidence() {
+        expect(this).toBe(input);
+        reads += 1;
+        if (reads > 1) throw new Error('A later evidence getter result must not replace the first Snapshot.');
+        return evidence;
+      },
+    };
+    const input: DeleteSelectionInput = kind === 'inherited' ? Object.create(source) : source;
+    if (kind === 'non-enumerable') Object.defineProperty(input, 'evidence', { enumerable: false });
+    const commit = await runtime.commands.execute(deleteSelectionCommand, input);
+    expect(commit?.changeSet).toMatchObject({ origin: 'interaction', commandId: deleteSelectionCommand.id });
+    expect(reads).toBe(1);
+    expect(runtime.kernel.read().query.getNode(id)).toBeUndefined();
+    expect(runtime.kernel.read().query.getNode(parentId)).toBe(evidence.nodes.find((node) => node.id === parentId));
+    expect(runtime.session.getSnapshot().selection).toEqual({ nodeIds: [], edgeIds: [] });
+    await runtime.commands.execute(undoCommand, undefined);
+    expect(runtime.kernel.read().query.getNode(id)).toEqual(evidence.nodes.find((node) => node.id === id));
+    expect(runtime.kernel.read().query.getNode(id)?.data).toBe(data);
+    await runtime.commands.execute(redoCommand, undefined);
+    expect(runtime.kernel.read().query.getNode(id)).toBeUndefined();
+    expect(reads).toBe(1);
+    expect(Object.isFrozen(data)).toBe(false);
+    expect([...data]).toEqual([['opaque', 'retained']]);
+    await runtime.host.dispose();
+  },
+);
+
+test('Delete Selection rejects malformed first evidence before a later valid Snapshot can replace it', async () => {
+  const runtime = await activateDeleteCommandRuntime();
+  const before = runtime.kernel.read();
+  const historyBefore = runtime.history.getSnapshot();
+  let reads = 0;
+  await expect(
+    runtime.commands.execute(deleteSelectionCommand, {
+      selection: { nodeIds: [], edgeIds: [] },
+      get evidence() {
+        reads += 1;
+        return reads === 1 ? { ...before.snapshot, revision: -1 } : before.snapshot;
+      },
+    }),
+  ).rejects.toMatchObject({ domain: 'interaction', code: 'INVALID_DELETE' });
+  expect(reads).toBe(1);
+  expect(runtime.kernel.read()).toBe(before);
+  expect(runtime.history.getSnapshot()).toBe(historyBefore);
+  await runtime.host.dispose();
+});
+
+test.each([undefined, null, false, 0, '', Symbol('evidence failure'), new Error('evidence failure')])(
+  'Delete Selection preserves the original evidence getter failure %p',
+  async (failure) => {
+    const runtime = await activateDeleteCommandRuntime();
+    const before = runtime.kernel.read();
+    const historyBefore = runtime.history.getSnapshot();
+    let caught = false;
+    let actual: unknown;
+    try {
+      await runtime.commands.execute(deleteSelectionCommand, {
+        selection: { nodeIds: [], edgeIds: [] },
+        get evidence(): DeleteSelectionInput['evidence'] {
+          throw failure;
+        },
+      });
+    } catch (error) {
+      caught = true;
+      actual = error;
+    }
+    expect(caught).toBe(true);
+    expect(actual).toBe(failure);
+    expect(runtime.kernel.read()).toBe(before);
+    expect(runtime.history.getSnapshot()).toBe(historyBefore);
+    await runtime.host.dispose();
+  },
+);
+
+test('Delete Selection preserves abort and malformed Selection short circuits before evidence reads', async () => {
+  const runtime = await activateDeleteCommandRuntime();
+  const controller = new AbortController();
+  const reason = new Error('aborted before Delete input');
+  controller.abort(reason);
+  let reads = 0;
+  const input = {
+    get selection(): DeleteSelectionInput['selection'] {
+      reads += 1;
+      throw new Error('unexpected Selection read');
+    },
+    get evidence(): DeleteSelectionInput['evidence'] {
+      reads += 1;
+      throw new Error('unexpected evidence read');
+    },
+  };
+  await expect(runtime.commands.execute(deleteSelectionCommand, input, { signal: controller.signal })).rejects.toBe(
+    reason,
+  );
+  expect(reads).toBe(0);
+  await expect(
+    runtime.commands.execute(deleteSelectionCommand, {
+      selection: { nodeIds: [undefined], edgeIds: [] } as never,
+      get evidence(): DeleteSelectionInput['evidence'] {
+        reads += 1;
+        throw new Error('unexpected evidence read');
+      },
+    }),
+  ).rejects.toMatchObject({ domain: 'interaction', code: 'INVALID_DELETE' });
+  expect(reads).toBe(0);
+  const before = runtime.kernel.read();
+  await expect(
+    runtime.commands.execute(deleteSelectionCommand, {
+      selection: { nodeIds: [], edgeIds: [] },
+      get evidence() {
+        reads += 1;
+        if (reads > 1) throw new Error('unexpected later evidence read');
+        return before.snapshot;
+      },
+    }),
+  ).resolves.toBeNull();
+  expect(reads).toBe(1);
   expect(runtime.kernel.read()).toBe(before);
   expect(runtime.history.getSnapshot()).toEqual({ canUndo: false, canRedo: false });
   await runtime.host.dispose();
