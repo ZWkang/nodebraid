@@ -16,13 +16,13 @@ export function createDeleteSelectionHandler(
 ): CommandHandler<DeleteSelectionInput, DeleteSelectionResult> {
   return (input, execution) => {
     execution.signal.throwIfAborted();
-    assertDeleteSelectionInput(input);
+    const evidence = captureDeleteSelectionEvidence(input);
     const nodeIds = canonicalIds(input.selection.nodeIds);
     const selectedEdgeIds = canonicalIds(input.selection.edgeIds);
     if (nodeIds.length === 0 && selectedEdgeIds.length === 0) return null;
 
-    const evidenceNodes = new Map(input.evidence.nodes.map((node) => [node.id, node]));
-    const evidenceEdges = new Map(input.evidence.edges.map((edge) => [edge.id, edge]));
+    const evidenceNodes = new Map(evidence.nodes.map((node) => [node.id, node]));
+    const evidenceEdges = new Map(evidence.edges.map((edge) => [edge.id, edge]));
     const selectedNodes = nodeIds.map((id) => requireEvidenceNode(evidenceNodes, id));
     const deletionEdges = new Map<EdgeId, CanvasEdge>();
     for (const edgeId of selectedEdgeIds) {
@@ -30,7 +30,7 @@ export function createDeleteSelectionHandler(
       if (!edge) throwInvalidDelete('Delete Selection evidence does not contain a selected Edge.');
       deletionEdges.set(edge.id, edge);
     }
-    for (const edge of input.evidence.edges) {
+    for (const edge of evidence.edges) {
       if (nodeIds.includes(edge.source.nodeId) || nodeIds.includes(edge.target.nodeId)) {
         deletionEdges.set(edge.id, edge);
       }
@@ -42,7 +42,7 @@ export function createDeleteSelectionHandler(
         for (const node of selectedNodes) {
           if (transaction.query.getNode(node.id) !== node) throwStaleSelection();
           const currentIncidentIds = transaction.query.getIncidentEdges(node.id).map((edge) => edge.id);
-          const evidenceIncidentIds = input.evidence.edges
+          const evidenceIncidentIds = evidence.edges
             .filter((edge) => edge.source.nodeId === node.id || edge.target.nodeId === node.id)
             .map((edge) => edge.id)
             .sort(compareIds);
@@ -59,10 +59,13 @@ export function createDeleteSelectionHandler(
   };
 }
 
-function assertDeleteSelectionInput(value: unknown): asserts value is DeleteSelectionInput {
-  if (!isRecord(value) || !isSelection(value.selection) || !isSnapshot(value.evidence)) {
+function captureDeleteSelectionEvidence(value: unknown): DeleteSelectionInput['evidence'] {
+  if (!isRecord(value) || !isSelection(value.selection)) {
     throwInvalidDelete('Delete Selection Command input is malformed.');
   }
+  const evidence = value.evidence;
+  if (!isSnapshot(evidence)) throwInvalidDelete('Delete Selection Command input is malformed.');
+  return evidence;
 }
 
 function isSelection(value: unknown): value is DeleteSelectionInput['selection'] {
