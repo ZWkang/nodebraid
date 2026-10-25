@@ -30,7 +30,7 @@ This module is not suitable for undoing Selection, Viewport, Renderer state, ext
 - `historyService`: provides a stable `HistorySnapshot` and future-change subscription;
 - `undoCommand` / `redoCommand`: take `void` as input and return the actual Replay `CanvasCommit`;
 - A new recordable Commit automatically clears redo;
-- Replay Commits do not generate new History Entries;
+- Replay and Baseline Commits do not generate new History Entries;
 - Single-flight Replay and Kernel catch-up protection;
 - `HistoryError` and subscriber-fault diagnostics.
 
@@ -64,6 +64,7 @@ The History Installation remains pending when either Kernel or Command Service i
 
 ```ts
 import {
+  establishHistoryBaselineCommand,
   historyDiagnosticEvents,
   historyPlugin,
   historyService,
@@ -82,7 +83,7 @@ These entry points are also re-exported by `@nodebraid/core`.
 
 When an Activation begins, History reads the current Kernel revision once as its Baseline. Commits before that Baseline are not guessed or backfilled. The public Snapshot is replaced and subscribers are notified only after History has observed the Kernel's current revision, so subscribers never see Undo/Redo availability that is known to be stale.
 
-Replay starts only when History has caught up with the Kernel and no other Replay is active. Requests are not queued: delayed execution could act on a different top-of-stack entry, so the module fails explicitly instead. The caller signal is checked before the Transaction. Once Replay has actually committed, late cancellation neither manufactures a failure nor compensates for the Commit that already happened.
+Replay starts only when History has caught up with the Kernel and no other Replay or Baseline is active. Requests are not queued: delayed execution could act on a different top-of-stack entry, so the module fails explicitly instead. The caller signal is checked before the Transaction. Once Replay has actually committed, late cancellation neither manufactures a failure nor compensates for the Commit that already happened.
 
 Losing Kernel or Command Service ends the current Activation immediately: the old Service becomes invalid, Commands are unregistered, Kernel observers and subscribers are released, and Entry references are cleared. When the dependencies return, a new Activation establishes a fresh, empty Baseline at the Kernel revision at that moment; it does not inherit the old stacks. `host.dispose()` waits for Command registrations and other Owned Resources to finish cleanup.
 
@@ -90,7 +91,7 @@ Losing Kernel or Command Service ends the current Activation immediately: the ol
 | ----------------------- | ----------------------------------------------------------- |
 | `UNDO_EMPTY`            | No History Entry is currently available to undo             |
 | `REDO_EMPTY`            | No History Entry is currently available to redo             |
-| `HISTORY_BUSY`          | Another Replay has not finished                             |
+| `HISTORY_BUSY`          | Another Replay or Baseline has not finished                 |
 | `HISTORY_NOT_CAUGHT_UP` | History has not yet observed the Kernel's current revision  |
 | `SERVICE_DISPOSED`      | The Activation that owned the old History Service has ended |
 
@@ -108,3 +109,10 @@ Kernel Replay errors preserve their original identity and are not wrapped as His
 ## Verification evidence
 
 Package tests compose the real Plugin Host, Kernel Plugin, and Command Plugin to verify a nonzero Baseline, the first recordable Commit, Undo/Redo return values, revision metadata, Redo branch invalidation, empty-stack errors, Snapshot identity, subscriber faults, observer reentrancy, catch-up publication, single-flight Replay, cancellation, finalization of committed Replay, Kernel/Command Provider loss, and a fresh Activation. Type tests lock down readonly Snapshots, the narrow Service surface, and the `void -> CanvasCommit` Command types.
+
+## Establishing a new History Baseline
+
+`establishHistoryBaselineCommand` takes a synchronous `(transaction: TransactionContext) => void` and returns `CanvasCommit | null`.
+It clears prior Undo/Redo at the successful Transaction boundary without recording the Baseline Commit; subsequent ordinary Commits remain recordable.
+Failure preserves the original graph and History. A net-zero Transaction also clears old History. It shares busy/caught-up, cancellation and disposal semantics with Undo/Redo.
+Async callbacks are rejected; `origin` metadata cannot skip recording. See [Document](/en/modules/document) for complete-file restoration.

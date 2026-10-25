@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { extname, resolve, sep } from 'node:path';
+import { mkdir, mkdtemp, rename, rmdir } from 'node:fs/promises';
+import { dirname, extname, resolve, sep } from 'node:path';
 
 export type CdpSend = (method: string, params?: Readonly<Record<string, unknown>>) => Promise<unknown>;
 
@@ -61,6 +62,35 @@ export async function readAgentBrowserCdpUrl(
   return response.data.cdpUrl;
 }
 
+export async function downloadBrowserFile(
+  client: CdpClient,
+  runAgentBrowser: (arguments_: readonly string[]) => Promise<string>,
+  selector: string,
+  path: string,
+  browserContextId?: string,
+): Promise<void> {
+  await mkdir(dirname(path), { recursive: true });
+  const directory = await mkdtemp(resolve(dirname(path), '.download-'));
+  // agent-browser 0.20's download command only sets a directory; it does not click or await a file.
+  await client.send('Browser.setDownloadBehavior', {
+    behavior: 'allowAndName',
+    downloadPath: directory,
+    eventsEnabled: true,
+    ...(browserContextId === undefined ? {} : { browserContextId }),
+  });
+  const started = client.waitForEvent('Browser.downloadWillBegin', () => true);
+  const finished = client.waitForEvent(
+    'Browser.downloadProgress',
+    (event) => event.state === 'completed' || event.state === 'canceled',
+  );
+  const [start, finish] = await Promise.all([started, finished, runAgentBrowser(['click', selector])]);
+  assert.equal(finish.guid, start.guid, 'Expected completion of the download triggered by this click.');
+  assert.equal(finish.state, 'completed', 'Chromium canceled the file download.');
+  assert.equal(typeof finish.guid, 'string');
+  await rename(resolve(directory, finish.guid as string), path);
+  await rmdir(directory);
+}
+
 export class CdpClient {
   readonly #socket: WebSocket;
   readonly #pending = new Map<
@@ -102,6 +132,39 @@ export class CdpClient {
     const result = new Promise<unknown>((resolve, reject) => this.#pending.set(id, { resolve, reject }));
     this.#socket.send(JSON.stringify({ id, method, params, ...(sessionId === undefined ? {} : { sessionId }) }));
     return result;
+  }
+
+  waitForEvent(
+    method: string,
+    matches: (params: Readonly<Record<string, unknown>>) => boolean,
+  ): Promise<Readonly<Record<string, unknown>>> {
+    return new Promise((resolve, reject) => {
+      const cleanup = () => {
+        clearTimeout(timer);
+        this.#socket.removeEventListener('message', receive);
+        this.#socket.removeEventListener('close', closed);
+      };
+      const receive = (event: MessageEvent) => {
+        if (typeof event.data !== 'string') return;
+        const message = JSON.parse(event.data) as Readonly<{
+          method?: string;
+          params?: Readonly<Record<string, unknown>>;
+        }>;
+        if (message.method !== method || !message.params || !matches(message.params)) return;
+        cleanup();
+        resolve(message.params);
+      };
+      const closed = () => {
+        cleanup();
+        reject(new Error(`Chromium CDP closed while waiting for ${method}.`));
+      };
+      const timer = setTimeout(() => {
+        cleanup();
+        reject(new Error(`Timed out waiting for Chromium CDP event ${method}.`));
+      }, 5000);
+      this.#socket.addEventListener('message', receive);
+      this.#socket.addEventListener('close', closed);
+    });
   }
 
   close(): void {

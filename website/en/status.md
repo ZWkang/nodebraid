@@ -27,13 +27,15 @@ NodeBraid is at an early implementation stage, but it already has a working head
 
 See [All modules](/en/modules/) for the complete inventory.
 
+The pure [`@nodebraid/document`](/en/modules/document) package supports complete graph files, explicit application data codecs and manual Example export/import with a fresh History Baseline.
+
 ## Current gaps
 
 ::: warning No product-level editor shell yet
-The current branch delivers the Basic Canvas Composition, Duplicate/Delete Selection, explicit Clipboard Copy/Paste, the Port Capability, Port-aware/node-level Edge Connection, the SVG Renderer loop, the React Adapter, and a developer-reference Examples Application. It still has no Vue or other framework adapter and no product-level editor shell. It does not include Document Serialization/Persistence, a cross-version Clipboard format, Edge/Port box selection, lasso, snapping, pinch/touch tools, text editing, product Node UI, or an extensible Tool Registry.
+The current branch delivers the Basic Canvas Composition, Duplicate/Delete Selection, explicit Clipboard Copy/Paste, the Port Capability, Port-aware/node-level Edge Connection, the SVG Renderer loop, the React Adapter, and a developer-reference Examples Application. It still has no Vue or other framework adapter and no product-level editor shell. It does not include automatic/cloud Persistence, a cross-version Clipboard format, Edge/Port box selection, lasso, snapping, pinch/touch tools, text editing, product Node UI, or an extensible Tool Registry.
 :::
 
-There is also no Persistence, Collaboration, serialization schema, or remote synchronization capability. A name appearing in the target architecture does not mean it has become a public package.
+Versioned complete Document serialization and manual Example file export/import are available. There is no automatic/cloud Persistence, Collaboration, or remote synchronization. A name appearing in the target architecture does not mean it has become a public package.
 
 Layout for graphs with Ports only arranges Nodes. Port-aware layout that uses Port sides, order, or Geometry in the algorithm remains unimplemented; the Renderer continues to own Port Geometry.
 

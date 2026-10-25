@@ -47,7 +47,7 @@ do not continue driving an unknown state.
 
 ## Drive
 
-Use the four mapped scenes. Agent-browser owns the browser and performs native
+Use the mapped scenes. Agent-browser owns the browser and performs native
 clicks; keyboard shortcuts and dragging use the existing CDP native-input seam
 with explicit key codes, modifiers, coordinates and held buttons. Version 0.20's
 `press` does not parse modifier combinations and `mouse down/up` uses (0, 0).
@@ -58,9 +58,9 @@ Never substitute internal Runtime setters, injected Events or a mock Canvas.
 
 Changed runtime/Examples source selects relevant scenes deterministically in
 [`preview-scenarios.ts`](../../../scripts/preview-scenarios.ts). Shared code and
-collector/skill changes run all four. Docs/tests-only changes are explicitly
+collector/skill changes run all scenes. Docs/tests-only changes are explicitly
 `not-applicable`. The Example's manual Auto layout control is verified by
-`examples/app/browser-tests/basic-svg.browser.ts`. These four preview scenes do
+`examples/app/browser-tests/basic-svg.browser.ts`. These five preview scenes do
 not click it, so their screenshots do not prove Layout execution; capture the
 Layout interaction separately when providing evidence for a Layout change.
 
@@ -103,7 +103,7 @@ chosen base for new routes, controls or public entry points missing from the map
 Name the actual source path for each coverage gap; a clean pass of the old map
 does not verify a newly added feature.
 
-Read source for the four feature files in parallel when helpful; one coordinator
+Read source for the feature files in parallel when helpful; one coordinator
 owns live driving. Run the full map serially:
 
 ```sh

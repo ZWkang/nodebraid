@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import {
   ClipboardX,
+  Download,
   Focus,
   History as HistoryIcon,
   KeyboardOff,
@@ -11,8 +12,9 @@ import {
   Redo2,
   RotateCcw,
   Undo2,
+  Upload,
 } from 'lucide-react';
-import { useCallback, useState, type ComponentProps, type ReactNode } from 'react';
+import { useCallback, useRef, useState, type ComponentProps, type ReactNode } from 'react';
 
 import {
   useHistorySnapshot,
@@ -33,6 +35,7 @@ import {
   exampleLayoutCommand,
   type ExampleRuntime,
 } from '@/example-runtime/create-example-runtime';
+import { downloadExampleDocument, restoreExampleDocument } from '@/example-runtime/document-adapters';
 import { useClipboardFailure } from '@/example-runtime/use-clipboard-failure';
 
 type Language = 'en' | 'zh';
@@ -87,6 +90,7 @@ function BasicSvgExample() {
                 setGeneration((value) => value + 1);
               }}
               onError={reportFailure}
+              onFileError={(error) => setErrorMessage(error === undefined ? undefined : describeExampleError(error))}
             />
           ) : null}
           <section className="canvas-frame" aria-label={copy.canvasLabel}>
@@ -132,11 +136,14 @@ interface CanvasToolbarProps {
   readonly target: SVGSVGElement;
   readonly onResetExample: () => void;
   readonly onError: (error: unknown) => void;
+  readonly onFileError: (error: unknown) => void;
 }
 
-function CanvasToolbar({ copy, runtime, target, onResetExample, onError }: CanvasToolbarProps) {
+function CanvasToolbar({ copy, runtime, target, onResetExample, onError, onFileError }: CanvasToolbarProps) {
   const [clipboardShortcutsEnabled, setClipboardShortcutsEnabled] = useState(true);
   const [duplicateShortcutEnabled, setDuplicateShortcutEnabled] = useState(true);
+  const [importing, setImporting] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
   const history = useHistorySnapshot(runtime.history);
   const run = (operation: () => void | Promise<void>) => {
     try {
@@ -187,6 +194,46 @@ function CanvasToolbar({ copy, runtime, target, onResetExample, onError }: Canva
         label={copy.resetView}
         icon={<Focus />}
         onClick={() => runtime.session.setViewport({ x: 0, y: 0, zoom: 1 })}
+      />
+      <Separator orientation="vertical" className="toolbar-separator" />
+      <ToolbarButton
+        label={copy.exportDocument}
+        icon={<Download />}
+        onClick={() => {
+          try {
+            downloadExampleDocument(runtime);
+          } catch (error) {
+            onFileError(error);
+          }
+        }}
+      />
+      <ToolbarButton
+        label={copy.importDocument}
+        icon={<Upload />}
+        disabled={importing}
+        onClick={() => fileInput.current?.click()}
+      />
+      <input
+        ref={fileInput}
+        type="file"
+        accept=".json,application/json"
+        aria-label={copy.documentFile}
+        hidden
+        disabled={importing}
+        onChange={async (event) => {
+          const file = event.currentTarget.files?.[0];
+          event.currentTarget.value = '';
+          if (!file) return;
+          setImporting(true);
+          onFileError(undefined);
+          try {
+            await restoreExampleDocument(runtime, await file.text());
+          } catch (error) {
+            onFileError(error);
+          } finally {
+            setImporting(false);
+          }
+        }}
       />
       <Separator orientation="vertical" className="toolbar-separator" />
       <ToolbarButton label={copy.resetExample} icon={<RotateCcw />} onClick={onResetExample} />
@@ -361,6 +408,9 @@ interface Copy {
   readonly fitView: string;
   readonly resetView: string;
   readonly resetExample: string;
+  readonly exportDocument: string;
+  readonly importDocument: string;
+  readonly documentFile: string;
   readonly disableClipboardShortcuts: string;
   readonly disableDuplicateShortcut: string;
   readonly runtime: string;
@@ -397,6 +447,9 @@ const translations: Readonly<Record<Language, Copy>> = {
     fitView: 'Fit view',
     resetView: 'Reset view',
     resetExample: 'Reset example',
+    exportDocument: 'Export document',
+    importDocument: 'Import document',
+    documentFile: 'Document file',
     disableClipboardShortcuts: 'Disable clipboard shortcuts',
     disableDuplicateShortcut: 'Disable duplicate shortcut',
     runtime: 'Runtime state',
@@ -424,6 +477,7 @@ const translations: Readonly<Record<Language, Copy>> = {
       'Use Auto layout to arrange nodes from left to right; Undo restores their previous positions.',
       'Drag from a source anchor to a target anchor.',
       'Pan the canvas or use the mouse wheel to zoom.',
+      'Export your canvas to a file, then import it to replace the current canvas. Undo starts with your next edit.',
     ],
     error: 'Runtime error',
   },
@@ -440,6 +494,9 @@ const translations: Readonly<Record<Language, Copy>> = {
     fitView: '适应画布',
     resetView: '重置视图',
     resetExample: '重置示例',
+    exportDocument: '导出文档',
+    importDocument: '导入文档',
+    documentFile: '文档文件',
     disableClipboardShortcuts: '停用剪贴板快捷键',
     disableDuplicateShortcut: '停用复制快捷键',
     runtime: 'Runtime 状态',
@@ -467,6 +524,7 @@ const translations: Readonly<Record<Language, Copy>> = {
       '点击自动布局，从左到右排列 Node；撤销可恢复布局前的位置。',
       '从 source anchor 拖向 target anchor。',
       '拖动画布或使用滚轮缩放。',
+      '将画布导出为文件，再导入以替换当前画布；撤销从导入后的新编辑开始记录。',
     ],
     error: 'Runtime 错误',
   },

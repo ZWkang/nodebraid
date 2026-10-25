@@ -8,7 +8,7 @@ description: Compose a pure Kernel and local Session into one authoritative Docu
 NodeBraid separates “what is in the graph” from “how the current user is viewing it” into two state boundaries with clear ownership. The Kernel maintains the authoritative Document; the Session maintains Selection and Viewport. Runtime Services compose them explicitly, but they never collapse into one global Store.
 
 ::: info Current status
-All four packages in the Graph State capability family are implemented and connected to the public facade. Use them from the repository source for now; they have not yet been published to npm under this project.
+All packages in the Graph State capability family are implemented and connected to the public facade. Use them from the repository source for now; they have not yet been published to npm under this project.
 :::
 
 ## The problem it solves
@@ -19,6 +19,8 @@ The Graph State capability family solves this with two ownership boundaries:
 
 - **Document**: owned exclusively by the Kernel and modified atomically only through synchronous Transactions.
 - **Session**: separate from the Document and limited to the current Canvas Runtime's Selection and Viewport.
+
+The pure [Document](/en/modules/document) module provides versioned complete graph text. An application Codec owns business data representation; file I/O remains application-owned.
 
 ## When to use it
 
@@ -32,12 +34,13 @@ The Graph State capability family solves this with two ownership boundaries:
 
 | Module                                                    | Role                   | Key capabilities                                                                                   |
 | --------------------------------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------- |
+| [`@nodebraid/document`](/en/modules/document)             | Complete graph text    | Explicit application Data Codec, version and complete-graph validation, file round trip            |
 | [`@nodebraid/kernel`](/en/modules/kernel)                 | Pure graph Kernel      | Document, synchronous Transaction, revision-bound Canvas View, Canvas Query, reversible Change Set |
 | [`@nodebraid/plugin-kernel`](/en/modules/plugin-kernel)   | Kernel Runtime adapter | A fresh Kernel per Activation, narrow `KernelService`, ordered Canvas Commit observation           |
 | [`@nodebraid/session-api`](/en/modules/session-api)       | Session value contract | Renderer-independent `SelectionSnapshot`, `Viewport`, and `SessionSnapshot`                        |
 | [`@nodebraid/plugin-session`](/en/modules/plugin-session) | Session Runtime Plugin | Selection/Viewport mutation, subscriptions, and coordination between Selection and the Kernel View |
 
-The four modules let consumers choose a layer. Pure algorithmic code can use only the Kernel; a Renderer Provider can depend only on the Session value contract; a Canvas Runtime can install both Runtime Plugins for complete Document and Session lifecycles.
+These modules let consumers choose a layer. Pure algorithmic code can use only the Kernel; a Renderer Provider can depend only on the Session value contract; a Canvas Runtime can install both Runtime Plugins for complete Document and Session lifecycles.
 
 ## Dependencies and composition
 
@@ -80,7 +83,7 @@ These imports show the repository's current public exports; they do not mean tha
 
 - Session state is not Document, History, Persistence, or Collaboration state.
 - The Kernel does not own Selection, Viewport, Renderer, Command, or Plugin lifecycle.
-- Graph State does not provide database serialization, remote synchronization, CRDTs, schema migration, or interpretation of business data.
+- Graph State does not provide database storage, remote synchronization, CRDTs, schema migration, or interpretation of business data.
 - Selection does not express a primary item or selection order; Viewport does not include product-level zoom limits.
 - Node and Edge `data` are opaque to the Kernel; domain layers must preserve immutable usage themselves.
 - The Renderer contract, Runtime adapter, and SVG Provider are delivered. Graph State itself still neither owns nor draws a visible canvas.

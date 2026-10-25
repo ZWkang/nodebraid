@@ -76,6 +76,10 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
   let nextDuplicateEdgeSequence = 1;
   let nextClipboardNodeSequence = 1;
   let nextClipboardEdgeSequence = 1;
+  let commands: CommandService | undefined;
+  let history: HistoryService | undefined;
+  let kernel: KernelService | undefined;
+  let session: SessionService | undefined;
   const basicCanvasPlugin = createBasicCanvasPlugin(createSvgRenderer, {
     interaction: {
       minZoom: 0.25,
@@ -83,8 +87,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       wheelZoomSensitivity: Math.log(2) / 100,
       connection: {
         materializeEdge({ source, target: edgeTarget }) {
-          const id = edgeId(`example-edge-${nextEdgeSequence}`);
-          nextEdgeSequence += 1;
+          const id = freshEdgeId('example-edge', () => nextEdgeSequence++);
           return { id, type: 'flow', source, target: edgeTarget, data: null };
         },
       },
@@ -94,13 +97,11 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
     materializeIds({ nodeIds, edgeIds }) {
       return {
         nodes: nodeIds.map((sourceId) => {
-          const duplicateId = nodeId(`example-duplicate-node-${nextDuplicateNodeSequence}`);
-          nextDuplicateNodeSequence += 1;
+          const duplicateId = freshNodeId('example-duplicate-node', () => nextDuplicateNodeSequence++);
           return { sourceId, duplicateId };
         }),
         edges: edgeIds.map((sourceId) => {
-          const duplicateId = edgeId(`example-duplicate-edge-${nextDuplicateEdgeSequence}`);
-          nextDuplicateEdgeSequence += 1;
+          const duplicateId = freshEdgeId('example-duplicate-edge', () => nextDuplicateEdgeSequence++);
           return { sourceId, duplicateId };
         }),
       };
@@ -124,23 +125,17 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
     materializeIds({ nodeIds, edgeIds }) {
       return {
         nodes: nodeIds.map((sourceId) => {
-          const materializedId = nodeId(`example-clipboard-node-${nextClipboardNodeSequence}`);
-          nextClipboardNodeSequence += 1;
+          const materializedId = freshNodeId('example-clipboard-node', () => nextClipboardNodeSequence++);
           return { sourceId, materializedId };
         }),
         edges: edgeIds.map((sourceId) => {
-          const materializedId = edgeId(`example-clipboard-edge-${nextClipboardEdgeSequence}`);
-          nextClipboardEdgeSequence += 1;
+          const materializedId = freshEdgeId('example-clipboard-edge', () => nextClipboardEdgeSequence++);
           return { sourceId, materializedId };
         }),
       };
     },
   });
   const clipboardShortcutPlugin = createClipboardShortcutPlugin();
-  let commands: CommandService | undefined;
-  let history: HistoryService | undefined;
-  let kernel: KernelService | undefined;
-  let session: SessionService | undefined;
   const applicationPlugin = definePlugin({
     name: 'nodebraid.examples.basic-svg',
     requires: {
@@ -240,6 +235,22 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
   } catch (error) {
     await host.dispose();
     throw error;
+  }
+
+  function freshNodeId(prefix: string, next: () => number) {
+    if (!kernel) throw new Error('Example ID allocation requires an active Kernel Service.');
+    const query = kernel.read().query;
+    let id = nodeId(`${prefix}-${next()}`);
+    while (query.getNode(id)) id = nodeId(`${prefix}-${next()}`);
+    return id;
+  }
+
+  function freshEdgeId(prefix: string, next: () => number) {
+    if (!kernel) throw new Error('Example ID allocation requires an active Kernel Service.');
+    const query = kernel.read().query;
+    let id = edgeId(`${prefix}-${next()}`);
+    while (query.getEdge(id)) id = edgeId(`${prefix}-${next()}`);
+    return id;
   }
 }
 

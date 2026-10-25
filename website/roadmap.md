@@ -17,7 +17,7 @@ SVG Renderer Provider 已经通过真实 Target、Document/Session 同步、输�
 
 ## Interaction 扩展与框架接入
 
-Duplicate Selection 与显式 Clipboard Copy/Paste 已经通过独立 Behavior/Shortcut Plugin 交付，并共用纯内存 Canvas Fragment；选择、Box Selection、Delete Selection、多 Node 拖动、Pan、Wheel Zoom、Port Capability 与 Port-aware/Node-level Edge Connection 也已存在。公开 React Adapter 已交付 Runtime Mount 与稳定 Snapshot projection；Vue 或其他 framework adapter 仍需按各自框架惯例独立设计，并保持在 Runtime 与 UI 框架之间，不取得第二份 Document authority。Serialized Document、Persistence、跨版本 Clipboard format、Edge/Port 框选、lasso、snapping、pinch/touch、文本编辑或可扩展 Tool Registry 仍需独立设计。
+Duplicate Selection 与显式 Clipboard Copy/Paste 已经通过独立 Behavior/Shortcut Plugin 交付，并共用纯内存 Canvas Fragment；选择、Box Selection、Delete Selection、多 Node 拖动、Pan、Wheel Zoom、Port Capability 与 Port-aware/Node-level Edge Connection 也已存在。公开 React Adapter 已交付 Runtime Mount 与稳定 Snapshot projection；Vue 或其他 framework adapter 仍需按各自框架惯例独立设计，并保持在 Runtime 与 UI 框架之间，不取得第二份 Document authority。自动/云端 Persistence、跨版本 Clipboard format、Edge/Port 框选、lasso、snapping、pinch/touch、文本编辑或可扩展 Tool Registry 仍需独立设计。
 
 ## Composition 与示例
 
@@ -25,4 +25,4 @@ Duplicate Selection 与显式 Clipboard Copy/Paste 已经通过独立 Behavior/S
 
 ## 更后面的探索
 
-Persistence、Collaboration、序列化 schema、远程同步和更多 Layout/Renderer Provider 都需要独立场景、契约与验证。它们目前是探索方向，不是已承诺模块。
+自动/云端 Persistence、Collaboration、文件格式跨版本迁移、远程同步和更多 Layout/Renderer Provider 都需要独立场景、契约与验证。它们目前是探索方向，不是已承诺模块。

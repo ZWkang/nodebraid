@@ -44,7 +44,7 @@ test('selects visible scenes for changed public capabilities without duplicate r
       'packages/plugin-history/src/index.ts',
       'packages/port-api/src/index.ts',
     ]).map((scene) => scene.id),
-  ).toEqual(['selection-history', 'port-connection']);
+  ).toEqual(['selection-history', 'port-connection', 'document-files']);
 });
 
 test('the CLI records committed source for a docs-only change and rejects dirty source', () => {
@@ -105,8 +105,9 @@ test('clipboard and preview maintenance select their real scenes, with uncovered
     'selection-history',
     'port-connection',
     'clipboard',
+    'document-files',
   ]);
-  expect(selectPreviewScenes(['packages/layout-elk/src/index.ts']).length).toBe(4);
+  expect(selectPreviewScenes(['packages/layout-elk/src/index.ts']).length).toBe(5);
   expect(previewLimitations(['packages/layout-elk/src/index.ts']).join('\n')).toContain('not Layout execution');
 });
 
@@ -147,6 +148,7 @@ test('shared rendering changes exercise all scenes, while docs and tests have no
     'selection-history',
     'port-connection',
     'clipboard',
+    'document-files',
   ]);
   expect(
     selectPreviewScenes([
@@ -162,5 +164,10 @@ test('shared rendering changes exercise all scenes, while docs and tests have no
     'selection-history',
     'port-connection',
     'clipboard',
+    'document-files',
   ]);
+});
+
+test('Document changes select the real file round-trip scene', () => {
+  expect(selectPreviewScenes(['packages/document/src/index.ts']).map((scene) => scene.id)).toEqual(['document-files']);
 });

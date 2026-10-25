@@ -16,8 +16,10 @@ Session 与 History Snapshot。私有 React Examples Application 通过它把公
 连边、Viewport 控制、手动 Dagre/full/LR 自动布局与 History 操作。布局保留 Selection、
 Viewport 和原 Port 连接，不自动 Fit View。
 
-NodeBraid 仍处于预发布阶段，尚未提供产品级编辑器外壳、React 之外的框架适配器、持久化、
-协作或序列化 schema。源码 package 使用 `@nodebraid/*` 命名空间，但尚未发布到 npm。
+版本化完整 Document 文件与应用 Data Codec 支持手动导出/导入；Examples Application
+通过原子替换恢复图，并从新的 History Baseline 继续编辑。
+
+NodeBraid 仍处于预发布阶段，尚未提供产品级编辑器外壳、React 之外的框架适配器、自动/云端持久化或协作。源码 package 使用 `@nodebraid/*` 命名空间，但尚未发布到 npm。
 
 ## 文档
 

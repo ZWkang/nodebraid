@@ -5,6 +5,8 @@ import {
   type ClipboardTextTransport,
 } from '@nodebraid/core';
 
+import { acceptExampleData } from './example-data-codec';
+
 export const nodeBraidExampleClipboardType = 'nodebraid.examples/canvas-fragment';
 export const nodeBraidExampleClipboardVersion = 1;
 
@@ -30,11 +32,10 @@ export function createNavigatorClipboardTransport(): ClipboardTextTransport {
 
 export const exampleCanvasFragmentTextCodec: CanvasFragmentTextCodec = Object.freeze({
   encode(fragment: CanvasFragment): string {
-    assertNullData(fragment);
     return JSON.stringify({
       type: nodeBraidExampleClipboardType,
       version: nodeBraidExampleClipboardVersion,
-      fragment,
+      fragment: withExampleData(fragment),
     });
   },
   decode(text: string): CanvasFragment {
@@ -45,16 +46,16 @@ export const exampleCanvasFragmentTextCodec: CanvasFragmentTextCodec = Object.fr
     if (envelope.type !== nodeBraidExampleClipboardType || envelope.version !== nodeBraidExampleClipboardVersion) {
       throw new Error('Clipboard text uses an unsupported NodeBraid Examples Canvas Fragment envelope.');
     }
-    const fragment = acceptCanvasFragment(envelope.fragment);
-    assertNullData(fragment);
-    return fragment;
+    return withExampleData(acceptCanvasFragment(envelope.fragment));
   },
 });
 
-function assertNullData(fragment: CanvasFragment): void {
-  if (fragment.nodes.some((node) => node.data !== null) || fragment.edges.some((edge) => edge.data !== null)) {
-    throw new Error('The Basic SVG Example Clipboard codec accepts only null Node and Edge data.');
-  }
+function withExampleData(fragment: CanvasFragment): CanvasFragment {
+  return Object.freeze({
+    ...fragment,
+    nodes: Object.freeze(fragment.nodes.map((node) => Object.freeze({ ...node, data: acceptExampleData(node.data) }))),
+    edges: Object.freeze(fragment.edges.map((edge) => Object.freeze({ ...edge, data: acceptExampleData(edge.data) }))),
+  });
 }
 
 function isExactRecord(value: unknown, keys: readonly string[]): value is Record<string, unknown> {

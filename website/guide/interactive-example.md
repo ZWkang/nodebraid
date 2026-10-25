@@ -31,3 +31,13 @@ bun run example:dev
 一次有净变化的布局对应一次 History Entry：先用一次 Undo 恢复布局前位置，再用一次 Redo 恢复布局后位置。再次执行相同确定性布局时，无净变化不会增加 revision 或历史；后续新建连线会产生自己的 History Entry。
 
 页面初始化和拖动、连线、复制粘贴等普通编辑都不会自动重排。按钮沿用已有 Command 执行和错误卡片；失败会明确显示，不自动排队或重试，由使用者决定是否重新触发。
+
+## 保存与恢复文件
+
+点击“导出文档”（Export document）下载完整图 JSON；重新打开页面后，点击“导入文档”（Import document）选择该文件。
+导入成功替换整图并清空旧 Undo/Redo，之后的编辑从新的历史起点记录。导入失败显示原始错误，旧图与历史保持。
+Viewport 保持当前值；Selection 继续按已有 ID 协调，不从文件恢复。
+
+Example 的应用 Data Codec 仅接受 `null` 或 `{ label: string, tags: string[] }`，Clipboard 使用同一业务约束。
+框架的 [Document](/modules/document) 契约允许应用提供其他 codec。文件不包含 Runtime revision 或 Session/History，
+页面不会自动保存；取消文件选择不会改变画布，同一文件可以再次导入。

@@ -31,6 +31,7 @@ description: NodeBraid 当前已交付公共能力的统一 facade。
 
 - `@nodebraid/diagnostics` 的结构化错误与 Diagnostic Event 契约；
 - `@nodebraid/kernel` 的纯图模型、Transaction、Canvas View、Canvas Query 与 Change Set；
+- `@nodebraid/document` 的完整图文本与应用 Data Codec；
 - `@nodebraid/canvas-fragment` 的纯内存 selected-Node 子图值；
 - `@nodebraid/session-api` 的不可变 Session 值；
 - `@nodebraid/renderer-api` 的后端中立 Renderer contract；
@@ -71,7 +72,7 @@ Package 只有一个公开子路径：`@nodebraid/core`。代表性的公共入�
 | Kernel      | `createCanvasKernel`、`kernelPlugin`、`kernelService`                                                                 |
 | Command     | `defineCommand`、`commandPlugin`、`commandService`                                                                    |
 | Session     | `sessionPlugin`、`sessionService`                                                                                     |
-| History     | `historyPlugin`、`historyService`、`undoCommand`、`redoCommand`                                                       |
+| History     | `historyPlugin`、`historyService`、`undoCommand`、`redoCommand`、`establishHistoryBaselineCommand`                    |
 | Layout      | `createLayoutInput`、`defineLayoutEngine`、`createLayoutPlugin`、`LayoutError`                                        |
 | Renderer    | `createRendererPlugin`、`rendererService`、`RendererError`                                                            |
 | Interaction | `interactionPlugin`、`moveNodesCommand`、`createEdgeCommand`、`deleteSelectionCommand`、`interactionDiagnosticEvents` |
@@ -99,7 +100,7 @@ Facade 测试会同时从 `@nodebraid/core` 验证这些对象的类型与行为
 - 不隐式安装 Basic Canvas Composition，也不选择默认 Renderer。
 - 不重导出 Dagre、ELK 等具体 Layout Provider。
 - 不选择或重导出 `@nodebraid/renderer-svg` 等 concrete Renderer Provider。
-- 不提供框架 Adapter、UI 组件、持久化或协作能力。
+- 不提供框架 Adapter、UI 组件、自动/云端持久化或协作能力。
 - 不把 Cordis 类型暴露给应用。
 - 当前不能作为 NodeBraid package 从 npm 安装。
 

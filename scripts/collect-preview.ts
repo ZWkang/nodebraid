@@ -18,6 +18,7 @@ import {
   CdpClient,
   createAgentBrowserRunner,
   createProductionAppServer,
+  downloadBrowserFile,
   readAgentBrowserCdpUrl,
 } from '../examples/app/browser-tests/browser-test-harness';
 import { previewLimitations, selectPreviewScenes, type PreviewScene } from './preview-scenarios';
@@ -345,6 +346,57 @@ async function collectScene(
         await metrics({ revision: '2', nodes: '3', edges: '2' });
         assert.equal(await observe('document.querySelectorAll("[data-nodebraid-connection-preview]").length'), 0);
         assert.equal(await observe('document.querySelectorAll("[data-nodebraid-edge-id=example-edge-1]").length'), 1);
+      });
+    } else if (scene.id === 'document-files') {
+      const documentPath = join(directory, 'document.json');
+      await step('Edit and download a real complete Document file', async () => {
+        await run(['click', '[data-nodebraid-node-id="example-discover"]']);
+        await shortcut('d');
+        await metrics({ nodes: '4', revision: '2' });
+        assert.ok(client, 'Expected the owned browser connection.');
+        await downloadBrowserFile(client, run, '[aria-label="Export document"]', documentPath, browserContextId);
+        const saved = JSON.parse(readFileSync(documentPath, 'utf8'));
+        assert.equal(saved.type, 'nodebraid/document');
+        assert.equal(saved.version, 1);
+        assert.equal(saved.nodes.length, 4);
+        assert.equal(saved.edges.length, 1);
+        assert.equal('revision' in saved, false);
+        remember('document.json', 'snapshot');
+        await capture('exported');
+      });
+      await step('Reopen the application and upload the downloaded file', async () => {
+        await run(['reload']);
+        await run(['wait', '[data-example-status="ready"]']);
+        await metrics({ nodes: '3', revision: '1' });
+        await run(['upload', '[aria-label="Document file"]', documentPath]);
+        await metrics({ nodes: '4', edges: '1', history: '— / —' });
+        assert.equal(await observe('document.querySelector("[aria-label=Undo]").disabled'), true);
+        assert.equal(
+          await observe('document.querySelectorAll("[data-nodebraid-node-id=example-duplicate-node-1]").length'),
+          1,
+        );
+        const restored = join(directory, 'restored.json');
+        assert.ok(client, 'Expected the owned browser connection.');
+        await downloadBrowserFile(client, run, '[aria-label="Export document"]', restored, browserContextId);
+        assert.deepEqual(JSON.parse(readFileSync(restored, 'utf8')), JSON.parse(readFileSync(documentPath, 'utf8')));
+        remember('restored.json', 'snapshot');
+        await capture('restored');
+      });
+      await step('Continue editing and Undo only the new edit', async () => {
+        await run(['click', '[data-nodebraid-node-id="example-discover"]']);
+        await shortcut('d');
+        await metrics({ nodes: '5' });
+        assert.equal(
+          await observe('document.querySelectorAll("[data-nodebraid-node-id=example-duplicate-node-2]").length'),
+          1,
+        );
+        await control('Undo');
+        await metrics({ nodes: '4', history: '— / Redo' });
+        assert.equal(
+          await observe('document.querySelectorAll("[data-nodebraid-node-id=example-duplicate-node-1]").length'),
+          1,
+        );
+        assert.equal(await observe('document.querySelector("[aria-label=Undo]").disabled'), true);
       });
     } else {
       await step('Grant clipboard permission only to this isolated browser context', async () => {
