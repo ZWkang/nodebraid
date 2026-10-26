@@ -1,0 +1,55 @@
+import assert from 'node:assert/strict';
+import {writeFileSync} from 'node:fs';
+import {createBasicCanvasPlugin} from '@nodebraid/preset-basic';
+import {createPluginHost,definePlugin} from '@nodebraid/runtime-cordis';
+import {commandService,defineCommand} from '@nodebraid/plugin-command';
+import {defineInteractionShortcut,interactionShortcutService,type InteractionShortcutBinding} from '@nodebraid/plugin-interaction';
+import type {InteractionProjection} from '@nodebraid/interaction-api';
+import type {SessionSnapshot} from '@nodebraid/session-api';
+import type {CanvasRenderer,RendererDocumentUpdate,RendererInput,RendererInputListener,InputDisposition,HitResult,ScreenPoint,InputModifiers} from '@nodebraid/renderer-api';
+const results:{name:string;passed:boolean;details:unknown}[]=[];
+function record(name:string,passed:boolean,details:unknown){results.push({name,passed,details});writeFileSync(process.env.NODEBRAID_PROBE_RESULTS!,JSON.stringify(results,null,2)+'\n');}
+const normal={alt:false,control:false,meta:false,shift:false};
+{
+ let reads=0;const input={get code(){reads++;return reads<3?'KeyP':'';},modifierAlternatives:[normal]};
+ const result=defineInteractionShortcut(input);record('changing-code',result.code==='KeyP'&&reads===1,{reads,first:'KeyP',actual:result.code,nonempty:result.code.length>0});
+}
+{
+ let reads=0;const input={code:'KeyP',get modifierAlternatives(){reads++;return reads<3?[normal]:[];}};
+ const result=defineInteractionShortcut(input);record('changing-alternatives',result.modifierAlternatives.length===1&&reads===1,{reads,firstLength:1,actualLength:result.modifierAlternatives.length});
+}
+{
+ let reads=0;const modifiers:InputModifiers={get alt(){reads++;return reads===1?false:true;},control:false,meta:false,shift:false};
+ const result=defineInteractionShortcut({code:'KeyP',modifierAlternatives:[modifiers]});record('changing-modifier',result.modifierAlternatives[0]!.alt===false&&reads===1,{reads,first:false,actual:result.modifierAlternatives[0]!.alt});
+}
+{
+ const result=defineInteractionShortcut({code:'KeyP',modifierAlternatives:[normal]});record('constant-definition',result.code==='KeyP'&&result.modifierAlternatives.length===1&&result.modifierAlternatives[0]!.alt===false,{code:result.code,alternatives:result.modifierAlternatives});
+}
+class RecordingRenderer implements CanvasRenderer{
+ readonly listeners=new Set<RendererInputListener>();
+ updateDocument(_update:RendererDocumentUpdate):void{}updateSession(_snapshot:SessionSnapshot):void{}updateInteraction(_projection:InteractionProjection|null):void{}
+ subscribeInput(listener:RendererInputListener):()=>void{this.listeners.add(listener);return ()=>{this.listeners.delete(listener);};}
+ hitTest(point:ScreenPoint):HitResult|null{return {type:'canvas',worldPoint:point};}
+ capturePointer(_id:number):void{}releasePointer(_id:number):void{}focus():void{}
+ async dispose():Promise<void>{this.listeners.clear();}
+ emit(input:RendererInput):InputDisposition|undefined{let disposition:InputDisposition|undefined;for(const listener of this.listeners)disposition=listener(input)??disposition;return disposition;}
+}
+for(const changing of [true,false]){
+ const renderer=new RecordingRenderer(),first=defineCommand<void,void>('probe.first'),later=defineCommand<void,void>('probe.later');
+ const observed=Promise.withResolvers<string>();const calls:string[]=[];let reads=0;
+ const host=createPluginHost();const composition=host.install(createBasicCanvasPlugin(()=>renderer));
+ const consumer=host.install(definePlugin({requires:{commands:commandService,shortcuts:interactionShortcutService},setup(context){
+  context.own(context.services.commands.register(first,()=>{calls.push('first');observed.resolve('first');}).dispose);
+  context.own(context.services.commands.register(later,()=>{calls.push('later');observed.resolve('later');}).dispose);
+  const binding:InteractionShortcutBinding<void>={shortcut:{code:'KeyP',modifierAlternatives:[normal]},get command(){reads++;return changing&&reads>=3?later:first;}};
+  const registration=context.services.shortcuts.register(binding);context.own(()=>registration.dispose());
+ }}));
+ await Promise.all([composition.whenActive(),consumer.whenActive()]);
+ const disposition=renderer.emit({type:'key.down',key:'p',code:'KeyP',repeat:false,modifiers:normal});
+ assert.deepEqual(disposition,{defaultAction:'prevent'});const actual=await observed.promise;
+ await host.dispose();assert.equal(renderer.listeners.size,0);
+ record(changing?'changing-binding-command':'constant-binding-command',actual==='first'&&(!changing||reads===1),{reads,actual,calls,renderer:'explicit normalized-input public fixture; no native browser claim'});
+}
+console.log(JSON.stringify({controls:results.length,passed:results.filter(x=>x.passed).length,failed:results.filter(x=>!x.passed),source:'actual typed compiled public definition and Host/Command/Interaction seam'}));
+assert.equal(results.length,6);
+assert.ok(results.every(x=>x.passed),'Shortcut normalization must use the same captured values for validation and ownership.');

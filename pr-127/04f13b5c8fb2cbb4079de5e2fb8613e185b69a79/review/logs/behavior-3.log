@@ -1,0 +1,28 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/lifecycle.test.ts:
+77 |         repeat: false,
+78 |         modifiers: { alt: false, control: false, meta: false, shift: false },
+79 |       }),
+80 |     ).toEqual({ defaultAction: 'prevent' });
+81 |     await observed.promise;
+82 |     expect(calls).toEqual(['first']);
+                       ^
+error: expect(received).toEqual(expected)
+
+  [
+-   "first",
++   "later",
+  ]
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/lifecycle.test.ts:82:19)
+(fail) Shortcut Binding preserves the Command accepted from a caller getter [32.70ms]
+
+ 0 pass
+ 13 filtered out
+ 1 fail
+ 5 expect() calls
+Ran 1 test across 1 file. [147.00ms]

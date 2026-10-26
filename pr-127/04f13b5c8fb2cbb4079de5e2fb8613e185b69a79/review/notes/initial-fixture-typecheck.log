@@ -1,0 +1,4 @@
+@nodebraid/plugin-interaction typecheck:self: tests/shortcut-values.test.ts(100,13): error TS2769: No overload matches this call.
+@nodebraid/plugin-interaction typecheck:self:   The last overload gave the following error.
+@nodebraid/plugin-interaction typecheck:self:     The type 'readonly unknown[]' is 'readonly' and cannot be assigned to the mutable type 'unknown[]'.
+@nodebraid/plugin-interaction typecheck:self: Exited with code 1

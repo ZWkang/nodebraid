@@ -1,0 +1,69 @@
+[
+  {
+    "name": "changing-code",
+    "passed": false,
+    "details": {
+      "reads": 3,
+      "first": "KeyP",
+      "actual": "",
+      "nonempty": false
+    }
+  },
+  {
+    "name": "changing-alternatives",
+    "passed": false,
+    "details": {
+      "reads": 3,
+      "firstLength": 1,
+      "actualLength": 0
+    }
+  },
+  {
+    "name": "changing-modifier",
+    "passed": false,
+    "details": {
+      "reads": 2,
+      "first": false,
+      "actual": true
+    }
+  },
+  {
+    "name": "constant-definition",
+    "passed": true,
+    "details": {
+      "code": "KeyP",
+      "alternatives": [
+        {
+          "alt": false,
+          "control": false,
+          "meta": false,
+          "shift": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "changing-binding-command",
+    "passed": false,
+    "details": {
+      "reads": 3,
+      "actual": "later",
+      "calls": [
+        "later"
+      ],
+      "renderer": "explicit normalized-input public fixture; no native browser claim"
+    }
+  },
+  {
+    "name": "constant-binding-command",
+    "passed": true,
+    "details": {
+      "reads": 3,
+      "actual": "first",
+      "calls": [
+        "first"
+      ],
+      "renderer": "explicit normalized-input public fixture; no native browser claim"
+    }
+  }
+]

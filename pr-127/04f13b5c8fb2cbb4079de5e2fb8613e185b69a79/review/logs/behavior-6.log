@@ -1,0 +1,32 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/shortcut-values.test.ts:
+(pass) Shortcut definition retains the nonempty code accepted from a getter [0.08ms]
+(pass) Shortcut definition retains the nonempty alternatives accepted from a getter [0.04ms]
+52 |     shift: false,
+53 |   };
+54 | 
+55 |   const shortcut = defineInteractionShortcut({ code: 'KeyP', modifierAlternatives: [modifiers] });
+56 | 
+57 |   expect(shortcut.modifierAlternatives[0]).toEqual({ alt: false, control: false, meta: false, shift: false });
+                                                ^
+error: expect(received).toEqual(expected)
+
+  {
+-   "alt": false,
++   "alt": true,
+    "control": false,
+    "meta": false,
+    "shift": false,
+  }
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/shortcut-values.test.ts:57:44)
+(fail) Shortcut definition retains the modifier value accepted from a getter [11.55ms]
+
+ 2 pass
+ 1 fail
+ 11 expect() calls
+Ran 3 tests across 1 file. [28.00ms]

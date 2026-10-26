@@ -1,0 +1,850 @@
+Independent Standards + ponytail-review, Issue126
+Base 6fd2d016f6330cc422508b3e51229bea4be2cce0
+Head 1bdfa894f0e1081ef18dc8459108d127653f971b
+Tree 5db45010568a9ea7141005ce29ad0b4d12d20bc8
+Binary patch SHA256 61009ea6271e44f300cab49c8be741e41190832bac705e384f590b2d34a6fdea
+Task digest 99febd96154ef7db40a4451f336d1fa3a68344b3e0b1c4e92b19d56135b40d98
+Output records complete combined stdout/stderr as returned by the process tool.
+
+Pre-test audit: git rev-parse HEAD HEAD^{tree}; git status --porcelain; git merge-base BASE HEAD; git show -s --format=%P HEAD; canonical git diff --binary BASE HEAD byte/SHA comparison with run/change.patch; prepared task/base/digest; deployed pr-risk blob; current compiled shortcut-value.js and shortcut-runtime.js capture inspection; artifact-ready/current Issue source/provenance reads.
+FILE review-artifacts-ready.json
+{
+  "at": "2026-10-26T13:13:50.031289+00:00",
+  "head": "1bdfa894f0e1081ef18dc8459108d127653f971b",
+  "tree": "5db45010568a9ea7141005ce29ad0b4d12d20bc8",
+  "patch": "61009ea6271e44f300cab49c8be741e41190832bac705e384f590b2d34a6fdea",
+  "affected": {
+    "command": "bun run check:affected --base 6fd2d016f6330cc422508b3e51229bea4be2cce0",
+    "exitCode": 0,
+    "log": "/Users/zhou/.codex/local-workflows/nodebraid/runs/b7113488-5488-4455-bdfe-9e19d3e9bd04/affected.log"
+  },
+  "originalByteIdenticalCompiled6": {
+    "typecheckExit": 0,
+    "compiledExit": 0,
+    "allPassed": true,
+    "provenance": "/Users/zhou/.codex/local-workflows/nodebraid/runs/b7113488-5488-4455-bdfe-9e19d3e9bd04/original-green-provenance.json",
+    "log": "/Users/zhou/.codex/local-workflows/nodebraid/runs/b7113488-5488-4455-bdfe-9e19d3e9bd04/original-green-compiled.log"
+  },
+  "independentReviewsNotYetComplete": true,
+  "formalFullNotRun": true
+}
+
+FILE review-boundary-source.json
+{
+  "readAt": "2026-10-26T13:13:53.362Z",
+  "issue": {
+    "url": "https://api.github.com/repos/ZWkang/nodebraid/issues/126",
+    "repository_url": "https://api.github.com/repos/ZWkang/nodebraid",
+    "labels_url": "https://api.github.com/repos/ZWkang/nodebraid/issues/126/labels{/name}",
+    "comments_url": "https://api.github.com/repos/ZWkang/nodebraid/issues/126/comments",
+    "events_url": "https://api.github.com/repos/ZWkang/nodebraid/issues/126/events",
+    "html_url": "https://github.com/ZWkang/nodebraid/issues/126",
+    "id": 6039608471,
+    "node_id": "I_kwDOT399I88AAAABZ_0clw",
+    "number": 126,
+    "title": "fix: snapshot validated Shortcut values and Command once",
+    "user": {
+      "login": "ZWkang",
+      "id": 15853907,
+      "node_id": "MDQ6VXNlcjE1ODUzOTA3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15853907?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ZWkang",
+      "html_url": "https://github.com/ZWkang",
+      "followers_url": "https://api.github.com/users/ZWkang/followers",
+      "following_url": "https://api.github.com/users/ZWkang/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ZWkang/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ZWkang/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ZWkang/subscriptions",
+      "organizations_url": "https://api.github.com/users/ZWkang/orgs",
+      "repos_url": "https://api.github.com/users/ZWkang/repos",
+      "events_url": "https://api.github.com/users/ZWkang/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ZWkang/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 11828270353,
+        "node_id": "LA_kwDOT399I88AAAACwQUVEQ",
+        "url": "https://api.github.com/repos/ZWkang/nodebraid/labels/bug",
+        "name": "bug",
+        "color": "d73a4a",
+        "default": true,
+        "description": "Something isn't working",
+        "archived_at": null,
+        "archived_by": null
+      },
+      {
+        "id": 12761007595,
+        "node_id": "LA_kwDOT399I88AAAAC-J2F6w",
+        "url": "https://api.github.com/repos/ZWkang/nodebraid/labels/ready-for-agent",
+        "name": "ready-for-agent",
+        "color": "ededed",
+        "default": false,
+        "description": null,
+        "archived_at": null,
+        "archived_by": null
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignees": [],
+    "milestone": null,
+    "comments": 0,
+    "created_at": "2026-10-26T12:26:15Z",
+    "updated_at": "2026-10-26T12:26:15Z",
+    "closed_at": null,
+    "assignee": null,
+    "author_association": "OWNER",
+    "active_lock_reason": null,
+    "sub_issues_summary": {
+      "total": 0,
+      "completed": 0,
+      "percent_completed": 0
+    },
+    "issue_dependencies_summary": {
+      "blocked_by": 0,
+      "total_blocked_by": 0,
+      "blocking": 0,
+      "total_blocking": 0
+    },
+    "body": "## Confirmed defect\n\nAt main `6fd2d016f6330cc422508b3e51229bea4be2cce0`, Shortcut definition and binding normalization validate fields and later reread them when constructing the owned value. Typed getters can therefore replace validated values.\n\nA strictly typechecked, compiled program uses the public package exports and six controls. Two constant controls pass; four changing-getter controls fail:\n\n- `defineInteractionShortcut` reads `code` three times and returns an empty code after validating a nonempty code.\n- It reads `modifierAlternatives` three times and returns an empty alternatives collection after validating a nonempty collection.\n- A modifier field is read twice, so the returned immutable shortcut contains a later boolean.\n- A real Plugin Host, Basic Composition, Command Service and Interaction Shortcut registration execute the later Command instead of the first Command supplied by the binding getter. Both Command tokens are real, separately registered public tokens.\n\nThe last control uses an explicitly recording Renderer with normalized Keyboard Input at the existing public seam. It is not a native browser or SVG gesture claim. The original entry, compiled red bundle, public dependency hashes, raw observations and exit-1 log are retained locally.\n\n## Contract and cause\n\n[ADR-0074](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/docs/adr/0074-compose-shortcuts-through-interaction-authority.md) defines a static, Activation-owned Shortcut Binding that routes normalized input to its typed Command.\n\n[`defineInteractionShortcut`](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/plugin-interaction/src/shortcut-value.ts) explicitly requires a nonempty code and modifier alternatives, but rereads those properties and modifier booleans after validation. [`acceptBinding`](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/plugin-interaction/src/shortcut-runtime.ts) similarly rereads `binding.command` for its owned snapshot.\n\n## Acceptance\n\n- Capture each relevant field once at its existing normalization owner, validate and retain that same value: code, alternatives, modifier booleans, binding shortcut and Command.\n- Retain original getter receivers, original thrown-value identity, existing `INVALID_SHORTCUT` classification and first-invalid-field/error order. Do not read later fields after an earlier invalid value fails.\n- Public definitions never publish the empty code/alternatives that this reproduction currently produces; registration executes the originally captured Command and preserves captured modifier matching.\n- Preserve ordinary matching, modifier alternatives, repeat/gesture arbitration, capability-unavailable handling, Disposition, conflict reservations, in-flight cancellation/disposal and reactivation.\n- Keep current public APIs, defaults and array traversal/coercion policies. Do not add a Registry, retry, cap, fallback, new shortcut policy or unrelated Snapshot/Delete Selection change.\n- Preserve the independent six-case compiled red evidence and demonstrate green; add public regression tracers before implementation, complete related/affected checks, independent Standards with ponytail-review and Spec/risk, then the formal full check and current-head publication/CI/report/evidence gates.\n- Keep the Issue open through actual main integration and whole-Issue acceptance.\n\n## Runnable public reproduction\n\nAfter building the workspace, place this script at the repository root and run `NODEBRAID_PROBE_RESULTS=/tmp/nodebraid-shortcut-repro.json bun ./shortcut-repro.ts`. At the base above it exits 1: four changing-value cases fail and two constant controls pass. The original program was also independently typechecked and executed as a compiled public-import bundle.\n\n```ts\nimport assert from 'node:assert/strict';\nimport {writeFileSync} from 'node:fs';\nimport {createBasicCanvasPlugin} from '@nodebraid/preset-basic';\nimport {createPluginHost,definePlugin} from '@nodebraid/runtime-cordis';\nimport {commandService,defineCommand} from '@nodebraid/plugin-command';\nimport {defineInteractionShortcut,interactionShortcutService,type InteractionShortcutBinding} from '@nodebraid/plugin-interaction';\nimport type {InteractionProjection} from '@nodebraid/interaction-api';\nimport type {SessionSnapshot} from '@nodebraid/session-api';\nimport type {CanvasRenderer,RendererDocumentUpdate,RendererInput,RendererInputListener,InputDisposition,HitResult,ScreenPoint,InputModifiers} from '@nodebraid/renderer-api';\nconst results:{name:string;passed:boolean;details:unknown}[]=[];\nfunction record(name:string,passed:boolean,details:unknown){results.push({name,passed,details});writeFileSync(process.env.NODEBRAID_PROBE_RESULTS!,JSON.stringify(results,null,2)+'\\n');}\nconst normal={alt:false,control:false,meta:false,shift:false};\n{\n let reads=0;const input={get code(){reads++;return reads<3?'KeyP':'';},modifierAlternatives:[normal]};\n const result=defineInteractionShortcut(input);record('changing-code',result.code==='KeyP'&&reads===1,{reads,first:'KeyP',actual:result.code,nonempty:result.code.length>0});\n}\n{\n let reads=0;const input={code:'KeyP',get modifierAlternatives(){reads++;return reads<3?[normal]:[];}};\n const result=defineInteractionShortcut(input);record('changing-alternatives',result.modifierAlternatives.length===1&&reads===1,{reads,firstLength:1,actualLength:result.modifierAlternatives.length});\n}\n{\n let reads=0;const modifiers:InputModifiers={get alt(){reads++;return reads===1?false:true;},control:false,meta:false,shift:false};\n const result=defineInteractionShortcut({code:'KeyP',modifierAlternatives:[modifiers]});record('changing-modifier',result.modifierAlternatives[0]!.alt===false&&reads===1,{reads,first:false,actual:result.modifierAlternatives[0]!.alt});\n}\n{\n const result=defineInteractionShortcut({code:'KeyP',modifierAlternatives:[normal]});record('constant-definition',result.code==='KeyP'&&result.modifierAlternatives.length===1&&result.modifierAlternatives[0]!.alt===false,{code:result.code,alternatives:result.modifierAlternatives});\n}\nclass RecordingRenderer implements CanvasRenderer{\n readonly listeners=new Set<RendererInputListener>();\n updateDocument(_update:RendererDocumentUpdate):void{}updateSession(_snapshot:SessionSnapshot):void{}updateInteraction(_projection:InteractionProjection|null):void{}\n subscribeInput(listener:RendererInputListener):()=>void{this.listeners.add(listener);return ()=>{this.listeners.delete(listener);};}\n hitTest(point:ScreenPoint):HitResult|null{return {type:'canvas',worldPoint:point};}\n capturePointer(_id:number):void{}releasePointer(_id:number):void{}focus():void{}\n async dispose():Promise<void>{this.listeners.clear();}\n emit(input:RendererInput):InputDisposition|undefined{let disposition:InputDisposition|undefined;for(const listener of this.listeners)disposition=listener(input)??disposition;return disposition;}\n}\nfor(const changing of [true,false]){\n const renderer=new RecordingRenderer(),first=defineCommand<void,void>('probe.first'),later=defineCommand<void,void>('probe.later');\n const observed=Promise.withResolvers<string>();const calls:string[]=[];let reads=0;\n const host=createPluginHost();const composition=host.install(createBasicCanvasPlugin(()=>renderer));\n const consumer=host.install(definePlugin({requires:{commands:commandService,shortcuts:interactionShortcutService},setup(context){\n  context.own(context.services.commands.register(first,()=>{calls.push('first');observed.resolve('first');}).dispose);\n  context.own(context.services.commands.register(later,()=>{calls.push('later');observed.resolve('later');}).dispose);\n  const binding:InteractionShortcutBinding<void>={shortcut:{code:'KeyP',modifierAlternatives:[normal]},get command(){reads++;return changing&&reads>=3?later:first;}};\n  const registration=context.services.shortcuts.register(binding);context.own(()=>registration.dispose());\n }}));\n await Promise.all([composition.whenActive(),consumer.whenActive()]);\n const disposition=renderer.emit({type:'key.down',key:'p',code:'KeyP',repeat:false,modifiers:normal});\n assert.deepEqual(disposition,{defaultAction:'prevent'});const actual=await observed.promise;\n await host.dispose();assert.equal(renderer.listeners.size,0);\n record(changing?'changing-binding-command':'constant-binding-command',actual==='first'&&(!changing||reads===1),{reads,actual,calls,renderer:'explicit normalized-input public fixture; no native browser claim'});\n}\nconsole.log(JSON.stringify({controls:results.length,passed:results.filter(x=>x.passed).length,failed:results.filter(x=>!x.passed),source:'actual typed compiled public definition and Host/Command/Interaction seam'}));\nassert.equal(results.length,6);\nassert.ok(results.every(x=>x.passed),'Shortcut normalization must use the same captured values for validation and ownership.');\n```\n\n## Deduplication\n\nComplete all-state collections were read through their final short pages: 125 Issue/PR records (100 + 25) and 64 PRs (20 + 20 + 20 + 4). No existing delivery covers these shared normalizers. Issue #35 / PR #36 repaired Duplicate Selection Behavior and Shortcut factory options; their actual five changed files are confined to `plugin-duplicate-selection`. Its completed implementation and empty discussions are preserved. The present failure is in shared `plugin-interaction` Shortcut value/binding ownership.",
+    "closed_by": null,
+    "reactions": {
+      "url": "https://api.github.com/repos/ZWkang/nodebraid/issues/126/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "timeline_url": "https://api.github.com/repos/ZWkang/nodebraid/issues/126/timeline",
+    "performed_via_github_app": {
+      "id": 1144995,
+      "client_id": "Iv23liVemv8A9if9v0F2",
+      "slug": "chatgpt-codex-connector",
+      "node_id": "A_kwHOAOQ6Gs4AEXij",
+      "owner": {
+        "login": "openai",
+        "id": 14957082,
+        "node_id": "MDEyOk9yZ2FuaXphdGlvbjE0OTU3MDgy",
+        "avatar_url": "https://avatars.githubusercontent.com/u/14957082?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/openai",
+        "html_url": "https://github.com/openai",
+        "followers_url": "https://api.github.com/users/openai/followers",
+        "following_url": "https://api.github.com/users/openai/following{/other_user}",
+        "gists_url": "https://api.github.com/users/openai/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/openai/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/openai/subscriptions",
+        "organizations_url": "https://api.github.com/users/openai/orgs",
+        "repos_url": "https://api.github.com/users/openai/repos",
+        "events_url": "https://api.github.com/users/openai/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/openai/received_events",
+        "type": "Organization",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "name": "ChatGPT Codex Connector",
+      "description": "Bring ChatGPT and Codex to your GitHub repositories.",
+      "external_url": "https://www.chatgpt.com",
+      "html_url": "https://github.com/apps/chatgpt-codex-connector",
+      "created_at": "2025-02-14T01:37:05Z",
+      "updated_at": "2026-09-23T18:52:59Z",
+      "permissions": {
+        "actions": "write",
+        "checks": "read",
+        "contents": "write",
+        "emails": "read",
+        "issues": "write",
+        "metadata": "read",
+        "pull_requests": "write",
+        "statuses": "read",
+        "workflows": "write"
+      },
+      "events": [
+        "check_run",
+        "check_suite",
+        "commit_comment",
+        "issues",
+        "issue_comment",
+        "pull_request",
+        "pull_request_review",
+        "pull_request_review_comment",
+        "pull_request_review_thread",
+        "repository",
+        "status",
+        "sub_issues"
+      ]
+    },
+    "state_reason": null,
+    "pinned_comment": null
+  },
+  "commentPages": [
+    []
+  ],
+  "target": {
+    "ref": "refs/heads/main",
+    "node_id": "REF_kwDOT399I69yZWZzL2hlYWRzL21haW4",
+    "url": "https://api.github.com/repos/ZWkang/nodebraid/git/refs/heads/main",
+    "object": {
+      "sha": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+      "type": "commit",
+      "url": "https://api.github.com/repos/ZWkang/nodebraid/git/commits/6fd2d016f6330cc422508b3e51229bea4be2cce0"
+    }
+  }
+}
+
+FILE original-green-provenance.json
+{
+  "head": "1bdfa894f0e1081ef18dc8459108d127653f971b",
+  "tree": "5db45010568a9ea7141005ce29ad0b4d12d20bc8",
+  "patch": "61009ea6271e44f300cab49c8be741e41190832bac705e384f590b2d34a6fdea",
+  "original": "/Users/zhou/.codex/local-workflows/nodebraid/runs/20261026T115845-discovery-shortcut-owned-values/shortcut-repro.ts",
+  "entry": "/Users/zhou/.codex/local-workflows/nodebraid/runs/b7113488-5488-4455-bdfe-9e19d3e9bd04/original-shortcut-repro.ts",
+  "entrySHA256": "d23d07cb0c5e5625c8f772893bce49d394e2d44219f5543f15a8245735b534a0",
+  "resolved": {
+    "@nodebraid/preset-basic": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/preset-basic/dist/index.js",
+    "@nodebraid/runtime-cordis": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/runtime-cordis/dist/index.js",
+    "@nodebraid/plugin-command": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-command/dist/index.js",
+    "@nodebraid/plugin-interaction": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/dist/index.js",
+    "@nodebraid/diagnostics": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/diagnostics/dist/index.js",
+    "@nodebraid/plugin-history": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-history/dist/index.js",
+    "@nodebraid/plugin-kernel": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-kernel/dist/index.js",
+    "@nodebraid/plugin-port": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-port/dist/index.js",
+    "@nodebraid/plugin-renderer": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-renderer/dist/index.js",
+    "@nodebraid/plugin-session": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-session/dist/index.js",
+    "@nodebraid/kernel": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/kernel/dist/index.js",
+    "@nodebraid/interaction-api": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/interaction-api/dist/index.js",
+    "@nodebraid/renderer-api": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/renderer-api/dist/index.js"
+  },
+  "hashes": {
+    "@nodebraid/preset-basic": "6e3ad9b6ba2bfcb1ecc33d96606ec81b6e461f485c4a79c266a830afef36df94",
+    "@nodebraid/runtime-cordis": "c51e03769fd58eee903f81f5556ad3ac653917eab47c6dd6226d5e8c1972d5f4",
+    "@nodebraid/plugin-command": "1d7f5330d190f6308aca64385aef47729efd99c86e8cf7486efa7d138e5895de",
+    "@nodebraid/plugin-interaction": "be7340694ba387bbd1d3bd52cd733803df6d7dac5efa97055ff65806746521e0",
+    "@nodebraid/diagnostics": "438fb75caf4a4ff7e7e73dd3b13a9c188a47448b0892e8b3f7fa3158f6886ac9",
+    "@nodebraid/plugin-history": "c236bbcb6d41f1cdc3de040a34287ac87e8d4c3fd68cb4e20c8106e067b205bf",
+    "@nodebraid/plugin-kernel": "6a8360764dcc17d0cdc449d77f86cdce959a8d69ca30e3e1394c96327b26aa70",
+    "@nodebraid/plugin-port": "0f7b2354c858d54f1957f8b73e19d3087c935b46d2b0c4147e018eb89a9b1e50",
+    "@nodebraid/plugin-renderer": "77d678ea8e4fbb41631b56daac145c0a532bc7b4f07a9361092d0366458cfb66",
+    "@nodebraid/plugin-session": "dd5518501483e57a960156de2e4f3e60384d4523f7930dc40ee9d94a1d28ed3d",
+    "@nodebraid/kernel": "c9ff8d863bd1c07313f11443fbf1c8773ff320d6edb4d5b0d18e35cd1b429f92",
+    "@nodebraid/interaction-api": "ee72f90e5774574b57c8bdf729610b79e0bc0c9a6d6300b055a853aa68e2bd6f",
+    "@nodebraid/renderer-api": "e11c931a0082e17755436efecb49079f00db4dae619d382bd60a74f8fe977e7f"
+  },
+  "bundle": "/Users/zhou/.codex/local-workflows/nodebraid/runs/b7113488-5488-4455-bdfe-9e19d3e9bd04/original-green-build/original-shortcut-repro.js",
+  "bundleSHA256": "eab1afbba6b6996d27c3938874659304896d5bfcb1839b87c8569a91678b561d",
+  "artifactPreparation": "/Users/zhou/.codex/local-workflows/nodebraid/runs/b7113488-5488-4455-bdfe-9e19d3e9bd04/affected.log",
+  "noOriginalRedOverwrite": true
+}
+
+PRE-TEST CURRENT SOURCE / CANONICAL PATCH / TASK / DEPLOYED RISK POLICY / COMPILED CAPTURE: PASS
+
+Exit code: 0
+
+$ bun test packages/plugin-interaction/tests packages/plugin-duplicate-selection/tests packages/plugin-clipboard/tests packages/preset-basic/tests tests/layout-providers.test.ts
+bun test v1.4.2 (744846f84)
+
+tests/layout-providers.test.ts:
+(pass) Dagre lays out Port topology with one undoable commit and a no-op repeat [34.78ms]
+(pass) ELK lays out Port topology with one undoable commit and a no-op repeat [107.08ms]
+(pass) accepted getter-backed Layout values survive Runtime revalidation and History replay [2.02ms]
+(pass) Dagre and ELK compose with Provider-specific typed Runtime Commands [7.72ms]
+
+packages/preset-basic/tests/index.test.ts:
+(pass) Composition readiness publishes every base Service through static bindings [3.28ms]
+
+packages/preset-basic/tests/types.test.ts:
+(pass) Basic Canvas Composition preserves required Renderer config and provides no Service [2.46ms]
+
+packages/preset-basic/tests/numeric-policy.test.ts:
+(pass) Composition preserves invalid dragThreshold from enumerable policy fields [1.85ms]
+(pass) Composition preserves invalid dragThreshold from inherited policy fields [1.19ms]
+(pass) Composition preserves invalid dragThreshold from non-enumerable policy fields [1.20ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from enumerable policy fields [1.07ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from inherited policy fields [1.06ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from non-enumerable policy fields [0.94ms]
+(pass) Composition preserves invalid minZoom from enumerable policy fields [0.86ms]
+(pass) Composition preserves invalid minZoom from inherited policy fields [1.13ms]
+(pass) Composition preserves invalid minZoom from non-enumerable policy fields [1.02ms]
+(pass) Composition preserves invalid maxZoom from enumerable policy fields [0.94ms]
+(pass) Composition preserves invalid maxZoom from inherited policy fields [1.02ms]
+(pass) Composition preserves invalid maxZoom from non-enumerable policy fields [1.07ms]
+(pass) Composition retains valid enumerable policies across mutation and fresh Hosts [2.79ms]
+(pass) Composition retains valid inherited policies across mutation and fresh Hosts [1.99ms]
+(pass) Composition retains valid non-enumerable policies across mutation and fresh Hosts [8.02ms]
+(pass) Composition preserves the original enumerable dragThreshold getter failure [0.16ms]
+(pass) Composition preserves the original inherited dragThreshold getter failure
+(pass) Composition preserves the original non-enumerable dragThreshold getter failure
+(pass) Composition preserves the original enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original inherited wheelZoomSensitivity getter failure
+(pass) Composition preserves the original non-enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original enumerable minZoom getter failure
+(pass) Composition preserves the original inherited minZoom getter failure
+(pass) Composition preserves the original non-enumerable minZoom getter failure
+(pass) Composition preserves the original enumerable maxZoom getter failure
+(pass) Composition preserves the original inherited maxZoom getter failure
+(pass) Composition preserves the original non-enumerable maxZoom getter failure
+
+packages/preset-basic/tests/readiness.test.ts:
+(pass) invalid Interaction options fail the Composition with the original Interaction error [1.50ms]
+(pass) Composition snapshots Interaction options when the Plugin is created [1.59ms]
+(pass) Composition snapshots nested Connection options when the Plugin is created [1.13ms]
+(pass) Composition keeps the Connection value captured before a caller getter changes [1.47ms]
+(pass) Composition owns inherited Connection options across fresh Host installations [1.96ms]
+(pass) Composition owns non-enumerable Connection options across fresh Host installations [1.63ms]
+(pass) Composition preserves the original Connection getter failure at creation [0.10ms]
+(pass) Composition leaves malformed Connection validation with Interaction [1.18ms]
+(pass) Composition creation rejects malformed or unknown top-level options [3.01ms]
+(pass) Composition waits for an asynchronous Renderer before becoming active [1.36ms]
+(pass) Renderer Factory failure keeps its identity and releases the Child tree for reinstall [2.01ms]
+
+packages/preset-basic/tests/lifecycle.test.ts:
+(pass) existing standard Provider makes Basic Canvas Composition fail explicitly [1.17ms]
+(pass) second Basic Canvas Composition conflicts without disturbing the active one [1.38ms]
+(pass) a later Renderer Provider conflict rolls back earlier Child reservations [1.90ms]
+(pass) Composition disposes consumers before Renderer and awaits asynchronous Renderer cleanup [1.50ms]
+(pass) Composition cleanup attempts every Renderer resource and preserves all failures [1.39ms]
+(pass) Composition diagnostics expose the complete reverse Child cleanup order [1.24ms]
+
+packages/preset-basic/tests/package-import.test.ts:
+(pass) package-name import exposes the Basic Canvas Composition factory [0.24ms]
+
+packages/plugin-interaction/tests/input-cleanup.test.ts:
+(pass) a failed Selection transition releases Pointer Capture before reporting the Input fault [1.86ms]
+
+packages/plugin-interaction/tests/types.test.ts:
+(pass) publishes Interaction as a Runtime Plugin with a narrow Shortcut contribution Service [0.03ms]
+
+packages/plugin-interaction/tests/create-edge-input-values.test.ts:
+(pass) Create Edge cannot replace a validated forward Edge with a later self-loop [2.21ms]
+(pass) Create Edge retains first values, receivers and late opaque data from own properties [2.04ms]
+(pass) Create Edge retains first values, receivers and late opaque data from non-enumerable properties [1.35ms]
+(pass) Create Edge retains first values, receivers and late opaque data from inherited properties [1.01ms]
+(pass) Create Edge preserves the original edge read failure and exact committed state [1.31ms]
+(pass) Create Edge preserves the original edge.id read failure and exact committed state [0.87ms]
+(pass) Create Edge preserves the original edge.type read failure and exact committed state [0.93ms]
+(pass) Create Edge preserves the original edge.source read failure and exact committed state [0.91ms]
+(pass) Create Edge preserves the original edge.source.nodeId read failure and exact committed state [0.78ms]
+(pass) Create Edge preserves the original edge.source.portId read failure and exact committed state [2.21ms]
+(pass) Create Edge preserves the original edge.target read failure and exact committed state [1.51ms]
+(pass) Create Edge preserves the original edge.target.nodeId read failure and exact committed state [1.22ms]
+(pass) Create Edge preserves the original edge.target.portId read failure and exact committed state [1.13ms]
+(pass) Create Edge preserves the original edge.data.presence read failure and exact committed state [1.56ms]
+(pass) Create Edge preserves the original source read failure and exact committed state [1.67ms]
+(pass) Create Edge preserves the original source.nodeId read failure and exact committed state [0.85ms]
+(pass) Create Edge preserves the original source.portId read failure and exact committed state [0.83ms]
+(pass) Create Edge preserves the original source.role read failure and exact committed state [0.84ms]
+(pass) Create Edge preserves the original target read failure and exact committed state [0.86ms]
+(pass) Create Edge preserves the original target.nodeId read failure and exact committed state [0.77ms]
+(pass) Create Edge preserves the original target.portId read failure and exact committed state [0.83ms]
+(pass) Create Edge preserves the original target.role read failure and exact committed state [0.76ms]
+(pass) Create Edge preserves the original edge.data read failure and exact committed state [0.79ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.89ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.73ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.73ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.73ms]
+(pass) Create Edge observes abort before input getters [0.86ms]
+(pass) Create Edge self-loop preflight wins before the opaque-data getter [0.89ms]
+(pass) Create Edge mismatched-endpoint preflight wins before the opaque-data getter [0.71ms]
+(pass) Create Edge wrong-role preflight wins before the opaque-data getter [0.74ms]
+(pass) Create Edge missing-node preflight wins before the opaque-data getter [0.89ms]
+(pass) Create Edge missing-port preflight wins before the opaque-data getter [0.86ms]
+(pass) Create Edge duplicate-id preflight wins before the opaque-data getter [0.81ms]
+(pass) Create Edge finishes every shape check before semantic role checks [0.89ms]
+(pass) Create Edge preserves invalid-ID short circuit before Edge type reads [2.46ms]
+(pass) Create Edge validates data presence before reading Anchor roots [1.00ms]
+(pass) Create Edge retains Anchor empty-Port short circuit before the target root [0.85ms]
+(pass) Create Edge keeps an empty Endpoint Port distinct from an absent Anchor Port [0.78ms]
+(pass) Create Edge retains captured Port evidence across application Definition and data callbacks [1.42ms]
+
+packages/plugin-interaction/tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [1.95ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [1.56ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [2.54ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [4.85ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [3.01ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [1.34ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [0.98ms]
+(pass) Delete Selection rejects the first stale Snapshot when later evidence reads would return current state [1.27ms]
+(pass) Delete Selection retains the first Snapshot for explicit-edge preflight [1.09ms]
+(pass) Delete Selection retains the first Snapshot for incident-edge preflight [1.10ms]
+(pass) Delete Selection retains the first Snapshot for new-incident-edge preflight [1.01ms]
+(pass) Delete Selection accepts the first valid own evidence getter and preserves replay data [1.18ms]
+(pass) Delete Selection accepts the first valid inherited evidence getter and preserves replay data [1.05ms]
+(pass) Delete Selection accepts the first valid non-enumerable evidence getter and preserves replay data [1.13ms]
+(pass) Delete Selection rejects malformed first evidence before a later valid Snapshot can replace it [1.05ms]
+(pass) Delete Selection preserves the original evidence getter failure undefined [0.90ms]
+(pass) Delete Selection preserves the original evidence getter failure null [0.94ms]
+(pass) Delete Selection preserves the original evidence getter failure false [0.79ms]
+(pass) Delete Selection preserves the original evidence getter failure 0 [0.73ms]
+(pass) Delete Selection preserves the original evidence getter failure "" [0.75ms]
+(pass) Delete Selection preserves the original evidence getter failure Symbol(evidence failure) [0.69ms]
+(pass) Delete Selection preserves the original evidence getter failure 578 |   expect(runtime.kernel.read()).toBe(before);
+579 |   expect(runtime.history.getSnapshot()).toBe(historyBefore);
+580 |   await runtime.host.dispose();
+581 | });
+582 | 
+583 | test.each([undefined, null, false, 0, '', Symbol('evidence failure'), new Error('evidence failure')])(
+                                                                                ^
+error: evidence failure
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:583:75
+ [2.13ms]
+(pass) Delete Selection preserves abort and malformed Selection short circuits before evidence reads [1.18ms]
+(pass) Delete Selection applies the first Selection when later root reads would choose another Node [1.02ms]
+(pass) Delete Selection captures root-own for node targets [1.38ms]
+(pass) Delete Selection captures root-inherited for node targets [0.89ms]
+(pass) Delete Selection captures root-non-enumerable for node targets [0.97ms]
+(pass) Delete Selection captures collection-root for node targets [0.85ms]
+(pass) Delete Selection captures inherited-collection for node targets [0.82ms]
+(pass) Delete Selection captures iterator for node targets [0.83ms]
+(pass) Delete Selection captures array-hooks for node targets [0.97ms]
+(pass) Delete Selection captures index-once for node targets [0.88ms]
+(pass) Delete Selection captures evidence-mutates-ids for node targets [0.82ms]
+(pass) Delete Selection keeps native fractional length 1.5 for node targets [0.86ms]
+(pass) Delete Selection keeps native fractional length "1.5" for node targets [0.74ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for node targets [0.77ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for node targets [0.99ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for node targets [0.80ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for node targets [0.74ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for node targets [0.75ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for node targets [0.75ms]
+(pass) Delete Selection preserves native length failure 1n for node [0.90ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for node [0.71ms]
+(pass) Delete Selection captures root-own for edge targets [0.81ms]
+(pass) Delete Selection captures root-inherited for edge targets [0.74ms]
+(pass) Delete Selection captures root-non-enumerable for edge targets [0.72ms]
+(pass) Delete Selection captures collection-root for edge targets [0.74ms]
+(pass) Delete Selection captures inherited-collection for edge targets [0.75ms]
+(pass) Delete Selection captures iterator for edge targets [0.70ms]
+(pass) Delete Selection captures array-hooks for edge targets [0.71ms]
+(pass) Delete Selection captures index-once for edge targets [0.66ms]
+(pass) Delete Selection captures evidence-mutates-ids for edge targets [0.71ms]
+(pass) Delete Selection keeps native fractional length 1.5 for edge targets [0.70ms]
+(pass) Delete Selection keeps native fractional length "1.5" for edge targets [0.67ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for edge targets [0.69ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for edge targets [2.06ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for edge targets [1.08ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for edge targets [0.81ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for edge targets [0.76ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for edge targets [0.71ms]
+(pass) Delete Selection preserves native length failure 1n for edge [0.70ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for edge [0.70ms]
+(pass) Delete Selection preserves original selection read failures [4.92ms]
+(pass) Delete Selection preserves original length read failures [4.93ms]
+(pass) Delete Selection preserves original index read failures [4.46ms]
+(pass) Delete Selection rejects sparse and invalid indexed IDs before evidence and preserves lazy first failure [3.84ms]
+(pass) Delete Selection admits node IDs before edge IDs and evidence and retains the first coercion [0.80ms]
+(pass) Delete Selection rejects stale first evidence Nodes when later collection reads return current roots [0.87ms]
+(pass) Delete Selection rejects first stale node evidence through root collection access [2.19ms]
+(pass) Delete Selection rejects first stale node evidence through index collection access [0.79ms]
+(pass) Delete Selection rejects first stale node evidence through map collection access [0.70ms]
+(pass) Delete Selection rejects first stale node evidence through hooks collection access [0.70ms]
+(pass) Delete Selection rejects first stale node evidence through later-field-mutation collection access [0.68ms]
+(pass) Delete Selection accepts first valid own node evidence and preserves Undo data [0.96ms]
+(pass) Delete Selection accepts first valid inherited node evidence and preserves Undo data [0.72ms]
+(pass) Delete Selection accepts first valid non-enumerable node evidence and preserves Undo data [0.70ms]
+(pass) Delete Selection uses valid first node entities independently of caller iterator [0.76ms]
+(pass) Delete Selection uses valid first node entities independently of caller methods [0.65ms]
+(pass) Delete Selection uses valid first node entities independently of caller index [0.82ms]
+(pass) Delete Selection uses valid first node entities independently of caller length [0.73ms]
+(pass) Delete Selection rejects first stale edge evidence through root collection access [0.66ms]
+(pass) Delete Selection rejects first stale edge evidence through index collection access [0.66ms]
+(pass) Delete Selection rejects first stale edge evidence through map collection access [0.63ms]
+(pass) Delete Selection rejects first stale edge evidence through hooks collection access [0.71ms]
+(pass) Delete Selection rejects first stale edge evidence through later-field-mutation collection access [0.69ms]
+(pass) Delete Selection accepts first valid own edge evidence and preserves Undo data [0.68ms]
+(pass) Delete Selection accepts first valid inherited edge evidence and preserves Undo data [0.69ms]
+(pass) Delete Selection accepts first valid non-enumerable edge evidence and preserves Undo data [0.67ms]
+(pass) Delete Selection uses valid first edge entities independently of caller iterator [0.65ms]
+(pass) Delete Selection uses valid first edge entities independently of caller methods [0.67ms]
+(pass) Delete Selection uses valid first edge entities independently of caller index [0.66ms]
+(pass) Delete Selection uses valid first edge entities independently of caller length [0.65ms]
+(pass) Delete Selection validates the first malformed evidence revision before later valid values [0.74ms]
+(pass) Delete Selection validates the first malformed evidence nodes before later valid values [0.60ms]
+(pass) Delete Selection validates the first malformed evidence edges before later valid values [0.60ms]
+(pass) Delete Selection preserves original revision evidence failure undefined [0.77ms]
+(pass) Delete Selection preserves original revision evidence failure null [0.61ms]
+(pass) Delete Selection preserves original revision evidence failure false [0.61ms]
+(pass) Delete Selection preserves original revision evidence failure 0 [0.80ms]
+(pass) Delete Selection preserves original revision evidence failure "" [0.67ms]
+(pass) Delete Selection preserves original revision evidence failure Symbol(evidence read) [0.67ms]
+(pass) Delete Selection preserves original revision evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.66ms]
+(pass) Delete Selection preserves original nodes evidence failure undefined [0.69ms]
+(pass) Delete Selection preserves original nodes evidence failure null [2.39ms]
+(pass) Delete Selection preserves original nodes evidence failure false [0.91ms]
+(pass) Delete Selection preserves original nodes evidence failure 0 [0.80ms]
+(pass) Delete Selection preserves original nodes evidence failure "" [0.80ms]
+(pass) Delete Selection preserves original nodes evidence failure Symbol(evidence read) [0.82ms]
+(pass) Delete Selection preserves original nodes evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.71ms]
+(pass) Delete Selection preserves original edges evidence failure undefined [0.67ms]
+(pass) Delete Selection preserves original edges evidence failure null [0.64ms]
+(pass) Delete Selection preserves original edges evidence failure false [0.68ms]
+(pass) Delete Selection preserves original edges evidence failure 0 [0.66ms]
+(pass) Delete Selection preserves original edges evidence failure "" [0.69ms]
+(pass) Delete Selection preserves original edges evidence failure Symbol(evidence read) [0.65ms]
+(pass) Delete Selection preserves original edges evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.74ms]
+(pass) Delete Selection preserves original length evidence failure undefined [0.91ms]
+(pass) Delete Selection preserves original length evidence failure null [0.76ms]
+(pass) Delete Selection preserves original length evidence failure false [0.88ms]
+(pass) Delete Selection preserves original length evidence failure 0 [0.78ms]
+(pass) Delete Selection preserves original length evidence failure "" [0.83ms]
+(pass) Delete Selection preserves original length evidence failure Symbol(evidence read) [0.76ms]
+(pass) Delete Selection preserves original length evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.70ms]
+(pass) Delete Selection preserves original index evidence failure undefined [0.74ms]
+(pass) Delete Selection preserves original index evidence failure null [0.72ms]
+(pass) Delete Selection preserves original index evidence failure false [0.67ms]
+(pass) Delete Selection preserves original index evidence failure 0 [0.64ms]
+(pass) Delete Selection preserves original index evidence failure "" [0.64ms]
+(pass) Delete Selection preserves original index evidence failure Symbol(evidence read) [0.77ms]
+(pass) Delete Selection preserves original index evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.74ms]
+(pass) Delete Selection rejects sparse, hidden-invalid and lazily invalid evidence entities [1.02ms]
+(pass) Delete Selection captures evidence revision before Nodes before Edges and rejects malformed empty Selection evidence [0.82ms]
+(pass) Delete Selection preserves native evidence nodes length normalization and failures [0.84ms]
+(pass) Delete Selection preserves native evidence edges length normalization and failures [0.66ms]
+
+packages/plugin-interaction/tests/shortcut-values.test.ts:
+(pass) Shortcut definition retains the nonempty code accepted from a getter [0.05ms]
+(pass) Shortcut definition retains the nonempty alternatives accepted from a getter [0.03ms]
+(pass) Shortcut definition retains the modifier value accepted from a getter [0.03ms]
+(pass) Shortcut retains first enumerable alt value false [0.04ms]
+(pass) Shortcut retains first enumerable alt value true
+(pass) Shortcut retains first inherited alt value false
+(pass) Shortcut retains first inherited alt value true
+(pass) Shortcut retains first non-enumerable alt value false [0.04ms]
+(pass) Shortcut retains first non-enumerable alt value true
+(pass) Shortcut retains first enumerable control value false
+(pass) Shortcut retains first enumerable control value true
+(pass) Shortcut retains first inherited control value false
+(pass) Shortcut retains first inherited control value true
+(pass) Shortcut retains first non-enumerable control value false
+(pass) Shortcut retains first non-enumerable control value true
+(pass) Shortcut retains first enumerable meta value false
+(pass) Shortcut retains first enumerable meta value true
+(pass) Shortcut retains first inherited meta value false
+(pass) Shortcut retains first inherited meta value true
+(pass) Shortcut retains first non-enumerable meta value false [0.03ms]
+(pass) Shortcut retains first non-enumerable meta value true [0.04ms]
+(pass) Shortcut retains first enumerable shift value false
+(pass) Shortcut retains first enumerable shift value true
+(pass) Shortcut retains first inherited shift value false
+(pass) Shortcut retains first inherited shift value true
+(pass) Shortcut retains first non-enumerable shift value false
+(pass) Shortcut retains first non-enumerable shift value true
+(pass) Shortcut preserves the original code getter failure undefined [0.07ms]
+(pass) Shortcut preserves the original code getter failure null
+(pass) Shortcut preserves the original code getter failure false
+(pass) Shortcut preserves the original code getter failure 0
+(pass) Shortcut preserves the original code getter failure ""
+(pass) Shortcut preserves the original code getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original modifierAlternatives getter failure undefined
+(pass) Shortcut preserves the original modifierAlternatives getter failure null
+(pass) Shortcut preserves the original modifierAlternatives getter failure false
+(pass) Shortcut preserves the original modifierAlternatives getter failure 0
+(pass) Shortcut preserves the original modifierAlternatives getter failure ""
+(pass) Shortcut preserves the original modifierAlternatives getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original alt getter failure undefined [0.02ms]
+(pass) Shortcut preserves the original alt getter failure null
+(pass) Shortcut preserves the original alt getter failure false
+(pass) Shortcut preserves the original alt getter failure 0
+(pass) Shortcut preserves the original alt getter failure ""
+(pass) Shortcut preserves the original alt getter failure Symbol(Shortcut getter) [0.01ms]
+(pass) Shortcut preserves the original control getter failure undefined
+(pass) Shortcut preserves the original control getter failure null [0.03ms]
+(pass) Shortcut preserves the original control getter failure false
+(pass) Shortcut preserves the original control getter failure 0
+(pass) Shortcut preserves the original control getter failure ""
+(pass) Shortcut preserves the original control getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original meta getter failure undefined
+(pass) Shortcut preserves the original meta getter failure null
+(pass) Shortcut preserves the original meta getter failure false
+(pass) Shortcut preserves the original meta getter failure 0
+(pass) Shortcut preserves the original meta getter failure ""
+(pass) Shortcut preserves the original meta getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original shift getter failure undefined
+(pass) Shortcut preserves the original shift getter failure null
+(pass) Shortcut preserves the original shift getter failure false [0.01ms]
+(pass) Shortcut preserves the original shift getter failure 0
+(pass) Shortcut preserves the original shift getter failure ""
+(pass) Shortcut preserves the original shift getter failure Symbol(Shortcut getter)
+(pass) Shortcut rejects the first empty code before reading alternatives [0.08ms]
+(pass) Shortcut rejects the first empty alternatives instead of accepting a later collection [0.04ms]
+(pass) Shortcut rejects the first invalid alt without reading later fields [0.08ms]
+(pass) Shortcut rejects the first invalid control without reading later fields [0.05ms]
+(pass) Shortcut rejects the first invalid meta without reading later fields
+(pass) Shortcut rejects the first invalid shift without reading later fields
+(pass) Shortcut owns its alternatives and modifier shells after caller mutation [0.05ms]
+
+packages/plugin-interaction/tests/create-edge-command.test.ts:
+(pass) Create Edge commits one complete Node-level Edge [1.36ms]
+
+packages/plugin-interaction/tests/selection-transition.test.ts:
+(pass) a Port click selects its owning Node without inventing a Port selection [0.06ms]
+
+packages/plugin-interaction/tests/config.test.ts:
+(pass) Interaction accepts an explicit synchronous Connection materializer [0.62ms]
+(pass) Interaction rejects unknown config fields through Plugin installation [0.63ms]
+(pass) Interaction rejects malformed numeric config without coercion [1.77ms]
+(pass) Interaction revalidates the materializer on recovery and preserves its read failure [0.88ms]
+
+packages/plugin-interaction/tests/move-input-values.test.ts:
+(pass) Move Nodes cannot substitute a stale target through repeated caller array traversal [2.72ms]
+(pass) Move Nodes retains valid first values from own fields and receivers [1.05ms]
+(pass) Move Nodes retains valid first values from non-enumerable fields and receivers [0.80ms]
+(pass) Move Nodes retains valid first values from inherited fields and receivers [0.90ms]
+(pass) Move Nodes preserves the original moves read failure before committing [0.85ms]
+(pass) Move Nodes preserves the original length read failure before committing [0.69ms]
+(pass) Move Nodes preserves the original entry read failure before committing [0.67ms]
+(pass) Move Nodes preserves the original nodeId read failure before committing [0.60ms]
+(pass) Move Nodes preserves the original basePosition read failure before committing [0.59ms]
+(pass) Move Nodes preserves the original base.x read failure before committing [0.68ms]
+(pass) Move Nodes preserves the original base.y read failure before committing [0.63ms]
+(pass) Move Nodes preserves the original position read failure before committing [0.63ms]
+(pass) Move Nodes preserves the original position.x read failure before committing [0.65ms]
+(pass) Move Nodes preserves the original position.y read failure before committing [0.62ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [0.70ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [0.66ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [0.63ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [0.59ms]
+(pass) Move Nodes observes abort before any input read [0.69ms]
+(pass) Move Nodes retains the first nonfinite basePosition.x, rather than a later finite value [0.69ms]
+(pass) Move Nodes retains the first nonfinite basePosition.y, rather than a later finite value [0.60ms]
+(pass) Move Nodes retains the first nonfinite position.x, rather than a later finite value [0.59ms]
+(pass) Move Nodes retains the first nonfinite position.y, rather than a later finite value [0.59ms]
+(pass) Move Nodes keeps whole-input shape failures before duplicate validation [0.68ms]
+(pass) Move Nodes keeps whole-input shape failures before nonfinite validation [0.62ms]
+(pass) Move Nodes rejects a sparse indexed entry even if caller hooks hide it [0.69ms]
+(pass) Move Nodes does not call caller traversal, map, constructor or species hooks [0.71ms]
+(pass) Move Nodes retains native array-like positive length normalization %s [0.72ms]
+(pass) Move Nodes retains native array-like positive length normalization 1.5 [0.64ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.66ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.62ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.63ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.76ms]
+(pass) Move Nodes rejects a native-normalized empty input length 0 [0.69ms]
+(pass) Move Nodes exposes native length coercion failure %s before entries [0.76ms]
+(pass) Move Nodes exposes native length coercion failure %s before entries [0.67ms]
+(pass) Move Nodes reads the length conversion once and cannot hide the original first entry failure behind allocation [0.73ms]
+(pass) Move Nodes retains owned earlier Point values, Node fields and one atomic History entry [2.18ms]
+
+packages/plugin-interaction/tests/lifecycle.test.ts:
+(pass) Shortcut Binding preserves the Command accepted from a caller getter [1.80ms]
+(pass) captured modifier values retain distinct Shortcut matching and reservations [0.84ms]
+(pass) Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh [1.25ms]
+(pass) Delete Selection registration follows dependency reactivation and disposal lifecycle [0.96ms]
+(pass) Connection materializer failure keeps identity and reports exactly once after terminal cleanup [2.15ms]
+(pass) Connection dependency recovery creates a fresh idle Activation [0.81ms]
+(pass) Connection final Hit Test failure still clears Preview and releases Capture [0.58ms]
+(pass) Connection Escape attempts every terminal cleanup and never materializes after cleanup failure [0.63ms]
+(pass) Box Selection disposal continues after every public Renderer cleanup failure [0.81ms]
+(pass) Box Selection escape exposes every terminal cleanup failure [0.57ms]
+(pass) Box Selection pointer-cancel exposes every terminal cleanup failure [0.48ms]
+(pass) Interaction dependency recovery creates a fresh idle Activation [0.89ms]
+(pass) an input-driven Command rejection is reported exactly once while Interaction is active [1.98ms]
+(pass) a late Command rejection cannot report through an ended Interaction Activation [1.88ms]
+(pass) a recovered Renderer reset receives the still-compatible Active Gesture again [2.00ms]
+
+packages/plugin-interaction/tests/move-nodes-command.test.ts:
+(pass) Move Nodes rejects an empty input without changing Document [0.80ms]
+
+packages/plugin-interaction/tests/diagnostic-events.test.ts:
+(pass) publishes the stable Interaction diagnostic event catalog
+
+packages/plugin-interaction/tests/port-connection.test.ts:
+(pass) Port Gesture tracks target loss, materializes exact Endpoints once, and cancels on source loss [2.61ms]
+(pass) Connection Gesture uses the materializer accepted before its getter changes [2.14ms]
+
+packages/plugin-interaction/tests/delete-selection-input.test.ts:
+(pass) a live Interaction Shortcut Binding executes its Command and prevents the matched input default [3.66ms]
+(pass) logical Delete key removes the current Selection through the public Renderer Input seam [2.12ms]
+(pass) physical Delete accepts modifiers and repeat while empty Selection and Backspace remain no-ops [3.29ms]
+(pass) Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connection without cancelling them [8.11ms]
+(pass) Delete Transaction failure preserves state and reports the original diagnostic identity exactly once [2.20ms]
+
+packages/plugin-clipboard/tests/behavior.test.ts:
+(pass) Copy keeps empty and edge-only Selection as no-ops without codec or transport calls [0.87ms]
+(pass) History Undo removes a Paste and Redo restores only the Document [1.30ms]
+(pass) Clipboard preserves nested parents, ports, self-loops, parallel Edges, and boundary scope [0.87ms]
+(pass) Paste rejects a missing external parent immediately before commit [0.77ms]
+(pass) Paste preserves its Commit but rejects when a newer Selection wins [0.61ms]
+(pass) concurrent Paste Commands are independent and repeated Paste keeps one deterministic offset [0.68ms]
+(pass) Copy and Paste execute independently without queuing or rewriting the captured Fragment [0.76ms]
+
+packages/plugin-clipboard/tests/index.test.ts:
+(pass) Copy captures one committed selected-node Fragment before writing text [0.55ms]
+(pass) Paste reads, validates, materializes, commits once, and selects the pasted Fragment [0.67ms]
+
+packages/plugin-clipboard/tests/types.test.ts:
+(pass) publishes typed Clipboard behavior and Shortcut Plugins [1.63ms]
+
+packages/plugin-clipboard/tests/duplicate-composition.test.ts:
+(pass) Duplicate and Clipboard compose through one Host and shared Canvas Fragment seam [1.80ms]
+
+packages/plugin-clipboard/tests/shortcut.test.ts:
+(pass) default Clipboard Shortcuts route exact Mod+C and Mod+V through Interaction [5.23ms]
+
+packages/plugin-clipboard/tests/lifecycle.test.ts:
+(pass) Clipboard disposal aborts and awaits an in-flight external read without residual registrations [0.64ms]
+(pass) caller cancellation keeps its reason and dependency recovery creates fresh Clipboard registrations [0.92ms]
+
+packages/plugin-clipboard/tests/factory.test.ts:
+(pass) Copy and Paste retain the accepted transport property [0.70ms]
+(pass) Copy and Paste retain the accepted readText property [0.45ms]
+(pass) Copy and Paste retain the accepted writeText property [0.46ms]
+(pass) Copy and Paste retain the accepted codec property [0.59ms]
+(pass) Copy and Paste retain the accepted encode property [0.46ms]
+(pass) Copy and Paste retain the accepted decode property [0.45ms]
+(pass) Copy and Paste retain the accepted materializeIds property [0.48ms]
+(pass) Copy and Paste retain the accepted offset property [0.46ms]
+(pass) Copy and Paste retain the accepted x property [0.42ms]
+(pass) Copy and Paste retain the accepted y property [0.40ms]
+(pass) factory keeps the original transport getter exception [0.08ms]
+(pass) factory keeps the original readText getter exception
+(pass) factory keeps the original writeText getter exception
+(pass) factory keeps the original codec getter exception
+(pass) factory keeps the original encode getter exception
+(pass) factory keeps the original decode getter exception
+(pass) factory keeps the original materializeIds getter exception
+(pass) factory keeps the original offset getter exception
+(pass) factory keeps the original x getter exception
+(pass) factory keeps the original y getter exception
+(pass) factory rejects invalid transport before reading codec [0.04ms]
+(pass) factory rejects invalid readText before reading writeText
+(pass) factory rejects invalid writeText before reading codec
+(pass) factory rejects invalid codec before reading materializeIds
+(pass) factory rejects invalid encode before reading decode
+(pass) factory rejects invalid decode before reading materializeIds
+(pass) factory rejects invalid materializeIds before reading offset
+(pass) factory rejects invalid x before reading y
+(pass) factory rejects unknown fields before invoking configuration getters [0.06ms]
+(pass) factory preserves omitted, nullish, and zero offsets: undefined [0.59ms]
+(pass) factory preserves omitted, nullish, and zero offsets: null [0.47ms]
+(pass) factory preserves omitted, nullish, and zero offsets: {
+  x: 0,
+  y: 0,
+} [0.44ms]
+(pass) factory owns its accepted shell while keeping application inputs mutable [0.56ms]
+
+packages/plugin-clipboard/tests/failures.test.ts:
+(pass) Clipboard external transport and codec failures keep stable identities and original causes [1.85ms]
+(pass) Paste rejects foreign decoded values and incomplete mapping without a Commit [1.78ms]
+(pass) Paste rejects a decoded Fragment whose normalized Node collection is empty [0.47ms]
+(pass) Paste wraps a Kernel validation rejection as COMMIT_FAILED without partial state [0.56ms]
+(pass) Paste rejects occupied materialized Node and Edge IDs atomically [1.01ms]
+
+packages/plugin-duplicate-selection/tests/index.test.ts:
+(pass) Duplicate Selection factories reject malformed config structurally [0.06ms]
+(pass) Duplicate Selection copies the current Node and selects its duplicate as one History entry [1.04ms]
+(pass) Duplicate Selection captures the validated materializer for execution [0.62ms]
+(pass) Duplicate Selection captures the finite offset coordinates accepted at creation [0.62ms]
+(pass) Duplicate Selection captures its offset reference and retains an explicit zero copy [0.58ms]
+(pass) Duplicate Selection preserves validation short circuits before later option reads [0.10ms]
+(pass) Duplicate Selection preserves original option getter failures [0.08ms]
+(pass) Duplicate Selection remaps nested Nodes, ports, self-loops, and parallel internal Edges only [0.84ms]
+(pass) Duplicate Selection preserves an unselected parent and does not copy unselected descendants [0.71ms]
+(pass) Duplicate Selection keeps empty and edge-only Selection as no-ops without materialization [0.55ms]
+(pass) Duplicate Selection rejects incomplete ID mapping atomically [0.67ms]
+(pass) Duplicate Selection rejects extra, duplicate, colliding, and async ID materialization [2.22ms]
+(pass) Duplicate Selection preserves an application materializer failure identity [0.56ms]
+(pass) Duplicate Selection rejects same-value source ABA without blocking unrelated Commits [0.67ms]
+(pass) Duplicate Selection rejects a new internal Edge and same-value internal Edge ABA [1.32ms]
+(pass) Undo removes Duplicate Selection and Redo restores Document without reselecting [0.67ms]
+(pass) Duplicate Selection preserves a Commit but does not overwrite newer Selection from a Commit observer [0.63ms]
+(pass) Duplicate Selection wraps post-Commit Session loss with the committed revision [0.56ms]
+
+packages/plugin-duplicate-selection/tests/types.test.ts:
+(pass) publishes typed Duplicate Selection behavior and Shortcut Plugins [0.08ms]
+
+packages/plugin-duplicate-selection/tests/mapping-input.test.ts:
+(pass) Duplicate rejects actual invalid nodes mappings instead of custom map output [0.84ms]
+(pass) Duplicate rejects actual invalid edges mappings instead of custom map output [0.59ms]
+(pass) Duplicate retains the nodes collection accepted before translation [0.67ms]
+(pass) Duplicate retains the edges collection accepted before translation [0.51ms]
+(pass) Duplicate accepts frozen mappings without consulting collection hooks [0.61ms]
+(pass) Duplicate preserves the original nodes element read failure [0.49ms]
+(pass) Duplicate preserves the original edges element read failure [2.16ms]
+(pass) Duplicate rejects an invalid Node collection before reading Edge mappings [0.65ms]
+(pass) Duplicate retains native mapping index behavior for hole [0.56ms]
+(pass) Duplicate retains native mapping index behavior for inherited [0.68ms]
+(pass) Duplicate retains native mapping index behavior for string-length [0.77ms]
+
+packages/plugin-duplicate-selection/tests/shortcut.test.ts:
+(pass) the Duplicate Shortcut factory captures its option reference once [0.05ms]
+(pass) the Duplicate Shortcut factory preserves captured invalid values and getter failures [0.13ms]
+(pass) the default Duplicate Shortcut invokes the public behavior through Mod+D [2.56ms]
+
+packages/plugin-duplicate-selection/tests/lifecycle.test.ts:
+(pass) Duplicate Selection registration follows dependency loss, reactivation, and disposal [0.98ms]
+
+ 451 pass
+ 0 fail
+ 2832 expect() calls
+Ran 451 tests across 34 files. [629.00ms]
+
+Exit code: 0
+
+Post-test audit: git rev-parse HEAD HEAD^{tree}; git status --porcelain; git show -s --format=%P HEAD; git merge-base BASE HEAD; canonical git diff --binary BASE HEAD byte/SHA comparison; prepared task/source/target/current empty discussion/pr-risk policy checks; git diff --check BASE HEAD; git log BASE..HEAD --oneline.
+REVIEW IDENTITY {"taskDigest": "99febd96154ef7db40a4451f336d1fa3a68344b3e0b1c4e92b19d56135b40d98", "head": "1bdfa894f0e1081ef18dc8459108d127653f971b", "tree": "5db45010568a9ea7141005ce29ad0b4d12d20bc8", "patch": "61009ea6271e44f300cab49c8be741e41190832bac705e384f590b2d34a6fdea", "changedFiles": ["packages/plugin-interaction/src/shortcut-runtime.ts", "packages/plugin-interaction/src/shortcut-value.ts", "packages/plugin-interaction/tests/lifecycle.test.ts", "packages/plugin-interaction/tests/shortcut-values.test.ts"], "base": "6fd2d016f6330cc422508b3e51229bea4be2cce0", "expectedParent": "6fd2d016f6330cc422508b3e51229bea4be2cce0", "scriptCommit": "6fd2d016f6330cc422508b3e51229bea4be2cce0", "scriptBlob": "ff11d98b51ba12f0742bdd7750f941268a4d7522", "rawPatch": "/Users/zhou/.codex/local-workflows/nodebraid/runs/b7113488-5488-4455-bdfe-9e19d3e9bd04/change.patch", "worktree": "/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow"}
+POST-TEST FIXED SOURCE / SAVED PATCH / CLEAN TREE / PARENT / TASK / SOURCE DISCUSSION / DEPLOYED RISK POLICY / WHITESPACE: PASS
+1bdfa89 fix: capture shortcut values once
+
+Exit code: 0
+
+Reviewer artifact serialization validation originally exited1: JSONDecodeError: Extra data: line 34 column 2 (char 5081)
+Preserved invalid JSON as standards-evidence-before-newline-correction.json.invalid; replaced only the trailing literal backslash-n with a real newline. Fresh JSON parse, full report equality, risk fields, source HEAD and clean-tree assertions passed. No tests rerun or source changes.

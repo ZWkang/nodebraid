@@ -1,0 +1,21 @@
+{"controls":6,"passed":2,"failed":[{"name":"changing-code","passed":false,"details":{"reads":3,"first":"KeyP","actual":"","nonempty":false}},{"name":"changing-alternatives","passed":false,"details":{"reads":3,"firstLength":1,"actualLength":0}},{"name":"changing-modifier","passed":false,"details":{"reads":2,"first":false,"actual":true}},{"name":"changing-binding-command","passed":false,"details":{"reads":3,"actual":"later","calls":["later"],"renderer":"explicit normalized-input public fixture; no native browser claim"}}],"source":"actual typed compiled public definition and Host/Command/Interaction seam"}
+6130 |   assert.equal(renderer.listeners.size, 0);
+6131 |   record(changing ? "changing-binding-command" : "constant-binding-command", actual === "first" && (!changing || reads === 1), { reads, actual, calls, renderer: "explicit normalized-input public fixture; no native browser claim" });
+6132 | }
+6133 | console.log(JSON.stringify({ controls: results.length, passed: results.filter((x) => x.passed).length, failed: results.filter((x) => !x.passed), source: "actual typed compiled public definition and Host/Command/Interaction seam" }));
+6134 | assert.equal(results.length, 6);
+6135 | assert.ok(results.every((x) => x.passed), "Shortcut normalization must use the same captured values for validation and ownership.");
+                ^
+AssertionError: Shortcut normalization must use the same captured values for validation and ownership.
+ generatedMessage: false,
+     actual: false,
+   expected: true,
+   operator: "==",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261026T115845-discovery-shortcut-owned-values/build/shortcut-repro.js:6135:10
+note: missing sourcemaps for /Users/zhou/.codex/local-workflows/nodebraid/runs/20261026T115845-discovery-shortcut-owned-values/build/shortcut-repro.js
+note: consider bundling with '--sourcemap' to get unminified traces
+
+Bun v1.4.2 (macOS arm64)

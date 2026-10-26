@@ -1,0 +1,95 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/shortcut-values.test.ts:
+(pass) Shortcut definition retains the nonempty code accepted from a getter [0.61ms]
+(pass) Shortcut definition retains the nonempty alternatives accepted from a getter [1.05ms]
+(pass) Shortcut definition retains the modifier value accepted from a getter [0.04ms]
+(pass) Shortcut retains first enumerable alt value false [0.09ms]
+(pass) Shortcut retains first enumerable alt value true
+(pass) Shortcut retains first inherited alt value false [0.21ms]
+(pass) Shortcut retains first inherited alt value true
+(pass) Shortcut retains first non-enumerable alt value false
+(pass) Shortcut retains first non-enumerable alt value true
+(pass) Shortcut retains first enumerable control value false
+(pass) Shortcut retains first enumerable control value true
+(pass) Shortcut retains first inherited control value false
+(pass) Shortcut retains first inherited control value true
+(pass) Shortcut retains first non-enumerable control value false
+(pass) Shortcut retains first non-enumerable control value true
+(pass) Shortcut retains first enumerable meta value false
+(pass) Shortcut retains first enumerable meta value true
+(pass) Shortcut retains first inherited meta value false
+(pass) Shortcut retains first inherited meta value true
+(pass) Shortcut retains first non-enumerable meta value false
+(pass) Shortcut retains first non-enumerable meta value true
+(pass) Shortcut retains first enumerable shift value false
+(pass) Shortcut retains first enumerable shift value true
+(pass) Shortcut retains first inherited shift value false
+(pass) Shortcut retains first inherited shift value true [0.20ms]
+(pass) Shortcut retains first non-enumerable shift value false
+(pass) Shortcut retains first non-enumerable shift value true
+(pass) Shortcut preserves the original code getter failure undefined [0.98ms]
+(pass) Shortcut preserves the original code getter failure null
+(pass) Shortcut preserves the original code getter failure false
+(pass) Shortcut preserves the original code getter failure 0
+(pass) Shortcut preserves the original code getter failure ""
+(pass) Shortcut preserves the original code getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original modifierAlternatives getter failure undefined
+(pass) Shortcut preserves the original modifierAlternatives getter failure null
+(pass) Shortcut preserves the original modifierAlternatives getter failure false
+(pass) Shortcut preserves the original modifierAlternatives getter failure 0
+(pass) Shortcut preserves the original modifierAlternatives getter failure ""
+(pass) Shortcut preserves the original modifierAlternatives getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original alt getter failure undefined [0.43ms]
+(pass) Shortcut preserves the original alt getter failure null
+(pass) Shortcut preserves the original alt getter failure false
+(pass) Shortcut preserves the original alt getter failure 0
+(pass) Shortcut preserves the original alt getter failure ""
+(pass) Shortcut preserves the original alt getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original control getter failure undefined
+(pass) Shortcut preserves the original control getter failure null
+(pass) Shortcut preserves the original control getter failure false
+(pass) Shortcut preserves the original control getter failure 0
+(pass) Shortcut preserves the original control getter failure ""
+(pass) Shortcut preserves the original control getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original meta getter failure undefined
+(pass) Shortcut preserves the original meta getter failure null
+(pass) Shortcut preserves the original meta getter failure false
+(pass) Shortcut preserves the original meta getter failure 0
+(pass) Shortcut preserves the original meta getter failure ""
+(pass) Shortcut preserves the original meta getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original shift getter failure undefined
+(pass) Shortcut preserves the original shift getter failure null
+(pass) Shortcut preserves the original shift getter failure false
+(pass) Shortcut preserves the original shift getter failure 0
+(pass) Shortcut preserves the original shift getter failure ""
+(pass) Shortcut preserves the original shift getter failure Symbol(Shortcut getter)
+(pass) Shortcut rejects the first empty code before reading alternatives [2.46ms]
+(pass) Shortcut rejects the first empty alternatives instead of accepting a later collection [0.06ms]
+(pass) Shortcut rejects the first invalid alt without reading later fields [1.33ms]
+(pass) Shortcut rejects the first invalid control without reading later fields [0.62ms]
+(pass) Shortcut rejects the first invalid meta without reading later fields
+(pass) Shortcut rejects the first invalid shift without reading later fields [0.04ms]
+(pass) Shortcut owns its alternatives and modifier shells after caller mutation [0.05ms]
+
+packages/plugin-interaction/tests/lifecycle.test.ts:
+(pass) Shortcut Binding preserves the Command accepted from a caller getter [25.77ms]
+(pass) captured modifier values retain distinct Shortcut matching and reservations [3.26ms]
+(pass) Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh [3.92ms]
+(pass) Delete Selection registration follows dependency reactivation and disposal lifecycle [3.47ms]
+(pass) Connection materializer failure keeps identity and reports exactly once after terminal cleanup [5.80ms]
+(pass) Connection dependency recovery creates a fresh idle Activation [3.96ms]
+(pass) Connection final Hit Test failure still clears Preview and releases Capture [2.12ms]
+(pass) Connection Escape attempts every terminal cleanup and never materializes after cleanup failure [1.37ms]
+(pass) Box Selection disposal continues after every public Renderer cleanup failure [1.54ms]
+(pass) Box Selection escape exposes every terminal cleanup failure [1.05ms]
+(pass) Box Selection pointer-cancel exposes every terminal cleanup failure [1.06ms]
+(pass) Interaction dependency recovery creates a fresh idle Activation [1.73ms]
+(pass) an input-driven Command rejection is reported exactly once while Interaction is active [2.51ms]
+(pass) a late Command rejection cannot report through an ended Interaction Activation [2.30ms]
+(pass) a recovered Renderer reset receives the still-compatible Active Gesture again [3.28ms]
+
+ 85 pass
+ 0 fail
+ 287 expect() calls
+Ran 85 tests across 2 files. [159.00ms]
