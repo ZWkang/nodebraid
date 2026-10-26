@@ -58,6 +58,58 @@ const server = Bun.serve({
 
 try {
   await runAgentBrowser(['open', server.url.href]);
+  let toleranceCases = 0;
+  for (const field of ['edgeHitTolerance', 'connectionAnchorHitTolerance'] as const) {
+    for (const kind of ['own', 'inherited', 'non-enumerable'] as const) {
+      for (const scenario of ['infinite', 'nan', 'negative', 'absent', 'zero', 'six'] as const) {
+        const invalid = ['infinite', 'nan', 'negative'].includes(scenario);
+        const hitTypes = invalid
+          ? []
+          : scenario === 'zero'
+            ? ['canvas', 'canvas']
+            : field === 'edgeHitTolerance'
+              ? scenario === 'six'
+                ? ['edge', 'edge']
+                : ['edge', 'canvas']
+              : scenario === 'six'
+                ? ['connection-anchor', 'canvas']
+                : ['connection-anchor', 'connection-anchor'];
+        await assertBrowserScenario(
+          `globalThis.__nodebraidRendererSvgToleranceCapture(${JSON.stringify(field)}, ${JSON.stringify(kind)}, ${JSON.stringify(scenario)})`,
+          {
+            case: [field, kind, scenario].join(':'),
+            code: invalid ? 'INVALID_CONFIG' : null,
+            reads: 1,
+            receiverCorrect: true,
+            targetUnchanged: invalid,
+            originalError: false,
+            reusable: true,
+            hitTypes,
+          },
+        );
+        toleranceCases += 1;
+      }
+    }
+    for (let index = 0; index < 6; index += 1) {
+      const scenario = `throw-${index}`;
+      await assertBrowserScenario(
+        `globalThis.__nodebraidRendererSvgToleranceCapture(${JSON.stringify(field)}, 'own', ${JSON.stringify(scenario)})`,
+        {
+          case: [field, 'own', scenario].join(':'),
+          code: null,
+          reads: 1,
+          receiverCorrect: true,
+          targetUnchanged: true,
+          originalError: true,
+          reusable: true,
+          hitTypes: [],
+        },
+      );
+      toleranceCases += 1;
+    }
+  }
+  assert.equal(toleranceCases, 48);
+  console.log('SVG tolerance capture: 48 public browser cases passed.');
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket01()', {
     callerContentPreserved: true,
     targetChildOrder: ['defs', 'g'],
