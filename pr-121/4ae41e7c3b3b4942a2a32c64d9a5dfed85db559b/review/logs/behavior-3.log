@@ -1,0 +1,9 @@
+bun test v1.4.2 (744846f84)
+
+packages/kernel/tests/edge-endpoint-values.test.ts:
+(pass) an Edge Writer retains the first source Port ID while copying its Endpoint [0.76ms]
+
+ 1 pass
+ 0 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [10.00ms]

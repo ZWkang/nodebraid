@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "b58f1b17ab5ce3d64780c329cf0af1703b86a4e3",
+    "expectedParent": "b58f1b17ab5ce3d64780c329cf0af1703b86a4e3",
+    "head": "4ae41e7c3b3b4942a2a32c64d9a5dfed85db559b",
+    "tree": "3f189e61617cd7e4d8d2fc061cc7bb91aae3563e",
+    "patch": "b96e04e2723786126efa08e85ff053cb50fb14d78cd2a9ed2033090bf6d5a839",
+    "localHead": "7c80696d1b8aa54233c89842fff15b6bfddd9575"
+  },
+  "task": {
+    "run": "e1a42bd4-ea60-468b-9da7-4c156c1df78c",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 120
+    },
+    "request": "## Confirmed defect\n\nOn fetched main `b58f1b17ab5ce3d64780c329cf0af1703b86a4e3`, both direct Kernel Edge Writers reread a present Endpoint `portId` while copying its owned shell. The first value is used for the presence test, then a second read supplies the stored value.\n\nA separately typechecked program runs **24 actual compiled public Kernel cases**: add/replace × source/target × six getter behaviors. Every getter returns values compatible with the public `string | undefined` type; no malformed input cast or private API is used.\n\n- Eight changing-present/first-empty cases commit `replacement-port` instead of the first `first-port` or empty string.\n- Four valid-first/later-throw cases fail on the unnecessary second read instead of accepting the first valid port.\n- Four stable-present cases also read twice. Eight absent-first controls already read once and pass.\n- Owned shells are frozen and opaque data references remain intact in successful controls. Failures preserve the exact committed View.\n\nThe public assertion requiring first-value capture exits **1**; the independent TypeScript check exits **0**. Original source, compiled artifact provenance, all observations and failure output are retained in investigation `20261026T045355-discovery-kernel-endpoint-values`: `kernel-endpoint-probe.ts`, `compiled-red.log`, `observations.json`.\n\n## Contract and cause\n\n[ADR0012](https://github.com/ZWkang/nodebraid/blob/b58f1b17ab5ce3d64780c329cf0af1703b86a4e3/docs/adr/0012-keep-domain-data-opaque-to-kernel.md) assigns copying/freezing of Kernel-owned Endpoint shells to Kernel and preserves opaque application data. [ADR0010](https://github.com/ZWkang/nodebraid/blob/b58f1b17ab5ce3d64780c329cf0af1703b86a4e3/docs/adr/0010-bind-canvas-query-to-snapshot-revision.md) binds Snapshot and Query to consistent committed evidence. Replay already captures Endpoint structural fields once before application.\n\nIn [`freezeEdgeEndpoint`](https://github.com/ZWkang/nodebraid/blob/b58f1b17ab5ce3d64780c329cf0af1703b86a4e3/packages/kernel/src/entity-values.ts), the conditional spread reads `endpoint.portId` for both presence and copying. The shared copy owner is used by direct `edges.add` and `edges.replace`.\n\n## Acceptance\n\n- Capture a direct incoming Endpoint's Node ID and optional Port ID once while copying, and retain the first Port ID for both presence and the frozen value.\n- Cover source and target for add and replace: changing valid values, empty string, absent optional value, valid-first/later-throw and ordinary values. Preserve readable inherited/non-enumerable properties and original receivers.\n- Preserve first-read external thrown-value identity, Writer closed/duplicate/missing/mismatched-ID precedence, source-before-target/data read order, and no partial Draft/index write when a copy failure is caught inside a larger Transaction.\n- Preserve opaque data reference/read phase, independent Node/Edge ID namespaces, temporary/final graph semantics, canonical queries, historical Snapshot/Query/Change Set consistency, net-zero coalescing, and forward/reverse replay.\n- Repair only the shared Endpoint copy owner. No new Port existence/type/role policy, public API, accessor ban, dependency, eager graph validation, cap, retry or fallback.\n- Real public red/green and the original compiled24 controls; related Kernel/History/Document/Interaction checks, affected checks, independent Standards with ponytail-review and Spec, one formal complete check, exact remote tree/first-parent publication, current-head CI, complete immutable reports and all mapped native previews.\n- Keep this Issue open until actual main integration and whole-Issue acceptance.\n\n## Deduplication\n\nComplete all-state collections contain **119 Issue/PR records** through the final short page and **61 PRs**. Full #102 and #89 discussions were read. #102/#103 explicitly limited the direct Writer fix to Node Position/Size/parent fields and excluded Edge Endpoint/Port policy; #89/#91 capture replay-owned records/Endpoints. Neither changes this direct Edge copy owner. #106/#107 capture Create Edge Command input before Kernel writing and do not remove this Kernel optional Port reread. This is a separate bounded copying defect, with no Port policy change.\n",
+    "plan": [
+      {
+        "id": "public-red",
+        "blockedBy": [],
+        "acceptance": "Original typed compiled24 direct Edge/Endpoint cases and a public Kernel regression fail before the source fix; preserve raw source and logs."
+      },
+      {
+        "id": "capture-endpoint-ports",
+        "blockedBy": [
+          "public-red"
+        ],
+        "acceptance": "Shared Endpoint copy owner retains Node ID and optional Port ID once; all first-value, first-error, absence, receiver, writer/index atomicity and existing graph/replay/opaque data behavior remain."
+      },
+      {
+        "id": "integration-and-independent-review",
+        "blockedBy": [
+          "capture-endpoint-ports"
+        ],
+        "acceptance": "Original compiled24 controls, public Kernel/History/Document/Interaction consumers and affected checks pass; independent Standards+ponytail and Spec bind full exact source."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "integration-and-independent-review"
+        ],
+        "acceptance": "Pinned main agents:run verify executes this attempt's sole formal full bun run check after both reviews pass; original failures retained."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Exact actual remote tree/first parent, current head CI, complete paginated feedback and full original report/all5 native previews immutable byte readback pass."
+      },
+      {
+        "id": "authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "Current deployed main policy, strict live protection and all current source/review/CI/feedback/ticket/presentation gates permit immediate normal expected-head merge; read back actual result."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "authorized-merge"
+        ],
+        "acceptance": "Fresh fetched main contains actual merge; original compiled24 and public related controls/build plus full main CI satisfy whole Issue before acceptance publication and closure."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "7c80696d1b8aa54233c89842fff15b6bfddd9575",
+      "tree": "3f189e61617cd7e4d8d2fc061cc7bb91aae3563e",
+      "patch": "b96e04e2723786126efa08e85ff053cb50fb14d78cd2a9ed2033090bf6d5a839",
+      "report": "What this change does: retains the first Endpoint port value for both optional-property presence and the frozen Endpoint copy.\n\n- Base: `b58f1b17ab5ce3d64780c329cf0af1703b86a4e3`\n- Head: `7c80696d1b8aa54233c89842fff15b6bfddd9575`\n- Tree: `3f189e61617cd7e4d8d2fc061cc7bb91aae3563e`\n- Binary patch SHA256: `b96e04e2723786126efa08e85ff053cb50fb14d78cd2a9ed2033090bf6d5a839`\n- Task digest: `59f00ccdd1514770dae1c9b2249b46f68e7a1fd6d27d9da325ba13da892b022c`\n\nReviewed the complete two-file diff, including all 263 new public-test lines; the complete Issue120 request, empty discussion, independent plan and retained red/green evidence. Canonical `git diff --binary BASE HEAD` matches `review.patch` bytewise. HEAD, tree, sole parent, task identity, clean checkout and `git diff --check BASE HEAD` were independently verified.\n\nHard documented standards: no violations found. Node-before-port and source-before-target reads remain ordered; undefined stays omitted and empty strings remain present. Raw getter failures retain identity and occur before opaque-data reads or Draft Map/index/touched mutation. Direct add/replace guards, Snapshot queries, net-zero replacement and transactional replay preserve ADR0010/0011; opaque data retains its reference under ADR0012, and external failures follow ADR0029. Tests exercise observable Kernel behavior and exact thrown values, consistent with `principle-test-behavior-not-implementation`.\n\nJudgment-only smells: no concrete finding across the Fowler baseline. The shared private copying owner fixes the repeated read without new Port policy, abstraction or dependency.\n\nPonytail assessment: correct, safe, tested and lean for an isolated Canvas Kernel. Traced shared Writer add/replace, graph/index validation, replay preflight/application and History, Document, Interaction and Core consumers. The current compiled Endpoint helper also contains one ordered read per field.\n\nIndependent execution: `bun test packages/kernel/tests packages/plugin-kernel/tests packages/plugin-history/tests packages/document/tests packages/plugin-interaction/tests packages/core/tests` exited 0: **660 tests, 4097 assertions**. Full original output is retained in `standards-tests.log`.\n\nNot independently checked: TypeScript, builds, affected/full engineering checks, browsers, remote CI, publication or main acceptance. Coordinator results are not counted as reviewer execution.\n\n**Verdict: passed. Looks good. Ship.**\n"
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "7c80696d1b8aa54233c89842fff15b6bfddd9575",
+      "tree": "3f189e61617cd7e4d8d2fc061cc7bb91aae3563e",
+      "patch": "b96e04e2723786126efa08e85ff053cb50fb14d78cd2a9ed2033090bf6d5a839",
+      "report": "verdict: passed\n\nbase: b58f1b17ab5ce3d64780c329cf0af1703b86a4e3\nhead: 7c80696d1b8aa54233c89842fff15b6bfddd9575\ntree: 3f189e61617cd7e4d8d2fc061cc7bb91aae3563e\nbinary patch SHA256: b96e04e2723786126efa08e85ff053cb50fb14d78cd2a9ed2033090bf6d5a839\ntaskDigest: 59f00ccdd1514770dae1c9b2249b46f68e7a1fd6d27d9da325ba13da892b022c\n\n独立读取 [Issue120](https://github.com/ZWkang/nodebraid/issues/120) 全文、labels 与全部评论。最终读回 2026-10-26 05:04:42 UTC：open、bug/ready-for-agent，评论0，原始 request 未变。读取当前 AGENTS/CONTEXT、tracker/discussion/code-review、ADR0010/0011/0012/0029、prepared 依赖计划、Kernel 公共契约，以及 Writer→owned copy→Draft/index→Commit/Query→replay/History/Document/Interaction 调用链。完整两文件补丁及263行新公共测试均已审查；Git 原始补丁与 review.patch 字节一致，五项身份与 inspection/prepared 完全匹配。\n\n未发现规格遗漏、错误实现或范围扩张。针对 “retain the first Port ID for both presence and the frozen value”，共享 freezeEdgeEndpoint 按原 nodeId→portId 顺序各捕获一次；空字符串保留，undefined 省略，后续 getter 不再替换首值或额外抛错。普通、继承、非枚举 getter 的 receiver 和首异常（含 falsey thrown value）保留。closed/duplicate/missing/mismatched-ID 判断仍在复制之前；两个 Endpoint 全部复制成功后才读 opaque data，完成冻结后才写 Draft/index。新增公共矩阵覆盖 source/target×add/replace、caught-copy-failure 后继续 Transaction、历史 Query、net-zero 与双向 replay。未加入 Port 存在/类型/role 校验，API、Node/Edge namespaces、最终图校验、data 引用与其他 owner 不变。\n\n本轮独立执行 `bun test packages/kernel/tests packages/plugin-kernel/tests packages/plugin-history/tests packages/document/tests packages/plugin-interaction/tests packages/core/tests`：660 pass、0 fail、4097 assertions，36文件，exit0；`git diff --check BASE...HEAD` exit0。测试前后 HEAD/tree/clean 未变。核对当前 dist 单次捕获实现及 compiled24 的代码、记录结果、bundle/入口哈希；既有 tracer red→green 和 compiled24 仅作读取核验，未算作本人运行。完整原始命令及输出保存在 spec-commands.log。\n\n未独立运行 build、类型检查、affected、browser、正式 full check，亦未验证远端发布、当前头 CI、报告/媒体、merge 或实际 main 整项验收；Spec passed 不替代这些交付条件。\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-compiled-red",
+      "acceptance": "Original main24 compiled cases:8 port substitutions and4 unnecessary later exceptions, plus redundant stable reads;8 absence controls pass. Assertion exits1.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/20261026T045355-discovery-kernel-endpoint-values/build-and-run.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "public-red",
+      "acceptance": "Original direct public Edge source Port regression rejects replacement-port instead of first-port before the helper edit.",
+      "command": "bun test packages/kernel/tests/edge-endpoint-values.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "public-tracer-green",
+      "acceptance": "The minimal shared Endpoint capture fix makes the initial1test/2assertion tracer pass.",
+      "command": "bun test packages/kernel/tests/edge-endpoint-values.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "compiled-typecheck",
+      "acceptance": "Original24-case control body is unchanged; only observation source-head metadata is adapted and disclosed. Independent typecheck passes.",
+      "command": "node_modules/.bin/tsc --noEmit -p /Users/zhou/.codex/local-workflows/nodebraid/runs/e1a42bd4-ea60-468b-9da7-4c156c1df78c/compiled-controls/tsconfig.json",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "compiled-green",
+      "acceptance": "Actual reviewed7c80696 source:24/24 typed compiled controls pass, each first optional port captured once; original opaque data/frozen shells/historical View retained.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/e1a42bd4-ea60-468b-9da7-4c156c1df78c/compiled-controls/build-and-run.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "related-public",
+      "acceptance": "Final related Kernel/PluginKernel/History/Document/Interaction/Core working-tree suites pass660tests4097assertions; committed-source independent checks are recorded separately.",
+      "command": "bun test packages/kernel/tests packages/plugin-kernel/tests packages/plugin-history/tests packages/document/tests packages/plugin-interaction/tests packages/core/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "complete-affected",
+      "acceptance": "Exact committed source affected builds/types/tests/React+SVG+Examples native browsers/docs pass.",
+      "command": "bun run check:affected --base origin/main",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "independent-standards",
+      "acceptance": "Independent standards review at exact head/tree/patch/task identity passed; separately executed660tests4097assertions.",
+      "command": "bun test packages/kernel/tests packages/plugin-kernel/tests packages/plugin-history/tests packages/document/tests packages/plugin-interaction/tests packages/core/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "independent-spec",
+      "acceptance": "Independent spec review at exact head/tree/patch/task identity passed; separately executed660tests4097assertions.",
+      "command": "bun test packages/kernel/tests packages/plugin-kernel/tests packages/plugin-history/tests packages/document/tests packages/plugin-interaction/tests packages/core/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-9.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "fb18a6cbd2422d169af9f5a51ea4e99e95f9caedb8049db0823f918ab01e3713"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "b80268ffc5f11ca6eddcb94ab2b8ab11e7c310b1758dc0c189a7debbd3d800ee"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "30d87bbbc4583ba1aa8379f17276f595bb5a9c053d24306ffcf2b08ddc20fe3f"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "86acda30c0b0ebe005ffa6ad155176152067c8fd84e50df0bbaeac916d34888a"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "62cb40dee5074a5626302558d8dae4163194c3b756160ea1ab83b364c4721930"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "54dabcad7fd2f4d68d7f11eedfe0390a19bf190a7057c4f323ab95ce87cc81a1"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "2961be56bf0295ac84be8eeec78b51e399465b02aabe535d3e8750a945178f4a"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "c6822c17e71c34210bc08876059f7210d18b80510b2897f8bd23c876fd82459b"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "280405e6555aa3df6da1de6b0304d32007b36083421cd40619ae3eda47b0b0d6"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "97678da0db261a542ec1397595e54f4d21c123f61dd9df83a67123195d6895cd"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "5a39e87d71c8d86824061b8c76d676453c38f17fdfc58b5f8ebf0f6f03db533b"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "bde2c888356618052d5e3fc9ecd5f20ac4a34fcdb16643e36dac43a5062773db"
+    },
+    {
+      "path": "probes/compiled-controls.md",
+      "kind": "report",
+      "sha256": "d13f77863a507f06402c60473fea6f1bbc9b2452106fd6cf6d2953b316253132"
+    }
+  ]
+}
