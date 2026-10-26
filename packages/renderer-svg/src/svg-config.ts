@@ -76,17 +76,17 @@ function normalizeDomEventPolicy(policy: unknown, field: string): Required<SvgDo
   }
   if (policy !== undefined) assertKnownConfigKeys(policy, ['preventDefault', 'stopPropagation'], `input.${field}`);
   const normalized = policy as SvgDomEventPolicy | undefined;
+  const accepted = { preventDefault: false, stopPropagation: false };
   for (const key of ['preventDefault', 'stopPropagation'] as const) {
-    if (normalized?.[key] !== undefined && typeof normalized[key] !== 'boolean') {
+    const value = normalized?.[key];
+    if (value !== undefined && typeof value !== 'boolean') {
       throw new SvgRendererError('INVALID_CONFIG', 'SVG Renderer DOM event policy values must be boolean.', {
         field: `${field}.${key}`,
       });
     }
+    accepted[key] = value ?? false;
   }
-  return {
-    preventDefault: normalized?.preventDefault ?? false,
-    stopPropagation: normalized?.stopPropagation ?? false,
-  };
+  return accepted;
 }
 
 function assertKnownConfigKeys(value: object, allowedKeys: readonly string[], prefix: string): void {
