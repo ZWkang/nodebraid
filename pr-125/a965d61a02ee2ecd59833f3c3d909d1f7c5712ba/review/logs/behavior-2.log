@@ -1,0 +1,53 @@
+63 |   );
+64 |   await withRendererPageCdp(async (send) => {
+65 |     await send('Input.dispatchMouseEvent', { type: 'mouseWheel', x: policyPoint.x, y: policyPoint.y, deltaX: 0, deltaY: 40 });
+66 |     const result = await evaluateBrowserScenario('globalThis.__nodebraidPolicyRead()');
+67 |     await evaluateBrowserScenario('globalThis.__nodebraidPolicyCleanup()');
+68 |     assert.deepEqual(result, {
+                ^
+AssertionError: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
+    bubbled: 1,
+    flag: 'preventDefault',
+    mode: 'first-true',
++   reads: 3,
+-   reads: 1,
+    receiverCorrect: true,
+    targetEvent: {
+      cancelBubble: false,
++     defaultPrevented: false,
+-     defaultPrevented: true,
+      isTrusted: true
+    },
+    wheelInputs: 1
+  }
+
+ generatedMessage: true,
+     actual: {
+  bubbled: 1,
+  flag: "preventDefault",
+  mode: "first-true",
+  reads: 3,
+  receiverCorrect: true,
+  targetEvent: [Object ...],
+  wheelInputs: 1,
+},
+   expected: {
+  flag: "preventDefault",
+  mode: "first-true",
+  reads: 1,
+  receiverCorrect: true,
+  targetEvent: [Object ...],
+  bubbled: 1,
+  wheelInputs: 1,
+},
+   operator: "deepStrictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/renderer-svg/browser-tests/renderer-contract.browser.ts:68:12
+      at withRendererPageCdp (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/renderer-svg/browser-tests/renderer-contract.browser.ts:2290:11)
+
+Bun v1.4.2 (macOS arm64)

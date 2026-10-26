@@ -1,0 +1,22 @@
+{"cases":8,"nativeTrustedInputs":8,"constantControlsPassed":4,"dynamic":[{"bubbled":1,"flag":"preventDefault","mode":"first-true","reads":3,"receiverCorrect":true,"targetEvent":{"cancelBubble":false,"defaultPrevented":false,"isTrusted":true},"wheelInputs":1},{"bubbled":1,"flag":"preventDefault","mode":"first-absent","reads":2,"receiverCorrect":true,"targetEvent":{"cancelBubble":false,"defaultPrevented":true,"isTrusted":true},"wheelInputs":1},{"bubbled":1,"flag":"stopPropagation","mode":"first-true","reads":3,"receiverCorrect":true,"targetEvent":{"cancelBubble":false,"defaultPrevented":false,"isTrusted":true},"wheelInputs":1},{"bubbled":0,"flag":"stopPropagation","mode":"first-absent","reads":2,"receiverCorrect":true,"targetEvent":{"cancelBubble":true,"defaultPrevented":false,"isTrusted":true},"wheelInputs":1}]}
+49 |  }
+50 |  const dynamic=observations.filter(x=>x.mode.startsWith('first'));
+51 |  console.log(JSON.stringify({cases:8,nativeTrustedInputs:8,constantControlsPassed:4,dynamic}));
+52 |  for(const result of dynamic){
+53 |   const first=result.mode==='first-true';
+54 |   assert.equal(result.targetEvent.defaultPrevented,result.flag==='preventDefault'&&first,JSON.stringify(result));
+              ^
+AssertionError: {"bubbled":1,"flag":"preventDefault","mode":"first-true","reads":3,"receiverCorrect":true,"targetEvent":{"cancelBubble":false,"defaultPrevented":false,"isTrusted":true},"wheelInputs":1}
+
+false !== true
+
+ generatedMessage: false,
+     actual: false,
+   expected: true,
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261026T084642-discovery-svg-wheel-policy-capture/browser-probe.ts:54:10
+
+Bun v1.4.2 (macOS arm64)
