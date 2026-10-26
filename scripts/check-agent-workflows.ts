@@ -10,6 +10,7 @@ const requiredFiles = [
   '.agents/skills/PSTACK-LICENSE',
   'scripts/local-agent.ts',
   'scripts/local-agent-run.ts',
+  'scripts/pr-risk.ts',
   'scripts/local-agent-reconcile.ts',
   'scripts/github-feedback.ts',
   'scripts/discovery.ts',
@@ -18,7 +19,7 @@ const requiredFiles = [
   'scripts/pr-evidence.ts',
   'scripts/verification-report.ts',
   '.agents/skills/verify-nodebraid/SKILL.md',
-  ...['tdd', 'code-review', 'ponytail', 'ponytail-review', 'pr', 'show-me'].map(
+  ...['tdd', 'code-review', 'ponytail', 'ponytail-review', 'pr', 'pr-risk', 'show-me'].map(
     (name) => `.agents/skills/${name}/SKILL.md`,
   ),
   ...[

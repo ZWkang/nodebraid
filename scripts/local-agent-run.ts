@@ -7,6 +7,7 @@ import {
   type FeedbackSnapshot,
 } from './pr-feedback';
 import { planFrontier, type PlanStep } from './discovery-queue';
+import { summarizeRisk, type RiskAssessment } from './pr-risk';
 
 export interface RunInput {
   run: string;
@@ -29,6 +30,7 @@ export interface ReviewEvidence {
   tree: string;
   patch: string;
   report: string;
+  risk?: RiskAssessment;
 }
 export interface VerifiedRun {
   taskDigest: string;
@@ -38,6 +40,7 @@ export interface VerifiedRun {
   checks: { command: string; exitCode: number; log: string; stable: boolean };
   reviews: { standards: ReviewEvidence; spec: ReviewEvidence };
   decisions: Decision[];
+  changedFiles?: string[];
 }
 export interface Publication {
   taskDigest: string;
@@ -118,6 +121,7 @@ export function validateVerification(task: PreparedRun, verified: VerifiedRun): 
       throw new Error('Both reviews must pass and identify the exact checked head/tree/patch.');
     }
   }
+  summarizeRisk(verified.reviews, verified.changedFiles);
   validateReceipt(
     {
       number: task.source.number,
@@ -148,6 +152,7 @@ export function evaluateVerifiedRun(
   pr: FeedbackSnapshot,
 ) {
   validateVerification(task, verified);
+  const risk = summarizeRisk(verified.reviews, verified.changedFiles);
   if (
     publication.taskDigest !== task.digest ||
     publication.localHead !== verified.head ||
@@ -166,6 +171,8 @@ export function evaluateVerifiedRun(
     return {
       status: 'waiting-verification' as const,
       reason: 'Legacy run lacks baseRefName or expectedParent; prepare a new run.',
+      risk,
+      autoMergeCandidate: false,
     };
   if (publication.parent !== task.expectedParent)
     throw new Error('Publication does not match the independently prepared append parent.');
@@ -173,8 +180,11 @@ export function evaluateVerifiedRun(
     return {
       status: 'waiting-verification' as const,
       reason: 'PR head or base changed; prepare and verify a new run.',
+      risk,
+      autoMergeCandidate: false,
     };
   if (pr.statusCheckRollup.some((check) => check.headSha !== pr.headRefOid))
     throw new Error('Check head is unverified.');
-  return evaluateFeedback(pr, task.repository, verified.decisions);
+  const result = evaluateFeedback(pr, task.repository, verified.decisions);
+  return { ...result, risk, autoMergeCandidate: result.status === 'ready' && risk.level === 'low' };
 }

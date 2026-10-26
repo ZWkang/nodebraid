@@ -101,6 +101,12 @@ test.each(['initial', 'append', 'main-sync'] as const)(
         patch,
         verdict: 'passed',
         report: 'Execution-layer fixture metadata; not an independent reviewer result.',
+        risk: {
+          level: 'medium',
+          rationale: 'The fixture changes application behavior.',
+          evidence: 'The execution-layer fixture runs a real check process.',
+          rollback: 'Revert the fixture implementation commit.',
+        },
       };
       json('.tmp/reviews.json', { standards: fixtureReview, spec: fixtureReview });
       json('.tmp/decisions.json', []);

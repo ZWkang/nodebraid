@@ -2,7 +2,7 @@
 
 本流程把已执行的独立 Standards/Spec 审查、工程检查与真实 Examples Application 操作
 放到 PR 可访问的位置。源代码、完整检查、界面场景和证据发布各自有结果；截图或成功上传
-不能替代其他结果。执行资格、用户确认范围与最终人工合并仍由
+不能替代其他结果。执行资格、用户确认范围与按风险分级合并仍由
 [本地工作流](../../.agents/workflows/local-agent.md) 决定。
 
 ## 入口与产物
@@ -21,6 +21,8 @@ bun run agents:publish-evidence prepare <output-dir> ZWkang/nodebraid <pr-number
   `publication.json`，复用执行层校验，输出 `report.md`、`report.json`、两轴原文与
   已声明日志。它只创建新文件，不覆盖旧报告。可先采集 preview，再把 report 生成到
   同一输出目录；已有 preview 文件不会被当作 report 的输入。
+  报告按 [pr-risk](../../.agents/skills/pr-risk/SKILL.md) 展示两轴风险依据、验证证据、
+  回滚方案和最终分级/路由。历史记录缺失分级时明确显示 unclassified，需要人工审阅。
 - `agents:publish-evidence prepare` 校验本地 manifest、身份和 artifact 字节，生成
   `publication-input.json`，供已连接的 GitHub 工具发布。它本身不写 GitHub。
 
@@ -161,10 +163,11 @@ workflow run、证据分支与 PR 回读结果前，只能报告本地实现/验
 每次报告 ready 前，执行者必须确认完整报告已实际发布到当前 PR head，并保存可访问报告
 URL、source head 与 evidence commit；有可见变化时同时核验 preview 或明确未完成原因。
 当前 `agents:run evaluate` 校验代码执行记录、CI 与反馈，**尚未自动校验证据展示回执**。
-因此它返回 `ready` 不是报告/媒体已发布的证明，执行者仍须完成上述发布与回读。
+因此它返回 `ready` 或 `autoMergeCandidate` 不是报告/媒体已发布或合并前 ticket/验收
+已完成的证明，执行者仍须完成上述发布与回读，以及本地工作流规定的合并前核对。
 
-该实现沿用现有本地 Codex 调度，不增加模型 API、外部模型调用或新调度器；最终审阅和合并
-仍由用户完成。GitHub 分支保护/合并门禁仍是独立 [Issue #10](https://github.com/ZWkang/nodebraid/issues/10)，
+该实现沿用现有本地 Codex 调度，不增加模型 API、外部模型调用或新调度器；审阅和合并
+按 [pr-risk](../../.agents/skills/pr-risk/SKILL.md) 路由。GitHub 分支保护/合并门禁仍是独立 [Issue #10](https://github.com/ZWkang/nodebraid/issues/10)，
 本流程不修改其设置，也不把本地配置文件当成远端生效证据。
 
 场景 skill 借鉴 pstack 的

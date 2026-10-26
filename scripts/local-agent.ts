@@ -14,6 +14,7 @@ import { normalizeFeedback } from './github-feedback';
 import { planFrontier } from './discovery-queue';
 import { archiveIssue } from './local-agent-issue-archive';
 import { reconcileDelivery } from './local-agent-reconcile';
+import { validateRiskAssessment } from './pr-risk';
 
 const read = <T>(path: string): T => JSON.parse(readFileSync(path, 'utf8')) as T;
 const git = (...args: string[]) => execFileSync('git', args, { encoding: 'utf8' }).trim();
@@ -29,6 +30,9 @@ const snapshot = (base: string) => {
     patch: createHash('sha256')
       .update(execFileSync('git', ['diff', '--binary', base, 'HEAD']))
       .digest('hex'),
+    changedFiles: execFileSync('git', ['diff', '--name-only', '--no-renames', '-z', base, 'HEAD'], { encoding: 'utf8' })
+      .split('\0')
+      .filter(Boolean),
   };
 };
 
@@ -85,6 +89,7 @@ if (mode === 'archive-issue') {
     const reviews = read<VerifiedRun['reviews']>(second),
       decisions = read<VerifiedRun['decisions']>(third);
     for (const review of [reviews.standards, reviews.spec]) {
+      validateRiskAssessment(review.risk);
       if (
         review.verdict !== 'passed' ||
         review.head !== before.head ||
@@ -126,9 +131,12 @@ if (mode === 'archive-issue') {
     if (!second) throw new Error('publication requires the actual GitHub Git commit JSON');
     const verified = read<VerifiedRun>(join(directory, 'verification.json'));
     validateVerification(task, verified);
+    const current = snapshot(task.base);
     if (
-      artifactDigest(snapshot(task.base)) !==
-      artifactDigest({ head: verified.head, tree: verified.tree, patch: verified.patch })
+      artifactDigest({ head: current.head, tree: current.tree, patch: current.patch }) !==
+        artifactDigest({ head: verified.head, tree: verified.tree, patch: verified.patch }) ||
+      (verified.changedFiles !== undefined &&
+        artifactDigest(current.changedFiles) !== artifactDigest(verified.changedFiles))
     )
       throw new Error('Local source changed after verification.');
     const remote = read<{ sha: string; tree: { sha: string }; parents: { sha: string }[] }>(second);

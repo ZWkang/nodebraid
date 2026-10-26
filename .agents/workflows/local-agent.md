@@ -177,6 +177,11 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    with the implementer's self-assessment.
    Use `agents:run inspect <run-dir>` to give both reviewers the same full
    head/tree/raw-patch digest. Save their actual reports with those identities.
+   Both reviewers independently apply [pr-risk](../skills/pr-risk/SKILL.md) and
+   include `risk: {level, rationale, evidence, rollback}` in their existing record;
+   new verification requires both complete assessments. The CLI captures actual
+   changed paths and applies the policy's minimum levels. Preserve the two
+   assessments and their final route; do not add a third review.
 3. After both review axes pass, run
    `bun run agents:run verify <run-dir> <reviews.json> <decisions.json>` for the
    delivery attempt's full check. Do not manually run the same `bun run check`
@@ -191,7 +196,8 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    `[local-agent] ` title to opt a PR into local maintenance.
    Legacy `[agent] ` issue PRs are also managed. Create a non-draft PR only after local
    verification and review, with the installed `pr`/`show-me` template:
-   focused Summary, real Before/After Evidence, and Merge Danger. Publish the full
+   focused Summary, real Before/After Evidence, and Merge Danger including the
+   final risk/route, assessment evidence, rollback and required human attention. Publish the full
    reviews, declared behavior evidence and media through [PR evidence](../../docs/agents/pr-evidence.md).
    Keep detailed logs linked; the generated marker block preserves the author's body.
    The single PR targets main and links the spec Issue directly. Keep `Refs #N`
@@ -230,11 +236,20 @@ an unrecorded comment is not excluded merely because it copies an evidence marke
    records these phase-specific checks explicitly.
    Give the user the PR link.
    Until current-head GitHub checks and feedback pass, report it as waiting for CI
-   or repair. Only then hand it to the user as ready for final review. A draft is
+   or repair. Only then apply the risk route below. A draft is
    an explicit opt-out; do not leave a newly managed PR in that state.
-   Human review and merge remain the default. Perform a merge or issue closure
-   only within explicit user authorization and after the required evidence passes.
-   Never self-approve, dismiss reviews, bypass checks or enable auto-merge.
+   Follow the canonical [pr-risk merge policy](../skills/pr-risk/SKILL.md): only a
+   low-risk `autoMergeCandidate` with all current-head evidence and pre-merge
+   acceptance confirmed may merge without human review. Refresh complete
+   discussion and live CI/review/mergeability before the write; any explicit hold,
+   unresolved discussion, changes request or required human approval stays waiting.
+   Use an authenticated immediate merge operation that enforces the expected head
+   SHA, then read back the actual merge before marking its ticket complete. Never
+   enable a GitHub auto-merge queue, self-approve, dismiss reviews or bypass checks.
+   Medium, high and unclassified PRs go to human review and merge, subject to any
+   existing explicit single-PR authorization. The low-risk route does not authorize
+   Issue closure. Changes to this policy or its enforcement are high risk and
+   cannot merge themselves under the exemption.
 
 ## Maintain the current PR head
 
@@ -260,6 +275,11 @@ original digests and published reports intact. New verification, publication,
 reporting and readiness require a new independently prepared run; never fill
 missing fields in the old task.
 Do not replace context with empty feedback arrays to obtain ready.
+`evaluate` preserves its existing status and adds `risk: {level, route, reasons}`
+and `autoMergeCandidate` according to `pr-risk`. The candidate is true only for
+a ready low-risk result. Historical receipts lacking risk or changed-path
+evidence remain readable and explicitly unclassified, routed to full human
+review; never edit old receipts to manufacture an assessment.
 `evaluate` does not yet validate the presentation publication receipt. Its `ready`
 result still requires the report/media publication and current-head readback above;
 CI preview alone does not establish independent review or full-check completion.
@@ -299,9 +319,10 @@ verify its acceptance; retain the old PR's ancestry result only as history.
    new content invalidates the old digest. Require the receipt commit to be on the
    current branch and never accept an arbitrary PR comment as a trusted receipt.
 5. Re-evaluate GitHub mergeability and outstanding reviews after the latest CI.
-   Required human approval is a waiting state. Only report ready for human review
-   with actual current evidence. Failed tools, stale inputs and incomplete runs
-   remain visible. No fixed repair-round cap is added.
+   Required human approval is a waiting state. Route the current verified result
+   through `pr-risk` and the merge procedure above; report missing evidence or
+   human review explicitly. Failed tools, stale inputs and incomplete runs remain
+   visible. No fixed repair-round cap is added.
 
 ## Manual acceptance and rollback
 
@@ -310,7 +331,8 @@ for the first local run; do not claim the failed API-backed triage is a local ru
 Record issue investigation, red/green, both reviews, published PR/head, actual CI,
 and any real review/CI repair separately. A scheduler being registered is not proof
 that every stage ran. Do not invent feedback or intentionally break main to fill
-an acceptance checkbox. Final human merge remains pending until the user performs it.
+an acceptance checkbox. This original migration acceptance retains its human-merge
+requirement; later deliveries follow the risk route above.
 
 Disable the local scheduled task in Codex to stop new work; cancel a currently
 running turn separately. Keep the source protocol and evidence. GitHub CI does

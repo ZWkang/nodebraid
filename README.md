@@ -98,8 +98,15 @@ Ready for merge review checks pre-merge tickets and evidence; closure additional
 checks actual main integration and every remaining ticket and acceptance result.
 Historical parent/child and stacked PR chains remain readable and recoverable,
 including `feat/issue-N-integration`; they are not the model for new work.
-Human review and merge remain the default; explicit authorization can permit
-verified merge and closure. Owners, execution choices and acceptance remain explicit.
+The [PR risk policy](./.agents/skills/pr-risk/SKILL.md) routes low-risk candidates
+to immediate merge after all existing delivery requirements pass, medium risk
+to focused human review, and high or unclassified risk to full human review.
+Each existing review axis records its independent assessment; `agents:run verify`
+requires both, and `evaluate` adds the final risk and `autoMergeCandidate` without
+performing a merge. The coordinator still verifies report readback and pre-merge
+acceptance. Immediate merge binds the expected current head; GitHub auto-merge
+queues remain disabled. Separate Issue closure authorization and existing explicit
+single-PR authorization remain applicable. Owners and acceptance remain explicit.
 
 Project-local Ponytail keeps implementation complete and minimal; `ponytail-review`
 checks connected callers in the independent Standards axis. Spec review remains

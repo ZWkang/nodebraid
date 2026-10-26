@@ -1,6 +1,6 @@
 # Issue and PR discussions
 
-Use this workflow when a task references an Issue, PR, review comment, or linked discussion. The [tracker configuration](issue-tracker.md) defines one GitHub Issue as the spec and one main PR as its delivery. Local tickets in the prepared run plan record implementation steps. This supplements the [local subscription workflow](../../.agents/workflows/local-agent.md), which owns scheduling, eligibility, existing authorization, full checks, durable receipts, and managed PR thread resolution. Human approval and merge remain the default; apply any explicit user merge/closure authorization only after the workflow's checks pass.
+Use this workflow when a task references an Issue, PR, review comment, or linked discussion. The [tracker configuration](issue-tracker.md) defines one GitHub Issue as the spec and one main PR as its delivery. Local tickets in the prepared run plan record implementation steps. This supplements the [local subscription workflow](../../.agents/workflows/local-agent.md), which owns scheduling, eligibility, existing authorization, full checks, durable receipts, and managed PR thread resolution. Review and merge follow the canonical [PR risk policy](../../.agents/skills/pr-risk/SKILL.md); separate Issue closure and existing explicit single-PR authorization remain subject to the workflow's checks.
 
 ## Read the conversation at work boundaries
 
@@ -12,6 +12,7 @@ Read the relevant discussion when starting or resuming work, before delivering a
 - Keep source links or local anchors, the read time, and comment/review identifiers or update timestamps. For PRs, also record the head commit used for review and verification. Managed runs use the existing durable receipts; other tasks can use their notes or handoff.
 - After fully reading a spec Issue and relevant existing Issues, refresh their [local reading and archive copies](issue-tracker.md#local-reading-and-archive-copies). Do the same after an authorized change is read back. Keep full bodies and comments; these copies never replace the live read. Local ticket progress belongs to the run, not the archived Issue copy.
 - If the PR head changes, inspect the new diff and reassess which findings and verification results still apply. Repeat affected checks before claiming the current revision is verified; retain the commit associated with earlier evidence.
+- Before an immediate low-risk merge, refresh the full discussion and current review states. An explicit hold, unresolved decision, active changes request or required human approval remains a waiting state; neither a risk label nor `autoMergeCandidate` resolves it.
 - If a source cannot be read, report the failed operation and missing context. Continue independent work where possible, but do not report inaccessible feedback as absent or resolved.
 
 ## Turn discussion into decisions

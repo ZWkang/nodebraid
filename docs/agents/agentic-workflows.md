@@ -15,7 +15,9 @@ flowchart TD
   F --> G[pr + show-me、完整报告和界面证据发布到原 PR]
   G --> H[GitHub CI / review]
   H -->|明确问题| D
-  H -->|当前 head 已验证| I[用户最终审阅和合并]
+  H -->|当前 head 已验证| I[pr-risk 分级路由]
+  I -->|low 且全部合并前条件通过| J[绑定当前 head 即时合并]
+  I -->|medium / high / unclassified| K[人工审阅和合并]
 ```
 
 ## 运行方式与计费
@@ -46,7 +48,8 @@ GitHub 操作优先使用本地 Codex 已连接的 GitHub 工具；已登录的 
 
 ## 自主执行范围
 
-用户参与前期 grill、spec、领域文档和公共测试 seam，以及最终审阅和合并。
+用户参与前期 grill、spec、领域文档和公共测试 seam；最终审阅和合并按
+[pr-risk](../../.agents/skills/pr-risk/SKILL.md) 分级路由。
 确认后，Agent 自主拆分、审计划、实现、测试、独立 review 和修正，不逐票询问。
 需求、公开契约、ADR 或安全策略发生变化时返回前期讨论。
 
@@ -54,6 +57,11 @@ GitHub 操作优先使用本地 Codex 已连接的 GitHub 工具；已登录的 
 Standards 同时应用 `ponytail-review`，Spec 独立核对原始要求。不能因精简而删除必要的
 错误处理、公共 seam 或 ADR 约束。使用同一份包含新文件的完整 patch，记录 base、tree、
 patch digest、命令与结果。修正后复验，详细轨迹保留在运行记录中。
+
+风险评估由这两轴各自完成，记录具体影响、依据和回滚方案，不新增第三轮审查。
+`pr-risk` 是唯一分级规则入口：最终等级取两轴与路径最低等级中的最高值；low 才可能
+免人工即时合并，medium 重点人工审阅，high 或历史未分级记录完整人工审阅。
+分级和合并策略自身的修改属于 high，不能使用新豁免自行合入。
 
 可见 Canvas 变更与场景维护使用项目 [verify-nodebraid](../../.agents/skills/verify-nodebraid/SKILL.md)。
 完整审查报告、行为证据与真实截图/录屏通过 [PR 证据流程](./pr-evidence.md) 发布到当前 head。
@@ -81,8 +89,11 @@ GitHub Issue 保存规格、讨论和交付状态；本地 run 保存该需求�
 移除前缀、关闭 PR 或转为 draft 后不再自动处理。每次写入前重新检查当前资格和 head；
 不得复用旧 head 的绿灯。新 review、编辑或已解决 thread 的新回复都需重新判断。
 人类 `changes requested` 和争议 thread 不自动 dismiss／approve；需要人工批准时明确等待。
-默认保留用户最终审阅与合并。已有明确用户授权可允许验证通过后的合并和关闭 Issue，
-不得据此开启 auto-merge、绕过 checks 或代替 reviewer 批准。
+low 候选仍须实际核对当前 head 的报告发布回读、全部合并前 ticket/验收和最新完整讨论，
+没有暂停、未决讨论、changes requested 或所需人工批准后，才能使用 expected-head 即时合并。
+工具不能约束预期 head 时明确等待，不开启 GitHub auto-merge 队列、不绕过 checks、
+不代替 reviewer 批准。medium/high 继续由用户最终审阅合并，已有单 PR 明确授权仍适用。
+低风险豁免不授权关闭 Issue；关闭继续按独立授权和完整验收处理。
 
 规格标题统一为 `spec: `，但标题不参与执行授权。设计和验收确认、实施获准后，同一
 Issue 标记 `approved-spec` 与 `ready-for-agent`，直接成为交付任务。`to-tickets` 把
@@ -226,8 +237,12 @@ PR 集成状态、历史聚合规格的标题/未完成子任务、未完成验�
 `prepare` 独立写入 `prepared-task.json`，重启后相同输入可恢复，变更输入需要新 run；
 不能从结果 receipt 复制一个“预期 task”。`inspect` 输出当前完整 head、tree 和原始
 `git diff --binary <base> HEAD` 的 SHA-256，两个 reviewer 以同一组值审查完整 patch。
-`reviews.json` 是 `{standards, spec}`，每轴包含 `head`、`tree`、`patch`、实际 `report` 和
-明确的 `verdict: passed|changes-requested|needs-design`；仅两轴均 passed 可验证发布。
+`reviews.json` 是 `{standards, spec}`，每轴包含 `head`、`tree`、`patch`、实际 `report`、
+明确的 `verdict: passed|changes-requested|needs-design` 和
+`risk: {level: low|medium|high, rationale, evidence, rollback}`；后三项均为非空字符串。
+仅两轴均 passed 且分级完整可启动新的验证发布。`verify` 从真实 Git diff 捕获
+`changedFiles`，应用 `pr-risk` 的路径最低等级；路径仅能提高风险，不证明 low。
+风险和变更路径随既有 head/tree/patch 身份保存，完整报告保留两轴依据及最终路由。
 `decisions.json` 必须恰好覆盖原 pending 的 key/digest、处置和原因。
 
 `verify` 是托管交付全量检查的唯一入口，在干净提交上运行真实 `bun run check`，收据中的
@@ -261,9 +276,15 @@ PR 的 `base.sha` 必须是真实目标 SHA，归一化为 `baseRefOid`；缺失
 都进入判断。新 head、目标分支名或目标 SHA 改变时返回 `waiting-verification`，
 不会把旧 tree、测试和 review 改贴到新 SHA，也不会用已通过的另一审查范围交付。
 
+`evaluate` 保留原 ready/repair/waiting 等状态，追加 `risk: {level, route, reasons}`
+和 `autoMergeCandidate`。route 为 low 的 `automatic`、medium 的 `quick-human`、
+high 或 unclassified 的 `full-human`；只有 ready 且 low 时自动合并候选为 true。
+旧收据缺少风险或变更路径时仍可读取，明确 unclassified 并交人工审阅，不能补写旧证据。
+候选不执行合并，也不核对本地 ticket 完成记录。
+
 `evaluate` 尚未自动检查完整报告和媒体的发布回执。每次交付 ready 前，执行者还必须实际
 发布并回读当前 head 的报告，记录报告 URL、source head 与 evidence commit；不能把
-`evaluate` 的 ready 或 CI preview 上传成功当成这一步已完成。
+`evaluate` 的 ready、autoMergeCandidate 或 CI preview 上传成功当成这一步已完成。
 
 调查队列的命令为：
 
@@ -283,7 +304,8 @@ evidence 文件再原子更新队列；相同报告恢复不会重复完成任�
 
 配置默认分支时使用独立的 `main-pr-and-checks` ruleset：required PR、由 GitHub Actions 上报的
 `checks`、最新 main、讨论解决和非快进/删除保护。单人维护时 approving review count
-为 0，避免作者无法批准自己的 PR；最终审阅和合并仍由用户手动完成。原 disabled `deny`
+为 0，避免作者无法批准自己的 PR；分级路由不修改该设置，也不能绕过实际所需的批准。
+原 disabled `deny`
 规则含限制所有更新等其他策略，不能直接启用代替上述配置。
 可审查的请求正文保存在 `docs/agents/main-ruleset.json`；它只是配置输入，不代表远端已启用。
 
@@ -305,7 +327,8 @@ evidence 文件再原子更新队列；相同报告恢复不会重复完成任�
 - 旧 API triage 运行 [39364597209](https://github.com/ZWkang/nodebraid/actions/runs/39364597209)
   在启动前明确失败：没有 `CODEX_API_KEY`／`OPENAI_API_KEY`。这不计作本地订阅验收。
 - 后续本地实现、双轴 review、PR、实际 CI 与反馈修复分别记录其真实结果；不人为破坏
-  main 或伪造 review 来补齐验收项目。最终合并由用户执行。
+  main 或伪造 review 来补齐验收项目。该次迁移的最终人工合并验收保持原要求，后续交付
+  按上述分级路由执行。
 
 本地执行层测试使用隔离 Git 仓库和真实子进程，覆盖检查失败/恢复、task 不可重绑、
 新 head、分页和依赖前沿。这些 fixture 结果与下一次真实远端 CI/review 修复验收分开记录；

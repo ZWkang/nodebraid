@@ -10,6 +10,11 @@ Two-axis review of the diff between the reviewed revision and a fixed point:
 
 Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
 
+Both axes independently apply [pr-risk](../pr-risk/SKILL.md) to the same complete
+patch and append `risk: {level, rationale, evidence, rollback}` to their existing
+review record. Do not add a third reviewer. Risk routing never replaces either
+axis's findings or verdict.
+
 The issue tracker should have been provided to you. If `docs/agents/issue-tracker.md` is missing, tell the user to run `/setup-matt-pocock-skills`.
 
 Review-only requests end with analysis and a report. When the user also asks to address feedback, follow `docs/agents/discussion-workflow.md` for fixes, replies, thread resolution, and requesting re-review within the authorized scope.
@@ -67,6 +72,7 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 - The list of standards-source files you found in step 3, **plus the smell baseline from step 3** pasted in full — the sub-agent has no other access to it.
 - The [project principle index](../../../docs/agents/principles.md) and applicable leaf skill paths. Use their project adaptations and concrete evidence; do not infer a violation from a principle name or replace the independent Spec axis.
 - Confirmed decisions and unresolved questions relevant to standards, with their discussion links and supporting evidence.
+- The [pr-risk policy](../pr-risk/SKILL.md), the pinned review identity and changed paths. Require an independent risk assessment with concrete rationale, evidence and rollback in addition to findings.
 - The brief: "Report — per file/hunk where relevant — (a) every place the diff violates a documented standard: cite the standard (file + the rule); and (b) any baseline smell you spot: name it and quote the hunk. Distinguish hard violations from judgement calls — documented-standard breaches can be hard, but baseline smells are always judgement calls, and a documented repo standard overrides the baseline. Skip anything tooling enforces. Under 400 words."
 
 **Spec sub-agent prompt** — include:
@@ -74,13 +80,21 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 - The diff command and commit list.
 - The path or fetched contents of the spec.
 - Confirmed requirements and decisions, plus unresolved questions relevant to the spec, with their discussion links and supporting evidence.
+- The [pr-risk policy](../pr-risk/SKILL.md), the same pinned review identity and changed paths. Require an independent risk assessment with concrete rationale, evidence and rollback in addition to findings.
 - The brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong. Quote the spec line for each finding. Under 400 words."
 
 If the spec is missing, skip the Spec sub-agent and note this in the final report.
+The absent assessment cannot qualify for automatic merge or a new managed `verify`.
 
 ### 5. Aggregate
 
 Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings — the two axes are deliberately separate (see _Why two axes_).
+
+Preserve both risk assessments beside their reports. Report the final risk and
+route under `pr-risk`: take the higher assessment and changed-path minimum,
+without reranking the independent findings. Missing historical assessments remain
+explicitly unclassified and require human review. Include this result in the PR
+and full verification report, bound to the reviewed head/tree/patch.
 
 When discussions were involved, add a brief feedback status: what was read, the review state, feedback assessed or handled with commit/verification evidence, and remaining questions or threads with links. Distinguish a code fix from a posted reply, a resolved thread, and reviewer approval; report only actions actually completed.
 
