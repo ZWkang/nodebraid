@@ -159,7 +159,10 @@ function requireRecord(value: unknown): Record<string, unknown> {
 function captureArray<Value>(value: unknown, capture: (item: unknown) => Value): Value[] {
   if (!Array.isArray(value)) invalid('Document entities must be arrays.');
   // Read actual indexed values; caller-owned iterators, map and species do not control validation.
-  return Array.from({ length: value.length }, (_, index) => capture(value[index]));
+  const length = +value.length;
+  const captured: Value[] = [];
+  for (const index of Array.prototype.keys.call({ length })) captured.push(capture(value[index]));
+  return captured;
 }
 
 function requireString(value: unknown, field: string): string {
