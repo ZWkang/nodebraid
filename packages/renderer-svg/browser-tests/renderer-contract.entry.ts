@@ -604,6 +604,7 @@ interface ResizeObserverMultipleErrorsResult {
 }
 
 declare global {
+  var __nodebraidRendererSvgToleranceCapture: typeof runToleranceCapture;
   var __nodebraidRendererSvgTicket01: () => Promise<FirstNodeResult>;
   var __nodebraidRendererSvgConnectionAnchors: () => Promise<ConnectionAnchorResult>;
   var __nodebraidRendererSvgConnectionProjectionRollback: () => Promise<ConnectionProjectionRollbackResult>;
@@ -740,6 +741,136 @@ declare global {
   var __nodebraidRendererSvgReviewResizeObserverRollbackFailure: () => Promise<ResizeObserverRollbackFailureResult>;
   var __nodebraidRendererSvgReviewResizeObserverMultipleErrors: () => Promise<ResizeObserverMultipleErrorsResult>;
 }
+
+type ToleranceField = 'edgeHitTolerance' | 'connectionAnchorHitTolerance';
+type TolerancePropertyKind = 'own' | 'inherited' | 'non-enumerable';
+type ToleranceScenario = 'infinite' | 'nan' | 'negative' | 'absent' | 'zero' | 'six' | `throw-${number}`;
+
+interface ToleranceCaptureResult {
+  readonly case: string;
+  readonly code: string | null;
+  readonly reads: number;
+  readonly receiverCorrect: boolean;
+  readonly targetUnchanged: boolean;
+  readonly originalError: boolean;
+  readonly reusable: boolean;
+  readonly hitTypes: readonly string[];
+}
+
+async function runToleranceCapture(
+  field: ToleranceField,
+  kind: TolerancePropertyKind,
+  scenario: ToleranceScenario,
+): Promise<ToleranceCaptureResult> {
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  const callerContent = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  target.append(callerContent);
+  document.body.append(target);
+  const before = target.outerHTML;
+  const config: SvgRendererConfig = { target };
+  let reads = 0;
+  let receiverCorrect = true;
+  const markers: readonly unknown[] = [undefined, null, false, 0, '', Symbol('first read')];
+  const throws = scenario.startsWith('throw-');
+  const marker = markers[Number(scenario.slice('throw-'.length))];
+  const first =
+    scenario === 'absent'
+      ? undefined
+      : scenario === 'zero'
+        ? 0
+        : scenario === 'six'
+          ? 6
+          : scenario === 'negative'
+            ? -1
+            : scenario === 'infinite'
+              ? Infinity
+              : NaN;
+  const holder = kind === 'inherited' ? Object.create(Object.prototype) : config;
+  Object.defineProperty(holder, field, {
+    enumerable: kind !== 'non-enumerable',
+    get() {
+      receiverCorrect &&= this === config;
+      reads += 1;
+      if (throws) throw marker;
+      if (reads > 1) throw new Error('Tolerance was read after its first value.');
+      return first;
+    },
+  });
+  if (kind === 'inherited') Object.setPrototypeOf(config, holder);
+  let renderer: CanvasRenderer | undefined;
+  let received: unknown;
+  let didThrow = false;
+  let hitTypes: string[] = [];
+  try {
+    renderer = createSvgRenderer(config);
+    const kernel = createCanvasKernel();
+    kernel.transact((transaction) => {
+      transaction.nodes.add({
+        id: nodeId('capture-a'),
+        type: 'task',
+        position: { x: 10, y: 20 },
+        size: { width: 80, height: 40 },
+        data: null,
+      });
+      transaction.nodes.add({
+        id: nodeId('capture-b'),
+        type: 'task',
+        position: { x: 200, y: 20 },
+        size: { width: 80, height: 40 },
+        data: null,
+      });
+      if (field === 'edgeHitTolerance') {
+        transaction.edges.add({
+          id: edgeId('capture-edge'),
+          type: 'flow',
+          source: { nodeId: nodeId('capture-a') },
+          target: { nodeId: nodeId('capture-b') },
+          data: null,
+        });
+      }
+    });
+    renderer.updateDocument({ type: 'reset', view: kernel.read() });
+    renderer.updateSession({
+      selection: { nodeIds: [], edgeIds: [] },
+      viewport: { x: 0, y: 0, zoom: 1 },
+    });
+    const points =
+      field === 'edgeHitTolerance'
+        ? [
+            { x: 140, y: 43 },
+            { x: 140, y: 45 },
+          ]
+        : [
+            { x: 94, y: 43 },
+            { x: 95, y: 45 },
+          ];
+    hitTypes = points.map((point) => renderer!.hitTest(point)?.type ?? 'outside');
+  } catch (error) {
+    didThrow = true;
+    received = error;
+  }
+  const targetUnchanged = target.outerHTML === before;
+  const result: ToleranceCaptureResult = {
+    case: [field, kind, scenario].join(':'),
+    code: typeof received === 'object' && received !== null && 'code' in received ? String(received.code) : null,
+    reads,
+    receiverCorrect,
+    targetUnchanged,
+    originalError: throws && didThrow && Object.is(received, marker),
+    reusable: false,
+    hitTypes,
+  };
+  await renderer?.dispose();
+  const replacement = createSvgRenderer({ target });
+  await replacement.dispose();
+  const reusable = target.contains(callerContent) && target.outerHTML === before;
+  target.remove();
+  return { ...result, reusable };
+}
+
+globalThis.__nodebraidRendererSvgToleranceCapture = runToleranceCapture;
 
 globalThis.__nodebraidRendererSvgTicket01 = async (): Promise<FirstNodeResult> => {
   const target = document.querySelector<SVGSVGElement>('#target');

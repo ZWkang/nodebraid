@@ -52,9 +52,7 @@ import { type AffineMatrix, formatSvgMatrix, readTargetMatrix } from './target-m
 const targetReservations = new WeakSet<SVGSVGElement>();
 
 export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRenderer {
-  const target = validateConfig(config);
-  const edgeHitTolerance = config.edgeHitTolerance ?? 4;
-  const connectionAnchorHitTolerance = config.connectionAnchorHitTolerance ?? 8;
+  const { target, edgeHitTolerance, connectionAnchorHitTolerance } = validateConfig(config);
   const inputPolicies = normalizeInputPolicies(config.input);
   readTargetMatrix(target, 'INVALID_TARGET');
   if (targetReservations.has(target) || target.querySelector(':scope > [data-nodebraid-renderer-svg-root]')) {

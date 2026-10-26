@@ -9,8 +9,14 @@ export interface NormalizedInputPolicies {
   readonly contextMenu: Required<SvgDomEventPolicy>;
 }
 
+interface ValidatedSvgConfig {
+  readonly target: SVGSVGElement;
+  readonly edgeHitTolerance: number;
+  readonly connectionAnchorHitTolerance: number;
+}
+
 /** @internal */
-export function validateConfig(config: Readonly<SvgRendererConfig>): SVGSVGElement {
+export function validateConfig(config: Readonly<SvgRendererConfig>): ValidatedSvgConfig {
   if (typeof config !== 'object' || config === null) {
     throw new SvgRendererError('INVALID_CONFIG', 'SVG Renderer config must be an object.');
   }
@@ -25,23 +31,26 @@ export function validateConfig(config: Readonly<SvgRendererConfig>): SVGSVGEleme
   ) {
     throw new SvgRendererError('INVALID_TARGET', 'SVG Renderer Target must be an SVGSVGElement.');
   }
-  if (
-    config.edgeHitTolerance !== undefined &&
-    (!Number.isFinite(config.edgeHitTolerance) || config.edgeHitTolerance < 0)
-  ) {
+  const edgeHitTolerance = config.edgeHitTolerance;
+  if (edgeHitTolerance !== undefined && (!Number.isFinite(edgeHitTolerance) || edgeHitTolerance < 0)) {
     throw new SvgRendererError('INVALID_CONFIG', 'edgeHitTolerance must be a finite non-negative number.', {
       field: 'edgeHitTolerance',
     });
   }
+  const connectionAnchorHitTolerance = config.connectionAnchorHitTolerance;
   if (
-    config.connectionAnchorHitTolerance !== undefined &&
-    (!Number.isFinite(config.connectionAnchorHitTolerance) || config.connectionAnchorHitTolerance < 0)
+    connectionAnchorHitTolerance !== undefined &&
+    (!Number.isFinite(connectionAnchorHitTolerance) || connectionAnchorHitTolerance < 0)
   ) {
     throw new SvgRendererError('INVALID_CONFIG', 'connectionAnchorHitTolerance must be a finite non-negative number.', {
       field: 'connectionAnchorHitTolerance',
     });
   }
-  return target as SVGSVGElement;
+  return {
+    target: target as SVGSVGElement,
+    edgeHitTolerance: edgeHitTolerance ?? 4,
+    connectionAnchorHitTolerance: connectionAnchorHitTolerance ?? 8,
+  };
 }
 
 /** @internal */
