@@ -113,9 +113,11 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function freezeEdgeEndpoint(endpoint: EdgeEndpoint): EdgeEndpoint {
+  const nodeId = endpoint.nodeId;
+  const portId = endpoint.portId;
   return Object.freeze({
-    nodeId: endpoint.nodeId,
-    ...(endpoint.portId === undefined ? {} : { portId: endpoint.portId }),
+    nodeId,
+    ...(portId === undefined ? {} : { portId }),
   });
 }
 
