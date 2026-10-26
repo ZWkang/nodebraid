@@ -1,0 +1,37 @@
+1794 |   assert.ok(response.data, `Browser scenario returned no data: ${expression}`);
+1795 |   return response.data.result;
+1796 | }
+1797 | 
+1798 | async function assertBrowserScenario<Result>(expression: string, expected: Result): Promise<void> {
+1799 |   assert.deepEqual(await evaluateBrowserScenario<Result>(expression), expected);
+                ^
+AssertionError: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
++   code: null,
++   reads: 4,
++   targetUnchanged: false
+-   code: 'INVALID_CONFIG',
+-   reads: 1,
+-   targetUnchanged: true
+  }
+
+ generatedMessage: true,
+     actual: {
+  code: null,
+  reads: 4,
+  targetUnchanged: false,
+},
+   expected: {
+  code: "INVALID_CONFIG",
+  targetUnchanged: true,
+  reads: 1,
+},
+   operator: "deepStrictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at assertBrowserScenario (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/renderer-svg/browser-tests/renderer-contract.browser.ts:1799:10)
+
+Bun v1.4.2 (macOS arm64)

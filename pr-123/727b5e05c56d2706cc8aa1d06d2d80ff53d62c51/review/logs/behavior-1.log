@@ -1,0 +1,24 @@
+{"cases":10,"dynamicInvalidAccepted":6,"constantControlsPassed":4}
+32 |   const dynamic=result.observations.filter((o:{kind:string})=>o.kind==='changing-first-invalid');
+33 |   const constant=result.observations.filter((o:{kind:string})=>o.kind==='constant-control');
+34 |   assert.equal(dynamic.length,6);assert.equal(constant.length,4);
+35 |   for(const o of constant){assert.equal(o.created,o.constant===0);assert.equal(o.errorCode,o.constant===0?null:'INVALID_CONFIG');}
+36 |   console.log(JSON.stringify({cases:10,dynamicInvalidAccepted:dynamic.filter((o:{created:boolean})=>o.created).length,constantControlsPassed:4}));
+37 |   for(const o of dynamic){assert.equal(o.error?.code,'INVALID_CONFIG',JSON.stringify(o));assert.equal(o.created,false);}
+                                      ^
+AssertionError: {"callerContentPreserved":true,"created":true,"error":null,"field":"edgeHitTolerance","first":"Infinity","kind":"changing-first-invalid","projectionAdded":true,"reads":4,"tabIndexAdded":true}
++ actual - expected
+
++ undefined
+- 'INVALID_CONFIG'
+
+ generatedMessage: false,
+     actual: undefined,
+   expected: "INVALID_CONFIG",
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261026T070355-discovery-svg-config-capture/browser-probe.ts:37:34
+
+Bun v1.4.2 (macOS arm64)

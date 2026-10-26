@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "fc70eecccec5bb2f4173908b2829c5e3f75afbdf",
+    "expectedParent": "fc70eecccec5bb2f4173908b2829c5e3f75afbdf",
+    "head": "727b5e05c56d2706cc8aa1d06d2d80ff53d62c51",
+    "tree": "995191f91615636ed8d413d91cf050f9baa3329e",
+    "patch": "d583d225fb5e5e22d1a65506d33f3f54d943e249d44dcabd4a8954a8082df2e3",
+    "localHead": "01743ed7d1e516aea6876f2bb891473b8a98f351"
+  },
+  "task": {
+    "run": "d9321820-432d-4549-a487-9f6713c30beb",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 122
+    },
+    "request": "## Confirmed defect\n\nAt main `fc70eecccec5bb2f4173908b2829c5e3f75afbdf`, the synchronous public SVG Renderer Factory rereads each optional hit tolerance while checking presence, finiteness, sign and later storing it. A typed numeric getter can therefore replace its first invalid value with a later valid value.\n\nA separately typechecked program was bundled from the actual public package exports and executed in real Chromium through the repository's locked agent-browser. All six changing-getter cases (two tolerance fields × first Infinity/NaN/negative value, later zero) incorrectly created a Renderer, appended its projection and added tabindex. Each getter was read four times. Four constant controls correctly rejected negative values and accepted zero. The public assertion requiring INVALID_CONFIG exits 1; the independent TypeScript check with browser DOM libraries exits 0.\n\nFor example, with an existing connected measurable SVG target:\n\n```ts\nimport { createSvgRenderer } from '@nodebraid/renderer-svg';\n\nlet reads = 0;\nconst renderer = createSvgRenderer({\n  target,\n  get edgeHitTolerance() {\n    return ++reads === 1 ? Infinity : 0;\n  },\n});\n// Current result: a Renderer is created after four reads.\n// Expected: INVALID_CONFIG for the first non-finite value, before target mutation.\n```\n\nThe same failure occurs for connectionAnchorHitTolerance. The original browser entry, compiled artifact identities, observations and red log are retained in investigation `20261026T070355-discovery-svg-config-capture`. Its initial external TypeScript configuration lacked DOM libraries; that fixture-only configuration failure is retained separately and was corrected before any browser execution.\n\n## Existing contract and cause\n\n[ADR0053](https://github.com/ZWkang/nodebraid/blob/fc70eecccec5bb2f4173908b2829c5e3f75afbdf/docs/adr/0053-hit-test-semantic-svg-geometry.md), [ADR0057](https://github.com/ZWkang/nodebraid/blob/fc70eecccec5bb2f4173908b2829c5e3f75afbdf/docs/adr/0057-keep-the-svg-provider-api-narrow-and-synchronous.md) and the published SVG module contract define non-negative finite CSS-pixel tolerances. Existing defaults are 4 for Edge and 8 for Connection Anchor.\n\nThe shared owner is [svg-config.ts](https://github.com/ZWkang/nodebraid/blob/fc70eecccec5bb2f4173908b2829c5e3f75afbdf/packages/renderer-svg/src/svg-config.ts). Its only caller, createSvgRenderer, rereads the original values after validation.\n\n## Acceptance\n\n- Capture each optional tolerance once, validate that captured value and use it for the created Renderer. Retain first zero, positive and absent values and existing defaults.\n- Reject first Infinity, NaN and negative values as INVALID_CONFIG before projection, tabindex or Target reservation changes. A later getter result must not rescue an invalid first value or replace a valid first value.\n- Preserve own/inherited/non-enumerable readable properties, original getter receiver and first external thrown-value identity. Do not inspect later values unnecessarily.\n- Use real browser public Factory/Hit Test controls to prove accepted Edge and Connection Anchor tolerances affect geometry as configured. Keep existing Target validation, unknown-key validation, input policy, CSS-pixel semantics, lifecycle and caller-owned Target behavior.\n- Fix only the tolerance capture/validation/use path. No new public API, accessor prohibition, input policy change, dependencies, cap, retry or fallback.\n- Preserve the original compiled red and prove green; add a browser regression before implementation, run affected and relevant checks, independent Standards with ponytail-review and Spec, one formal full engineering check, exact remote tree/first-parent publication, current-head CI, complete report/all mapped native preview readback.\n- Keep this Issue open through actual main integration and whole-Issue acceptance.\n\n## Deduplication\n\nComplete all-state collections were read through their final short pages: 121 Issue/PR records and 62 PR records. Searches of titles and full bodies for the tolerance fields, svg-config, SVG capture/reread and tolerance symptoms found no existing matching delivery. Previous Basic Canvas Interaction-policy, Connection-option, Clipboard and Duplicate option captures concern different ownership paths and do not change this SVG Factory.\n",
+    "plan": [
+      {
+        "id": "public-red",
+        "blockedBy": [],
+        "acceptance": "Original real Chromium compiled10 controls and a repository public browser tracer fail before source fix; retain original raw source, bad DOM-lib fixture config and red logs."
+      },
+      {
+        "id": "capture-svg-tolerances",
+        "blockedBy": [
+          "public-red"
+        ],
+        "acceptance": "One shared capture/validation owner returns accepted numeric tolerances to the only caller; retain first finite/zero/undefined value, first failure, receiver and existing defaults/Target and input validation semantics."
+      },
+      {
+        "id": "integration-and-independent-review",
+        "blockedBy": [
+          "capture-svg-tolerances"
+        ],
+        "acceptance": "Original compiled10, real public Factory/Hit Test regressions, full SVG browser and affected consumers pass; exact head/tree/full patch independently pass Standards+ponytail and Spec."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "integration-and-independent-review"
+        ],
+        "acceptance": "Pinned main agents:run verify performs this delivery attempt's sole formal full bun run check after both reviews; preserve every failure."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Exact actual remote tree/first-parent publication, current head CI, complete paginated feedback and full original reports/all mapped native previews pass immutable byte readback."
+      },
+      {
+        "id": "authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "Current deployed main protocol, live strict protection and current source/review/check/feedback/tickets/presentation gates permit immediate normal expected-head merge; read actual merge result."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "authorized-merge"
+        ],
+        "acceptance": "Fresh fetched main includes actual merge; original compiled10/public SVG browser behavior plus whole main CI and integration prove Issue acceptance before publishing summary and closing."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "01743ed7d1e516aea6876f2bb891473b8a98f351",
+      "tree": "995191f91615636ed8d413d91cf050f9baa3329e",
+      "patch": "d583d225fb5e5e22d1a65506d33f3f54d943e249d44dcabd4a8954a8082df2e3",
+      "report": "What this change does: captures each SVG hit tolerance once. The same accepted numbers reach Hit Test, including zero and the existing defaults.\n\n- Base: `fc70eecccec5bb2f4173908b2829c5e3f75afbdf`\n- Head: `01743ed7d1e516aea6876f2bb891473b8a98f351`\n- Tree: `995191f91615636ed8d413d91cf050f9baa3329e`\n- Binary patch SHA256: `d583d225fb5e5e22d1a65506d33f3f54d943e249d44dcabd4a8954a8082df2e3`\n- Task digest: `3ed103ffd5797103c7db42b728885e35e9c670a69a748c6d428d88dd547d5717`\n\nReviewed the complete four-file patch, full Issue122 request and empty discussion, independent plan, retained tracer red/green, and all 48 new browser-case definitions. Canonical `git diff --binary BASE HEAD` matches `full-source.patch` bytewise. Commit list, clean checkout, sole parent, identities and whitespace passed independent checks before and after testing.\n\nHard documented standards: no violations found. Under ADR0053/0057 and Boundary Discipline, `svg-config.ts` remains the single acceptance owner; its only caller now stores the returned numbers. Unknown keys and Target validation still precede tolerances; Edge tolerance precedes Connection Anchor tolerance, followed by input policies and Target geometry/reservation. Invalid first values fail before DOM changes. Own, inherited and non-enumerable getters keep their receiver; thrown values propagate unchanged under ADR0029. Defaults remain 4 and 8 CSS pixels.\n\nJudgment-only Fowler smells: no concrete finding. The private return shape joins values that must travel together and removes caller rereads without extra policy, dependency or abstraction.\n\nPonytail assessment: correct, safe, tested and lean for one synchronous Factory call per isolated SVG Target. Traced Factory, reservation/cleanup, Hit Test geometry, Runtime/Preset and Example consumers. Browser regressions assert actual geometry, original thrown values and unchanged/reusable Targets rather than private calls. Existing lifecycle assertions remain.\n\nIndependent command: `bun test packages/renderer-api/tests packages/renderer-svg/tests packages/preset-basic/tests packages/plugin-renderer/tests packages/plugin-interaction/tests packages/plugin-history/tests` exited 0: **343 tests, 2343 assertions**. Current compiled configuration and caller also passed static checks for one read per tolerance and the retained defaults. Full raw output is in `standards-tests.log`.\n\nNot independently run: browser cases, TypeScript, builds, affected/full engineering checks, remote CI or publication/main acceptance. Coordinator results are not counted as reviewer execution.\n\n**Verdict: passed. Looks good. Ship.**\n"
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "01743ed7d1e516aea6876f2bb891473b8a98f351",
+      "tree": "995191f91615636ed8d413d91cf050f9baa3329e",
+      "patch": "d583d225fb5e5e22d1a65506d33f3f54d943e249d44dcabd4a8954a8082df2e3",
+      "report": "verdict: passed\n\nbase: fc70eecccec5bb2f4173908b2829c5e3f75afbdf\nhead: 01743ed7d1e516aea6876f2bb891473b8a98f351\ntree: 995191f91615636ed8d413d91cf050f9baa3329e\nbinary patch SHA256: d583d225fb5e5e22d1a65506d33f3f54d943e249d44dcabd4a8954a8082df2e3\ntaskDigest: 3ed103ffd5797103c7db42b728885e35e9c670a69a748c6d428d88dd547d5717\n\n独立读回 [Issue122](https://github.com/ZWkang/nodebraid/issues/122) 全文、labels 与全部评论；最终读回为 2026-10-26 07:31:42 UTC，open、bug/ready-for-agent，评论0，正文与 prepared request 一致。审查当前规则/CONTEXT、ADR0053/0057/0046、Renderer 契约、完整四文件补丁和全部48个浏览器回归输入；追踪 validateConfig→Factory→hitTestProjection 及 Target reservation/disposal。Git 原始补丁与 full-source.patch 字节一致，inspection/prepared 身份匹配。\n\n未发现验收遗漏、范围扩张或错误实现。针对 “Capture each optional tolerance once, validate that captured value and use it for the created Renderer”，校验 owner 分别保留首值并返回已接受数值，唯一 Factory caller 不再读取原字段；0/正值保留，undefined 使用既有4/8默认值。首 Infinity/NaN/负值及外部 getter 抛值在 projection/tabindex/reservation 修改前直接失败，原 receiver、继承/非枚举属性和验证顺序保留。Target、unknown-key、input policy、CSS-pixel、生命周期和公共导出未变。\n\n48场景通过公共 Factory、真实已连接 SVG Target 和 Hit Test 观察行为，并验证失败后 Target 内容及可重用性；Edge 的3/5像素距离能区分0/4/6容差，Anchor 的5/√50距离能区分0/6/8容差。断言可检测只验证但未使用首值的错误，不依赖私有 helper。\n\n产物稳定后，本轮独立执行 `bun test packages/renderer-api/tests packages/renderer-svg/tests packages/plugin-renderer/tests packages/plugin-interaction/tests packages/plugin-history/tests`：296 pass、0 fail、2196 assertions，21文件，exit0；`git diff --check BASE...HEAD` exit0。前后 HEAD/tree/patch/clean 未变，核对当前 dist 捕获和 Factory 使用路径。原 compiled10 的6个误接受/4个常量控制、tracer red 及48场景 green 日志只作读取核验，不算本人执行。完整命令和原始输出在 spec-tests.log。\n\n未独立执行 build、browser、affected、正式 full check、原 compiled10 或远端发布/CI/媒体/merge/main 验收；公共 Bun 通过不替代实际浏览器和后续交付证据。\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-compiled-red",
+      "acceptance": "Six first-invalid changing tolerance inputs incorrectly create a Renderer on original main fc70; four static controls pass. Real Chromium behavior assertion exits1.",
+      "command": "bun browser-probe.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "public-tracer-red",
+      "acceptance": "Repository public Factory tracer rejects the invalid first Infinity only after this repair; original code returns no error, reads4 and modifies Target.",
+      "command": "bun packages/renderer-svg/browser-tests/renderer-contract.browser.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "public-tracer-green",
+      "acceptance": "Precommit minimal-fix tracer and complete SVG suite pass. This is retained precommit evidence; exact committed-head coverage is recorded separately.",
+      "command": "bun packages/renderer-svg/browser-tests/renderer-contract.browser.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "original-program-typecheck",
+      "acceptance": "Original main public ten-input browser program typechecks after explicitly including DOM libraries. Initial configuration failure is retained separately and is not product red.",
+      "command": "tsc --noEmit -p tsconfig.json",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "compiled-program-green-typecheck",
+      "acceptance": "Byte-identical public ten-input entry is typechecked against the actual reviewed worktree package declarations; only runner metadata/roots differ.",
+      "command": "tsc --noEmit -p original-compiled-green/tsconfig.json",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "compiled-program-green",
+      "acceptance": "Exact reviewed01743ed tree: all six first-invalid inputs reject after one read without mutation, four constant controls pass. Original program/assertions unchanged.",
+      "command": "bun original-compiled-green/browser-probe.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "complete-affected",
+      "acceptance": "Exact committed source affected build/types/public tests and actual Examples Basic SVG/Clipboard/Document plus complete SVG suite and48 capture/Hit Test cases pass.",
+      "command": "bun run check:affected --base fc70eecccec5bb2f4173908b2829c5e3f75afbdf",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "independent-standards",
+      "acceptance": "Independent exact-head Standards+ponytail review and its separate343tests/2343assertions pass; browser evidence is read, not counted as reviewer execution.",
+      "command": "bun test packages/renderer-api/tests packages/renderer-svg/tests packages/preset-basic/tests packages/plugin-renderer/tests packages/plugin-interaction/tests packages/plugin-history/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "independent-spec",
+      "acceptance": "Independent exact-head Spec review and separate296tests/2196assertions pass; browser evidence is read, not counted as reviewer execution.",
+      "command": "bun test packages/renderer-api/tests packages/renderer-svg/tests packages/plugin-renderer/tests packages/plugin-interaction/tests packages/plugin-history/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-9.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "90354da1c60f361353958911fb28aec7fc716d9b09abc7f91e7598ba3697a3f3"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "b87c6d1c5c7befd81a9aade7f817b23541ec44c60675d90750b60a46887141c6"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "f21745756615aba760dabe82d593b695ad5e5b3850a1c93f8b58f18fe31a2ec2"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "9534b6eb681ee414d9aa528a9dc8d02ff9c026c257194d6ad800781192a94d2f"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "6d10320aef53f6d46b763615ddb80ddbdb1f67ad0e0de443db617875546f2fc3"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "014f9740a24a28d72aa54d695e9432723990fcef2e27265d825061b65e3ade50"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "01d2c7ae30ca34230b8dce0fd7ad0442f64ebb7aa00a514064e503b157f0c10f"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "35c3951e1b7a635da16330babcece6c616b010791981a07fb0f87d68fc0b5b60"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "01995ce1c39b2149ec5bb86aaa8eb3aa062e2f5ae805223e9b125194387c58c5"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "948f01664f5b4c74031e42dab71561a72796bfa8dbc506d97282bbdec98218e6"
+    },
+    {
+      "path": "probes/compiled-controls.md",
+      "kind": "report",
+      "sha256": "952c462f741cccb0d8bceb11b1555249fa51fc46d20865bd3928dd1d4aaeec83"
+    }
+  ]
+}
