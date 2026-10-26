@@ -1,3 +1,9 @@
+import {
+  setupPolicyCase,
+  readPolicyCase,
+  cleanupPolicyCase,
+  policyConstructorFailure,
+} from './dom-policy-capture.entry';
 // Public-seam browser scenarios for the complete SVG Renderer contract.
 import { createCanvasKernel, edgeId, nodeId, type EdgeEndpoint } from '@nodebraid/kernel';
 import type { DiagnosticEvent, DiagnosticFault } from '@nodebraid/diagnostics';
@@ -604,6 +610,10 @@ interface ResizeObserverMultipleErrorsResult {
 }
 
 declare global {
+  var __nodebraidPolicySetup: typeof setupPolicyCase;
+  var __nodebraidPolicyRead: typeof readPolicyCase;
+  var __nodebraidPolicyCleanup: typeof cleanupPolicyCase;
+  var __nodebraidPolicyFailure: typeof policyConstructorFailure;
   var __nodebraidRendererSvgToleranceCapture: typeof runToleranceCapture;
   var __nodebraidRendererSvgTicket01: () => Promise<FirstNodeResult>;
   var __nodebraidRendererSvgConnectionAnchors: () => Promise<ConnectionAnchorResult>;
@@ -741,6 +751,11 @@ declare global {
   var __nodebraidRendererSvgReviewResizeObserverRollbackFailure: () => Promise<ResizeObserverRollbackFailureResult>;
   var __nodebraidRendererSvgReviewResizeObserverMultipleErrors: () => Promise<ResizeObserverMultipleErrorsResult>;
 }
+
+globalThis.__nodebraidPolicySetup = setupPolicyCase;
+globalThis.__nodebraidPolicyRead = readPolicyCase;
+globalThis.__nodebraidPolicyCleanup = cleanupPolicyCase;
+globalThis.__nodebraidPolicyFailure = policyConstructorFailure;
 
 type ToleranceField = 'edgeHitTolerance' | 'connectionAnchorHitTolerance';
 type TolerancePropertyKind = 'own' | 'inherited' | 'non-enumerable';
