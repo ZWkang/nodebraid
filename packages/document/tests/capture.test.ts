@@ -281,3 +281,198 @@ test('still rejects a genuinely missing required source field', () => {
   Reflect.deleteProperty(source.nodes[0]!, 'data');
   expect(() => serializeCanvasDocument(source, codec)).toThrow(expect.objectContaining({ code: 'INVALID_DOCUMENT' }));
 });
+
+test('Document preserves a first entity getter failure before allocating a virtual array', () => {
+  const source = snapshot();
+  const failure = new Error('First Document Node getter failed.');
+  let indexReads = 0;
+  const nodes = new Proxy([...source.nodes], {
+    get(target, key, receiver) {
+      if (key === 'length') return Infinity;
+      if (key === '0') {
+        indexReads += 1;
+        throw failure;
+      }
+      return Reflect.get(target, key, receiver);
+    },
+  });
+  let rejected = false,
+    caught: unknown;
+  try {
+    serializeCanvasDocument({ ...source, nodes }, codec);
+  } catch (error) {
+    rejected = true;
+    caught = error;
+  }
+  expect(rejected).toBe(true);
+  expect(caught).toBe(failure);
+  expect(indexReads).toBe(1);
+});
+
+for (const field of ['nodes', 'edges'] as const) {
+  for (const length of [1, 4294967296, Infinity]) {
+    test.each(['malformed', 'throwing'] as const)(
+      'Document preserves first %s ' + field + ' failure at length ' + String(length),
+      (mode) => {
+        const source = snapshot(),
+          failure = new Error('Original first ' + field + ' failure.');
+        const calls: string[] = [];
+        let codecCalls = 0;
+        const values = new Proxy([...source[field]], {
+          get(target, key, receiver) {
+            if (key === 'length') {
+              expect(receiver).toBe(values);
+              calls.push('length');
+              return length;
+            }
+            if (key === '0') {
+              expect(receiver).toBe(values);
+              calls.push('0');
+              if (mode === 'throwing') throw failure;
+              return null;
+            }
+            if (key === '1') throw new Error('A later entity cannot hide the first failure.');
+            return Reflect.get(target, key, receiver);
+          },
+        });
+        let rejected = false,
+          caught: unknown;
+        try {
+          serializeCanvasDocument({ ...source, [field]: values } as CanvasSnapshot, {
+            ...codec,
+            encode(data) {
+              codecCalls += 1;
+              return codec.encode(data);
+            },
+          });
+        } catch (error) {
+          rejected = true;
+          caught = error;
+        }
+        expect(rejected).toBe(true);
+        if (mode === 'throwing') expect(caught).toBe(failure);
+        else expect(caught).toMatchObject({ domain: 'document', code: 'INVALID_DOCUMENT' });
+        expect(calls).toEqual(['length', '0']);
+        expect(codecCalls).toBe(0);
+      },
+    );
+  }
+
+  for (const boundary of ['length', 'index'] as const) {
+    test.each([undefined, null, false, 0, '', Symbol('Document read'), new Error('Document read')])(
+      'Document preserves original ' + field + ' ' + boundary + ' failure %p',
+      (failure) => {
+        const source = snapshot();
+        let reads = 0,
+          codecCalls = 0;
+        const values = new Proxy([...source[field]], {
+          get(target, key, receiver) {
+            if (key === (boundary === 'length' ? 'length' : '0')) {
+              reads += 1;
+              throw failure;
+            }
+            if (key === 'length') return Infinity;
+            return Reflect.get(target, key, receiver);
+          },
+        });
+        let rejected = false,
+          caught: unknown;
+        try {
+          serializeCanvasDocument({ ...source, [field]: values } as CanvasSnapshot, {
+            ...codec,
+            encode(data) {
+              codecCalls += 1;
+              return codec.encode(data);
+            },
+          });
+        } catch (error) {
+          rejected = true;
+          caught = error;
+        }
+        expect(rejected).toBe(true);
+        expect(caught).toBe(failure);
+        expect(reads).toBe(1);
+        expect(codecCalls).toBe(0);
+      },
+    );
+  }
+
+  test('Document retains native empty lengths and failures for ' + field, () => {
+    const empty: CanvasSnapshot = { revision: 0, nodes: [], edges: [] };
+    for (const length of [undefined, null, NaN, -Infinity, -1, 0, 0.9, '0.9', 'invalid']) {
+      let reads = 0;
+      const values = new Proxy([], {
+        get(target, key, receiver) {
+          if (key === 'length') {
+            reads += 1;
+            return length;
+          }
+          return Reflect.get(target, key, receiver);
+        },
+      });
+      const text = serializeCanvasDocument(
+        { ...empty, [field]: values },
+        {
+          ...codec,
+          encode() {
+            throw new Error('Empty graph must not invoke codec');
+          },
+        },
+      );
+      expect(deserializeCanvasDocument(text, codec)).toEqual({ nodes: [], edges: [] });
+      expect(reads).toBe(1);
+    }
+    for (const length of [1n, Symbol('length')]) {
+      const values = new Proxy([], {
+        get(target, key, receiver) {
+          if (key === 'length') return length;
+          return Reflect.get(target, key, receiver);
+        },
+      });
+      expect(() => serializeCanvasDocument({ ...empty, [field]: values }, codec)).toThrow(TypeError);
+    }
+  });
+
+  test('Document captures fractional native length and first indexed values without caller hooks for ' + field, () => {
+    const source = snapshot(),
+      original = source[field][0];
+    let lengthReads = 0,
+      coercions = 0,
+      firstReads = 0,
+      hookReads = 0;
+    const values = new Proxy([...source[field]], {
+      get(target, key, receiver) {
+        if (key === 'length') {
+          lengthReads += 1;
+          if (lengthReads > 1) throw new Error('Repeated length read');
+          return {
+            valueOf() {
+              coercions += 1;
+              if (coercions > 1) throw new Error('Repeated length coercion');
+              return 2.9;
+            },
+          };
+        }
+        if (key === '0') {
+          firstReads += 1;
+          if (firstReads > 1) throw new Error('Repeated entity read');
+          return original;
+        }
+        if ([Symbol.iterator, 'map', 'every', 'filter', 'constructor', Symbol.species].includes(key)) {
+          hookReads += 1;
+          throw new Error('Caller collection hook must not run');
+        }
+        return Reflect.get(target, key, receiver);
+      },
+    });
+    const file = JSON.parse(serializeCanvasDocument({ ...source, [field]: values } as CanvasSnapshot, codec));
+    expect(file.nodes.map((node: { id: string }) => node.id)).toEqual(['a', 'z']);
+    expect(file.edges.map((edge: { id: string }) => edge.id)).toEqual(['a-edge', 'z-edge']);
+    expect(file.edges[0].source.portId).toBe('');
+    expect(deserializeCanvasDocument(JSON.stringify(file), codec).nodes).toHaveLength(2);
+    expect(lengthReads).toBe(1);
+    expect(coercions).toBe(1);
+    expect(firstReads).toBe(1);
+    expect(hookReads).toBe(0);
+  });
+}

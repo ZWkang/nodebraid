@@ -58,6 +58,191 @@ const server = Bun.serve({
 
 try {
   await runAgentBrowser(['open', server.url.href]);
+  let nativePolicyCases = 0;
+  await withRendererPageCdp(async (send) => {
+    for (const family of ['pointer', 'wheel', 'keyboard', 'contextMenu'] as const) {
+      for (const flag of ['preventDefault', 'stopPropagation'] as const) {
+        for (const mode of ['first-true', 'first-false', 'first-absent'] as const) {
+          for (const kind of ['own', 'inherited', 'non-enumerable'] as const) {
+            const point = await evaluateBrowserScenario<{ x: number; y: number }>(
+              'globalThis.__nodebraidPolicySetup(' +
+                JSON.stringify(family) +
+                ',' +
+                JSON.stringify(flag) +
+                ',' +
+                JSON.stringify(mode) +
+                ',' +
+                JSON.stringify(kind) +
+                ')',
+            );
+            if (family === 'wheel') {
+              await send('Input.dispatchMouseEvent', {
+                type: 'mouseWheel',
+                x: point.x,
+                y: point.y,
+                deltaX: 0,
+                deltaY: 40,
+              });
+            } else if (family === 'keyboard') {
+              await send('Input.dispatchKeyEvent', {
+                type: 'keyDown',
+                key: 'a',
+                code: 'KeyA',
+                windowsVirtualKeyCode: 65,
+                nativeVirtualKeyCode: 65,
+                text: 'a',
+              });
+              await send('Input.dispatchKeyEvent', {
+                type: 'keyUp',
+                key: 'a',
+                code: 'KeyA',
+                windowsVirtualKeyCode: 65,
+                nativeVirtualKeyCode: 65,
+              });
+            } else {
+              const button = family === 'contextMenu' ? 'right' : 'left';
+              await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: point.x, y: point.y, buttons: 0 });
+              await send('Input.dispatchMouseEvent', {
+                type: 'mousePressed',
+                x: point.x,
+                y: point.y,
+                button,
+                buttons: family === 'contextMenu' ? 2 : 1,
+                clickCount: 1,
+              });
+              await send('Input.dispatchMouseEvent', {
+                type: 'mouseReleased',
+                x: point.x,
+                y: point.y,
+                button,
+                buttons: 0,
+                clickCount: 1,
+              });
+            }
+            const result = await evaluateBrowserScenario('globalThis.__nodebraidPolicyRead()');
+            if (family === 'contextMenu') {
+              await send('Input.dispatchKeyEvent', {
+                type: 'keyDown',
+                key: 'Escape',
+                code: 'Escape',
+                windowsVirtualKeyCode: 27,
+              });
+              await send('Input.dispatchKeyEvent', {
+                type: 'keyUp',
+                key: 'Escape',
+                code: 'Escape',
+                windowsVirtualKeyCode: 27,
+              });
+            }
+            await evaluateBrowserScenario('globalThis.__nodebraidPolicyCleanup()');
+            const value = mode === 'first-true';
+            assert.deepEqual(result, {
+              case: [family, flag, mode, kind].join(':'),
+              reads: 1,
+              receiverCorrect: true,
+              targetEvent: {
+                isTrusted: true,
+                defaultPrevented: flag === 'preventDefault' && value,
+                cancelBubble: flag === 'stopPropagation' && value,
+              },
+              bubbled: flag === 'stopPropagation' && value ? 0 : 1,
+              semanticInputs: family === 'contextMenu' ? 0 : 1,
+            });
+            nativePolicyCases += 1;
+          }
+        }
+      }
+    }
+  });
+  let policyFailureCases = 0;
+  for (const family of ['pointer', 'wheel', 'keyboard', 'contextMenu'] as const) {
+    for (const flag of ['preventDefault', 'stopPropagation'] as const) {
+      for (const scenario of [
+        'invalid-null',
+        'invalid-number',
+        'invalid-string',
+        ...Array.from({ length: 6 }, (_, index) => 'throw-' + index),
+      ]) {
+        const throws = scenario.startsWith('throw-');
+        const result = await evaluateBrowserScenario(
+          'globalThis.__nodebraidPolicyFailure(' +
+            JSON.stringify(family) +
+            ',' +
+            JSON.stringify(flag) +
+            ',' +
+            JSON.stringify(scenario) +
+            ')',
+        );
+        assert.deepEqual(result, {
+          case: [family, flag, scenario].join(':'),
+          reads: 1,
+          receiverCorrect: true,
+          laterFlagReads: 0,
+          code: throws ? null : 'INVALID_CONFIG',
+          field: throws ? null : family + '.' + flag,
+          originalError: throws,
+          targetUnchanged: true,
+          reusable: true,
+        });
+        policyFailureCases += 1;
+      }
+    }
+  }
+  assert.equal(nativePolicyCases, 72);
+  assert.equal(policyFailureCases, 72);
+  console.log('SVG DOM policy capture: 72 trusted native and 72 constructor failure cases passed.');
+  let toleranceCases = 0;
+  for (const field of ['edgeHitTolerance', 'connectionAnchorHitTolerance'] as const) {
+    for (const kind of ['own', 'inherited', 'non-enumerable'] as const) {
+      for (const scenario of ['infinite', 'nan', 'negative', 'absent', 'zero', 'six'] as const) {
+        const invalid = ['infinite', 'nan', 'negative'].includes(scenario);
+        const hitTypes = invalid
+          ? []
+          : scenario === 'zero'
+            ? ['canvas', 'canvas']
+            : field === 'edgeHitTolerance'
+              ? scenario === 'six'
+                ? ['edge', 'edge']
+                : ['edge', 'canvas']
+              : scenario === 'six'
+                ? ['connection-anchor', 'canvas']
+                : ['connection-anchor', 'connection-anchor'];
+        await assertBrowserScenario(
+          `globalThis.__nodebraidRendererSvgToleranceCapture(${JSON.stringify(field)}, ${JSON.stringify(kind)}, ${JSON.stringify(scenario)})`,
+          {
+            case: [field, kind, scenario].join(':'),
+            code: invalid ? 'INVALID_CONFIG' : null,
+            reads: 1,
+            receiverCorrect: true,
+            targetUnchanged: invalid,
+            originalError: false,
+            reusable: true,
+            hitTypes,
+          },
+        );
+        toleranceCases += 1;
+      }
+    }
+    for (let index = 0; index < 6; index += 1) {
+      const scenario = `throw-${index}`;
+      await assertBrowserScenario(
+        `globalThis.__nodebraidRendererSvgToleranceCapture(${JSON.stringify(field)}, 'own', ${JSON.stringify(scenario)})`,
+        {
+          case: [field, 'own', scenario].join(':'),
+          code: null,
+          reads: 1,
+          receiverCorrect: true,
+          targetUnchanged: true,
+          originalError: true,
+          reusable: true,
+          hitTypes: [],
+        },
+      );
+      toleranceCases += 1;
+    }
+  }
+  assert.equal(toleranceCases, 48);
+  console.log('SVG tolerance capture: 48 public browser cases passed.');
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgTicket01()', {
     callerContentPreserved: true,
     targetChildOrder: ['defs', 'g'],

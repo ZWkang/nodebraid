@@ -9,8 +9,14 @@ export interface NormalizedInputPolicies {
   readonly contextMenu: Required<SvgDomEventPolicy>;
 }
 
+interface ValidatedSvgConfig {
+  readonly target: SVGSVGElement;
+  readonly edgeHitTolerance: number;
+  readonly connectionAnchorHitTolerance: number;
+}
+
 /** @internal */
-export function validateConfig(config: Readonly<SvgRendererConfig>): SVGSVGElement {
+export function validateConfig(config: Readonly<SvgRendererConfig>): ValidatedSvgConfig {
   if (typeof config !== 'object' || config === null) {
     throw new SvgRendererError('INVALID_CONFIG', 'SVG Renderer config must be an object.');
   }
@@ -25,23 +31,26 @@ export function validateConfig(config: Readonly<SvgRendererConfig>): SVGSVGEleme
   ) {
     throw new SvgRendererError('INVALID_TARGET', 'SVG Renderer Target must be an SVGSVGElement.');
   }
-  if (
-    config.edgeHitTolerance !== undefined &&
-    (!Number.isFinite(config.edgeHitTolerance) || config.edgeHitTolerance < 0)
-  ) {
+  const edgeHitTolerance = config.edgeHitTolerance;
+  if (edgeHitTolerance !== undefined && (!Number.isFinite(edgeHitTolerance) || edgeHitTolerance < 0)) {
     throw new SvgRendererError('INVALID_CONFIG', 'edgeHitTolerance must be a finite non-negative number.', {
       field: 'edgeHitTolerance',
     });
   }
+  const connectionAnchorHitTolerance = config.connectionAnchorHitTolerance;
   if (
-    config.connectionAnchorHitTolerance !== undefined &&
-    (!Number.isFinite(config.connectionAnchorHitTolerance) || config.connectionAnchorHitTolerance < 0)
+    connectionAnchorHitTolerance !== undefined &&
+    (!Number.isFinite(connectionAnchorHitTolerance) || connectionAnchorHitTolerance < 0)
   ) {
     throw new SvgRendererError('INVALID_CONFIG', 'connectionAnchorHitTolerance must be a finite non-negative number.', {
       field: 'connectionAnchorHitTolerance',
     });
   }
-  return target as SVGSVGElement;
+  return {
+    target: target as SVGSVGElement,
+    edgeHitTolerance: edgeHitTolerance ?? 4,
+    connectionAnchorHitTolerance: connectionAnchorHitTolerance ?? 8,
+  };
 }
 
 /** @internal */
@@ -67,17 +76,17 @@ function normalizeDomEventPolicy(policy: unknown, field: string): Required<SvgDo
   }
   if (policy !== undefined) assertKnownConfigKeys(policy, ['preventDefault', 'stopPropagation'], `input.${field}`);
   const normalized = policy as SvgDomEventPolicy | undefined;
+  const accepted = { preventDefault: false, stopPropagation: false };
   for (const key of ['preventDefault', 'stopPropagation'] as const) {
-    if (normalized?.[key] !== undefined && typeof normalized[key] !== 'boolean') {
+    const value = normalized?.[key];
+    if (value !== undefined && typeof value !== 'boolean') {
       throw new SvgRendererError('INVALID_CONFIG', 'SVG Renderer DOM event policy values must be boolean.', {
         field: `${field}.${key}`,
       });
     }
+    accepted[key] = value ?? false;
   }
-  return {
-    preventDefault: normalized?.preventDefault ?? false,
-    stopPropagation: normalized?.stopPropagation ?? false,
-  };
+  return accepted;
 }
 
 function assertKnownConfigKeys(value: object, allowedKeys: readonly string[], prefix: string): void {
