@@ -1,0 +1,51 @@
+bun test v1.4.2 (744846f84)
+
+packages/document/tests/index.test.ts:
+(pass) round-trips a complete Document and opaque application data without persisting runtime state [1.81ms]
+(pass) supports an empty Document and uses no codec calls when there are no entities [0.06ms]
+(pass) rejects wrong envelope type before interpreting any application data [0.15ms]
+(pass) rejects unknown version before interpreting any application data [0.02ms]
+(pass) rejects wrong data format before interpreting any application data [0.03ms]
+(pass) rejects non-object envelope before interpreting any application data
+(pass) rejects unknown envelope field before interpreting any application data
+(pass) rejects missing array before interpreting any application data
+(pass) rejects non-array nodes before interpreting any application data
+(pass) rejects invalid node type before interpreting any application data [0.34ms]
+(pass) rejects empty node ID before interpreting any application data [0.06ms]
+(pass) rejects string position before interpreting any application data [0.02ms]
+(pass) rejects unknown node field before interpreting any application data
+(pass) rejects malformed size before interpreting any application data
+(pass) rejects invalid parent ID before interpreting any application data
+(pass) rejects malformed edge before interpreting any application data [0.02ms]
+(pass) rejects invalid port ID before interpreting any application data
+(pass) rejects non-text data on later edge before interpreting any application data [0.01ms]
+(pass) rejects duplicate Node ID through the Kernel complete-graph contract [0.23ms]
+(pass) rejects duplicate Edge ID through the Kernel complete-graph contract [0.04ms]
+(pass) rejects missing parent through the Kernel complete-graph contract [0.07ms]
+(pass) rejects self parent cycle through the Kernel complete-graph contract [0.04ms]
+(pass) rejects missing endpoint through the Kernel complete-graph contract [0.03ms]
+(pass) rejects negative size through the Kernel complete-graph contract [0.03ms]
+(pass) rejects malformed JSON and non-finite JSON geometry [0.09ms]
+(pass) preserves original application codec exceptions and rejects non-text encoding [0.27ms]
+(pass) rejects invalid codec configuration [0.01ms]
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+
+packages/document/tests/types.test.ts:
+(pass) keeps decoded Document structure readonly and business data opaque
+
+packages/document/tests/capture.test.ts:
+(pass) captures getters once and preserves the graph even when application encoding changes its source [0.20ms]
+(pass) normalizes valid graph ordering and ignores caller array iteration hooks [0.13ms]
+(pass) rejects sparse arrays and malformed owned export fields instead of losing information [0.37ms]
+(pass) calls the original codec methods with their receiver when their bind property is overridden [0.09ms]
+(pass) captures typed class getters and extra application fields without requiring own enumerable storage [0.46ms]
+(pass) still rejects a genuinely missing required source field [0.03ms]
+(pass) Document preserves a first entity getter failure before allocating a virtual array [0.05ms]
+
+ 39 pass
+ 0 fail
+ 107 expect() calls
+Ran 39 tests across 3 files. [13.00ms]

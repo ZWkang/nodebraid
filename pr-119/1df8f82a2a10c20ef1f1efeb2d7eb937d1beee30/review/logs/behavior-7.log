@@ -1,0 +1,329 @@
+$ bun run scripts/check-affected.ts --base "c7d7f1b8c5a729a1e127bf6a1a080a1487b4471d"
+{
+  "mode": "affected",
+  "files": [
+    "packages/document/src/document.ts",
+    "packages/document/tests/capture.test.ts"
+  ],
+  "packages": [
+    "@nodebraid/core",
+    "@nodebraid/document",
+    "@nodebraid/examples"
+  ],
+  "tests": [
+    "tests/layout-providers.test.ts"
+  ],
+  "browser": [
+    "@nodebraid/examples"
+  ],
+  "docs": true,
+  "shared": []
+}
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install prettier --check --ignore-unknown packages/document/src/document.ts packages/document/tests/capture.test.ts
+Checking formatting...
+All matched files use Prettier code style!
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install oxlint packages/document/src/document.ts packages/document/tests/capture.test.ts
+[build] @nodebraid/diagnostics
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/kernel
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/canvas-fragment
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/port-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/session-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/interaction-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-api
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/runtime-cordis
+$ tsgo -p tsconfig.build.json
+[build] @nodebraid/plugin-command
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-kernel
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-port
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-session
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-renderer
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-interaction
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-clipboard
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-duplicate-selection
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-history
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-layout
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/preset-basic
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/document
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/core
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/adapter-react
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-dagre
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-svg
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/examples
+$ vite build
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 2190 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                              0.62 kB │ gzip:   0.34 kB
+dist/assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2    7.42 kB
+dist/assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2      8.00 kB
+dist/assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2       15.08 kB
+dist/assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2      16.51 kB
+dist/assets/geist-latin-wght-normal-BgDaEnEv.woff2          29.40 kB
+dist/assets/index-BJoUvGm6.css                              38.33 kB │ gzip:   8.11 kB
+dist/assets/routes-C8RK5nwQ.js                               0.56 kB │ gzip:   0.41 kB
+dist/assets/rolldown-runtime-CbXtAM7H.js                     0.58 kB │ gzip:   0.36 kB
+dist/assets/preload-helper-nlOK6TZ5.js                      35.01 kB │ gzip:  12.63 kB
+dist/assets/basic-svg-DlQzyZ89.js                          250.62 kB │ gzip:  74.81 kB
+dist/assets/index-CS7I4Yki.js                              348.54 kB │ gzip: 113.55 kB
+
+✓ built in 423ms
+[build] @nodebraid/layout-elk
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) @nodebraid/core > publishes Port values and Runtime contribution seams [0.03ms]
+(pass) @nodebraid/core > publishes Canvas Fragment and Clipboard through the public facade [0.01ms]
+(pass) @nodebraid/core > publishes Duplicate Selection through the public facade
+(pass) @nodebraid/core > publishes the shared Diagnostics seam [0.29ms]
+(pass) @nodebraid/core > publishes the typed Plugin Host seam [2.80ms]
+(pass) @nodebraid/core > publishes the reversible Kernel seam [0.73ms]
+(pass) @nodebraid/core > publishes the Kernel Runtime Plugin seam [1.04ms]
+(pass) @nodebraid/core > publishes the Session Runtime Plugin seam [0.85ms]
+(pass) @nodebraid/core > publishes the backend-neutral Renderer and Runtime integration seams [0.04ms]
+(pass) @nodebraid/core > publishes backend-neutral Interaction values and Runtime behavior [0.01ms]
+(pass) @nodebraid/core > composes asynchronous Command preparation with a synchronous Kernel Transaction [1.01ms]
+(pass) @nodebraid/core > publishes the History Runtime Plugin seam
+
+tests/preset-basic.test.ts:
+(pass) Core facade exports Basic Canvas Composition without a concrete Renderer
+
+tests/layout.test.ts:
+(pass) the Core facade exports generic Layout seams without concrete Providers [0.01ms]
+
+tests/document-roundtrip.test.ts:
+(pass) the public facade restores a file and records only subsequent editing [2.74ms]
+
+ 15 pass
+ 0 fail
+ 44 expect() calls
+Ran 15 tests across 4 files. [25.00ms]
+
+[check:affected] packages/document: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/document: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) round-trips a complete Document and opaque application data without persisting runtime state [1.18ms]
+(pass) supports an empty Document and uses no codec calls when there are no entities [0.05ms]
+(pass) rejects wrong envelope type before interpreting any application data [0.13ms]
+(pass) rejects unknown version before interpreting any application data [0.02ms]
+(pass) rejects wrong data format before interpreting any application data [0.02ms]
+(pass) rejects non-object envelope before interpreting any application data
+(pass) rejects unknown envelope field before interpreting any application data
+(pass) rejects missing array before interpreting any application data
+(pass) rejects non-array nodes before interpreting any application data
+(pass) rejects invalid node type before interpreting any application data [0.04ms]
+(pass) rejects empty node ID before interpreting any application data [0.01ms]
+(pass) rejects string position before interpreting any application data [0.03ms]
+(pass) rejects unknown node field before interpreting any application data [0.04ms]
+(pass) rejects malformed size before interpreting any application data [0.01ms]
+(pass) rejects invalid parent ID before interpreting any application data
+(pass) rejects malformed edge before interpreting any application data [0.02ms]
+(pass) rejects invalid port ID before interpreting any application data [0.01ms]
+(pass) rejects non-text data on later edge before interpreting any application data [0.01ms]
+(pass) rejects duplicate Node ID through the Kernel complete-graph contract [0.22ms]
+(pass) rejects duplicate Edge ID through the Kernel complete-graph contract [0.05ms]
+(pass) rejects missing parent through the Kernel complete-graph contract [0.07ms]
+(pass) rejects self parent cycle through the Kernel complete-graph contract [0.03ms]
+(pass) rejects missing endpoint through the Kernel complete-graph contract [0.03ms]
+(pass) rejects negative size through the Kernel complete-graph contract [0.03ms]
+(pass) rejects malformed JSON and non-finite JSON geometry [0.10ms]
+(pass) preserves original application codec exceptions and rejects non-text encoding [0.23ms]
+(pass) rejects invalid codec configuration [0.02ms]
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+
+tests/types.test.ts:
+(pass) keeps decoded Document structure readonly and business data opaque
+
+tests/capture.test.ts:
+(pass) captures getters once and preserves the graph even when application encoding changes its source [0.24ms]
+(pass) normalizes valid graph ordering and ignores caller array iteration hooks [0.13ms]
+(pass) rejects sparse arrays and malformed owned export fields instead of losing information [0.15ms]
+(pass) calls the original codec methods with their receiver when their bind property is overridden [0.12ms]
+(pass) captures typed class getters and extra application fields without requiring own enumerable storage [0.23ms]
+(pass) still rejects a genuinely missing required source field [0.03ms]
+(pass) Document preserves a first entity getter failure before allocating a virtual array [0.05ms]
+(pass) Document preserves first malformed nodes failure at length 1 [0.13ms]
+(pass) Document preserves first throwing nodes failure at length 1 [0.01ms]
+(pass) Document preserves first malformed nodes failure at length 4294967296
+(pass) Document preserves first throwing nodes failure at length 4294967296
+(pass) Document preserves first malformed nodes failure at length Infinity
+(pass) Document preserves first throwing nodes failure at length Infinity
+(pass) Document preserves original nodes length failure undefined [0.04ms]
+(pass) Document preserves original nodes length failure null
+(pass) Document preserves original nodes length failure false
+(pass) Document preserves original nodes length failure 0
+(pass) Document preserves original nodes length failure ""
+(pass) Document preserves original nodes length failure Symbol(Document read)
+(pass) Document preserves original nodes length failure 357 |       },
+358 |     );
+359 |   }
+360 | 
+361 |   for (const boundary of ['length', 'index'] as const) {
+362 |     test.each([undefined, null, false, 0, '', Symbol('Document read'), new Error('Document read')])(
+                                                                                 ^
+error: Document read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/document/tests/capture.test.ts:362:76
+
+(pass) Document preserves original nodes index failure undefined
+(pass) Document preserves original nodes index failure null
+(pass) Document preserves original nodes index failure false
+(pass) Document preserves original nodes index failure 0
+(pass) Document preserves original nodes index failure ""
+(pass) Document preserves original nodes index failure Symbol(Document read)
+(pass) Document preserves original nodes index failure 357 |       },
+358 |     );
+359 |   }
+360 | 
+361 |   for (const boundary of ['length', 'index'] as const) {
+362 |     test.each([undefined, null, false, 0, '', Symbol('Document read'), new Error('Document read')])(
+                                                                                 ^
+error: Document read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/document/tests/capture.test.ts:362:76
+
+(pass) Document retains native empty lengths and failures for nodes [0.17ms]
+(pass) Document captures fractional native length and first indexed values without caller hooks for nodes [0.14ms]
+(pass) Document preserves first malformed edges failure at length 1 [0.01ms]
+(pass) Document preserves first throwing edges failure at length 1
+(pass) Document preserves first malformed edges failure at length 4294967296
+(pass) Document preserves first throwing edges failure at length 4294967296
+(pass) Document preserves first malformed edges failure at length Infinity
+(pass) Document preserves first throwing edges failure at length Infinity
+(pass) Document preserves original edges length failure undefined
+(pass) Document preserves original edges length failure null
+(pass) Document preserves original edges length failure false
+(pass) Document preserves original edges length failure 0
+(pass) Document preserves original edges length failure ""
+(pass) Document preserves original edges length failure Symbol(Document read)
+(pass) Document preserves original edges length failure 357 |       },
+358 |     );
+359 |   }
+360 | 
+361 |   for (const boundary of ['length', 'index'] as const) {
+362 |     test.each([undefined, null, false, 0, '', Symbol('Document read'), new Error('Document read')])(
+                                                                                 ^
+error: Document read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/document/tests/capture.test.ts:362:76
+
+(pass) Document preserves original edges index failure undefined
+(pass) Document preserves original edges index failure null
+(pass) Document preserves original edges index failure false
+(pass) Document preserves original edges index failure 0
+(pass) Document preserves original edges index failure ""
+(pass) Document preserves original edges index failure Symbol(Document read)
+(pass) Document preserves original edges index failure 357 |       },
+358 |     );
+359 |   }
+360 | 
+361 |   for (const boundary of ['length', 'index'] as const) {
+362 |     test.each([undefined, null, false, 0, '', Symbol('Document read'), new Error('Document read')])(
+                                                                                 ^
+error: Document read
+      at /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/document/tests/capture.test.ts:362:76
+
+(pass) Document retains native empty lengths and failures for edges [0.09ms]
+(pass) Document captures fractional native length and first indexed values without caller hooks for edges [0.06ms]
+
+ 83 pass
+ 0 fail
+ 347 expect() calls
+Ran 83 tests across 3 files. [9.00ms]
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] .: /Users/zhou/.bun/bin/bun test tests/layout-providers.test.ts
+bun test v1.4.2 (744846f84)
+
+tests/layout-providers.test.ts:
+(pass) Dagre lays out Port topology with one undoable commit and a no-op repeat [13.30ms]
+(pass) ELK lays out Port topology with one undoable commit and a no-op repeat [96.91ms]
+(pass) accepted getter-backed Layout values survive Runtime revalidation and History replay [1.58ms]
+(pass) Dagre and ELK compose with Provider-specific typed Runtime Commands [6.51ms]
+
+ 4 pass
+ 0 fail
+ 92 expect() calls
+Ran 4 tests across 1 file. [139.00ms]
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run test:browser:self
+$ bun run ./browser-tests/basic-svg.browser.ts && bun run ./browser-tests/clipboard.browser.ts && bun run ./browser-tests/document.browser.ts
+Document file workflow passed; evidence: /Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/.tmp/document-browser-IaH98j
+
+[check:affected] .: /Users/zhou/.bun/bin/bun run docs:check:self
+$ bun run docs:verify && bun run website/examples/quick-start.ts && bun run docs:build
+$ bun run website/scripts/verify-content.ts
+documentation content verified (26 modules)
+revision=1 nodes=1
+$ NODEBRAID_DOCS_BASE=/nodebraid/ vitepress build website
+
+  vitepress v1.6.4
+
+- building client + server bundles...
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[32m✓[0m building client + server bundles...
+- rendering pages...
+[32m✓[0m rendering pages...
+build complete in 14.77s.

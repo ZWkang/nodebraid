@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "c7d7f1b8c5a729a1e127bf6a1a080a1487b4471d",
+    "expectedParent": "c7d7f1b8c5a729a1e127bf6a1a080a1487b4471d",
+    "head": "1df8f82a2a10c20ef1f1efeb2d7eb937d1beee30",
+    "tree": "f7cc6c61b670b49c3d2cfe4079471d7df9adaf58",
+    "patch": "7486a70010106403bbc66592cf79b9643fea9951e1f27f1e2e656d8afe64d133",
+    "localHead": "0255b60bb4e4404328ec4458a4f38ae64f035bc3"
+  },
+  "task": {
+    "run": "2690b62a-d6a9-4970-8e20-1a6d3369d34e",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 118
+    },
+    "request": "## Confirmed defect\n\nOn fetched clean main `c7d7f1b8c5a729a1e127bf6a1a080a1487b4471d`, the public Document serializer allocates a complete output array before reading its first entity. A typed caller-owned array Proxy reporting length `4294967296` or `Infinity` makes `Array.from` throw an internal `RangeError` before the first entity can fail validation or expose its original getter exception.\n\nA separately typechecked actual compiled public Kernel/Document12-case program creates a real graph and exercises both Node and Edge collections:\n- Ordinary length1 with first `null` rejects `document / INVALID_DOCUMENT`; the same length with a throwing first getter preserves the exact original Error. Both read index0 once.\n- For each entity collection and each large length above, malformed-first and throwing-first instead raise `RangeError`, read index0 zero times, and lose the required first failure. All8 large-length cases reproduce.\n- No encoder runs and the active Kernel retains its exact View in all12 controls. A normal public serialize/deserialize round trip succeeds before those cases.\n- The assertion requiring first-entity admission before allocation exits1 after all observations are saved. This safely exposes allocation-before-validation without constructing a large array.\n\nOriginal current-main code and raw output are retained in local run `20261026T032824-discovery-document-codec-inputs`: `document-array-probe.ts`, `build-and-run.ts`, `tsconfig.json`, `typecheck.log`, `red.log`, `observations.json`, and resolved compiled public-entry hashes. The program uses actual exported packages and Kernel state, with no private helper or mocked success path.\n\n## Contract and cause\n\n[Approved Document scope #108](https://github.com/ZWkang/nodebraid/issues/108) requires explicit malformed-input failures, complete graph capture/validation before application data interpretation, original external errors, pure public package-name tests and unchanged active state. [ADR0084](https://github.com/ZWkang/nodebraid/blob/c7d7f1b8c5a729a1e127bf6a1a080a1487b4471d/docs/adr/0084-serialize-complete-documents-with-application-data-codecs.md) retains the explicit application codec and independent Kernel validation boundary; [ADR0029](https://github.com/ZWkang/nodebraid/blob/c7d7f1b8c5a729a1e127bf6a1a080a1487b4471d/docs/adr/0029-preserve-domain-and-external-error-identity.md) preserves original external failure identity. [The public Document error contract](https://github.com/ZWkang/nodebraid/blob/c7d7f1b8c5a729a1e127bf6a1a080a1487b4471d/packages/document/README.md#errors) identifies malformed graph-owned fields as `INVALID_DOCUMENT` and supports readable getter/array capture.\n\n[Document captureArray](https://github.com/ZWkang/nodebraid/blob/c7d7f1b8c5a729a1e127bf6a1a080a1487b4471d/packages/document/src/document.ts) uses `Array.from({ length: value.length }, mapper)`. The native allocation precedes mapper validation and can hide even an immediate invalid or throwing entry. Existing Kernel, Session and Interaction boundaries already use lazy native indices to retain first failure without imposing a new cap.\n\n## Acceptance\n\n- Replace the Document array helper's eager preallocation with owned lazy indexed capture. Read/coerce the incoming length once with the existing native array-like semantics; capture/validate each indexed entry in order, stopping at its first actual failure. Incoming iterator/map/constructor/species hooks cannot choose validation or allocation.\n- All8 large-length cases above must reach index0 once and return `INVALID_DOCUMENT` for malformed first entities or propagate the exact original getter-thrown value. No later entity/codec is consumed after that first failure. Ordinary-length and real normal round-trip controls retain their behavior.\n- Preserve original collection-root/length/index read failures and receivers, falsey thrown values, native fractional/empty/negative/BigInt/Symbol/coercion behavior, sparse-array rejection and first invalid field ordering. Do not pre-read all entries, bulk allocate, add arbitrary length caps, accessor bans, retries or fallback.\n- Keep complete graph capture and independent Kernel validation before encode/decode callbacks. Preserve known-field getter capture, canonical ordering, original opaque data/codec-returned references, receiver-bound captured codec methods, format/version and explicit error contracts, duplicates/invalid graph Kernel errors, empty graph support and unchanged active Kernel state.\n- Scope is the private Document collection helper and public regressions. Its serialized JSON decoder shares that helper and must retain all normal/malformed/codec/graph behavior. Do not alter the file schema, public API, codec policy, Kernel, History Baseline, Examples UI, other packages' helpers or dependencies.\n- Use the established pure package-name Document public seam: real test-first red/green, original typed compiled12-case controls, normal serialization/deserialization and affected consumers; independent Standards+ponytail-review and Spec on exact full source, versioned formal full check, actual remote tree/first-parent/current-head CI and complete original report/all mapped previews publication and immutable readback. Keep the Issue open for real main integration and complete final acceptance.\n\n## Deduplication\n\nRead all117 all-state Issue/PR records through100+17 pages and all60 PRs through the final short page. Read full #108 and both discussions, plus #76/#92 and their complete acceptance discussions. #108/#109 delivered complete files and already closed after main acceptance; no active owner or existing repair covers this private helper. #76 owns Session and #92 owns replay headers; their native-capture patterns are precedents, not Document fixes. Completed Delete Selection #112/#114/#116 remain separate. Open #111 changes review/merge authority and is unrelated.\n",
+    "plan": [
+      {
+        "id": "public-red",
+        "blockedBy": [],
+        "acceptance": "Preserve original current-main typed compiled12-case program and request; public Document regression fails before implementation."
+      },
+      {
+        "id": "capture-document-arrays",
+        "blockedBy": [
+          "public-red"
+        ],
+        "acceptance": "Use native lazy owned indices so allocation cannot hide first Document entity validation/read failure; normal capture/codec/graph/error/native-length behavior remains."
+      },
+      {
+        "id": "integration-and-independent-review",
+        "blockedBy": [
+          "capture-document-arrays"
+        ],
+        "acceptance": "Original typed12case program, Document/Kernel/Core related suites and affected consumers pass; independent Standards+ponytail and Spec review exact full source."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "integration-and-independent-review"
+        ],
+        "acceptance": "Pinned main agents:run verify performs this delivery attempt's sole formal full bun run check after both reviews pass, preserving all original logs."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Actual remote tree/first parent, current-head CI, complete paginated feedback and complete original report/all mapped media immutable byte readback pass."
+      },
+      {
+        "id": "authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "Normal expected-head protected merge only after then-current deployed main protocol/policy and all source/review/CI/feedback/evidence/pre-merge gates permit."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "authorized-merge"
+        ],
+        "acceptance": "Actual fetched main contains delivery; fresh package build/tests, original typed12case program and complete main CI satisfy whole Issue before outcomes and authorized closure."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "0255b60bb4e4404328ec4458a4f38ae64f035bc3",
+      "tree": "f7cc6c61b670b49c3d2cfe4079471d7df9adaf58",
+      "patch": "7486a70010106403bbc66592cf79b9643fea9951e1f27f1e2e656d8afe64d133",
+      "report": "What this change does: Document capture validates entities one at a time instead of allocating an output array from the reported length first. An invalid or throwing first entity now exposes its actual failure.\n\nSource identity:\n\n- Base: c7d7f1b8c5a729a1e127bf6a1a080a1487b4471d\n- Head: 0255b60bb4e4404328ec4458a4f38ae64f035bc3\n- Tree: f7cc6c61b670b49c3d2cfe4079471d7df9adaf58\n- Binary patch SHA256: 7486a70010106403bbc66592cf79b9643fea9951e1f27f1e2e656d8afe64d133\n- Task digest: da5ad9e49644d693af0cada6b4de12a53849c0d018aa8f9eb9f973fb42100556\n\nScope: complete base...head diff, both files, the shared helper and all 195 added public test lines. Sole commit 0255b60, parent, prepared/inspection identities and canonical saved `review.patch` bytes agree. Read Issue #118 and its empty discussion, independent plan, approved Issue #108 and both comments, original 12-case observations and behavioral red/green logs.\n\nHard standards: No violations found. The helper keeps native length conversion and indexed order while allowing the first failure to surface under ADR0029 and Document README's error contract. It adds no length cap, accessor restriction, retry or fallback.\n\nADR0084's boundaries remain intact: serializer/deserializer use the same owner, complete graph capture and independent Kernel validation still precede data encoding/decoding, and file schema/version checks are unchanged. Codec methods retain their receiver; opaque data and codec-returned references retain ADR0012's contract.\n\nJudgment-only smells: No concrete finding across the full Fowler baseline. The existing private helper serves Nodes and Edges in both directions; replacing its allocation step requires no new layer or cross-package parser.\n\nPonytail assessment: Correct and lean for a local Canvas file workflow. I traced both public owners through captureGraph, Kernel, codec callbacks, Core exports and Example restore/Baseline consumers. Public tests exercise large virtual lengths safely, malformed entries, exact falsey exceptions, fractional/empty/native conversion cases, ignored caller hooks, normal round trips and unchanged state.\n\nIndependent command at this exact head:\n`bun test packages/document/tests packages/kernel/tests packages/plugin-history/tests packages/core/tests`\n\nResult: exit 0; 352 tests, 1698 assertions. Current compiled lazy capture, final identity, whitespace and clean-status audits passed.\n\nNot checked independently: TypeScript, builds, native browsers, complete affected/full engineering gates, remote CI, publication or main acceptance. Supplied compiled-control execution was not counted as my run.\n\nVerdict: passed. Looks good. Ship.\n"
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "0255b60bb4e4404328ec4458a4f38ae64f035bc3",
+      "tree": "f7cc6c61b670b49c3d2cfe4079471d7df9adaf58",
+      "patch": "7486a70010106403bbc66592cf79b9643fea9951e1f27f1e2e656d8afe64d133",
+      "report": "verdict: passed\n\nbase: c7d7f1b8c5a729a1e127bf6a1a080a1487b4471d\nhead: 0255b60bb4e4404328ec4458a4f38ae64f035bc3\ntree: f7cc6c61b670b49c3d2cfe4079471d7df9adaf58\nbinary patch SHA256: 7486a70010106403bbc66592cf79b9643fea9951e1f27f1e2e656d8afe64d133\ntaskDigest: da5ad9e49644d693af0cada6b4de12a53849c0d018aa8f9eb9f973fb42100556\n\n独立读取 [Issue118](https://github.com/ZWkang/nodebraid/issues/118) 全文、labels 和完整评论；最终读回为 2026-10-26 03:44:40 UTC，open、bug/ready-for-agent，评论0，正文与 prepared request 一致。读取原 Issue108 全文及两条讨论、当前规则/领域词汇、ADR0084/0012/0029、Document 公共契约和 Core/Example→History Baseline 调用链。完整两文件补丁及195行新增测试均已审查，Git 补丁与 review.patch 字节一致，inspection/prepared digest 完全匹配。\n\n未发现缺失、错误实现或范围扩张。针对 “capture/validate each indexed entry in order, stopping at its first actual failure”，私有 helper 先捕获并原生转换 length，再在自有 descriptor 上惰性产生索引；逐项读取、验证、追加，没有提前分配整个输出。Node/Edge 首无效值及原始（含 falsey）抛值能先于后续元素和 codec 失败；原 receiver、一次 coercion、fractional/empty/negative/BigInt/Symbol 语义及 sparse 拒绝保留，输入 hooks 不参与遍历/分配。serializer 和 decoder 共用相同 helper，完整 graph capture→独立 Kernel validation→codec 的边界保持；schema、canonical ordering、opaque data/codec-returned reference、Errors、History 与其他包 helper 均未变。\n\n独立执行 `bun test packages/document/tests packages/kernel/tests packages/plugin-history/tests packages/core/tests`：352 pass、0 fail、1698 assertions，20文件，exit0；`git diff --check BASE...HEAD` exit0。前后 HEAD/tree/clean 未变；核对当前 dist 惰性 helper 和编译入口哈希。原12场景程序仅输出路径变化、历史8个 RangeError/零索引读取及当前12个预期结果、red→green 日志均作读取核验，未算作本人执行。完整原始命令和输出在 spec-commands.log。\n\n未独立执行构建、类型检查、affected、浏览器、正式全量检查、远端 CI/发布/媒体或合入 main 验收；这些后续交付条件不由本次 Spec passed 代替。\n"
+    }
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-compiled-red",
+      "acceptance": "Original c7d public12cases:8large-length RangeErrors hide first Node/Edge validation/read failures;4normal controls correct. Intentional behavior assertion exits1.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/20261026T032824-discovery-document-codec-inputs/build-and-run.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "public-red",
+      "acceptance": "Before helper edit,38Document tests pass and new public first-getter regression fails because Array.from raises RangeError instead of original Error.",
+      "command": "bun test packages/document/tests",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "public-tracer-green",
+      "acceptance": "Minimal private lazy capture fix turns tracer green:39tests107assertions.",
+      "command": "bun test packages/document/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "expanded-public-green",
+      "acceptance": "All83Document public tests347assertions pass; both collections, original falsey errors, large/fractional/empty/coercion lengths, hooks and normal decode/graph/codec controls.",
+      "command": "bun test packages/document/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "compiled-green",
+      "acceptance": "Exact0255 reviewed source: original typed12case program passes, every first index reads once; malformed keeps document error, getter keeps exact marker, codec0 and activeView unchanged.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/2690b62a-d6a9-4970-8e20-1a6d3369d34e/compiled-controls/build-and-run.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "public-integration",
+      "acceptance": "Exact0255 Document/Kernel/History/Core352tests1698assertions pass.",
+      "command": "bun test packages/document/tests packages/kernel/tests packages/plugin-history/tests packages/core/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "complete-affected",
+      "acceptance": "Current complete affected builds/types/consumers/native Examples including files and docs pass; source/test final tree unchanged by commit hooks.",
+      "command": "bun run check:affected --base c7d7f1b8c5a729a1e127bf6a1a080a1487b4471d",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "independent-standards",
+      "acceptance": "Independent standards full current-source/contract/identity review and actual352tests1698assertions. No independently claimed full/browser/remote gate.",
+      "command": "bun test packages/document/tests packages/kernel/tests packages/plugin-history/tests packages/core/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "independent-spec",
+      "acceptance": "Independent spec full current-source/contract/identity review and actual352tests1698assertions. No independently claimed full/browser/remote gate.",
+      "command": "bun test packages/document/tests packages/kernel/tests packages/plugin-history/tests packages/core/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-9.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "c6a9e0efb29d1c74c695ed3a38dbd7c7e171441e1e4dc5e0a4e7c6bc74f04ae2"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "37b639f2f26e50d704d7e1fa72a9592bad96e726616a7df99129c803b6d6cc21"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "d16deddc72d52593c46f362b0ab8cd65c42d0292175c886f72830d147c898583"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "ae6cb54fca867f17c27ab7a4d8d222378d3997d9a35f4d35079cb7ff99feb24c"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "188d4aa4845cdc87127a4ec584a403075f2100494cb85654072a67b72308e5ed"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "bf17b5f0f6337d8e6644f7f9b261cdd4dd21b28320334b20011b5f88ff097a7a"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "b5b55ba843b76f314e135d8a23538ec979905435b5da585227588aef84e12fc2"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "22b66c6f25d85acb0fda35a2cb1f1e1c1183bd6f1c0b899a55b88eb0542a9fdd"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "c0af2e67626e19fb6daceaa52e1ac0013b38f7717101cd1c79578b97b601605d"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "cc7eaec8abb7c4e9dc6ba25e94d03e204b1dc018204f1d956462b34d79faf112"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "318d8591ef39d0d01a2d18ef1b9a007400c5423145be6ff5f04a23b565e07e8c"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "88af62c03655ade1bafd720a6ff59db136cc0b5828930e3623bbd0154a555596"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "37f1cf3cbcd42eac865201155572de699dfadf0df00c502653494f275bd289ad"
+    },
+    {
+      "path": "probes/compiled-controls.md",
+      "kind": "report",
+      "sha256": "d319c052fffccf59e2129d2c428d56146f50509078198d65a2bcb4726bb9ef80"
+    },
+    {
+      "path": "probes/preview-provenance.md",
+      "kind": "report",
+      "sha256": "895d1d40308da8a832f75b1100328f44ca8c9879699c98263a30d5f8423f6d1f"
+    }
+  ]
+}

@@ -68,7 +68,7 @@ $ tsgo -p tsconfig.build.json && bun run test:artifacts
 $ bun run ./artifacts/check-declarations.ts
 [build] @nodebraid/examples
 $ vite build
-[36mvite v8.2.2 [32mbuilding client environment for production...[36m[39m
+vite v8.2.2 building client environment for production...
 transforming...
 ✓ 2190 modules transformed.
 rendering chunks...
@@ -86,4 +86,4 @@ dist/assets/preload-helper-nlOK6TZ5.js                      35.01 kB │ gzip:  
 dist/assets/basic-svg-DlQzyZ89.js                          250.62 kB │ gzip:  74.81 kB
 dist/assets/index-CS7I4Yki.js                              348.54 kB │ gzip: 113.55 kB
 
-[32m✓ built in 734ms[39m
+✓ built in 378ms

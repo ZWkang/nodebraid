@@ -1,0 +1,88 @@
+bun test v1.4.2 (744846f84)
+
+packages/document/tests/index.test.ts:
+(pass) round-trips a complete Document and opaque application data without persisting runtime state [20.18ms]
+(pass) supports an empty Document and uses no codec calls when there are no entities [0.75ms]
+(pass) rejects wrong envelope type before interpreting any application data [6.19ms]
+(pass) rejects unknown version before interpreting any application data [2.50ms]
+(pass) rejects wrong data format before interpreting any application data [0.04ms]
+(pass) rejects non-object envelope before interpreting any application data
+(pass) rejects unknown envelope field before interpreting any application data
+(pass) rejects missing array before interpreting any application data
+(pass) rejects non-array nodes before interpreting any application data
+(pass) rejects invalid node type before interpreting any application data [0.02ms]
+(pass) rejects empty node ID before interpreting any application data [0.02ms]
+(pass) rejects string position before interpreting any application data [0.04ms]
+(pass) rejects unknown node field before interpreting any application data
+(pass) rejects malformed size before interpreting any application data [0.01ms]
+(pass) rejects invalid parent ID before interpreting any application data [0.01ms]
+(pass) rejects malformed edge before interpreting any application data [0.03ms]
+(pass) rejects invalid port ID before interpreting any application data [0.01ms]
+(pass) rejects non-text data on later edge before interpreting any application data [0.02ms]
+(pass) rejects duplicate Node ID through the Kernel complete-graph contract [1.12ms]
+(pass) rejects duplicate Edge ID through the Kernel complete-graph contract [2.27ms]
+(pass) rejects missing parent through the Kernel complete-graph contract [0.39ms]
+(pass) rejects self parent cycle through the Kernel complete-graph contract [0.26ms]
+(pass) rejects missing endpoint through the Kernel complete-graph contract [0.04ms]
+(pass) rejects negative size through the Kernel complete-graph contract [0.04ms]
+(pass) rejects malformed JSON and non-finite JSON geometry [1.35ms]
+(pass) preserves original application codec exceptions and rejects non-text encoding [0.52ms]
+(pass) rejects invalid codec configuration [0.02ms]
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+
+packages/document/tests/types.test.ts:
+(pass) keeps decoded Document structure readonly and business data opaque
+
+packages/document/tests/capture.test.ts:
+(pass) captures getters once and preserves the graph even when application encoding changes its source [1.25ms]
+(pass) normalizes valid graph ordering and ignores caller array iteration hooks [0.39ms]
+(pass) rejects sparse arrays and malformed owned export fields instead of losing information [1.10ms]
+(pass) calls the original codec methods with their receiver when their bind property is overridden [0.74ms]
+(pass) captures typed class getters and extra application fields without requiring own enumerable storage [0.26ms]
+(pass) still rejects a genuinely missing required source field [0.44ms]
+294 |     },
+295 |   });
+296 |   let rejected = false, caught: unknown;
+297 |   try { serializeCanvasDocument({ ...source, nodes }, codec); } catch (error) { rejected = true; caught = error; }
+298 |   expect(rejected).toBe(true);
+299 |   expect(caught).toBe(failure);
+                       ^
+error: expect(received).toBe(expected)
+
+Expected: 282 |   expect(() => serializeCanvasDocument(source, codec)).toThrow(expect.objectContaining({ code: 'INVALID_DOCUMENT' }));
+283 | });
+284 | 
+285 | test('Document preserves a first entity getter failure before allocating a virtual array', () => {
+286 |   const source = snapshot();
+287 |   const failure = new Error('First Document Node getter failed.');
+                            ^
+error: First Document Node getter failed.
+      at <anonymous> (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/document/tests/capture.test.ts:287:23)
+
+Received: 77 |     decode: (text) => Reflect.apply(decode, value, [text]),
+78 |   };
+79 | }
+80 | 
+81 | function captureGraph(nodesValue: unknown, edgesValue: unknown, encoded: boolean): DecodedCanvasDocument {
+82 |   const nodes = captureArray(nodesValue, (value) => captureNode(value, encoded));
+               ^
+RangeError: Array length must be a positive integer of safe magnitude.
+      at from (1:11)
+      at captureGraph (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/document/src/document.ts:82:17)
+      at serializeCanvasDocument (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/document/src/document.ts:20:17)
+      at <anonymous> (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/document/tests/capture.test.ts:297:9)
+
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/interaction-materializer-capture/cflow/packages/document/tests/capture.test.ts:299:18)
+(fail) Document preserves a first entity getter failure before allocating a virtual array [5.91ms]
+
+1 tests failed:
+(fail) Document preserves a first entity getter failure before allocating a virtual array [5.91ms]
+
+ 38 pass
+ 1 fail
+ 106 expect() calls
+Ran 39 tests across 3 files. [107.00ms]
