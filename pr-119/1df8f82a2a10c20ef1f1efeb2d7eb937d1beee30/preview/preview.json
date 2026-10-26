@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "c7d7f1b8c5a729a1e127bf6a1a080a1487b4471d",
+    "head": "1df8f82a2a10c20ef1f1efeb2d7eb937d1beee30",
+    "tree": "f7cc6c61b670b49c3d2cfe4079471d7df9adaf58",
+    "patch": "7486a70010106403bbc66592cf79b9643fea9951e1f27f1e2e656d8afe64d133"
+  },
+  "status": "passed",
+  "limitations": [],
+  "scenes": [
+    {
+      "id": "document-files",
+      "title": "Export and restore a complete Document file",
+      "status": "passed",
+      "steps": [
+        "Doctor: wait for the real Examples Application and its initial Canvas",
+        "Edit and download a real complete Document file",
+        "Reopen the application and upload the downloaded file",
+        "Continue editing and Undo only the new edit"
+      ],
+      "artifacts": [
+        "document-files/before.png",
+        "document-files/before.snapshot.json",
+        "document-files/document.json",
+        "document-files/exported.png",
+        "document-files/exported.snapshot.json",
+        "document-files/restored.json",
+        "document-files/restored.png",
+        "document-files/restored.snapshot.json",
+        "document-files/after.png",
+        "document-files/after.snapshot.json",
+        "document-files/recording.mp4",
+        "document-files/review-encoding.log",
+        "document-files/review.mp4",
+        "document-files/actions.log"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build.log",
+      "kind": "log",
+      "sha256": "9fa8aaa32636365d47f7f3c7331064ea74420abe1dee93641d3c0fe4f0ea75c9"
+    },
+    {
+      "path": "ffmpeg.log",
+      "kind": "log",
+      "sha256": "a85f002a2266c5bfd7a5d1e5c72d18a0f9e8e60fd941327fa9a093d931687c17"
+    },
+    {
+      "path": "document-files/before.png",
+      "kind": "screenshot",
+      "sha256": "fa5da2b72a00dabcaad62d287d1501edb2bcc9260453db76cc3c70e1d2be348f"
+    },
+    {
+      "path": "document-files/before.snapshot.json",
+      "kind": "snapshot",
+      "sha256": "060e58e8ec9b2d63a3737269aabcd146b942dcd8c0ed2621130ec38dfb9138a0"
+    },
+    {
+      "path": "document-files/document.json",
+      "kind": "snapshot",
+      "sha256": "7f43afa138c455c989c4de3fc659dfdc7f6bb69934a6ad65d8799b4fe9c948b7"
+    },
+    {
+      "path": "document-files/exported.png",
+      "kind": "screenshot",
+      "sha256": "cb7139408733e6048873d114ce4687b7cd1629d05202cc493cb01f8274cf6183"
+    },
+    {
+      "path": "document-files/exported.snapshot.json",
+      "kind": "snapshot",
+      "sha256": "0736f175e4ee2338dd16a60e7ef44c86feaae890ae25fdcd92c60a797b603528"
+    },
+    {
+      "path": "document-files/restored.json",
+      "kind": "snapshot",
+      "sha256": "7f43afa138c455c989c4de3fc659dfdc7f6bb69934a6ad65d8799b4fe9c948b7"
+    },
+    {
+      "path": "document-files/restored.png",
+      "kind": "screenshot",
+      "sha256": "0c599d227e0e98bf156d37282f216c160ea49432accd38a64a5d7c52ff507268"
+    },
+    {
+      "path": "document-files/restored.snapshot.json",
+      "kind": "snapshot",
+      "sha256": "0f2fee48f193a331b9f8ee26762d8607e701fbdca8b14cadab2610145d1a8388"
+    },
+    {
+      "path": "document-files/after.png",
+      "kind": "screenshot",
+      "sha256": "af271467e76fc6ebfbe6958f1b9bbded118bc3ba62c47eaca163a722c9133ffb"
+    },
+    {
+      "path": "document-files/after.snapshot.json",
+      "kind": "snapshot",
+      "sha256": "7aebf0c8f7522a93ecacf9c3ed93d966f66192de190b6c23d6b6af0ea7b586be"
+    },
+    {
+      "path": "document-files/recording.mp4",
+      "kind": "recording",
+      "sha256": "c9658100a3ca2bfa379dccf13de1d724c5987d65fd55d0a2a7f1ae18e60c79db"
+    },
+    {
+      "path": "document-files/review-encoding.log",
+      "kind": "log",
+      "sha256": "0ca034536e0fe8313ff12ed505dee69cac113eb5a6a3d7fbbef23167c32fd6b1"
+    },
+    {
+      "path": "document-files/review.mp4",
+      "kind": "recording",
+      "sha256": "91d5871a6c47823010ad0cdd4ce5c2a7f41c30fa855eafe13e4d2820872920c0"
+    },
+    {
+      "path": "document-files/actions.log",
+      "kind": "log",
+      "sha256": "4da36bc7adf5a7f4b2166e4fc29a17e61293276402b71b8b5300b8eabaa2a814"
+    }
+  ]
+}
