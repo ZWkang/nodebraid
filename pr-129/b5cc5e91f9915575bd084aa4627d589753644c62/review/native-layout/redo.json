@@ -1,0 +1,29 @@
+{
+  "edgeIds": [
+    "example-initial-edge"
+  ],
+  "metrics": {
+    "clipboard-failure": "None",
+    "edges": "1",
+    "history": "Undo / —",
+    "nodes": "3",
+    "revision": "4",
+    "selection": "example-discover",
+    "zoom": "0.83×"
+  },
+  "positions": {
+    "example-compose": {
+      "x": 210,
+      "y": 0
+    },
+    "example-discover": {
+      "x": 0,
+      "y": 0
+    },
+    "example-ship": {
+      "x": 0,
+      "y": 138
+    }
+  },
+  "transform": "matrix(0.833333333333 0 0 0.833333333333 73.166666666667 40.799479166667)"
+}

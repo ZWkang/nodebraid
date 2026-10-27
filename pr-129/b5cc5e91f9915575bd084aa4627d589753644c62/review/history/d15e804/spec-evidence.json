@@ -1,0 +1,72 @@
+{
+  "axis": "Spec",
+  "verdict": "passed",
+  "base": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "expectedParent": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "head": "d15e80423973e27a7f1619d129093496f3594c0d",
+  "tree": "c7d4fd27330252327e95263459adf3bbccdc395f",
+  "patch": "7736c03f4664d5d2339f5133cc9308cb3286cfdb9ce9043690c3ea838604ce60",
+  "taskDigest": "78e4d4e2ec9c37ff55c487cd2c78900a462bd8c3534f0a961853f4836bcedeb9",
+  "changedFiles": [
+    "packages/layout-api/src/layout-engine.ts",
+    "packages/layout-api/tests/capability-values.test.ts"
+  ],
+  "report": "verdict: passed\n\nbase: 6fd2d016f6330cc422508b3e51229bea4be2cce0\nhead: d15e80423973e27a7f1619d129093496f3594c0d\ntree: c7d4fd27330252327e95263459adf3bbccdc395f\nbinary patch SHA256: 7736c03f4664d5d2339f5133cc9308cb3286cfdb9ce9043690c3ea838604ce60\ntaskDigest: 78e4d4e2ec9c37ff55c487cd2c78900a462bd8c3534f0a961853f4836bcedeb9\n\n独立读回 [Issue128](https://github.com/ZWkang/nodebraid/issues/128) 全文、labels/全部评论；最终读回2026-10-27 04:34:44 UTC，open、bug/ready-for-agent，评论0，prepared request未变。审查完整两文件及248行新测试、指定main规则/CONTEXT/原则、ADR0020/21/24/25/26/29，追踪Layout API→Runtime→Kernel/Command/History及Dagre/ELK；完整Git补丁与complete.patch字节一致。\n\n未发现缺漏、范围扩张或错误实现。对照 “Capture the capability source once and each required value once”，先保留原own-enumerable浅复制，再仅补入未被枚举的declared flags；每个required getter只读一次且receiver不变。true/false、额外enumerable字符串/Symbol属性的浅引用及原复制顺序保留，冻结仅作用于owned shell，caller对象/metadata不冻结。没有flag转换/缺省或plain-record/accessor限制。false仍在Provider计算前明确拒绝；取消、Proposal/Fixed Node/实时revision校验及单Commit/净零/UndoRedo路径未改。\n\n本人执行 `bun test packages/layout-api/tests packages/plugin-layout/tests packages/layout-dagre/tests packages/layout-elk/tests packages/plugin-command/tests packages/kernel/tests packages/plugin-history/tests tests/layout-providers.test.ts`：483 pass、0 fail、2775 assertions，34文件，exit0；另用公共package-name入口执行10个严格Error对象身份场景，10/10通过，不把toThrow(Error)视为身份断言。diff-check通过，前后HEAD/tree/patch/clean一致；完整命令/程序/原始输出在spec-tests.log。原编译6的源码字节一致、bundle/入口哈希及红绿记录仅作读取核验，未算本人执行。\n\n未本人运行build/类型检查/affected/browser/formal full、原compiled6或远端CI/发布/媒体/merge/main验收。显式控制Provider只证明公共契约，非算法或浏览器证明；Spec通过不代表交付完成或人工批准。\n\nrisk: {\"level\": \"medium\", \"rationale\": \"修改公共Layout API的Capability ownership与Provider执行门禁，命中packages/*/src的medium下限；需重点人工审阅继承/隐藏声明、原复制顺序与不支持特性的拒绝边界。\", \"evidence\": \"完整两文件补丁、ADR0020/21/24/25/26/29及真实Providers/Runtime调用链独立核对；当前身份独立483tests/2775assertions通过，另10个公共Error身份场景通过。采用main6fd2的pr-risk blob596298db784c4f3424968cd05a3aca4a6471b1b3。\", \"rollback\": \"通过普通回退提交撤销source d15e80423973e27a7f1619d129093496f3594c0d或其已映射发布改动；无schema/依赖/数据迁移，回退会恢复继承/非枚举能力丢失缺陷，不能追溯撤销应用已执行的Command。\"}\n",
+  "risk": {
+    "level": "medium",
+    "rationale": "修改公共Layout API的Capability ownership与Provider执行门禁，命中packages/*/src的medium下限；需重点人工审阅继承/隐藏声明、原复制顺序与不支持特性的拒绝边界。",
+    "evidence": "完整两文件补丁、ADR0020/21/24/25/26/29及真实Providers/Runtime调用链独立核对；当前身份独立483tests/2775assertions通过，另10个公共Error身份场景通过。采用main6fd2的pr-risk blob596298db784c4f3424968cd05a3aca4a6471b1b3。",
+    "rollback": "通过普通回退提交撤销source d15e80423973e27a7f1619d129093496f3594c0d或其已映射发布改动；无schema/依赖/数据迁移，回退会恢复继承/非枚举能力丢失缺陷，不能追溯撤销应用已执行的Command。"
+  },
+  "checks": [
+    {
+      "command": [
+        "bun",
+        "test",
+        "packages/layout-api/tests",
+        "packages/plugin-layout/tests",
+        "packages/layout-dagre/tests",
+        "packages/layout-elk/tests",
+        "packages/plugin-command/tests",
+        "packages/kernel/tests",
+        "packages/plugin-history/tests",
+        "tests/layout-providers.test.ts"
+      ],
+      "exitCode": 0,
+      "tests": 483,
+      "assertions": 2775,
+      "files": 34,
+      "log": "spec-tests.log"
+    },
+    {
+      "command": [
+        "bun",
+        "--eval",
+        "import assert from 'node:assert/strict';\nimport { defineLayoutEngine } from '@nodebraid/layout-api';\nconst fields = ['incremental', 'fixedNodes', 'selfLoops'];\nlet checks = 0;\nfor (const shape of ['prototype', 'hidden-own', 'enumerable-own']) {\n  for (const field of fields) {\n    const marker = new Error(shape + ':' + field);\n    let supplied;\n    const holder = {};\n    for (const flag of fields) Object.defineProperty(holder, flag, {\n      enumerable: shape === 'enumerable-own',\n      get() { assert.equal(this, supplied); if (flag === field) throw marker; return true; },\n    });\n    supplied = shape === 'prototype' ? Object.create(holder) : holder;\n    let threw = false, received;\n    try { defineLayoutEngine({ id: 'identity-control', capabilities: supplied, compute: input => ({ sourceRevision: input.revision, positions: [] }) }); }\n    catch (error) { threw = true; received = error; }\n    assert.equal(threw, true); assert.equal(received, marker); checks++;\n  }\n}\nconst original = new Error('capability-source');\nconst definition = { id: 'source-identity', get capabilities() { assert.equal(this, definition); throw original; }, compute: input => ({ sourceRevision: input.revision, positions: [] }) };\nlet threw = false, received;\ntry { defineLayoutEngine(definition); } catch (error) { threw = true; received = error; }\nassert.equal(threw, true); assert.equal(received, original); checks++;\nconsole.log(JSON.stringify({ checks, passed: checks, failures: 0, source: 'actual public package-name entry; strict original Error object identity' }));"
+      ],
+      "exitCode": 0,
+      "checks": 10,
+      "log": "spec-tests.log"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "6fd2d016f6330cc422508b3e51229bea4be2cce0...d15e80423973e27a7f1619d129093496f3594c0d"
+      ],
+      "exitCode": 0,
+      "log": "spec-tests.log"
+    }
+  ],
+  "policy": {
+    "sourceCommit": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+    "path": ".agents/skills/pr-risk/SKILL.md",
+    "blob": "596298db784c4f3424968cd05a3aca4a6471b1b3"
+  },
+  "sourceReadback": "spec-live-issue-final-readback.json",
+  "limitations": [
+    "No independent build/typecheck/affected/browser/formal full/original compiled6/remote CI/publication/media/merge/main acceptance.",
+    "Explicit typed control Provider is public-contract evidence, not real Dagre/ELK algorithm or native browser proof; real Provider suites are identified separately in the test command."
+  ]
+}

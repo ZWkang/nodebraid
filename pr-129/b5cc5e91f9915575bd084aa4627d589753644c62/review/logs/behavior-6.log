@@ -1,0 +1,453 @@
+$ bun run scripts/check-affected.ts --base "6fd2d016f6330cc422508b3e51229bea4be2cce0"
+{
+  "mode": "affected",
+  "files": [
+    "packages/layout-api/src/layout-engine.ts",
+    "packages/layout-api/tests/capability-values.test.ts"
+  ],
+  "packages": [
+    "@nodebraid/core",
+    "@nodebraid/examples",
+    "@nodebraid/layout-api",
+    "@nodebraid/layout-dagre",
+    "@nodebraid/layout-elk",
+    "@nodebraid/plugin-layout"
+  ],
+  "tests": [
+    "tests/layout-providers.test.ts"
+  ],
+  "browser": [
+    "@nodebraid/examples"
+  ],
+  "docs": true,
+  "shared": []
+}
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install prettier --check --ignore-unknown packages/layout-api/src/layout-engine.ts packages/layout-api/tests/capability-values.test.ts
+Checking formatting...
+All matched files use Prettier code style!
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install oxlint packages/layout-api/src/layout-engine.ts packages/layout-api/tests/capability-values.test.ts
+[build] @nodebraid/diagnostics
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/kernel
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/canvas-fragment
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/port-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/session-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/interaction-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-api
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/runtime-cordis
+$ tsgo -p tsconfig.build.json
+[build] @nodebraid/plugin-command
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-kernel
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-port
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-session
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-renderer
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-interaction
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-clipboard
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-duplicate-selection
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-history
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-layout
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/preset-basic
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/document
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/core
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/adapter-react
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-dagre
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-svg
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/examples
+$ vite build
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 2190 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                              0.62 kB │ gzip:   0.34 kB
+dist/assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2    7.42 kB
+dist/assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2      8.00 kB
+dist/assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2       15.08 kB
+dist/assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2      16.51 kB
+dist/assets/geist-latin-wght-normal-BgDaEnEv.woff2          29.40 kB
+dist/assets/index-BJoUvGm6.css                              38.33 kB │ gzip:   8.11 kB
+dist/assets/routes-Bn22wQme.js                               0.56 kB │ gzip:   0.41 kB
+dist/assets/rolldown-runtime-CbXtAM7H.js                     0.58 kB │ gzip:   0.36 kB
+dist/assets/preload-helper-nlOK6TZ5.js                      35.01 kB │ gzip:  12.63 kB
+dist/assets/basic-svg-JzVwShLq.js                          250.69 kB │ gzip:  74.85 kB
+dist/assets/index-BXX_oZct.js                              348.54 kB │ gzip: 113.55 kB
+
+✓ built in 336ms
+[build] @nodebraid/layout-elk
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) @nodebraid/core > publishes Port values and Runtime contribution seams [0.71ms]
+(pass) @nodebraid/core > publishes Canvas Fragment and Clipboard through the public facade [0.01ms]
+(pass) @nodebraid/core > publishes Duplicate Selection through the public facade
+(pass) @nodebraid/core > publishes the shared Diagnostics seam [0.79ms]
+(pass) @nodebraid/core > publishes the typed Plugin Host seam [3.07ms]
+(pass) @nodebraid/core > publishes the reversible Kernel seam [0.84ms]
+(pass) @nodebraid/core > publishes the Kernel Runtime Plugin seam [1.24ms]
+(pass) @nodebraid/core > publishes the Session Runtime Plugin seam [0.84ms]
+(pass) @nodebraid/core > publishes the backend-neutral Renderer and Runtime integration seams [0.04ms]
+(pass) @nodebraid/core > publishes backend-neutral Interaction values and Runtime behavior [0.01ms]
+(pass) @nodebraid/core > composes asynchronous Command preparation with a synchronous Kernel Transaction [1.29ms]
+(pass) @nodebraid/core > publishes the History Runtime Plugin seam [0.01ms]
+
+tests/preset-basic.test.ts:
+(pass) Core facade exports Basic Canvas Composition without a concrete Renderer [0.01ms]
+
+tests/layout.test.ts:
+(pass) the Core facade exports generic Layout seams without concrete Providers [0.01ms]
+
+tests/document-roundtrip.test.ts:
+(pass) the public facade restores a file and records only subsequent editing [2.45ms]
+
+ 15 pass
+ 0 fail
+ 44 expect() calls
+Ran 15 tests across 4 files. [29.00ms]
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/layout-api: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/layout-api: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/capability-values.test.ts:
+(pass) retains inherited Capability values in the helper Engine [0.61ms]
+(pass) owns all declared prototype Capability values for combination 0 [0.87ms]
+(pass) owns all declared prototype Capability values for combination 1 [0.07ms]
+(pass) owns all declared prototype Capability values for combination 2 [0.05ms]
+(pass) owns all declared prototype Capability values for combination 3 [0.07ms]
+(pass) owns all declared prototype Capability values for combination 4 [0.04ms]
+(pass) owns all declared prototype Capability values for combination 5 [0.03ms]
+(pass) owns all declared prototype Capability values for combination 6 [0.09ms]
+(pass) owns all declared prototype Capability values for combination 7 [0.07ms]
+(pass) owns all declared hidden-own Capability values for combination 0 [0.04ms]
+(pass) owns all declared hidden-own Capability values for combination 1 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 2 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 3 [0.05ms]
+(pass) owns all declared hidden-own Capability values for combination 4 [0.04ms]
+(pass) owns all declared hidden-own Capability values for combination 5 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 6 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 7 [0.03ms]
+(pass) owns all declared enumerable-own Capability values for combination 0 [0.05ms]
+(pass) owns all declared enumerable-own Capability values for combination 1 [0.03ms]
+(pass) owns all declared enumerable-own Capability values for combination 2 [0.04ms]
+(pass) owns all declared enumerable-own Capability values for combination 3 [0.03ms]
+(pass) owns all declared enumerable-own Capability values for combination 4 [0.02ms]
+(pass) owns all declared enumerable-own Capability values for combination 5 [0.04ms]
+(pass) owns all declared enumerable-own Capability values for combination 6 [0.02ms]
+(pass) owns all declared enumerable-own Capability values for combination 7 [0.03ms]
+(pass) preserves prototype incremental read failure 0 [0.16ms]
+(pass) preserves prototype incremental read failure 1
+(pass) preserves prototype incremental read failure 2
+(pass) preserves prototype incremental read failure 3
+(pass) preserves prototype incremental read failure 4
+(pass) preserves prototype incremental read failure 5
+(pass) preserves prototype fixedNodes read failure 0
+(pass) preserves prototype fixedNodes read failure 1
+(pass) preserves prototype fixedNodes read failure 2
+(pass) preserves prototype fixedNodes read failure 3
+(pass) preserves prototype fixedNodes read failure 4
+(pass) preserves prototype fixedNodes read failure 5
+(pass) preserves prototype selfLoops read failure 0
+(pass) preserves prototype selfLoops read failure 1
+(pass) preserves prototype selfLoops read failure 2
+(pass) preserves prototype selfLoops read failure 3
+(pass) preserves prototype selfLoops read failure 4
+(pass) preserves prototype selfLoops read failure 5
+(pass) preserves hidden-own incremental read failure 0
+(pass) preserves hidden-own incremental read failure 1
+(pass) preserves hidden-own incremental read failure 2
+(pass) preserves hidden-own incremental read failure 3
+(pass) preserves hidden-own incremental read failure 4
+(pass) preserves hidden-own incremental read failure 5
+(pass) preserves hidden-own fixedNodes read failure 0
+(pass) preserves hidden-own fixedNodes read failure 1
+(pass) preserves hidden-own fixedNodes read failure 2
+(pass) preserves hidden-own fixedNodes read failure 3
+(pass) preserves hidden-own fixedNodes read failure 4
+(pass) preserves hidden-own fixedNodes read failure 5
+(pass) preserves hidden-own selfLoops read failure 0
+(pass) preserves hidden-own selfLoops read failure 1
+(pass) preserves hidden-own selfLoops read failure 2
+(pass) preserves hidden-own selfLoops read failure 3
+(pass) preserves hidden-own selfLoops read failure 4
+(pass) preserves hidden-own selfLoops read failure 5
+(pass) preserves enumerable-own incremental read failure 0
+(pass) preserves enumerable-own incremental read failure 1
+(pass) preserves enumerable-own incremental read failure 2
+(pass) preserves enumerable-own incremental read failure 3
+(pass) preserves enumerable-own incremental read failure 4
+(pass) preserves enumerable-own incremental read failure 5
+(pass) preserves enumerable-own fixedNodes read failure 0
+(pass) preserves enumerable-own fixedNodes read failure 1
+(pass) preserves enumerable-own fixedNodes read failure 2
+(pass) preserves enumerable-own fixedNodes read failure 3
+(pass) preserves enumerable-own fixedNodes read failure 4
+(pass) preserves enumerable-own fixedNodes read failure 5
+(pass) preserves enumerable-own selfLoops read failure 0
+(pass) preserves enumerable-own selfLoops read failure 1
+(pass) preserves enumerable-own selfLoops read failure 2
+(pass) preserves enumerable-own selfLoops read failure 3
+(pass) preserves enumerable-own selfLoops read failure 4
+(pass) preserves enumerable-own selfLoops read failure 5
+(pass) preserves own enumerable copying order before materializing non-enumerable flags [0.04ms]
+(pass) preserves a capability-source getter failure without converting it to a Layout error [0.03ms]
+
+tests/index.test.ts:
+(pass) a custom Layout Engine computes a full Layout Proposal from a committed Canvas View [0.23ms]
+(pass) Layout data crossing the computation seam is frozen [0.12ms]
+(pass) a pre-aborted Layout Engine preserves the reason without invoking its Provider [0.07ms]
+
+tests/proposal-values.test.ts:
+(pass) Layout compute retains the finite coordinate accepted during validation [0.16ms]
+(pass) Layout validation retains the source revision accepted before reading positions [0.04ms]
+(pass) Layout retains the accepted id property [0.05ms]
+(pass) Layout retains the accepted position property [0.01ms]
+(pass) Layout retains the accepted y property [0.02ms]
+(pass) Layout retains its accepted collection without another field read or iteration [0.10ms]
+(pass) Layout publishes the Fixed Node coordinates that passed validation [0.04ms]
+(pass) Layout preserves revision validation precedence over later read errors [0.12ms]
+(pass) Layout preserves duplicate validation precedence over later read errors [0.08ms]
+(pass) Layout preserves unknown validation precedence over later read errors [0.03ms]
+(pass) Layout preserves x validation precedence over later read errors [0.04ms]
+(pass) Layout propagates the original collection read failure [0.05ms]
+(pass) Layout propagates the original id read failure [0.01ms]
+(pass) Layout propagates the original position read failure
+(pass) Layout propagates the original x read failure
+(pass) Layout propagates the original y read failure
+
+tests/input-validation.test.ts:
+(pass) invalid mode and Fixed Node identities are rejected as invalid Layout Requests [0.15ms]
+(pass) nested Nodes are rejected as unsupported Layout Inputs [0.08ms]
+(pass) mixed Port Endpoints project to Node topology without changing the Document [0.15ms]
+
+tests/error-contract.test.ts:
+(pass) Layout structural failures expose the shared NodeBraid error identity [0.03ms]
+
+tests/input-values.test.ts:
+(pass) Layout Input retains the Request mode accepted during validation [0.09ms]
+(pass) Layout Input retains an accepted incremental Request mode [0.03ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: "wrong",
+  details: {
+    issue: "INVALID_MODE",
+    mode: "wrong",
+  },
+} [0.12ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: null,
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "null",
+  },
+} [0.03ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: 42,
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "number",
+  },
+} [0.02ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: {
+    privateValue: "must-not-escape",
+  },
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "object",
+  },
+} [0.01ms]
+(pass) Layout preserves the original mode read failure before Fixed Node processing [0.04ms]
+(pass) Layout rejects an invalid mode before later Fixed Node read failures [0.05ms]
+(pass) Fixed Node resolution cannot replace the Request mode already accepted [0.05ms]
+(pass) Layout preserves a Fixed Node iterator failure after one mode capture [0.04ms]
+
+tests/proposal-validation.test.ts:
+(pass) a Layout Engine rejects incomplete, foreign, invalid, or constraint-breaking positions [0.36ms]
+(pass) a Proposal must identify the Layout Input revision [0.08ms]
+
+tests/capability-validation.test.ts:
+(pass) a low-level Layout Engine rejects unsupported Input capabilities before its Provider runs [0.17ms]
+
+ 117 pass
+ 0 fail
+ 843 expect() calls
+Ran 117 tests across 8 files. [15.00ms]
+
+[check:affected] packages/layout-dagre: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/layout-dagre: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) Dagre computes deterministic top-left world positions for a full Layout Input [4.80ms]
+(pass) Dagre full layout supports the baseline graph shapes [3.82ms]
+(pass) Dagre preserves every edge constraint when opaque IDs contain graphlib delimiters [0.82ms]
+(pass) Dagre rejects a non-finite Provider configuration before layout [0.17ms]
+
+ 4 pass
+ 0 fail
+ 8 expect() calls
+Ran 4 tests across 1 file. [15.00ms]
+
+[check:affected] packages/layout-elk: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/layout-elk: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/incremental.test.ts:
+(pass) ELK Stress keeps multiple Fixed Nodes at their absolute world positions [119.95ms]
+(pass) ELK Stress incremental layout uses current positions as a deterministic soft constraint [28.36ms]
+(pass) ELK rejects incremental and Fixed Node requests for unproven algorithms [0.42ms]
+
+tests/index.test.ts:
+(pass) ELK computes deterministic top-left world positions for a full Layout Input [13.86ms]
+(pass) ELK layered full treats seed zero as the fixed default seed [96.31ms]
+(pass) ELK stress full treats seed zero as the fixed default seed [80.31ms]
+(pass) ELK stress incremental treats seed zero as the fixed default seed [18.86ms]
+(pass) ELK rejects non-integer and unsafe seeds [0.27ms]
+(pass) ELK full layout supports the baseline graph shapes [18.93ms]
+(pass) ELK rejects a non-finite Provider configuration before layout [0.22ms]
+
+ 10 pass
+ 0 fail
+ 21 expect() calls
+Ran 10 tests across 2 files. [385.00ms]
+
+[check:affected] packages/plugin-layout: /Users/zhou/.bun/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/plugin-layout: /Users/zhou/.bun/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/engine-binding.test.ts:
+(pass) Layout keeps its concrete Engine when options change during capability validation [5.83ms]
+(pass) Layout keeps its concrete Engine when options change after Plugin creation [1.20ms]
+(pass) Layout preserves the original Engine option read failure at creation [0.05ms]
+
+tests/index.test.ts:
+(pass) a typed Layout Command commits all Node positions in one Canvas Commit [1.02ms]
+
+tests/commit-protection.test.ts:
+(pass) a stale Layout Proposal cannot overwrite a newer Kernel revision [1.09ms]
+(pass) cancellation after Provider execution starts preserves the reason and prevents commit [0.86ms]
+(pass) a pre-aborted Layout Command does not invoke the Provider [0.63ms]
+
+tests/request-validation.test.ts:
+(pass) a Node without Size rejects the Layout Request before the Provider runs [0.72ms]
+(pass) unsupported incremental, Fixed Node, and self-loop capabilities fail before the Provider runs [0.85ms]
+
+tests/port-commit-protection.test.ts:
+(pass) a pending Port topology Layout preserves a newer Port Endpoint commit [0.91ms]
+(pass) a pending Port topology Layout preserves a newer Layout commit [0.49ms]
+
+tests/cancellation-boundary.test.ts:
+(pass) direct Engine cancellation skips resolved Proposal reads [0.80ms]
+(pass) helper Engine cancellation skips resolved Proposal reads [0.48ms]
+(pass) an uncancelled direct Engine commits normally and preserves net-zero results [0.62ms]
+(pass) an uncancelled direct Engine still rejects an incomplete Proposal [1.99ms]
+(pass) an uncancelled direct Engine preserves the original Proposal read error [0.74ms]
+(pass) a rejected Engine preserves its original failure when cancellation is false [0.66ms]
+(pass) a rejected Engine preserves its original failure when cancellation is true [0.46ms]
+(pass) cancellation during Proposal validation still prevents the commit [0.50ms]
+
+ 19 pass
+ 0 fail
+ 61 expect() calls
+Ran 19 tests across 6 files. [32.00ms]
+
+[check:affected] .: /Users/zhou/.bun/bin/bun test tests/layout-providers.test.ts
+bun test v1.4.2 (744846f84)
+
+tests/layout-providers.test.ts:
+(pass) Dagre lays out Port topology with one undoable commit and a no-op repeat [12.44ms]
+(pass) ELK lays out Port topology with one undoable commit and a no-op repeat [97.16ms]
+(pass) accepted getter-backed Layout values survive Runtime revalidation and History replay [1.68ms]
+(pass) Dagre and ELK compose with Provider-specific typed Runtime Commands [7.39ms]
+
+ 4 pass
+ 0 fail
+ 92 expect() calls
+Ran 4 tests across 1 file. [139.00ms]
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run test:browser:self
+$ bun run ./browser-tests/basic-svg.browser.ts && bun run ./browser-tests/clipboard.browser.ts && bun run ./browser-tests/document.browser.ts
+Document file workflow passed; evidence: /Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/.tmp/document-browser-36jtbD
+
+[check:affected] .: /Users/zhou/.bun/bin/bun run docs:check:self
+$ bun run docs:verify && bun run website/examples/quick-start.ts && bun run docs:build
+$ bun run website/scripts/verify-content.ts
+documentation content verified (26 modules)
+revision=1 nodes=1
+$ NODEBRAID_DOCS_BASE=/nodebraid/ vitepress build website
+
+  vitepress v1.6.4
+
+- building client + server bundles...
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[32m✓[0m building client + server bundles...
+- rendering pages...
+[32m✓[0m rendering pages...
+build complete in 15.38s.

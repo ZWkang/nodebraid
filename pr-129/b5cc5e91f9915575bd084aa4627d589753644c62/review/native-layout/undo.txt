@@ -1,0 +1,159 @@
+- generic
+  - generic
+    - banner
+      - link "NodeBraid" [ref=e1]
+        - StaticText "NodeBraid"
+          - InlineTextBox "NodeBraid"
+      - navigation "Site navigation" [ref=e2]
+        - link "Documentation" [ref=e4]
+          - StaticText "Documentation"
+            - InlineTextBox "Documentation"
+        - link "Capabilities" [ref=e5]
+          - StaticText "Capabilities"
+            - InlineTextBox "Capabilities"
+        - link "Modules" [ref=e6]
+          - StaticText "Modules"
+            - InlineTextBox "Modules"
+        - link "Interactive Example" [ref=e7]
+          - StaticText "Interactive Example"
+            - InlineTextBox "Interactive Example"
+        - link "GitHub" [ref=e8]
+          - StaticText "GitHub"
+            - InlineTextBox "GitHub"
+      - link "切换到中文" [ref=e3]
+    - main
+      - generic
+        - paragraph
+          - StaticText "INTERACTIVE EXAMPLE"
+            - InlineTextBox "INTERACTIVE EXAMPLE"
+        - heading "Basic SVG Canvas" [level=1, ref=e9]
+          - StaticText "Basic SVG Canvas"
+            - InlineTextBox "Basic SVG Canvas"
+        - paragraph
+          - StaticText "Select, box-select, copy/paste, duplicate, delete, drag, pan, zoom, and connect one node anchor to another."
+            - InlineTextBox "Select, box-select, copy/paste, duplicate, delete, drag, pan, zoom, and connect one node "
+            - InlineTextBox "anchor to another."
+      - generic
+        - toolbar "Canvas controls"
+          - button "Undo" [ref=e11]
+          - button "Redo" [ref=e12]
+          - button "Auto layout" [ref=e13]
+          - separator
+          - button "Zoom in" [ref=e14]
+          - button "Zoom out" [ref=e15]
+          - button "Fit view" [ref=e16]
+          - button "Reset view" [ref=e17]
+          - separator
+          - button "Export document" [ref=e18]
+          - button "Import document" [ref=e19]
+          - separator
+          - button "Reset example" [ref=e20]
+          - button "Disable clipboard shortcuts" [ref=e21]
+          - button "Disable duplicate shortcut" [ref=e22]
+        - region "Interactive canvas" [ref=e10]
+          - image
+      - complementary
+        - generic
+          - StaticText "Runtime state"
+            - InlineTextBox "Runtime state"
+        - StaticText "Ready"
+          - InlineTextBox "Ready"
+        - generic
+          - StaticText "Observed only through public NodeBraid services."
+            - InlineTextBox "Observed only through public "
+            - InlineTextBox "NodeBraid services."
+        - DescriptionList
+          - term "REVISION"
+            - StaticText "REVISION"
+              - InlineTextBox "REVISION"
+          - definition
+            - StaticText "3"
+              - InlineTextBox "3"
+          - term "NODES"
+            - StaticText "NODES"
+              - InlineTextBox "NODES"
+          - definition
+            - StaticText "3"
+              - InlineTextBox "3"
+          - term "EDGES"
+            - StaticText "EDGES"
+              - InlineTextBox "EDGES"
+          - definition
+            - StaticText "1"
+              - InlineTextBox "1"
+          - term "SELECTION"
+            - StaticText "SELECTION"
+              - InlineTextBox "SELECTION"
+          - definition
+            - StaticText "example-discover"
+              - InlineTextBox "example-discover"
+          - term "ZOOM"
+            - StaticText "ZOOM"
+              - InlineTextBox "ZOOM"
+          - definition
+            - StaticText "0.83×"
+              - InlineTextBox "0.83×"
+          - term "HISTORY"
+            - StaticText "HISTORY"
+              - InlineTextBox "HISTORY"
+          - definition
+            - StaticText "Undo / Redo"
+              - InlineTextBox "Undo / Redo"
+          - term "CLIPBOARD FAILURE"
+            - StaticText "CLIPBOARD FAILURE"
+              - InlineTextBox "CLIPBOARD "
+              - InlineTextBox "FAILURE"
+          - definition
+            - StaticText "None"
+              - InlineTextBox "None"
+        - generic
+          - StaticText "Try the interaction loop"
+            - InlineTextBox "Try the interaction loop"
+        - generic
+          - StaticText "Every stable graph change becomes a Kernel Commit."
+            - InlineTextBox "Every stable graph change becomes a "
+            - InlineTextBox "Kernel Commit."
+        - list
+          - listitem [level=1]
+            - StaticText "Click a node to select it."
+              - InlineTextBox "Click a node to select it."
+          - listitem [level=1]
+            - StaticText "Drag across empty canvas space to box-select intersecting nodes."
+              - InlineTextBox "Drag across empty canvas space to "
+              - InlineTextBox "box-select intersecting nodes."
+          - listitem [level=1]
+            - StaticText "Press Ctrl/Cmd+C and Ctrl/Cmd+V while the canvas is focused to copy and paste the Selection."
+              - InlineTextBox "Press Ctrl/Cmd+C and Ctrl/Cmd+V "
+              - InlineTextBox "while the canvas is focused to copy "
+              - InlineTextBox "and paste the Selection."
+          - listitem [level=1]
+            - StaticText "Press Ctrl/Cmd+D while the canvas is focused to duplicate the Selection."
+              - InlineTextBox "Press Ctrl/Cmd+D while the canvas "
+              - InlineTextBox "is focused to duplicate the "
+              - InlineTextBox "Selection."
+          - listitem [level=1]
+            - StaticText "Press Delete while the canvas is focused to remove the Selection."
+              - InlineTextBox "Press Delete while the canvas is "
+              - InlineTextBox "focused to remove the Selection."
+          - listitem [level=1]
+            - StaticText "Drag a selected node."
+              - InlineTextBox "Drag a selected node."
+          - listitem [level=1]
+            - StaticText "Use Auto layout to arrange nodes from left to right; Undo restores their previous positions."
+              - InlineTextBox "Use Auto layout to arrange nodes "
+              - InlineTextBox "from left to right; Undo restores "
+              - InlineTextBox "their previous positions."
+          - listitem [level=1]
+            - StaticText "Drag from a source anchor to a target anchor."
+              - InlineTextBox "Drag from a source anchor to a "
+              - InlineTextBox "target anchor."
+          - listitem [level=1]
+            - StaticText "Pan the canvas or use the mouse wheel to zoom."
+              - InlineTextBox "Pan the canvas or use the mouse "
+              - InlineTextBox "wheel to zoom."
+          - listitem [level=1]
+            - StaticText "Export your canvas to a file, then import it to replace the current canvas. Undo starts with your next edit."
+              - InlineTextBox "Export your canvas to a file, then "
+              - InlineTextBox "import it to replace the current "
+              - InlineTextBox "canvas. Undo starts with your next "
+              - InlineTextBox "edit."

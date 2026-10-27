@@ -1,0 +1,89 @@
+bun test v1.4.2 (744846f84)
+
+packages/layout-api/tests/capability-values.test.ts:
+(pass) retains inherited Capability values in the helper Engine [17.06ms]
+(pass) owns all declared prototype Capability values for combination 0 [5.71ms]
+(pass) owns all declared prototype Capability values for combination 1 [0.10ms]
+(pass) owns all declared prototype Capability values for combination 2 [0.23ms]
+(pass) owns all declared prototype Capability values for combination 3 [0.49ms]
+(pass) owns all declared prototype Capability values for combination 4 [0.05ms]
+(pass) owns all declared prototype Capability values for combination 5 [7.56ms]
+(pass) owns all declared prototype Capability values for combination 6 [0.11ms]
+(pass) owns all declared prototype Capability values for combination 7 [0.43ms]
+(pass) owns all declared hidden-own Capability values for combination 0 [0.11ms]
+(pass) owns all declared hidden-own Capability values for combination 1 [0.04ms]
+(pass) owns all declared hidden-own Capability values for combination 2 [0.04ms]
+(pass) owns all declared hidden-own Capability values for combination 3 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 4 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 5 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 6 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 7 [0.04ms]
+(pass) owns all declared enumerable-own Capability values for combination 0 [0.08ms]
+(pass) owns all declared enumerable-own Capability values for combination 1 [0.03ms]
+(pass) owns all declared enumerable-own Capability values for combination 2 [0.04ms]
+(pass) owns all declared enumerable-own Capability values for combination 3 [0.03ms]
+(pass) owns all declared enumerable-own Capability values for combination 4 [0.03ms]
+(pass) owns all declared enumerable-own Capability values for combination 5 [0.03ms]
+(pass) owns all declared enumerable-own Capability values for combination 6 [0.03ms]
+(pass) owns all declared enumerable-own Capability values for combination 7 [0.04ms]
+(pass) preserves prototype incremental read failure 0 [0.63ms]
+(pass) preserves prototype incremental read failure 1 [0.01ms]
+(pass) preserves prototype incremental read failure 2
+(pass) preserves prototype incremental read failure 3
+(pass) preserves prototype incremental read failure 4
+(pass) preserves prototype incremental read failure 5
+(pass) preserves prototype fixedNodes read failure 0
+(pass) preserves prototype fixedNodes read failure 1
+(pass) preserves prototype fixedNodes read failure 2
+(pass) preserves prototype fixedNodes read failure 3
+(pass) preserves prototype fixedNodes read failure 4
+(pass) preserves prototype fixedNodes read failure 5
+(pass) preserves prototype selfLoops read failure 0
+(pass) preserves prototype selfLoops read failure 1
+(pass) preserves prototype selfLoops read failure 2
+(pass) preserves prototype selfLoops read failure 3
+(pass) preserves prototype selfLoops read failure 4
+(pass) preserves prototype selfLoops read failure 5
+(pass) preserves hidden-own incremental read failure 0
+(pass) preserves hidden-own incremental read failure 1
+(pass) preserves hidden-own incremental read failure 2
+(pass) preserves hidden-own incremental read failure 3
+(pass) preserves hidden-own incremental read failure 4
+(pass) preserves hidden-own incremental read failure 5
+(pass) preserves hidden-own fixedNodes read failure 0
+(pass) preserves hidden-own fixedNodes read failure 1
+(pass) preserves hidden-own fixedNodes read failure 2
+(pass) preserves hidden-own fixedNodes read failure 3
+(pass) preserves hidden-own fixedNodes read failure 4
+(pass) preserves hidden-own fixedNodes read failure 5
+(pass) preserves hidden-own selfLoops read failure 0
+(pass) preserves hidden-own selfLoops read failure 1
+(pass) preserves hidden-own selfLoops read failure 2
+(pass) preserves hidden-own selfLoops read failure 3
+(pass) preserves hidden-own selfLoops read failure 4
+(pass) preserves hidden-own selfLoops read failure 5 [0.02ms]
+(pass) preserves enumerable-own incremental read failure 0
+(pass) preserves enumerable-own incremental read failure 1
+(pass) preserves enumerable-own incremental read failure 2
+(pass) preserves enumerable-own incremental read failure 3
+(pass) preserves enumerable-own incremental read failure 4
+(pass) preserves enumerable-own incremental read failure 5
+(pass) preserves enumerable-own fixedNodes read failure 0
+(pass) preserves enumerable-own fixedNodes read failure 1
+(pass) preserves enumerable-own fixedNodes read failure 2
+(pass) preserves enumerable-own fixedNodes read failure 3
+(pass) preserves enumerable-own fixedNodes read failure 4
+(pass) preserves enumerable-own fixedNodes read failure 5
+(pass) preserves enumerable-own selfLoops read failure 0
+(pass) preserves enumerable-own selfLoops read failure 1
+(pass) preserves enumerable-own selfLoops read failure 2
+(pass) preserves enumerable-own selfLoops read failure 3
+(pass) preserves enumerable-own selfLoops read failure 4
+(pass) preserves enumerable-own selfLoops read failure 5
+(pass) preserves own enumerable copying order before materializing non-enumerable flags [0.06ms]
+(pass) preserves a capability-source getter failure without converting it to a Layout error [0.03ms]
+
+ 81 pass
+ 0 fail
+ 771 expect() calls
+Ran 81 tests across 1 file. [112.00ms]

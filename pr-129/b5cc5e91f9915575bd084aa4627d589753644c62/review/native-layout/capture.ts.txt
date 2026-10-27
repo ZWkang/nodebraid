@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';import {execFileSync} from 'node:child_process';import {appendFileSync,writeFileSync,readFileSync} from 'node:fs';import {createHash} from 'node:crypto';
+import {createProductionAppServer} from "/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/examples/app/browser-tests/browser-test-harness.ts";
+import {createPreviewBrowserRunner} from '/Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow/scripts/collect-preview.ts';
+const root="/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow",out=import.meta.dir,git=(...args:string[])=>execFileSync('git',args,{cwd:root,encoding:'utf8'}).trim();
+const publication=JSON.parse(readFileSync(out+'/../publication.json','utf8')),verification=JSON.parse(readFileSync(out+'/../verification.json','utf8'));
+assert.equal(git('rev-parse','HEAD'),publication.head);assert.equal(git('rev-parse','HEAD^{tree}'),publication.tree);assert.equal(git('status','--porcelain'),'');assert.equal(git('rev-parse',verification.head+'^{tree}'),publication.tree);
+const session='nodebraid-pr129-layout-'+process.pid;
+const runner=createPreviewBrowserRunner(root+'/node_modules/.bin/agent-browser',root,session,out+'/browser-config.json');
+const run=async(args:readonly string[])=>{appendFileSync(out+'/actions.log',JSON.stringify({at:new Date().toISOString(),command:[root+'/node_modules/.bin/agent-browser','--session',session,'--config',out+'/browser-config.json',...args]})+'\n');try{const result=await runner(args);appendFileSync(out+'/actions.log',JSON.stringify({exitCode:0,stdout:result})+'\n');return result;}catch(error){appendFileSync(out+'/actions.log',JSON.stringify({error:String(error)})+'\n');throw error;}};
+const evaluate=async<T>(expression:string):Promise<T>=>{const result=JSON.parse(await run(['eval',expression,'--json']));assert.equal(result.success,true,JSON.stringify(result.error));assert.ok(result.data);return result.data.result as T;};
+const wait=async(expected:Record<string,string>)=>evaluate<Record<string,string>>(`new Promise((resolve,reject)=>{const expected=${JSON.stringify(expected)},deadline=Date.now()+5000;const read=()=>{const actual=Object.fromEntries(Object.keys(expected).map(name=>[name,document.querySelector('[data-example-metric="'+name+'"]')?.textContent]));if(document.querySelector('[data-example-status]')?.getAttribute('data-example-status')==='ready'&&Object.entries(expected).every(([k,v])=>actual[k]===v)){resolve(actual);return;}if(Date.now()>=deadline){reject(new Error('Expected metrics '+JSON.stringify(expected)+' actual '+JSON.stringify(actual)));return;}setTimeout(read,25);};read();})`);
+interface State {positions:Record<string,{x:number;y:number}>;transform:string|null;edgeIds:string[];metrics:Record<string,string>}
+const state=()=>evaluate<State>(`({positions:Object.fromEntries(Array.from(document.querySelectorAll('[data-nodebraid-node-id]'),node=>[node.getAttribute('data-nodebraid-node-id'),{x:Number(node.getAttribute('x')),y:Number(node.getAttribute('y'))}])),transform:document.querySelector('[data-nodebraid-renderer-svg-root]')?.getAttribute('transform')??null,edgeIds:Array.from(document.querySelectorAll('[data-nodebraid-edge-id]'),edge=>edge.getAttribute('data-nodebraid-edge-id')),metrics:Object.fromEntries(Array.from(document.querySelectorAll('[data-example-metric]'),e=>[e.getAttribute('data-example-metric'),e.textContent]))})`);
+const snapshots:Record<string,State>={};
+const capture=async(name:string)=>{const current=await state();snapshots[name]=current;writeFileSync(out+'/'+name+'.json',JSON.stringify(current,null,2)+'\n');await run(['screenshot',out+'/'+name+'.png']);writeFileSync(out+'/'+name+'.txt',await run(['snapshot']));return current;};
+const server=await createProductionAppServer(root+'/examples/app');
+writeFileSync(out+'/session.json',JSON.stringify({session,url:server.url.origin+'/basic-svg?lang=en',source:publication,productionDistributionBuiltAtLocalHead:verification.head,productionTreeVerifiedIdentical:true,browserConfig:'empty explicit config; inherited AGENT_BROWSER_* filtered by canonical runner'},null,2)+'\n');
+try{
+ await run(['open',server.url.origin+'/basic-svg?lang=en']);await run(['set','viewport','1280','720']);
+ await wait({revision:'1',nodes:'3',edges:'1',selection:'None',zoom:'1.00×'});
+ assert.equal(await evaluate<number>('document.querySelectorAll("[data-nodebraid-renderer-svg-root]").length'),1);
+ const userAgent=await evaluate<string>('navigator.userAgent');
+ await run(['click','[data-nodebraid-node-id="example-discover"]']);await run(['click','[aria-label="Zoom out"]']);
+ await wait({revision:'1',selection:'example-discover',zoom:'0.83×'});
+ const before=await capture('before');assert.ok(before.transform);
+ assert.deepEqual(before.positions,{'example-compose':{x:360,y:260},'example-discover':{x:80,y:100},'example-ship':{x:660,y:120}});
+ await run(['click','[aria-label="Auto layout"]']);await wait({revision:'2',nodes:'3',edges:'1',selection:'example-discover',zoom:'0.83×'});
+ const after=await capture('after');assert.notDeepEqual(after.positions,before.positions);assert.deepEqual(Object.keys(after.positions),Object.keys(before.positions));assert.ok(after.positions['example-compose']!.x>after.positions['example-discover']!.x);assert.equal(after.transform,before.transform);assert.deepEqual(after.edgeIds,before.edgeIds);
+ await run(['click','[aria-label="Auto layout"]']);await wait({revision:'2',history:'Undo / —'});
+ const repeated=await capture('repeat');assert.deepEqual(repeated,after);
+ await run(['click','[aria-label="Undo"]']);await wait({revision:'3',selection:'example-discover',zoom:'0.83×'});
+ const undone=await capture('undo');assert.deepEqual(undone.positions,before.positions);assert.equal(undone.transform,before.transform);assert.deepEqual(undone.edgeIds,before.edgeIds);
+ await run(['click','[aria-label="Redo"]']);await wait({revision:'4',selection:'example-discover',zoom:'0.83×'});
+ const redone=await capture('redo');assert.deepEqual(redone.positions,after.positions);assert.equal(redone.transform,before.transform);assert.deepEqual(redone.edgeIds,before.edgeIds);
+ writeFileSync(out+'/result.json',JSON.stringify({passed:true,source:{base:publication.parent,head:publication.head,tree:publication.tree,patch:verification.patch},productionDistributionBuiltAtLocalHead:verification.head,sameTreePublicationMapping:true,userAgent,session,url:server.url.origin+'/basic-svg?lang=en',states:snapshots,nativeControls:['select node','Zoom out','Auto layout','repeat Auto layout','Undo','Redo'],scope:'Real Chromium native clicks and public DOM/metrics. This exercises ordinary Dagre/full/LR behavior, not the getter-substitution API fixture. Before/after are interactions at one published head, not base-code comparisons.'},null,2)+'\n');
+ console.log(JSON.stringify({passed:true,source:publication.head,revisions:[before.metrics.revision,after.metrics.revision,repeated.metrics.revision,undone.metrics.revision,redone.metrics.revision],selectionPreserved:true,viewportPreserved:true,provider:'actual Dagre/full/LR'}));
+}catch(error){try{await run(['screenshot',out+'/failure.png']);}catch(captureError){appendFileSync(out+'/actions.log',String(captureError)+'\n');}writeFileSync(out+'/failure.json',JSON.stringify({error:String(error),source:publication},null,2)+'\n');throw error;}
+finally{await run(['close']);await server.stop(true);writeFileSync(out+'/cleanup.json',JSON.stringify({closedOnlyOwnedSession:session,ownedServerStopped:true,originalEvidenceRetained:true},null,2)+'\n');}

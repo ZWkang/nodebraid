@@ -1,0 +1,170 @@
+{
+  "passed": true,
+  "source": {
+    "base": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+    "head": "b5cc5e91f9915575bd084aa4627d589753644c62",
+    "tree": "1590be6c815c785a35b2755ad0532aecc193c46a",
+    "patch": "6bcbb10f76f389ffc3a2cdeb30b5f3544c02787e280dbff6020cc6126e834342"
+  },
+  "productionDistributionBuiltAtLocalHead": "d1924090cd37125c9955ebfe869e8e0e974d0776",
+  "sameTreePublicationMapping": true,
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+  "session": "nodebraid-pr129-layout-72073",
+  "url": "http://127.0.0.1:55297/basic-svg?lang=en",
+  "states": {
+    "before": {
+      "edgeIds": [
+        "example-initial-edge"
+      ],
+      "metrics": {
+        "clipboard-failure": "None",
+        "edges": "1",
+        "history": "Undo / —",
+        "nodes": "3",
+        "revision": "1",
+        "selection": "example-discover",
+        "zoom": "0.83×"
+      },
+      "positions": {
+        "example-compose": {
+          "x": 360,
+          "y": 260
+        },
+        "example-discover": {
+          "x": 80,
+          "y": 100
+        },
+        "example-ship": {
+          "x": 660,
+          "y": 120
+        }
+      },
+      "transform": "matrix(0.833333333333 0 0 0.833333333333 73.166666666667 40.799479166667)"
+    },
+    "after": {
+      "edgeIds": [
+        "example-initial-edge"
+      ],
+      "metrics": {
+        "clipboard-failure": "None",
+        "edges": "1",
+        "history": "Undo / —",
+        "nodes": "3",
+        "revision": "2",
+        "selection": "example-discover",
+        "zoom": "0.83×"
+      },
+      "positions": {
+        "example-compose": {
+          "x": 210,
+          "y": 0
+        },
+        "example-discover": {
+          "x": 0,
+          "y": 0
+        },
+        "example-ship": {
+          "x": 0,
+          "y": 138
+        }
+      },
+      "transform": "matrix(0.833333333333 0 0 0.833333333333 73.166666666667 40.799479166667)"
+    },
+    "repeat": {
+      "edgeIds": [
+        "example-initial-edge"
+      ],
+      "metrics": {
+        "clipboard-failure": "None",
+        "edges": "1",
+        "history": "Undo / —",
+        "nodes": "3",
+        "revision": "2",
+        "selection": "example-discover",
+        "zoom": "0.83×"
+      },
+      "positions": {
+        "example-compose": {
+          "x": 210,
+          "y": 0
+        },
+        "example-discover": {
+          "x": 0,
+          "y": 0
+        },
+        "example-ship": {
+          "x": 0,
+          "y": 138
+        }
+      },
+      "transform": "matrix(0.833333333333 0 0 0.833333333333 73.166666666667 40.799479166667)"
+    },
+    "undo": {
+      "edgeIds": [
+        "example-initial-edge"
+      ],
+      "metrics": {
+        "clipboard-failure": "None",
+        "edges": "1",
+        "history": "Undo / Redo",
+        "nodes": "3",
+        "revision": "3",
+        "selection": "example-discover",
+        "zoom": "0.83×"
+      },
+      "positions": {
+        "example-compose": {
+          "x": 360,
+          "y": 260
+        },
+        "example-discover": {
+          "x": 80,
+          "y": 100
+        },
+        "example-ship": {
+          "x": 660,
+          "y": 120
+        }
+      },
+      "transform": "matrix(0.833333333333 0 0 0.833333333333 73.166666666667 40.799479166667)"
+    },
+    "redo": {
+      "edgeIds": [
+        "example-initial-edge"
+      ],
+      "metrics": {
+        "clipboard-failure": "None",
+        "edges": "1",
+        "history": "Undo / —",
+        "nodes": "3",
+        "revision": "4",
+        "selection": "example-discover",
+        "zoom": "0.83×"
+      },
+      "positions": {
+        "example-compose": {
+          "x": 210,
+          "y": 0
+        },
+        "example-discover": {
+          "x": 0,
+          "y": 0
+        },
+        "example-ship": {
+          "x": 0,
+          "y": 138
+        }
+      },
+      "transform": "matrix(0.833333333333 0 0 0.833333333333 73.166666666667 40.799479166667)"
+    }
+  },
+  "nativeControls": [
+    "select node",
+    "Zoom out",
+    "Auto layout",
+    "repeat Auto layout",
+    "Undo",
+    "Redo"
+  ],
+  "scope": "Real Chromium native clicks and public DOM/metrics. This exercises ordinary Dagre/full/LR behavior, not the getter-substitution API fixture. Before/after are interactions at one published head, not base-code comparisons."
+}

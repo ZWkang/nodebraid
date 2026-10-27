@@ -1,0 +1,28 @@
+
+packages/layout-api/tests/capability-values.test.ts:
+24 |     compute(input) {
+25 |       calls += 1;
+26 |       return { sourceRevision: input.revision, positions: [] };
+27 |     },
+28 |   });
+29 |   expect(engine.capabilities).toEqual({ incremental: true, fixedNodes: true, selfLoops: true });
+                                   ^
+error: expect(received).toEqual(expected)
+
+- {
+-   "fixedNodes": true,
+-   "incremental": true,
+-   "selfLoops": true,
+- }
++ {}
+
+- Expected  - 5
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/layout-api/tests/capability-values.test.ts:29:31)
+(fail) retains inherited Capability values in the helper Engine [23.83ms]
+
+ 0 pass
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [100.00ms]

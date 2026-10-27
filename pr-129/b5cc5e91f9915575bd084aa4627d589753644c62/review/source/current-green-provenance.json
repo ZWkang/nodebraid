@@ -1,0 +1,29 @@
+{
+  "head": "d1924090cd37125c9955ebfe869e8e0e974d0776",
+  "tree": "1590be6c815c785a35b2755ad0532aecc193c46a",
+  "originalSource": "/Users/zhou/.codex/local-workflows/nodebraid/runs/20261027T035938-layout-boundaries/layout-capabilities-repro.ts",
+  "sourceSHA256": "cea6723bb9e139e606bca7ee9816ea0a2c9873dfbb5e88f2abdff4b607776ee7",
+  "copiedSourceSHA256": "cea6723bb9e139e606bca7ee9816ea0a2c9873dfbb5e88f2abdff4b607776ee7",
+  "resolved": {
+    "@nodebraid/runtime-cordis": "/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/runtime-cordis/dist/index.js",
+    "@nodebraid/kernel": "/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/kernel/dist/index.js",
+    "@nodebraid/plugin-kernel": "/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/plugin-kernel/dist/index.js",
+    "@nodebraid/plugin-command": "/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/plugin-command/dist/index.js",
+    "@nodebraid/plugin-history": "/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/plugin-history/dist/index.js",
+    "@nodebraid/layout-api": "/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/layout-api/dist/index.js",
+    "@nodebraid/plugin-layout": "/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/plugin-layout/dist/index.js",
+    "@nodebraid/diagnostics": "/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/diagnostics/dist/index.js"
+  },
+  "entryHashes": {
+    "@nodebraid/runtime-cordis": "c51e03769fd58eee903f81f5556ad3ac653917eab47c6dd6226d5e8c1972d5f4",
+    "@nodebraid/kernel": "c9ff8d863bd1c07313f11443fbf1c8773ff320d6edb4d5b0d18e35cd1b429f92",
+    "@nodebraid/plugin-kernel": "6a8360764dcc17d0cdc449d77f86cdce959a8d69ca30e3e1394c96327b26aa70",
+    "@nodebraid/plugin-command": "1d7f5330d190f6308aca64385aef47729efd99c86e8cf7486efa7d138e5895de",
+    "@nodebraid/plugin-history": "c236bbcb6d41f1cdc3de040a34287ac87e8d4c3fd68cb4e20c8106e067b205bf",
+    "@nodebraid/layout-api": "a203b3a5d4ff2a58a36e24d19dd9b910e42e82c3b6958b8c234c68445aea4afd",
+    "@nodebraid/plugin-layout": "7b0948a50828ec75e365f8a86a10970e2b147c5f0b1867fac33840f2a069c3f9",
+    "@nodebraid/diagnostics": "438fb75caf4a4ff7e7e73dd3b13a9c188a47448b0892e8b3f7fa3158f6886ac9"
+  },
+  "bundle": "/Users/zhou/.codex/local-workflows/nodebraid/runs/ac599065-2060-403e-baa3-e20ab3670f6d/original-green/d1924090cd37125c9955ebfe869e8e0e974d0776/build/layout-capabilities-repro.js",
+  "bundleSHA256": "6457aacb0438e4b6f30b4ee47f7a5e41c01c0040ccaa2b9ce92e63620b825575"
+}

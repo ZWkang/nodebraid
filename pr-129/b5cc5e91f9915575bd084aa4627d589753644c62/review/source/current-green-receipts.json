@@ -1,0 +1,33 @@
+[
+  {
+    "command": [
+      "/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/node_modules/.bin/tsc",
+      "--noEmit",
+      "--pretty",
+      "false",
+      "-p",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/ac599065-2060-403e-baa3-e20ab3670f6d/original-green/d1924090cd37125c9955ebfe869e8e0e974d0776/tsconfig.json"
+    ],
+    "startedAt": "2026-10-27T04:40:36.228656+00:00",
+    "exitCode": 0,
+    "sourceSHA256": "cea6723bb9e139e606bca7ee9816ea0a2c9873dfbb5e88f2abdff4b607776ee7"
+  },
+  {
+    "command": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/ac599065-2060-403e-baa3-e20ab3670f6d/original-green/d1924090cd37125c9955ebfe869e8e0e974d0776/build-original.ts"
+    ],
+    "startedAt": "2026-10-27T04:40:36.649906+00:00",
+    "exitCode": 0,
+    "sourceSHA256": "cea6723bb9e139e606bca7ee9816ea0a2c9873dfbb5e88f2abdff4b607776ee7"
+  },
+  {
+    "command": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/ac599065-2060-403e-baa3-e20ab3670f6d/original-green/d1924090cd37125c9955ebfe869e8e0e974d0776/build/layout-capabilities-repro.js"
+    ],
+    "startedAt": "2026-10-27T04:40:36.875099+00:00",
+    "exitCode": 0,
+    "sourceSHA256": "cea6723bb9e139e606bca7ee9816ea0a2c9873dfbb5e88f2abdff4b607776ee7"
+  }
+]

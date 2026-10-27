@@ -1,0 +1,245 @@
+Independent Standards + ponytail-review, corrected complete Issue128 patch
+Base 6fd2d016f6330cc422508b3e51229bea4be2cce0
+Head d1924090cd37125c9955ebfe869e8e0e974d0776
+Tree 1590be6c815c785a35b2755ad0532aecc193c46a
+Binary patch SHA256 6bcbb10f76f389ffc3a2cdeb30b5f3544c02787e280dbff6020cc6126e834342
+Task digest 78e4d4e2ec9c37ff55c487cd2c78900a462bd8c3534f0a961853f4836bcedeb9
+Complete combined stdout/stderr from process tools follows.
+
+Pre-test HEAD/tree/clean/merge-base, canonical patch byte/SHA comparison, independent task, byte-identical production and compiled capability-copy checks:
+PRE-TEST EXACT SOURCE / COMPLETE PATCH / CLEAN TREE / TASK / UNCHANGED PRODUCTION / COMPILED CAPABILITY COPY: PASS
+
+Exit code: 0
+
+$ bun test packages/layout-api/tests packages/plugin-layout/tests packages/layout-dagre/tests packages/layout-elk/tests tests/layout-providers.test.ts
+bun test v1.4.2 (744846f84)
+
+tests/layout-providers.test.ts:
+(pass) Dagre lays out Port topology with one undoable commit and a no-op repeat [36.84ms]
+(pass) ELK lays out Port topology with one undoable commit and a no-op repeat [108.91ms]
+(pass) accepted getter-backed Layout values survive Runtime revalidation and History replay [2.05ms]
+(pass) Dagre and ELK compose with Provider-specific typed Runtime Commands [7.56ms]
+
+packages/plugin-layout/tests/engine-binding.test.ts:
+(pass) Layout keeps its concrete Engine when options change during capability validation [1.56ms]
+(pass) Layout keeps its concrete Engine when options change after Plugin creation [1.07ms]
+(pass) Layout preserves the original Engine option read failure at creation [0.08ms]
+
+packages/plugin-layout/tests/index.test.ts:
+(pass) a typed Layout Command commits all Node positions in one Canvas Commit [0.92ms]
+
+packages/plugin-layout/tests/commit-protection.test.ts:
+(pass) a stale Layout Proposal cannot overwrite a newer Kernel revision [0.93ms]
+(pass) cancellation after Provider execution starts preserves the reason and prevents commit [0.92ms]
+(pass) a pre-aborted Layout Command does not invoke the Provider [0.75ms]
+
+packages/plugin-layout/tests/request-validation.test.ts:
+(pass) a Node without Size rejects the Layout Request before the Provider runs [0.63ms]
+(pass) unsupported incremental, Fixed Node, and self-loop capabilities fail before the Provider runs [0.79ms]
+
+packages/plugin-layout/tests/port-commit-protection.test.ts:
+(pass) a pending Port topology Layout preserves a newer Port Endpoint commit [1.16ms]
+(pass) a pending Port topology Layout preserves a newer Layout commit [0.56ms]
+
+packages/plugin-layout/tests/cancellation-boundary.test.ts:
+(pass) direct Engine cancellation skips resolved Proposal reads [0.77ms]
+(pass) helper Engine cancellation skips resolved Proposal reads [0.56ms]
+(pass) an uncancelled direct Engine commits normally and preserves net-zero results [0.64ms]
+(pass) an uncancelled direct Engine still rejects an incomplete Proposal [0.57ms]
+(pass) an uncancelled direct Engine preserves the original Proposal read error [0.48ms]
+(pass) a rejected Engine preserves its original failure when cancellation is false [0.51ms]
+(pass) a rejected Engine preserves its original failure when cancellation is true [0.57ms]
+(pass) cancellation during Proposal validation still prevents the commit [0.68ms]
+
+packages/layout-dagre/tests/index.test.ts:
+(pass) Dagre computes deterministic top-left world positions for a full Layout Input [0.71ms]
+(pass) Dagre full layout supports the baseline graph shapes [2.73ms]
+(pass) Dagre preserves every edge constraint when opaque IDs contain graphlib delimiters [0.97ms]
+(pass) Dagre rejects a non-finite Provider configuration before layout [0.15ms]
+
+packages/layout-elk/tests/incremental.test.ts:
+(pass) ELK Stress keeps multiple Fixed Nodes at their absolute world positions [6.59ms]
+(pass) ELK Stress incremental layout uses current positions as a deterministic soft constraint [22.58ms]
+(pass) ELK rejects incremental and Fixed Node requests for unproven algorithms [0.49ms]
+
+packages/layout-elk/tests/index.test.ts:
+(pass) ELK computes deterministic top-left world positions for a full Layout Input [6.30ms]
+(pass) ELK layered full treats seed zero as the fixed default seed [90.92ms]
+(pass) ELK stress full treats seed zero as the fixed default seed [78.21ms]
+(pass) ELK stress incremental treats seed zero as the fixed default seed [23.27ms]
+(pass) ELK rejects non-integer and unsafe seeds [0.53ms]
+(pass) ELK full layout supports the baseline graph shapes [19.42ms]
+(pass) ELK rejects a non-finite Provider configuration before layout [0.25ms]
+
+packages/layout-api/tests/capability-values.test.ts:
+(pass) retains inherited Capability values in the helper Engine [0.19ms]
+(pass) owns all declared prototype Capability values for combination 0 [0.44ms]
+(pass) owns all declared prototype Capability values for combination 1 [0.07ms]
+(pass) owns all declared prototype Capability values for combination 2 [0.04ms]
+(pass) owns all declared prototype Capability values for combination 3 [0.04ms]
+(pass) owns all declared prototype Capability values for combination 4 [0.04ms]
+(pass) owns all declared prototype Capability values for combination 5 [0.03ms]
+(pass) owns all declared prototype Capability values for combination 6 [0.03ms]
+(pass) owns all declared prototype Capability values for combination 7 [0.07ms]
+(pass) owns all declared hidden-own Capability values for combination 0 [0.06ms]
+(pass) owns all declared hidden-own Capability values for combination 1 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 2 [0.02ms]
+(pass) owns all declared hidden-own Capability values for combination 3 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 4 [0.02ms]
+(pass) owns all declared hidden-own Capability values for combination 5 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 6 [0.02ms]
+(pass) owns all declared hidden-own Capability values for combination 7 [0.04ms]
+(pass) owns all declared enumerable-own Capability values for combination 0 [0.02ms]
+(pass) owns all declared enumerable-own Capability values for combination 1 [0.23ms]
+(pass) owns all declared enumerable-own Capability values for combination 2 [0.07ms]
+(pass) owns all declared enumerable-own Capability values for combination 3 [0.15ms]
+(pass) owns all declared enumerable-own Capability values for combination 4 [0.03ms]
+(pass) owns all declared enumerable-own Capability values for combination 5 [0.02ms]
+(pass) owns all declared enumerable-own Capability values for combination 6 [0.02ms]
+(pass) owns all declared enumerable-own Capability values for combination 7 [0.02ms]
+(pass) preserves prototype incremental read failure 0 [0.13ms]
+(pass) preserves prototype incremental read failure 1 [0.04ms]
+(pass) preserves prototype incremental read failure 2 [0.04ms]
+(pass) preserves prototype incremental read failure 3 [0.04ms]
+(pass) preserves prototype incremental read failure 4
+(pass) preserves prototype incremental read failure 5
+(pass) preserves prototype fixedNodes read failure 0
+(pass) preserves prototype fixedNodes read failure 1 [0.07ms]
+(pass) preserves prototype fixedNodes read failure 2 [0.01ms]
+(pass) preserves prototype fixedNodes read failure 3
+(pass) preserves prototype fixedNodes read failure 4
+(pass) preserves prototype fixedNodes read failure 5
+(pass) preserves prototype selfLoops read failure 0
+(pass) preserves prototype selfLoops read failure 1
+(pass) preserves prototype selfLoops read failure 2
+(pass) preserves prototype selfLoops read failure 3 [0.05ms]
+(pass) preserves prototype selfLoops read failure 4 [0.04ms]
+(pass) preserves prototype selfLoops read failure 5 [0.02ms]
+(pass) preserves hidden-own incremental read failure 0 [0.04ms]
+(pass) preserves hidden-own incremental read failure 1 [0.02ms]
+(pass) preserves hidden-own incremental read failure 2 [0.02ms]
+(pass) preserves hidden-own incremental read failure 3
+(pass) preserves hidden-own incremental read failure 4
+(pass) preserves hidden-own incremental read failure 5
+(pass) preserves hidden-own fixedNodes read failure 0
+(pass) preserves hidden-own fixedNodes read failure 1
+(pass) preserves hidden-own fixedNodes read failure 2
+(pass) preserves hidden-own fixedNodes read failure 3
+(pass) preserves hidden-own fixedNodes read failure 4
+(pass) preserves hidden-own fixedNodes read failure 5
+(pass) preserves hidden-own selfLoops read failure 0
+(pass) preserves hidden-own selfLoops read failure 1
+(pass) preserves hidden-own selfLoops read failure 2
+(pass) preserves hidden-own selfLoops read failure 3 [0.02ms]
+(pass) preserves hidden-own selfLoops read failure 4
+(pass) preserves hidden-own selfLoops read failure 5
+(pass) preserves enumerable-own incremental read failure 0
+(pass) preserves enumerable-own incremental read failure 1
+(pass) preserves enumerable-own incremental read failure 2
+(pass) preserves enumerable-own incremental read failure 3
+(pass) preserves enumerable-own incremental read failure 4
+(pass) preserves enumerable-own incremental read failure 5
+(pass) preserves enumerable-own fixedNodes read failure 0 [0.01ms]
+(pass) preserves enumerable-own fixedNodes read failure 1 [0.05ms]
+(pass) preserves enumerable-own fixedNodes read failure 2
+(pass) preserves enumerable-own fixedNodes read failure 3
+(pass) preserves enumerable-own fixedNodes read failure 4 [0.01ms]
+(pass) preserves enumerable-own fixedNodes read failure 5 [0.02ms]
+(pass) preserves enumerable-own selfLoops read failure 0 [0.02ms]
+(pass) preserves enumerable-own selfLoops read failure 1
+(pass) preserves enumerable-own selfLoops read failure 2
+(pass) preserves enumerable-own selfLoops read failure 3
+(pass) preserves enumerable-own selfLoops read failure 4
+(pass) preserves enumerable-own selfLoops read failure 5
+(pass) preserves own enumerable copying order before materializing non-enumerable flags [0.07ms]
+(pass) preserves a capability-source getter failure without converting it to a Layout error [0.03ms]
+
+packages/layout-api/tests/index.test.ts:
+(pass) a custom Layout Engine computes a full Layout Proposal from a committed Canvas View [0.30ms]
+(pass) Layout data crossing the computation seam is frozen [0.13ms]
+(pass) a pre-aborted Layout Engine preserves the reason without invoking its Provider [0.09ms]
+
+packages/layout-api/tests/proposal-values.test.ts:
+(pass) Layout compute retains the finite coordinate accepted during validation [0.21ms]
+(pass) Layout validation retains the source revision accepted before reading positions [0.04ms]
+(pass) Layout retains the accepted id property [0.05ms]
+(pass) Layout retains the accepted position property [0.02ms]
+(pass) Layout retains the accepted y property [0.02ms]
+(pass) Layout retains its accepted collection without another field read or iteration [0.08ms]
+(pass) Layout publishes the Fixed Node coordinates that passed validation [0.03ms]
+(pass) Layout preserves revision validation precedence over later read errors [0.16ms]
+(pass) Layout preserves duplicate validation precedence over later read errors [0.03ms]
+(pass) Layout preserves unknown validation precedence over later read errors [0.02ms]
+(pass) Layout preserves x validation precedence over later read errors [0.10ms]
+(pass) Layout propagates the original collection read failure [0.09ms]
+(pass) Layout propagates the original id read failure [0.01ms]
+(pass) Layout propagates the original position read failure [0.01ms]
+(pass) Layout propagates the original x read failure [0.06ms]
+(pass) Layout propagates the original y read failure [0.02ms]
+
+packages/layout-api/tests/input-validation.test.ts:
+(pass) invalid mode and Fixed Node identities are rejected as invalid Layout Requests [0.25ms]
+(pass) nested Nodes are rejected as unsupported Layout Inputs [0.13ms]
+(pass) mixed Port Endpoints project to Node topology without changing the Document [0.21ms]
+
+packages/layout-api/tests/error-contract.test.ts:
+(pass) Layout structural failures expose the shared NodeBraid error identity [0.04ms]
+
+packages/layout-api/tests/input-values.test.ts:
+(pass) Layout Input retains the Request mode accepted during validation [0.13ms]
+(pass) Layout Input retains an accepted incremental Request mode [0.04ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: "wrong",
+  details: {
+    issue: "INVALID_MODE",
+    mode: "wrong",
+  },
+} [0.11ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: null,
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "null",
+  },
+} [0.02ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: 42,
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "number",
+  },
+} [0.01ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: {
+    privateValue: "must-not-escape",
+  },
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "object",
+  },
+} [0.01ms]
+(pass) Layout preserves the original mode read failure before Fixed Node processing [0.04ms]
+(pass) Layout rejects an invalid mode before later Fixed Node read failures [0.03ms]
+(pass) Fixed Node resolution cannot replace the Request mode already accepted [0.04ms]
+(pass) Layout preserves a Fixed Node iterator failure after one mode capture [0.04ms]
+
+packages/layout-api/tests/proposal-validation.test.ts:
+(pass) a Layout Engine rejects incomplete, foreign, invalid, or constraint-breaking positions [0.42ms]
+(pass) a Proposal must identify the Layout Input revision [0.09ms]
+
+packages/layout-api/tests/capability-validation.test.ts:
+(pass) a low-level Layout Engine rejects unsupported Input capabilities before its Provider runs [0.29ms]
+
+ 154 pass
+ 0 fail
+ 1025 expect() calls
+Ran 154 tests across 18 files. [516.00ms]
+
+Exit code: 0
+
+Post-test source/task/canonical saved patch/clean/parent/empty source discussion/whitespace and immutable original Standards evidence checks, plus actual two-commit list:
+POST-TEST CURRENT SOURCE / CANONICAL COMPLETE PATCH / CLEAN TREE / TASK / SOURCE DISCUSSION / WHITESPACE / IMMUTABLE ORIGINAL STANDARDS RECORDS: PASS
+d192409 test: assert original Layout read errors
+d15e804 fix: preserve declared Layout capabilities
+
+Exit code: 0

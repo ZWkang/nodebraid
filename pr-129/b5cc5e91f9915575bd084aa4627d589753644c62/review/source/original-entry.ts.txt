@@ -1,0 +1,72 @@
+import assert from 'node:assert/strict';
+import process from 'node:process';import {writeFileSync} from 'node:fs';
+import {createPluginHost,definePlugin} from '@nodebraid/runtime-cordis';
+import {nodeId,edgeId,type CanvasCommit} from '@nodebraid/kernel';
+import {kernelPlugin,kernelService,type KernelService} from '@nodebraid/plugin-kernel';
+import {commandPlugin,commandService,defineCommand,type CommandService} from '@nodebraid/plugin-command';
+import {historyPlugin,historyService,establishHistoryBaselineCommand,undoCommand,redoCommand,type HistoryService} from '@nodebraid/plugin-history';
+import {defineLayoutEngine,LayoutError,type LayoutCapabilities,type LayoutEngine,type LayoutInput,type LayoutComputeContext,type LayoutProposal} from '@nodebraid/layout-api';
+import {createLayoutPlugin,type LayoutCommandInput,type LayoutCommandResult} from '@nodebraid/plugin-layout';
+type Shape='prototype-getters'|'nonenumerable-own'|'enumerable-own';
+interface Config {readonly opaque:object}
+class PrototypeCapabilities implements LayoutCapabilities {
+ get incremental():boolean{return true;}
+ get fixedNodes():boolean{return true;}
+ get selfLoops():boolean{return true;}
+}
+class HiddenCapabilities implements LayoutCapabilities {
+ readonly incremental=true;readonly fixedNodes=true;readonly selfLoops=true;
+ constructor(){for(const key of ['incremental','fixedNodes','selfLoops'] as const)Object.defineProperty(this,key,{enumerable:false});}
+}
+const results:Record<string,unknown>[]=[];const output=process.env.NODEBRAID_LAYOUT_REPRO_RESULTS;assert.ok(output);
+for(const helper of [true,false]){
+ for(const shape of ['prototype-getters','nonenumerable-own','enumerable-own'] as const satisfies readonly Shape[]){
+  const capabilities:LayoutCapabilities=shape==='prototype-getters'?new PrototypeCapabilities():shape==='nonenumerable-own'?new HiddenCapabilities():{incremental:true,fixedNodes:true,selfLoops:true};
+  assert.equal(capabilities.incremental,true);assert.equal(capabilities.fixedNodes,true);assert.equal(capabilities.selfLoops,true);
+  const id=(helper?'helper-':'raw-')+shape;
+  let computeCalls=0;
+  const config:Config={opaque:{caller:Symbol(id)}};
+  const compute=async(input:LayoutInput,received:Config,context:LayoutComputeContext):Promise<LayoutProposal>=>{
+   computeCalls++;assert.equal(received,config);assert.equal(context.signal.aborted,false);
+   assert.ok(Object.isFrozen(input)&&Object.isFrozen(input.nodes)&&Object.isFrozen(input.edges));
+   return {sourceRevision:input.revision,positions:input.nodes.map(node=>({id:node.id,position:node.fixed?node.position:{x:23,y:-5}}))};
+  };
+  const engine:LayoutEngine<Config>=helper?defineLayoutEngine({id,capabilities,compute}):{id,capabilities,compute};
+  const capturedFlags=(['incremental','fixedNodes','selfLoops'] as const).map(key=>({key,type:typeof engine.capabilities[key],value:engine.capabilities[key]}));
+  const flagsPreserved=capturedFlags.every(flag=>flag.value===true);
+  const command=defineCommand<LayoutCommandInput<Config>,LayoutCommandResult>('probe.layout.'+id);
+  const host=createPluginHost();let kernel:KernelService|undefined,commands:CommandService|undefined,history:HistoryService|undefined;
+  const installations=[host.install(kernelPlugin),host.install(commandPlugin),host.install(historyPlugin),host.install(createLayoutPlugin({engine,command})),host.install(definePlugin({requires:{kernel:kernelService,commands:commandService,history:historyService},setup(context){kernel=context.services.kernel;commands=context.services.commands;history=context.services.history;}}))];
+  try{
+   await Promise.all(installations.map(installation=>installation.whenActive()));
+   assert.ok(kernel&&commands&&history);
+   const fixed=nodeId('a-fixed'),moving=nodeId('b-moving'),loop=edgeId('self-loop');const data=new Map([['caller',id]]);
+   kernel.transact(tx=>{
+    tx.nodes.add({id:fixed,type:'probe',position:{x:0,y:0},size:{width:0,height:0},data});
+    tx.nodes.add({id:moving,type:'probe',position:{x:0,y:0},size:{width:10,height:10},data});
+    tx.edges.add({id:loop,type:'probe',source:{nodeId:fixed,portId:''},target:{nodeId:fixed,portId:'口'},data});
+   });
+   await commands.execute(establishHistoryBaselineCommand,()=>{});
+   const before=kernel.read(),beforeHistory=history.getSnapshot();const commits:CanvasCommit[]=[];
+   const stop=kernel.observeCommits(commit=>{commits.push(commit);});
+   const actual=await commands.execute(command,{mode:'incremental',fixedNodeIds:[fixed],config}).then(value=>({ok:true as const,value}),error=>({ok:false as const,error}));
+   const passed=flagsPreserved&&actual.ok&&actual.value!==null&&computeCalls===1&&commits.length===1;
+   if(actual.ok&&actual.value!==null){
+    assert.equal(actual.value,commits[0]);assert.equal(actual.value.before,before);assert.equal(kernel.read(),actual.value.after);
+    assert.deepEqual(kernel.read().query.getNode(moving)!.position,{x:23,y:-5});assert.equal(kernel.read().query.getNode(fixed),before.query.getNode(fixed));
+    assert.equal(kernel.read().query.getEdge(loop),before.query.getEdge(loop));assert.equal(kernel.read().query.getNode(moving)!.data,data);
+    assert.deepEqual(history.getSnapshot(),{canUndo:true,canRedo:false});
+    await commands.execute(undoCommand,undefined);assert.deepEqual(kernel.read().query.getNode(moving)!.position,{x:0,y:0});
+    await commands.execute(redoCommand,undefined);assert.deepEqual(kernel.read().query.getNode(moving)!.position,{x:23,y:-5});
+   }else{
+    assert.equal(kernel.read(),before);assert.equal(history.getSnapshot(),beforeHistory);assert.equal(commits.length,0);assert.equal(computeCalls,0);
+   }
+   stop();
+   results.push({id,helper,shape,passed,flagsPreserved,capturedFlags,computeCalls,error:actual.ok?null:{type:typeof actual.error,name:actual.error instanceof Error?actual.error.name:null,code:actual.error instanceof LayoutError?actual.error.code:null,message:actual.error instanceof Error?actual.error.message:null},outcome:actual.ok?'committed':'rejected',noPartialMutation:true});
+   writeFileSync(output,JSON.stringify(results,null,2)+'\n');console.log(JSON.stringify(results.at(-1)));
+  }finally{await host.dispose();assert.ok(installations.every(installation=>installation.getSnapshot().status==='disposed'));}
+ }
+}
+const failed=results.filter(row=>!row.passed).length;
+console.log(JSON.stringify({controls:results.length,failed,passed:results.length-failed,publicTypedCapabilities:true,actualHostAndLayout:true}));
+if(failed>0)process.exitCode=1;

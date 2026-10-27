@@ -1,0 +1,485 @@
+Independent Standards + ponytail-review, Issue128
+Base 6fd2d016f6330cc422508b3e51229bea4be2cce0
+Head d15e80423973e27a7f1619d129093496f3594c0d
+Tree c7d4fd27330252327e95263459adf3bbccdc395f
+Binary patch SHA256 7736c03f4664d5d2339f5133cc9308cb3286cfdb9ce9043690c3ea838604ce60
+Task digest 78e4d4e2ec9c37ff55c487cd2c78900a462bd8c3534f0a961853f4836bcedeb9
+Full combined stdout/stderr returned by process tools follows.
+
+Pre-test exact source, clean tree, parent, canonical patch/complete.patch byte comparison, prepared-task/inspect binding and current compiled helper audit:
+PRE-TEST CURRENT SOURCE / PARENT / CLEAN TREE / SAVED PATCH / TASK / COMPILED CAPABILITY COPY: PASS
+
+Exit code: 0
+
+$ bun test packages/layout-api/tests packages/plugin-layout/tests packages/layout-dagre/tests packages/layout-elk/tests tests/layout-providers.test.ts
+bun test v1.4.2 (744846f84)
+
+tests/layout-providers.test.ts:
+(pass) Dagre lays out Port topology with one undoable commit and a no-op repeat [39.82ms]
+(pass) ELK lays out Port topology with one undoable commit and a no-op repeat [120.75ms]
+(pass) accepted getter-backed Layout values survive Runtime revalidation and History replay [4.87ms]
+(pass) Dagre and ELK compose with Provider-specific typed Runtime Commands [7.46ms]
+
+packages/plugin-layout/tests/engine-binding.test.ts:
+(pass) Layout keeps its concrete Engine when options change during capability validation [1.88ms]
+(pass) Layout keeps its concrete Engine when options change after Plugin creation [1.13ms]
+(pass) Layout preserves the original Engine option read failure at creation [0.09ms]
+
+packages/plugin-layout/tests/index.test.ts:
+(pass) a typed Layout Command commits all Node positions in one Canvas Commit [0.84ms]
+
+packages/plugin-layout/tests/commit-protection.test.ts:
+(pass) a stale Layout Proposal cannot overwrite a newer Kernel revision [0.76ms]
+(pass) cancellation after Provider execution starts preserves the reason and prevents commit [0.67ms]
+(pass) a pre-aborted Layout Command does not invoke the Provider [0.56ms]
+
+packages/plugin-layout/tests/request-validation.test.ts:
+(pass) a Node without Size rejects the Layout Request before the Provider runs [0.63ms]
+(pass) unsupported incremental, Fixed Node, and self-loop capabilities fail before the Provider runs [0.76ms]
+
+packages/plugin-layout/tests/port-commit-protection.test.ts:
+(pass) a pending Port topology Layout preserves a newer Port Endpoint commit [1.75ms]
+(pass) a pending Port topology Layout preserves a newer Layout commit [0.68ms]
+
+packages/plugin-layout/tests/cancellation-boundary.test.ts:
+(pass) direct Engine cancellation skips resolved Proposal reads [0.79ms]
+(pass) helper Engine cancellation skips resolved Proposal reads [0.45ms]
+(pass) an uncancelled direct Engine commits normally and preserves net-zero results [0.58ms]
+(pass) an uncancelled direct Engine still rejects an incomplete Proposal [0.62ms]
+(pass) an uncancelled direct Engine preserves the original Proposal read error [0.62ms]
+(pass) a rejected Engine preserves its original failure when cancellation is false [0.72ms]
+(pass) a rejected Engine preserves its original failure when cancellation is true [0.57ms]
+(pass) cancellation during Proposal validation still prevents the commit [0.72ms]
+
+packages/layout-dagre/tests/index.test.ts:
+(pass) Dagre computes deterministic top-left world positions for a full Layout Input [0.87ms]
+(pass) Dagre full layout supports the baseline graph shapes [2.74ms]
+(pass) Dagre preserves every edge constraint when opaque IDs contain graphlib delimiters [0.95ms]
+(pass) Dagre rejects a non-finite Provider configuration before layout [0.14ms]
+
+packages/layout-elk/tests/incremental.test.ts:
+(pass) ELK Stress keeps multiple Fixed Nodes at their absolute world positions [7.46ms]
+(pass) ELK Stress incremental layout uses current positions as a deterministic soft constraint [23.42ms]
+(pass) ELK rejects incremental and Fixed Node requests for unproven algorithms [0.36ms]
+
+packages/layout-elk/tests/index.test.ts:
+(pass) ELK computes deterministic top-left world positions for a full Layout Input [5.66ms]
+(pass) ELK layered full treats seed zero as the fixed default seed [83.57ms]
+(pass) ELK stress full treats seed zero as the fixed default seed [69.12ms]
+(pass) ELK stress incremental treats seed zero as the fixed default seed [18.79ms]
+(pass) ELK rejects non-integer and unsafe seeds [0.76ms]
+(pass) ELK full layout supports the baseline graph shapes [15.87ms]
+(pass) ELK rejects a non-finite Provider configuration before layout [0.22ms]
+
+packages/layout-api/tests/capability-values.test.ts:
+(pass) retains inherited Capability values in the helper Engine [0.18ms]
+(pass) owns all declared prototype Capability values for combination 0 [0.36ms]
+(pass) owns all declared prototype Capability values for combination 1 [0.05ms]
+(pass) owns all declared prototype Capability values for combination 2 [0.03ms]
+(pass) owns all declared prototype Capability values for combination 3 [0.03ms]
+(pass) owns all declared prototype Capability values for combination 4 [0.04ms]
+(pass) owns all declared prototype Capability values for combination 5 [0.02ms]
+(pass) owns all declared prototype Capability values for combination 6 [0.03ms]
+(pass) owns all declared prototype Capability values for combination 7 [0.06ms]
+(pass) owns all declared hidden-own Capability values for combination 0 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 1 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 2 [0.02ms]
+(pass) owns all declared hidden-own Capability values for combination 3 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 4 [0.02ms]
+(pass) owns all declared hidden-own Capability values for combination 5 [0.03ms]
+(pass) owns all declared hidden-own Capability values for combination 6 [0.09ms]
+(pass) owns all declared hidden-own Capability values for combination 7 [0.11ms]
+(pass) owns all declared enumerable-own Capability values for combination 0 [0.14ms]
+(pass) owns all declared enumerable-own Capability values for combination 1 [0.08ms]
+(pass) owns all declared enumerable-own Capability values for combination 2 [0.02ms]
+(pass) owns all declared enumerable-own Capability values for combination 3 [0.02ms]
+(pass) owns all declared enumerable-own Capability values for combination 4 [0.03ms]
+(pass) owns all declared enumerable-own Capability values for combination 5 [0.02ms]
+(pass) owns all declared enumerable-own Capability values for combination 6 [0.03ms]
+(pass) owns all declared enumerable-own Capability values for combination 7 [0.03ms]
+(pass) preserves prototype incremental read failure 0 [0.07ms]
+(pass) preserves prototype incremental read failure 1
+(pass) preserves prototype incremental read failure 2 [0.02ms]
+(pass) preserves prototype incremental read failure 3
+(pass) preserves prototype incremental read failure 4
+(pass) preserves prototype incremental read failure 5
+(pass) preserves prototype fixedNodes read failure 0
+(pass) preserves prototype fixedNodes read failure 1
+(pass) preserves prototype fixedNodes read failure 2
+(pass) preserves prototype fixedNodes read failure 3
+(pass) preserves prototype fixedNodes read failure 4
+(pass) preserves prototype fixedNodes read failure 5
+(pass) preserves prototype selfLoops read failure 0
+(pass) preserves prototype selfLoops read failure 1
+(pass) preserves prototype selfLoops read failure 2
+(pass) preserves prototype selfLoops read failure 3
+(pass) preserves prototype selfLoops read failure 4
+(pass) preserves prototype selfLoops read failure 5
+(pass) preserves hidden-own incremental read failure 0
+(pass) preserves hidden-own incremental read failure 1
+(pass) preserves hidden-own incremental read failure 2
+(pass) preserves hidden-own incremental read failure 3
+(pass) preserves hidden-own incremental read failure 4
+(pass) preserves hidden-own incremental read failure 5
+(pass) preserves hidden-own fixedNodes read failure 0
+(pass) preserves hidden-own fixedNodes read failure 1
+(pass) preserves hidden-own fixedNodes read failure 2 [0.01ms]
+(pass) preserves hidden-own fixedNodes read failure 3 [0.05ms]
+(pass) preserves hidden-own fixedNodes read failure 4
+(pass) preserves hidden-own fixedNodes read failure 5
+(pass) preserves hidden-own selfLoops read failure 0
+(pass) preserves hidden-own selfLoops read failure 1
+(pass) preserves hidden-own selfLoops read failure 2
+(pass) preserves hidden-own selfLoops read failure 3
+(pass) preserves hidden-own selfLoops read failure 4
+(pass) preserves hidden-own selfLoops read failure 5
+(pass) preserves enumerable-own incremental read failure 0
+(pass) preserves enumerable-own incremental read failure 1
+(pass) preserves enumerable-own incremental read failure 2
+(pass) preserves enumerable-own incremental read failure 3
+(pass) preserves enumerable-own incremental read failure 4
+(pass) preserves enumerable-own incremental read failure 5
+(pass) preserves enumerable-own fixedNodes read failure 0
+(pass) preserves enumerable-own fixedNodes read failure 1
+(pass) preserves enumerable-own fixedNodes read failure 2
+(pass) preserves enumerable-own fixedNodes read failure 3
+(pass) preserves enumerable-own fixedNodes read failure 4
+(pass) preserves enumerable-own fixedNodes read failure 5 [0.03ms]
+(pass) preserves enumerable-own selfLoops read failure 0
+(pass) preserves enumerable-own selfLoops read failure 1 [0.01ms]
+(pass) preserves enumerable-own selfLoops read failure 2
+(pass) preserves enumerable-own selfLoops read failure 3
+(pass) preserves enumerable-own selfLoops read failure 4
+(pass) preserves enumerable-own selfLoops read failure 5
+(pass) preserves own enumerable copying order before materializing non-enumerable flags [1.79ms]
+(pass) preserves a capability-source getter failure without converting it to a Layout error [0.06ms]
+
+packages/layout-api/tests/index.test.ts:
+(pass) a custom Layout Engine computes a full Layout Proposal from a committed Canvas View [0.33ms]
+(pass) Layout data crossing the computation seam is frozen [0.12ms]
+(pass) a pre-aborted Layout Engine preserves the reason without invoking its Provider [0.08ms]
+
+packages/layout-api/tests/proposal-values.test.ts:
+(pass) Layout compute retains the finite coordinate accepted during validation [0.16ms]
+(pass) Layout validation retains the source revision accepted before reading positions [0.04ms]
+(pass) Layout retains the accepted id property [0.06ms]
+(pass) Layout retains the accepted position property [0.02ms]
+(pass) Layout retains the accepted y property
+(pass) Layout retains its accepted collection without another field read or iteration [0.07ms]
+(pass) Layout publishes the Fixed Node coordinates that passed validation [0.04ms]
+(pass) Layout preserves revision validation precedence over later read errors [0.10ms]
+(pass) Layout preserves duplicate validation precedence over later read errors [0.02ms]
+(pass) Layout preserves unknown validation precedence over later read errors [0.04ms]
+(pass) Layout preserves x validation precedence over later read errors [0.13ms]
+(pass) Layout propagates the original collection read failure [0.10ms]
+(pass) Layout propagates the original id read failure [0.03ms]
+(pass) Layout propagates the original position read failure [0.02ms]
+(pass) Layout propagates the original x read failure [0.01ms]
+(pass) Layout propagates the original y read failure [0.01ms]
+
+packages/layout-api/tests/input-validation.test.ts:
+(pass) invalid mode and Fixed Node identities are rejected as invalid Layout Requests [0.17ms]
+(pass) nested Nodes are rejected as unsupported Layout Inputs [0.12ms]
+(pass) mixed Port Endpoints project to Node topology without changing the Document [0.11ms]
+
+packages/layout-api/tests/error-contract.test.ts:
+(pass) Layout structural failures expose the shared NodeBraid error identity [0.05ms]
+
+packages/layout-api/tests/input-values.test.ts:
+(pass) Layout Input retains the Request mode accepted during validation [0.07ms]
+(pass) Layout Input retains an accepted incremental Request mode [0.02ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: "wrong",
+  details: {
+    issue: "INVALID_MODE",
+    mode: "wrong",
+  },
+} [0.08ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: null,
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "null",
+  },
+} [0.02ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: 42,
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "number",
+  },
+} [0.01ms]
+(pass) Layout rejects the first invalid mode with bounded details: {
+  value: {
+    privateValue: "must-not-escape",
+  },
+  details: {
+    issue: "INVALID_MODE",
+    receivedType: "object",
+  },
+}
+(pass) Layout preserves the original mode read failure before Fixed Node processing [0.03ms]
+(pass) Layout rejects an invalid mode before later Fixed Node read failures [0.03ms]
+(pass) Fixed Node resolution cannot replace the Request mode already accepted [0.03ms]
+(pass) Layout preserves a Fixed Node iterator failure after one mode capture [0.04ms]
+
+packages/layout-api/tests/proposal-validation.test.ts:
+(pass) a Layout Engine rejects incomplete, foreign, invalid, or constraint-breaking positions [0.33ms]
+(pass) a Proposal must identify the Layout Input revision [0.09ms]
+
+packages/layout-api/tests/capability-validation.test.ts:
+(pass) a low-level Layout Engine rejects unsupported Input capabilities before its Provider runs [0.17ms]
+
+ 154 pass
+ 0 fail
+ 1024 expect() calls
+Ran 154 tests across 18 files. [535.00ms]
+
+Exit code: 0
+
+$ bun -e 'import assert from "node:assert/strict"; import { expect } from "bun:test"; import { defineLayoutEngine } from "@nodebraid/layout-api"; const original = new Error("source failed"); const replacement = new Error("source failed"); expect(() => { throw replacement; }).toThrow(original); let threw = false; let received; try { defineLayoutEngine({ id: "identity-probe", get capabilities() { throw original; }, compute(input) { return { sourceRevision: input.revision, positions: [] }; } }); } catch (error) { threw = true; received = error; } assert.ok(threw); assert.equal(received, original); console.log(JSON.stringify({ matcherAcceptedDifferentError: replacement !== original, publicHelperThrewOriginal: received === original }));'
+{"matcherAcceptedDifferentError":true,"publicHelperThrewOriginal":true}
+
+Exit code: 0
+
+Post-test HEAD/tree/clean/parent/saved patch/task/source discussion/whitespace audit and actual commit list:
+POST-TEST SOURCE / SAVED PATCH / CLEAN TREE / PARENT / TASK / SOURCE DISCUSSION / WHITESPACE: PASS
+TASK DIGEST 78e4d4e2ec9c37ff55c487cd2c78900a462bd8c3534f0a961853f4836bcedeb9
+d15e804 fix: preserve declared Layout capabilities
+
+Exit code: 0
+
+Static read diagnostic: an initial cat guessed dagre-engine.ts/elk-engine.ts filenames and exited1. The actual rg results were dagre-layout-engine.ts/elk-layout-engine.ts; the corrected source/ADR reads succeeded. This was a source-location error, not a product or test failure.
+cat: packages/layout-dagre/src/dagre-engine.ts: No such file or directory
+cat: packages/layout-elk/src/elk-engine.ts: No such file or directory
+import { expect, test } from 'bun:test';
+
+import {
+  commandPlugin,
+  commandService,
+  createLayoutPlugin,
+  createPluginHost,
+  defineCommand,
+  defineLayoutEngine,
+  definePlugin,
+  edgeId,
+  historyPlugin,
+  kernelPlugin,
+  kernelService,
+  nodeId,
+  redoCommand,
+  sessionPlugin,
+  sessionService,
+  undoCommand,
+  type CanvasCommit,
+  type CommandService,
+  type KernelService,
+  type LayoutCommandInput,
+  type LayoutCommandResult,
+  type LayoutEngine,
+  type NodeId,
+  type SessionService,
+} from '@nodebraid/core';
+import { dagreLayoutEngine, type DagreLayoutConfig } from '@nodebraid/layout-dagre';
+import { elkLayoutEngine, type ElkLayoutConfig } from '@nodebraid/layout-elk';
+
+test('Dagre lays out Port topology with one undoable commit and a no-op repeat', () =>
+  assertPortLayoutHistory(dagreLayoutEngine, { direction: 'LR' }));
+
+test('ELK lays out Port topology with one undoable commit and a no-op repeat', () =>
+  assertPortLayoutHistory(elkLayoutEngine, { algorithm: 'layered', direction: 'RIGHT', randomSeed: 1 }));
+
+test('accepted getter-backed Layout values survive Runtime revalidation and History replay', async () => {
+  const reads: number[][] = [];
+  const engine = defineLayoutEngine({
+    id: 'accepted-values',
+    capabilities: { incremental: false, fixedNodes: false, selfLoops: false },
+    compute(input) {
+      const currentReads = input.nodes.map(() => 0);
+      reads.push(currentReads);
+      return {
+        sourceRevision: input.revision,
+        positions: input.nodes.map((node, index) => ({
+          id: node.id,
+          position: {
+            get x() {
+              return ++currentReads[index]! === 1 ? index * 120 : NaN;
+            },
+            y: 0,
+          },
+        })),
+      };
+    },
+  });
+  await assertPortLayoutHistory(engine, {});
+  expect(reads).toEqual([
+    [1, 1, 1],
+    [1, 1, 1],
+  ]);
+});
+
+async function assertPortLayoutHistory<Config>(engine: LayoutEngine<Config>, config: Config) {
+  const command = defineCommand<LayoutCommandInput<Config>, LayoutCommandResult>(`layout.${engine.id}`);
+  let kernel: KernelService | undefined;
+  let commands: CommandService | undefined;
+  let session: SessionService | undefined;
+  const consumer = definePlugin({
+    requires: { kernel: kernelService, commands: commandService, session: sessionService },
+    setup(context) {
+      kernel = context.services.kernel;
+      commands = context.services.commands;
+      session = context.services.session;
+    },
+  });
+  const host = createPluginHost();
+  try {
+    await Promise.all(
+      [
+        host.install(kernelPlugin),
+        host.install(commandPlugin),
+        host.install(sessionPlugin),
+        host.install(historyPlugin),
+        host.install(createLayoutPlugin({ engine, command })),
+        host.install(consumer),
+      ].map((installation) => installation.whenActive()),
+    );
+    if (!kernel || !commands || !session) throw new Error('Expected Runtime Services to activate.');
+    const left = nodeId('left');
+    const middle = nodeId('middle');
+    const right = nodeId('right');
+    const data = new Map([['business', { value: 7 }]]);
+    kernel.transact((transaction) => {
+      for (const [id, position] of [
+        [left, { x: 300, y: 400 }],
+        [middle, { x: 10, y: 500 }],
+        [right, { x: 100, y: 20 }],
+      ] as const) {
+        transaction.nodes.add({ id, type: 'task', position, size: { width: 80, height: 40 }, data });
+      }
+      for (const [id, source, target] of [
+        ['both', { nodeId: left, portId: 'out' }, { nodeId: middle, portId: 'in' }],
+        ['plain', { nodeId: left }, { nodeId: middle }],
+        ['source', { nodeId: middle, portId: 'out' }, { nodeId: right }],
+        ['target', { nodeId: middle }, { nodeId: right, portId: 'in' }],
+      ] as const) {
+        transaction.edges.add({ id: edgeId(id), type: 'flow', source, target, data });
+      }
+    });
+    session.setSelection({ nodeIds: [middle], edgeIds: [edgeId('both')] });
+    session.setViewport({ x: 36, y: -20, zoom: 1.5 });
+    const before = kernel.read();
+    const beforeSession = session.getSnapshot();
+    const commits: CanvasCommit[] = [];
+    const unsubscribe = kernel.observeCommits((commit) => commits.push(commit));
+    const request: LayoutCommandInput<Config> = { mode: 'full', fixedNodeIds: [], config };
+    const commit = await commands.execute(command, request);
+    if (!commit) throw new Error('Expected Layout to move the initial Nodes.');
+    const after = kernel.read();
+    expect(commits).toEqual([commit]);
+    expect(commit.changeSet).toMatchObject({ origin: 'layout', commandId: `layout.${engine.id}`, revision: 2 });
+    expect(commit.changeSet.changes.every((change) => change.entity === 'node')).toBe(true);
+    expect(after.snapshot.nodes).not.toEqual(before.snapshot.nodes);
+    for (const node of before.snapshot.nodes) {
+      const moved = after.query.getNode(node.id);
+      expect({ ...moved, position: node.position }).toEqual(node);
+      expect(moved?.data).toBe(data);
+    }
+    for (const edge of before.snapshot.edges) expect(after.query.getEdge(edge.id)).toBe(edge);
+    expect(session.getSnapshot()).toBe(beforeSession);
+
+    expect(await commands.execute(command, request)).toBeNull();
+    expect(kernel.read()).toBe(after);
+    expect(commits).toEqual([commit]);
+
+    await commands.execute(undoCommand, undefined);
+    expect(kernel.read().snapshot.nodes).toEqual(before.snapshot.nodes);
+    for (const edge of before.snapshot.edges) expect(kernel.read().query.getEdge(edge.id)).toBe(edge);
+    expect(session.getSnapshot()).toBe(beforeSession);
+    await commands.execute(redoCommand, undefined);
+    expect(kernel.read().snapshot.nodes).toEqual(after.snapshot.nodes);
+    for (const edge of before.snapshot.edges) expect(kernel.read().query.getEdge(edge.id)).toBe(edge);
+    expect(session.getSnapshot()).toBe(beforeSession);
+    unsubscribe();
+  } finally {
+    await host.dispose();
+  }
+}
+
+test('Dagre and ELK compose with Provider-specific typed Runtime Commands', async () => {
+  const dagre = await runProvider(dagreLayoutEngine, { direction: 'LR', rankSpacing: 50 } satisfies DagreLayoutConfig);
+  const elk = await runProvider(
+    elkLayoutEngine,
+    { algorithm: 'stress', padding: 0, randomSeed: 1 } satisfies ElkLayoutConfig,
+    true,
+  );
+
+  expect({ dagre, elk }).toEqual({
+    dagre: {
+      commandId: 'layout.dagre',
+      revision: 2,
+      fixedPositions: [],
+    },
+    elk: {
+      commandId: 'layout.elk',
+      revision: 2,
+      fixedPositions: [
+        { id: nodeId('left'), position: { x: 100, y: 100 } },
+        { id: nodeId('right'), position: { x: 400, y: 100 } },
+      ],
+    },
+  });
+});
+
+async function runProvider<Config>(engine: LayoutEngine<Config>, config: Config, useFixedNodes = false) {
+  const leftId = nodeId('left');
+  const middleId = nodeId('middle');
+  const rightId = nodeId('right');
+  const command = defineCommand<LayoutCommandInput<Config>, LayoutCommandResult>(`layout.${engine.id}`);
+  const layoutPlugin = createLayoutPlugin({ engine, command });
+  let kernel: KernelService | undefined;
+  let commands: CommandService | undefined;
+  const consumer = definePlugin({
+    requires: { kernel: kernelService, commands: commandService },
+    setup(context) {
+      kernel = context.services.kernel;
+      commands = context.services.commands;
+    },
+  });
+  const host = createPluginHost();
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(commandPlugin),
+    host.install(layoutPlugin),
+    host.install(consumer),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (!kernel || !commands) throw new Error('Expected Runtime Services to activate.');
+  kernel.transact((transaction) => {
+    for (const [id, position] of [
+      [leftId, { x: 100, y: 100 }],
+      [middleId, { x: 250, y: 260 }],
+      [rightId, { x: 400, y: 100 }],
+    ] as const) {
+      transaction.nodes.add({
+        id,
+        type: 'task',
+        position,
+        size: { width: 80, height: 40 },
+        data: null,
+      });
+    }
+  });
+  const fixedNodeIds: readonly NodeId[] = useFixedNodes ? [leftId, rightId] : [];
+  const request: LayoutCommandInput<Config> = { mode: 'full', fixedNodeIds, config };
+  const commit = await commands.execute(command, request);
+  const fixedPositions = fixedNodeIds.map((id) => ({ id, position: kernel!.read().query.getNode(id)?.position }));
+  const result = {
+    commandId: commit?.changeSet.commandId,
+    revision: kernel.read().snapshot.revision,
+    fixedPositions,
+  };
+  await host.dispose();
+  return result;
+}
+
+Initial static read exit code: 1

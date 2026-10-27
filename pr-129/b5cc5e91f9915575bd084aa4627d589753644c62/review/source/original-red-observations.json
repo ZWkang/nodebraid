@@ -1,0 +1,174 @@
+[
+  {
+    "id": "helper-prototype-getters",
+    "helper": true,
+    "shape": "prototype-getters",
+    "passed": false,
+    "flagsPreserved": false,
+    "capturedFlags": [
+      {
+        "key": "incremental",
+        "type": "undefined"
+      },
+      {
+        "key": "fixedNodes",
+        "type": "undefined"
+      },
+      {
+        "key": "selfLoops",
+        "type": "undefined"
+      }
+    ],
+    "computeCalls": 0,
+    "error": {
+      "type": "object",
+      "name": "LayoutError",
+      "code": "UNSUPPORTED_FEATURE",
+      "message": "Layout Provider \"helper-prototype-getters\" does not support incremental."
+    },
+    "outcome": "rejected",
+    "noPartialMutation": true
+  },
+  {
+    "id": "helper-nonenumerable-own",
+    "helper": true,
+    "shape": "nonenumerable-own",
+    "passed": false,
+    "flagsPreserved": false,
+    "capturedFlags": [
+      {
+        "key": "incremental",
+        "type": "undefined"
+      },
+      {
+        "key": "fixedNodes",
+        "type": "undefined"
+      },
+      {
+        "key": "selfLoops",
+        "type": "undefined"
+      }
+    ],
+    "computeCalls": 0,
+    "error": {
+      "type": "object",
+      "name": "LayoutError",
+      "code": "UNSUPPORTED_FEATURE",
+      "message": "Layout Provider \"helper-nonenumerable-own\" does not support incremental."
+    },
+    "outcome": "rejected",
+    "noPartialMutation": true
+  },
+  {
+    "id": "helper-enumerable-own",
+    "helper": true,
+    "shape": "enumerable-own",
+    "passed": true,
+    "flagsPreserved": true,
+    "capturedFlags": [
+      {
+        "key": "incremental",
+        "type": "boolean",
+        "value": true
+      },
+      {
+        "key": "fixedNodes",
+        "type": "boolean",
+        "value": true
+      },
+      {
+        "key": "selfLoops",
+        "type": "boolean",
+        "value": true
+      }
+    ],
+    "computeCalls": 1,
+    "error": null,
+    "outcome": "committed",
+    "noPartialMutation": true
+  },
+  {
+    "id": "raw-prototype-getters",
+    "helper": false,
+    "shape": "prototype-getters",
+    "passed": true,
+    "flagsPreserved": true,
+    "capturedFlags": [
+      {
+        "key": "incremental",
+        "type": "boolean",
+        "value": true
+      },
+      {
+        "key": "fixedNodes",
+        "type": "boolean",
+        "value": true
+      },
+      {
+        "key": "selfLoops",
+        "type": "boolean",
+        "value": true
+      }
+    ],
+    "computeCalls": 1,
+    "error": null,
+    "outcome": "committed",
+    "noPartialMutation": true
+  },
+  {
+    "id": "raw-nonenumerable-own",
+    "helper": false,
+    "shape": "nonenumerable-own",
+    "passed": true,
+    "flagsPreserved": true,
+    "capturedFlags": [
+      {
+        "key": "incremental",
+        "type": "boolean",
+        "value": true
+      },
+      {
+        "key": "fixedNodes",
+        "type": "boolean",
+        "value": true
+      },
+      {
+        "key": "selfLoops",
+        "type": "boolean",
+        "value": true
+      }
+    ],
+    "computeCalls": 1,
+    "error": null,
+    "outcome": "committed",
+    "noPartialMutation": true
+  },
+  {
+    "id": "raw-enumerable-own",
+    "helper": false,
+    "shape": "enumerable-own",
+    "passed": true,
+    "flagsPreserved": true,
+    "capturedFlags": [
+      {
+        "key": "incremental",
+        "type": "boolean",
+        "value": true
+      },
+      {
+        "key": "fixedNodes",
+        "type": "boolean",
+        "value": true
+      },
+      {
+        "key": "selfLoops",
+        "type": "boolean",
+        "value": true
+      }
+    ],
+    "computeCalls": 1,
+    "error": null,
+    "outcome": "committed",
+    "noPartialMutation": true
+  }
+]

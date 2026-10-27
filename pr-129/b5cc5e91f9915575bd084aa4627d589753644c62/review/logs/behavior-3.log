@@ -1,0 +1,9 @@
+bun test v1.4.2 (744846f84)
+
+packages/layout-api/tests/capability-values.test.ts:
+(pass) retains inherited Capability values in the helper Engine [17.31ms]
+
+ 1 pass
+ 0 fail
+ 5 expect() calls
+Ran 1 test across 1 file. [93.00ms]

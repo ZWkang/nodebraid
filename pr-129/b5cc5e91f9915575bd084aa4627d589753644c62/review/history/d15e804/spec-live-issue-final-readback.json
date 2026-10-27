@@ -1,0 +1,40 @@
+{
+  "repository": "ZWkang/nodebraid",
+  "readAt": "2026-10-27 04:34:44 UTC",
+  "issue": {
+    "url": "https://github.com/ZWkang/nodebraid/issues/128",
+    "title": "fix: retain declared Layout Capability values",
+    "issue_number": 128,
+    "body": "## Confirmed defect\n\nAt main `6fd2d016f6330cc422508b3e51229bea4be2cce0`, `defineLayoutEngine` loses required Layout Capability values supplied through prototype getters or non-enumerable own properties. Both are valid, strictly typechecked `LayoutCapabilities` implementations whose three flags are `true`.\n\nThe helper copies only enumerable own properties. Its public `engine.capabilities.incremental`, `fixedNodes` and `selfLoops` are consequently `undefined`. An incremental Layout Request is rejected as `UNSUPPORTED_FEATURE` before the supported Provider runs.\n\nA six-control compiled public-package program reproduces the defect with real Host, Kernel, Command, History and Layout composition:\n\n- Helper + prototype getters: fails; all three flags disappear and compute is never called.\n- Helper + non-enumerable own flags: the same failure.\n- Helper + ordinary enumerable flags, and all three corresponding direct Engine controls: pass; each computes once, commits the expected position and supports actual Undo/Redo.\n\nThe initial strict typecheck and bundle both pass; the compiled program exits 1 with two failures and four passing controls. Rejected calls preserve the exact Document View and History Snapshot and produce no partial Commit. The Provider is an explicit typed control implementation; this is public contract evidence, not a Dagre/ELK algorithm or browser claim.\n\n## Contract and cause\n\n[LayoutCapabilities](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/layout-api/src/contracts.ts) declares three readonly booleans without an own-property or enumerability restriction. [ADR-0026](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/docs/adr/0026-validate-layout-contracts-at-their-ownership-boundaries.md) requires an owned frozen Capability shell and explicit unsupported-feature checks.\n\n[The helper](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/layout-api/src/layout-engine.ts) currently uses `Object.freeze({ ...definition.capabilities })`. Enumeration drops declared values instead of retaining them. The Runtime capability check correctly rejects the resulting missing values, so the repair belongs at the shared helper's ownership boundary.\n\n## Acceptance\n\n- Preserve each declared incremental, Fixed Node and self-loop capability value in the helper's owned frozen shell, including inherited getters and non-enumerable own properties. Preserve both true and false.\n- Capture the capability source once and each required value once, with its original receiver. Keep the owned values stable if the caller later changes its source.\n- Preserve existing own enumerable copying behavior, original read exceptions and shallow ownership. Do not freeze caller-owned objects or traverse application data.\n- The original six-control public reproduction must become green. Supported helper and direct Engines still execute normally; false capabilities still reject before Provider computation, without a Commit.\n- Preserve Provider configuration/receiver and original failures, cancellation, Proposal validation, live-revision checks, canonical output, Fixed Nodes, one Commit/net-zero results and History Undo/Redo.\n- No new capability, default Provider, Registry, public API, flag coercion/default, plain-record/accessor restriction, retry, cap, fallback, dependency or unrelated Engine/Command binding change.\n- Use public Layout API and actual Host/Kernel/Command/Layout/History tests, test-first regression, related/affected checks, independent Standards with ponytail-review and Spec/risk, formal full check, exact publication/current-head CI and complete immutable report/media readback.\n- Keep this Issue open through real main integration and whole-Issue acceptance.\n\n## Minimal public reproduction\n\nRun from the repository after building its public packages:\n\n```ts\nimport assert from 'node:assert/strict';\nimport { defineLayoutEngine, type LayoutCapabilities } from '@nodebraid/layout-api';\n\nclass Supported implements LayoutCapabilities {\n  get incremental(): boolean { return true; }\n  get fixedNodes(): boolean { return true; }\n  get selfLoops(): boolean { return true; }\n}\n\nconst engine = defineLayoutEngine<void>({\n  id: 'supported',\n  capabilities: new Supported(),\n  compute: input => ({\n    sourceRevision: input.revision,\n    positions: input.nodes.map(node => ({ id: node.id, position: node.position })),\n  }),\n});\n\nassert.equal(engine.capabilities.incremental, true);\nassert.equal(engine.capabilities.fixedNodes, true);\nassert.equal(engine.capabilities.selfLoops, true);\n```\n\nThe first assertion fails because the helper publishes `undefined`. An ordinary object with the same three enumerable flags passes.\n\n## Deduplication\n\nComplete all-state collections contain 127 Issue/PR records (50 + 50 + 27) and 65 PRs (20 + 20 + 20 + 5). Related bodies, complete discussions, PR reviews/inline threads and changed files were read. #78/PR #79 repair Request and Proposal capture; #88/PR #90 repair cancellation before Proposal inspection; #98/PR #99 repair the Engine object bound by the Runtime Plugin. Their changes do not repair `layout-engine.ts` capability copying. The accepted Port-topology scope in #37 retains the existing capability constraints. No existing delivery covers this helper failure.\n",
+    "state": "open",
+    "user": {
+      "login": "ZWkang",
+      "name": "ZWkang",
+      "email": null,
+      "avatar_url": "https://avatars.githubusercontent.com/u/15853907?v=4",
+      "id": 15853907
+    },
+    "assignees": null,
+    "labels": [
+      {
+        "name": "bug",
+        "color": "d73a4a",
+        "description": "Something isn't working"
+      },
+      {
+        "name": "ready-for-agent",
+        "color": "ededed",
+        "description": null
+      }
+    ],
+    "milestone": null,
+    "state_reason": null,
+    "comments": 0,
+    "created_at": "2026-10-27T04:12:42Z",
+    "updated_at": "2026-10-27T04:12:42Z",
+    "closed_at": null,
+    "display_url": "https://github.com/ZWkang/nodebraid/issues/128",
+    "display_title": "fix: retain declared Layout Capability values"
+  },
+  "comments": []
+}

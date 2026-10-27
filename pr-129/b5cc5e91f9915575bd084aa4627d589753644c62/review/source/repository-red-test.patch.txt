@@ -1,0 +1,44 @@
+diff --git a/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/layout-api/tests/capability-values.test.ts b/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/layout-api/tests/capability-values.test.ts
+new file mode 100644
+index 0000000..587c64d
+--- /dev/null
++++ b/Users/zhou/.codex/worktrees/issue-78-layout-proposal/cflow/packages/layout-api/tests/capability-values.test.ts
+@@ -0,0 +1,38 @@
++import { expect, test } from 'bun:test';
++import { createCanvasKernel } from '@nodebraid/kernel';
++
++import { createLayoutInput, defineLayoutEngine, type LayoutCapabilities } from '../src';
++
++test('retains inherited Capability values in the helper Engine', async () => {
++  class SupportedCapabilities implements LayoutCapabilities {
++    get incremental(): boolean {
++      return true;
++    }
++    get fixedNodes(): boolean {
++      return true;
++    }
++    get selfLoops(): boolean {
++      return true;
++    }
++  }
++
++  const supplied = new SupportedCapabilities();
++  let calls = 0;
++  const engine = defineLayoutEngine<void>({
++    id: 'inherited-capabilities',
++    capabilities: supplied,
++    compute(input) {
++      calls += 1;
++      return { sourceRevision: input.revision, positions: [] };
++    },
++  });
++  expect(engine.capabilities).toEqual({ incremental: true, fixedNodes: true, selfLoops: true });
++  expect(Object.isFrozen(engine.capabilities)).toBe(true);
++  expect(Object.isFrozen(supplied)).toBe(false);
++  const input = createLayoutInput(createCanvasKernel().read(), { mode: 'incremental', fixedNodeIds: [] });
++  await expect(engine.compute(input, undefined, { signal: new AbortController().signal })).resolves.toEqual({
++    sourceRevision: 0,
++    positions: [],
++  });
++  expect(calls).toBe(1);
++});

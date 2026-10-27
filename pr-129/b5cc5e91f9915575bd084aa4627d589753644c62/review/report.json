@@ -1,0 +1,483 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+    "expectedParent": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+    "head": "b5cc5e91f9915575bd084aa4627d589753644c62",
+    "tree": "1590be6c815c785a35b2755ad0532aecc193c46a",
+    "patch": "6bcbb10f76f389ffc3a2cdeb30b5f3544c02787e280dbff6020cc6126e834342",
+    "localHead": "d1924090cd37125c9955ebfe869e8e0e974d0776"
+  },
+  "task": {
+    "run": "ac599065-2060-403e-baa3-e20ab3670f6d",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 128
+    },
+    "request": "## Confirmed defect\n\nAt main `6fd2d016f6330cc422508b3e51229bea4be2cce0`, `defineLayoutEngine` loses required Layout Capability values supplied through prototype getters or non-enumerable own properties. Both are valid, strictly typechecked `LayoutCapabilities` implementations whose three flags are `true`.\n\nThe helper copies only enumerable own properties. Its public `engine.capabilities.incremental`, `fixedNodes` and `selfLoops` are consequently `undefined`. An incremental Layout Request is rejected as `UNSUPPORTED_FEATURE` before the supported Provider runs.\n\nA six-control compiled public-package program reproduces the defect with real Host, Kernel, Command, History and Layout composition:\n\n- Helper + prototype getters: fails; all three flags disappear and compute is never called.\n- Helper + non-enumerable own flags: the same failure.\n- Helper + ordinary enumerable flags, and all three corresponding direct Engine controls: pass; each computes once, commits the expected position and supports actual Undo/Redo.\n\nThe initial strict typecheck and bundle both pass; the compiled program exits 1 with two failures and four passing controls. Rejected calls preserve the exact Document View and History Snapshot and produce no partial Commit. The Provider is an explicit typed control implementation; this is public contract evidence, not a Dagre/ELK algorithm or browser claim.\n\n## Contract and cause\n\n[LayoutCapabilities](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/layout-api/src/contracts.ts) declares three readonly booleans without an own-property or enumerability restriction. [ADR-0026](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/docs/adr/0026-validate-layout-contracts-at-their-ownership-boundaries.md) requires an owned frozen Capability shell and explicit unsupported-feature checks.\n\n[The helper](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/layout-api/src/layout-engine.ts) currently uses `Object.freeze({ ...definition.capabilities })`. Enumeration drops declared values instead of retaining them. The Runtime capability check correctly rejects the resulting missing values, so the repair belongs at the shared helper's ownership boundary.\n\n## Acceptance\n\n- Preserve each declared incremental, Fixed Node and self-loop capability value in the helper's owned frozen shell, including inherited getters and non-enumerable own properties. Preserve both true and false.\n- Capture the capability source once and each required value once, with its original receiver. Keep the owned values stable if the caller later changes its source.\n- Preserve existing own enumerable copying behavior, original read exceptions and shallow ownership. Do not freeze caller-owned objects or traverse application data.\n- The original six-control public reproduction must become green. Supported helper and direct Engines still execute normally; false capabilities still reject before Provider computation, without a Commit.\n- Preserve Provider configuration/receiver and original failures, cancellation, Proposal validation, live-revision checks, canonical output, Fixed Nodes, one Commit/net-zero results and History Undo/Redo.\n- No new capability, default Provider, Registry, public API, flag coercion/default, plain-record/accessor restriction, retry, cap, fallback, dependency or unrelated Engine/Command binding change.\n- Use public Layout API and actual Host/Kernel/Command/Layout/History tests, test-first regression, related/affected checks, independent Standards with ponytail-review and Spec/risk, formal full check, exact publication/current-head CI and complete immutable report/media readback.\n- Keep this Issue open through real main integration and whole-Issue acceptance.\n\n## Minimal public reproduction\n\nRun from the repository after building its public packages:\n\n```ts\nimport assert from 'node:assert/strict';\nimport { defineLayoutEngine, type LayoutCapabilities } from '@nodebraid/layout-api';\n\nclass Supported implements LayoutCapabilities {\n  get incremental(): boolean { return true; }\n  get fixedNodes(): boolean { return true; }\n  get selfLoops(): boolean { return true; }\n}\n\nconst engine = defineLayoutEngine<void>({\n  id: 'supported',\n  capabilities: new Supported(),\n  compute: input => ({\n    sourceRevision: input.revision,\n    positions: input.nodes.map(node => ({ id: node.id, position: node.position })),\n  }),\n});\n\nassert.equal(engine.capabilities.incremental, true);\nassert.equal(engine.capabilities.fixedNodes, true);\nassert.equal(engine.capabilities.selfLoops, true);\n```\n\nThe first assertion fails because the helper publishes `undefined`. An ordinary object with the same three enumerable flags passes.\n\n## Deduplication\n\nComplete all-state collections contain 127 Issue/PR records (50 + 50 + 27) and 65 PRs (20 + 20 + 20 + 5). Related bodies, complete discussions, PR reviews/inline threads and changed files were read. #78/PR #79 repair Request and Proposal capture; #88/PR #90 repair cancellation before Proposal inspection; #98/PR #99 repair the Engine object bound by the Runtime Plugin. Their changes do not repair `layout-engine.ts` capability copying. The accepted Port-topology scope in #37 retains the existing capability constraints. No existing delivery covers this helper failure.\n",
+    "plan": [
+      {
+        "id": "public-red",
+        "blockedBy": [],
+        "acceptance": "Preserve independent typed compiled6 red (2 helper failures/4 controls) and add a public Layout Engine capability repository tracer that fails before production change."
+      },
+      {
+        "id": "capture-declared-capabilities",
+        "blockedBy": [
+          "public-red"
+        ],
+        "acceptance": "The existing helper retains declared inherited/non-enumerable/own flags as once-captured owned values, preserving own enumerable copying, original receivers/errors/shallow ownership and all existing Layout policies."
+      },
+      {
+        "id": "integration-and-independent-review",
+        "blockedBy": [
+          "capture-declared-capabilities"
+        ],
+        "acceptance": "Original byte-identical compiled6 becomes green, expanded public value/error/Provider/Runtime/History regressions and affected checks pass; independent Standards+ponytail/Spec with full current risk pass on complete exact head/tree/patch."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "integration-and-independent-review"
+        ],
+        "acceptance": "Pinned main agents:run verify executes the real formal full bun run check after both reviews. Preserve all attempts and do not pre-run or repeat this head full check."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Normal remote tree/expected first parent readback, one PR to main Refs128, current source CI and all mapped native scenes/full original review-report immutable publication/readback are verified."
+      },
+      {
+        "id": "required-review-and-authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "Use canonical fetched-main pr-risk and actual specific authorization; satisfy required human route and all current discussion/strict protection/ticket gates before an immediate expected-head merge. No self approval/queue/bypass."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "required-review-and-authorized-merge"
+        ],
+        "acceptance": "After actual normal merge, fresh main whole-Issue public/compiled acceptance and actual main CI/Deploy pass before independently authorized summary/readback/archive/completed closure."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "d1924090cd37125c9955ebfe869e8e0e974d0776",
+      "tree": "1590be6c815c785a35b2755ad0532aecc193c46a",
+      "patch": "6bcbb10f76f389ffc3a2cdeb30b5f3544c02787e280dbff6020cc6126e834342",
+      "report": "What this change does: preserves declared Layout capability values when they are inherited or non-enumerable. The helper still copies enumerable metadata and owns a shallow frozen shell.\n\n- Base: `6fd2d016f6330cc422508b3e51229bea4be2cce0`\n- Head: `d1924090cd37125c9955ebfe869e8e0e974d0776`\n- Tree: `1590be6c815c785a35b2755ad0532aecc193c46a`\n- Binary patch SHA256: `6bcbb10f76f389ffc3a2cdeb30b5f3544c02787e280dbff6020cc6126e834342`\n- Task digest: `78e4d4e2ec9c37ff55c487cd2c78900a462bd8c3534f0a961853f4836bcedeb9`\n\nRe-read the complete base-to-head patch, both commits, all 253 test lines, saved Issue128/empty discussion and independent plan. Traced current Input, capability validation, helper, Proposal ownership, Runtime, concrete Dagre/ELK and real Command/History integration. Canonical saved patch, clean checkout and source identities passed independent checks before/after testing. Earlier Standards evidence remains unchanged.\n\nHard documented standards: no remaining violation found. ADR0026 ownership is established at the helper: the source is captured once, enumerable copying runs first, and only absent declared flags are subsequently read. Values and original receivers are retained without defaults, coercion or freezing caller metadata. Unsupported features still fail before computation. Cancellation, Proposal validation, live revision checks and one-Transaction/net-zero behavior remain unchanged.\n\nThe previous P2 is closed. Both Error-object cases now assert the actual caught value with `toBe(original)`; the shared helper also checks didThrow, so an absent throw cannot masquerade as `throw undefined`. The fixture-constant assertion is removed. This now tests ADR0029 and `principle-test-behavior-not-implementation` directly.\n\nJudgment-only Fowler smells: no concrete finding. Ponytail: correctly owned, safe and lean for isolated Canvas Engines; the shared test assertion removes real duplication without another production abstraction.\n\nIndependent `bun test packages/layout-api/tests packages/plugin-layout/tests packages/layout-dagre/tests packages/layout-elk/tests tests/layout-providers.test.ts` exited 0: **154 tests, 1025 assertions**. Full raw output is retained.\n\nRisk: **medium**, under deployed `pr-risk` and its public-source floor. This changes capability acceptance across Providers; complete-source review and the fresh public checks support focused human review. Rollback must revert the complete Issue128 delivery: both commits in reverse order, or the complete mapped publication, restoring the base and recreating Engines. No schema migration exists; code rollback cannot undo application Commands already executed.\n\nNot independently run: TypeScript, builds, browsers, affected/full checks, original compiled-six program, remote CI or publication/main acceptance.\n\n**Verdict: passed. Looks good. Ship.** This is not merge approval.\n",
+      "risk": {
+        "level": "medium",
+        "rationale": "Compatible public framework capability ownership repair changes accepted inherited/non-enumerable flags and support checks across helper Engines and Runtime Providers. The complete delivery includes public packages/layout-api/src implementation, imposing medium risk under the deployed policy. Focused human review is required; test size or green checks cannot reduce the floor.",
+        "evidence": "Complete base 6fd2d016f6330cc422508b3e51229bea4be2cce0 to head d1924090cd37125c9955ebfe869e8e0e974d0776 patch 6bcbb10f76f389ffc3a2cdeb30b5f3544c02787e280dbff6020cc6126e834342 and connected API/Runtime/Dagre/ELK/History code were independently re-read. Fresh selected public tests exited 0 with 154 tests and 1025 assertions. The two original Error identity regressions now check didThrow and caught-value toBe, closing the previous finding. Source, canonical bytes, task identity and clean checkout checked before/after. Browser/full engineering checks were not independently run.",
+        "rollback": "Restore base 6fd2d016f6330cc422508b3e51229bea4be2cce0 by reverting the complete Issue128 delivery: d1924090cd37125c9955ebfe869e8e0e974d0776 and d15e80423973e27a7f1619d129093496f3594c0d in reverse order, or reverting their complete mapped published commit(s), then recreate Engine/Runtime instances. Reverting only the latest test commit does not undo the implementation. No persisted schema migration is introduced. Code rollback does not undo application Commands already executed; their effects require the application's existing History or recovery process."
+      }
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "d1924090cd37125c9955ebfe869e8e0e974d0776",
+      "tree": "1590be6c815c785a35b2755ad0532aecc193c46a",
+      "patch": "6bcbb10f76f389ffc3a2cdeb30b5f3544c02787e280dbff6020cc6126e834342",
+      "report": "verdict: passed\n\nbase: 6fd2d016f6330cc422508b3e51229bea4be2cce0\nhead: d1924090cd37125c9955ebfe869e8e0e974d0776\ntree: 1590be6c815c785a35b2755ad0532aecc193c46a\nbinary patch SHA256: 6bcbb10f76f389ffc3a2cdeb30b5f3544c02787e280dbff6020cc6126e834342\ntaskDigest: 78e4d4e2ec9c37ff55c487cd2c78900a462bd8c3534f0a961853f4836bcedeb9\n\n独立重新读回 [Issue128](https://github.com/ZWkang/nodebraid/issues/128) 全文/完整评论；最终读回2026-10-27 04:43:49 UTC，open、bug/ready-for-agent，评论0，prepared request未变。审查完整base→head两文件补丁、253行测试及Layout API→Provider/Runtime→Kernel/Command/History调用链，结合CONTEXT、ADR0020/21/24/25/26/29与指定main规范。实际Git补丁与本head归档字节一致，当前生产代码已重新检查，不以旧报告替代。\n\n未发现遗漏、错误实现或范围扩张。source与三个required flags各取值一次，继承/非枚举和普通true/false进入owned frozen shell；原own-enumerable浅复制、额外字符串/Symbol引用和receiver保持，caller对象/metadata不冻结。false仍在Provider执行前拒绝；config、异常、取消、Proposal/Fixed Node/实时revision及单Commit/净零/UndoRedo边界未改，没有新API/默认/coercion/Registry。\n\n针对 “Preserve existing own enumerable copying behavior, original read exceptions and shallow ownership”，新expectThrownValue同时断言didThrow和caught===original；两个Error对象用例及54个falsey用例不会因相同message或未抛undefined而假绿。移除对原fixture常量类型的断言没有弱化实际抛值身份验证。\n\n本轮新进程执行 `bun test packages/layout-api/tests packages/plugin-layout/tests packages/layout-dagre/tests packages/layout-elk/tests packages/plugin-command/tests packages/kernel/tests packages/plugin-history/tests tests/layout-providers.test.ts`：483 pass、0 fail、2776 assertions，34文件，exit0；diff-check通过，前后HEAD/tree/patch/clean一致。未复用旧head计数/额外probe。新head原编译6的源码字节、bundle/入口哈希与green记录仅作读取核验。完整原始输出在spec-tests.log。\n\n未本人执行build/typecheck/affected/browser/formal full、原compiled6或远端发布/CI/媒体/merge/main验收。Spec通过不代表人工批准或整项交付完成。\n\nrisk: {\"level\": \"medium\", \"rationale\": \"完整交付修改公共Layout API能力所有权和Provider可执行性，命中packages/*/src的medium路径下限。严格身份测试改善覆盖，但不降低继承/隐藏声明及能力门禁的行为风险，仍需重点人工审阅。\", \"evidence\": \"完整base→d192两文件及253行测试、能力/Proposal/Runtime和Dagre/ELK调用链重新核对；本轮新进程483tests/2776assertions通过，含严格Error身份和54个falsey用例。当前main6fd2 pr-risk blob596298db784c4f3424968cd05a3aca4a6471b1b3独立核实。\", \"rollback\": \"普通回退提交撤销完整base6fd2→d192交付，即d1924090cd37125c9955ebfe869e8e0e974d0776与d15e80423973e27a7f1619d129093496f3594c0d两提交或未来映射的完整发布改动；只回退测试提交不足。无schema/数据迁移；会恢复能力丢失缺陷，代码回退不能撤销应用已执行的Command。\"}\n",
+      "risk": {
+        "level": "medium",
+        "rationale": "完整交付修改公共Layout API能力所有权和Provider可执行性，命中packages/*/src的medium路径下限。严格身份测试改善覆盖，但不降低继承/隐藏声明及能力门禁的行为风险，仍需重点人工审阅。",
+        "evidence": "完整base→d192两文件及253行测试、能力/Proposal/Runtime和Dagre/ELK调用链重新核对；本轮新进程483tests/2776assertions通过，含严格Error身份和54个falsey用例。当前main6fd2 pr-risk blob596298db784c4f3424968cd05a3aca4a6471b1b3独立核实。",
+        "rollback": "普通回退提交撤销完整base6fd2→d192交付，即d1924090cd37125c9955ebfe869e8e0e974d0776与d15e80423973e27a7f1619d129093496f3594c0d两提交或未来映射的完整发布改动；只回退测试提交不足。无schema/数据迁移；会恢复能力丢失缺陷，代码回退不能撤销应用已执行的Command。"
+      }
+    }
+  },
+  "changedFiles": [
+    "packages/layout-api/src/layout-engine.ts",
+    "packages/layout-api/tests/capability-values.test.ts"
+  ],
+  "risk": {
+    "level": "medium",
+    "route": "quick-human",
+    "reasons": [
+      "standards: medium — Compatible public framework capability ownership repair changes accepted inherited/non-enumerable flags and support checks across helper Engines and Runtime Providers. The complete delivery includes public packages/layout-api/src implementation, imposing medium risk under the deployed policy. Focused human review is required; test size or green checks cannot reduce the floor.",
+      "spec: medium — 完整交付修改公共Layout API能力所有权和Provider可执行性，命中packages/*/src的medium路径下限。严格身份测试改善覆盖，但不降低继承/隐藏声明及能力门禁的行为风险，仍需重点人工审阅。",
+      "packages/layout-api/src/layout-engine.ts: minimum medium risk."
+    ]
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-public-compiled-six-red",
+      "acceptance": "Main6fd2 typed public6 executes actual Host/Kernel/Command/Layout/History: two helper Capability snapshots lose inherited/nonenumerable flags and reject; four controls pass. Exit1 is this product behavior, not compile/setup failure. Original strictTSC/bundle exit0 and raw source/bundle are preserved.",
+      "command": "NODEBRAID_LAYOUT_REPRO_RESULTS=/Users/zhou/.codex/local-workflows/nodebraid/runs/20261027T035938-layout-boundaries/observations.json bun /Users/zhou/.codex/local-workflows/nodebraid/runs/20261027T035938-layout-boundaries/build/layout-capabilities-repro.js",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "repository-public-tracer-red",
+      "acceptance": "The initial repository public defineLayoutEngine tracer fails with expected three booleans but actual empty object before production edit. Full untracked test preimage and binary patch retained.",
+      "command": "bun test packages/layout-api/tests/capability-values.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "repository-public-tracer-green",
+      "acceptance": "The initial single public regression passes after the shared owner is repaired; later expanded error/value cases and actual review correction are separate records.",
+      "command": "bun test packages/layout-api/tests/capability-values.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "current-original-compiled-six-green",
+      "acceptance": "Byte-identical original entry now has six passing controls on reviewed locald192409, strictTSC/bundle/actual execution exit0; inherited/nonenumerable helper flags are true and real Layout Commit/UndoRedo succeed. Publishedb5 maps to this exact tree through actual publication proof; no local execution is relabeled as a remote execution.",
+      "command": "NODEBRAID_LAYOUT_REPRO_RESULTS=/Users/zhou/.codex/local-workflows/nodebraid/runs/ac599065-2060-403e-baa3-e20ab3670f6d/original-green/d1924090cd37125c9955ebfe869e8e0e974d0776/observations.json bun /Users/zhou/.codex/local-workflows/nodebraid/runs/ac599065-2060-403e-baa3-e20ab3670f6d/original-green/d1924090cd37125c9955ebfe869e8e0e974d0776/build/layout-capabilities-repro.js",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "actual-review-identity-assertion-repair",
+      "acceptance": "An independent d15e Standards P2 demonstrated Error-object toThrow compares message. A new test-only commit uses didThrow+strict toBe, preserving undefined detection and raw identity;81 strengthened regressions/771assertions pass. Both current-head independent reviews and full check subsequently cover them. Original historical reports are separately declared at their own head.",
+      "command": "bun test packages/layout-api/tests/capability-values.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "current-head-affected-check",
+      "acceptance": "At current reviewed head d192409, affected check passes six packages plus real Examples browser suites and docs. This is targeted development validation; the formal full check has its own original receipt.",
+      "command": "bun run check:affected --base 6fd2d016f6330cc422508b3e51229bea4be2cce0",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "current-standards-independent-tests",
+      "acceptance": "Current independent Standards+ponytail review passes154 public tests/1025assertions, riskmedium. Whole current report and separate risk retained; not a human approval.",
+      "command": "bun test packages/layout-api/tests packages/plugin-layout/tests packages/layout-dagre/tests packages/layout-elk/tests tests/layout-providers.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "current-spec-independent-tests",
+      "acceptance": "Current independent Spec review passes483 public tests/2776assertions, riskmedium. Original command and scope appear in the independent report; no full/browser publication is attributed to this axis.",
+      "command": "bun test packages/layout-api/tests packages/plugin-layout/tests packages/layout-dagre/tests packages/layout-elk/tests packages/plugin-command/tests packages/kernel/tests packages/plugin-history/tests tests/layout-providers.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "actual-source-linux-ci",
+      "acceptance": "Actual sourceCI40452926659 checks122019570845 succeeds at publishedb5:1361 tests/7342 assertions on Linux, plus real browser/build/docs checks. Local full uses7348 assertions; these are distinct actual executions. PR Deploy is normally skipped.",
+      "command": "bun run check",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "native-auto-layout-repeat-undo-redo",
+      "acceptance": "Publishedb5 real owned Chromium native clicks produce revisions1→2→2→3→4, same Node/Edge IDs, retained Selection and Viewport; ordinary Dagre/full/LR layout changes positions, repeat is netzero, Undo/Redo restore them. See [native before](native-layout/before.png), [after](native-layout/after.png), and result.json. Before/after are one-head interactions, not base-code comparison. Existing production dist was built at locald192 with verified identical published tree; no rebuild/old media relabel. This ordinary UI run does not simulate getter substitution.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/ac599065-2060-403e-baa3-e20ab3670f6d/native-layout/capture.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-10.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "1be6b3fdfeda2a36ccf936b42ff24c6c79f3c2d8407255b70ab9d7ff5b22cdf5"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "d0210d27ff0e8190e4f786fb835e75b3c5b60f469350ec08a2d09974805840c0"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "8570e308f2c6753698130dffe7cfb2d8a0e26814a013295dfbc2cabf2b648aa0"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "b101d25c5c022963070aa1b184ea382132a741e2c406bcdee6889fa0be3a10b8"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "b26005633f7dc1dc4d6ea3b56889198be3745be1a71a00a718e8f7c0f9268f3d"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "035c4937c1c1e16ac67c40fb4ce665da27513b5d75b2f9301b0102bf06b1da3c"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "824236e523760335ec5249a87131bdc543a17dd8476be9370d90685a383fee81"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "556699dd69c857e53b7b59d06f845f8c699f3da0c8e8c54e2d3761017bad6075"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "f53ad4d8c5171f8ed8236dd932a6933170764b76d286d8c933eaa6ec0383a055"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "2ec887e5632560159f2683e86329399eb3abd87aa3bb42d437ca04c1fb496d83"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "4125c7546a03531ac8e082b2d90b2edd00e0e9d682c4f6d35c0dc101bc5765cb"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "a613e8446e9a9013bd026af185ff8a0ef3c05955ab0f316337b2a7febb206a96"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "c276f043951c60147cee892289cf7a2fb9bd5c0fb797505db8c886547b360bc8"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "93234c79e7e1bb26373a68f60d1b79ad09cf7b275353b9c88af2608bc790f9e6"
+    },
+    {
+      "path": "source/original-entry.ts.txt",
+      "kind": "log",
+      "sha256": "cea6723bb9e139e606bca7ee9816ea0a2c9873dfbb5e88f2abdff4b607776ee7"
+    },
+    {
+      "path": "source/original-red-bundle.js.txt",
+      "kind": "log",
+      "sha256": "c3e672cd81717d848332ee306d0794144ce937bd53b2e1d69b31364adb55781b"
+    },
+    {
+      "path": "source/repository-red.test.ts.txt",
+      "kind": "log",
+      "sha256": "79535d4596dbb992d3e545b8408940eff13c85eb65b19680b2000473910569e8"
+    },
+    {
+      "path": "source/before-layout-engine.ts.txt",
+      "kind": "log",
+      "sha256": "ef16ac4524e4a7f0eb7b284d1a6786976896a671da1977a533f00308fa204971"
+    },
+    {
+      "path": "source/repository-red-test.patch.txt",
+      "kind": "log",
+      "sha256": "21907da8a69aa4cc7df0811210aa1710b2157d4b741770c7b39439441b524acb"
+    },
+    {
+      "path": "source/original-red-observations.json",
+      "kind": "report",
+      "sha256": "88e98c34f1d5d7cb0eee22cb4476442347b97eb7134f127f0c0ea6fcc4ca966f"
+    },
+    {
+      "path": "source/original-red-provenance.json",
+      "kind": "report",
+      "sha256": "c358d1a48f324e3832e36a93513cc63e37e5af17afadd70d198fff5f6b90dcc9"
+    },
+    {
+      "path": "source/current-green-observations.json",
+      "kind": "report",
+      "sha256": "ca6eafdb6a2b1fb5d2f6b0513fbfd888ff602a3f236f22d2ef093a5f87719ddd"
+    },
+    {
+      "path": "source/current-green-provenance.json",
+      "kind": "report",
+      "sha256": "65aeedfbf24be11462fd347221b337629f31c64d3ae7a67825ccb42e6e34df65"
+    },
+    {
+      "path": "source/current-green-receipts.json",
+      "kind": "report",
+      "sha256": "326b7383d7d1c974531c1a24ea7a622a2a9c7430a0f8f16f86771353ef557e42"
+    },
+    {
+      "path": "history/d15e804/spec.md",
+      "kind": "report",
+      "sha256": "4d5d7f88dc1e97e6dceb1869e11659a4c99c92396a77d665b2ccfb5b7dfeeca1"
+    },
+    {
+      "path": "history/d15e804/spec-evidence.json",
+      "kind": "report",
+      "sha256": "52c76755f27d27a0eb8b7415aa6cda819c4f72ba59abaa44244d50b13652c8d0"
+    },
+    {
+      "path": "history/d15e804/spec-tests.log",
+      "kind": "log",
+      "sha256": "28fd3b4ea730ef255ac78253e9dbfe25467cd668b41e351ec725baf09cf278e3"
+    },
+    {
+      "path": "history/d15e804/standards.md",
+      "kind": "report",
+      "sha256": "5d01ca38bcba7220611ece9a2e5e44187799fa7dbc94d38fab3ac18882efd110"
+    },
+    {
+      "path": "history/d15e804/standards-evidence.json",
+      "kind": "report",
+      "sha256": "5fa0b6f14adbf2b525ed79cfbf3453bb0ddf4b1319b8a373ebe16ef0b3245bd5"
+    },
+    {
+      "path": "history/d15e804/standards-tests.log",
+      "kind": "log",
+      "sha256": "ce17643fe79c97efc0296dad0632cdec9fcf3a694548962dce7640cc1394447a"
+    },
+    {
+      "path": "history/d15e804/spec-live-issue-final-readback.json",
+      "kind": "report",
+      "sha256": "c901fff6d7f6234e9511009dc1ecdb4f96fd90076e7919d918f24cd0164567dd"
+    },
+    {
+      "path": "history/d15e804/spec-live-issue-readback.json",
+      "kind": "report",
+      "sha256": "8fc07b77e61c86aef9a235650ccb4a91e73f3a726c39cf6ae40ea1859a87d6dc"
+    },
+    {
+      "path": "native-layout/before.png",
+      "kind": "screenshot",
+      "sha256": "5e11ee460be14546d95a9cd3af7c6a2a08c389bdffbbcee5d4ad77960557196f"
+    },
+    {
+      "path": "native-layout/before.json",
+      "kind": "report",
+      "sha256": "b9a31b16c2949512dd431306692e28dcfda0831dc45889c4a5eefb4faec9860a"
+    },
+    {
+      "path": "native-layout/before.txt",
+      "kind": "snapshot",
+      "sha256": "ff5ba34c2660b6d8428779c131fdbef5038aee5a1d7fbd0ddc90aea5b9ca17de"
+    },
+    {
+      "path": "native-layout/after.png",
+      "kind": "screenshot",
+      "sha256": "2cfcf0cc666a25d4d157f4eeb1c3e04365b0e44e283ead87eab49dd2a8ff35a3"
+    },
+    {
+      "path": "native-layout/after.json",
+      "kind": "report",
+      "sha256": "1cff014fb64b412aa08c758911e698be3ce4aa0c801dbf7addd4d686fa85af32"
+    },
+    {
+      "path": "native-layout/after.txt",
+      "kind": "snapshot",
+      "sha256": "d29f5110e215fe3ff02c44ab87b3f2feee8c57acb003b7de123c2dc33d439ce7"
+    },
+    {
+      "path": "native-layout/repeat.png",
+      "kind": "screenshot",
+      "sha256": "2cfcf0cc666a25d4d157f4eeb1c3e04365b0e44e283ead87eab49dd2a8ff35a3"
+    },
+    {
+      "path": "native-layout/repeat.json",
+      "kind": "report",
+      "sha256": "1cff014fb64b412aa08c758911e698be3ce4aa0c801dbf7addd4d686fa85af32"
+    },
+    {
+      "path": "native-layout/repeat.txt",
+      "kind": "snapshot",
+      "sha256": "d29f5110e215fe3ff02c44ab87b3f2feee8c57acb003b7de123c2dc33d439ce7"
+    },
+    {
+      "path": "native-layout/undo.png",
+      "kind": "screenshot",
+      "sha256": "7386dcf5aecac45ca45c0b17c38745f660d9c5f44c6c334d16f5a083937783af"
+    },
+    {
+      "path": "native-layout/undo.json",
+      "kind": "report",
+      "sha256": "50660b0ccb481269cdf90fbb15fff208783ebc31365cc6eb19d9253f147936dd"
+    },
+    {
+      "path": "native-layout/undo.txt",
+      "kind": "snapshot",
+      "sha256": "42e2f8def331b21597f1af9d4133e73d2319aa17ea5943dd59a9626c0fedeb61"
+    },
+    {
+      "path": "native-layout/redo.png",
+      "kind": "screenshot",
+      "sha256": "3c9a901610aa47c275a72da8a0f2a473bac8556239c10d7b2e344a29de6aad8d"
+    },
+    {
+      "path": "native-layout/redo.json",
+      "kind": "report",
+      "sha256": "a0af2b93253775f1d60dc350b916299e7b1b5cba4c1ddb3ef5ab16074525f83d"
+    },
+    {
+      "path": "native-layout/redo.txt",
+      "kind": "snapshot",
+      "sha256": "d24fdbe67f71943b5372e5127efb4729f60f94c450666d30a960f333a23fe1e5"
+    },
+    {
+      "path": "native-layout/result.json",
+      "kind": "report",
+      "sha256": "d038488edf5f3fdc2f7cc768f3e675b6c68ef305ebba631001926ee8a8fb812a"
+    },
+    {
+      "path": "native-layout/cleanup.json",
+      "kind": "report",
+      "sha256": "37bee7964268f9b70a0ebe9529e06d0cf386069a277a5a3507c2ea3b7bb3c73a"
+    },
+    {
+      "path": "native-layout/actions.log",
+      "kind": "log",
+      "sha256": "1d19551f5fd073e356ca2519347415ed9ca9ecb58fa85a0ee27339dff2cbbece"
+    },
+    {
+      "path": "native-layout/capture.stdout.log",
+      "kind": "log",
+      "sha256": "c276f043951c60147cee892289cf7a2fb9bd5c0fb797505db8c886547b360bc8"
+    },
+    {
+      "path": "native-layout/capture.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "native-layout/capture.ts.txt",
+      "kind": "log",
+      "sha256": "59471d4ff3fd3c21deed7f11a7a5e4c6292ee1bf93d219eb0233a9629dc13536"
+    },
+    {
+      "path": "publication-notes.md",
+      "kind": "report",
+      "sha256": "eda03df21b95d1ca272af19d89ec76025a32e6fd8142bcb66d5bebf71e67eb3d"
+    }
+  ]
+}
