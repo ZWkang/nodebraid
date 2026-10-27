@@ -53,15 +53,20 @@ function snapshotInteractionConfig(config: InteractionConfig | undefined): Inter
   if (input === undefined || input === null || typeof input !== 'object' || Array.isArray(input)) return config;
   const { connection, dragThreshold, wheelZoomSensitivity, minZoom, maxZoom, ...snapshot } =
     config as InteractionConfig;
+  let ownedConnection = connection;
+  if (connection !== undefined && connection !== null && typeof connection === 'object' && !Array.isArray(connection)) {
+    const connectionValues = { ...connection };
+    if (!Object.hasOwn(connectionValues, 'materializeEdge')) {
+      connectionValues.materializeEdge = connection.materializeEdge;
+    }
+    ownedConnection = Object.freeze(connectionValues);
+  }
   return Object.freeze({
     ...snapshot,
     dragThreshold,
     wheelZoomSensitivity,
     minZoom,
     maxZoom,
-    connection:
-      connection !== undefined && connection !== null && typeof connection === 'object' && !Array.isArray(connection)
-        ? Object.freeze({ ...connection })
-        : connection,
+    connection: ownedConnection,
   });
 }
