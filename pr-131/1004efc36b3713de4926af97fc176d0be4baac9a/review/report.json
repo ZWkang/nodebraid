@@ -1,0 +1,384 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+    "expectedParent": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+    "head": "1004efc36b3713de4926af97fc176d0be4baac9a",
+    "tree": "9d26a37eb77f17d1c7cae4c0e4c1a8a65cf5058d",
+    "patch": "577aab23d8747832f7a25239e8f36a548c755ba7ac84da31e0c875b47a77af44",
+    "localHead": "878aecc6dfd02597016d26e3e3310a323e3974e8"
+  },
+  "task": {
+    "run": "260341e5-02b0-4105-8c3e-5e853fe9c973",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 130
+    },
+    "request": "## Confirmed defect\n\nAt main `6fd2d016f6330cc422508b3e51229bea4be2cce0`, Basic Canvas Composition loses a valid `ConnectionConfig.materializeEdge` supplied as an inherited class method or a non-enumerable own function. Both configurations strictly satisfy the public `ConnectionConfig` type.\n\nA strictly typechecked compiled public-package program creates actual Plugin Hosts and compares Basic Composition with manual installation of the same seven public Plugins. Two Basic cases fail to activate with `InteractionError / INVALID_CONFIG` (“materializeEdge must be a function”). Basic with an ordinary enumerable callback and all three manual controls become active. The source callback is still a function in every case. The compiled program exits1 with two failures and four passing controls.\n\nThe Renderer is an explicit implementation of the public CanvasRenderer seam. This reproduction tests real composition readiness and cleanup; it does not request a Connection Gesture, invoke materialization, or claim SVG/native browser behavior.\n\n## Contract and cause\n\n[The public ConnectionConfig](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/plugin-interaction/src/contracts.ts) requires a readonly materializer function without an own/enumerable restriction. [The Interaction boundary](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/plugin-interaction/src/interaction-config.ts) accepts these same inherited/non-enumerable callback values.\n\n[Basic's nested snapshot](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/preset-basic/src/preset-basic-plugin.ts) uses an own enumerable spread, omitting the required callback before the Interaction Plugin receives it. [ADR-0066](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/docs/adr/0066-publish-a-backend-neutral-basic-canvas-composition.md) makes Basic a backend-neutral composition of those existing Plugins; it must not invalidate their valid configuration by dropping a declared value.\n\n## Acceptance\n\n- Retain the first declared materializer function in the existing Basic nested Connection snapshot for own enumerable, inherited and non-enumerable properties.\n- Read the Connection source and callback once with the getter's original receiver; keep the captured function stable after source mutation. Preserve existing callback invocation semantics.\n- Preserve existing shallow own enumerable copying, original reflection/read errors and ordering, unknown/malformed configuration rejection and caller-owned data. Do not add a default callback, coercion, binding policy, accessor/record restriction, Registry, cap, retry or fallback.\n- The original six readiness controls become green. Add public regressions and actual Connection Command/Gesture controls for captured callback identity, valid Edge creation and History without claiming normalized fixture input is native browser input.\n- Preserve numeric Interaction options, Renderer/Child readiness and cleanup, provider conflicts, Host isolation, gestures/Disposition/cancellation and existing public APIs/dependencies.\n- Complete related/affected checks, independent Standards with ponytail-review and Spec/risk, formal full verification, exact publication/current-head CI and immutable complete report/media readback.\n- Keep the canonical Issue open through actual main integration and whole-Issue acceptance.\n\n## Runnable public reproduction\n\nAfter building public packages, save this program as basic-connection-repro.ts at the repository root and run:\n\n```sh\nNODEBRAID_BASIC_REPRO_RESULTS=/tmp/nodebraid-basic-connection-repro.json bun basic-connection-repro.ts\n```\n\n```ts\nimport assert from 'node:assert/strict';import process from 'node:process';import {writeFileSync} from 'node:fs';\nimport {createPluginHost,type PluginInstallation} from '@nodebraid/runtime-cordis';\nimport {edgeId,type CanvasEdge} from '@nodebraid/kernel';\nimport {kernelPlugin} from '@nodebraid/plugin-kernel';import {portPlugin} from '@nodebraid/plugin-port';import {commandPlugin} from '@nodebraid/plugin-command';import {sessionPlugin} from '@nodebraid/plugin-session';\nimport {createRendererPlugin} from '@nodebraid/plugin-renderer';import {interactionPlugin,InteractionError,type ConnectionConfig,type ConnectionMaterializationInput} from '@nodebraid/plugin-interaction';import {historyPlugin} from '@nodebraid/plugin-history';import {createBasicCanvasPlugin} from '@nodebraid/preset-basic';\nimport type {CanvasRenderer,RendererInputListener,RendererDocumentUpdate,HitResult,ScreenPoint} from '@nodebraid/renderer-api';import type {SessionSnapshot} from '@nodebraid/session-api';import type {InteractionProjection} from '@nodebraid/interaction-api';\nclass PublicRenderer implements CanvasRenderer{\n readonly listeners=new Set<RendererInputListener>();disposed=false;\n updateDocument(_update:RendererDocumentUpdate):void{}updateSession(_snapshot:SessionSnapshot):void{}updateInteraction(_projection:InteractionProjection|null):void{}\n subscribeInput(listener:RendererInputListener):()=>void{this.listeners.add(listener);return()=>{this.listeners.delete(listener);};}\n hitTest(_point:ScreenPoint):HitResult|null{return null;}capturePointer(_id:number):void{}releasePointer(_id:number):void{}focus():void{}\n async dispose():Promise<void>{this.disposed=true;this.listeners.clear();}\n}\nconst results:Record<string,unknown>[]=[];const out=process.env.NODEBRAID_BASIC_REPRO_RESULTS;assert.ok(out);\nfor(const basic of [true,false])for(const shape of ['prototype-method','nonenumerable-own','enumerable-own'] as const){\n let materializeCalls=0,factoryCalls=0;const opaque={caller:Symbol(shape)};\n const materialize=(input:ConnectionMaterializationInput):CanvasEdge=>{materializeCalls++;return{id:edgeId('connection-'+shape),type:'probe',source:input.source,target:input.target,data:opaque};};\n class Inherited implements ConnectionConfig{materializeEdge(input:ConnectionMaterializationInput):CanvasEdge{return materialize(input);}}\n const own:ConnectionConfig={materializeEdge:materialize};if(shape==='nonenumerable-own')Object.defineProperty(own,'materializeEdge',{enumerable:false});\n const connection:ConnectionConfig=shape==='prototype-method'?new Inherited():own;assert.equal(typeof connection.materializeEdge,'function');\n const renderer=new PublicRenderer(),config:{targetId:string}={targetId:shape},host=createPluginHost();\n const factory=(received:Readonly<{targetId:string}>):CanvasRenderer=>{assert.equal(received,config);factoryCalls++;return renderer;};\n let installations:PluginInstallation[],parent:PluginInstallation|undefined;\n if(basic){parent=host.install(createBasicCanvasPlugin(factory,{interaction:{connection}}),config);installations=[parent];}\n else{installations=[host.install(kernelPlugin),host.install(portPlugin),host.install(commandPlugin),host.install(sessionPlugin),host.install(createRendererPlugin(factory),config),host.install(interactionPlugin,{connection}),host.install(historyPlugin)];}\n try{\n  const result=await Promise.all(installations.map(x=>x.whenActive())).then(()=>({ok:true as const}),error=>({ok:false as const,error}));\n  if(result.ok)assert.ok(installations.every(x=>x.getSnapshot().status==='active'));\n  else{assert.ok(parent);const state=parent.getSnapshot();assert.equal(state.status,'failed');if(state.status==='failed')assert.equal(state.error,result.error);}\n  assert.equal(materializeCalls,0,'No Connection Gesture is requested in this public readiness reproduction');\n  results.push({basic,shape,passed:result.ok,sourceCallbackType:typeof connection.materializeEdge,status:parent?.getSnapshot().status??(result.ok?'all-manual-children-active':'failure'),factoryCalls,materializeCalls,error:result.ok?null:{name:result.error instanceof Error?result.error.name:null,code:result.error instanceof InteractionError?result.error.code:null,message:result.error instanceof Error?result.error.message:null},renderer:'explicit public Renderer fixture; no native/browser/connection gesture claim'});\n  writeFileSync(out,JSON.stringify(results,null,2)+'\\n');console.log(JSON.stringify(results.at(-1)));\n }finally{await host.dispose();assert.ok(installations.every(x=>x.getSnapshot().status==='disposed'));}\n}\nconst failed=results.filter(x=>!x.passed).length;console.log(JSON.stringify({controls:results.length,failed,passed:results.length-failed,publicTypedConnectionConfigs:true,actualHostComposition:true}));if(failed)process.exitCode=1;\n```\n\n## Deduplication\n\nComplete current all-state collections contain 129 Issue/PR records (50 + 50 + 29) and 66 PRs (20 + 20 + 20 + 6). Full related #35/#84/#86/#100 bodies and discussions, and #36/#85/#87/#101 changed files, reviews and inline threads were read. #84/#85 capture the outer Connection value; #86/#87 retain the callback accepted by direct Interaction validation; #100/#101 retain four numeric Interaction fields. The current failure drops the required nested callback during Basic's enumerable copy, before Interaction receives it. This occurrence is not implemented by those completed deliveries. Existing #128/PR #129 concern Layout Capabilities, not Basic Connection configuration.\n",
+    "plan": [
+      {
+        "id": "public-red",
+        "blockedBy": [],
+        "acceptance": "Preserve original strict compiled6 readiness red2/controls4 and a repository public Basic Composition regression that fails before production change."
+      },
+      {
+        "id": "capture-declared-materializer",
+        "blockedBy": [
+          "public-red"
+        ],
+        "acceptance": "Existing Basic Connection snapshot preserves the once-read inherited/nonenumerable/own callback and own-copy/error/order/shallow ownership; no new binding or validation/default policies."
+      },
+      {
+        "id": "integration-and-independent-review",
+        "blockedBy": [
+          "capture-declared-materializer"
+        ],
+        "acceptance": "Expanded value/getter/error/Connection Gesture/Command/History controls and original byte-identical6green pass with related/affected checks. Independent Standards+ponytail and Spec each full exact-head risk pass."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "integration-and-independent-review"
+        ],
+        "acceptance": "Only after both axes pass, canonical pinned main agents:run verify executes the real full bun run check; retain each actual failure/correction without weakening assertions."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "Normal branch/one PR to main Refs130, actual remote tree/ordered first parent and current sourceCI, all dynamic mapped scenes/full raw reports immutable publication and full byte/hash/Gitblob readback."
+      },
+      {
+        "id": "required-review-and-authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "Canonical fetched-main risk route plus actual required human/specific authorization and all current strict discussion/check/ticket gates before immediate expected-head merge/readback. No self-approve/force/bypass/auto queue."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "required-review-and-authorized-merge"
+        ],
+        "acceptance": "Actual merged source inherited by fresh main; whole-Issue public/compiled acceptance and actual main CI/required Deploy before separately authorized summary/commentID+digest/readback/archive/completed close."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "878aecc6dfd02597016d26e3e3310a323e3974e8",
+      "tree": "9d26a37eb77f17d1c7cae4c0e4c1a8a65cf5058d",
+      "patch": "577aab23d8747832f7a25239e8f36a548c755ba7ac84da31e0c875b47a77af44",
+      "report": "What this change does: retains the first declared Connection materializer in Basic Composition's nested snapshot. Inherited and non-enumerable callbacks now reach the existing Interaction validator.\n\n- Base: `6fd2d016f6330cc422508b3e51229bea4be2cce0`\n- Head: `878aecc6dfd02597016d26e3e3310a323e3974e8`\n- Tree: `9d26a37eb77f17d1c7cae4c0e4c1a8a65cf5058d`\n- Binary patch SHA256: `577aab23d8747832f7a25239e8f36a548c755ba7ac84da31e0c875b47a77af44`\n- Task digest: `b9606e650c81c842e3fa05a8a55b591810f6db4b16fc7fbadcd51a41945af227`\n\nReviewed the complete two-file patch, all 356 new test lines, full Issue130/empty discussion, independent plan and retained repository tracer red/green. Canonical patch bytes, source identities, clean checkout, parent and whitespace passed independent checks before/after testing.\n\nHard documented standards: no violations found. Under ADR0066 and Boundary Discipline, Composition preserves the supplied value rather than reinterpreting Interaction policy. Own enumerable copying and reflection failures still occur first; an absent copied callback is then read once with its original receiver. Caller objects stay mutable, while the nested snapshot stays frozen. Unknown fields and malformed/invalid values still reach Interaction's existing validation. Numeric options, child readiness and cleanup retain their previous owners.\n\nTraced Interaction normalization, Connection Gesture completion, the bare materializer invocation, Create Edge Command, Kernel Transaction and History. No new callback binding, default, coercion or lifecycle policy is introduced. The new tests check exact thrown values, first-invalid preservation, fresh Hosts, one materialization/Commit, opaque data identity, Undo/Redo and cleanup.\n\nJudgment-only Fowler smells: no concrete finding. Ponytail: correctly owned, safe and lean for isolated per-Canvas Hosts. The small conditional copy fixes the shared boundary without another abstraction; tests use actual Runtime services and a recording public Renderer seam, not native-browser claims.\n\nIndependent command: `bun test packages/preset-basic/tests packages/plugin-interaction/tests packages/plugin-history/tests packages/plugin-renderer/tests packages/plugin-session/tests` exited 0: **404 tests, 2748 assertions**. The current compiled nested capture also passed static inspection. Complete raw output is retained.\n\nRisk: **medium** under canonical `pr-risk`: public framework configuration ownership changes which valid callbacks reach live Interaction. The full patch and fresh public checks support focused human review; green tests do not lower the path floor. Rollback: revert the entire `878aecc` delivery to the base and recreate Composition instances. No schema migration exists; code rollback does not undo application Commands already executed.\n\nNot independently run: TypeScript, builds, browsers, affected/full checks, original compiled-six program or remote CI/publication/main acceptance.\n\n**Verdict: passed. Looks good. Ship.** This is not merge approval.\n",
+      "risk": {
+        "level": "medium",
+        "rationale": "Compatible public framework ownership repair changes Basic Composition's accepted nested Connection callback snapshot and therefore live Interaction readiness/materialization across inherited, non-enumerable and enumerable configurations. Public packages/preset-basic/src has the deployed medium path floor and requires focused human review; small diff or passing checks do not qualify it as low.",
+        "evidence": "Complete two-file patch 577aab23d8747832f7a25239e8f36a548c755ba7ac84da31e0c875b47a77af44 reviewed at head 878aecc6dfd02597016d26e3e3310a323e3974e8, including all 356 new public-test lines and the connected Interaction/Gesture/Command/Kernel/History path. Independent public suites exited 0 with 404 tests and 2748 assertions. Current compiled nested capture, canonical patch, task identity, clean tree and parent checked before/after. Repository tracer red/green was inspected as implementer evidence; native browser/full engineering checks were not independently executed.",
+        "rollback": "Revert the complete Issue130 commit 878aecc6dfd02597016d26e3e3310a323e3974e8, or its complete mapped published commit, to restore base 6fd2d016f6330cc422508b3e51229bea4be2cce0, then recreate Composition/Host instances whose configuration snapshots already exist. No persistent schema migration is introduced. Code rollback does not undo application Commands already executed; their effects require the application's existing History or recovery contract."
+      }
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "878aecc6dfd02597016d26e3e3310a323e3974e8",
+      "tree": "9d26a37eb77f17d1c7cae4c0e4c1a8a65cf5058d",
+      "patch": "577aab23d8747832f7a25239e8f36a548c755ba7ac84da31e0c875b47a77af44",
+      "report": "verdict: passed\n\nbase: 6fd2d016f6330cc422508b3e51229bea4be2cce0\nhead: 878aecc6dfd02597016d26e3e3310a323e3974e8\ntree: 9d26a37eb77f17d1c7cae4c0e4c1a8a65cf5058d\nbinary patch SHA256: 577aab23d8747832f7a25239e8f36a548c755ba7ac84da31e0c875b47a77af44\ntaskDigest: b9606e650c81c842e3fa05a8a55b591810f6db4b16fc7fbadcd51a41945af227\n\n独立读取 [Issue130](https://github.com/ZWkang/nodebraid/issues/130) 全文/完整评论；最终读回2026-10-27 06:39:52 UTC，open、bug/ready-for-agent，评论0，prepared request未变。审查全部两文件、356行新测试、当前main规范/CONTEXT/pr-risk、ADR0066/0068/0069，以及Basic factory→Child readiness→Interaction Config→Gesture→Create Edge Command→Kernel/History。实际完整Git补丁与归档diff.patch字节一致。\n\n未发现缺漏、范围扩张或错误实现。对照 “Retain the first declared materializer function in the existing Basic nested Connection snapshot”，原own-enumerable浅复制后，仅在copy未拥有声明字段时读取原source的materializeEdge；outer source和callback各捕获一次，getter receiver保持。冻结owned shell、保留函数引用，不冻结caller或执行bind；Runtime仍以原方式直接调用callback。反射先于补读、原抛值、unknown/malformed转交既有Interaction验证、numeric选项/Renderer config identity/Child清理均保持，无默认callback/API/策略扩张。\n\n公共回归覆盖三种property形态、source mutation后fresh Hosts、getter及reflection异常、首非法值拒绝、unknown字段、真实规范化Pointer Input→Edge Commit、opaque data、Capture/Preview释放与History UndoRedo。它们使用明确的公共Renderer fixture，不是native browser证明。\n\n本人新进程执行 `bun test packages/preset-basic/tests packages/plugin-interaction/tests packages/plugin-history/tests packages/plugin-renderer/tests packages/plugin-command/tests packages/core/tests`：400 pass、0 fail、2727 assertions，31文件，exit0；diff-check通过，前后HEAD/tree/patch/clean一致。原typed compiled6源码逐字节相同、bundle/入口哈希及红绿记录只作读取核验，不算本人执行；完整原始命令/输出见spec-tests.log。\n\n未本人运行build/typecheck/affected/browser/formal full、原compiled6或远端CI/发布/媒体/merge/main验收；Spec通过不等于人工批准或整项完成。\n\nrisk: {\"level\": \"medium\", \"rationale\": \"公共preset-basic实现修改Connection配置所有权与Composition激活/实际连线回调可用性，命中packages/*/src的medium路径下限；需重点人工审阅复制顺序、getter receiver与未绑定callback调用边界。\", \"evidence\": \"完整两文件/356行新公共测试、Basic→Interaction→Gesture→Create Edge→Kernel/History链独立核对；当前身份独立400tests/2727assertions通过，覆盖Host隔离、失败清理、原异常、连线Commit与UndoRedo。采用main6fd2/pr-risk blob596298db784c4f3424968cd05a3aca4a6471b1b3。\", \"rollback\": \"普通回退提交撤销878aecc6dfd02597016d26e3e3310a323e3974e8整项两文件或未来映射发布改动；无schema/依赖/数据迁移，会恢复继承/非枚举回调丢失缺陷，代码回退不撤销应用已执行的Command或已提交Edge。\"}\n",
+      "risk": {
+        "level": "medium",
+        "rationale": "公共preset-basic实现修改Connection配置所有权与Composition激活/实际连线回调可用性，命中packages/*/src的medium路径下限；需重点人工审阅复制顺序、getter receiver与未绑定callback调用边界。",
+        "evidence": "完整两文件/356行新公共测试、Basic→Interaction→Gesture→Create Edge→Kernel/History链独立核对；当前身份独立400tests/2727assertions通过，覆盖Host隔离、失败清理、原异常、连线Commit与UndoRedo。采用main6fd2/pr-risk blob596298db784c4f3424968cd05a3aca4a6471b1b3。",
+        "rollback": "普通回退提交撤销878aecc6dfd02597016d26e3e3310a323e3974e8整项两文件或未来映射发布改动；无schema/依赖/数据迁移，会恢复继承/非枚举回调丢失缺陷，代码回退不撤销应用已执行的Command或已提交Edge。"
+      }
+    }
+  },
+  "changedFiles": [
+    "packages/preset-basic/src/preset-basic-plugin.ts",
+    "packages/preset-basic/tests/connection-values.test.ts"
+  ],
+  "risk": {
+    "level": "medium",
+    "route": "quick-human",
+    "reasons": [
+      "standards: medium — Compatible public framework ownership repair changes Basic Composition's accepted nested Connection callback snapshot and therefore live Interaction readiness/materialization across inherited, non-enumerable and enumerable configurations. Public packages/preset-basic/src has the deployed medium path floor and requires focused human review; small diff or passing checks do not qualify it as low.",
+      "spec: medium — 公共preset-basic实现修改Connection配置所有权与Composition激活/实际连线回调可用性，命中packages/*/src的medium路径下限；需重点人工审阅复制顺序、getter receiver与未绑定callback调用边界。",
+      "packages/preset-basic/src/preset-basic-plugin.ts: minimum medium risk."
+    ]
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-public-compiled-six-red",
+      "acceptance": "At actual main6fd2 strictTSC and bundle succeeded. Original compiled public readiness6 then truly exited1: inherited and hidden Basic callbacks are dropped; enumerable Basic and all three manual same-seven-Plugin controls pass. No Gesture/materialization/native browser in this readiness fixture. Original source/bundle retained.",
+      "command": "NODEBRAID_BASIC_REPRO_RESULTS=/Users/zhou/.codex/local-workflows/nodebraid/runs/20261027T055106-maintenance-and-basic-options/observations.json bun /Users/zhou/.codex/local-workflows/nodebraid/runs/20261027T055106-maintenance-and-basic-options/build/basic-connection-repro.js",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "repository-public-tracer-red",
+      "acceptance": "The initial public Basic Composition prototype-method tracer truly failed INVALID_CONFIG before production change. Complete untracked test/source preimages and binary patch retained.",
+      "command": "bun test packages/preset-basic/tests/connection-values.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "repository-public-tracer-green",
+      "acceptance": "The same initial single regression becomes active and cleans up after the minimal owner repair.",
+      "command": "bun test packages/preset-basic/tests/connection-values.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "expanded-public-owned-values",
+      "acceptance": "30 regressions/289 assertions pass: three getter shapes, mutation-stable callback, two independent Hosts per shape, actual normalized Pointer Input→Connection Command→one Edge Commit→Undo/Redo, raw falsey throws/first-invalid callback/ownKeys order/unknown config. Renderer is explicitly a public recording fixture, not SVG/native Input.",
+      "command": "bun test packages/preset-basic/tests/connection-values.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "original-byte-identical-six-green",
+      "acceptance": "Original entry bytes c37298f7d6a4016d74f443442418b66554f0dcd4fbb6fde4b5ce00c3fc4f002c strictly typecheck/bundle/execute at local878aecc. All six readiness controls pass. Publication maps that local tree to actual remote head; local execution is not attributed to remote SHA.",
+      "command": "NODEBRAID_BASIC_REPRO_RESULTS=/Users/zhou/.codex/local-workflows/nodebraid/runs/260341e5-02b0-4105-8c3e-5e853fe9c973/original-green/observations.json bun /Users/zhou/.codex/local-workflows/nodebraid/runs/260341e5-02b0-4105-8c3e-5e853fe9c973/original-green/build/basic-connection-repro.js",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "current-head-affected",
+      "acceptance": "Current reviewed local878aecc affected checks pass three consumers core/examples/preset-basic, root layout-provider tests, real Examples browser suites and docs. Targeted check is separate from formal full.",
+      "command": "bun run check:affected --base 6fd2d016f6330cc422508b3e51229bea4be2cce0",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "independent-standards",
+      "acceptance": "Fresh independent standards review passed; exact-head risk medium and full original Markdown retained. Actual counts and scope are in the report, not human approval.",
+      "command": "bun test packages/preset-basic/tests packages/plugin-interaction/tests packages/plugin-history/tests packages/plugin-renderer/tests packages/plugin-session/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "independent-spec",
+      "acceptance": "Fresh independent spec review passed; exact-head risk medium and full original Markdown retained. Actual counts and scope are in the report, not human approval.",
+      "command": "bun test packages/preset-basic/tests packages/plugin-interaction/tests packages/plugin-history/tests packages/plugin-renderer/tests packages/plugin-command/tests packages/core/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "actual-source-linux-ci",
+      "acceptance": "Actual published-head sourceCI 40463366463 checks job 122052912319 succeeds with 1310 tests/6860 assertions on Linux; local full is a different execution. React/SVG/Examples/Document/Clipboard/build/docs and the source preview complete; PR Deploy skipped normally.",
+      "command": "bun run check",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-9.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "642e855c31aafb8974deadab539179f0cbee3f0d489019264300b19a42663f55"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "4b13e0d69de063384f8e0a32e1eb0d341e41ee80c0c24eba79602b1ac3ea9488"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "ae83b05250bd4843fad5784bd00b733db618008ea7b375b00f3f9b7feda54047"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "db7daf9b5552ade96b0b7bbddafaa0a35944a14ff68b0d824200bff02e3a99ae"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "79fb67af45f96e770eb7b51f541b6f5086632c88876f1d1a86edda3db0fcfe25"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "e98777e2b1eb83f6f2b11cfc9c94fce7608f3257dd4cbf2015f6b56ebdf5a423"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "3225d7cb90b8596c3456b4e46856486050289df35042c23de9c3518c9d744ae7"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "d917f5421f7bfc3b96d3996710b9f65f29f279fdf7a6e78095da43f871d40536"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "b90aa205ad52ff4b2c7e6e979f8e35bb70cb21168ead9c44187b8fd0a97bfed2"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "159b1e215b63447c188a5bdc550eeb6604b4b1cbb5606457393087d80d4da0ff"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "3f83a19a295afd01a1b478aa37c7ed34b742e6aadc4828b6369a2851270de861"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "f2e47ec8dd1c002b670542c777d52b5d3784ea6502b0c54a9ae3d763416cb07f"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "461e2ea9ffa70db4f35a91aa7944501d0d367957f5a7ebd9affc9c635b35f0bb"
+    },
+    {
+      "path": "source/original-entry.ts.txt",
+      "kind": "log",
+      "sha256": "c37298f7d6a4016d74f443442418b66554f0dcd4fbb6fde4b5ce00c3fc4f002c"
+    },
+    {
+      "path": "source/original-red-bundle.js.txt",
+      "kind": "log",
+      "sha256": "eefa0e4a61d443431ec5c29da4d61aeb5937940ad345f1d467e1a71fba069ae3"
+    },
+    {
+      "path": "source/repository-red.test.ts.txt",
+      "kind": "log",
+      "sha256": "986f44bef346d70e10170cdb90d29af0255d37f8ef872d138974691247a3b1ee"
+    },
+    {
+      "path": "source/before-preset-basic-plugin.ts.txt",
+      "kind": "log",
+      "sha256": "de1cb1f264685dfbdc6098d37bfb4a10f9e685a63cfe7dc2de61bb33be0fee88"
+    },
+    {
+      "path": "source/repository-red.patch.txt",
+      "kind": "log",
+      "sha256": "40ec534945b21fbd12f78869bdecb2165762d89116af0b80f79b3d1f38aa86e9"
+    },
+    {
+      "path": "source/original-red-observations.json",
+      "kind": "report",
+      "sha256": "050d574ccdb26f53bbf42a0be722221010f3464b6f302c71f43a38160271fbe1"
+    },
+    {
+      "path": "source/original-red-provenance.json",
+      "kind": "report",
+      "sha256": "119709fd06eab4dc98bf96455dadf3f3337be7b1af59b34039f52ba0c6f13d78"
+    },
+    {
+      "path": "source/original-red-receipts.json",
+      "kind": "report",
+      "sha256": "6228db13216e3a34258955f7ac4c121d6d087dcde36a1d8141ba6a1db0130e1a"
+    },
+    {
+      "path": "source/repository-red-receipt.json",
+      "kind": "report",
+      "sha256": "70c6a652efd8c7f402af053ef64198a0336d5e3217fbfa87c8e0d18be0dda865"
+    },
+    {
+      "path": "source/current-green-observations.json",
+      "kind": "report",
+      "sha256": "f37b065d9b1b1880cbf7ed8141572e3dc4f4185d814a682fc1467e4d913fd8e2"
+    },
+    {
+      "path": "source/current-green-provenance.json",
+      "kind": "report",
+      "sha256": "a61931c5ed76c9b561869900c186c74a478205bf131764d6441e4e72be4c6a62"
+    },
+    {
+      "path": "source/current-green-receipts.json",
+      "kind": "report",
+      "sha256": "422c17bceedf26deba126f06e7fab2e9ee801f82681e43142b9a253a1c429084"
+    },
+    {
+      "path": "source/original-typecheck.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/original-typecheck.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/original-bundle.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/original-bundle.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/original-compiled-red.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/green-typecheck.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/green-typecheck.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/green-bundle.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/green-bundle.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/green-compiled.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "publication-notes.md",
+      "kind": "report",
+      "sha256": "0269e3a0c58bda26fcf8a11c80fa62b1af18cd2d57a4c0159f2348c458cd2826"
+    }
+  ]
+}

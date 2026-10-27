@@ -1,0 +1,42 @@
+[
+  {
+    "command": [
+      "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/node_modules/.bin/tsc",
+      "--noEmit",
+      "--pretty",
+      "false",
+      "-p",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/260341e5-02b0-4105-8c3e-5e853fe9c973/original-green/tsconfig.json"
+    ],
+    "head": "878aecc6dfd02597016d26e3e3310a323e3974e8",
+    "startedAt": "2026-10-27T06:35:50.893929+00:00",
+    "exitCode": 0,
+    "sourceSHA256": "c37298f7d6a4016d74f443442418b66554f0dcd4fbb6fde4b5ce00c3fc4f002c",
+    "stdout": "typecheck.stdout.log",
+    "stderr": "typecheck.stderr.log"
+  },
+  {
+    "command": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/260341e5-02b0-4105-8c3e-5e853fe9c973/original-green/build-probe.ts"
+    ],
+    "head": "878aecc6dfd02597016d26e3e3310a323e3974e8",
+    "startedAt": "2026-10-27T06:35:52.020652+00:00",
+    "exitCode": 0,
+    "sourceSHA256": "c37298f7d6a4016d74f443442418b66554f0dcd4fbb6fde4b5ce00c3fc4f002c",
+    "stdout": "bundle.stdout.log",
+    "stderr": "bundle.stderr.log"
+  },
+  {
+    "command": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/260341e5-02b0-4105-8c3e-5e853fe9c973/original-green/build/basic-connection-repro.js"
+    ],
+    "head": "878aecc6dfd02597016d26e3e3310a323e3974e8",
+    "startedAt": "2026-10-27T06:35:52.188787+00:00",
+    "exitCode": 0,
+    "sourceSHA256": "c37298f7d6a4016d74f443442418b66554f0dcd4fbb6fde4b5ce00c3fc4f002c",
+    "stdout": "compiled.stdout.log",
+    "stderr": "compiled.stderr.log"
+  }
+]

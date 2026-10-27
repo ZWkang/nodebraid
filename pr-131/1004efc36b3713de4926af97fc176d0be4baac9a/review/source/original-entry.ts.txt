@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';import process from 'node:process';import {writeFileSync} from 'node:fs';
+import {createPluginHost,type PluginInstallation} from '@nodebraid/runtime-cordis';
+import {edgeId,type CanvasEdge} from '@nodebraid/kernel';
+import {kernelPlugin} from '@nodebraid/plugin-kernel';import {portPlugin} from '@nodebraid/plugin-port';import {commandPlugin} from '@nodebraid/plugin-command';import {sessionPlugin} from '@nodebraid/plugin-session';
+import {createRendererPlugin} from '@nodebraid/plugin-renderer';import {interactionPlugin,InteractionError,type ConnectionConfig,type ConnectionMaterializationInput} from '@nodebraid/plugin-interaction';import {historyPlugin} from '@nodebraid/plugin-history';import {createBasicCanvasPlugin} from '@nodebraid/preset-basic';
+import type {CanvasRenderer,RendererInputListener,RendererDocumentUpdate,HitResult,ScreenPoint} from '@nodebraid/renderer-api';import type {SessionSnapshot} from '@nodebraid/session-api';import type {InteractionProjection} from '@nodebraid/interaction-api';
+class PublicRenderer implements CanvasRenderer{
+ readonly listeners=new Set<RendererInputListener>();disposed=false;
+ updateDocument(_update:RendererDocumentUpdate):void{}updateSession(_snapshot:SessionSnapshot):void{}updateInteraction(_projection:InteractionProjection|null):void{}
+ subscribeInput(listener:RendererInputListener):()=>void{this.listeners.add(listener);return()=>{this.listeners.delete(listener);};}
+ hitTest(_point:ScreenPoint):HitResult|null{return null;}capturePointer(_id:number):void{}releasePointer(_id:number):void{}focus():void{}
+ async dispose():Promise<void>{this.disposed=true;this.listeners.clear();}
+}
+const results:Record<string,unknown>[]=[];const out=process.env.NODEBRAID_BASIC_REPRO_RESULTS;assert.ok(out);
+for(const basic of [true,false])for(const shape of ['prototype-method','nonenumerable-own','enumerable-own'] as const){
+ let materializeCalls=0,factoryCalls=0;const opaque={caller:Symbol(shape)};
+ const materialize=(input:ConnectionMaterializationInput):CanvasEdge=>{materializeCalls++;return{id:edgeId('connection-'+shape),type:'probe',source:input.source,target:input.target,data:opaque};};
+ class Inherited implements ConnectionConfig{materializeEdge(input:ConnectionMaterializationInput):CanvasEdge{return materialize(input);}}
+ const own:ConnectionConfig={materializeEdge:materialize};if(shape==='nonenumerable-own')Object.defineProperty(own,'materializeEdge',{enumerable:false});
+ const connection:ConnectionConfig=shape==='prototype-method'?new Inherited():own;assert.equal(typeof connection.materializeEdge,'function');
+ const renderer=new PublicRenderer(),config:{targetId:string}={targetId:shape},host=createPluginHost();
+ const factory=(received:Readonly<{targetId:string}>):CanvasRenderer=>{assert.equal(received,config);factoryCalls++;return renderer;};
+ let installations:PluginInstallation[],parent:PluginInstallation|undefined;
+ if(basic){parent=host.install(createBasicCanvasPlugin(factory,{interaction:{connection}}),config);installations=[parent];}
+ else{installations=[host.install(kernelPlugin),host.install(portPlugin),host.install(commandPlugin),host.install(sessionPlugin),host.install(createRendererPlugin(factory),config),host.install(interactionPlugin,{connection}),host.install(historyPlugin)];}
+ try{
+  const result=await Promise.all(installations.map(x=>x.whenActive())).then(()=>({ok:true as const}),error=>({ok:false as const,error}));
+  if(result.ok)assert.ok(installations.every(x=>x.getSnapshot().status==='active'));
+  else{assert.ok(parent);const state=parent.getSnapshot();assert.equal(state.status,'failed');if(state.status==='failed')assert.equal(state.error,result.error);}
+  assert.equal(materializeCalls,0,'No Connection Gesture is requested in this public readiness reproduction');
+  results.push({basic,shape,passed:result.ok,sourceCallbackType:typeof connection.materializeEdge,status:parent?.getSnapshot().status??(result.ok?'all-manual-children-active':'failure'),factoryCalls,materializeCalls,error:result.ok?null:{name:result.error instanceof Error?result.error.name:null,code:result.error instanceof InteractionError?result.error.code:null,message:result.error instanceof Error?result.error.message:null},renderer:'explicit public Renderer fixture; no native/browser/connection gesture claim'});
+  writeFileSync(out,JSON.stringify(results,null,2)+'\n');console.log(JSON.stringify(results.at(-1)));
+ }finally{await host.dispose();assert.ok(installations.every(x=>x.getSnapshot().status==='disposed'));}
+}
+const failed=results.filter(x=>!x.passed).length;console.log(JSON.stringify({controls:results.length,failed,passed:results.length-failed,publicTypedConnectionConfigs:true,actualHostComposition:true}));if(failed)process.exitCode=1;

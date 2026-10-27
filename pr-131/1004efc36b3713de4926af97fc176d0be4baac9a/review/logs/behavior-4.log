@@ -1,0 +1,38 @@
+bun test v1.4.2 (744846f84)
+
+packages/preset-basic/tests/connection-values.test.ts:
+(pass) Composition retains a declared Connection materializer inherited from its prototype [29.23ms]
+(pass) Composition retains the inherited materializer across mutation and fresh Hosts [13.90ms]
+(pass) Composition retains the non-enumerable materializer across mutation and fresh Hosts [5.88ms]
+(pass) Composition retains the enumerable materializer across mutation and fresh Hosts [9.61ms]
+(pass) Composition preserves the first inherited materializer read failure 0 [0.17ms]
+(pass) Composition preserves the first inherited materializer read failure 1 [0.02ms]
+(pass) Composition preserves the first inherited materializer read failure 2
+(pass) Composition preserves the first inherited materializer read failure 3
+(pass) Composition preserves the first inherited materializer read failure 4
+(pass) Composition preserves the first inherited materializer read failure 5 [0.01ms]
+(pass) Composition preserves the first non-enumerable materializer read failure 0
+(pass) Composition preserves the first non-enumerable materializer read failure 1
+(pass) Composition preserves the first non-enumerable materializer read failure 2
+(pass) Composition preserves the first non-enumerable materializer read failure 3
+(pass) Composition preserves the first non-enumerable materializer read failure 4
+(pass) Composition preserves the first non-enumerable materializer read failure 5
+(pass) Composition preserves the first enumerable materializer read failure 0
+(pass) Composition preserves the first enumerable materializer read failure 1
+(pass) Composition preserves the first enumerable materializer read failure 2
+(pass) Composition preserves the first enumerable materializer read failure 3
+(pass) Composition preserves the first enumerable materializer read failure 4
+(pass) Composition preserves the first enumerable materializer read failure 5
+(pass) Composition retains an invalid first inherited callback for existing validation 0 [2.36ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 1 [1.09ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 2 [0.83ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 3 [0.87ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 4 [1.10ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 5 [1.36ms]
+(pass) Composition preserves original own-key reflection failure before reading an inherited callback [0.10ms]
+(pass) Composition preserves unknown own Connection fields for Interaction validation [1.24ms]
+
+ 30 pass
+ 0 fail
+ 289 expect() calls
+Ran 30 tests across 1 file. [166.00ms]

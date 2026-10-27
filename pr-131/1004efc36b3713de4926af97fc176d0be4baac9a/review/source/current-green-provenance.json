@@ -1,0 +1,38 @@
+{
+  "head": "878aecc6dfd02597016d26e3e3310a323e3974e8",
+  "tree": "9d26a37eb77f17d1c7cae4c0e4c1a8a65cf5058d",
+  "resolved": {
+    "@nodebraid/runtime-cordis": "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/runtime-cordis/dist/index.js",
+    "@nodebraid/kernel": "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/kernel/dist/index.js",
+    "@nodebraid/plugin-kernel": "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/plugin-kernel/dist/index.js",
+    "@nodebraid/plugin-port": "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/plugin-port/dist/index.js",
+    "@nodebraid/plugin-command": "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/plugin-command/dist/index.js",
+    "@nodebraid/plugin-session": "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/plugin-session/dist/index.js",
+    "@nodebraid/plugin-renderer": "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/plugin-renderer/dist/index.js",
+    "@nodebraid/plugin-interaction": "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/plugin-interaction/dist/index.js",
+    "@nodebraid/plugin-history": "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/plugin-history/dist/index.js",
+    "@nodebraid/preset-basic": "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/preset-basic/dist/index.js",
+    "@nodebraid/diagnostics": "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/diagnostics/dist/index.js",
+    "@nodebraid/renderer-api": "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/renderer-api/dist/index.js",
+    "@nodebraid/interaction-api": "/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/interaction-api/dist/index.js"
+  },
+  "hashes": {
+    "@nodebraid/runtime-cordis": "c51e03769fd58eee903f81f5556ad3ac653917eab47c6dd6226d5e8c1972d5f4",
+    "@nodebraid/kernel": "c9ff8d863bd1c07313f11443fbf1c8773ff320d6edb4d5b0d18e35cd1b429f92",
+    "@nodebraid/plugin-kernel": "6a8360764dcc17d0cdc449d77f86cdce959a8d69ca30e3e1394c96327b26aa70",
+    "@nodebraid/plugin-port": "0f7b2354c858d54f1957f8b73e19d3087c935b46d2b0c4147e018eb89a9b1e50",
+    "@nodebraid/plugin-command": "1d7f5330d190f6308aca64385aef47729efd99c86e8cf7486efa7d138e5895de",
+    "@nodebraid/plugin-session": "dd5518501483e57a960156de2e4f3e60384d4523f7930dc40ee9d94a1d28ed3d",
+    "@nodebraid/plugin-renderer": "77d678ea8e4fbb41631b56daac145c0a532bc7b4f07a9361092d0366458cfb66",
+    "@nodebraid/plugin-interaction": "be7340694ba387bbd1d3bd52cd733803df6d7dac5efa97055ff65806746521e0",
+    "@nodebraid/plugin-history": "c236bbcb6d41f1cdc3de040a34287ac87e8d4c3fd68cb4e20c8106e067b205bf",
+    "@nodebraid/preset-basic": "6e3ad9b6ba2bfcb1ecc33d96606ec81b6e461f485c4a79c266a830afef36df94",
+    "@nodebraid/diagnostics": "438fb75caf4a4ff7e7e73dd3b13a9c188a47448b0892e8b3f7fa3158f6886ac9",
+    "@nodebraid/renderer-api": "e11c931a0082e17755436efecb49079f00db4dae619d382bd60a74f8fe977e7f",
+    "@nodebraid/interaction-api": "ee72f90e5774574b57c8bdf729610b79e0bc0c9a6d6300b055a853aa68e2bd6f"
+  },
+  "actualDependencyBuildHead": "878aecc6dfd02597016d26e3e3310a323e3974e8",
+  "actualExistingBuildLog": "/Users/zhou/.codex/local-workflows/nodebraid/runs/260341e5-02b0-4105-8c3e-5e853fe9c973/affected.log",
+  "bundle": "/Users/zhou/.codex/local-workflows/nodebraid/runs/260341e5-02b0-4105-8c3e-5e853fe9c973/original-green/build/basic-connection-repro.js",
+  "bundleSHA256": "252c56d6f8a8371fe4a53e2417f056dd272ce5eada5bc6f561cff591af90784c"
+}

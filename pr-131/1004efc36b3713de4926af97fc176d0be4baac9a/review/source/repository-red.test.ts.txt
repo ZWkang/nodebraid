@@ -1,0 +1,36 @@
+import { expect, test } from 'bun:test';
+import { edgeId } from '@nodebraid/kernel';
+import { createPluginHost } from '@nodebraid/runtime-cordis';
+import type { ConnectionConfig, ConnectionMaterializationInput } from '@nodebraid/plugin-interaction';
+
+import { createBasicCanvasPlugin } from '../src';
+import { TestCanvasRenderer } from './test-renderer';
+
+test('Composition retains a declared Connection materializer inherited from its prototype', async () => {
+  class InheritedConnection implements ConnectionConfig {
+    materializeEdge(input: ConnectionMaterializationInput) {
+      return {
+        id: edgeId('inherited-edge'),
+        type: 'link',
+        source: input.source,
+        target: input.target,
+        data: null,
+      };
+    }
+  }
+
+  const renderer = new TestCanvasRenderer();
+  const plugin = createBasicCanvasPlugin(
+    (_config: Readonly<{ targetId: string }>) => renderer,
+    { interaction: { connection: new InheritedConnection() } },
+  );
+  const host = createPluginHost();
+  const composition = host.install(plugin, { targetId: 'inherited-materializer' });
+  try {
+    await composition.whenActive();
+    expect(composition.getSnapshot()).toEqual({ status: 'active' });
+  } finally {
+    await host.dispose();
+  }
+  expect(renderer.disposed).toBe(true);
+});

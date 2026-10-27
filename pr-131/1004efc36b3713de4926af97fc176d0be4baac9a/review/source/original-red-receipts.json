@@ -1,0 +1,39 @@
+[
+  {
+    "command": [
+      "/Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow/node_modules/.bin/tsc",
+      "--noEmit",
+      "--pretty",
+      "false",
+      "-p",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/20261027T055106-maintenance-and-basic-options/tsconfig.json"
+    ],
+    "startedAt": "2026-10-27T06:01:10.094585+00:00",
+    "exitCode": 0,
+    "sourceSHA256": "c37298f7d6a4016d74f443442418b66554f0dcd4fbb6fde4b5ce00c3fc4f002c",
+    "stdout": "typecheck.stdout.log",
+    "stderr": "typecheck.stderr.log"
+  },
+  {
+    "command": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/20261027T055106-maintenance-and-basic-options/build-probe.ts"
+    ],
+    "startedAt": "2026-10-27T06:01:10.600808+00:00",
+    "exitCode": 0,
+    "sourceSHA256": "c37298f7d6a4016d74f443442418b66554f0dcd4fbb6fde4b5ce00c3fc4f002c",
+    "stdout": "bundle.stdout.log",
+    "stderr": "bundle.stderr.log"
+  },
+  {
+    "command": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/20261027T055106-maintenance-and-basic-options/build/basic-connection-repro.js"
+    ],
+    "startedAt": "2026-10-27T06:01:10.762979+00:00",
+    "exitCode": 1,
+    "sourceSHA256": "c37298f7d6a4016d74f443442418b66554f0dcd4fbb6fde4b5ce00c3fc4f002c",
+    "stdout": "compiled-red.stdout.log",
+    "stderr": "compiled-red.stderr.log"
+  }
+]

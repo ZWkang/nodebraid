@@ -1,0 +1,68 @@
+[
+  {
+    "basic": true,
+    "shape": "prototype-method",
+    "passed": true,
+    "sourceCallbackType": "function",
+    "status": "active",
+    "factoryCalls": 1,
+    "materializeCalls": 0,
+    "error": null,
+    "renderer": "explicit public Renderer fixture; no native/browser/connection gesture claim"
+  },
+  {
+    "basic": true,
+    "shape": "nonenumerable-own",
+    "passed": true,
+    "sourceCallbackType": "function",
+    "status": "active",
+    "factoryCalls": 1,
+    "materializeCalls": 0,
+    "error": null,
+    "renderer": "explicit public Renderer fixture; no native/browser/connection gesture claim"
+  },
+  {
+    "basic": true,
+    "shape": "enumerable-own",
+    "passed": true,
+    "sourceCallbackType": "function",
+    "status": "active",
+    "factoryCalls": 1,
+    "materializeCalls": 0,
+    "error": null,
+    "renderer": "explicit public Renderer fixture; no native/browser/connection gesture claim"
+  },
+  {
+    "basic": false,
+    "shape": "prototype-method",
+    "passed": true,
+    "sourceCallbackType": "function",
+    "status": "all-manual-children-active",
+    "factoryCalls": 1,
+    "materializeCalls": 0,
+    "error": null,
+    "renderer": "explicit public Renderer fixture; no native/browser/connection gesture claim"
+  },
+  {
+    "basic": false,
+    "shape": "nonenumerable-own",
+    "passed": true,
+    "sourceCallbackType": "function",
+    "status": "all-manual-children-active",
+    "factoryCalls": 1,
+    "materializeCalls": 0,
+    "error": null,
+    "renderer": "explicit public Renderer fixture; no native/browser/connection gesture claim"
+  },
+  {
+    "basic": false,
+    "shape": "enumerable-own",
+    "passed": true,
+    "sourceCallbackType": "function",
+    "status": "all-manual-children-active",
+    "factoryCalls": 1,
+    "materializeCalls": 0,
+    "error": null,
+    "renderer": "explicit public Renderer fixture; no native/browser/connection gesture claim"
+  }
+]

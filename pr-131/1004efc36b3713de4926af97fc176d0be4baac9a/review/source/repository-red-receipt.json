@@ -1,0 +1,14 @@
+{
+  "command": [
+    "bun",
+    "test",
+    "packages/preset-basic/tests/connection-values.test.ts"
+  ],
+  "startedAt": "2026-10-27T06:20:52.332314+00:00",
+  "exitCode": 1,
+  "expectedRed": true,
+  "head": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "testSHA256": "986f44bef346d70e10170cdb90d29af0255d37f8ef872d138974691247a3b1ee",
+  "sourceSHA256": "de1cb1f264685dfbdc6098d37bfb4a10f9e685a63cfe7dc2de61bb33be0fee88",
+  "untrackedTestPreimageAndBinaryPatchComplete": true
+}

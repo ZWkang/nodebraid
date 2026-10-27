@@ -1,0 +1,1054 @@
+Independent Issue130 Spec review; static complete and exact-head affected artifact signal received before tests.
+2026-10-27T06:39:20.773365+00:00
+Read lookup note: guessed connection-state-machine.ts/connection-command.ts were absent; actual interaction-runtime.ts/create-edge-command.ts were located and read. No product/test failure.
+
+$ ["git", "rev-parse", "HEAD"]
+878aecc6dfd02597016d26e3e3310a323e3974e8
+
+exit=0
+
+$ ["git", "rev-parse", "HEAD^{tree}"]
+9d26a37eb77f17d1c7cae4c0e4c1a8a65cf5058d
+
+exit=0
+
+$ ["git", "rev-parse", "HEAD^1"]
+6fd2d016f6330cc422508b3e51229bea4be2cce0
+
+exit=0
+
+$ ["git", "status", "--porcelain"]
+
+exit=0
+
+$ ["git", "log", "6fd2d016f6330cc422508b3e51229bea4be2cce0..878aecc6dfd02597016d26e3e3310a323e3974e8", "--oneline"]
+878aecc fix: retain Basic connection materializer
+
+exit=0
+
+$ ["git", "diff", "--binary", "6fd2d016f6330cc422508b3e51229bea4be2cce0...878aecc6dfd02597016d26e3e3310a323e3974e8"]
+diff --git a/packages/preset-basic/src/preset-basic-plugin.ts b/packages/preset-basic/src/preset-basic-plugin.ts
+index cfe8a2c..b36acbb 100644
+--- a/packages/preset-basic/src/preset-basic-plugin.ts
++++ b/packages/preset-basic/src/preset-basic-plugin.ts
+@@ -53,15 +53,20 @@ function snapshotInteractionConfig(config: InteractionConfig | undefined): Inter
+   if (input === undefined || input === null || typeof input !== 'object' || Array.isArray(input)) return config;
+   const { connection, dragThreshold, wheelZoomSensitivity, minZoom, maxZoom, ...snapshot } =
+     config as InteractionConfig;
++  let ownedConnection = connection;
++  if (connection !== undefined && connection !== null && typeof connection === 'object' && !Array.isArray(connection)) {
++    const connectionValues = { ...connection };
++    if (!Object.hasOwn(connectionValues, 'materializeEdge')) {
++      connectionValues.materializeEdge = connection.materializeEdge;
++    }
++    ownedConnection = Object.freeze(connectionValues);
++  }
+   return Object.freeze({
+     ...snapshot,
+     dragThreshold,
+     wheelZoomSensitivity,
+     minZoom,
+     maxZoom,
+-    connection:
+-      connection !== undefined && connection !== null && typeof connection === 'object' && !Array.isArray(connection)
+-        ? Object.freeze({ ...connection })
+-        : connection,
++    connection: ownedConnection,
+   });
+ }
+diff --git a/packages/preset-basic/tests/connection-values.test.ts b/packages/preset-basic/tests/connection-values.test.ts
+new file mode 100644
+index 0000000..6e98295
+--- /dev/null
++++ b/packages/preset-basic/tests/connection-values.test.ts
+@@ -0,0 +1,356 @@
++import { expect, test } from 'bun:test';
++import { edgeId, nodeId, type CanvasCommit, type CanvasEdge } from '@nodebraid/kernel';
++import type { DiagnosticFault } from '@nodebraid/diagnostics';
++import { commandService, type CommandService } from '@nodebraid/plugin-command';
++import { kernelService, type KernelService } from '@nodebraid/plugin-kernel';
++import {
++  historyService,
++  establishHistoryBaselineCommand,
++  undoCommand,
++  redoCommand,
++  type HistoryService,
++} from '@nodebraid/plugin-history';
++import type { HitResult, PointerInput, RendererInputListener, ScreenPoint } from '@nodebraid/renderer-api';
++import type { InteractionProjection } from '@nodebraid/interaction-api';
++import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
++import type {
++  ConnectionConfig,
++  ConnectionMaterializationInput,
++  ConnectionMaterializer,
++} from '@nodebraid/plugin-interaction';
++
++import { createBasicCanvasPlugin } from '../src';
++import { TestCanvasRenderer } from './test-renderer';
++
++test('Composition retains a declared Connection materializer inherited from its prototype', async () => {
++  class InheritedConnection implements ConnectionConfig {
++    materializeEdge(input: ConnectionMaterializationInput) {
++      return {
++        id: edgeId('inherited-edge'),
++        type: 'link',
++        source: input.source,
++        target: input.target,
++        data: null,
++      };
++    }
++  }
++
++  const renderer = new TestCanvasRenderer();
++  const plugin = createBasicCanvasPlugin((_config: Readonly<{ targetId: string }>) => renderer, {
++    interaction: { connection: new InheritedConnection() },
++  });
++  const host = createPluginHost();
++  const composition = host.install(plugin, { targetId: 'inherited-materializer' });
++  try {
++    await composition.whenActive();
++    expect(composition.getSnapshot()).toEqual({ status: 'active' });
++  } finally {
++    await host.dispose();
++  }
++  expect(renderer.disposed).toBe(true);
++});
++
++type Shape = 'inherited' | 'non-enumerable' | 'enumerable';
++const shapes: Shape[] = ['inherited', 'non-enumerable', 'enumerable'];
++
++function connectionWithGetter(shape: Shape, read: (receiver: unknown) => ConnectionMaterializer): ConnectionConfig {
++  class Inherited implements ConnectionConfig {
++    get materializeEdge(): ConnectionMaterializer {
++      return read(this);
++    }
++  }
++  const own = {
++    get materializeEdge(): ConnectionMaterializer {
++      return read(this);
++    },
++  };
++  if (shape === 'non-enumerable') Object.defineProperty(own, 'materializeEdge', { enumerable: false });
++  return shape === 'inherited' ? new Inherited() : own;
++}
++
++function expectThrownValue(action: () => unknown, original: unknown): void {
++  let threw = false;
++  let caught: unknown;
++  try {
++    action();
++  } catch (error) {
++    threw = true;
++    caught = error;
++  }
++  expect(threw).toBe(true);
++  expect(caught).toBe(original);
++}
++
++for (const shape of shapes) {
++  test(`Composition retains the ${shape} materializer across mutation and fresh Hosts`, async () => {
++    const renderers: ConnectionRenderer[] = [];
++    const configurations: Readonly<{ targetId: string }>[] = [];
++    const materialized: ConnectionMaterializationInput[] = [];
++    const opaque = { caller: Symbol(shape) };
++    const acceptedId = edgeId('captured-' + shape);
++    let laterCalls = 0;
++    const accepted: ConnectionMaterializer = (input) => {
++      materialized.push(input);
++      return { id: acceptedId, type: 'link', source: input.source, target: input.target, data: opaque };
++    };
++    let current: ConnectionMaterializer = accepted;
++    let reads = 0;
++    const supplied = connectionWithGetter(shape, (receiver) => {
++      expect(receiver).toBe(supplied);
++      reads += 1;
++      return current;
++    });
++    const originalPrototype = Object.getPrototypeOf(supplied);
++    const plugin = createBasicCanvasPlugin(
++      (configuration: Readonly<{ targetId: string }>) => {
++        configurations.push(configuration);
++        const renderer = new ConnectionRenderer();
++        renderers.push(renderer);
++        return renderer;
++      },
++      { interaction: { connection: supplied } },
++    );
++    expect(reads).toBe(1);
++    current = (input) => {
++      laterCalls += 1;
++      return { id: edgeId('later'), type: 'wrong-materializer', ...input, data: null };
++    };
++    expect(Object.isFrozen(supplied)).toBe(false);
++    expect(Object.getPrototypeOf(supplied)).toBe(originalPrototype);
++
++    for (const targetId of ['first', 'second']) {
++      const faults: DiagnosticFault[] = [];
++      const host = createPluginHost({
++        diagnostics: {
++          faultReporter: (fault) => {
++            faults.push(fault);
++          },
++        },
++      });
++      let services: { kernel: KernelService; commands: CommandService; history: HistoryService } | undefined;
++      const configuration = { targetId };
++      const composition = host.install(plugin, configuration);
++      const consumer = host.install(
++        definePlugin({
++          requires: { kernel: kernelService, commands: commandService, history: historyService },
++          setup(context) {
++            services = context.services;
++          },
++        }),
++      );
++      try {
++        await Promise.all([composition.whenActive(), consumer.whenActive()]);
++        expect(services).toBeDefined();
++        if (!services) throw new Error('Expected public Basic Services.');
++        expect(configurations.at(-1)).toBe(configuration);
++        const renderer = renderers.at(-1)!;
++        const { kernel, commands, history } = services;
++        const sourceId = nodeId('source'),
++          targetNodeId = nodeId('target');
++        kernel.transact((transaction) => {
++          transaction.nodes.add({ id: sourceId, type: 'task', position: { x: 0, y: 0 }, data: null });
++          transaction.nodes.add({ id: targetNodeId, type: 'task', position: { x: 100, y: 0 }, data: null });
++        });
++        await commands.execute(establishHistoryBaselineCommand, () => {});
++        const before = kernel.read();
++        const commits: CanvasCommit[] = [];
++        const stop = kernel.observeCommits((commit) => {
++          commits.push(commit);
++        });
++        const countBefore = materialized.length;
++        renderer.hit = { type: 'connection-anchor', nodeId: sourceId, role: 'source', worldPoint: { x: 0, y: 0 } };
++        renderer.emit(pointerInput('pointer.down', { x: 0, y: 0 }));
++        renderer.hit = {
++          type: 'connection-anchor',
++          nodeId: targetNodeId,
++          role: 'target',
++          worldPoint: { x: 100, y: 0 },
++        };
++        renderer.emit(pointerInput('pointer.move', { x: 100, y: 0 }));
++        renderer.emit(pointerInput('pointer.up', { x: 100, y: 0 }));
++        await settleCommands();
++        expect(materialized.length).toBe(countBefore + 1);
++        expect(materialized.at(-1)).toEqual({ source: { nodeId: sourceId }, target: { nodeId: targetNodeId } });
++        expect(laterCalls).toBe(0);
++        expect(reads).toBe(1);
++        expect(commits.length).toBe(1);
++        expect(commits[0]!.before).toBe(before);
++        expect(commits[0]!.after).toBe(kernel.read());
++        expect(kernel.read().query.getEdge(acceptedId)).toEqual({
++          id: acceptedId,
++          type: 'link',
++          source: { nodeId: sourceId },
++          target: { nodeId: targetNodeId },
++          data: opaque,
++        });
++        expect(kernel.read().query.getEdge(acceptedId)!.data).toBe(opaque);
++        expect(history.getSnapshot()).toEqual({ canUndo: true, canRedo: false });
++        expect(renderer.released).toEqual([1]);
++        expect(renderer.projections.at(-1)).toBeNull();
++        await commands.execute(undoCommand, undefined);
++        expect(kernel.read().query.getEdge(acceptedId)).toBeUndefined();
++        await commands.execute(redoCommand, undefined);
++        expect(kernel.read().query.getEdge(acceptedId)!.data).toBe(opaque);
++        expect(materialized.length).toBe(countBefore + 1);
++        expect(faults).toEqual([]);
++        stop();
++      } finally {
++        await host.dispose();
++      }
++      expect(composition.getSnapshot().status).toBe('disposed');
++      expect(consumer.getSnapshot().status).toBe('disposed');
++      expect(renderers.at(-1)!.disposed).toBe(true);
++      expect(renderers.at(-1)!.listener).toBeUndefined();
++    }
++    expect(reads).toBe(1);
++    expect(materialized.length).toBe(2);
++  });
++}
++
++const failures: unknown[] = [undefined, null, false, 0, '', Symbol('materializer read')];
++for (const shape of shapes) {
++  for (const [index, original] of failures.entries()) {
++    test(`Composition preserves the first ${shape} materializer read failure ${index}`, () => {
++      let reads = 0,
++        factoryCalls = 0;
++      const supplied = connectionWithGetter(shape, (receiver) => {
++        expect(receiver).toBe(supplied);
++        reads += 1;
++        throw original;
++      });
++      expectThrownValue(
++        () =>
++          createBasicCanvasPlugin(
++            () => {
++              factoryCalls += 1;
++              return new TestCanvasRenderer();
++            },
++            { interaction: { connection: supplied } },
++          ),
++        original,
++      );
++      expect(reads).toBe(1);
++      expect(factoryCalls).toBe(0);
++      expect(Object.isFrozen(supplied)).toBe(false);
++    });
++  }
++}
++
++for (const [index, invalid] of failures.entries()) {
++  test(`Composition retains an invalid first inherited callback for existing validation ${index}`, async () => {
++    let reads = 0;
++    const valid: ConnectionMaterializer = (input) => ({
++      id: edgeId('valid-later'),
++      type: 'link',
++      ...input,
++      data: null,
++    });
++    const supplied = connectionWithGetter('inherited', () => {
++      reads += 1;
++      return (reads === 1 ? invalid : valid) as ConnectionMaterializer;
++    });
++    const renderer = new TestCanvasRenderer();
++    const plugin = createBasicCanvasPlugin(() => renderer, { interaction: { connection: supplied } });
++    expect(reads).toBe(1);
++    const host = createPluginHost(),
++      composition = host.install(plugin);
++    try {
++      await expect(composition.whenActive()).rejects.toMatchObject({ code: 'INVALID_CONFIG' });
++      expect(reads).toBe(1);
++    } finally {
++      await host.dispose();
++    }
++    expect(renderer.disposed).toBe(true);
++  });
++}
++
++test('Composition preserves original own-key reflection failure before reading an inherited callback', () => {
++  const first = new Error('ownKeys first'),
++    later = new Error('callback later');
++  let callbackReads = 0;
++  const supplied = connectionWithGetter('inherited', () => {
++    callbackReads += 1;
++    throw later;
++  });
++  const proxy = new Proxy(supplied, {
++    ownKeys() {
++      throw first;
++    },
++  });
++  expectThrownValue(
++    () => createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction: { connection: proxy } }),
++    first,
++  );
++  expect(callbackReads).toBe(0);
++});
++
++test('Composition preserves unknown own Connection fields for Interaction validation', async () => {
++  let calls = 0;
++  const connection = {
++    unexpected: true,
++    materializeEdge(input: ConnectionMaterializationInput): CanvasEdge {
++      calls += 1;
++      return { id: edgeId('unexpected'), type: 'link', ...input, data: null };
++    },
++  };
++  const host = createPluginHost();
++  const composition = host.install(
++    createBasicCanvasPlugin(() => new TestCanvasRenderer(), { interaction: { connection } }),
++  );
++  try {
++    await expect(composition.whenActive()).rejects.toMatchObject({
++      code: 'INVALID_CONFIG',
++      message: 'Interaction connection config contains an unknown field.',
++    });
++    expect(calls).toBe(0);
++  } finally {
++    await host.dispose();
++  }
++});
++
++class ConnectionRenderer extends TestCanvasRenderer {
++  hit: HitResult | null = null;
++  listener: RendererInputListener | undefined;
++  readonly projections: Array<InteractionProjection | null> = [];
++  readonly released: number[] = [];
++  override updateInteraction(projection: InteractionProjection | null): void {
++    this.projections.push(projection);
++  }
++  override subscribeInput(listener: RendererInputListener): () => void {
++    this.listener = listener;
++    return () => {
++      this.listener = undefined;
++    };
++  }
++  override hitTest(_point: ScreenPoint): HitResult | null {
++    return this.hit;
++  }
++  override releasePointer(pointerId: number): void {
++    this.released.push(pointerId);
++  }
++  override async dispose(): Promise<void> {
++    this.listener = undefined;
++    await super.dispose();
++  }
++  emit(input: PointerInput): void {
++    if (!this.listener) throw new Error('Expected active public Input subscription.');
++    this.listener(input);
++  }
++}
++
++function pointerInput(type: PointerInput['type'], point: { x: number; y: number }): PointerInput {
++  return {
++    type,
++    pointerId: 1,
++    pointerType: 'mouse',
++    screenPoint: point,
++    worldPoint: point,
++    button: type === 'pointer.down' ? 'primary' : null,
++    pressedButtons: type === 'pointer.down' ? ['primary'] : [],
++    modifiers: { alt: false, control: false, meta: false, shift: false },
++  };
++}
++
++function settleCommands(): Promise<void> {
++  return new Promise((resolve) => setTimeout(resolve, 0));
++}
+
+exit=0
+Current built Basic nested snapshot contains declared materializer capture; SHA256=e7896d52ee91904227c316a565386f03d4c8bf4ebdd97ce41a687f7a258ef5a5
+Original source metadata keys: ["readAt", "issue", "comments", "originalReproRun", "originalReproSource", "originalReproSHA256", "dedupRecoveryRun", "baseRead", "expectedParentRead", "scriptCommit", "scriptBlob"]
+Original compiled6 record/source hash/bundle/public entries inspected only, not independently built/typechecked/executed:
+{"basic":true,"shape":"prototype-method","passed":true,"sourceCallbackType":"function","status":"active","factoryCalls":1,"materializeCalls":0,"error":null,"renderer":"explicit public Renderer fixture; no native/browser/connection gesture claim"}
+{"basic":true,"shape":"nonenumerable-own","passed":true,"sourceCallbackType":"function","status":"active","factoryCalls":1,"materializeCalls":0,"error":null,"renderer":"explicit public Renderer fixture; no native/browser/connection gesture claim"}
+{"basic":true,"shape":"enumerable-own","passed":true,"sourceCallbackType":"function","status":"active","factoryCalls":1,"materializeCalls":0,"error":null,"renderer":"explicit public Renderer fixture; no native/browser/connection gesture claim"}
+{"basic":false,"shape":"prototype-method","passed":true,"sourceCallbackType":"function","status":"all-manual-children-active","factoryCalls":1,"materializeCalls":0,"error":null,"renderer":"explicit public Renderer fixture; no native/browser/connection gesture claim"}
+{"basic":false,"shape":"nonenumerable-own","passed":true,"sourceCallbackType":"function","status":"all-manual-children-active","factoryCalls":1,"materializeCalls":0,"error":null,"renderer":"explicit public Renderer fixture; no native/browser/connection gesture claim"}
+{"basic":false,"shape":"enumerable-own","passed":true,"sourceCallbackType":"function","status":"all-manual-children-active","factoryCalls":1,"materializeCalls":0,"error":null,"renderer":"explicit public Renderer fixture; no native/browser/connection gesture claim"}
+{"controls":6,"failed":0,"passed":6,"publicTypedConnectionConfigs":true,"actualHostComposition":true}
+
+
+$ ["git", "diff", "--check", "6fd2d016f6330cc422508b3e51229bea4be2cce0...878aecc6dfd02597016d26e3e3310a323e3974e8"]
+
+exit=0
+
+$ ["bun", "test", "packages/preset-basic/tests", "packages/plugin-interaction/tests", "packages/plugin-history/tests", "packages/plugin-renderer/tests", "packages/plugin-command/tests", "packages/core/tests"]
+bun test v1.4.2 (744846f84)
+
+packages/plugin-history/tests/index.test.ts:
+(pass) @nodebraid/plugin-history > publishes the stable History diagnostic event catalog [1.27ms]
+(pass) @nodebraid/plugin-history > records the first post-Baseline Commit and undoes it through Command Service [20.45ms]
+(pass) @nodebraid/plugin-history > redoes the most recently undone History Entry with diagnostic metadata [1.77ms]
+(pass) @nodebraid/plugin-history > records a Recordable Commit that uses History-like diagnostic metadata [1.79ms]
+(pass) @nodebraid/plugin-history > records Command-originated work but not net-zero or failed Transactions [2.02ms]
+(pass) @nodebraid/plugin-history > clears Redo when a new Recordable Commit creates a branch [1.35ms]
+(pass) @nodebraid/plugin-history > rejects an empty Undo without changing Kernel or History [0.69ms]
+(pass) @nodebraid/plugin-history > publishes only meaningful History Snapshot changes [1.11ms]
+(pass) @nodebraid/plugin-history > snapshots subscriber recipients and isolates their errors [2.21ms]
+(pass) @nodebraid/plugin-history > allows an aligned Recordable Commit subscriber to Undo immediately [0.90ms]
+(pass) @nodebraid/plugin-history > rejects Undo before History catches up to the current Kernel revision [1.05ms]
+(pass) @nodebraid/plugin-history > keeps one queued Replay in flight and rejects a reentrant second Undo [0.76ms]
+(pass) @nodebraid/plugin-history > records a reentrant Recordable Commit and publishes only after catching up [0.86ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy while publishing its History Snapshot [6.29ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through later Kernel Observers [1.28ms]
+(pass) @nodebraid/plugin-history > returns the exact Replay Commit delivered to Kernel Observers [0.81ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through the final caught-up Snapshot publication [0.92ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Kernel Provider disappears before delivery [0.97ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Command Provider disappears before delivery [0.57ms]
+(pass) @nodebraid/plugin-history > preserves caller cancellation before starting a Replay [0.55ms]
+(pass) @nodebraid/plugin-history > prioritizes caller cancellation over an empty Undo stack [0.71ms]
+(pass) @nodebraid/plugin-history > closes old History state and reactivates from a fresh Kernel Baseline [1.71ms]
+(pass) @nodebraid/plugin-history > starts a new Baseline when Command Service returns to a retained Kernel [1.11ms]
+
+packages/plugin-history/tests/types.test.ts:
+(pass) keeps the public History seam narrow and type-safe
+
+packages/plugin-history/tests/baseline.test.ts:
+(pass) replaces the Document as a new baseline and only undoes subsequent edits [1.44ms]
+(pass) establishes a baseline without a net Document change and publishes the cleared history [1.07ms]
+(pass) keeps a net-zero baseline busy through publication while recording a subsequent Commit [0.77ms]
+(pass) preserves the original Document and History after callback rejection [0.77ms]
+(pass) preserves the original Document and History after invalid-graph rejection [0.69ms]
+(pass) preserves the original Document and History after async-callback rejection [1.50ms]
+(pass) rejects an already aborted baseline before invoking its update [0.68ms]
+(pass) rejects overlapping baseline and replay Commands before writing [2.44ms]
+(pass) returns the committed baseline when a later observer aborts the caller [0.75ms]
+(pass) rejects a baseline when an earlier observer runs before History catches up [0.68ms]
+(pass) records an ordinary reentrant Commit after the exact baseline Commit [0.79ms]
+(pass) settles a committed queued baseline when its kernel Provider disappears [0.66ms]
+(pass) settles a committed queued baseline when its command Provider disappears [0.53ms]
+
+packages/core/tests/index.test.ts:
+(pass) @nodebraid/core > publishes Port values and Runtime contribution seams [0.02ms]
+(pass) @nodebraid/core > publishes Canvas Fragment and Clipboard through the public facade [0.01ms]
+(pass) @nodebraid/core > publishes Duplicate Selection through the public facade
+(pass) @nodebraid/core > publishes the shared Diagnostics seam [0.13ms]
+(pass) @nodebraid/core > publishes the typed Plugin Host seam [0.49ms]
+(pass) @nodebraid/core > publishes the reversible Kernel seam [0.32ms]
+(pass) @nodebraid/core > publishes the Kernel Runtime Plugin seam [0.35ms]
+(pass) @nodebraid/core > publishes the Session Runtime Plugin seam [0.44ms]
+(pass) @nodebraid/core > publishes the backend-neutral Renderer and Runtime integration seams [0.06ms]
+(pass) @nodebraid/core > publishes backend-neutral Interaction values and Runtime behavior [0.01ms]
+(pass) @nodebraid/core > composes asynchronous Command preparation with a synchronous Kernel Transaction [0.42ms]
+(pass) @nodebraid/core > publishes the History Runtime Plugin seam [0.01ms]
+
+packages/core/tests/preset-basic.test.ts:
+(pass) Core facade exports Basic Canvas Composition without a concrete Renderer [0.02ms]
+
+packages/core/tests/layout.test.ts:
+(pass) the Core facade exports generic Layout seams without concrete Providers [0.02ms]
+
+packages/core/tests/document-roundtrip.test.ts:
+(pass) the public facade restores a file and records only subsequent editing [1.45ms]
+
+packages/preset-basic/tests/index.test.ts:
+(pass) Composition readiness publishes every base Service through static bindings [3.19ms]
+
+packages/preset-basic/tests/types.test.ts:
+(pass) Basic Canvas Composition preserves required Renderer config and provides no Service [2.99ms]
+
+packages/preset-basic/tests/numeric-policy.test.ts:
+(pass) Composition preserves invalid dragThreshold from enumerable policy fields [1.40ms]
+(pass) Composition preserves invalid dragThreshold from inherited policy fields [0.80ms]
+(pass) Composition preserves invalid dragThreshold from non-enumerable policy fields [2.47ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from enumerable policy fields [1.32ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from inherited policy fields [0.89ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from non-enumerable policy fields [0.76ms]
+(pass) Composition preserves invalid minZoom from enumerable policy fields [0.75ms]
+(pass) Composition preserves invalid minZoom from inherited policy fields [0.66ms]
+(pass) Composition preserves invalid minZoom from non-enumerable policy fields [0.68ms]
+(pass) Composition preserves invalid maxZoom from enumerable policy fields [0.70ms]
+(pass) Composition preserves invalid maxZoom from inherited policy fields [0.66ms]
+(pass) Composition preserves invalid maxZoom from non-enumerable policy fields [0.65ms]
+(pass) Composition retains valid enumerable policies across mutation and fresh Hosts [2.73ms]
+(pass) Composition retains valid inherited policies across mutation and fresh Hosts [2.81ms]
+(pass) Composition retains valid non-enumerable policies across mutation and fresh Hosts [1.89ms]
+(pass) Composition preserves the original enumerable dragThreshold getter failure [0.16ms]
+(pass) Composition preserves the original inherited dragThreshold getter failure
+(pass) Composition preserves the original non-enumerable dragThreshold getter failure
+(pass) Composition preserves the original enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original inherited wheelZoomSensitivity getter failure
+(pass) Composition preserves the original non-enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original enumerable minZoom getter failure
+(pass) Composition preserves the original inherited minZoom getter failure [0.01ms]
+(pass) Composition preserves the original non-enumerable minZoom getter failure
+(pass) Composition preserves the original enumerable maxZoom getter failure
+(pass) Composition preserves the original inherited maxZoom getter failure
+(pass) Composition preserves the original non-enumerable maxZoom getter failure
+
+packages/preset-basic/tests/readiness.test.ts:
+(pass) invalid Interaction options fail the Composition with the original Interaction error [1.36ms]
+(pass) Composition snapshots Interaction options when the Plugin is created [0.93ms]
+(pass) Composition snapshots nested Connection options when the Plugin is created [0.79ms]
+(pass) Composition keeps the Connection value captured before a caller getter changes [0.93ms]
+(pass) Composition owns inherited Connection options across fresh Host installations [1.67ms]
+(pass) Composition owns non-enumerable Connection options across fresh Host installations [3.22ms]
+(pass) Composition preserves the original Connection getter failure at creation [0.14ms]
+(pass) Composition leaves malformed Connection validation with Interaction [1.05ms]
+(pass) Composition creation rejects malformed or unknown top-level options [0.07ms]
+(pass) Composition waits for an asynchronous Renderer before becoming active [0.91ms]
+(pass) Renderer Factory failure keeps its identity and releases the Child tree for reinstall [1.70ms]
+
+packages/preset-basic/tests/connection-values.test.ts:
+(pass) Composition retains a declared Connection materializer inherited from its prototype [1.18ms]
+(pass) Composition retains the inherited materializer across mutation and fresh Hosts [8.74ms]
+(pass) Composition retains the non-enumerable materializer across mutation and fresh Hosts [5.29ms]
+(pass) Composition retains the enumerable materializer across mutation and fresh Hosts [6.54ms]
+(pass) Composition preserves the first inherited materializer read failure 0 [0.18ms]
+(pass) Composition preserves the first inherited materializer read failure 1 [0.01ms]
+(pass) Composition preserves the first inherited materializer read failure 2
+(pass) Composition preserves the first inherited materializer read failure 3
+(pass) Composition preserves the first inherited materializer read failure 4
+(pass) Composition preserves the first inherited materializer read failure 5
+(pass) Composition preserves the first non-enumerable materializer read failure 0
+(pass) Composition preserves the first non-enumerable materializer read failure 1
+(pass) Composition preserves the first non-enumerable materializer read failure 2 [0.02ms]
+(pass) Composition preserves the first non-enumerable materializer read failure 3
+(pass) Composition preserves the first non-enumerable materializer read failure 4
+(pass) Composition preserves the first non-enumerable materializer read failure 5
+(pass) Composition preserves the first enumerable materializer read failure 0
+(pass) Composition preserves the first enumerable materializer read failure 1
+(pass) Composition preserves the first enumerable materializer read failure 2
+(pass) Composition preserves the first enumerable materializer read failure 3
+(pass) Composition preserves the first enumerable materializer read failure 4
+(pass) Composition preserves the first enumerable materializer read failure 5
+(pass) Composition retains an invalid first inherited callback for existing validation 0 [1.16ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 1 [0.83ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 2 [0.88ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 3 [0.78ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 4 [0.80ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 5 [0.72ms]
+(pass) Composition preserves original own-key reflection failure before reading an inherited callback [0.08ms]
+(pass) Composition preserves unknown own Connection fields for Interaction validation [0.93ms]
+
+packages/preset-basic/tests/lifecycle.test.ts:
+(pass) existing standard Provider makes Basic Canvas Composition fail explicitly [0.81ms]
+(pass) second Basic Canvas Composition conflicts without disturbing the active one [1.09ms]
+(pass) a later Renderer Provider conflict rolls back earlier Child reservations [3.09ms]
+(pass) Composition disposes consumers before Renderer and awaits asynchronous Renderer cleanup [1.47ms]
+(pass) Composition cleanup attempts every Renderer resource and preserves all failures [1.08ms]
+(pass) Composition diagnostics expose the complete reverse Child cleanup order [1.01ms]
+
+packages/preset-basic/tests/package-import.test.ts:
+(pass) package-name import exposes the Basic Canvas Composition factory [0.40ms]
+
+packages/plugin-command/tests/index.test.ts:
+(pass) @nodebraid/plugin-command > rejects an empty Command ID with a stable structural error [0.09ms]
+(pass) @nodebraid/plugin-command > classifies a non-string JavaScript Command ID without copying it [0.48ms]
+(pass) @nodebraid/plugin-command > registers and executes one typed Command in an Activation [0.67ms]
+(pass) @nodebraid/plugin-command > preserves asynchronous Command results and handler errors [0.38ms]
+(pass) @nodebraid/plugin-command > enforces Command token identity and diagnostic ID uniqueness [0.30ms]
+(pass) @nodebraid/plugin-command > unregisters, aborts, and awaits in-flight Command executions [0.32ms]
+(pass) @nodebraid/plugin-command > keeps Registration disposal idempotent when abort handling reenters dispose [0.30ms]
+(pass) @nodebraid/plugin-command > closes residual registrations before disposing the Command Service Activation [1.35ms]
+(pass) @nodebraid/plugin-command > isolates caller cancellation to one Command execution [0.32ms]
+(pass) @nodebraid/plugin-command > preserves the original caller signal after execution options are reused [0.28ms]
+(pass) @nodebraid/plugin-command > detaches the original caller signal after reused-options execution settles [0.25ms]
+(pass) @nodebraid/plugin-command > does not start a Command when execution options dispose its Registration [0.29ms]
+(pass) @nodebraid/plugin-command > keeps existing executions owned while options dispose their Registration [0.33ms]
+(pass) @nodebraid/plugin-command > preserves structural errors before reading execution options [0.29ms]
+(pass) @nodebraid/plugin-command > preserves option failures and permits unrelated Registration disposal [0.25ms]
+(pass) @nodebraid/plugin-command > reinstalls an empty Command Service after Provider disposal [0.37ms]
+
+packages/plugin-command/tests/types.test.ts:
+(pass) keeps Command input and output types invariant
+
+packages/plugin-interaction/tests/input-cleanup.test.ts:
+(pass) a failed Selection transition releases Pointer Capture before reporting the Input fault [1.98ms]
+
+packages/plugin-interaction/tests/types.test.ts:
+(pass) publishes Interaction as a Runtime Plugin with a narrow Shortcut contribution Service [0.02ms]
+
+packages/plugin-interaction/tests/create-edge-input-values.test.ts:
+(pass) Create Edge cannot replace a validated forward Edge with a later self-loop [1.98ms]
+(pass) Create Edge retains first values, receivers and late opaque data from own properties [2.60ms]
+(pass) Create Edge retains first values, receivers and late opaque data from non-enumerable properties [1.26ms]
+(pass) Create Edge retains first values, receivers and late opaque data from inherited properties [1.65ms]
+(pass) Create Edge preserves the original edge read failure and exact committed state [1.25ms]
+(pass) Create Edge preserves the original edge.id read failure and exact committed state [1.03ms]
+(pass) Create Edge preserves the original edge.type read failure and exact committed state [0.87ms]
+(pass) Create Edge preserves the original edge.source read failure and exact committed state [0.83ms]
+(pass) Create Edge preserves the original edge.source.nodeId read failure and exact committed state [0.80ms]
+(pass) Create Edge preserves the original edge.source.portId read failure and exact committed state [1.05ms]
+(pass) Create Edge preserves the original edge.target read failure and exact committed state [3.18ms]
+(pass) Create Edge preserves the original edge.target.nodeId read failure and exact committed state [1.20ms]
+(pass) Create Edge preserves the original edge.target.portId read failure and exact committed state [1.01ms]
+(pass) Create Edge preserves the original edge.data.presence read failure and exact committed state [1.38ms]
+(pass) Create Edge preserves the original source read failure and exact committed state [0.94ms]
+(pass) Create Edge preserves the original source.nodeId read failure and exact committed state [2.63ms]
+(pass) Create Edge preserves the original source.portId read failure and exact committed state [1.79ms]
+(pass) Create Edge preserves the original source.role read failure and exact committed state [1.20ms]
+(pass) Create Edge preserves the original target read failure and exact committed state [2.25ms]
+(pass) Create Edge preserves the original target.nodeId read failure and exact committed state [1.81ms]
+(pass) Create Edge preserves the original target.portId read failure and exact committed state [1.49ms]
+(pass) Create Edge preserves the original target.role read failure and exact committed state [1.03ms]
+(pass) Create Edge preserves the original edge.data read failure and exact committed state [0.83ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [1.31ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [1.08ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.82ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [3.15ms]
+(pass) Create Edge observes abort before input getters [2.32ms]
+(pass) Create Edge self-loop preflight wins before the opaque-data getter [1.47ms]
+(pass) Create Edge mismatched-endpoint preflight wins before the opaque-data getter [0.84ms]
+(pass) Create Edge wrong-role preflight wins before the opaque-data getter [0.85ms]
+(pass) Create Edge missing-node preflight wins before the opaque-data getter [1.26ms]
+(pass) Create Edge missing-port preflight wins before the opaque-data getter [1.57ms]
+(pass) Create Edge duplicate-id preflight wins before the opaque-data getter [1.02ms]
+(pass) Create Edge finishes every shape check before semantic role checks [1.23ms]
+(pass) Create Edge preserves invalid-ID short circuit before Edge type reads [0.96ms]
+(pass) Create Edge validates data presence before reading Anchor roots [1.80ms]
+(pass) Create Edge retains Anchor empty-Port short circuit before the target root [1.57ms]
+(pass) Create Edge keeps an empty Endpoint Port distinct from an absent Anchor Port [1.04ms]
+(pass) Create Edge retains captured Port evidence across application Definition and data callbacks [1.55ms]
+
+packages/plugin-interaction/tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [2.53ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [1.74ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [3.36ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [7.77ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [3.07ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [1.81ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [1.12ms]
+(pass) Delete Selection rejects the first stale Snapshot when later evidence reads would return current state [2.08ms]
+(pass) Delete Selection retains the first Snapshot for explicit-edge preflight [1.63ms]
+(pass) Delete Selection retains the first Snapshot for incident-edge preflight [0.96ms]
+(pass) Delete Selection retains the first Snapshot for new-incident-edge preflight [1.23ms]
+(pass) Delete Selection accepts the first valid own evidence getter and preserves replay data [1.73ms]
+(pass) Delete Selection accepts the first valid inherited evidence getter and preserves replay data [0.95ms]
+(pass) Delete Selection accepts the first valid non-enumerable evidence getter and preserves replay data [0.83ms]
+(pass) Delete Selection rejects malformed first evidence before a later valid Snapshot can replace it [0.97ms]
+(pass) Delete Selection preserves the original evidence getter failure undefined [0.93ms]
+(pass) Delete Selection preserves the original evidence getter failure null [0.76ms]
+(pass) Delete Selection preserves the original evidence getter failure false [2.79ms]
+(pass) Delete Selection preserves the original evidence getter failure 0 [1.22ms]
+(pass) Delete Selection preserves the original evidence getter failure "" [0.78ms]
+(pass) Delete Selection preserves the original evidence getter failure Symbol(evidence failure) [0.78ms]
+(pass) Delete Selection preserves the original evidence getter failure 578 |   expect(runtime.kernel.read()).toBe(before);
+579 |   expect(runtime.history.getSnapshot()).toBe(historyBefore);
+580 |   await runtime.host.dispose();
+581 | });
+582 | 
+583 | test.each([undefined, null, false, 0, '', Symbol('evidence failure'), new Error('evidence failure')])(
+                                                                                ^
+error: evidence failure
+      at /Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:583:75
+ [0.76ms]
+(pass) Delete Selection preserves abort and malformed Selection short circuits before evidence reads [0.87ms]
+(pass) Delete Selection applies the first Selection when later root reads would choose another Node [1.01ms]
+(pass) Delete Selection captures root-own for node targets [1.38ms]
+(pass) Delete Selection captures root-inherited for node targets [1.97ms]
+(pass) Delete Selection captures root-non-enumerable for node targets [1.14ms]
+(pass) Delete Selection captures collection-root for node targets [2.81ms]
+(pass) Delete Selection captures inherited-collection for node targets [1.16ms]
+(pass) Delete Selection captures iterator for node targets [1.10ms]
+(pass) Delete Selection captures array-hooks for node targets [1.69ms]
+(pass) Delete Selection captures index-once for node targets [1.15ms]
+(pass) Delete Selection captures evidence-mutates-ids for node targets [0.92ms]
+(pass) Delete Selection keeps native fractional length 1.5 for node targets [1.10ms]
+(pass) Delete Selection keeps native fractional length "1.5" for node targets [1.11ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for node targets [0.91ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for node targets [1.00ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for node targets [3.12ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for node targets [1.34ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for node targets [0.84ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for node targets [0.83ms]
+(pass) Delete Selection preserves native length failure 1n for node [1.09ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for node [0.75ms]
+(pass) Delete Selection captures root-own for edge targets [0.92ms]
+(pass) Delete Selection captures root-inherited for edge targets [1.79ms]
+(pass) Delete Selection captures root-non-enumerable for edge targets [1.41ms]
+(pass) Delete Selection captures collection-root for edge targets [2.03ms]
+(pass) Delete Selection captures inherited-collection for edge targets [1.02ms]
+(pass) Delete Selection captures iterator for edge targets [0.80ms]
+(pass) Delete Selection captures array-hooks for edge targets [0.74ms]
+(pass) Delete Selection captures index-once for edge targets [0.90ms]
+(pass) Delete Selection captures evidence-mutates-ids for edge targets [1.43ms]
+(pass) Delete Selection keeps native fractional length 1.5 for edge targets [1.05ms]
+(pass) Delete Selection keeps native fractional length "1.5" for edge targets [0.90ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for edge targets [0.84ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for edge targets [0.95ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for edge targets [2.25ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for edge targets [1.83ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for edge targets [1.14ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for edge targets [1.50ms]
+(pass) Delete Selection preserves native length failure 1n for edge [1.06ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for edge [0.82ms]
+(pass) Delete Selection preserves original selection read failures [8.57ms]
+(pass) Delete Selection preserves original length read failures [6.68ms]
+(pass) Delete Selection preserves original index read failures [8.48ms]
+(pass) Delete Selection rejects sparse and invalid indexed IDs before evidence and preserves lazy first failure [7.14ms]
+(pass) Delete Selection admits node IDs before edge IDs and evidence and retains the first coercion [1.25ms]
+(pass) Delete Selection rejects stale first evidence Nodes when later collection reads return current roots [1.07ms]
+(pass) Delete Selection rejects first stale node evidence through root collection access [1.12ms]
+(pass) Delete Selection rejects first stale node evidence through index collection access [0.87ms]
+(pass) Delete Selection rejects first stale node evidence through map collection access [2.19ms]
+(pass) Delete Selection rejects first stale node evidence through hooks collection access [1.52ms]
+(pass) Delete Selection rejects first stale node evidence through later-field-mutation collection access [1.35ms]
+(pass) Delete Selection accepts first valid own node evidence and preserves Undo data [3.13ms]
+(pass) Delete Selection accepts first valid inherited node evidence and preserves Undo data [1.55ms]
+(pass) Delete Selection accepts first valid non-enumerable node evidence and preserves Undo data [1.69ms]
+(pass) Delete Selection uses valid first node entities independently of caller iterator [1.25ms]
+(pass) Delete Selection uses valid first node entities independently of caller methods [0.93ms]
+(pass) Delete Selection uses valid first node entities independently of caller index [0.81ms]
+(pass) Delete Selection uses valid first node entities independently of caller length [0.81ms]
+(pass) Delete Selection rejects first stale edge evidence through root collection access [0.79ms]
+(pass) Delete Selection rejects first stale edge evidence through index collection access [0.81ms]
+(pass) Delete Selection rejects first stale edge evidence through map collection access [1.71ms]
+(pass) Delete Selection rejects first stale edge evidence through hooks collection access [2.52ms]
+(pass) Delete Selection rejects first stale edge evidence through later-field-mutation collection access [1.37ms]
+(pass) Delete Selection accepts first valid own edge evidence and preserves Undo data [0.93ms]
+(pass) Delete Selection accepts first valid inherited edge evidence and preserves Undo data [0.99ms]
+(pass) Delete Selection accepts first valid non-enumerable edge evidence and preserves Undo data [0.85ms]
+(pass) Delete Selection uses valid first edge entities independently of caller iterator [1.34ms]
+(pass) Delete Selection uses valid first edge entities independently of caller methods [1.34ms]
+(pass) Delete Selection uses valid first edge entities independently of caller index [0.91ms]
+(pass) Delete Selection uses valid first edge entities independently of caller length [0.94ms]
+(pass) Delete Selection validates the first malformed evidence revision before later valid values [1.16ms]
+(pass) Delete Selection validates the first malformed evidence nodes before later valid values [2.54ms]
+(pass) Delete Selection validates the first malformed evidence edges before later valid values [1.84ms]
+(pass) Delete Selection preserves original revision evidence failure undefined [1.27ms]
+(pass) Delete Selection preserves original revision evidence failure null [0.80ms]
+(pass) Delete Selection preserves original revision evidence failure false [0.90ms]
+(pass) Delete Selection preserves original revision evidence failure 0 [0.77ms]
+(pass) Delete Selection preserves original revision evidence failure "" [1.48ms]
+(pass) Delete Selection preserves original revision evidence failure Symbol(evidence read) [1.17ms]
+(pass) Delete Selection preserves original revision evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [2.10ms]
+(pass) Delete Selection preserves original nodes evidence failure undefined [18.88ms]
+(pass) Delete Selection preserves original nodes evidence failure null [1.27ms]
+(pass) Delete Selection preserves original nodes evidence failure false [2.33ms]
+(pass) Delete Selection preserves original nodes evidence failure 0 [4.32ms]
+(pass) Delete Selection preserves original nodes evidence failure "" [1.42ms]
+(pass) Delete Selection preserves original nodes evidence failure Symbol(evidence read) [2.10ms]
+(pass) Delete Selection preserves original nodes evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [1.10ms]
+(pass) Delete Selection preserves original edges evidence failure undefined [1.44ms]
+(pass) Delete Selection preserves original edges evidence failure null [1.42ms]
+(pass) Delete Selection preserves original edges evidence failure false [0.91ms]
+(pass) Delete Selection preserves original edges evidence failure 0 [0.97ms]
+(pass) Delete Selection preserves original edges evidence failure "" [1.14ms]
+(pass) Delete Selection preserves original edges evidence failure Symbol(evidence read) [1.80ms]
+(pass) Delete Selection preserves original edges evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.88ms]
+(pass) Delete Selection preserves original length evidence failure undefined [1.38ms]
+(pass) Delete Selection preserves original length evidence failure null [1.29ms]
+(pass) Delete Selection preserves original length evidence failure false [0.89ms]
+(pass) Delete Selection preserves original length evidence failure 0 [0.89ms]
+(pass) Delete Selection preserves original length evidence failure "" [0.90ms]
+(pass) Delete Selection preserves original length evidence failure Symbol(evidence read) [0.98ms]
+(pass) Delete Selection preserves original length evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.89ms]
+(pass) Delete Selection preserves original index evidence failure undefined [0.91ms]
+(pass) Delete Selection preserves original index evidence failure null [2.62ms]
+(pass) Delete Selection preserves original index evidence failure false [1.02ms]
+(pass) Delete Selection preserves original index evidence failure 0 [0.83ms]
+(pass) Delete Selection preserves original index evidence failure "" [0.82ms]
+(pass) Delete Selection preserves original index evidence failure Symbol(evidence read) [0.87ms]
+(pass) Delete Selection preserves original index evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.81ms]
+(pass) Delete Selection rejects sparse, hidden-invalid and lazily invalid evidence entities [1.12ms]
+(pass) Delete Selection captures evidence revision before Nodes before Edges and rejects malformed empty Selection evidence [2.22ms]
+(pass) Delete Selection preserves native evidence nodes length normalization and failures [1.30ms]
+(pass) Delete Selection preserves native evidence edges length normalization and failures [0.97ms]
+
+packages/plugin-interaction/tests/create-edge-command.test.ts:
+(pass) Create Edge commits one complete Node-level Edge [3.46ms]
+
+packages/plugin-interaction/tests/selection-transition.test.ts:
+(pass) a Port click selects its owning Node without inventing a Port selection [0.10ms]
+
+packages/plugin-interaction/tests/config.test.ts:
+(pass) Interaction accepts an explicit synchronous Connection materializer [1.06ms]
+(pass) Interaction rejects unknown config fields through Plugin installation [0.74ms]
+(pass) Interaction rejects malformed numeric config without coercion [1.99ms]
+(pass) Interaction revalidates the materializer on recovery and preserves its read failure [0.90ms]
+
+packages/plugin-interaction/tests/move-input-values.test.ts:
+(pass) Move Nodes cannot substitute a stale target through repeated caller array traversal [2.07ms]
+(pass) Move Nodes retains valid first values from own fields and receivers [1.20ms]
+(pass) Move Nodes retains valid first values from non-enumerable fields and receivers [0.80ms]
+(pass) Move Nodes retains valid first values from inherited fields and receivers [0.80ms]
+(pass) Move Nodes preserves the original moves read failure before committing [1.08ms]
+(pass) Move Nodes preserves the original length read failure before committing [2.02ms]
+(pass) Move Nodes preserves the original entry read failure before committing [1.72ms]
+(pass) Move Nodes preserves the original nodeId read failure before committing [1.06ms]
+(pass) Move Nodes preserves the original basePosition read failure before committing [0.75ms]
+(pass) Move Nodes preserves the original base.x read failure before committing [0.73ms]
+(pass) Move Nodes preserves the original base.y read failure before committing [0.70ms]
+(pass) Move Nodes preserves the original position read failure before committing [0.68ms]
+(pass) Move Nodes preserves the original position.x read failure before committing [0.74ms]
+(pass) Move Nodes preserves the original position.y read failure before committing [0.75ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [0.92ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [2.25ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [1.22ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [0.78ms]
+(pass) Move Nodes observes abort before any input read [0.84ms]
+(pass) Move Nodes retains the first nonfinite basePosition.x, rather than a later finite value [0.90ms]
+(pass) Move Nodes retains the first nonfinite basePosition.y, rather than a later finite value [0.79ms]
+(pass) Move Nodes retains the first nonfinite position.x, rather than a later finite value [0.84ms]
+(pass) Move Nodes retains the first nonfinite position.y, rather than a later finite value [0.75ms]
+(pass) Move Nodes keeps whole-input shape failures before duplicate validation [0.89ms]
+(pass) Move Nodes keeps whole-input shape failures before nonfinite validation [1.32ms]
+(pass) Move Nodes rejects a sparse indexed entry even if caller hooks hide it [1.38ms]
+(pass) Move Nodes does not call caller traversal, map, constructor or species hooks [2.08ms]
+(pass) Move Nodes retains native array-like positive length normalization %s [1.14ms]
+(pass) Move Nodes retains native array-like positive length normalization 1.5 [0.91ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.88ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [1.00ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [1.14ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.87ms]
+(pass) Move Nodes rejects a native-normalized empty input length 0 [0.85ms]
+(pass) Move Nodes exposes native length coercion failure %s before entries [0.94ms]
+(pass) Move Nodes exposes native length coercion failure %s before entries [0.85ms]
+(pass) Move Nodes reads the length conversion once and cannot hide the original first entry failure behind allocation [1.97ms]
+(pass) Move Nodes retains owned earlier Point values, Node fields and one atomic History entry [2.12ms]
+
+packages/plugin-interaction/tests/lifecycle.test.ts:
+(pass) Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh [2.26ms]
+(pass) Delete Selection registration follows dependency reactivation and disposal lifecycle [1.34ms]
+(pass) Connection materializer failure keeps identity and reports exactly once after terminal cleanup [2.80ms]
+(pass) Connection dependency recovery creates a fresh idle Activation [1.61ms]
+(pass) Connection final Hit Test failure still clears Preview and releases Capture [0.80ms]
+(pass) Connection Escape attempts every terminal cleanup and never materializes after cleanup failure [0.74ms]
+(pass) Box Selection disposal continues after every public Renderer cleanup failure [0.98ms]
+(pass) Box Selection escape exposes every terminal cleanup failure [0.70ms]
+(pass) Box Selection pointer-cancel exposes every terminal cleanup failure [0.62ms]
+(pass) Interaction dependency recovery creates a fresh idle Activation [1.19ms]
+(pass) an input-driven Command rejection is reported exactly once while Interaction is active [4.43ms]
+(pass) a late Command rejection cannot report through an ended Interaction Activation [2.07ms]
+(pass) a recovered Renderer reset receives the still-compatible Active Gesture again [2.45ms]
+
+packages/plugin-interaction/tests/move-nodes-command.test.ts:
+(pass) Move Nodes rejects an empty input without changing Document [1.68ms]
+
+packages/plugin-interaction/tests/diagnostic-events.test.ts:
+(pass) publishes the stable Interaction diagnostic event catalog [0.02ms]
+
+packages/plugin-interaction/tests/port-connection.test.ts:
+(pass) Port Gesture tracks target loss, materializes exact Endpoints once, and cancels on source loss [3.12ms]
+(pass) Connection Gesture uses the materializer accepted before its getter changes [3.21ms]
+
+packages/plugin-interaction/tests/delete-selection-input.test.ts:
+(pass) a live Interaction Shortcut Binding executes its Command and prevents the matched input default [4.39ms]
+(pass) logical Delete key removes the current Selection through the public Renderer Input seam [2.87ms]
+(pass) physical Delete accepts modifiers and repeat while empty Selection and Backspace remain no-ops [3.70ms]
+(pass) Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connection without cancelling them [12.31ms]
+(pass) Delete Transaction failure preserves state and reports the original diagnostic identity exactly once [2.70ms]
+
+packages/plugin-renderer/tests/index.test.ts:
+(pass) @nodebraid/plugin-renderer > publishes the stable Renderer diagnostic event catalog [0.01ms]
+(pass) @nodebraid/plugin-renderer > creates one Renderer and publishes only the narrow Runtime Service [1.13ms]
+(pass) @nodebraid/plugin-renderer > keeps every delivered Session resolvable while Document entities are removed [0.68ms]
+(pass) @nodebraid/plugin-renderer > waits for reentrant Session reconciliation before delivering a deleting Commit [0.55ms]
+(pass) @nodebraid/plugin-renderer > delegates input, hit testing, capture and focus without exposing update methods [1.17ms]
+(pass) @nodebraid/plugin-renderer > binds one exclusive Interaction Projection writer for the Renderer Activation [0.95ms]
+(pass) @nodebraid/plugin-renderer > isolates Input listener faults through Host diagnostics [0.91ms]
+(pass) @nodebraid/plugin-renderer > reports an out-of-sync Renderer and re-establishes its current baseline [0.61ms]
+(pass) @nodebraid/plugin-renderer > attempts one full recovery after an arbitrary internal synchronization fault [0.51ms]
+(pass) @nodebraid/plugin-renderer > enters terminal Sync Failure when the single full recovery also fails [0.66ms]
+(pass) @nodebraid/plugin-renderer > does not report queued Commits already subsumed by an out-of-sync reset [0.75ms]
+
+packages/plugin-renderer/tests/types.test.ts:
+(pass) binds Provider config without exposing CanvasRenderer update authority
+
+ 400 pass
+ 0 fail
+ 2727 expect() calls
+Ran 400 tests across 31 files. [628.00ms]
+
+exit=0
+
+Post-test HEAD/tree/patch/clean unchanged. No source/build/browser/affected/full/remote actions by reviewer.
+
+Final live fetch_issue/all-pages fetch_issue_comments 2026-10-27 06:39:52 UTC: open bug/ready-for-agent, comments0, full original request unchanged. Readback: spec-live-issue-final-readback.json
+
+Original reproduction metadata / repository red / compiled6 observations read only, not reviewer execution:
+{'readAt': '2026-10-27T06:19:42.571273+00:00', 'originalReproRun': '/Users/zhou/.codex/local-workflows/nodebraid/runs/20261027T055106-maintenance-and-basic-options', 'originalReproSource': '/Users/zhou/.codex/local-workflows/nodebraid/runs/20261027T055106-maintenance-and-basic-options/basic-connection-repro.ts', 'originalReproSHA256': 'c37298f7d6a4016d74f443442418b66554f0dcd4fbb6fde4b5ce00c3fc4f002c', 'dedupRecoveryRun': '/Users/zhou/.codex/local-workflows/nodebraid/runs/20261027T061107-basic-dedup-recovery', 'baseRead': '6fd2d016f6330cc422508b3e51229bea4be2cce0', 'expectedParentRead': '6fd2d016f6330cc422508b3e51229bea4be2cce0', 'scriptCommit': '6fd2d016f6330cc422508b3e51229bea4be2cce0', 'scriptBlob': 'ff11d98b51ba12f0742bdd7750f941268a4d7522'}
+Original public repository red stderr tail:
+      at activate (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/runtime-cordis/dist/plugin-installation.js:98:49)
+      at plugin (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/packages/runtime-cordis/dist/cordis-plugin-host.js:130:64)
+      at /Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/node_modules/cordis/lib/index.js:808:37
+      at composeError (/Users/zhou/.codex/worktrees/preset-interaction-policy/cflow/node_modules/cordis/lib/index.js:239:20)
+(fail) Composition retains a declared Connection materializer inherited from its prototype [30.03ms]
+
+ 0 pass
+ 1 fail
+Ran 1 test across 1 file. [95.00ms]
+Current compiled6 observations:
+[
+  {
+    "basic": true,
+    "shape": "prototype-method",
+    "passed": true,
+    "sourceCallbackType": "function",
+    "status": "active",
+    "factoryCalls": 1,
+    "materializeCalls": 0,
+    "error": null,
+    "renderer": "explicit public Renderer fixture; no native/browser/connection gesture claim"
+  },
+  {
+    "basic": true,
+    "shape": "nonenumerable-own",
+    "passed": true,
+    "sourceCallbackType": "function",
+    "status": "active",
+    "factoryCalls": 1,
+    "materializeCalls": 0,
+    "error": null,
+    "renderer": "explicit public Renderer fixture; no native/browser/connection gesture claim"
+  },
+  {
+    "basic": true,
+    "shape": "enumerable-own",
+    "passed": true,
+    "sourceCallbackType": "function",
+    "status": "active",
+    "factoryCalls": 1,
+    "materializeCalls": 0,
+    "error": null,
+    "renderer": "explicit public Renderer fixture; no native/browser/connection gesture claim"
+  },
+  {
+    "basic": false,
+    "shape": "prototype-method",
+    "passed": true,
+    "sourceCallbackType": "function",
+    "status": "all-manual-children-active",
+    "factoryCalls": 1,
+    "materializeCalls": 0,
+    "error": null,
+    "renderer": "explicit public Renderer fixture; no native/browser/connection gesture claim"
+  },
+  {
+    "basic": false,
+    "shape": "nonenumerable-own",
+    "passed": true,
+    "sourceCallbackType": "function",
+    "status": "all-manual-children-active",
+    "factoryCalls": 1,
+    "materializeCalls": 0,
+    "error": null,
+    "renderer": "explicit public Renderer fixture; no native/browser/connection gesture claim"
+  },
+  {
+    "basic": false,
+    "shape": "enumerable-own",
+    "passed": true,
+    "sourceCallbackType": "function",
+    "status": "all-manual-children-active",
+    "factoryCalls": 1,
+    "materializeCalls": 0,
+    "error": null,
+    "renderer": "explicit public Renderer fixture; no native/browser/connection gesture claim"
+  }
+]
+
