@@ -58,6 +58,21 @@ const server = Bun.serve({
 
 try {
   await runAgentBrowser(['open', server.url.href]);
+  const declaredGeometry = await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgDeclaredGeometryTracer()');
+  assert.deepEqual(declaredGeometry, { x: '80', y: '90', baselineUnchanged: true });
+
+  const geometryValues = await evaluateBrowserScenario<{
+    controls: number;
+    passed: number;
+    results: { id: string; passed: boolean; error?: string }[];
+  }>('globalThis.__nodebraidRendererSvgGeometryValueCases()');
+  assert.equal(geometryValues.controls, 214);
+  assert.equal(
+    geometryValues.passed,
+    geometryValues.controls,
+    JSON.stringify(geometryValues.results.filter((result) => !result.passed)),
+  );
+  console.info('SVG Interaction Geometry capture: 214 public browser cases passed.');
   let nativePolicyCases = 0;
   await withRendererPageCdp(async (send) => {
     for (const family of ['pointer', 'wheel', 'keyboard', 'contextMenu'] as const) {

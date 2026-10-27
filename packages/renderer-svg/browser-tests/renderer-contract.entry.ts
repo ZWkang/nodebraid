@@ -1,4 +1,9 @@
 import {
+  runInteractionGeometryValueCases,
+  runInteractionGeometryArrayCases,
+  runInteractionGeometryMetadataCases,
+} from './interaction-geometry-values.entry';
+import {
   setupPolicyCase,
   readPolicyCase,
   cleanupPolicyCase,
@@ -5971,3 +5976,67 @@ globalThis.__nodebraidRendererSvgReviewResizeObserverMultipleErrors =
     target.remove();
     return result;
   };
+
+declare global {
+  var __nodebraidRendererSvgDeclaredGeometryTracer: () => Promise<{
+    x: string | null;
+    y: string | null;
+    baselineUnchanged: boolean;
+  }>;
+}
+globalThis.__nodebraidRendererSvgDeclaredGeometryTracer = async () => {
+  class InheritedPosition {
+    get x(): number {
+      return 80;
+    }
+    get y(): number {
+      return 90;
+    }
+  }
+  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  target.setAttribute('width', '400');
+  target.setAttribute('height', '300');
+  document.body.append(target);
+  const renderer = createSvgRenderer({ target });
+  const kernel = createCanvasKernel();
+  const id = nodeId('declared-geometry-tracer');
+  kernel.transact((tx) =>
+    tx.nodes.add({
+      id,
+      type: 'task',
+      position: { x: 10, y: 20 },
+      size: { width: 80, height: 40 },
+      data: null,
+    }),
+  );
+  const baseline = kernel.read();
+  try {
+    renderer.updateDocument({ type: 'reset', view: baseline });
+    renderer.updateSession({ selection: { nodeIds: [], edgeIds: [] }, viewport: { x: 0, y: 0, zoom: 1 } });
+    renderer.updateInteraction({
+      type: 'node-drag',
+      nodes: [{ nodeId: id, basePosition: { x: 10, y: 20 }, position: new InheritedPosition() }],
+    });
+    const node = target.querySelector('[data-nodebraid-node-id="declared-geometry-tracer"]');
+    if (!node) throw new Error('Expected the public SVG Node.');
+    return { x: node.getAttribute('x'), y: node.getAttribute('y'), baselineUnchanged: kernel.read() === baseline };
+  } finally {
+    await renderer.dispose();
+    target.remove();
+  }
+};
+
+declare global {
+  var __nodebraidRendererSvgGeometryValueCases: typeof runInteractionGeometryValueCases;
+}
+globalThis.__nodebraidRendererSvgGeometryValueCases = runInteractionGeometryValueCases;
+
+declare global {
+  var __nodebraidRendererSvgGeometryArrayCases: typeof runInteractionGeometryArrayCases;
+}
+globalThis.__nodebraidRendererSvgGeometryArrayCases = runInteractionGeometryArrayCases;
+
+declare global {
+  var __nodebraidRendererSvgGeometryMetadataCases: typeof runInteractionGeometryMetadataCases;
+}
+globalThis.__nodebraidRendererSvgGeometryMetadataCases = runInteractionGeometryMetadataCases;
