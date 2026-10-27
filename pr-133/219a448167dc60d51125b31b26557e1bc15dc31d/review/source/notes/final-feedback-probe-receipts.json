@@ -1,0 +1,50 @@
+[
+  {
+    "kind": "callback-index-repro",
+    "command": [
+      "/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/node_modules/.bin/tsc",
+      "--noEmit",
+      "--pretty",
+      "false",
+      "-p",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/callback-index-repro/final-fe48/tsconfig.json"
+    ],
+    "exitCode": 0,
+    "head": "fe48ff7c2ffb7eef144f64b4699b042f6acdad19",
+    "at": "2026-10-27T08:22:56.474400+00:00"
+  },
+  {
+    "kind": "callback-index-repro",
+    "command": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/callback-index-repro/final-fe48/browser-probe.ts"
+    ],
+    "exitCode": 0,
+    "head": "fe48ff7c2ffb7eef144f64b4699b042f6acdad19",
+    "at": "2026-10-27T08:22:58.816224+00:00"
+  },
+  {
+    "kind": "metadata-copy-repro",
+    "command": [
+      "/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/node_modules/.bin/tsc",
+      "--noEmit",
+      "--pretty",
+      "false",
+      "-p",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/metadata-copy-repro/final-fe48/tsconfig.json"
+    ],
+    "exitCode": 0,
+    "head": "fe48ff7c2ffb7eef144f64b4699b042f6acdad19",
+    "at": "2026-10-27T08:22:59.002705+00:00"
+  },
+  {
+    "kind": "metadata-copy-repro",
+    "command": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/metadata-copy-repro/final-fe48/browser-probe.ts"
+    ],
+    "exitCode": 0,
+    "head": "fe48ff7c2ffb7eef144f64b4699b042f6acdad19",
+    "at": "2026-10-27T08:23:00.390325+00:00"
+  }
+]

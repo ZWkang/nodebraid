@@ -1,0 +1,39 @@
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {readFileSync,realpathSync,writeFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+const root="/Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow",out=import.meta.dir,head='6fd2d016f6330cc422508b3e51229bea4be2cce0';
+const git=(...args:string[])=>execFileSync('git',args,{cwd:root,encoding:'utf8'}).trim();
+assert.equal(git('rev-parse','HEAD'),head);assert.equal(git('status','--porcelain'),'');
+const resolved:Record<string,string>={};
+const built=await Bun.build({entrypoints:[out+'/projection-repro.entry.ts'],target:'browser',format:'iife',plugins:[{name:'actual-public-dist',setup(builder){builder.onResolve({filter:/^@nodebraid\//},args=>{const path=realpathSync(Bun.resolveSync(args.path,root));assert.ok(path.startsWith(root+'/packages/')&&path.endsWith('/dist/index.js'));resolved[args.path]=path;return {path};});}}]});
+assert.equal(built.success,true,built.logs.map(String).join('\n'));assert.equal(built.outputs.length,1);
+const bundle=out+'/projection-repro.js';await Bun.write(bundle,built.outputs[0]!);
+const sha=(path:string)=>createHash('sha256').update(readFileSync(path)).digest('hex');
+writeFileSync(out+'/compiled-provenance.json',JSON.stringify({head,tree:git('rev-parse','HEAD^{tree}'),resolved,hashes:Object.fromEntries(Object.entries(resolved).map(([name,path])=>[name,sha(path)])),bundle,bundleSHA256:sha(bundle),entrySHA256:sha(out+'/projection-repro.entry.ts'),artifactPrerequisite:out+'/artifact-prerequisite.json'},null,2)+'\n');
+const session='nodebraid-svg-projection-'+process.pid,agentBrowser=root+'/node_modules/.bin/agent-browser',config=out+'/browser-config.json';
+writeFileSync(config,'{}\n');
+const childEnv=Object.fromEntries(Object.entries(process.env).filter((x):x is [string,string]=>x[1]!==undefined&&!x[0].startsWith('AGENT_BROWSER_')));
+const commands:unknown[]=[];
+async function run(args:readonly string[]){
+ const child=Bun.spawn([agentBrowser,'--session',session,'--config',config,...args],{cwd:root,env:childEnv,stdout:'pipe',stderr:'pipe'});
+ const [stdout,stderr,exitCode]=await Promise.all([new Response(child.stdout).text(),new Response(child.stderr).text(),child.exited]);
+ commands.push({args,stdout,stderr,exitCode});writeFileSync(out+'/browser-commands.json',JSON.stringify(commands,null,2)+'\n');assert.equal(exitCode,0,stderr||stdout);return stdout.trim();
+}
+const server=Bun.serve({hostname:'127.0.0.1',port:0,fetch(request){
+ if(new URL(request.url).pathname==='/probe.js')return new Response(Bun.file(bundle),{headers:{'content-type':'text/javascript'}});
+ return new Response('<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0}</style></head><body><script src="/probe.js"></script></body></html>',{headers:{'content-type':'text/html; charset=utf-8'}});
+}});
+writeFileSync(out+'/browser-ownership.json',JSON.stringify({head,session,url:server.url.href,emptyConfig:config,agentBrowserVersion:JSON.parse(readFileSync(root+'/node_modules/agent-browser/package.json','utf8')).version},null,2)+'\n');
+try{
+ await run(['open',server.url.href]);
+ const response=JSON.parse(await run(['eval','globalThis.__nodebraidProjectionDiscovery()','--json']));
+ assert.equal(response.success,true,JSON.stringify(response.error));const result=response.data.result;
+ writeFileSync(out+'/observations.json',JSON.stringify({head,session,url:server.url.href,...result},null,2)+'\n');
+ assert.equal(result.controls,12);assert.equal(result.passed,12);assert.equal(result.observations.length,12);
+ assert.ok(result.observations.every((x:{passed:boolean})=>x.passed));assert.equal(result.nativeInputEventsDriven,0);
+ console.log(JSON.stringify({controls:result.controls,passed:result.passed,failed:result.failed,nativeInputEventsDriven:0}));
+}catch(error){
+ try{const partial=await run(['eval','globalThis.__nodebraidProjectionProgress','--json']);writeFileSync(out+'/partial-browser-response.json',partial+'\n');}catch(readError){writeFileSync(out+'/partial-read-error.log',String(readError)+'\n');}
+ throw error;
+}finally{let browserClosed=false;try{await run(['close']);browserClosed=true;}finally{await server.stop(true);writeFileSync(out+'/cleanup.json',JSON.stringify({session,browserClosed,ownedServerStopped:true},null,2)+'\n');}}

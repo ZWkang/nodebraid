@@ -1,0 +1,7 @@
+@nodebraid/renderer-svg typecheck:self: browser-tests/interaction-geometry-values.entry.ts(80,77): error TS2322: Type 'string extends keyof T ? T[keyof T & string] : any' is not assignable to type 'number'.
+@nodebraid/renderer-svg typecheck:self:   Type 'T[keyof T & string]' is not assignable to type 'number'.
+@nodebraid/renderer-svg typecheck:self:     Type 'T[string]' is not assignable to type 'number'.
+@nodebraid/renderer-svg typecheck:self: browser-tests/interaction-geometry-values.entry.ts(83,11): error TS2322: Type 'string extends keyof T ? T[keyof T & string] : any' is not assignable to type 'number'.
+@nodebraid/renderer-svg typecheck:self:   Type 'T[keyof T & string]' is not assignable to type 'number'.
+@nodebraid/renderer-svg typecheck:self:     Type 'T[string]' is not assignable to type 'number'.
+@nodebraid/renderer-svg typecheck:self: Exited with code 1

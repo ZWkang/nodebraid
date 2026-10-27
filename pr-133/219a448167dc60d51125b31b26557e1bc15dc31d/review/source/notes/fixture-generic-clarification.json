@@ -1,0 +1,16 @@
+{
+  "originalTypeFailure": "typecheck-expanded.log",
+  "originalFixture": "geometry-fixture-before-generic-fix.ts",
+  "genericChange": "T extends object -> T extends Record<string, number>, affecting only the descriptor fixture's numeric type guarantee.",
+  "existingCaseValuesAndAssertionsUnchangedByGenericConstraint": true,
+  "sameEditingStepAlsoAddedFourNewFirstErrorOrderCases": true,
+  "wholeEntryWasNotByteIdentical": true,
+  "expanded204WasNotExecuted": "The anticipated 204-case version failed TSC and never bundled/ran. Four new order controls were added before the first actual 208-case browser execution.",
+  "actualFirstExpandedRun": {
+    "controls": 208,
+    "passed": 178,
+    "fixtureExpectationFailures": 30
+  },
+  "originalDiscovery12EntryUnchanged": true,
+  "scope": "Clarifies earlier shorthand, preserves original source/logs/receipts and does not trigger any test rerun."
+}

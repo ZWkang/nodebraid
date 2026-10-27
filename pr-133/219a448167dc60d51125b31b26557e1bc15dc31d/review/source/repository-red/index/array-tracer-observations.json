@@ -1,0 +1,23 @@
+{
+  "success": true,
+  "data": {
+    "origin": "http://127.0.0.1:59829/",
+    "result": {
+      "controls": 2,
+      "passed": 0,
+      "results": [
+        {
+          "error": "Error: Node a keeps its validated candidate: {\"x\":\"280\",\"y\":\"190\"}\n    at check (http://127.0.0.1:59829/probe.js:2913:13)\n    at equal (http://127.0.0.1:59829/probe.js:2916:5)\n    at geometryArrayCase (http://127.0.0.1:59829/probe.js:3145:7)\n    at runInteractionGeometryArrayCases (http://127.0.0.1:59829/probe.js:3164:15)\n    at <anonymous>:1:12",
+          "id": "candidate-node-key/false",
+          "passed": false
+        },
+        {
+          "error": "Error: Node a keeps its validated candidate: {\"x\":\"280\",\"y\":\"190\"}\n    at check (http://127.0.0.1:59829/probe.js:2913:13)\n    at equal (http://127.0.0.1:59829/probe.js:2916:5)\n    at geometryArrayCase (http://127.0.0.1:59829/probe.js:3145:7)\n    at runInteractionGeometryArrayCases (http://127.0.0.1:59829/probe.js:3164:15)",
+          "id": "candidate-node-key/true",
+          "passed": false
+        }
+      ]
+    }
+  },
+  "error": null
+}

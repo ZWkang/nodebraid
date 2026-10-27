@@ -1,0 +1,29 @@
+[
+  {
+    "args": [
+      "open",
+      "http://127.0.0.1:61281/"
+    ],
+    "stdout": "✓ \n  http://127.0.0.1:61281/\n",
+    "stderr": "",
+    "exitCode": 0
+  },
+  {
+    "args": [
+      "eval",
+      "globalThis.__nodebraidRendererSvgDeclaredGeometryTracer()",
+      "--json"
+    ],
+    "stdout": "{\"success\":true,\"data\":{\"origin\":\"http://127.0.0.1:61281/\",\"result\":{\"baselineUnchanged\":true,\"x\":\"undefined\",\"y\":\"undefined\"}},\"error\":null}\n",
+    "stderr": "",
+    "exitCode": 0
+  },
+  {
+    "args": [
+      "close"
+    ],
+    "stdout": "✓ Browser closed\n",
+    "stderr": "",
+    "exitCode": 0
+  }
+]

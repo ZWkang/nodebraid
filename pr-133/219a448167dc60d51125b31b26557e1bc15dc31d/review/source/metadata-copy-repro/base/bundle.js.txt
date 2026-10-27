@@ -1,0 +1,2897 @@
+(() => {
+  // ../../issue-6-dagre-layout/cflow/packages/diagnostics/dist/diagnostic-value.js
+  function describeNonFiniteNumber(value) {
+    if (Number.isNaN(value))
+      return "nan";
+    if (value === Number.POSITIVE_INFINITY)
+      return "positive-infinity";
+    if (value === Number.NEGATIVE_INFINITY)
+      return "negative-infinity";
+    throw new RangeError(`Expected a non-finite number; received ${String(value)}.`);
+  }
+
+  class DiagnosticValueError extends TypeError {
+    details;
+    name = "DiagnosticValueError";
+    constructor(message, details) {
+      super(message);
+      this.details = details;
+      this.details = Object.freeze({ ...details });
+    }
+  }
+  function copyAndFreezeDiagnosticDetails(attributes) {
+    return copyAndFreezeDiagnosticValue(attributes, "details", new Map);
+  }
+  function copyAndFreezeDiagnosticValue(value, path, ancestors) {
+    if (typeof value === "object" && value !== null) {
+      const firstPath = ancestors.get(value);
+      if (firstPath) {
+        throw new DiagnosticValueError(`Diagnostic value at ${path} must not be circular; first seen at ${firstPath}.`, {
+          path,
+          issue: "CIRCULAR",
+          firstPath
+        });
+      }
+      ancestors.set(value, path);
+      try {
+        const symbolKey = Object.getOwnPropertySymbols(value)[0];
+        if (symbolKey) {
+          throw new DiagnosticValueError(`Diagnostic value at ${path} must use string keys; received ${String(symbolKey)}.`, { path, issue: "SYMBOL_KEY", receivedKey: String(symbolKey) });
+        }
+        if (Array.isArray(value)) {
+          const copy = new Array(value.length);
+          for (let index = 0;index < value.length; index += 1) {
+            let descriptor;
+            for (let owner = value;owner !== null; owner = Object.getPrototypeOf(owner)) {
+              descriptor = Object.getOwnPropertyDescriptor(owner, index);
+              if (descriptor)
+                break;
+            }
+            if (!descriptor)
+              continue;
+            const propertyPath = `${path}[${index}]`;
+            if (!("value" in descriptor)) {
+              throw new DiagnosticValueError(`Diagnostic value at ${propertyPath} must use a data property; received accessor.`, { path: propertyPath, issue: "ACCESSOR_PROPERTY" });
+            }
+            copy[index] = copyAndFreezeDiagnosticValue(descriptor.value, propertyPath, ancestors);
+          }
+          return Object.freeze(copy);
+        }
+        const prototype = Object.getPrototypeOf(value);
+        if (prototype !== Object.prototype && prototype !== null) {
+          const constructorName = prototype?.constructor?.name || "object";
+          throw new DiagnosticValueError(`Diagnostic value at ${path} must be a plain record; received ${constructorName}.`, { path, issue: "NON_PLAIN_OBJECT", receivedClass: constructorName });
+        }
+        return Object.freeze(Object.fromEntries(Object.keys(value).sort().map((key) => {
+          const propertyPath = `${path}.${key}`;
+          const descriptor = Object.getOwnPropertyDescriptor(value, key);
+          if (!descriptor || !("value" in descriptor)) {
+            throw new DiagnosticValueError(`Diagnostic value at ${propertyPath} must use a data property; received accessor.`, { path: propertyPath, issue: "ACCESSOR_PROPERTY" });
+          }
+          return [key, copyAndFreezeDiagnosticValue(descriptor.value, propertyPath, ancestors)];
+        })));
+      } finally {
+        ancestors.delete(value);
+      }
+    }
+    if (value === null || typeof value === "boolean" || typeof value === "string")
+      return value;
+    if (typeof value === "number") {
+      if (!Number.isFinite(value)) {
+        throw new DiagnosticValueError(`Diagnostic value at ${path} must be finite; received ${String(value)}.`, {
+          path,
+          issue: "NON_FINITE_NUMBER",
+          receivedNumber: describeNonFiniteNumber(value)
+        });
+      }
+      return Object.is(value, -0) ? 0 : value;
+    }
+    throw new DiagnosticValueError(`Diagnostic value at ${path} must be JSON-safe; received ${typeof value}.`, {
+      path,
+      issue: "UNSAFE_TYPE",
+      receivedType: typeof value
+    });
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/diagnostics/dist/nodebraid-error.js
+  var emptyDetails = Object.freeze({});
+
+  class NodeBraidError extends Error {
+    domain;
+    code;
+    cause;
+    details;
+    constructor(domain, code, message, options = {}) {
+      super(message, options.cause === undefined ? undefined : { cause: options.cause });
+      this.domain = domain;
+      this.code = code;
+      this.cause = options.cause;
+      this.details = options.details ? copyAndFreezeDiagnosticDetails(options.details) : emptyDetails;
+    }
+  }
+  // ../../issue-6-dagre-layout/cflow/packages/kernel/dist/kernel-error.js
+  class KernelError extends NodeBraidError {
+    name = "KernelError";
+    constructor(code, message, details = {}, options) {
+      super("kernel", code, message, { details, cause: options?.cause });
+    }
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/kernel/dist/identifiers.js
+  function nodeId(value) {
+    if (typeof value !== "string") {
+      throw new KernelError("INVALID_ID", "Node ID must be a non-empty string.", Object.freeze({ entity: "node", receivedType: value === null ? "null" : typeof value }));
+    }
+    if (value.length === 0) {
+      throw new KernelError("INVALID_ID", "Node ID must be a non-empty string.", Object.freeze({ entity: "node", value }));
+    }
+    return value;
+  }
+  function edgeId(value) {
+    if (typeof value !== "string") {
+      throw new KernelError("INVALID_ID", "Edge ID must be a non-empty string.", Object.freeze({ entity: "edge", receivedType: value === null ? "null" : typeof value }));
+    }
+    if (value.length === 0) {
+      throw new KernelError("INVALID_ID", "Edge ID must be a non-empty string.", Object.freeze({ entity: "edge", value }));
+    }
+    return value;
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/kernel/dist/entity-values.js
+  function freezeCanvasNode(node, id) {
+    const type = node.type;
+    const position = node.position;
+    const ownedPosition = Object.freeze({ x: position.x, y: position.y });
+    const size = node.size;
+    const ownedSize = size === undefined ? undefined : Object.freeze({ width: size.width, height: size.height });
+    const parentId = node.parentId;
+    return Object.freeze({
+      id,
+      type,
+      position: ownedPosition,
+      ...ownedSize === undefined ? {} : { size: ownedSize },
+      ...parentId === undefined ? {} : { parentId },
+      data: node.data
+    });
+  }
+  function freezeCanvasEdge(edge, id) {
+    return Object.freeze({
+      id,
+      type: edge.type,
+      source: freezeEdgeEndpoint(edge.source),
+      target: freezeEdgeEndpoint(edge.target),
+      data: edge.data
+    });
+  }
+  function canvasNodesEqual(left, right) {
+    if (left === right)
+      return true;
+    if (left === null || right === null)
+      return false;
+    return left.id === right.id && left.type === right.type && left.position.x === right.position.x && left.position.y === right.position.y && left.size?.width === right.size?.width && left.size?.height === right.size?.height && left.parentId === right.parentId && Object.is(left.data, right.data);
+  }
+  function canvasEdgesEqual(left, right) {
+    if (left === right)
+      return true;
+    if (left === null || right === null)
+      return false;
+    return left.id === right.id && left.type === right.type && left.source.nodeId === right.source.nodeId && left.source.portId === right.source.portId && left.target.nodeId === right.target.nodeId && left.target.portId === right.target.portId && Object.is(left.data, right.data);
+  }
+  function captureCanvasNodeValue(value) {
+    if (!isRecord(value))
+      return;
+    const id = value.id;
+    if (typeof id !== "string")
+      return;
+    const type = value.type;
+    if (typeof type !== "string" || !("data" in value))
+      return;
+    const position = capturePointValue(value.position);
+    if (!position)
+      return;
+    const receivedSize = value.size;
+    const size = receivedSize === undefined ? undefined : captureSizeValue(receivedSize);
+    if (receivedSize !== undefined && size === undefined)
+      return;
+    const parentId = value.parentId;
+    if (parentId !== undefined && (typeof parentId !== "string" || parentId.length === 0))
+      return;
+    if (id.length === 0)
+      return;
+    return Object.freeze({
+      id: nodeId(id),
+      type,
+      position,
+      ...size === undefined ? {} : { size },
+      ...parentId === undefined ? {} : { parentId: nodeId(parentId) },
+      get data() {
+        return value.data;
+      }
+    });
+  }
+  function captureCanvasEdgeValue(value) {
+    if (!isRecord(value))
+      return;
+    const id = value.id;
+    if (typeof id !== "string")
+      return;
+    const type = value.type;
+    if (typeof type !== "string" || !("data" in value))
+      return;
+    const source = captureEndpointValue(value.source);
+    if (!source)
+      return;
+    const target = captureEndpointValue(value.target);
+    if (!target || id.length === 0)
+      return;
+    return Object.freeze({
+      id: edgeId(id),
+      type,
+      source,
+      target,
+      get data() {
+        return value.data;
+      }
+    });
+  }
+  function isRecord(value) {
+    return typeof value === "object" && value !== null;
+  }
+  function freezeEdgeEndpoint(endpoint) {
+    const nodeId = endpoint.nodeId;
+    const portId = endpoint.portId;
+    return Object.freeze({
+      nodeId,
+      ...portId === undefined ? {} : { portId }
+    });
+  }
+  function capturePointValue(value) {
+    if (!isRecord(value))
+      return;
+    const x = value.x;
+    if (typeof x !== "number")
+      return;
+    const y = value.y;
+    if (typeof y !== "number")
+      return;
+    return Object.freeze({ x, y });
+  }
+  function captureSizeValue(value) {
+    if (!isRecord(value))
+      return;
+    const width = value.width;
+    if (typeof width !== "number")
+      return;
+    const height = value.height;
+    if (typeof height !== "number")
+      return;
+    return Object.freeze({ width, height });
+  }
+  function captureEndpointValue(value) {
+    if (!isRecord(value))
+      return;
+    const id = value.nodeId;
+    if (typeof id !== "string" || id.length === 0)
+      return;
+    const portId = value.portId;
+    if (portId !== undefined && typeof portId !== "string")
+      return;
+    return Object.freeze({ nodeId: nodeId(id), ...portId === undefined ? {} : { portId } });
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/kernel/dist/change-set.js
+  function applyChangeSetToDraft(changeSet, direction, draftNodes, draftEdges, nodeWriter, edgeWriter) {
+    const changes = validateChangeSet(changeSet, direction);
+    for (const change of changes) {
+      if (change.entity === "node") {
+        const expected = direction === "forward" ? change.before : change.after;
+        const actual = draftNodes.get(change.id) ?? null;
+        if (!canvasNodesEqual(actual, expected))
+          throwChangeSetConflict(change, direction, expected, actual);
+      } else {
+        const expected = direction === "forward" ? change.before : change.after;
+        const actual = draftEdges.get(change.id) ?? null;
+        if (!canvasEdgesEqual(actual, expected))
+          throwChangeSetConflict(change, direction, expected, actual);
+      }
+    }
+    const orderedChanges = direction === "forward" ? changes : [...changes].reverse();
+    for (const change of orderedChanges) {
+      const source = direction === "forward" ? change.before : change.after;
+      const target = direction === "forward" ? change.after : change.before;
+      const writer = change.entity === "node" ? nodeWriter : edgeWriter;
+      if (source === null && target !== null) {
+        writer.add(target);
+      } else if (source !== null && target === null) {
+        writer.remove(change.id);
+      } else if (target !== null) {
+        writer.replace(change.id, target);
+      }
+    }
+  }
+  function validateChangeSet(changeSet, direction) {
+    if (direction !== "forward" && direction !== "reverse") {
+      if (typeof direction !== "string") {
+        throwInvalidChangeSet("Change Set direction must be forward or reverse.", {
+          issue: "INVALID_DIRECTION",
+          receivedType: direction === null ? "null" : typeof direction
+        });
+      }
+      throwInvalidChangeSet("Change Set direction must be forward or reverse.", {
+        issue: "INVALID_DIRECTION",
+        direction
+      });
+    }
+    if (!isRecord(changeSet)) {
+      throwInvalidChangeSet("Change Set must be an object.", {});
+    }
+    const beforeRevision = changeSet.beforeRevision;
+    const revision = changeSet.revision;
+    if (!Number.isSafeInteger(beforeRevision) || beforeRevision < 0 || !Number.isSafeInteger(revision) || revision !== beforeRevision + 1) {
+      throwInvalidChangeSet("Change Set revisions must be adjacent non-negative safe integers.", {
+        issue: "INVALID_REVISIONS",
+        beforeRevision: describeInvalidRevision(beforeRevision),
+        revision: describeInvalidRevision(revision)
+      });
+    }
+    const changes = changeSet.changes;
+    if (!Array.isArray(changes)) {
+      throwInvalidChangeSet("Change Set must contain at least one change.", {});
+    }
+    const length = changes.length;
+    if (length === 0) {
+      throwInvalidChangeSet("Change Set must contain at least one change.", {});
+    }
+    const identities = new Set;
+    const accepted = [];
+    for (const index of Array.prototype.keys.call({ length })) {
+      const change = changes[index];
+      if (!isRecord(change)) {
+        throwInvalidChangeSet("Change must identify a Node or Edge.", { index });
+      }
+      const entityKind = change.entity;
+      if (entityKind !== "node" && entityKind !== "edge") {
+        throwInvalidChangeSet("Change must identify a Node or Edge.", { index });
+      }
+      const id = change.id;
+      if (typeof id !== "string" || id.length === 0) {
+        throwInvalidChangeSet("Change entity ID must be a non-empty string.", { index });
+      }
+      const identity = `${entityKind}\x00${id}`;
+      if (identities.has(identity)) {
+        throwInvalidChangeSet("Change Set must not contain duplicate entity changes.", {
+          index,
+          entity: entityKind,
+          id
+        });
+      }
+      identities.add(identity);
+      const before = change.before;
+      const after = change.after;
+      if (before === null && after === null) {
+        throwInvalidChangeSet("Change must contain a before or after entity.", { index });
+      }
+      const captureSide = (entity, side) => {
+        if (entity === null)
+          return null;
+        const captured = entityKind === "node" ? captureCanvasNodeValue(entity) : captureCanvasEdgeValue(entity);
+        if (!captured || captured.id !== id) {
+          throwInvalidChangeSet("Change entity must match its kind and ID.", {
+            index,
+            side,
+            entity: entityKind,
+            id
+          });
+        }
+        return captured;
+      };
+      const ownedBefore = captureSide(before, "before");
+      const ownedAfter = captureSide(after, "after");
+      accepted.push(Object.freeze({ entity: entityKind, id, before: ownedBefore, after: ownedAfter }));
+    }
+    return accepted;
+  }
+  function throwChangeSetConflict(change, direction, expected, actual) {
+    throw new KernelError("CHANGE_SET_CONFLICT", `Change Set source does not match ${change.entity} "${change.id}".`, Object.freeze({
+      entity: change.entity,
+      id: change.id,
+      direction,
+      expectedState: expected === null ? "missing" : "present",
+      actualState: actual === null ? "missing" : "present"
+    }));
+  }
+  function throwInvalidChangeSet(message, details) {
+    throw new KernelError("INVALID_CHANGE_SET", message, Object.freeze({ ...details }));
+  }
+  function describeInvalidRevision(value) {
+    if (typeof value !== "number") {
+      return Object.freeze({
+        receivedType: value === null ? "null" : typeof value
+      });
+    }
+    if (!Number.isFinite(value)) {
+      return Object.freeze({ receivedNumber: describeNonFiniteNumber(value) });
+    }
+    return Object.freeze({ value });
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/kernel/dist/ordering.js
+  function compareIds(left, right) {
+    return left < right ? -1 : left > right ? 1 : 0;
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/kernel/dist/graph-index.js
+  class GraphIndex {
+    #incoming = new Map;
+    #outgoing = new Map;
+    #children = new Map;
+    constructor(nodes, edges) {
+      for (const node of nodes.values()) {
+        if (node.parentId !== undefined)
+          append(this.#children, node.parentId, node);
+      }
+      for (const edge of edges.values()) {
+        append(this.#outgoing, edge.source.nodeId, edge);
+        append(this.#incoming, edge.target.nodeId, edge);
+      }
+      sortBuckets(this.#children);
+      sortBuckets(this.#incoming);
+      sortBuckets(this.#outgoing);
+    }
+    addNode(node) {
+      if (node.parentId !== undefined)
+        insertSorted(this.#children, node.parentId, node);
+    }
+    replaceNode(before, after) {
+      if (before.parentId !== undefined)
+        removeById(this.#children, before.parentId, before.id);
+      if (after.parentId !== undefined)
+        insertSorted(this.#children, after.parentId, after);
+    }
+    removeNode(node) {
+      if (node.parentId !== undefined)
+        removeById(this.#children, node.parentId, node.id);
+    }
+    addEdge(edge) {
+      insertSorted(this.#outgoing, edge.source.nodeId, edge);
+      insertSorted(this.#incoming, edge.target.nodeId, edge);
+    }
+    replaceEdge(before, after) {
+      this.removeEdge(before);
+      this.addEdge(after);
+    }
+    removeEdge(edge) {
+      removeById(this.#outgoing, edge.source.nodeId, edge.id);
+      removeById(this.#incoming, edge.target.nodeId, edge.id);
+    }
+    getIncoming(nodeId) {
+      return frozenCopy(this.#incoming.get(nodeId));
+    }
+    getOutgoing(nodeId) {
+      return frozenCopy(this.#outgoing.get(nodeId));
+    }
+    getIncident(nodeId) {
+      return Object.freeze(mergeById(this.#incoming.get(nodeId) ?? [], this.#outgoing.get(nodeId) ?? []));
+    }
+    getChildren(parentId) {
+      return frozenCopy(this.#children.get(parentId));
+    }
+  }
+  function createCanvasQuery(nodes, edges, index, assertOpen = () => {}) {
+    const requireNode = (id) => {
+      if (!nodes.has(id)) {
+        throw new KernelError("ENTITY_NOT_FOUND", `Node "${id}" does not exist.`, Object.freeze({ entity: "node", id }));
+      }
+    };
+    return Object.freeze({
+      getNode(id) {
+        assertOpen();
+        return nodes.get(id);
+      },
+      getEdge(id) {
+        assertOpen();
+        return edges.get(id);
+      },
+      getIncomingEdges(id) {
+        assertOpen();
+        requireNode(id);
+        return index.getIncoming(id);
+      },
+      getOutgoingEdges(id) {
+        assertOpen();
+        requireNode(id);
+        return index.getOutgoing(id);
+      },
+      getIncidentEdges(id) {
+        assertOpen();
+        requireNode(id);
+        return index.getIncident(id);
+      },
+      getChildren(id) {
+        assertOpen();
+        requireNode(id);
+        return index.getChildren(id);
+      }
+    });
+  }
+  function append(buckets, key, value) {
+    const bucket = buckets.get(key);
+    if (bucket === undefined)
+      buckets.set(key, [value]);
+    else
+      bucket.push(value);
+  }
+  function sortBuckets(buckets) {
+    for (const bucket of buckets.values())
+      bucket.sort((left, right) => compareIds(left.id, right.id));
+  }
+  function insertSorted(buckets, key, value) {
+    const bucket = buckets.get(key);
+    if (bucket === undefined) {
+      buckets.set(key, [value]);
+      return;
+    }
+    let low = 0;
+    let high = bucket.length;
+    while (low < high) {
+      const middle = low + high >>> 1;
+      if (compareIds(bucket[middle].id, value.id) < 0)
+        low = middle + 1;
+      else
+        high = middle;
+    }
+    bucket.splice(low, 0, value);
+  }
+  function removeById(buckets, key, id) {
+    const bucket = buckets.get(key);
+    if (bucket === undefined)
+      return;
+    const index = bucket.findIndex((value) => value.id === id);
+    if (index >= 0)
+      bucket.splice(index, 1);
+    if (bucket.length === 0)
+      buckets.delete(key);
+  }
+  function frozenCopy(values) {
+    return Object.freeze(values === undefined ? [] : [...values]);
+  }
+  function mergeById(left, right) {
+    const merged = [];
+    let leftIndex = 0;
+    let rightIndex = 0;
+    while (leftIndex < left.length || rightIndex < right.length) {
+      const leftValue = left[leftIndex];
+      const rightValue = right[rightIndex];
+      if (leftValue === undefined) {
+        merged.push(rightValue);
+        rightIndex += 1;
+      } else if (rightValue === undefined) {
+        merged.push(leftValue);
+        leftIndex += 1;
+      } else {
+        const comparison = compareIds(leftValue.id, rightValue.id);
+        if (comparison <= 0) {
+          merged.push(leftValue);
+          leftIndex += 1;
+        }
+        if (comparison >= 0) {
+          if (comparison > 0)
+            merged.push(rightValue);
+          rightIndex += 1;
+        }
+      }
+    }
+    return merged;
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/kernel/dist/canvas-view.js
+  function createCanvasView(revision, nodes, edges) {
+    const sortedNodes = Object.freeze([...nodes.values()].sort((left, right) => compareIds(left.id, right.id)));
+    const sortedEdges = Object.freeze([...edges.values()].sort((left, right) => compareIds(left.id, right.id)));
+    const snapshot = Object.freeze({
+      revision,
+      nodes: sortedNodes,
+      edges: sortedEdges
+    });
+    const index = new GraphIndex(nodes, edges);
+    return Object.freeze({ snapshot, query: createCanvasQuery(nodes, edges, index) });
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/kernel/dist/entity-collection.js
+  function createEntityWriter(options) {
+    const label = options.kind === "node" ? "Node" : "Edge";
+    return Object.freeze({
+      add(entity) {
+        options.assertOpen();
+        const id = entity.id;
+        if (options.draft.has(id)) {
+          throw new KernelError("ENTITY_ALREADY_EXISTS", `${label} "${id}" already exists.`, Object.freeze({ entity: options.kind, id }));
+        }
+        const frozen = options.freeze(entity, id);
+        options.draft.set(id, frozen);
+        options.onAdd(frozen);
+        options.touchedIds.add(id);
+      },
+      replace(id, entity) {
+        options.assertOpen();
+        const before = options.draft.get(id);
+        if (before === undefined) {
+          throw new KernelError("ENTITY_NOT_FOUND", `${label} "${id}" does not exist.`, Object.freeze({ entity: options.kind, id }));
+        }
+        const actualId = entity.id;
+        if (actualId !== id) {
+          throw new KernelError("ENTITY_ID_MISMATCH", `Replacement ${label} ID "${actualId}" does not match "${id}".`, Object.freeze({ entity: options.kind, id, actualId }));
+        }
+        const frozen = options.freeze(entity, actualId);
+        options.draft.set(id, frozen);
+        options.onReplace(before, frozen);
+        options.touchedIds.add(id);
+      },
+      remove(id) {
+        options.assertOpen();
+        const entity = options.draft.get(id);
+        if (entity === undefined) {
+          throw new KernelError("ENTITY_NOT_FOUND", `${label} "${id}" does not exist.`, Object.freeze({ entity: options.kind, id }));
+        }
+        options.draft.delete(id);
+        options.onRemove(entity);
+        options.touchedIds.add(id);
+      }
+    });
+  }
+  function collectEntityChanges(kind, before, after, touchedIds, equal) {
+    return [...touchedIds].map((id) => ({ id, before: before.get(id) ?? null, after: after.get(id) ?? null })).filter((change) => !equal(change.before, change.after)).sort((left, right) => compareIds(left.id, right.id)).map((change) => Object.freeze({ entity: kind, ...change }));
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/kernel/dist/graph-validation.js
+  function validateGraph(nodes, edges) {
+    const issues = [];
+    for (const node of nodes.values()) {
+      for (const coordinate of ["x", "y"]) {
+        const value = node.position[coordinate];
+        if (!Number.isFinite(value)) {
+          issues.push(Object.freeze({ code: "INVALID_POSITION", nodeId: node.id, coordinate, value }));
+        }
+      }
+      if (node.size !== undefined) {
+        for (const dimension of ["width", "height"]) {
+          const value = node.size[dimension];
+          if (!Number.isFinite(value) || value < 0) {
+            issues.push(Object.freeze({ code: "INVALID_SIZE", nodeId: node.id, dimension, value }));
+          }
+        }
+      }
+      if (node.parentId !== undefined && !nodes.has(node.parentId)) {
+        issues.push(Object.freeze({ code: "MISSING_PARENT", nodeId: node.id, parentId: node.parentId }));
+      }
+    }
+    for (const edge of edges.values()) {
+      for (const endpoint of ["source", "target"]) {
+        const nodeId = edge[endpoint].nodeId;
+        if (!nodes.has(nodeId)) {
+          issues.push(Object.freeze({ code: "MISSING_EDGE_ENDPOINT", edgeId: edge.id, endpoint, nodeId }));
+        }
+      }
+    }
+    issues.push(...findParentCycles(nodes));
+    return issues.sort(compareGraphIssues);
+  }
+  function describeGraphIssues(issues) {
+    return issues.map((issue) => {
+      switch (issue.code) {
+        case "MISSING_EDGE_ENDPOINT":
+          return {
+            code: issue.code,
+            edgeId: issue.edgeId,
+            endpoint: issue.endpoint,
+            nodeId: issue.nodeId
+          };
+        case "MISSING_PARENT":
+          return { code: issue.code, nodeId: issue.nodeId, parentId: issue.parentId };
+        case "PARENT_CYCLE":
+          return { code: issue.code, nodeIds: issue.nodeIds };
+        case "INVALID_POSITION":
+          return {
+            code: issue.code,
+            nodeId: issue.nodeId,
+            coordinate: issue.coordinate,
+            receivedNumber: describeNonFiniteNumber(issue.value)
+          };
+        case "INVALID_SIZE":
+          return {
+            code: issue.code,
+            nodeId: issue.nodeId,
+            dimension: issue.dimension,
+            ...Number.isFinite(issue.value) ? { value: issue.value } : { receivedNumber: describeNonFiniteNumber(issue.value) }
+          };
+      }
+    });
+  }
+  function findParentCycles(nodes) {
+    const completed = new Set;
+    const cycles = [];
+    for (const startId of [...nodes.keys()].sort(compareIds)) {
+      if (completed.has(startId))
+        continue;
+      const path = [];
+      const pathIndexes = new Map;
+      let currentId = startId;
+      while (currentId !== undefined && nodes.has(currentId) && !completed.has(currentId)) {
+        const cycleStart = pathIndexes.get(currentId);
+        if (cycleStart !== undefined) {
+          const nodeIds = Object.freeze(path.slice(cycleStart).sort(compareIds));
+          cycles.push(Object.freeze({ code: "PARENT_CYCLE", nodeIds }));
+          break;
+        }
+        pathIndexes.set(currentId, path.length);
+        path.push(currentId);
+        currentId = nodes.get(currentId)?.parentId;
+      }
+      for (const nodeId of path)
+        completed.add(nodeId);
+    }
+    return cycles;
+  }
+  function compareGraphIssues(left, right) {
+    const codeOrder = graphIssueOrder[left.code] - graphIssueOrder[right.code];
+    if (codeOrder !== 0)
+      return codeOrder;
+    switch (left.code) {
+      case "MISSING_EDGE_ENDPOINT":
+        if (right.code !== left.code)
+          return 0;
+        return compareIds(left.edgeId, right.edgeId) || compareIds(left.endpoint, right.endpoint);
+      case "MISSING_PARENT":
+        if (right.code !== left.code)
+          return 0;
+        return compareIds(left.nodeId, right.nodeId);
+      case "PARENT_CYCLE":
+        if (right.code !== left.code)
+          return 0;
+        return compareIds(left.nodeIds.join("\x00"), right.nodeIds.join("\x00"));
+      case "INVALID_POSITION":
+        if (right.code !== left.code)
+          return 0;
+        return compareIds(left.nodeId, right.nodeId) || compareIds(left.coordinate, right.coordinate);
+      case "INVALID_SIZE":
+        if (right.code !== left.code)
+          return 0;
+        return compareIds(left.nodeId, right.nodeId) || sizeDimensionOrder[left.dimension] - sizeDimensionOrder[right.dimension];
+    }
+  }
+  var graphIssueOrder = Object.freeze({
+    MISSING_EDGE_ENDPOINT: 0,
+    MISSING_PARENT: 1,
+    PARENT_CYCLE: 2,
+    INVALID_POSITION: 3,
+    INVALID_SIZE: 4
+  });
+  var sizeDimensionOrder = Object.freeze({ width: 0, height: 1 });
+
+  // ../../issue-6-dagre-layout/cflow/packages/kernel/dist/revision.js
+  function incrementRevision(revision) {
+    return revision === Number.MAX_SAFE_INTEGER ? null : revision + 1;
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/kernel/dist/canvas-kernel.js
+  function createCanvasKernel() {
+    let nodes = new Map;
+    let edges = new Map;
+    let view = createCanvasView(0, nodes, edges);
+    let transactionActive = false;
+    return Object.freeze({
+      read: () => view,
+      transact(callback, metadata) {
+        if (transactionActive) {
+          throw new KernelError("TRANSACTION_REENTRANT", "A Transaction is already active for this Kernel.", Object.freeze({}));
+        }
+        const before = view;
+        const draftNodes = new Map(nodes);
+        const draftEdges = new Map(edges);
+        const draftIndex = new GraphIndex(draftNodes, draftEdges);
+        const touchedNodeIds = new Set;
+        const touchedEdgeIds = new Set;
+        let transactionOpen = true;
+        const assertTransactionOpen = () => {
+          if (!transactionOpen) {
+            throw new KernelError("TRANSACTION_CLOSED", "Transaction Context is closed.", Object.freeze({}));
+          }
+        };
+        const query = createCanvasQuery(draftNodes, draftEdges, draftIndex, assertTransactionOpen);
+        const nodeWriter = createEntityWriter({
+          kind: "node",
+          draft: draftNodes,
+          touchedIds: touchedNodeIds,
+          freeze: freezeCanvasNode,
+          assertOpen: assertTransactionOpen,
+          onAdd: (node) => draftIndex.addNode(node),
+          onReplace: (oldNode, newNode) => draftIndex.replaceNode(oldNode, newNode),
+          onRemove: (node) => draftIndex.removeNode(node)
+        });
+        const edgeWriter = createEntityWriter({
+          kind: "edge",
+          draft: draftEdges,
+          touchedIds: touchedEdgeIds,
+          freeze: freezeCanvasEdge,
+          assertOpen: assertTransactionOpen,
+          onAdd: (edge) => draftIndex.addEdge(edge),
+          onReplace: (oldEdge, newEdge) => draftIndex.replaceEdge(oldEdge, newEdge),
+          onRemove: (edge) => draftIndex.removeEdge(edge)
+        });
+        const transaction = Object.freeze({
+          query,
+          nodes: nodeWriter,
+          edges: edgeWriter,
+          applyChangeSet(changeSet, direction) {
+            assertTransactionOpen();
+            applyChangeSetToDraft(changeSet, direction, draftNodes, draftEdges, nodeWriter, edgeWriter);
+          }
+        });
+        transactionActive = true;
+        try {
+          let callbackResult;
+          try {
+            callbackResult = callback(transaction);
+          } finally {
+            transactionOpen = false;
+          }
+          if (isThenable(callbackResult)) {
+            throw new KernelError("ASYNC_TRANSACTION", "Transaction callback must complete synchronously.", Object.freeze({}));
+          }
+          const issues = validateGraph(draftNodes, draftEdges);
+          if (issues.length > 0) {
+            throw new KernelError("INVALID_GRAPH", "The final graph is invalid.", Object.freeze({ issues: describeGraphIssues(issues) }));
+          }
+          const nodeChanges = collectEntityChanges("node", nodes, draftNodes, touchedNodeIds, canvasNodesEqual);
+          const edgeChanges = collectEntityChanges("edge", edges, draftEdges, touchedEdgeIds, canvasEdgesEqual);
+          const changes = Object.freeze([...nodeChanges, ...edgeChanges]);
+          if (changes.length === 0)
+            return null;
+          const revision = incrementRevision(before.snapshot.revision);
+          if (revision === null) {
+            throw new KernelError("REVISION_OVERFLOW", "Kernel revision cannot exceed Number.MAX_SAFE_INTEGER.", Object.freeze({ revision: before.snapshot.revision }));
+          }
+          const after = createCanvasView(revision, draftNodes, draftEdges);
+          const origin = metadata?.origin;
+          const commandId = metadata?.commandId;
+          const changeSet = Object.freeze({
+            beforeRevision: before.snapshot.revision,
+            revision,
+            ...origin === undefined ? {} : { origin },
+            ...commandId === undefined ? {} : { commandId },
+            changes
+          });
+          const commit = Object.freeze({ before, after, changeSet });
+          nodes = draftNodes;
+          edges = draftEdges;
+          view = after;
+          return commit;
+        } finally {
+          transactionActive = false;
+        }
+      }
+    });
+  }
+  function isThenable(value) {
+    if (typeof value !== "object" && typeof value !== "function" || value === null)
+      return false;
+    return typeof Reflect.get(value, "then") === "function";
+  }
+  // ../../issue-6-dagre-layout/cflow/packages/renderer-api/dist/renderer-error.js
+  class RendererError extends NodeBraidError {
+    name = "RendererError";
+    constructor(code, message, details = {}, options) {
+      super("renderer", code, message, { details, cause: options?.cause });
+    }
+  }
+  // ../../issue-6-dagre-layout/cflow/packages/renderer-svg/dist/svg-renderer-error.js
+  class SvgRendererError extends NodeBraidError {
+    name = "SvgRendererError";
+    constructor(code, message, details = {}, options) {
+      super("renderer.svg", code, message, { details, cause: options?.cause });
+    }
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/renderer-svg/dist/target-mapping.js
+  function readTargetMatrix(target, code) {
+    const bounds = target.getBoundingClientRect();
+    const matrix = target.getScreenCTM();
+    const determinant = matrix ? matrix.a * matrix.d - matrix.b * matrix.c : Number.NaN;
+    if (!target.isConnected || !Number.isFinite(bounds.width) || !Number.isFinite(bounds.height) || bounds.width <= 0 || bounds.height <= 0 || !matrix || !Number.isFinite(determinant) || determinant === 0) {
+      throw new SvgRendererError(code, "SVG Renderer Target must be connected, measurable, and invertible.");
+    }
+    const inverse = {
+      a: matrix.d / determinant,
+      b: -matrix.b / determinant,
+      c: -matrix.c / determinant,
+      d: matrix.a / determinant,
+      e: (matrix.c * matrix.f - matrix.d * matrix.e) / determinant,
+      f: (matrix.b * matrix.e - matrix.a * matrix.f) / determinant
+    };
+    const localToUser = {
+      a: inverse.a,
+      b: inverse.b,
+      c: inverse.c,
+      d: inverse.d,
+      e: inverse.a * bounds.left + inverse.c * bounds.top + inverse.e,
+      f: inverse.b * bounds.left + inverse.d * bounds.top + inverse.f
+    };
+    if (Object.values(localToUser).every(Number.isFinite))
+      return localToUser;
+    throw new SvgRendererError(code, "SVG Renderer Target coordinate mapping must be finite.");
+  }
+  function formatSvgMatrix(matrix) {
+    return `matrix(${[matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map(formatMatrixNumber).join(" ")})`;
+  }
+  function formatMatrixNumber(value) {
+    const normalized = Math.abs(value) < 0.000000000001 ? 0 : Math.round(value * 1000000000000) / 1000000000000;
+    return String(normalized);
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/port-api/dist/port-query.js
+  function getNodePortSnapshot(snapshot, nodeId) {
+    return snapshot.nodes.find((candidate) => candidate.nodeId === nodeId);
+  }
+  function getPortDefinition(snapshot, nodeId, portId) {
+    return getNodePortSnapshot(snapshot, nodeId)?.ports.find((candidate) => candidate.id === portId);
+  }
+  function hasPortDefinitions(snapshot, nodeId) {
+    return (getNodePortSnapshot(snapshot, nodeId)?.ports.length ?? 0) > 0;
+  }
+  function isConnectionTargetDefined(snapshot, target) {
+    if (target.portId === undefined)
+      return !hasPortDefinitions(snapshot, target.nodeId);
+    return getPortDefinition(snapshot, target.nodeId, target.portId)?.role === target.role;
+  }
+  // ../../issue-6-dagre-layout/cflow/packages/renderer-svg/dist/port-geometry.js
+  function getNodePortGeometries(node, ports) {
+    const snapshot = getNodePortSnapshot(ports, node.id);
+    if (!snapshot || !node.size || node.size.width <= 0 || node.size.height <= 0)
+      return [];
+    return snapshot.ports.map((definition) => {
+      const rolePorts = snapshot.ports.filter((candidate) => candidate.role === definition.role);
+      const index = rolePorts.findIndex((candidate) => candidate.id === definition.id);
+      return Object.freeze({
+        nodeId: node.id,
+        portId: definition.id,
+        role: definition.role,
+        worldPoint: Object.freeze({
+          x: definition.role === "source" ? node.position.x + node.size.width : node.position.x,
+          y: node.position.y + node.size.height * (index + 1) / (rolePorts.length + 1)
+        })
+      });
+    });
+  }
+  function resolveConnectionAnchorPoint(document2, ports, anchor) {
+    const node = document2.nodes.find((candidate) => candidate.id === anchor.nodeId);
+    if (!node?.size || node.size.width <= 0 || node.size.height <= 0) {
+      throw new RendererError("INTERACTION_OUT_OF_SYNC", "Connection Anchor Node is unavailable.", {
+        issue: "CONNECTION_ANCHOR_UNAVAILABLE"
+      });
+    }
+    if (anchor.portId === undefined) {
+      if (hasPortDefinitions(ports, anchor.nodeId)) {
+        throw new RendererError("INTERACTION_OUT_OF_SYNC", "Node-level Connection Anchor is unavailable.", {
+          issue: "NODE_ANCHOR_REPLACED_BY_PORTS"
+        });
+      }
+      return Object.freeze({
+        x: anchor.role === "source" ? node.position.x + node.size.width : node.position.x,
+        y: node.position.y + node.size.height / 2
+      });
+    }
+    const definition = getPortDefinition(ports, anchor.nodeId, anchor.portId);
+    if (!definition || definition.role !== anchor.role) {
+      throw new RendererError("INTERACTION_OUT_OF_SYNC", "Connection Port is unavailable.", {
+        issue: "CONNECTION_PORT_UNAVAILABLE"
+      });
+    }
+    const geometry = getNodePortGeometries(node, ports).find((candidate) => candidate.portId === anchor.portId);
+    if (!geometry)
+      throw new Error("Accepted Port Definition must have SVG Geometry.");
+    return geometry.worldPoint;
+  }
+  function resolveEdgeEndpointPoint(nodesById, ports, endpoint, role, edgeId) {
+    const node = nodesById.get(endpoint.nodeId);
+    if (!node?.size) {
+      throw new RendererError("INVALID_DOCUMENT_UPDATE", "SVG Edge endpoints require sized Nodes.", {
+        issue: "MISSING_NODE_SIZE",
+        edgeId
+      });
+    }
+    if (endpoint.portId === undefined) {
+      return Object.freeze({
+        x: node.position.x + node.size.width / 2,
+        y: node.position.y + node.size.height / 2
+      });
+    }
+    const definition = getPortDefinition(ports, endpoint.nodeId, endpoint.portId);
+    if (!definition || definition.role !== role) {
+      throw new RendererError("INVALID_DOCUMENT_UPDATE", "SVG Edge Port Geometry is unavailable.", {
+        issue: "UNAVAILABLE_PORT_GEOMETRY",
+        edgeId,
+        endpoint: role,
+        portId: endpoint.portId
+      });
+    }
+    const geometry = getNodePortGeometries(node, ports).find((candidate) => candidate.portId === endpoint.portId);
+    if (!geometry)
+      throw new Error("Accepted Port Definition must have SVG Geometry.");
+    return geometry.worldPoint;
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/renderer-svg/dist/hit-test.js
+  function hitTestProjection(point, target, documentSnapshot, portSnapshot, sessionSnapshot, edgeHitTolerance, connectionAnchorHitTolerance) {
+    validateScreenPoint(point);
+    readTargetMatrix(target, "TARGET_UNAVAILABLE");
+    const bounds = target.getBoundingClientRect();
+    if (point.x < 0 || point.y < 0 || point.x >= bounds.width || point.y >= bounds.height)
+      return null;
+    const viewport = sessionSnapshot.viewport;
+    const worldPoint = {
+      x: (point.x - viewport.x) / viewport.zoom,
+      y: (point.y - viewport.y) / viewport.zoom
+    };
+    for (let index = documentSnapshot.nodes.length - 1;index >= 0; index -= 1) {
+      const node = documentSnapshot.nodes[index];
+      if (!node?.size || node.size.width <= 0 || node.size.height <= 0)
+        continue;
+      const portGeometries = getNodePortGeometries(node, portSnapshot);
+      for (let portIndex = portGeometries.length - 1;portIndex >= 0; portIndex -= 1) {
+        const geometry = portGeometries[portIndex];
+        if (!geometry)
+          continue;
+        const portScreenPoint = {
+          x: geometry.worldPoint.x * viewport.zoom + viewport.x,
+          y: geometry.worldPoint.y * viewport.zoom + viewport.y
+        };
+        if (Math.hypot(point.x - portScreenPoint.x, point.y - portScreenPoint.y) <= connectionAnchorHitTolerance) {
+          return {
+            type: "port",
+            nodeId: geometry.nodeId,
+            portId: geometry.portId,
+            role: geometry.role,
+            worldPoint
+          };
+        }
+      }
+      if (portGeometries.length > 0)
+        continue;
+      for (const role of ["source", "target"]) {
+        const anchorWorldPoint = {
+          x: role === "source" ? node.position.x + node.size.width : node.position.x,
+          y: node.position.y + node.size.height / 2
+        };
+        const anchorScreenPoint = {
+          x: anchorWorldPoint.x * viewport.zoom + viewport.x,
+          y: anchorWorldPoint.y * viewport.zoom + viewport.y
+        };
+        if (Math.hypot(point.x - anchorScreenPoint.x, point.y - anchorScreenPoint.y) <= connectionAnchorHitTolerance) {
+          return { type: "connection-anchor", nodeId: node.id, role, worldPoint };
+        }
+      }
+    }
+    for (let index = documentSnapshot.nodes.length - 1;index >= 0; index -= 1) {
+      const node = documentSnapshot.nodes[index];
+      if (!node?.size)
+        continue;
+      if (worldPoint.x >= node.position.x && worldPoint.x <= node.position.x + node.size.width && worldPoint.y >= node.position.y && worldPoint.y <= node.position.y + node.size.height) {
+        return { type: "node", nodeId: node.id, worldPoint };
+      }
+    }
+    const nodesById = new Map(documentSnapshot.nodes.map((node) => [node.id, node]));
+    for (let index = documentSnapshot.edges.length - 1;index >= 0; index -= 1) {
+      const edge = documentSnapshot.edges[index];
+      if (!edge)
+        continue;
+      const source = resolveEdgeEndpointPoint(nodesById, portSnapshot, edge.source, "source", edge.id);
+      const destination = resolveEdgeEndpointPoint(nodesById, portSnapshot, edge.target, "target", edge.id);
+      const sourceScreen = {
+        x: source.x * viewport.zoom + viewport.x,
+        y: source.y * viewport.zoom + viewport.y
+      };
+      const destinationScreen = {
+        x: destination.x * viewport.zoom + viewport.x,
+        y: destination.y * viewport.zoom + viewport.y
+      };
+      if (distanceToSegment(point, sourceScreen, destinationScreen) <= edgeHitTolerance) {
+        return { type: "edge", edgeId: edge.id, worldPoint };
+      }
+    }
+    return { type: "canvas", worldPoint };
+  }
+  function validateScreenPoint(point) {
+    if (!isRecord2(point) || typeof point.x !== "number" || !Number.isFinite(point.x)) {
+      throw new RendererError("INVALID_SCREEN_POINT", "SVG Renderer Screen Point x must be finite.", { field: "x" });
+    }
+    if (typeof point.y !== "number" || !Number.isFinite(point.y)) {
+      throw new RendererError("INVALID_SCREEN_POINT", "SVG Renderer Screen Point y must be finite.", { field: "y" });
+    }
+  }
+  function distanceToSegment(point, start, end) {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const squaredLength = dx * dx + dy * dy;
+    if (squaredLength === 0)
+      return Math.hypot(point.x - start.x, point.y - start.y);
+    const projection = Math.max(0, Math.min(1, ((point.x - start.x) * dx + (point.y - start.y) * dy) / squaredLength));
+    return Math.hypot(point.x - (start.x + projection * dx), point.y - (start.y + projection * dy));
+  }
+  function isRecord2(value) {
+    return typeof value === "object" && value !== null;
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/renderer-svg/dist/input-normalization.js
+  function applyDomEventPolicy(event, policy) {
+    if (policy.preventDefault)
+      event.preventDefault();
+    if (policy.stopPropagation)
+      event.stopPropagation();
+  }
+  function normalizePointerInput(event, target, session, type = normalizePointerInputType(event.type)) {
+    const bounds = target.getBoundingClientRect();
+    const screenPoint = {
+      x: event.clientX - bounds.left,
+      y: event.clientY - bounds.top
+    };
+    const viewport = session.viewport;
+    return Object.freeze({
+      type,
+      pointerId: event.pointerId,
+      pointerType: normalizePointerType(event.pointerType),
+      screenPoint: Object.freeze(screenPoint),
+      worldPoint: Object.freeze({
+        x: (screenPoint.x - viewport.x) / viewport.zoom,
+        y: (screenPoint.y - viewport.y) / viewport.zoom
+      }),
+      button: type === "pointer.move" || type === "pointer.cancel" ? null : normalizePointerButton(event.button),
+      pressedButtons: Object.freeze(normalizePressedButtons(event.buttons)),
+      modifiers: normalizeInputModifiers(event)
+    });
+  }
+  function normalizeWheelInput(event, target, session) {
+    const bounds = target.getBoundingClientRect();
+    const screenPoint = {
+      x: event.clientX - bounds.left,
+      y: event.clientY - bounds.top
+    };
+    const viewport = session.viewport;
+    const factor = event.deltaMode === WheelEvent.DOM_DELTA_LINE ? 16 : event.deltaMode === WheelEvent.DOM_DELTA_PAGE ? bounds.height : 1;
+    return Object.freeze({
+      type: "wheel",
+      screenPoint: Object.freeze(screenPoint),
+      worldPoint: Object.freeze({
+        x: (screenPoint.x - viewport.x) / viewport.zoom,
+        y: (screenPoint.y - viewport.y) / viewport.zoom
+      }),
+      deltaX: event.deltaX * factor,
+      deltaY: event.deltaY * factor,
+      modifiers: normalizeInputModifiers(event)
+    });
+  }
+  function normalizeKeyboardInput(event) {
+    return Object.freeze({
+      type: event.type === "keydown" ? "key.down" : "key.up",
+      key: event.key,
+      code: event.code,
+      repeat: event.repeat,
+      modifiers: normalizeInputModifiers(event)
+    });
+  }
+  function normalizePointerInputType(type) {
+    switch (type) {
+      case "pointerdown":
+        return "pointer.down";
+      case "pointermove":
+        return "pointer.move";
+      case "pointerup":
+        return "pointer.up";
+      case "pointercancel":
+        return "pointer.cancel";
+      default:
+        throw new Error(`Unsupported Pointer event type: ${type}`);
+    }
+  }
+  function normalizePointerType(type) {
+    return type === "mouse" || type === "pen" || type === "touch" ? type : "unknown";
+  }
+  function normalizePointerButton(button) {
+    return {
+      0: "primary",
+      1: "auxiliary",
+      2: "secondary",
+      3: "back",
+      4: "forward"
+    }[button] ?? null;
+  }
+  function normalizePressedButtons(buttons) {
+    const pressed = [];
+    if ((buttons & 1) !== 0)
+      pressed.push("primary");
+    if ((buttons & 4) !== 0)
+      pressed.push("auxiliary");
+    if ((buttons & 2) !== 0)
+      pressed.push("secondary");
+    if ((buttons & 8) !== 0)
+      pressed.push("back");
+    if ((buttons & 16) !== 0)
+      pressed.push("forward");
+    return pressed;
+  }
+  function normalizeInputModifiers(event) {
+    return Object.freeze({
+      alt: event.altKey,
+      control: event.ctrlKey,
+      meta: event.metaKey,
+      shift: event.shiftKey
+    });
+  }
+  function assertActivePointer(pointerId, activePointerIds) {
+    if (Number.isSafeInteger(pointerId) && pointerId >= 0 && activePointerIds.has(pointerId))
+      return;
+    throw new RendererError("INVALID_POINTER", "SVG Renderer Pointer must be active.", { pointerId });
+  }
+  function releaseNativePointerCapture(target, pointerId, capturedPointerIds) {
+    if (!capturedPointerIds.has(pointerId))
+      return;
+    capturedPointerIds.delete(pointerId);
+    try {
+      if (target.hasPointerCapture(pointerId))
+        target.releasePointerCapture(pointerId);
+    } catch (error) {
+      capturedPointerIds.add(pointerId);
+      throw error;
+    }
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/renderer-svg/dist/renderer-state.js
+  function cloneCanvasSnapshot(snapshot) {
+    return {
+      revision: snapshot.revision,
+      nodes: snapshot.nodes.map((node) => ({
+        id: node.id,
+        type: node.type,
+        position: { x: node.position.x, y: node.position.y },
+        ...node.size === undefined ? {} : { size: { width: node.size.width, height: node.size.height } },
+        ...node.parentId === undefined ? {} : { parentId: node.parentId },
+        data: node.data
+      })),
+      edges: snapshot.edges.map((edge) => ({
+        id: edge.id,
+        type: edge.type,
+        source: {
+          nodeId: edge.source.nodeId,
+          ...edge.source.portId === undefined ? {} : { portId: edge.source.portId }
+        },
+        target: {
+          nodeId: edge.target.nodeId,
+          ...edge.target.portId === undefined ? {} : { portId: edge.target.portId }
+        },
+        data: edge.data
+      }))
+    };
+  }
+  function validateRendererDocumentUpdate(value) {
+    if (!isRecord3(value) || value.type !== "reset" && value.type !== "commit") {
+      throw new RendererError("INVALID_DOCUMENT_UPDATE", "SVG Renderer Document Update is invalid.", {
+        issue: "INVALID_DOCUMENT_UPDATE"
+      });
+    }
+    if (value.type === "reset") {
+      validateCanvasView(value.view);
+      return value;
+    }
+    validateCanvasCommit(value.commit);
+    return value;
+  }
+  function acceptPortSnapshot(value, document2) {
+    if (value === undefined) {
+      return Object.freeze({
+        documentRevision: document2.revision,
+        generation: 0,
+        nodes: Object.freeze([])
+      });
+    }
+    if (!isRecord3(value) || value.documentRevision !== document2.revision || !Number.isSafeInteger(value.generation) || value.generation < 0 || !Array.isArray(value.nodes)) {
+      throwInvalidPortSnapshot("PORT_SNAPSHOT_MISMATCH");
+    }
+    const documentNodeIds = new Set(document2.nodes.map((node) => node.id));
+    let previousNodeId;
+    const nodes = value.nodes.map((candidate) => {
+      if (!isRecord3(candidate) || typeof candidate.nodeId !== "string" || candidate.nodeId.length === 0 || !documentNodeIds.has(candidate.nodeId) || !Array.isArray(candidate.ports) || candidate.ports.length === 0 || previousNodeId !== undefined && previousNodeId >= candidate.nodeId) {
+        throwInvalidPortSnapshot("INVALID_NODE_PORTS");
+      }
+      previousNodeId = candidate.nodeId;
+      let previousPortId;
+      const ports = candidate.ports.map((port) => {
+        if (!isRecord3(port) || typeof port.id !== "string" || port.id.length === 0 || port.role !== "source" && port.role !== "target" || previousPortId !== undefined && previousPortId >= port.id) {
+          throwInvalidPortSnapshot("INVALID_PORT_DEFINITION");
+        }
+        previousPortId = port.id;
+        return Object.freeze({ id: port.id, role: port.role });
+      });
+      return Object.freeze({ nodeId: candidate.nodeId, ports: Object.freeze(ports) });
+    });
+    return Object.freeze({
+      documentRevision: value.documentRevision,
+      generation: value.generation,
+      nodes: Object.freeze(nodes)
+    });
+  }
+  function throwInvalidPortSnapshot(issue) {
+    throw new RendererError("INVALID_DOCUMENT_UPDATE", "SVG Renderer Port Snapshot is invalid.", { issue });
+  }
+  function validateCanvasCommit(value) {
+    if (!isRecord3(value))
+      throwInvalidCommit();
+    validateCanvasView(value.before);
+    validateCanvasView(value.after);
+    if (!isRecord3(value.changeSet))
+      throwInvalidCommit();
+    const changeSet = value.changeSet;
+    if (!Number.isSafeInteger(changeSet.beforeRevision) || !Number.isSafeInteger(changeSet.revision) || !Array.isArray(changeSet.changes)) {
+      throwInvalidCommit();
+    }
+    for (const change of changeSet.changes) {
+      if (!isRecord3(change) || change.entity !== "node" && change.entity !== "edge" || typeof change.id !== "string" || change.id.length === 0 || !("before" in change) || !("after" in change) || change.before === null && change.after === null || !isChangeEntityValue(change.entity, change.id, change.before) || !isChangeEntityValue(change.entity, change.id, change.after)) {
+        throwInvalidCommit();
+      }
+    }
+  }
+  function isChangeEntityValue(entity, id, value) {
+    if (value === null)
+      return true;
+    if (entity === "node")
+      return isCanvasNodeShell(value) && value.id === id;
+    return isCanvasEdgeShell(value) && value.id === id;
+  }
+  function throwInvalidCommit() {
+    throw new RendererError("INVALID_DOCUMENT_UPDATE", "SVG Renderer Canvas Commit is invalid.", {
+      issue: "INVALID_DOCUMENT_COMMIT"
+    });
+  }
+  function validateCanvasView(value) {
+    if (!isRecord3(value) || !isRecord3(value.snapshot))
+      throwInvalidSnapshot("view", "INVALID_VIEW");
+    const snapshot = value.snapshot;
+    if (typeof snapshot.revision !== "number" || !Number.isSafeInteger(snapshot.revision) || snapshot.revision < 0) {
+      throwInvalidSnapshot("revision", "INVALID_REVISION");
+    }
+    if (!Array.isArray(snapshot.nodes))
+      throwInvalidSnapshot("nodes", "INVALID_ARRAY");
+    if (!Array.isArray(snapshot.edges))
+      throwInvalidSnapshot("edges", "INVALID_ARRAY");
+    if (!isCanvasQuerySurface(value.query))
+      throwInvalidSnapshot("query", "INVALID_QUERY");
+    validateCanonicalIds(snapshot.nodes, "nodes");
+    validateCanonicalIds(snapshot.edges, "edges");
+    const nodeIds = new Set;
+    const nodes = [];
+    for (const node of snapshot.nodes) {
+      if (!isCanvasNodeShell(node))
+        throwInvalidSnapshot("nodes", "INVALID_ENTITY");
+      nodeIds.add(node.id);
+      nodes.push(node);
+    }
+    for (const node of nodes) {
+      if (node.parentId !== undefined && !nodeIds.has(node.parentId)) {
+        throwInvalidSnapshot("nodes", "MISSING_PARENT");
+      }
+    }
+    validateParentAcyclic(nodes);
+    for (const edge of snapshot.edges) {
+      if (!isCanvasEdgeShell(edge))
+        throwInvalidSnapshot("edges", "INVALID_ENTITY");
+      if (!nodeIds.has(edge.source.nodeId) || !nodeIds.has(edge.target.nodeId)) {
+        throwInvalidSnapshot("edges", "MISSING_EDGE_ENDPOINT");
+      }
+    }
+  }
+  function isCanvasQuerySurface(value) {
+    if (!isRecord3(value))
+      return false;
+    return ["getNode", "getEdge", "getIncomingEdges", "getOutgoingEdges", "getIncidentEdges", "getChildren"].every((method) => typeof value[method] === "function");
+  }
+  function validateParentAcyclic(nodes) {
+    const nodesById = new Map(nodes.map((node) => [node.id, node]));
+    const states = new Map;
+    const visit = (id) => {
+      const state = states.get(id);
+      if (state === "done")
+        return;
+      if (state === "visiting")
+        throwInvalidSnapshot("nodes", "PARENT_CYCLE");
+      states.set(id, "visiting");
+      const parentId = nodesById.get(id)?.parentId;
+      if (parentId !== undefined)
+        visit(parentId);
+      states.set(id, "done");
+    };
+    for (const node of nodes)
+      visit(node.id);
+  }
+  function validateCanonicalIds(entities, field) {
+    let previous;
+    for (const entity of entities) {
+      if (!isRecord3(entity) || typeof entity.id !== "string" || entity.id.length === 0) {
+        throwInvalidSnapshot(field, "INVALID_ID");
+      }
+      if (previous !== undefined && previous >= entity.id)
+        throwInvalidSnapshot(field, "NON_CANONICAL_IDS");
+      previous = entity.id;
+    }
+  }
+  function isCanvasNodeShell(value) {
+    if (!isRecord3(value) || typeof value.id !== "string" || typeof value.type !== "string" || !Object.hasOwn(value, "data")) {
+      return false;
+    }
+    if (!isPoint(value.position))
+      return false;
+    if (value.size !== undefined && !isSize(value.size))
+      return false;
+    return value.parentId === undefined || typeof value.parentId === "string" && value.parentId.length > 0;
+  }
+  function isCanvasEdgeShell(value) {
+    return isRecord3(value) && typeof value.id === "string" && typeof value.type === "string" && Object.hasOwn(value, "data") && isEndpoint(value.source) && isEndpoint(value.target);
+  }
+  function isPoint(value) {
+    return isRecord3(value) && typeof value.x === "number" && Number.isFinite(value.x) && typeof value.y === "number" && Number.isFinite(value.y);
+  }
+  function isSize(value) {
+    return isRecord3(value) && typeof value.width === "number" && Number.isFinite(value.width) && value.width > 0 && typeof value.height === "number" && Number.isFinite(value.height) && value.height > 0;
+  }
+  function isEndpoint(value) {
+    return isRecord3(value) && typeof value.nodeId === "string" && value.nodeId.length > 0 && (value.portId === undefined || typeof value.portId === "string");
+  }
+  function isRecord3(value) {
+    return typeof value === "object" && value !== null;
+  }
+  function throwInvalidSnapshot(field, reason) {
+    throw new RendererError("INVALID_DOCUMENT_UPDATE", "SVG Renderer Document Snapshot is invalid.", {
+      issue: "INVALID_DOCUMENT_SNAPSHOT",
+      field,
+      reason
+    });
+  }
+  function validateSessionSnapshot(snapshot, documentSnapshot) {
+    if (!isRecord3(snapshot) || !isRecord3(snapshot.selection) || !isRecord3(snapshot.viewport)) {
+      throwInvalidSession("INVALID_SESSION_STRUCTURE");
+    }
+    if (!Array.isArray(snapshot.selection.nodeIds))
+      throwInvalidSession("INVALID_SELECTION", { field: "nodeIds" });
+    if (!Array.isArray(snapshot.selection.edgeIds))
+      throwInvalidSession("INVALID_SELECTION", { field: "edgeIds" });
+    const nodeIds = new Set(documentSnapshot.nodes.map((node) => node.id));
+    const edgeIds = new Set(documentSnapshot.edges.map((edge) => edge.id));
+    validateSelectionIds(snapshot.selection.nodeIds, "nodeIds", "node", nodeIds);
+    validateSelectionIds(snapshot.selection.edgeIds, "edgeIds", "edge", edgeIds);
+    for (const field of ["x", "y", "zoom"]) {
+      const value = snapshot.viewport[field];
+      if (typeof value !== "number" || !Number.isFinite(value) || field === "zoom" && value <= 0) {
+        throwInvalidSession("INVALID_VIEWPORT", { field });
+      }
+    }
+  }
+  function validateSelectionIds(ids, field, entity, availableIds) {
+    let previous;
+    for (const id of ids) {
+      if (typeof id !== "string" || id.length === 0)
+        throwInvalidSession("INVALID_SELECTION", { field });
+      if (previous === id)
+        throwInvalidSession("DUPLICATE_SELECTION_ID", { field, id });
+      if (previous !== undefined && previous > id)
+        throwInvalidSession("NON_CANONICAL_SELECTION", { field });
+      if (!availableIds.has(id))
+        throwInvalidSession("SELECTION_ENTITY_MISSING", { entity, id });
+      previous = id;
+    }
+  }
+  function throwInvalidSession(issue, details = {}) {
+    throw new RendererError("INVALID_SESSION_SNAPSHOT", "SVG Renderer Session Snapshot is invalid.", {
+      issue,
+      ...details
+    });
+  }
+  function cloneSessionSnapshot(snapshot) {
+    return {
+      selection: {
+        nodeIds: [...snapshot.selection.nodeIds],
+        edgeIds: [...snapshot.selection.edgeIds]
+      },
+      viewport: {
+        x: snapshot.viewport.x,
+        y: snapshot.viewport.y,
+        zoom: snapshot.viewport.zoom
+      }
+    };
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/renderer-svg/dist/svg-config.js
+  function validateConfig(config) {
+    if (typeof config !== "object" || config === null) {
+      throw new SvgRendererError("INVALID_CONFIG", "SVG Renderer config must be an object.");
+    }
+    assertKnownConfigKeys(config, ["target", "edgeHitTolerance", "connectionAnchorHitTolerance", "input"], "");
+    const target = config.target;
+    const ownerDocument = isRecord4(target) ? Reflect.get(target, "ownerDocument") : undefined;
+    const ownerWindow = isRecord4(ownerDocument) ? Reflect.get(ownerDocument, "defaultView") : undefined;
+    if (!isRecord4(ownerWindow) || typeof ownerWindow.SVGSVGElement !== "function" || !(target instanceof ownerWindow.SVGSVGElement)) {
+      throw new SvgRendererError("INVALID_TARGET", "SVG Renderer Target must be an SVGSVGElement.");
+    }
+    const edgeHitTolerance = config.edgeHitTolerance;
+    if (edgeHitTolerance !== undefined && (!Number.isFinite(edgeHitTolerance) || edgeHitTolerance < 0)) {
+      throw new SvgRendererError("INVALID_CONFIG", "edgeHitTolerance must be a finite non-negative number.", {
+        field: "edgeHitTolerance"
+      });
+    }
+    const connectionAnchorHitTolerance = config.connectionAnchorHitTolerance;
+    if (connectionAnchorHitTolerance !== undefined && (!Number.isFinite(connectionAnchorHitTolerance) || connectionAnchorHitTolerance < 0)) {
+      throw new SvgRendererError("INVALID_CONFIG", "connectionAnchorHitTolerance must be a finite non-negative number.", {
+        field: "connectionAnchorHitTolerance"
+      });
+    }
+    return {
+      target,
+      edgeHitTolerance: edgeHitTolerance ?? 4,
+      connectionAnchorHitTolerance: connectionAnchorHitTolerance ?? 8
+    };
+  }
+  function normalizeInputPolicies(input) {
+    if (input !== undefined && !isRecord4(input)) {
+      throw new SvgRendererError("INVALID_CONFIG", "SVG Renderer input policy must be an object.", { field: "input" });
+    }
+    if (input !== undefined) {
+      assertKnownConfigKeys(input, ["pointer", "wheel", "keyboard", "contextMenu"], "input");
+    }
+    const policies = input;
+    return {
+      pointer: normalizeDomEventPolicy(policies?.pointer, "pointer"),
+      wheel: normalizeDomEventPolicy(policies?.wheel, "wheel"),
+      keyboard: normalizeDomEventPolicy(policies?.keyboard, "keyboard"),
+      contextMenu: normalizeDomEventPolicy(policies?.contextMenu, "contextMenu")
+    };
+  }
+  function normalizeDomEventPolicy(policy, field) {
+    if (policy !== undefined && !isRecord4(policy)) {
+      throw new SvgRendererError("INVALID_CONFIG", "SVG Renderer DOM event policy must be an object.", { field });
+    }
+    if (policy !== undefined)
+      assertKnownConfigKeys(policy, ["preventDefault", "stopPropagation"], `input.${field}`);
+    const normalized = policy;
+    const accepted = { preventDefault: false, stopPropagation: false };
+    for (const key of ["preventDefault", "stopPropagation"]) {
+      const value = normalized?.[key];
+      if (value !== undefined && typeof value !== "boolean") {
+        throw new SvgRendererError("INVALID_CONFIG", "SVG Renderer DOM event policy values must be boolean.", {
+          field: `${field}.${key}`
+        });
+      }
+      accepted[key] = value ?? false;
+    }
+    return accepted;
+  }
+  function assertKnownConfigKeys(value, allowedKeys, prefix) {
+    const allowed = new Set(allowedKeys);
+    for (const key of Reflect.ownKeys(value)) {
+      if (typeof key === "string" && allowed.has(key))
+        continue;
+      const field = typeof key === "string" ? prefix.length === 0 ? key : `${prefix}.${key}` : `${prefix || "config"}.[symbol]`;
+      throw new SvgRendererError("INVALID_CONFIG", "SVG Renderer config contains an unknown field.", { field });
+    }
+  }
+  function isRecord4(value) {
+    return typeof value === "object" && value !== null;
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/renderer-svg/dist/svg-projection.js
+  var SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+  function renderReset(view, document2, edgesLayer, nodesLayer, interactionLayer, ports) {
+    validateCanvasView(view);
+    const nodes = view.snapshot.nodes.map((node) => createNodeElement(document2, node));
+    const nodesById = new Map(view.snapshot.nodes.map((node) => [node.id, node]));
+    const edges = view.snapshot.edges.map((edge) => createEdgeElement(document2, edge, nodesById, ports));
+    edgesLayer.replaceChildren(...edges);
+    nodesLayer.replaceChildren(...nodes);
+    interactionLayer.replaceChildren(...view.snapshot.nodes.flatMap((node) => createConnectionTargetElements(document2, node, ports)));
+  }
+  function applyCommit(commit, baselineSnapshot, acceptedSession, document2, edgesLayer, nodesLayer, interactionLayer, ports, completeProjection) {
+    validateCanvasView(commit.before);
+    validateCanvasView(commit.after);
+    const baselineRevision = baselineSnapshot?.revision;
+    const beforeRevision = commit.before.snapshot.revision;
+    const afterRevision = commit.after.snapshot.revision;
+    if (baselineRevision === undefined || beforeRevision !== baselineRevision || afterRevision !== beforeRevision + 1 || commit.changeSet.beforeRevision !== beforeRevision || commit.changeSet.revision !== afterRevision) {
+      throw new RendererError("DOCUMENT_OUT_OF_SYNC", "SVG Renderer Commit is not contiguous with its Baseline.", {
+        expectedRevision: baselineRevision ?? null,
+        receivedRevision: beforeRevision
+      });
+    }
+    if (!canvasSnapshotsEqual(baselineSnapshot, commit.before.snapshot)) {
+      throw new RendererError("DOCUMENT_OUT_OF_SYNC", "SVG Renderer Commit before View differs from its Baseline.", {
+        issue: "BASELINE_CONTENT_MISMATCH",
+        expectedRevision: baselineRevision,
+        receivedRevision: beforeRevision
+      });
+    }
+    validateChangeSetConsistency(commit);
+    if (acceptedSession)
+      validateSessionSnapshot(acceptedSession, commit.after.snapshot);
+    const afterNodesById = new Map(commit.after.snapshot.nodes.map((node) => [node.id, node]));
+    const validatedNodes = new Map(commit.after.snapshot.nodes.map((node) => [node.id, createNodeElement(document2, node)]));
+    const validatedEdges = new Map(commit.after.snapshot.edges.map((edge) => [edge.id, createEdgeElement(document2, edge, afterNodesById, ports)]));
+    const changedNodeIds = new Set(commit.changeSet.changes.filter((change) => change.entity === "node").map((change) => change.id));
+    const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
+    try {
+      for (const change of commit.changeSet.changes) {
+        if (change.entity === "node")
+          applyNodeChange(change, validatedNodes, nodesLayer, journal);
+        else
+          applyEdgeChange(change, validatedEdges, edgesLayer, journal);
+      }
+      for (const edge of commit.after.snapshot.edges) {
+        if (!changedNodeIds.has(edge.source.nodeId) && !changedNodeIds.has(edge.target.nodeId))
+          continue;
+        const existing = requireEntityElement(edgesLayer, "data-nodebraid-edge-id", edge.id);
+        const validated = requireMapValue(validatedEdges, edge.id);
+        copyGeometryAttributes(validated, existing, ["x1", "y1", "x2", "y2"], journal);
+      }
+      nodesLayer.append(...commit.after.snapshot.nodes.map((node) => requireEntityElement(nodesLayer, "data-nodebraid-node-id", node.id)));
+      edgesLayer.append(...commit.after.snapshot.edges.map((edge) => requireEntityElement(edgesLayer, "data-nodebraid-edge-id", edge.id)));
+      syncConnectionTargets(commit.after.snapshot.nodes, document2, interactionLayer, ports, journal);
+      completeProjection?.(journal);
+    } catch (error) {
+      const rollbackErrors = journal.rollback();
+      if (rollbackErrors.length > 0) {
+        throw new ProjectionRollbackError([error, ...rollbackErrors]);
+      }
+      throw error;
+    }
+  }
+  function syncConnectionTargets(nodes, document2, interactionLayer, ports, journal) {
+    const ordered = [];
+    const existingTargets = Array.from(interactionLayer.querySelectorAll("[data-nodebraid-connection-anchor-node-id], [data-nodebraid-port-node-id]"));
+    const existingTargetsByKey = new Map(existingTargets.map((element) => [connectionTargetKey(element), element]));
+    for (const node of nodes) {
+      for (const candidate of createConnectionTargetElements(document2, node, ports)) {
+        const key = connectionTargetKey(candidate);
+        const existing = existingTargetsByKey.get(key);
+        if (existing) {
+          copyGeometryAttributes(candidate, existing, ["cx", "cy"], journal);
+          ordered.push(existing);
+          existingTargetsByKey.delete(key);
+        } else {
+          ordered.push(candidate);
+        }
+      }
+    }
+    for (const element of existingTargetsByKey.values())
+      element.remove();
+    interactionLayer.append(...ordered, ...interactionLayer.querySelectorAll("[data-nodebraid-connection-preview]"));
+  }
+  function createConnectionTargetElements(document2, node, ports) {
+    const size = node.size;
+    if (!size || size.width <= 0 || size.height <= 0)
+      return [];
+    const portGeometries = getNodePortGeometries(node, ports);
+    if (portGeometries.length > 0) {
+      return portGeometries.map((geometry) => {
+        const element = createSvgElement(document2, "circle");
+        element.setAttribute("class", "nodebraid-renderer-svg__port");
+        element.setAttribute("data-nodebraid-port-node-id", node.id);
+        element.setAttribute("data-nodebraid-port-id", geometry.portId);
+        element.setAttribute("data-nodebraid-port-role", geometry.role);
+        element.setAttribute("cx", String(geometry.worldPoint.x));
+        element.setAttribute("cy", String(geometry.worldPoint.y));
+        return element;
+      });
+    }
+    return ["target", "source"].map((role) => {
+      const element = createSvgElement(document2, "circle");
+      element.setAttribute("class", "nodebraid-renderer-svg__connection-anchor");
+      element.setAttribute("data-nodebraid-connection-anchor-node-id", node.id);
+      element.setAttribute("data-nodebraid-connection-anchor-role", role);
+      element.setAttribute("cx", String(role === "source" ? node.position.x + size.width : node.position.x));
+      element.setAttribute("cy", String(node.position.y + size.height / 2));
+      return element;
+    });
+  }
+  function connectionTargetKey(element) {
+    const portNodeId = element.getAttribute("data-nodebraid-port-node-id");
+    if (portNodeId !== null) {
+      return `port\x00${portNodeId}\x00${element.getAttribute("data-nodebraid-port-id")}\x00${element.getAttribute("data-nodebraid-port-role")}`;
+    }
+    return `anchor\x00${element.getAttribute("data-nodebraid-connection-anchor-node-id")}\x00${element.getAttribute("data-nodebraid-connection-anchor-role")}`;
+  }
+  function applyConnectionPreview(preview, snapshot, ports, interactionLayer, journal) {
+    const source = resolveConnectionAnchorPoint(snapshot, ports, preview.source);
+    let endpoint = preview.pointerWorldPoint;
+    if (preview.target.type !== "none") {
+      const targetAnchor = preview.target.anchor;
+      endpoint = resolveConnectionAnchorPoint(snapshot, ports, targetAnchor);
+    }
+    let element = interactionLayer.querySelector("[data-nodebraid-connection-preview]");
+    if (!element) {
+      element = createSvgElement(interactionLayer.ownerDocument, "line");
+      element.setAttribute("class", "nodebraid-renderer-svg__connection-preview");
+      element.setAttribute("data-nodebraid-connection-preview", "");
+      interactionLayer.append(element);
+    }
+    setElementAttribute(element, "x1", String(source.x), journal);
+    setElementAttribute(element, "y1", String(source.y), journal);
+    setElementAttribute(element, "x2", String(endpoint.x), journal);
+    setElementAttribute(element, "y2", String(endpoint.y), journal);
+    setElementAttribute(element, "data-nodebraid-connection-target", preview.target.type, journal);
+  }
+  function clearConnectionPreview(interactionLayer) {
+    interactionLayer.querySelector("[data-nodebraid-connection-preview]")?.remove();
+  }
+  function applyBoxSelection(projection, interactionLayer, journal) {
+    let element = interactionLayer.querySelector("[data-nodebraid-box-selection]");
+    if (!element) {
+      element = createSvgElement(interactionLayer.ownerDocument, "rect");
+      element.setAttribute("class", "nodebraid-renderer-svg__box-selection");
+      element.setAttribute("data-nodebraid-box-selection", "");
+      interactionLayer.append(element);
+    }
+    setElementAttribute(element, "x", String(projection.rect.x), journal);
+    setElementAttribute(element, "y", String(projection.rect.y), journal);
+    setElementAttribute(element, "width", String(projection.rect.width), journal);
+    setElementAttribute(element, "height", String(projection.rect.height), journal);
+  }
+  function clearBoxSelection(interactionLayer) {
+    interactionLayer.querySelector("[data-nodebraid-box-selection]")?.remove();
+  }
+  function applyNodeDragProjection(projection, baselineSnapshot, edgesLayer, nodesLayer, ports, suppliedJournal) {
+    const journal = suppliedJournal ?? new DomMutationJournal(edgesLayer, nodesLayer);
+    try {
+      const candidates = new Map(projection.nodes.map((candidate) => [candidate.nodeId, candidate]));
+      const effectiveNodes = new Map(baselineSnapshot.nodes.map((node) => {
+        const candidate = candidates.get(node.id);
+        return [node.id, candidate ? { ...node, position: candidate.position } : node];
+      }));
+      for (const candidate of projection.nodes) {
+        const element = requireEntityElement(nodesLayer, "data-nodebraid-node-id", candidate.nodeId);
+        setElementAttribute(element, "x", String(candidate.position.x), journal);
+        setElementAttribute(element, "y", String(candidate.position.y), journal);
+      }
+      for (const edge of baselineSnapshot.edges) {
+        if (!candidates.has(edge.source.nodeId) && !candidates.has(edge.target.nodeId))
+          continue;
+        const existing = requireEntityElement(edgesLayer, "data-nodebraid-edge-id", edge.id);
+        const validated = createEdgeElement(edgesLayer.ownerDocument, edge, effectiveNodes, ports);
+        copyGeometryAttributes(validated, existing, ["x1", "y1", "x2", "y2"], journal);
+      }
+    } catch (error) {
+      if (suppliedJournal)
+        throw error;
+      const rollbackErrors = journal.rollback();
+      if (rollbackErrors.length > 0)
+        throw new ProjectionRollbackError([error, ...rollbackErrors]);
+      throw error;
+    }
+  }
+  function applyNodeChange(change, validatedNodes, nodesLayer, journal) {
+    const existing = findEntityElement(nodesLayer, "data-nodebraid-node-id", change.id);
+    if (change.before === null && change.after !== null) {
+      if (existing)
+        throwBaselineEntityConflict("node", change.id, "missing", "present");
+      nodesLayer.append(requireMapValue(validatedNodes, change.id));
+      return;
+    }
+    if (change.before !== null && change.after === null) {
+      if (!existing)
+        throwBaselineEntityConflict("node", change.id, "present", "missing");
+      existing.remove();
+      return;
+    }
+    if (!existing || change.after === null)
+      throwBaselineEntityConflict("node", change.id, "present", "missing");
+    updateNodeElement(existing, change.after, journal);
+  }
+  function applyEdgeChange(change, validatedEdges, edgesLayer, journal) {
+    const existing = findEntityElement(edgesLayer, "data-nodebraid-edge-id", change.id);
+    if (change.before === null && change.after !== null) {
+      if (existing)
+        throwBaselineEntityConflict("edge", change.id, "missing", "present");
+      edgesLayer.append(requireMapValue(validatedEdges, change.id));
+      return;
+    }
+    if (change.before !== null && change.after === null) {
+      if (!existing)
+        throwBaselineEntityConflict("edge", change.id, "present", "missing");
+      existing.remove();
+      return;
+    }
+    if (!existing || change.after === null)
+      throwBaselineEntityConflict("edge", change.id, "present", "missing");
+    const validated = requireMapValue(validatedEdges, change.id);
+    copyGeometryAttributes(validated, existing, ["x1", "y1", "x2", "y2"], journal);
+  }
+  function createNodeElement(document2, node) {
+    if (!node.size) {
+      throw new RendererError("INVALID_DOCUMENT_UPDATE", "SVG Node projection requires an explicit Size.", {
+        issue: "MISSING_NODE_SIZE",
+        nodeId: node.id
+      });
+    }
+    const element = createSvgElement(document2, "rect");
+    element.setAttribute("class", "nodebraid-renderer-svg__node");
+    element.setAttribute("data-nodebraid-node-id", node.id);
+    updateNodeElement(element, node);
+    return element;
+  }
+  function updateNodeElement(element, node, journal) {
+    if (!node.size) {
+      throw new RendererError("INVALID_DOCUMENT_UPDATE", "SVG Node projection requires an explicit Size.", {
+        issue: "MISSING_NODE_SIZE",
+        nodeId: node.id
+      });
+    }
+    setElementAttribute(element, "x", String(node.position.x), journal);
+    setElementAttribute(element, "y", String(node.position.y), journal);
+    setElementAttribute(element, "width", String(node.size.width), journal);
+    setElementAttribute(element, "height", String(node.size.height), journal);
+  }
+  function createEdgeElement(document2, edge, nodesById, ports) {
+    if (edge.source.nodeId === edge.target.nodeId) {
+      throw new RendererError("INVALID_DOCUMENT_UPDATE", "SVG Renderer cannot project a self-loop as a straight Edge.", {
+        issue: "UNSUPPORTED_SELF_LOOP",
+        edgeId: edge.id
+      });
+    }
+    const source = resolveEdgeEndpointPoint(nodesById, ports, edge.source, "source", edge.id);
+    const target = resolveEdgeEndpointPoint(nodesById, ports, edge.target, "target", edge.id);
+    const element = createSvgElement(document2, "line");
+    element.setAttribute("class", "nodebraid-renderer-svg__edge");
+    element.setAttribute("data-nodebraid-edge-id", edge.id);
+    element.setAttribute("x1", String(source.x));
+    element.setAttribute("y1", String(source.y));
+    element.setAttribute("x2", String(target.x));
+    element.setAttribute("y2", String(target.y));
+    return element;
+  }
+  function createSvgElement(document2, name) {
+    return document2.createElementNS(SVG_NAMESPACE, name);
+  }
+  function setSelected(element, selected, journal) {
+    if (selected)
+      setElementAttribute(element, "data-nodebraid-selected", "true", journal);
+    else
+      removeElementAttribute(element, "data-nodebraid-selected", journal);
+  }
+  function findEntityElement(layer, attribute, id) {
+    return Array.from(layer.children).find((element) => element.getAttribute(attribute) === id);
+  }
+  function requireEntityElement(layer, attribute, id) {
+    const element = findEntityElement(layer, attribute, id);
+    if (!element)
+      throwBaselineEntityConflict(attribute.includes("node") ? "node" : "edge", id, "present", "missing");
+    return element;
+  }
+  function requireMapValue(map, key) {
+    const value = map.get(key);
+    if (!value)
+      throw new Error("Validated SVG Projection value is missing.");
+    return value;
+  }
+  function copyGeometryAttributes(source, target, attributes, journal) {
+    for (const attribute of attributes) {
+      const value = source.getAttribute(attribute);
+      if (value === null)
+        removeElementAttribute(target, attribute, journal);
+      else
+        setElementAttribute(target, attribute, value, journal);
+    }
+  }
+  function throwBaselineEntityConflict(entity, id, expectedState, actualState) {
+    throw new RendererError("DOCUMENT_OUT_OF_SYNC", "SVG Renderer Baseline entity state does not match the Commit.", {
+      entity,
+      id,
+      expectedState,
+      actualState
+    });
+  }
+
+  class DomMutationJournal {
+    edgesLayer;
+    nodesLayer;
+    interactionLayer;
+    #edgeChildren;
+    #nodeChildren;
+    #interactionChildren;
+    #attributeUndos = [];
+    constructor(edgesLayer, nodesLayer, interactionLayer) {
+      this.edgesLayer = edgesLayer;
+      this.nodesLayer = nodesLayer;
+      this.interactionLayer = interactionLayer;
+      this.#edgeChildren = [...edgesLayer.children];
+      this.#nodeChildren = [...nodesLayer.children];
+      this.#interactionChildren = interactionLayer ? [...interactionLayer.children] : undefined;
+    }
+    setAttribute(element, name, value) {
+      const previous = element.getAttribute(name);
+      if (previous === value)
+        return;
+      this.#attributeUndos.push(() => {
+        if (previous === null)
+          element.removeAttribute(name);
+        else
+          element.setAttribute(name, previous);
+      });
+      element.setAttribute(name, value);
+    }
+    removeAttribute(element, name) {
+      const previous = element.getAttribute(name);
+      if (previous === null)
+        return;
+      this.#attributeUndos.push(() => element.setAttribute(name, previous));
+      element.removeAttribute(name);
+    }
+    rollback() {
+      const errors = [];
+      for (const undo of [...this.#attributeUndos].reverse()) {
+        try {
+          undo();
+        } catch (error) {
+          errors.push(error);
+        }
+      }
+      const layers = [
+        [this.edgesLayer, this.#edgeChildren],
+        [this.nodesLayer, this.#nodeChildren],
+        ...this.interactionLayer && this.#interactionChildren ? [[this.interactionLayer, this.#interactionChildren]] : []
+      ];
+      for (const [layer, children] of layers) {
+        try {
+          layer.replaceChildren(...children);
+        } catch (error) {
+          errors.push(error);
+        }
+      }
+      return errors;
+    }
+  }
+
+  class ProjectionRollbackError extends AggregateError {
+    constructor(errors) {
+      super(errors, "SVG Renderer Projection update and DOM rollback both failed.");
+    }
+  }
+  function setElementAttribute(element, name, value, journal) {
+    if (journal)
+      journal.setAttribute(element, name, value);
+    else
+      element.setAttribute(name, value);
+  }
+  function removeElementAttribute(element, name, journal) {
+    if (journal)
+      journal.removeAttribute(element, name);
+    else
+      element.removeAttribute(name);
+  }
+  function canvasSnapshotsEqual(left, right) {
+    if (!left || left.revision !== right.revision)
+      return false;
+    if (left.nodes.length !== right.nodes.length || left.edges.length !== right.edges.length)
+      return false;
+    return left.nodes.every((node, index) => canvasNodesEqual2(node, right.nodes[index])) && left.edges.every((edge, index) => canvasEdgesEqual2(edge, right.edges[index]));
+  }
+  function canvasNodesEqual2(left, right) {
+    return right !== undefined && left.id === right.id && left.type === right.type && left.position.x === right.position.x && left.position.y === right.position.y && left.size?.width === right.size?.width && left.size?.height === right.size?.height && left.parentId === right.parentId && Object.is(left.data, right.data);
+  }
+  function canvasEdgesEqual2(left, right) {
+    return right !== undefined && left.id === right.id && left.type === right.type && left.source.nodeId === right.source.nodeId && left.source.portId === right.source.portId && left.target.nodeId === right.target.nodeId && left.target.portId === right.target.portId && Object.is(left.data, right.data);
+  }
+  function validateChangeSetConsistency(commit) {
+    const expected = collectGraphChanges(commit.before.snapshot, commit.after.snapshot);
+    const actual = commit.changeSet.changes;
+    if (expected.length === 0 && actual.length === 0) {
+      throw new RendererError("INVALID_DOCUMENT_UPDATE", "SVG Renderer Canvas Commit must contain a Change.", {
+        issue: "INVALID_DOCUMENT_COMMIT"
+      });
+    }
+    if (expected.length === actual.length && expected.every((change, index) => graphChangesEqual(change, actual[index]))) {
+      return;
+    }
+    throw new RendererError("INVALID_DOCUMENT_UPDATE", "SVG Renderer Change Set does not match its before and after Views.", {
+      issue: "CHANGE_SET_MISMATCH",
+      beforeRevision: commit.changeSet.beforeRevision,
+      revision: commit.changeSet.revision
+    });
+  }
+  function collectGraphChanges(before, after) {
+    const changes = [];
+    const beforeNodes = new Map(before.nodes.map((node) => [node.id, node]));
+    const afterNodes = new Map(after.nodes.map((node) => [node.id, node]));
+    for (const id of sortedUnion(beforeNodes.keys(), afterNodes.keys())) {
+      const beforeNode = beforeNodes.get(id) ?? null;
+      const afterNode = afterNodes.get(id) ?? null;
+      if (canvasNodeValuesEqual(beforeNode, afterNode))
+        continue;
+      changes.push({ entity: "node", id, before: beforeNode, after: afterNode });
+    }
+    const beforeEdges = new Map(before.edges.map((edge) => [edge.id, edge]));
+    const afterEdges = new Map(after.edges.map((edge) => [edge.id, edge]));
+    for (const id of sortedUnion(beforeEdges.keys(), afterEdges.keys())) {
+      const beforeEdge = beforeEdges.get(id) ?? null;
+      const afterEdge = afterEdges.get(id) ?? null;
+      if (canvasEdgeValuesEqual(beforeEdge, afterEdge))
+        continue;
+      changes.push({ entity: "edge", id, before: beforeEdge, after: afterEdge });
+    }
+    return changes;
+  }
+  function sortedUnion(left, right) {
+    return [...new Set([...left, ...right])].sort();
+  }
+  function graphChangesEqual(left, right) {
+    if (!right || left.entity !== right.entity || left.id !== right.id)
+      return false;
+    if (left.entity === "node" && right.entity === "node") {
+      return canvasNodeValuesEqual(left.before, right.before) && canvasNodeValuesEqual(left.after, right.after);
+    }
+    if (left.entity === "edge" && right.entity === "edge") {
+      return canvasEdgeValuesEqual(left.before, right.before) && canvasEdgeValuesEqual(left.after, right.after);
+    }
+    return false;
+  }
+  function canvasNodeValuesEqual(left, right) {
+    if (left === right)
+      return true;
+    if (left === null || right === null)
+      return false;
+    return canvasNodesEqual2(left, right);
+  }
+  function canvasEdgeValuesEqual(left, right) {
+    if (left === right)
+      return true;
+    if (left === null || right === null)
+      return false;
+    return canvasEdgesEqual2(left, right);
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/renderer-svg/dist/interaction-projection.js
+  function acceptInteractionProjection(value, document2, ports, session) {
+    if (!isRecord5(value))
+      throwInvalidProjectionType();
+    switch (value.type) {
+      case "node-drag":
+        return acceptNodeDrag(value, document2);
+      case "viewport-pan":
+        return acceptViewportPan(value, session);
+      case "connection-preview":
+        return acceptConnectionPreview(value, document2, ports);
+      case "box-selection":
+        return acceptBoxSelection(value);
+      default:
+        throwInvalidProjectionType();
+    }
+  }
+  function isInteractionCompatibleWithDocument(interaction, document2, ports) {
+    if (interaction?.type === "connection-preview") {
+      if (!connectionAnchorAvailable(interaction.source, document2, ports))
+        return false;
+      return interaction.target.type === "none" || connectionAnchorAvailable(interaction.target.anchor, document2, ports);
+    }
+    if (interaction?.type !== "node-drag")
+      return true;
+    const nodes = new Map(document2.nodes.map((node) => [node.id, node]));
+    return interaction.nodes.every((candidate) => {
+      const node = nodes.get(candidate.nodeId);
+      return node !== undefined && node.position.x === candidate.basePosition.x && node.position.y === candidate.basePosition.y;
+    });
+  }
+  function acceptNodeDrag(value, document2) {
+    if (!Array.isArray(value.nodes))
+      throwInvalidProjectionStructure("nodes");
+    for (let index = 0;index < value.nodes.length; index += 1) {
+      const candidate = value.nodes[index];
+      if (!isRecord5(candidate))
+        throwInvalidProjectionStructure(`nodes[${index}]`);
+      if (typeof candidate.nodeId !== "string" || candidate.nodeId.length === 0) {
+        throwInvalidProjectionStructure(`nodes[${index}].nodeId`);
+      }
+      if (!isRecord5(candidate.basePosition))
+        throwInvalidProjectionStructure(`nodes[${index}].basePosition`);
+      if (!isRecord5(candidate.position))
+        throwInvalidProjectionStructure(`nodes[${index}].position`);
+    }
+    const projection = value;
+    if (projection.nodes.length === 0) {
+      throw new RendererError("INVALID_INTERACTION_PROJECTION", "Node Drag Interaction Projection requires at least one Node.", { issue: "EMPTY_NODE_DRAG" });
+    }
+    const nodes = new Map(document2.nodes.map((node) => [node.id, node]));
+    const seenNodeIds = new Set;
+    let previousNodeId;
+    for (const candidate of projection.nodes) {
+      if (seenNodeIds.has(candidate.nodeId)) {
+        throw new RendererError("INVALID_INTERACTION_PROJECTION", "Interaction Projection Node IDs must be unique.", {
+          issue: "DUPLICATE_NODE"
+        });
+      }
+      seenNodeIds.add(candidate.nodeId);
+      if (previousNodeId !== undefined && previousNodeId > candidate.nodeId) {
+        throw new RendererError("INVALID_INTERACTION_PROJECTION", "Interaction Projection Node IDs must use canonical order.", { issue: "NON_CANONICAL_NODE_ORDER" });
+      }
+      previousNodeId = candidate.nodeId;
+      for (const [field, coordinate] of [
+        ["basePosition.x", candidate.basePosition.x],
+        ["basePosition.y", candidate.basePosition.y],
+        ["position.x", candidate.position.x],
+        ["position.y", candidate.position.y]
+      ]) {
+        if (Number.isFinite(coordinate))
+          continue;
+        throw new RendererError("INVALID_INTERACTION_PROJECTION", "Interaction Projection Node positions must be finite.", { issue: "INVALID_NODE_POSITION", field });
+      }
+      const node = nodes.get(candidate.nodeId);
+      if (!node || node.position.x !== candidate.basePosition.x || node.position.y !== candidate.basePosition.y) {
+        throw new RendererError("INTERACTION_OUT_OF_SYNC", "Interaction Projection Node Baseline is stale.", {
+          issue: "NODE_POSITION_MISMATCH"
+        });
+      }
+    }
+    return Object.freeze({
+      type: "node-drag",
+      nodes: Object.freeze(projection.nodes.map((candidate) => Object.freeze({
+        nodeId: candidate.nodeId,
+        basePosition: Object.freeze({ ...candidate.basePosition }),
+        position: Object.freeze({ ...candidate.position })
+      })))
+    });
+  }
+  function acceptViewportPan(value, session) {
+    if (!isRecord5(value.baseViewport))
+      throwInvalidProjectionStructure("baseViewport");
+    if (!isRecord5(value.viewport))
+      throwInvalidProjectionStructure("viewport");
+    const projection = value;
+    assertViewport("baseViewport", projection.baseViewport);
+    assertViewport("viewport", projection.viewport);
+    if (!viewportsEqual(projection.baseViewport, session.viewport)) {
+      throw new RendererError("INTERACTION_OUT_OF_SYNC", "Interaction Projection Viewport Baseline is stale.", {
+        issue: "VIEWPORT_MISMATCH"
+      });
+    }
+    return Object.freeze({
+      type: "viewport-pan",
+      baseViewport: Object.freeze({ ...projection.baseViewport }),
+      viewport: Object.freeze({ ...projection.viewport })
+    });
+  }
+  function acceptConnectionPreview(value, document2, ports) {
+    if (!isConnectionAnchor(value.source) || !isRecord5(value.pointerWorldPoint) || !isRecord5(value.target)) {
+      throwInvalidProjectionStructure("connection-preview");
+    }
+    if (value.target.type !== "none" && (value.target.type !== "valid" && value.target.type !== "invalid" || !isConnectionAnchor(value.target.anchor))) {
+      throwInvalidProjectionStructure("target");
+    }
+    const projection = value;
+    assertPoint("pointerWorldPoint", projection.pointerWorldPoint);
+    assertConnectionAnchorBaseline(projection.source, "source", document2, ports);
+    if (projection.target.type !== "none")
+      assertConnectionAnchorBaseline(projection.target.anchor, "target", document2, ports);
+    return Object.freeze({
+      type: "connection-preview",
+      source: Object.freeze({ ...projection.source }),
+      pointerWorldPoint: Object.freeze({ ...projection.pointerWorldPoint }),
+      target: projection.target.type === "none" ? Object.freeze({ type: "none" }) : Object.freeze({
+        type: projection.target.type,
+        anchor: Object.freeze({ ...projection.target.anchor })
+      })
+    });
+  }
+  function acceptBoxSelection(value) {
+    if (!isRecord5(value.rect))
+      throwInvalidProjectionStructure("rect");
+    const projection = value;
+    for (const field of ["x", "y", "width", "height"]) {
+      const coordinate = projection.rect[field];
+      if (Number.isFinite(coordinate) && (field !== "width" && field !== "height" || coordinate >= 0))
+        continue;
+      throw new RendererError("INVALID_INTERACTION_PROJECTION", "Box Selection rect must be finite and non-negative.", {
+        issue: "INVALID_BOX_SELECTION_RECT",
+        field: `rect.${field}`
+      });
+    }
+    return Object.freeze({ type: "box-selection", rect: Object.freeze({ ...projection.rect }) });
+  }
+  function assertConnectionAnchorBaseline(anchor, role, document2, ports) {
+    if (anchor.role !== role) {
+      throw new RendererError("INVALID_INTERACTION_PROJECTION", "Connection Anchor role is invalid.", {
+        issue: "INVALID_CONNECTION_ANCHOR_ROLE"
+      });
+    }
+    if (connectionAnchorAvailable(anchor, document2, ports))
+      return;
+    throw new RendererError("INTERACTION_OUT_OF_SYNC", "Connection Anchor Node is unavailable.", {
+      issue: "CONNECTION_ANCHOR_UNAVAILABLE"
+    });
+  }
+  function assertPoint(field, point) {
+    for (const coordinate of ["x", "y"]) {
+      if (Number.isFinite(point[coordinate]))
+        continue;
+      throw new RendererError("INVALID_INTERACTION_PROJECTION", "Interaction Projection Point must be finite.", {
+        issue: "INVALID_POINT",
+        field: `${field}.${coordinate}`
+      });
+    }
+  }
+  function assertViewport(prefix, viewport) {
+    for (const field of ["x", "y", "zoom"]) {
+      const coordinate = viewport[field];
+      if (Number.isFinite(coordinate) && (field !== "zoom" || coordinate > 0))
+        continue;
+      throw new RendererError("INVALID_INTERACTION_PROJECTION", "Interaction Projection Viewport values must be finite with positive zoom.", { issue: "INVALID_VIEWPORT", field: `${prefix}.${field}` });
+    }
+  }
+  function isConnectionAnchor(value) {
+    return isRecord5(value) && typeof value.nodeId === "string" && value.nodeId.length > 0 && (value.portId === undefined || typeof value.portId === "string" && value.portId.length > 0) && (value.role === "source" || value.role === "target");
+  }
+  function connectionAnchorAvailable(anchor, document2, ports) {
+    const node = document2.nodes.find((candidate) => candidate.id === anchor.nodeId);
+    if (!node?.size || node.size.width <= 0 || node.size.height <= 0)
+      return false;
+    return isConnectionTargetDefined(ports, anchor);
+  }
+  function throwInvalidProjectionType() {
+    throw new RendererError("INVALID_INTERACTION_PROJECTION", "Interaction Projection type is invalid.", {
+      issue: "INVALID_PROJECTION_TYPE"
+    });
+  }
+  function throwInvalidProjectionStructure(field) {
+    throw new RendererError("INVALID_INTERACTION_PROJECTION", "Interaction Projection structure is invalid.", {
+      issue: "INVALID_PROJECTION_STRUCTURE",
+      field
+    });
+  }
+  function isRecord5(value) {
+    return typeof value === "object" && value !== null;
+  }
+  function viewportsEqual(left, right) {
+    return left.x === right.x && left.y === right.y && left.zoom === right.zoom;
+  }
+
+  // ../../issue-6-dagre-layout/cflow/packages/renderer-svg/dist/svg-renderer.js
+  var targetReservations = new WeakSet;
+  function createSvgRenderer(config) {
+    const { target, edgeHitTolerance, connectionAnchorHitTolerance } = validateConfig(config);
+    const inputPolicies = normalizeInputPolicies(config.input);
+    readTargetMatrix(target, "INVALID_TARGET");
+    if (targetReservations.has(target) || target.querySelector(":scope > [data-nodebraid-renderer-svg-root]")) {
+      throw new SvgRendererError("TARGET_OCCUPIED", "SVG Renderer Target is already reserved.");
+    }
+    const document2 = target.ownerDocument;
+    const addedTabIndex = !target.hasAttribute("tabindex");
+    if (addedTabIndex)
+      target.setAttribute("tabindex", "-1");
+    const projection = createSvgElement(document2, "g");
+    projection.setAttribute("class", "nodebraid-renderer-svg");
+    projection.setAttribute("data-nodebraid-renderer-svg-root", "");
+    const edgesLayer = createSvgElement(document2, "g");
+    edgesLayer.setAttribute("class", "nodebraid-renderer-svg__edges");
+    const nodesLayer = createSvgElement(document2, "g");
+    nodesLayer.setAttribute("class", "nodebraid-renderer-svg__nodes");
+    const interactionLayer = createSvgElement(document2, "g");
+    interactionLayer.setAttribute("class", "nodebraid-renderer-svg__interaction");
+    projection.append(edgesLayer, nodesLayer, interactionLayer);
+    targetReservations.add(target);
+    try {
+      target.append(projection);
+    } catch (error) {
+      targetReservations.delete(target);
+      if (addedTabIndex)
+        target.removeAttribute("tabindex");
+      throw error;
+    }
+    let disposed = false;
+    let acceptedSession;
+    let acceptedInteraction = null;
+    let baselineSnapshot;
+    let acceptedPorts;
+    let projectionOutOfSync = false;
+    let observedResizeError;
+    let disposePromise;
+    const inputListeners = new Set;
+    const inputQueue = [];
+    const activePointerIds = new Set;
+    const capturedPointerIds = new Set;
+    let inputDraining = false;
+    const assertActive = () => {
+      if (disposed)
+        throw new RendererError("RENDERER_DISPOSED", "SVG Renderer Instance has been disposed.");
+    };
+    const throwProjectionOutOfSync = (receivedRevision) => {
+      throw new RendererError("DOCUMENT_OUT_OF_SYNC", "SVG Renderer requires reset after DOM rollback failure.", {
+        issue: "PROJECTION_ROLLBACK_FAILED",
+        expectedRevision: baselineSnapshot?.revision ?? null,
+        ...receivedRevision === undefined ? {} : { receivedRevision }
+      });
+    };
+    const assertProjectionSynchronized = () => {
+      if (projectionOutOfSync)
+        throwProjectionOutOfSync();
+    };
+    const applySession = (snapshot, journal, acceptedTargetMatrix) => {
+      const { x, y, zoom } = snapshot.viewport;
+      const localToUser = acceptedTargetMatrix ?? readTargetMatrix(target, "TARGET_UNAVAILABLE");
+      const selectedNodeIds = new Set(snapshot.selection.nodeIds);
+      const selectedEdgeIds = new Set(snapshot.selection.edgeIds);
+      for (const node of nodesLayer.querySelectorAll("[data-nodebraid-node-id]")) {
+        setSelected(node, selectedNodeIds.has(node.getAttribute("data-nodebraid-node-id") ?? ""), journal);
+      }
+      for (const edge of edgesLayer.querySelectorAll("[data-nodebraid-edge-id]")) {
+        setSelected(edge, selectedEdgeIds.has(edge.getAttribute("data-nodebraid-edge-id") ?? ""), journal);
+      }
+      const matrix = {
+        a: localToUser.a * zoom,
+        b: localToUser.b * zoom,
+        c: localToUser.c * zoom,
+        d: localToUser.d * zoom,
+        e: localToUser.a * x + localToUser.c * y + localToUser.e,
+        f: localToUser.b * x + localToUser.d * y + localToUser.f
+      };
+      setElementAttribute(projection, "transform", formatSvgMatrix(matrix), journal);
+    };
+    const applyInteractionProjection = (previous, next, baseline, ports, session, journal, targetMatrix) => {
+      applySession(session, journal, targetMatrix);
+      if (previous?.type === "node-drag") {
+        applyNodeDragProjection({
+          type: "node-drag",
+          nodes: baseline.nodes.map((node) => ({
+            nodeId: node.id,
+            basePosition: node.position,
+            position: node.position
+          }))
+        }, baseline, edgesLayer, nodesLayer, ports, journal);
+      }
+      if (previous?.type === "connection-preview" && next?.type !== "connection-preview") {
+        clearConnectionPreview(interactionLayer);
+      }
+      if (previous?.type === "box-selection" && next?.type !== "box-selection") {
+        clearBoxSelection(interactionLayer);
+      }
+      switch (next?.type) {
+        case "node-drag":
+          applyNodeDragProjection(next, baseline, edgesLayer, nodesLayer, ports, journal);
+          break;
+        case "viewport-pan":
+          applySession({ selection: session.selection, viewport: next.viewport }, journal, targetMatrix);
+          break;
+        case "connection-preview":
+          applyConnectionPreview(next, baseline, ports, interactionLayer, journal);
+          break;
+        case "box-selection":
+          applyBoxSelection(next, interactionLayer, journal);
+          break;
+      }
+    };
+    const refreshProjectionMapping = () => {
+      assertProjectionSynchronized();
+      const targetMatrix = readTargetMatrix(target, "TARGET_UNAVAILABLE");
+      if (!acceptedSession)
+        return targetMatrix;
+      const journal = new DomMutationJournal(edgesLayer, nodesLayer);
+      try {
+        applySession(createEffectiveSession(acceptedSession, acceptedInteraction), journal, targetMatrix);
+        return targetMatrix;
+      } catch (error) {
+        const rollbackErrors = journal.rollback();
+        if (rollbackErrors.length > 0) {
+          projectionOutOfSync = true;
+          throw new ProjectionRollbackError([error, ...rollbackErrors]);
+        }
+        throw error;
+      }
+    };
+    const window = target.ownerDocument.defaultView;
+    if (!window?.ResizeObserver) {
+      projection.remove();
+      targetReservations.delete(target);
+      if (addedTabIndex)
+        target.removeAttribute("tabindex");
+      throw new SvgRendererError("INVALID_TARGET", "SVG Renderer Target environment requires ResizeObserver.");
+    }
+    const resizeObserver = new window.ResizeObserver(() => {
+      if (disposed || !acceptedSession || projectionOutOfSync)
+        return;
+      const journal = new DomMutationJournal(edgesLayer, nodesLayer);
+      try {
+        applySession(createEffectiveSession(acceptedSession, acceptedInteraction), journal);
+        if (isTargetUnavailableError(observedResizeError))
+          observedResizeError = undefined;
+      } catch (error) {
+        const rollbackErrors = journal.rollback();
+        const nextError = rollbackErrors.length === 0 ? error : new ProjectionRollbackError([error, ...rollbackErrors]);
+        observedResizeError = observedResizeError === undefined || isTargetUnavailableError(observedResizeError) ? nextError : new AggregateError([observedResizeError, nextError], "Multiple SVG Renderer ResizeObserver updates failed.");
+        if (rollbackErrors.length > 0)
+          projectionOutOfSync = true;
+      }
+    });
+    resizeObserver.observe(target);
+    const assertNoObservedResizeError = () => {
+      if (observedResizeError === undefined)
+        return;
+      const error = observedResizeError;
+      if (isTargetUnavailableError(error)) {
+        try {
+          readTargetMatrix(target, "TARGET_UNAVAILABLE");
+        } catch {
+          throw error;
+        }
+        observedResizeError = undefined;
+        return;
+      }
+      observedResizeError = undefined;
+      throw error;
+    };
+    const emitInput = (input, applyDisposition) => {
+      if (applyDisposition) {
+        let immediateDisposition;
+        const immediateErrors = [];
+        for (const subscription of Array.from(inputListeners)) {
+          if (!subscription.decideDisposition)
+            continue;
+          try {
+            const received = subscription.decideDisposition(input);
+            if (received === undefined)
+              continue;
+            if (!isInputDisposition(received)) {
+              throw new RendererError("INVALID_INPUT_DISPOSITION", "Renderer Input disposition is malformed.", {
+                receivedType: typeof received
+              });
+            }
+            immediateDisposition = received;
+          } catch (error) {
+            immediateErrors.push(error);
+          }
+        }
+        if (immediateDisposition)
+          applyDisposition(immediateDisposition);
+        if (immediateErrors.length === 1)
+          throw immediateErrors[0];
+        if (immediateErrors.length > 1) {
+          throw new AggregateError(immediateErrors, "SVG Renderer Input disposition listeners failed.");
+        }
+      }
+      inputQueue.push({ input, applyDisposition });
+      if (inputDraining)
+        return;
+      inputDraining = true;
+      const errors = [];
+      try {
+        while (inputQueue.length > 0) {
+          const queued = inputQueue.shift();
+          if (!queued)
+            continue;
+          let disposition;
+          for (const subscription of Array.from(inputListeners)) {
+            try {
+              const received = subscription.listener(queued.input);
+              if (received === undefined)
+                continue;
+              if (!isInputDisposition(received)) {
+                throw new RendererError("INVALID_INPUT_DISPOSITION", "Renderer Input disposition is malformed.", {
+                  receivedType: typeof received
+                });
+              }
+              disposition = received;
+            } catch (error) {
+              errors.push(error);
+            }
+          }
+          if (disposition)
+            queued.applyDisposition?.(disposition);
+        }
+      } finally {
+        inputDraining = false;
+      }
+      if (errors.length === 1)
+        throw errors[0];
+      if (errors.length > 1)
+        throw new AggregateError(errors, "SVG Renderer Input listeners failed.");
+    };
+    const handlePointer = (event) => {
+      if (disposed)
+        return;
+      const endsPointer = event.type === "pointerup" || event.type === "pointercancel";
+      let handlingFailed = false;
+      let handlingError;
+      try {
+        assertNoObservedResizeError();
+        assertProjectionSynchronized();
+        applyDomEventPolicy(event, inputPolicies.pointer);
+        if (!baselineSnapshot || !acceptedSession) {
+          throw new RendererError("INVALID_SESSION_SNAPSHOT", "SVG Renderer Input requires Document and Session state.", {
+            issue: "RENDERER_STATE_INCOMPLETE"
+          });
+        }
+        refreshProjectionMapping();
+        if (event.type === "pointerdown")
+          activePointerIds.add(event.pointerId);
+        emitInput(normalizePointerInput(event, target, createEffectiveSession(acceptedSession, acceptedInteraction)), () => event.preventDefault());
+      } catch (error) {
+        handlingFailed = true;
+        handlingError = error;
+      }
+      let cleanupFailed = false;
+      let cleanupError;
+      if (endsPointer) {
+        try {
+          releaseNativePointerCapture(target, event.pointerId, capturedPointerIds);
+        } catch (error) {
+          cleanupFailed = true;
+          cleanupError = error;
+        } finally {
+          activePointerIds.delete(event.pointerId);
+        }
+      }
+      if (handlingFailed && cleanupFailed) {
+        throw new AggregateError([handlingError, cleanupError], "SVG Renderer Pointer handling and cleanup both failed.");
+      }
+      if (handlingFailed)
+        throw handlingError;
+      if (cleanupFailed)
+        throw cleanupError;
+    };
+    for (const type of ["pointerdown", "pointermove", "pointerup", "pointercancel"]) {
+      target.addEventListener(type, handlePointer);
+    }
+    const handleLostPointerCapture = (event) => {
+      if (disposed || !capturedPointerIds.has(event.pointerId))
+        return;
+      capturedPointerIds.delete(event.pointerId);
+      if (!activePointerIds.has(event.pointerId))
+        return;
+      try {
+        assertNoObservedResizeError();
+        assertProjectionSynchronized();
+        if (!baselineSnapshot || !acceptedSession) {
+          throw new RendererError("INVALID_SESSION_SNAPSHOT", "SVG Renderer Input requires Document and Session state.", {
+            issue: "RENDERER_STATE_INCOMPLETE"
+          });
+        }
+        refreshProjectionMapping();
+        emitInput(normalizePointerInput(event, target, createEffectiveSession(acceptedSession, acceptedInteraction), "pointer.cancel"));
+      } finally {
+        activePointerIds.delete(event.pointerId);
+      }
+    };
+    target.addEventListener("lostpointercapture", handleLostPointerCapture);
+    const handleWheel = (event) => {
+      if (disposed)
+        return;
+      assertNoObservedResizeError();
+      assertProjectionSynchronized();
+      applyDomEventPolicy(event, inputPolicies.wheel);
+      if (!baselineSnapshot || !acceptedSession) {
+        throw new RendererError("INVALID_SESSION_SNAPSHOT", "SVG Renderer Input requires Document and Session state.", {
+          issue: "RENDERER_STATE_INCOMPLETE"
+        });
+      }
+      refreshProjectionMapping();
+      emitInput(normalizeWheelInput(event, target, createEffectiveSession(acceptedSession, acceptedInteraction)), () => event.preventDefault());
+    };
+    const handleKeyboard = (event) => {
+      if (disposed)
+        return;
+      assertNoObservedResizeError();
+      assertProjectionSynchronized();
+      applyDomEventPolicy(event, inputPolicies.keyboard);
+      if (target.ownerDocument.activeElement !== target)
+        return;
+      if (!baselineSnapshot || !acceptedSession) {
+        throw new RendererError("INVALID_SESSION_SNAPSHOT", "SVG Renderer Input requires Document and Session state.", {
+          issue: "RENDERER_STATE_INCOMPLETE"
+        });
+      }
+      refreshProjectionMapping();
+      emitInput(normalizeKeyboardInput(event), () => event.preventDefault());
+    };
+    const handleContextMenu = (event) => {
+      if (disposed)
+        return;
+      assertNoObservedResizeError();
+      assertProjectionSynchronized();
+      applyDomEventPolicy(event, inputPolicies.contextMenu);
+    };
+    const handleFocus = (event) => {
+      if (disposed)
+        return;
+      assertNoObservedResizeError();
+      assertProjectionSynchronized();
+      emitInput(Object.freeze({ type: event.type === "focus" ? "focus.gained" : "focus.lost" }));
+    };
+    target.addEventListener("wheel", handleWheel, { passive: false });
+    target.addEventListener("keydown", handleKeyboard);
+    target.addEventListener("keyup", handleKeyboard);
+    target.addEventListener("contextmenu", handleContextMenu);
+    target.addEventListener("focus", handleFocus);
+    target.addEventListener("blur", handleFocus);
+    const renderer = Object.freeze({
+      updateDocument(update) {
+        assertActive();
+        const acceptedUpdate = validateRendererDocumentUpdate(update);
+        assertNoObservedResizeError();
+        if (acceptedUpdate.type === "reset") {
+          if (acceptedSession)
+            validateSessionSnapshot(acceptedSession, acceptedUpdate.view.snapshot);
+          const targetMatrix = readTargetMatrix(target, "TARGET_UNAVAILABLE");
+          const nextBaseline = cloneCanvasSnapshot(acceptedUpdate.view.snapshot);
+          const nextPorts = acceptPortSnapshot(acceptedUpdate.ports, acceptedUpdate.view.snapshot);
+          const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
+          try {
+            renderReset(acceptedUpdate.view, document2, edgesLayer, nodesLayer, interactionLayer, nextPorts);
+            if (acceptedSession)
+              applySession(acceptedSession, journal, targetMatrix);
+          } catch (error) {
+            const rollbackErrors = journal.rollback();
+            if (rollbackErrors.length > 0) {
+              projectionOutOfSync = true;
+              throw new ProjectionRollbackError([error, ...rollbackErrors]);
+            }
+            throw error;
+          }
+          baselineSnapshot = nextBaseline;
+          acceptedPorts = nextPorts;
+          acceptedInteraction = null;
+          projectionOutOfSync = false;
+          observedResizeError = undefined;
+        } else {
+          if (projectionOutOfSync)
+            throwProjectionOutOfSync(acceptedUpdate.commit.before.snapshot.revision);
+          const targetMatrix = readTargetMatrix(target, "TARGET_UNAVAILABLE");
+          const session = acceptedSession;
+          const nextPorts = acceptPortSnapshot(acceptedUpdate.ports, acceptedUpdate.commit.after.snapshot);
+          const nextInteraction = isInteractionCompatibleWithDocument(acceptedInteraction, acceptedUpdate.commit.after.snapshot, nextPorts) ? acceptedInteraction : null;
+          try {
+            applyCommit(acceptedUpdate.commit, baselineSnapshot, session, document2, edgesLayer, nodesLayer, interactionLayer, nextPorts, (journal) => {
+              if (session) {
+                applyInteractionProjection(acceptedInteraction, nextInteraction, acceptedUpdate.commit.after.snapshot, nextPorts, session, journal, targetMatrix);
+              }
+            });
+          } catch (error) {
+            if (error instanceof ProjectionRollbackError)
+              projectionOutOfSync = true;
+            throw error;
+          }
+          baselineSnapshot = cloneCanvasSnapshot(acceptedUpdate.commit.after.snapshot);
+          acceptedPorts = nextPorts;
+          acceptedInteraction = nextInteraction;
+        }
+      },
+      updateSession(snapshot) {
+        assertActive();
+        assertNoObservedResizeError();
+        assertProjectionSynchronized();
+        if (!baselineSnapshot || !acceptedPorts) {
+          throw new RendererError("INVALID_SESSION_SNAPSHOT", "SVG Renderer Session requires a Document Baseline.", {
+            issue: "DOCUMENT_BASELINE_MISSING"
+          });
+        }
+        validateSessionSnapshot(snapshot, baselineSnapshot);
+        const accepted = cloneSessionSnapshot(snapshot);
+        const nextInteraction = acceptedInteraction?.type === "viewport-pan" && (accepted.viewport.x !== acceptedInteraction.baseViewport.x || accepted.viewport.y !== acceptedInteraction.baseViewport.y || accepted.viewport.zoom !== acceptedInteraction.baseViewport.zoom) ? null : acceptedInteraction;
+        const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
+        try {
+          applyInteractionProjection(acceptedInteraction, nextInteraction, baselineSnapshot, acceptedPorts, accepted, journal);
+        } catch (error) {
+          const rollbackErrors = journal.rollback();
+          if (rollbackErrors.length > 0) {
+            projectionOutOfSync = true;
+            throw new ProjectionRollbackError([error, ...rollbackErrors]);
+          }
+          throw error;
+        }
+        acceptedSession = accepted;
+        acceptedInteraction = nextInteraction;
+      },
+      updateInteraction(projection) {
+        assertActive();
+        assertNoObservedResizeError();
+        assertProjectionSynchronized();
+        if (!baselineSnapshot || !acceptedPorts || !acceptedSession) {
+          throw new RendererError("INVALID_SESSION_SNAPSHOT", "SVG Renderer Interaction Projection requires Document and Session state.", { issue: "RENDERER_STATE_INCOMPLETE" });
+        }
+        const accepted = projection === null ? null : acceptInteractionProjection(projection, baselineSnapshot, acceptedPorts, acceptedSession);
+        const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
+        try {
+          applyInteractionProjection(acceptedInteraction, accepted, baselineSnapshot, acceptedPorts, acceptedSession, journal);
+        } catch (error) {
+          const rollbackErrors = journal.rollback();
+          if (rollbackErrors.length > 0) {
+            projectionOutOfSync = true;
+            throw new ProjectionRollbackError([error, ...rollbackErrors]);
+          }
+          throw error;
+        }
+        acceptedInteraction = accepted;
+      },
+      subscribeInput(listener, decideDisposition) {
+        assertActive();
+        assertNoObservedResizeError();
+        assertProjectionSynchronized();
+        if (typeof listener !== "function") {
+          throw new RendererError("INVALID_INPUT_SUBSCRIBER", "SVG Renderer Input listener must be a function.");
+        }
+        if (decideDisposition !== undefined && typeof decideDisposition !== "function") {
+          throw new RendererError("INVALID_INPUT_SUBSCRIBER", "SVG Renderer disposition listener must be a function.");
+        }
+        const subscription = { listener, decideDisposition };
+        inputListeners.add(subscription);
+        let subscribed = true;
+        return () => {
+          if (!subscribed)
+            return;
+          subscribed = false;
+          inputListeners.delete(subscription);
+        };
+      },
+      hitTest(point) {
+        assertActive();
+        assertNoObservedResizeError();
+        assertProjectionSynchronized();
+        if (!baselineSnapshot || !acceptedPorts || !acceptedSession) {
+          throw new RendererError("INVALID_SESSION_SNAPSHOT", "SVG Renderer Hit Test requires Document and Session state.", {
+            issue: "RENDERER_STATE_INCOMPLETE"
+          });
+        }
+        refreshProjectionMapping();
+        return hitTestProjection(point, target, createEffectiveSnapshot(baselineSnapshot, acceptedInteraction), acceptedPorts, createEffectiveSession(acceptedSession, acceptedInteraction), edgeHitTolerance, connectionAnchorHitTolerance);
+      },
+      capturePointer(pointerId) {
+        assertActive();
+        assertNoObservedResizeError();
+        assertProjectionSynchronized();
+        assertActivePointer(pointerId, activePointerIds);
+        if (capturedPointerIds.has(pointerId))
+          return;
+        target.setPointerCapture(pointerId);
+        capturedPointerIds.add(pointerId);
+      },
+      releasePointer(pointerId) {
+        assertActive();
+        assertNoObservedResizeError();
+        assertProjectionSynchronized();
+        assertActivePointer(pointerId, activePointerIds);
+        releaseNativePointerCapture(target, pointerId, capturedPointerIds);
+      },
+      focus() {
+        assertActive();
+        assertNoObservedResizeError();
+        assertProjectionSynchronized();
+        readTargetMatrix(target, "TARGET_UNAVAILABLE");
+        target.focus({ preventScroll: true });
+        if (target.ownerDocument.activeElement !== target) {
+          throw new SvgRendererError("TARGET_UNAVAILABLE", "SVG Renderer Target could not receive Focus.");
+        }
+      },
+      dispose() {
+        if (disposePromise)
+          return disposePromise;
+        disposed = true;
+        inputQueue.length = 0;
+        inputListeners.clear();
+        disposePromise = Promise.resolve().then(() => {
+          const cleanupErrors = [];
+          for (const pointerId of Array.from(capturedPointerIds)) {
+            attemptCleanup(cleanupErrors, () => releaseNativePointerCapture(target, pointerId, capturedPointerIds));
+          }
+          activePointerIds.clear();
+          for (const type of ["pointerdown", "pointermove", "pointerup", "pointercancel"]) {
+            attemptCleanup(cleanupErrors, () => target.removeEventListener(type, handlePointer));
+          }
+          attemptCleanup(cleanupErrors, () => target.removeEventListener("lostpointercapture", handleLostPointerCapture));
+          attemptCleanup(cleanupErrors, () => target.removeEventListener("wheel", handleWheel));
+          attemptCleanup(cleanupErrors, () => target.removeEventListener("keydown", handleKeyboard));
+          attemptCleanup(cleanupErrors, () => target.removeEventListener("keyup", handleKeyboard));
+          attemptCleanup(cleanupErrors, () => target.removeEventListener("contextmenu", handleContextMenu));
+          attemptCleanup(cleanupErrors, () => target.removeEventListener("focus", handleFocus));
+          attemptCleanup(cleanupErrors, () => target.removeEventListener("blur", handleFocus));
+          attemptCleanup(cleanupErrors, () => resizeObserver.disconnect());
+          attemptCleanup(cleanupErrors, () => projection.remove());
+          if (addedTabIndex)
+            attemptCleanup(cleanupErrors, () => target.removeAttribute("tabindex"));
+          if (cleanupErrors.length > 0)
+            throw new AggregateError(cleanupErrors, "SVG Renderer cleanup failed.");
+          targetReservations.delete(target);
+        });
+        return disposePromise;
+      }
+    });
+    return renderer;
+  }
+  function attemptCleanup(errors, cleanup) {
+    try {
+      cleanup();
+    } catch (error) {
+      errors.push(error);
+    }
+  }
+  function isTargetUnavailableError(error) {
+    return error instanceof SvgRendererError && error.code === "TARGET_UNAVAILABLE";
+  }
+  function isInputDisposition(value) {
+    if (typeof value !== "object" || value === null || Array.isArray(value))
+      return false;
+    const keys = Reflect.ownKeys(value);
+    return keys.length === 1 && keys[0] === "defaultAction" && Reflect.get(value, "defaultAction") === "prevent";
+  }
+  function createEffectiveSnapshot(baseline, interaction) {
+    if (interaction?.type !== "node-drag")
+      return baseline;
+    const candidates = new Map(interaction.nodes.map((candidate) => [candidate.nodeId, candidate.position]));
+    return {
+      revision: baseline.revision,
+      nodes: baseline.nodes.map((node) => {
+        const position = candidates.get(node.id);
+        return position ? { ...node, position } : node;
+      }),
+      edges: baseline.edges
+    };
+  }
+  function createEffectiveSession(session, interaction) {
+    return interaction?.type === "viewport-pan" ? { selection: session.selection, viewport: interaction.viewport } : session;
+  }
+  // ../../../local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/metadata-copy-repro/base/metadata-copy-repro.entry.ts
+  async function investigate() {
+    const observations = [];
+    for (const slot of ["basePosition", "position"])
+      for (const mode of ["raw-throws", "clone-throws"]) {
+        const target = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        target.setAttribute("width", "400");
+        target.setAttribute("height", "300");
+        document.body.append(target);
+        const renderer = createSvgRenderer({ target }), kernel = createCanvasKernel(), id = nodeId("a");
+        kernel.transact((tx) => tx.nodes.add({ id, type: "task", position: { x: 10, y: 20 }, size: { width: 80, height: 40 }, data: null }));
+        const original = new Error(slot + "/" + mode), opaque = { caller: Symbol(mode) };
+        let rawReads = 0, cloneReads = 0;
+        const rawPoint = { x: slot === "basePosition" ? 10 : 80, y: slot === "basePosition" ? 20 : 90 };
+        Object.defineProperty(rawPoint, "metadata", { enumerable: true, get() {
+          rawReads++;
+          if (mode === "raw-throws")
+            throw original;
+          return opaque;
+        } });
+        const clonePoint = { x: rawPoint.x, y: rawPoint.y };
+        Object.defineProperty(clonePoint, "metadata", { enumerable: true, get() {
+          cloneReads++;
+          if (mode === "clone-throws")
+            throw original;
+          return opaque;
+        } });
+        const candidate = { nodeId: id, basePosition: slot === "basePosition" ? rawPoint : { x: 10, y: 20 }, position: slot === "position" ? rawPoint : { x: 80, y: 90 } };
+        const clone = { ...candidate, [slot]: clonePoint };
+        const nodes = [candidate];
+        nodes[Symbol.iterator] = function() {
+          return [clone].values();
+        };
+        let didThrow = false, caught, actual, domUnchanged = false, baselineUnchanged = false;
+        try {
+          const view = kernel.read();
+          renderer.updateDocument({ type: "reset", view });
+          renderer.updateSession({ selection: { nodeIds: [], edgeIds: [] }, viewport: { x: 0, y: 0, zoom: 1 } });
+          renderer.updateInteraction({ type: "box-selection", rect: { x: 2, y: 3, width: 20, height: 30 } });
+          const before = target.innerHTML;
+          try {
+            renderer.updateInteraction({ type: "node-drag", nodes });
+          } catch (error) {
+            didThrow = true;
+            caught = error;
+          }
+          const element = target.querySelector('[data-nodebraid-node-id="a"]');
+          actual = { x: element?.getAttribute("x"), y: element?.getAttribute("y") };
+          domUnchanged = target.innerHTML === before;
+          baselineUnchanged = kernel.read() === view;
+        } finally {
+          await renderer.dispose();
+          target.remove();
+        }
+        const passed = rawReads === 1 && cloneReads === 0 && baselineUnchanged && (mode === "raw-throws" ? didThrow && caught === original && domUnchanged : !didThrow && JSON.stringify(actual) === JSON.stringify({ x: "80", y: "90" }));
+        observations.push({ slot, mode, rawReads, cloneReads, didThrow, sameErrorIdentity: caught === original, actual, domUnchanged, baselineUnchanged, passed });
+      }
+    return { controls: observations.length, passed: observations.filter((x) => x.passed).length, failed: observations.filter((x) => !x.passed).length, observations, nativeInputEventsDriven: 0 };
+  }
+  globalThis.__nodebraidMetadataCopyRepro = investigate;
+})();

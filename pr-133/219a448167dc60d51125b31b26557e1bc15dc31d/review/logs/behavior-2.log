@@ -1,0 +1,36 @@
+4 | const entry=root+'/packages/renderer-svg/browser-tests/renderer-contract.entry.ts';const build=await Bun.build({entrypoints:[entry],target:'browser',format:'iife'});assert.ok(build.success,build.logs.map(String).join('\n'));assert.equal(build.outputs.length,1);const bundle=out+'/repository-tracer.js';await Bun.write(bundle,build.outputs[0]!);
+5 | const sha=(s:Uint8Array)=>createHash('sha256').update(s).digest('hex');writeFileSync(out+'/repository-tracer-provenance.json',JSON.stringify({head:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),workingBinaryPatchSHA256:sha(execFileSync('git',['diff','--binary'],{cwd:root})),entrySHA256:sha(readFileSync(entry)),bundleSHA256:sha(readFileSync(bundle)),publicPackageResolution:realpathSync(Bun.resolveSync('@nodebraid/kernel',root))},null,2));
+6 | const config=out+'/repository-browser-config.json';writeFileSync(config,'{}\n');const commands:unknown[]=[];const env=Object.fromEntries(Object.entries(process.env).filter((x):x is [string,string]=>x[1]!==undefined&&!x[0].startsWith('AGENT_BROWSER_')));
+7 | async function run(args:string[]){const p=Bun.spawn([root+'/node_modules/.bin/agent-browser','--session',session,'--config',config,...args],{cwd:root,env,stdout:'pipe',stderr:'pipe'});const [stdout,stderr,exitCode]=await Promise.all([new Response(p.stdout).text(),new Response(p.stderr).text(),p.exited]);commands.push({args,stdout,stderr,exitCode});writeFileSync(out+'/repository-browser-commands.json',JSON.stringify(commands,null,2));assert.equal(exitCode,0,stderr||stdout);return stdout;}
+8 | const server=Bun.serve({hostname:'127.0.0.1',port:0,fetch(req){return new URL(req.url).pathname==='/probe.js'?new Response(Bun.file(bundle),{headers:{'content-type':'text/javascript'}}):new Response('<!doctype html><style>body{margin:0}</style><script src="/probe.js"></script>',{headers:{'content-type':'text/html'}});}});
+9 | try{await run(['open',server.url.href]);const raw=JSON.parse(await run(['eval','globalThis.__nodebraidRendererSvgDeclaredGeometryTracer()','--json']));writeFileSync(out+'/repository-tracer-observation.json',JSON.stringify(raw,null,2));assert.equal(raw.success,true);assert.deepEqual(raw.data.result,{x:'80',y:'90',baselineUnchanged:true});}
+                                                                                                                                                                                                                                                                                     ^
+AssertionError: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
+    baselineUnchanged: true,
++   x: 'undefined',
++   y: 'undefined'
+-   x: '80',
+-   y: '90'
+  }
+
+ generatedMessage: true,
+     actual: {
+  baselineUnchanged: true,
+  x: "undefined",
+  y: "undefined",
+},
+   expected: {
+  x: "80",
+  y: "90",
+  baselineUnchanged: true,
+},
+   operator: "deepStrictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/repository-tracer.ts:9:274
+
+Bun v1.4.2 (macOS arm64)

@@ -1,0 +1,47 @@
+{
+  "head": "fe48ff7c2ffb7eef144f64b4699b042f6acdad19",
+  "session": "nodebraid-svg-callback-final-96940",
+  "url": "http://127.0.0.1:54945/",
+  "controls": 2,
+  "failed": 0,
+  "nativeInputEventsDriven": 0,
+  "observations": [
+    {
+      "actual": [
+        {
+          "id": "a",
+          "x": "80",
+          "y": "90"
+        },
+        {
+          "id": "b",
+          "x": "280",
+          "y": "190"
+        }
+      ],
+      "baselineUnchanged": true,
+      "cloneIterator": false,
+      "error": null,
+      "passed": true
+    },
+    {
+      "actual": [
+        {
+          "id": "a",
+          "x": "80",
+          "y": "90"
+        },
+        {
+          "id": "b",
+          "x": "280",
+          "y": "190"
+        }
+      ],
+      "baselineUnchanged": true,
+      "cloneIterator": true,
+      "error": null,
+      "passed": true
+    }
+  ],
+  "passed": 2
+}

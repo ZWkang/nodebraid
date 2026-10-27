@@ -1,0 +1,21 @@
+{
+  "premise": "The Point object yielded during validation is also the owner of unrelated metadata at the later copy stage.",
+  "distinguishingObservation": "Use native map plus a custom iterator returning same NodeId/numeric geometry in independent Point objects with different metadata getters.",
+  "actualPublicEvidence": {
+    "currentHead": "cf231f772e0f5431281fec172b8c2419e1cce370",
+    "currentCases": 4,
+    "currentPassed": 0,
+    "baseHead": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+    "baseCases": 4,
+    "basePassed": 4,
+    "paths": "metadata-copy-repro/{current,base}"
+  },
+  "conclusion": "Premise contradicted. Cache only validated numeric geometry by semantic NodeId; copy unrelated metadata from the original map candidate at its original copy phase.",
+  "unchangedPolicies": [
+    "array iteration/mapping",
+    "no default geometry",
+    "raw external error identity/receiver",
+    "metadata shallow ownership"
+  ],
+  "formalFullNotExecuted": true
+}

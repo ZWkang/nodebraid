@@ -1,0 +1,29 @@
+[
+  {
+    "args": [
+      "open",
+      "http://127.0.0.1:50241/"
+    ],
+    "stdout": "✓ \n  http://127.0.0.1:50241/\n",
+    "stderr": "",
+    "exitCode": 0
+  },
+  {
+    "args": [
+      "eval",
+      "globalThis.__nodebraidRendererSvgGeometryMetadataCases()",
+      "--json"
+    ],
+    "stdout": "{\"success\":true,\"data\":{\"origin\":\"http://127.0.0.1:50241/\",\"result\":{\"controls\":4,\"passed\":0,\"results\":[{\"error\":\"Error: Copy stage reads original map metadata, not validation iterator clone\\n    at check (http://127.0.0.1:50241/probe.js:2914:13)\\n    at geometryMetadataCase (http://127.0.0.1:50241/probe.js:3228:7)\\n    at runInteractionGeometryMetadataCases (http://127.0.0.1:50241/probe.js:3251:17)\\n    at <anonymous>:1:12\",\"id\":\"copy-stage-metadata/basePosition/raw-throws\",\"passed\":false},{\"error\":\"Error: Copy stage reads original map metadata, not validation iterator clone\\n    at check (http://127.0.0.1:50241/probe.js:2914:13)\\n    at geometryMetadataCase (http://127.0.0.1:50241/probe.js:3228:7)\\n    at runInteractionGeometryMetadataCases (http://127.0.0.1:50241/probe.js:3251:17)\",\"id\":\"copy-stage-metadata/basePosition/clone-throws\",\"passed\":false},{\"error\":\"Error: Copy stage reads original map metadata, not validation iterator clone\\n    at check (http://127.0.0.1:50241/probe.js:2914:13)\\n    at geometryMetadataCase (http://127.0.0.1:50241/probe.js:3228:7)\\n    at runInteractionGeometryMetadataCases (http://127.0.0.1:50241/probe.js:3251:17)\",\"id\":\"copy-stage-metadata/position/raw-throws\",\"passed\":false},{\"error\":\"Error: Copy stage reads original map metadata, not validation iterator clone\\n    at check (http://127.0.0.1:50241/probe.js:2914:13)\\n    at geometryMetadataCase (http://127.0.0.1:50241/probe.js:3228:7)\\n    at runInteractionGeometryMetadataCases (http://127.0.0.1:50241/probe.js:3251:17)\",\"id\":\"copy-stage-metadata/position/clone-throws\",\"passed\":false}]}},\"error\":null}\n",
+    "stderr": "",
+    "exitCode": 0
+  },
+  {
+    "args": [
+      "close"
+    ],
+    "stdout": "✓ Browser closed\n",
+    "stderr": "",
+    "exitCode": 0
+  }
+]

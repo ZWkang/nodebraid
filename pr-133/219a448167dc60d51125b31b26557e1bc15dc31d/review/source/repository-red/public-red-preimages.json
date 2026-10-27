@@ -1,0 +1,18 @@
+{
+  "base": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "patchSHA256": "47530d56bde0132ffdeb8ce7675a06c26ff47d0c9064eff2dcc373c81d85c605",
+  "files": [
+    {
+      "path": "packages/renderer-svg/browser-tests/renderer-contract.entry.ts",
+      "sha256": "749012554026c5838543b32165d70305b23acc41bd8de57956b408d171020577"
+    },
+    {
+      "path": "packages/renderer-svg/browser-tests/renderer-contract.browser.ts",
+      "sha256": "8758418e637a4f07a5bd8a205bb1d1892041b8af045b308b4d0870bc2773af0d"
+    },
+    {
+      "path": "packages/renderer-svg/src/interaction-projection.ts",
+      "sha256": "38cda87e73a0b0aefbfd51a78755e595397ab152b5ee45dce347f3d8566b617f"
+    }
+  ]
+}

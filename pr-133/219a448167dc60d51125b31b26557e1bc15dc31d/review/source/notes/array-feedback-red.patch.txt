@@ -1,0 +1,107 @@
+diff --git a/packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts b/packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts
+index 85c6ce7..ddbeb57 100644
+--- a/packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts
++++ b/packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts
+@@ -1,5 +1,5 @@
+ import { createCanvasKernel, nodeId, edgeId } from '@nodebraid/kernel';
+-import type { InteractionProjection } from '@nodebraid/interaction-api';
++import type { InteractionProjection, NodeDragProjectionNode } from '@nodebraid/interaction-api';
+ import { RendererError } from '@nodebraid/renderer-api';
+ import { createSvgRenderer } from '../src';
+ 
+@@ -291,6 +291,7 @@ export async function runInteractionGeometryValueCases(): Promise<{
+       );
+     }
+   }
++  results.push(...(await runInteractionGeometryArrayCases()).results);
+   return {
+     controls: results.length,
+     passed: results.filter((result) => result.passed).length,
+@@ -298,3 +299,50 @@ export async function runInteractionGeometryValueCases(): Promise<{
+     nativeInputEventsDriven: 0,
+   };
+ }
++
++async function geometryArrayCase(cloneIterator: boolean): Promise<void> {
++  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
++  target.setAttribute('width', '600'); target.setAttribute('height', '400'); document.body.append(target);
++  const renderer = createSvgRenderer({ target }), kernel = createCanvasKernel();
++  const a = nodeId('a'), b = nodeId('b');
++  kernel.transact(tx => {
++    tx.nodes.add({ id: a, type: 'task', position: { x: 10, y: 20 }, size: { width: 80, height: 40 }, data: null });
++    tx.nodes.add({ id: b, type: 'task', position: { x: 220, y: 40 }, size: { width: 100, height: 60 }, data: null });
++  });
++  const nodes: NodeDragProjectionNode[] = [
++    { nodeId: a, basePosition: { x: 10, y: 20 }, position: { x: 80, y: 90 } },
++    { nodeId: b, basePosition: { x: 220, y: 40 }, position: { x: 280, y: 190 } },
++  ];
++  nodes.map = function<U>(callback: (value: NodeDragProjectionNode, index: number, array: NodeDragProjectionNode[]) => U, thisArg?: unknown): U[] {
++    const result: U[] = [];
++    for (let index = 0; index < this.length; index += 1) result.push(callback.call(thisArg, this[index]!, 1 - index, this));
++    return result;
++  };
++  if (cloneIterator) nodes[Symbol.iterator] = function() { return [{ ...this[0]! }, { ...this[1]! }].values(); };
++  try {
++    const view = kernel.read();
++    renderer.updateDocument({ type: 'reset', view });
++    renderer.updateSession({ selection: { nodeIds: [], edgeIds: [] }, viewport: { x: 0, y: 0, zoom: 1 } });
++    const before = target.innerHTML, nodeA = target.querySelector('[data-nodebraid-node-id="a"]'), nodeB = target.querySelector('[data-nodebraid-node-id="b"]');
++    renderer.updateInteraction({ type: 'node-drag', nodes });
++    equal(attributes(target, '[data-nodebraid-node-id="a"]', ['x', 'y']), { x: '80', y: '90' }, 'Node a keeps its validated candidate');
++    equal(attributes(target, '[data-nodebraid-node-id="b"]', ['x', 'y']), { x: '280', y: '190' }, 'Node b keeps its validated candidate');
++    equal(renderer.hitTest({ x: 100, y: 100 }), { type: 'node', nodeId: a, worldPoint: { x: 100, y: 100 } }, 'Candidate a hit');
++    equal(renderer.hitTest({ x: 310, y: 210 }), { type: 'node', nodeId: b, worldPoint: { x: 310, y: 210 } }, 'Candidate b hit');
++    check(kernel.read() === view, 'Array projection leaves Kernel unchanged');
++    renderer.updateInteraction(null);
++    check(target.innerHTML === before, 'Array projection clear restores baseline');
++    check(target.querySelector('[data-nodebraid-node-id="a"]') === nodeA && target.querySelector('[data-nodebraid-node-id="b"]') === nodeB, 'Both keyed Node elements survive');
++  } finally {
++    await renderer.dispose(); check(target.childElementCount === 0 && !target.hasAttribute('tabindex'), 'Array case cleanup'); target.remove();
++  }
++}
++export async function runInteractionGeometryArrayCases(): Promise<{ controls: number; passed: number; results: Result[] }> {
++  const results: Result[] = [];
++  for (const clone of [false, true]) {
++    const id = 'candidate-node-key/' + clone;
++    try { await geometryArrayCase(clone); results.push({ id, passed: true }); }
++    catch (error) { results.push({ id, passed: false, error: error instanceof Error ? error.stack : String(error) }); }
++  }
++  return { controls: results.length, passed: results.filter(result => result.passed).length, results };
++}
+diff --git a/packages/renderer-svg/browser-tests/renderer-contract.browser.ts b/packages/renderer-svg/browser-tests/renderer-contract.browser.ts
+index 0b577f2..99689f5 100644
+--- a/packages/renderer-svg/browser-tests/renderer-contract.browser.ts
++++ b/packages/renderer-svg/browser-tests/renderer-contract.browser.ts
+@@ -66,13 +66,13 @@ try {
+     passed: number;
+     results: { id: string; passed: boolean; error?: string }[];
+   }>('globalThis.__nodebraidRendererSvgGeometryValueCases()');
+-  assert.equal(geometryValues.controls, 208);
++  assert.equal(geometryValues.controls, 210);
+   assert.equal(
+     geometryValues.passed,
+     geometryValues.controls,
+     JSON.stringify(geometryValues.results.filter((result) => !result.passed)),
+   );
+-  console.info('SVG Interaction Geometry capture: 208 public browser cases passed.');
++  console.info('SVG Interaction Geometry capture: 210 public browser cases passed.');
+   let nativePolicyCases = 0;
+   await withRendererPageCdp(async (send) => {
+     for (const family of ['pointer', 'wheel', 'keyboard', 'contextMenu'] as const) {
+diff --git a/packages/renderer-svg/browser-tests/renderer-contract.entry.ts b/packages/renderer-svg/browser-tests/renderer-contract.entry.ts
+index 72c8026..df2da29 100644
+--- a/packages/renderer-svg/browser-tests/renderer-contract.entry.ts
++++ b/packages/renderer-svg/browser-tests/renderer-contract.entry.ts
+@@ -1,4 +1,4 @@
+-import { runInteractionGeometryValueCases } from './interaction-geometry-values.entry';
++import { runInteractionGeometryValueCases, runInteractionGeometryArrayCases } from './interaction-geometry-values.entry';
+ import {
+   setupPolicyCase,
+   readPolicyCase,
+@@ -6026,3 +6026,6 @@ declare global {
+   var __nodebraidRendererSvgGeometryValueCases: typeof runInteractionGeometryValueCases;
+ }
+ globalThis.__nodebraidRendererSvgGeometryValueCases = runInteractionGeometryValueCases;
++
++declare global { var __nodebraidRendererSvgGeometryArrayCases: typeof runInteractionGeometryArrayCases; }
++globalThis.__nodebraidRendererSvgGeometryArrayCases = runInteractionGeometryArrayCases;

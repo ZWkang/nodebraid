@@ -1,0 +1,21 @@
+{
+  "head": "3ae9d134d0ce7e20509905456f558841d745a05f",
+  "base": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "publicCompiledSource": "callback-index-repro.entry.ts",
+  "current": {
+    "controls": 2,
+    "passed": 0,
+    "driverExit": 1,
+    "scope": "Actual public SVG Renderer and DOM; map callback index swaps geometry"
+  },
+  "baseControl": {
+    "controls": 2,
+    "passed": 2,
+    "driverExit": 0
+  },
+  "cloneIteratorControlIncluded": true,
+  "noNativeInputOrKernelWrites": true,
+  "sourceUnchangedDuringBothReviews": true,
+  "correctionPlanned": "Associate captured geometry by validated canonical NodeId, retaining original traversal and without array restrictions/defaults",
+  "formalVerifyExecuted": false
+}

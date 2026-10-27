@@ -1,0 +1,28 @@
+[
+  {
+    "command": [
+      "/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/node_modules/.bin/tsc",
+      "--noEmit",
+      "--pretty",
+      "false",
+      "-p",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/original-green/fe48ff7c2ffb7eef144f64b4699b042f6acdad19/tsconfig.json"
+    ],
+    "exitCode": 0,
+    "head": "fe48ff7c2ffb7eef144f64b4699b042f6acdad19",
+    "at": "2026-10-27T08:21:09.669657+00:00",
+    "stdout": "typecheck.stdout.log",
+    "stderr": "typecheck.stderr.log"
+  },
+  {
+    "command": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/original-green/fe48ff7c2ffb7eef144f64b4699b042f6acdad19/browser-probe.ts"
+    ],
+    "exitCode": 0,
+    "head": "fe48ff7c2ffb7eef144f64b4699b042f6acdad19",
+    "at": "2026-10-27T08:21:12.537031+00:00",
+    "stdout": "compiled-browser.stdout.log",
+    "stderr": "compiled-browser.stderr.log"
+  }
+]

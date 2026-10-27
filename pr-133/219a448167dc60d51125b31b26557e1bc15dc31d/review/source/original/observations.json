@@ -1,0 +1,493 @@
+{
+  "head": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "session": "nodebraid-svg-projection-45420",
+  "url": "http://127.0.0.1:56411/",
+  "controls": 12,
+  "failed": 8,
+  "nativeInputEventsDriven": 0,
+  "observations": [
+    {
+      "actual": {
+        "box": {
+          "height": null,
+          "width": null,
+          "x": null,
+          "y": null
+        },
+        "connection": {
+          "x1": null,
+          "x2": null,
+          "y1": null,
+          "y2": null
+        },
+        "edge": {
+          "x1": "120",
+          "x2": "270",
+          "y1": "110",
+          "y2": "70"
+        },
+        "matrix": {
+          "transform": "matrix(1 0 0 1 0 0)"
+        },
+        "node": {
+          "x": "80",
+          "y": "90"
+        },
+        "sourceNode": {
+          "x": 10,
+          "y": 20
+        }
+      },
+      "baselineUnchanged": true,
+      "cleanup": true,
+      "error": null,
+      "family": "node-drag",
+      "nativeInputEventsDriven": 0,
+      "passed": true,
+      "shape": "own"
+    },
+    {
+      "actual": {
+        "box": {
+          "height": null,
+          "width": null,
+          "x": null,
+          "y": null
+        },
+        "connection": {
+          "x1": null,
+          "x2": null,
+          "y1": null,
+          "y2": null
+        },
+        "edge": {
+          "x1": "NaN",
+          "x2": "270",
+          "y1": "NaN",
+          "y2": "70"
+        },
+        "matrix": {
+          "transform": "matrix(1 0 0 1 0 0)"
+        },
+        "node": {
+          "x": "undefined",
+          "y": "undefined"
+        },
+        "sourceNode": {
+          "x": 10,
+          "y": 20
+        }
+      },
+      "baselineUnchanged": true,
+      "cleanup": true,
+      "error": null,
+      "family": "node-drag",
+      "nativeInputEventsDriven": 0,
+      "passed": false,
+      "shape": "inherited"
+    },
+    {
+      "actual": {
+        "box": {
+          "height": null,
+          "width": null,
+          "x": null,
+          "y": null
+        },
+        "connection": {
+          "x1": null,
+          "x2": null,
+          "y1": null,
+          "y2": null
+        },
+        "edge": {
+          "x1": "NaN",
+          "x2": "270",
+          "y1": "NaN",
+          "y2": "70"
+        },
+        "matrix": {
+          "transform": "matrix(1 0 0 1 0 0)"
+        },
+        "node": {
+          "x": "undefined",
+          "y": "undefined"
+        },
+        "sourceNode": {
+          "x": 10,
+          "y": 20
+        }
+      },
+      "baselineUnchanged": true,
+      "cleanup": true,
+      "error": null,
+      "family": "node-drag",
+      "nativeInputEventsDriven": 0,
+      "passed": false,
+      "shape": "non-enumerable"
+    },
+    {
+      "actual": {
+        "box": {
+          "height": null,
+          "width": null,
+          "x": null,
+          "y": null
+        },
+        "connection": {
+          "x1": null,
+          "x2": null,
+          "y1": null,
+          "y2": null
+        },
+        "edge": {
+          "x1": "50",
+          "x2": "270",
+          "y1": "40",
+          "y2": "70"
+        },
+        "matrix": {
+          "transform": "matrix(2 0 0 2 20 30)"
+        },
+        "node": {
+          "x": "10",
+          "y": "20"
+        },
+        "sourceNode": {
+          "x": 10,
+          "y": 20
+        }
+      },
+      "baselineUnchanged": true,
+      "cleanup": true,
+      "error": null,
+      "family": "viewport-pan",
+      "nativeInputEventsDriven": 0,
+      "passed": true,
+      "shape": "own"
+    },
+    {
+      "actual": {
+        "box": {
+          "height": null,
+          "width": null,
+          "x": null,
+          "y": null
+        },
+        "connection": {
+          "x1": null,
+          "x2": null,
+          "y1": null,
+          "y2": null
+        },
+        "edge": {
+          "x1": "50",
+          "x2": "270",
+          "y1": "40",
+          "y2": "70"
+        },
+        "matrix": {
+          "transform": "matrix(NaN NaN NaN NaN NaN NaN)"
+        },
+        "node": {
+          "x": "10",
+          "y": "20"
+        },
+        "sourceNode": {
+          "x": 10,
+          "y": 20
+        }
+      },
+      "baselineUnchanged": true,
+      "cleanup": true,
+      "error": null,
+      "family": "viewport-pan",
+      "nativeInputEventsDriven": 0,
+      "passed": false,
+      "shape": "inherited"
+    },
+    {
+      "actual": {
+        "box": {
+          "height": null,
+          "width": null,
+          "x": null,
+          "y": null
+        },
+        "connection": {
+          "x1": null,
+          "x2": null,
+          "y1": null,
+          "y2": null
+        },
+        "edge": {
+          "x1": "50",
+          "x2": "270",
+          "y1": "40",
+          "y2": "70"
+        },
+        "matrix": {
+          "transform": "matrix(NaN NaN NaN NaN NaN NaN)"
+        },
+        "node": {
+          "x": "10",
+          "y": "20"
+        },
+        "sourceNode": {
+          "x": 10,
+          "y": 20
+        }
+      },
+      "baselineUnchanged": true,
+      "cleanup": true,
+      "error": null,
+      "family": "viewport-pan",
+      "nativeInputEventsDriven": 0,
+      "passed": false,
+      "shape": "non-enumerable"
+    },
+    {
+      "actual": {
+        "box": {
+          "height": "80",
+          "width": "70",
+          "x": "5",
+          "y": "6"
+        },
+        "connection": {
+          "x1": null,
+          "x2": null,
+          "y1": null,
+          "y2": null
+        },
+        "edge": {
+          "x1": "50",
+          "x2": "270",
+          "y1": "40",
+          "y2": "70"
+        },
+        "matrix": {
+          "transform": "matrix(1 0 0 1 0 0)"
+        },
+        "node": {
+          "x": "10",
+          "y": "20"
+        },
+        "sourceNode": {
+          "x": 10,
+          "y": 20
+        }
+      },
+      "baselineUnchanged": true,
+      "cleanup": true,
+      "error": null,
+      "family": "box-selection",
+      "nativeInputEventsDriven": 0,
+      "passed": true,
+      "shape": "own"
+    },
+    {
+      "actual": {
+        "box": {
+          "height": "undefined",
+          "width": "undefined",
+          "x": "undefined",
+          "y": "undefined"
+        },
+        "connection": {
+          "x1": null,
+          "x2": null,
+          "y1": null,
+          "y2": null
+        },
+        "edge": {
+          "x1": "50",
+          "x2": "270",
+          "y1": "40",
+          "y2": "70"
+        },
+        "matrix": {
+          "transform": "matrix(1 0 0 1 0 0)"
+        },
+        "node": {
+          "x": "10",
+          "y": "20"
+        },
+        "sourceNode": {
+          "x": 10,
+          "y": 20
+        }
+      },
+      "baselineUnchanged": true,
+      "cleanup": true,
+      "error": null,
+      "family": "box-selection",
+      "nativeInputEventsDriven": 0,
+      "passed": false,
+      "shape": "inherited"
+    },
+    {
+      "actual": {
+        "box": {
+          "height": "undefined",
+          "width": "undefined",
+          "x": "undefined",
+          "y": "undefined"
+        },
+        "connection": {
+          "x1": null,
+          "x2": null,
+          "y1": null,
+          "y2": null
+        },
+        "edge": {
+          "x1": "50",
+          "x2": "270",
+          "y1": "40",
+          "y2": "70"
+        },
+        "matrix": {
+          "transform": "matrix(1 0 0 1 0 0)"
+        },
+        "node": {
+          "x": "10",
+          "y": "20"
+        },
+        "sourceNode": {
+          "x": 10,
+          "y": 20
+        }
+      },
+      "baselineUnchanged": true,
+      "cleanup": true,
+      "error": null,
+      "family": "box-selection",
+      "nativeInputEventsDriven": 0,
+      "passed": false,
+      "shape": "non-enumerable"
+    },
+    {
+      "actual": {
+        "box": {
+          "height": null,
+          "width": null,
+          "x": null,
+          "y": null
+        },
+        "connection": {
+          "x1": "90",
+          "x2": "330",
+          "y1": "40",
+          "y2": "140"
+        },
+        "edge": {
+          "x1": "50",
+          "x2": "270",
+          "y1": "40",
+          "y2": "70"
+        },
+        "matrix": {
+          "transform": "matrix(1 0 0 1 0 0)"
+        },
+        "node": {
+          "x": "10",
+          "y": "20"
+        },
+        "sourceNode": {
+          "x": 10,
+          "y": 20
+        }
+      },
+      "baselineUnchanged": true,
+      "cleanup": true,
+      "error": null,
+      "family": "connection-preview",
+      "nativeInputEventsDriven": 0,
+      "passed": true,
+      "shape": "own"
+    },
+    {
+      "actual": {
+        "box": {
+          "height": null,
+          "width": null,
+          "x": null,
+          "y": null
+        },
+        "connection": {
+          "x1": "90",
+          "x2": "undefined",
+          "y1": "40",
+          "y2": "undefined"
+        },
+        "edge": {
+          "x1": "50",
+          "x2": "270",
+          "y1": "40",
+          "y2": "70"
+        },
+        "matrix": {
+          "transform": "matrix(1 0 0 1 0 0)"
+        },
+        "node": {
+          "x": "10",
+          "y": "20"
+        },
+        "sourceNode": {
+          "x": 10,
+          "y": 20
+        }
+      },
+      "baselineUnchanged": true,
+      "cleanup": true,
+      "error": null,
+      "family": "connection-preview",
+      "nativeInputEventsDriven": 0,
+      "passed": false,
+      "shape": "inherited"
+    },
+    {
+      "actual": {
+        "box": {
+          "height": null,
+          "width": null,
+          "x": null,
+          "y": null
+        },
+        "connection": {
+          "x1": "90",
+          "x2": "undefined",
+          "y1": "40",
+          "y2": "undefined"
+        },
+        "edge": {
+          "x1": "50",
+          "x2": "270",
+          "y1": "40",
+          "y2": "70"
+        },
+        "matrix": {
+          "transform": "matrix(1 0 0 1 0 0)"
+        },
+        "node": {
+          "x": "10",
+          "y": "20"
+        },
+        "sourceNode": {
+          "x": 10,
+          "y": 20
+        }
+      },
+      "baselineUnchanged": true,
+      "cleanup": true,
+      "error": null,
+      "family": "connection-preview",
+      "nativeInputEventsDriven": 0,
+      "passed": false,
+      "shape": "non-enumerable"
+    }
+  ],
+  "passed": 4,
+  "scope": "Typed public CanvasRenderer.updateInteraction and actual SVG DOM; no native input, Command/Host, arbitrary scheduling or whole Renderer claim.",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36"
+}

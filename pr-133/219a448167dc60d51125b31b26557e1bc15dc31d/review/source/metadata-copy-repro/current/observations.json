@@ -1,0 +1,71 @@
+{
+  "head": "cf231f772e0f5431281fec172b8c2419e1cce370",
+  "session": "nodebraid-svg-metadata-current-63109",
+  "url": "http://127.0.0.1:64287/",
+  "controls": 4,
+  "failed": 4,
+  "nativeInputEventsDriven": 0,
+  "observations": [
+    {
+      "actual": {
+        "x": "80",
+        "y": "90"
+      },
+      "baselineUnchanged": true,
+      "cloneReads": 1,
+      "didThrow": false,
+      "domUnchanged": false,
+      "mode": "raw-throws",
+      "passed": false,
+      "rawReads": 0,
+      "sameErrorIdentity": false,
+      "slot": "basePosition"
+    },
+    {
+      "actual": {
+        "x": "10",
+        "y": "20"
+      },
+      "baselineUnchanged": true,
+      "cloneReads": 1,
+      "didThrow": true,
+      "domUnchanged": true,
+      "mode": "clone-throws",
+      "passed": false,
+      "rawReads": 0,
+      "sameErrorIdentity": true,
+      "slot": "basePosition"
+    },
+    {
+      "actual": {
+        "x": "80",
+        "y": "90"
+      },
+      "baselineUnchanged": true,
+      "cloneReads": 1,
+      "didThrow": false,
+      "domUnchanged": false,
+      "mode": "raw-throws",
+      "passed": false,
+      "rawReads": 0,
+      "sameErrorIdentity": false,
+      "slot": "position"
+    },
+    {
+      "actual": {
+        "x": "10",
+        "y": "20"
+      },
+      "baselineUnchanged": true,
+      "cloneReads": 1,
+      "didThrow": true,
+      "domUnchanged": true,
+      "mode": "clone-throws",
+      "passed": false,
+      "rawReads": 0,
+      "sameErrorIdentity": true,
+      "slot": "position"
+    }
+  ],
+  "passed": 0
+}

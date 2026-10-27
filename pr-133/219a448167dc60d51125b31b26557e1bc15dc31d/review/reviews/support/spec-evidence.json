@@ -1,0 +1,117 @@
+{
+  "axis": "Spec",
+  "verdict": "passed",
+  "findings": [],
+  "resolvedFindings": [
+    {
+      "kind": "Node Drag index association",
+      "evidence": "Fresh exact original callback-index case and equivalent iterator clone each actualExit0."
+    },
+    {
+      "kind": "Node Drag metadata copy source",
+      "evidence": "Fresh basePosition/position x raw-throws/clone-throws all preserve original map metadata source/receiver/error; rawReads1/cloneReads0."
+    }
+  ],
+  "base": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "expectedParent": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "head": "fe48ff7c2ffb7eef144f64b4699b042f6acdad19",
+  "tree": "abaf6c01ef863fa36f4a7c760363a2d69c38290a",
+  "patch": "cdbfce62eb18609e954cb47469e7335d9e10d632604850a98da3a1367ca92c40",
+  "taskDigest": "931f3d5bf15180095ee77655c8da3308ac84817af0cf9e85a5726b0e509a25d3",
+  "changedFiles": [
+    "packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts",
+    "packages/renderer-svg/browser-tests/renderer-contract.browser.ts",
+    "packages/renderer-svg/browser-tests/renderer-contract.entry.ts",
+    "packages/renderer-svg/src/interaction-projection.ts"
+  ],
+  "report": "verdict: passed\n\nbase: 6fd2d016f6330cc422508b3e51229bea4be2cce0\nhead: fe48ff7c2ffb7eef144f64b4699b042f6acdad19\ntree: abaf6c01ef863fa36f4a7c760363a2d69c38290a\nbinary patch SHA256: cdbfce62eb18609e954cb47469e7335d9e10d632604850a98da3a1367ca92c40\ntaskDigest: 931f3d5bf15180095ee77655c8da3308ac84817af0cf9e85a5726b0e509a25d3\n\n独立重读 [Issue132](https://github.com/ZWkang/nodebraid/issues/132) 全文/完整评论；最终读回2026-10-27 08:25:06 UTC，open、bug/ready-for-agent，评论0，request未变。审查完整三提交四路径、494行fixture/214输入及acceptor→DOM Journal→Effective State/Hit/Input链，依据指定main规范/CONTEXT与ADR0054/59/62/63。实际完整补丁与本head归档字节一致。\n\n未发现当前缺漏、scope creep或错误实现。NodeId缓存仅保存validated numeric pairs，不含Point source；原map candidate的basePosition/position仍作为metadata复制源。因而既不依赖callback index/candidate对象identity，又保留 “existing enumerable-copy behavior for unrelated metadata” 的原receiver、阶段、首异常与浅引用。四种Projection数字捕获/finite/positive/nonnegative及原eager/sequential错误顺序重新核对；无新array/ID/Anchor/Port/Input或默认/coercion/record策略。Renderer仍先完整accept，再用Journal投影，成功后替换accepted state。\n\n本人在本head新执行：原index互换程序及等值iterator clone各退出0；独立metadata四场景均rawReads1/cloneReads0，raw异常严格保留原Error、clone异常不传播；四family×own/inherited/non-enumerable的12几何场景全部通过，数字只读一次、owned冻结、caller/metadata不冻结且Kernel不变。这18场景是内部acceptor边界核验，不冒称公共Renderer/DOM/browser。\n\n另执行 `bun test packages/renderer-api/tests packages/renderer-svg/tests packages/plugin-renderer/tests packages/plugin-interaction/tests packages/plugin-history/tests`：296 pass、0 fail、2196 assertions，21文件，exit0；diff-check通过，前后HEAD/tree/patch/clean一致。未复用旧计数；全部程序与原始输出在spec-tests.log。fixture期望补全/工作树214记录不当作本head执行。\n\n未本人运行build/typecheck/affected/browser/full、原12或远端CI/发布/媒体/merge/main验收；外部浏览器进度不代表本人执行或最终job回执。Spec通过不等于人工批准或交付完成。\n\nrisk: {\"level\": \"medium\", \"rationale\": \"完整交付改变公共SVG Projection geometry ownership与Effective State/Hit/Input映射，命中public-src medium下限；数字关联及metadata复制来源均需重点人工审阅，修复与绿测不降为low。\", \"evidence\": \"完整base→fe48四路径、494行fixture/214输入及ADR0054/59/62/63调用链重审；本head新公共Bun296tests/2196assertions通过，内部index2、metadata4、四family×三形态12场景全actualExit0。main6fd2 risk blob596298db784c4f3424968cd05a3aca4a6471b1b3独立核实。\", \"rollback\": \"普通回退完整base6fd2→fe48交付，包括fe48ff7c2ffb7eef144f64b4699b042f6acdad19、cf231f772e0f5431281fec172b8c2419e1cce370、3ae9d134d0ce7e20509905456f558841d745a05f三提交或未来完整published映射；单回最后fix不足。无schema/数据迁移；依既有reset/dispose重建投影，代码回退不能撤销已执行应用Command。\"}\n",
+  "risk": {
+    "level": "medium",
+    "rationale": "完整交付改变公共SVG Projection geometry ownership与Effective State/Hit/Input映射，命中public-src medium下限；数字关联及metadata复制来源均需重点人工审阅，修复与绿测不降为low。",
+    "evidence": "完整base→fe48四路径、494行fixture/214输入及ADR0054/59/62/63调用链重审；本head新公共Bun296tests/2196assertions通过，内部index2、metadata4、四family×三形态12场景全actualExit0。main6fd2 risk blob596298db784c4f3424968cd05a3aca4a6471b1b3独立核实。",
+    "rollback": "普通回退完整base6fd2→fe48交付，包括fe48ff7c2ffb7eef144f64b4699b042f6acdad19、cf231f772e0f5431281fec172b8c2419e1cce370、3ae9d134d0ce7e20509905456f558841d745a05f三提交或未来完整published映射；单回最后fix不足。无schema/数据迁移；依既有reset/dispose重建投影，代码回退不能撤销已执行应用Command。"
+  },
+  "checks": [
+    {
+      "command": [
+        "bun",
+        "test",
+        "packages/renderer-api/tests",
+        "packages/renderer-svg/tests",
+        "packages/plugin-renderer/tests",
+        "packages/plugin-interaction/tests",
+        "packages/plugin-history/tests"
+      ],
+      "exitCode": 0,
+      "tests": 296,
+      "assertions": 2196,
+      "files": 21,
+      "log": "spec-tests.log"
+    },
+    {
+      "command": [
+        "bun",
+        "--eval",
+        "import assert from 'node:assert/strict';\nimport { createCanvasKernel, nodeId } from '@nodebraid/kernel';\nimport { acceptInteractionProjection } from './packages/renderer-svg/src/interaction-projection.ts';\nconst kernel = createCanvasKernel(), a = nodeId('a'), b = nodeId('b');\nkernel.transact(tx => {\n  tx.nodes.add({ id:a, type:'task', position:{x:10,y:20}, size:{width:20,height:20}, data:null });\n  tx.nodes.add({ id:b, type:'task', position:{x:100,y:110}, size:{width:20,height:20}, data:null });\n});\nconst view = kernel.read();\nconst ports = Object.freeze({ documentRevision:view.snapshot.revision, generation:0, nodes:Object.freeze([]) });\nconst session = Object.freeze({ selection:Object.freeze({ nodeIds:Object.freeze([]), edgeIds:Object.freeze([]) }), viewport:Object.freeze({x:0,y:0,zoom:1}) });\nconst candidates = [\n  Object.freeze({nodeId:a,basePosition:view.query.getNode(a).position,position:Object.freeze({x:30,y:40})}),\n  Object.freeze({nodeId:b,basePosition:view.query.getNode(b).position,position:Object.freeze({x:150,y:160})}),\n];\nconst expected = candidates.map(c => ({id:c.nodeId,base:c.basePosition,position:c.position}));\nconst observe = (nodes) => acceptInteractionProjection({type:'node-drag',nodes},view.snapshot,ports,session).nodes.map(c => ({id:c.nodeId,base:c.basePosition,position:c.position}));\nconst ordinary = observe(Object.freeze([...candidates])); assert.deepEqual(ordinary,expected);\nconst custom = [...candidates]; let mapCalls = 0;\nObject.defineProperty(custom,'map',{value:function(callback,thisArg){\n  mapCalls++;\n  return Array.prototype.map.call(this,(candidate,index,array)=>callback.call(thisArg,candidate,1-index,array));\n}});\nObject.freeze(custom);\nconst actual = observe(custom);\nassert.deepEqual(actual.map(row=>row.id),[a,b]);\nassert.equal(mapCalls,1); assert.equal(kernel.read(),view);\nconsole.log(JSON.stringify({ordinaryControl:ordinary,expected,actual,canonicalIds:true,mapCalls,unchangedKernel:true,scope:'pure acceptor/internal boundary; not public Renderer or DOM/browser proof'}));\nassert.deepEqual(actual,expected,'Accepted per-ID geometry must not depend on caller map callback index');"
+      ],
+      "exitCode": 0,
+      "cases": 1,
+      "scope": "internal pure acceptor; public Kernel/Port/Session values, no public Renderer/DOM/browser execution",
+      "log": "spec-tests.log"
+    },
+    {
+      "command": [
+        "bun",
+        "--eval",
+        "import assert from 'node:assert/strict';\nimport { createCanvasKernel, nodeId } from '@nodebraid/kernel';\nimport { acceptInteractionProjection } from './packages/renderer-svg/src/interaction-projection.ts';\nconst kernel = createCanvasKernel(), a = nodeId('a'), b = nodeId('b');\nkernel.transact(tx => {\n  tx.nodes.add({ id:a, type:'task', position:{x:10,y:20}, size:{width:20,height:20}, data:null });\n  tx.nodes.add({ id:b, type:'task', position:{x:100,y:110}, size:{width:20,height:20}, data:null });\n});\nconst view = kernel.read();\nconst ports = Object.freeze({ documentRevision:view.snapshot.revision, generation:0, nodes:Object.freeze([]) });\nconst session = Object.freeze({ selection:Object.freeze({ nodeIds:Object.freeze([]), edgeIds:Object.freeze([]) }), viewport:Object.freeze({x:0,y:0,zoom:1}) });\nconst candidates = [\n  Object.freeze({nodeId:a,basePosition:view.query.getNode(a).position,position:Object.freeze({x:30,y:40})}),\n  Object.freeze({nodeId:b,basePosition:view.query.getNode(b).position,position:Object.freeze({x:150,y:160})}),\n];\nconst expected = candidates.map(c => ({id:c.nodeId,base:c.basePosition,position:c.position}));\nconst observe = (nodes) => acceptInteractionProjection({type:'node-drag',nodes},view.snapshot,ports,session).nodes.map(c => ({id:c.nodeId,base:c.basePosition,position:c.position}));\nconst ordinary = observe(Object.freeze([...candidates])); assert.deepEqual(ordinary,expected);\nconst custom = [...candidates]; let mapCalls = 0;\nObject.defineProperty(custom,'map',{value:function(callback,thisArg){\n  mapCalls++;\n  return Array.prototype.map.call(this,(candidate,index,array)=>callback.call(thisArg,candidate,1-index,array));\n}});\nObject.defineProperty(custom,Symbol.iterator,{value:function*(){for(const candidate of candidates)yield {...candidate};}});\nObject.freeze(custom);\nconst actual = observe(custom);\nassert.deepEqual(actual.map(row=>row.id),[a,b]);\nassert.equal(mapCalls,1); assert.equal(kernel.read(),view);\nconsole.log(JSON.stringify({ordinaryControl:ordinary,expected,actual,canonicalIds:true,mapCalls,unchangedKernel:true,scope:'pure acceptor/internal boundary; not public Renderer or DOM/browser proof'}));\nassert.deepEqual(actual,expected,'Accepted per-ID geometry must not depend on caller map callback index');"
+      ],
+      "exitCode": 0,
+      "cases": 1,
+      "scope": "internal pure acceptor; public Kernel/Port/Session values, no public Renderer/DOM/browser execution",
+      "log": "spec-tests.log"
+    },
+    {
+      "command": [
+        "bun",
+        "--eval",
+        "import assert from 'node:assert/strict';\nimport { createCanvasKernel,nodeId } from '@nodebraid/kernel';\nimport { acceptInteractionProjection } from './packages/renderer-svg/src/interaction-projection.ts';\nconst observations=[];\nfor(const slot of ['basePosition','position']) for(const mode of ['raw-throws','clone-throws']) {\n const kernel=createCanvasKernel(),id=nodeId('a');\n kernel.transact(tx=>tx.nodes.add({id,type:'task',position:{x:10,y:20},size:{width:80,height:40},data:null}));\n const view=kernel.read(),marker=new Error(slot+'/'+mode),opaque={caller:Symbol(mode)};\n const raw={x:slot==='basePosition'?10:80,y:slot==='basePosition'?20:90},copy={...raw};let rawReads=0,cloneReads=0;\n Object.defineProperty(raw,'metadata',{enumerable:true,get(){assert.equal(this,raw);rawReads++;if(mode==='raw-throws')throw marker;return opaque;}});\n Object.defineProperty(copy,'metadata',{enumerable:true,get(){assert.equal(this,copy);cloneReads++;if(mode==='clone-throws')throw marker;return opaque;}});\n const candidate={nodeId:id,basePosition:slot==='basePosition'?raw:{x:10,y:20},position:slot==='position'?raw:{x:80,y:90}};\n const cloned={...candidate,[slot]:copy},nodes=[candidate];\n Object.defineProperty(nodes,Symbol.iterator,{value:function*(){yield cloned;}});\n const ports={documentRevision:view.snapshot.revision,generation:0,nodes:[]},session={selection:{nodeIds:[],edgeIds:[]},viewport:{x:0,y:0,zoom:1}};\n let didThrow=false,caught,accepted;\n try{accepted=acceptInteractionProjection({type:'node-drag',nodes},view.snapshot,ports,session);}catch(error){didThrow=true;caught=error;}\n assert.equal(rawReads,1);assert.equal(cloneReads,0);assert.equal(kernel.read(),view);\n if(mode==='raw-throws'){assert.equal(didThrow,true);assert.equal(caught,marker);}\n else {assert.equal(didThrow,false);assert.equal(accepted.nodes[0][slot].metadata,opaque);assert.deepEqual(accepted.nodes[0].position,{x:80,y:90,...(slot==='position'?{metadata:opaque}:{})});}\n assert.equal(Object.isFrozen(raw),false);assert.equal(Object.isFrozen(copy),false);assert.equal(Object.isFrozen(opaque),false);\n observations.push({slot,mode,rawReads,cloneReads,didThrow,originalError:didThrow&&caught===marker,passed:true});\n}\nconsole.log(JSON.stringify({checks:observations.length,passed:observations.length,scope:'pure internal acceptor with real public Kernel/Port/Session values; not Renderer/browser proof',observations}));"
+      ],
+      "exitCode": 0,
+      "cases": 4,
+      "scope": "internal pure acceptor; public Kernel/Port/Session values, no public Renderer/DOM/browser execution",
+      "log": "spec-tests.log"
+    },
+    {
+      "command": [
+        "bun",
+        "--eval",
+        "import assert from 'node:assert/strict';\nimport {createCanvasKernel,nodeId} from '@nodebraid/kernel';\nimport {acceptInteractionProjection} from './packages/renderer-svg/src/interaction-projection.ts';\nconst kernel=createCanvasKernel(),id=nodeId('a');kernel.transact(tx=>tx.nodes.add({id,type:'task',position:{x:10,y:20},size:{width:80,height:40},data:null}));\nconst view=kernel.read(),ports={documentRevision:view.snapshot.revision,generation:0,nodes:[]},session={selection:{nodeIds:[],edgeIds:[]},viewport:{x:0,y:0,zoom:1}};\nlet checks=0;\nfor(const family of ['node-drag','viewport-pan','box-selection','connection-preview']) for(const shape of ['own','inherited','non-enumerable']) {\n const controls=[],opaque={caller:Symbol(family)};\n function geometry(values){const expected={...values},reads={},holder={};let source,metadataReads=0;\n  for(const field of Object.keys(values))Object.defineProperty(holder,field,{enumerable:shape==='own',get(){assert.equal(this,source);reads[field]=(reads[field]??0)+1;if(reads[field]>1)return NaN;return values[field];}});\n  source=shape==='inherited'?Object.create(holder):holder;\n  Object.defineProperty(source,'metadata',{enumerable:true,get(){assert.equal(this,source);metadataReads++;return opaque;}});\n  const control={source,expected,reads,values,metadata:()=>metadataReads};controls.push(control);return source;}\n let projection;\n if(family==='node-drag')projection={type:family,nodes:[{nodeId:id,basePosition:geometry({x:10,y:20}),position:geometry({x:80,y:90})}]};\n if(family==='viewport-pan')projection={type:family,baseViewport:geometry({x:0,y:0,zoom:1}),viewport:geometry({x:20,y:30,zoom:2})};\n if(family==='box-selection')projection={type:family,rect:geometry({x:5,y:6,width:70,height:80})};\n if(family==='connection-preview')projection={type:family,source:{nodeId:id,role:'source'},pointerWorldPoint:geometry({x:330,y:140}),target:{type:'none'}};\n const accepted=acceptInteractionProjection(projection,view.snapshot,ports,session);\n const owned=family==='node-drag'?[accepted.nodes[0].basePosition,accepted.nodes[0].position]:family==='viewport-pan'?[accepted.baseViewport,accepted.viewport]:family==='box-selection'?[accepted.rect]:[accepted.pointerWorldPoint];\n assert.equal(owned.length,controls.length);assert.equal(Object.isFrozen(accepted),true);\n for(const [index,c] of controls.entries()){assert.equal(Object.isFrozen(owned[index]),true);assert.equal(Object.isFrozen(c.source),false);assert.equal(c.metadata(),1);assert.equal(owned[index].metadata,opaque);for(const field of Object.keys(c.expected)){assert.equal(c.reads[field],1);assert.equal(Object.hasOwn(owned[index],field),true);assert.equal(owned[index][field],c.expected[field]);c.values[field]=NaN;assert.equal(owned[index][field],c.expected[field]);}}\n assert.equal(Object.isFrozen(opaque),false);assert.equal(kernel.read(),view);checks++;\n}\nconsole.log(JSON.stringify({checks,passed:checks,scope:'four families x three shapes, internal acceptor only; not Renderer DOM/browser proof'}));"
+      ],
+      "exitCode": 0,
+      "cases": 12,
+      "scope": "internal pure acceptor; public Kernel/Port/Session values, no public Renderer/DOM/browser execution",
+      "log": "spec-tests.log"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "6fd2d016f6330cc422508b3e51229bea4be2cce0...fe48ff7c2ffb7eef144f64b4699b042f6acdad19"
+      ],
+      "exitCode": 0,
+      "log": "spec-tests.log"
+    }
+  ],
+  "policy": {
+    "sourceCommit": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+    "path": ".agents/skills/pr-risk/SKILL.md",
+    "blob": "596298db784c4f3424968cd05a3aca4a6471b1b3"
+  },
+  "limitations": [
+    "Fresh internal18 scenarios are not public CanvasRenderer/DOM/browser execution.",
+    "No independent build/typecheck/affected/browser/full/original12/remoteCI/publication/media/merge/main acceptance.",
+    "External current browser progress was read without independently confirmed final job exit.",
+    "Earlier3ae9/cf231 reports and logs were not written and their execution counts were not inherited."
+  ]
+}

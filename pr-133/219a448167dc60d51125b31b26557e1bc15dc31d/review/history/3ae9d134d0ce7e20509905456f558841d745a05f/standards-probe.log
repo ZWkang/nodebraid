@@ -1,0 +1,13 @@
+$ bun - <<'TS' (initial source in standards-probe-initial.ts; run from implementation worktree)
+SyntaxError: Unexpected keyword 'export'
+      at <parse> (3:1)
+      at Function (unknown:1:1)
+
+Bun v1.4.2 (macOS arm64)
+
+Exit code: 1
+
+$ bun - <<'TS' (corrected source in standards-probe-corrected.ts; run from implementation worktree)
+{"scope":"pure acceptance helper only; no DOM/browser claim","base":{"type":"node-drag","nodes":[{"nodeId":"a","basePosition":{"x":10,"y":20},"position":{"x":80,"y":90}},{"nodeId":"b","basePosition":{"x":200,"y":30},"position":{"x":280,"y":190}}]},"head":{"type":"node-drag","nodes":[{"nodeId":"a","basePosition":{"x":200,"y":30},"position":{"x":280,"y":190}},{"nodeId":"b","basePosition":{"x":10,"y":20},"position":{"x":80,"y":90}}]}}
+
+Exit code: 0

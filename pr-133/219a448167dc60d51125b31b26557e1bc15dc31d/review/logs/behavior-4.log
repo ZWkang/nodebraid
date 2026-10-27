@@ -1,0 +1,21 @@
+28 | try{
+29 |  await run(['open',server.url.href]);
+30 |  const response=JSON.parse(await run(['eval','globalThis.__nodebraidCallbackIndexRepro()','--json']));
+31 |  assert.equal(response.success,true,JSON.stringify(response.error));const result=response.data.result;
+32 |  writeFileSync(out+'/observations.json',JSON.stringify({head,session,url:server.url.href,...result},null,2)+'\n');
+33 |  assert.equal(result.controls,2);assert.equal(result.passed,2);assert.equal(result.observations.length,2);
+                                             ^
+AssertionError: Expected values to be strictly equal:
+
+0 !== 2
+
+ generatedMessage: true,
+     actual: 0,
+   expected: 2,
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/callback-index-repro/current/browser-probe.ts:33:41
+
+Bun v1.4.2 (macOS arm64)

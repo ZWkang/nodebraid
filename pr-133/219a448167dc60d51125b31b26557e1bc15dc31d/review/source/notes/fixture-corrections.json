@@ -1,0 +1,20 @@
+{
+  "genericTypeFailure": {
+    "log": "typecheck-expanded.log",
+    "diagnostics": "2 TS2322, fixture T extends object not constrained to numeric fields",
+    "preimage": "geometry-fixture-before-generic-fix.ts",
+    "correction": "T extends Record<string,number>; runtime values/assertions unchanged; corrected strict typecheck exit0 before expanded browser run"
+  },
+  "hitExpectationFailure": {
+    "initial": "expanded-attempts/initial",
+    "controls": 208,
+    "passed": 178,
+    "failed": 30,
+    "correction": "Added complete public HitResult.worldPoint expected100/100 (NodeDrag) and50/40 (ViewportPan); no assertion weakened and production source unchanged",
+    "corrected": "expanded-geometry-corrected.json",
+    "correctedExit": 0,
+    "correctedPassed": 208
+  },
+  "coordinatorSourceError": "remaining-geometry-coordinator-error.json",
+  "notProductOrOnlineRepair": true
+}

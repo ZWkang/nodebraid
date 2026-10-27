@@ -1,0 +1,111 @@
+diff --git a/packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts b/packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts
+index de5fafa..fc8c8d2 100644
+--- a/packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts
++++ b/packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts
+@@ -292,6 +292,7 @@ export async function runInteractionGeometryValueCases(): Promise<{
+     }
+   }
+   results.push(...(await runInteractionGeometryArrayCases()).results);
++  results.push(...(await runInteractionGeometryMetadataCases()).results);
+   return {
+     controls: results.length,
+     passed: results.filter((result) => result.passed).length,
+@@ -389,3 +390,59 @@ export async function runInteractionGeometryArrayCases(): Promise<{
+   }
+   return { controls: results.length, passed: results.filter((result) => result.passed).length, results };
+ }
++
++async function geometryMetadataCase(slot: 'basePosition' | 'position', mode: 'raw-throws' | 'clone-throws'): Promise<void> {
++  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
++  target.setAttribute('width', '400'); target.setAttribute('height', '300'); document.body.append(target);
++  const renderer = createSvgRenderer({ target }), kernel = createCanvasKernel(), id = nodeId('a');
++  kernel.transact(tx => tx.nodes.add({ id, type: 'task', position: { x: 10, y: 20 }, size: { width: 80, height: 40 }, data: null }));
++  const original = new Error(slot + '/' + mode), opaque = { caller: Symbol(mode) };
++  let rawReads = 0, cloneReads = 0;
++  const rawPoint = { x: slot === 'basePosition' ? 10 : 80, y: slot === 'basePosition' ? 20 : 90 };
++  Object.defineProperty(rawPoint, 'metadata', { enumerable: true, get(this: object) {
++    check(this === rawPoint, 'Original map Point metadata receiver'); rawReads += 1;
++    if (mode === 'raw-throws') throw original; return opaque;
++  } });
++  const clonePoint = { x: rawPoint.x, y: rawPoint.y };
++  Object.defineProperty(clonePoint, 'metadata', { enumerable: true, get() {
++    cloneReads += 1; if (mode === 'clone-throws') throw original; return opaque;
++  } });
++  const candidate: NodeDragProjectionNode = {
++    nodeId: id, basePosition: slot === 'basePosition' ? rawPoint : { x: 10, y: 20 },
++    position: slot === 'position' ? rawPoint : { x: 80, y: 90 },
++  };
++  const clone: NodeDragProjectionNode = { ...candidate, [slot]: clonePoint };
++  const nodes: NodeDragProjectionNode[] = [candidate];
++  nodes[Symbol.iterator] = function() { return [clone].values(); };
++  try {
++    const view = kernel.read();
++    renderer.updateDocument({ type: 'reset', view });
++    renderer.updateSession({ selection: { nodeIds: [], edgeIds: [] }, viewport: { x: 0, y: 0, zoom: 1 } });
++    const documentDOM = target.innerHTML;
++    renderer.updateInteraction({ type: 'box-selection', rect: { x: 2, y: 3, width: 20, height: 30 } });
++    const previousDOM = target.innerHTML;
++    let didThrow = false, caught: unknown;
++    try { renderer.updateInteraction({ type: 'node-drag', nodes }); } catch (error) { didThrow = true; caught = error; }
++    check(rawReads === 1 && cloneReads === 0, 'Copy stage reads original map metadata, not validation iterator clone');
++    if (mode === 'raw-throws') {
++      check(didThrow && caught === original, 'Original map metadata error identity retained');
++      check(target.innerHTML === previousDOM, 'Metadata error preserves accepted DOM');
++    } else {
++      check(!didThrow, 'Uncopied iterator metadata cannot introduce an error');
++      equal(attributes(target, '[data-nodebraid-node-id="a"]', ['x', 'y']), { x: '80', y: '90' }, 'Captured numeric geometry still projects');
++    }
++    check(kernel.read() === view && !Object.isFrozen(opaque), 'Kernel baseline and shallow caller metadata retained');
++    renderer.updateInteraction(null); check(target.innerHTML === documentDOM, 'Metadata case clears to committed DOM');
++  } finally {
++    await renderer.dispose(); check(target.childElementCount === 0 && !target.hasAttribute('tabindex'), 'Metadata case cleanup'); target.remove();
++  }
++}
++export async function runInteractionGeometryMetadataCases(): Promise<{ controls: number; passed: number; results: Result[] }> {
++  const results: Result[] = [];
++  for (const slot of ['basePosition', 'position'] as const) for (const mode of ['raw-throws', 'clone-throws'] as const) {
++    const id = 'copy-stage-metadata/' + slot + '/' + mode;
++    try { await geometryMetadataCase(slot, mode); results.push({ id, passed: true }); }
++    catch (error) { results.push({ id, passed: false, error: error instanceof Error ? error.stack : String(error) }); }
++  }
++  return { controls: results.length, passed: results.filter(result => result.passed).length, results };
++}
+diff --git a/packages/renderer-svg/browser-tests/renderer-contract.browser.ts b/packages/renderer-svg/browser-tests/renderer-contract.browser.ts
+index 99689f5..615b24c 100644
+--- a/packages/renderer-svg/browser-tests/renderer-contract.browser.ts
++++ b/packages/renderer-svg/browser-tests/renderer-contract.browser.ts
+@@ -66,13 +66,13 @@ try {
+     passed: number;
+     results: { id: string; passed: boolean; error?: string }[];
+   }>('globalThis.__nodebraidRendererSvgGeometryValueCases()');
+-  assert.equal(geometryValues.controls, 210);
++  assert.equal(geometryValues.controls, 214);
+   assert.equal(
+     geometryValues.passed,
+     geometryValues.controls,
+     JSON.stringify(geometryValues.results.filter((result) => !result.passed)),
+   );
+-  console.info('SVG Interaction Geometry capture: 210 public browser cases passed.');
++  console.info('SVG Interaction Geometry capture: 214 public browser cases passed.');
+   let nativePolicyCases = 0;
+   await withRendererPageCdp(async (send) => {
+     for (const family of ['pointer', 'wheel', 'keyboard', 'contextMenu'] as const) {
+diff --git a/packages/renderer-svg/browser-tests/renderer-contract.entry.ts b/packages/renderer-svg/browser-tests/renderer-contract.entry.ts
+index b76efe1..9254eea 100644
+--- a/packages/renderer-svg/browser-tests/renderer-contract.entry.ts
++++ b/packages/renderer-svg/browser-tests/renderer-contract.entry.ts
+@@ -1,6 +1,7 @@
+ import {
+   runInteractionGeometryValueCases,
+   runInteractionGeometryArrayCases,
++  runInteractionGeometryMetadataCases,
+ } from './interaction-geometry-values.entry';
+ import {
+   setupPolicyCase,
+@@ -6034,3 +6035,6 @@ declare global {
+   var __nodebraidRendererSvgGeometryArrayCases: typeof runInteractionGeometryArrayCases;
+ }
+ globalThis.__nodebraidRendererSvgGeometryArrayCases = runInteractionGeometryArrayCases;
++
++declare global { var __nodebraidRendererSvgGeometryMetadataCases: typeof runInteractionGeometryMetadataCases; }
++globalThis.__nodebraidRendererSvgGeometryMetadataCases = runInteractionGeometryMetadataCases;

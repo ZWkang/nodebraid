@@ -1,0 +1,955 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+    "expectedParent": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+    "head": "219a448167dc60d51125b31b26557e1bc15dc31d",
+    "tree": "abaf6c01ef863fa36f4a7c760363a2d69c38290a",
+    "patch": "cdbfce62eb18609e954cb47469e7335d9e10d632604850a98da3a1367ca92c40",
+    "localHead": "fe48ff7c2ffb7eef144f64b4699b042f6acdad19"
+  },
+  "task": {
+    "run": "afa38d74-62c2-4a42-b32e-4e86c6b9b41f",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 132
+    },
+    "request": "## Confirmed defect\n\nAt main `6fd2d016f6330cc422508b3e51229bea4be2cce0`, the public SVG Renderer validates declared Interaction Projection geometry and then snapshots it using own enumerable spreads. Valid inherited getters and non-enumerable own Point/Viewport/WorldRect values disappear before DOM projection.\n\nA fresh strictly typechecked, publicly compiled program ran once in real Chromium: 12 controls, 8 failures and 4 ordinary-own-value controls passing. In each of Node Drag, Viewport Pan, Box Selection and Connection Preview, both inherited and hidden geometry shapes are accepted without throwing but render invalid values:\n\n- Node Drag publishes Node x/y=`undefined` and incident Edge x1/y1=`NaN` instead of the finite candidate geometry.\n- Viewport Pan publishes `matrix(NaN NaN NaN NaN NaN NaN)` instead of `matrix(2 0 0 2 20 30)`.\n- Box Selection publishes `undefined` x/y/width/height instead of 5/6/70/80.\n- Connection Preview publishes `undefined` x2/y2 instead of 330/140.\n\nAll original values satisfy the public readonly structural types. All four ordinary own-value counterparts render correctly and clear back to their original DOM, retaining Node element identity. All 12 leave the real Kernel View unchanged and dispose their owned Renderer/Target cleanly. The driver exits1 on the actual 4-versus-12 assertion. This is a public API plus real SVG DOM test; no native Pointer/Wheel/Keyboard events, Host/Command scheduling or whole-Renderer coverage is claimed.\n\n## Contract and cause\n\n[`InteractionProjection`](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/interaction-api/src/contracts.ts) declares Point, Viewport and WorldRect geometry without an own/enumerability restriction. [ADR0059](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/docs/adr/0059-treat-interaction-projection-as-effective-renderer-state.md) requires synchronous all-or-throw acceptance of complete effective state; [ADR0062](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/docs/adr/0062-project-interaction-through-existing-svg-geometry.md) requires the finite candidate geometry to drive display, hit tests and Input mapping. [The shared acceptor](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/renderer-svg/src/interaction-projection.ts) validates readable declared fields but drops them in later spread copies.\n\n## Acceptance\n\n- Preserve accepted declared Point x/y, Viewport x/y/zoom and WorldRect x/y/width/height in owned frozen Interaction Projection geometry for ordinary, inherited and non-enumerable fields across all four affected Projection variants.\n- Capture the declared geometry values once with their original receivers; validate and project those same captured values. Preserve existing finite/positive/nonnegative rules, baseline compatibility and original first failures. Keep caller-owned values mutable and shallow, including existing enumerable-copy behavior for unrelated metadata; do not reinterpret application data.\n- Keep existing validation phase/order, malformed/canonical arrays and IDs, anchors/Port semantics, all-or-throw DOM/accepted-state recovery, Selection/Viewport synchronization, public API/selectors and lifecycle/Input/Disposition policies. No default/coercion, plain-record/accessor prohibition, cap/retry/fallback or unrelated configuration/Binding policy.\n- The exact original 12-case entry becomes green without overwriting its original red bundle. Add public regressions for once-read validated values, original receiver/error identity, state/DOM rollback and relevant hit/Input geometry. Distinguish public fixture input from native browser evidence.\n- Complete affected checks and the existing independent Standards+ponytail/Spec/risk reviews, formal main-protocol full verification, exact normal publication/current-head CI and immutable full reports/media readback. Keep this Issue open through actual main whole-Issue acceptance.\n\n## Reproduction\n\nAfter building the public packages, bundle the following TypeScript entry for the browser and call `await globalThis.__nodebraidProjectionDiscovery()` in Chromium. The actual run first passed strict TSC and browser compilation, then returned `{controls:12,passed:4,failed:8}`; its driver asserted 12 passes and exited1. Each case uses the real public Kernel and SVG Renderer with its own connected Target, retaining actual DOM attributes in the result.\n\n```ts\nimport {createCanvasKernel,nodeId,edgeId,type Point} from '@nodebraid/kernel';\nimport {createSvgRenderer} from '@nodebraid/renderer-svg';\nimport type {InteractionProjection,WorldRect} from '@nodebraid/interaction-api';\nimport type {Viewport} from '@nodebraid/session-api';\ntype Shape='own'|'inherited'|'non-enumerable';\ntype Family='node-drag'|'viewport-pan'|'box-selection'|'connection-preview';\ninterface Observation{family:Family;shape:Shape;passed:boolean;error:unknown;actual:Record<string,unknown>;baselineUnchanged:boolean;cleanup:boolean;nativeInputEventsDriven:0}\nfunction point(shape:Shape,x:number,y:number):Point{\n class Inherited implements Point{get x(){return x;}get y(){return y;}}\n const own={x,y};if(shape==='non-enumerable')for(const key of ['x','y'])Object.defineProperty(own,key,{enumerable:false});\n return shape==='inherited'?new Inherited():own;\n}\nfunction viewport(shape:Shape,x:number,y:number,zoom:number):Viewport{\n class Inherited implements Viewport{get x(){return x;}get y(){return y;}get zoom(){return zoom;}}\n const own={x,y,zoom};if(shape==='non-enumerable')for(const key of ['x','y','zoom'])Object.defineProperty(own,key,{enumerable:false});\n return shape==='inherited'?new Inherited():own;\n}\nfunction rect(shape:Shape,x:number,y:number,width:number,height:number):WorldRect{\n class Inherited implements WorldRect{get x(){return x;}get y(){return y;}get width(){return width;}get height(){return height;}}\n const own={x,y,width,height};if(shape==='non-enumerable')for(const key of ['x','y','width','height'])Object.defineProperty(own,key,{enumerable:false});\n return shape==='inherited'?new Inherited():own;\n}\nfunction attr(target:SVGSVGElement,selector:string,names:readonly string[]):Record<string,string|null>{\n const element=target.querySelector(selector);return Object.fromEntries(names.map(name=>[name,element?.getAttribute(name)??null]));\n}\nfunction same(a:unknown,b:unknown):boolean{return JSON.stringify(a)===JSON.stringify(b);}\nasync function investigate(){\n const observations:Observation[]=[];globalThis.__nodebraidProjectionProgress=observations;\n for(const family of ['node-drag','viewport-pan','box-selection','connection-preview'] as const)for(const shape of ['own','inherited','non-enumerable'] as const){\n  const target=document.createElementNS('http://www.w3.org/2000/svg','svg');target.setAttribute('width','400');target.setAttribute('height','300');\n  const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');defs.setAttribute('data-caller-owned','');target.append(defs);document.body.append(target);\n  const renderer=createSvgRenderer({target}),kernel=createCanvasKernel(),a=nodeId('a'),b=nodeId('b'),e=edgeId('edge');\n  kernel.transact(tx=>{tx.nodes.add({id:a,type:'task',position:{x:10,y:20},size:{width:80,height:40},data:null});tx.nodes.add({id:b,type:'task',position:{x:220,y:40},size:{width:100,height:60},data:null});tx.edges.add({id:e,type:'link',source:{nodeId:a},target:{nodeId:b},data:null});});\n  const view=kernel.read();renderer.updateDocument({type:'reset',view});renderer.updateSession({selection:{nodeIds:[a],edgeIds:[]},viewport:{x:0,y:0,zoom:1}});\n  const node=target.querySelector('[data-nodebraid-node-id=\"a\"]');if(!node)throw new Error('Real SVG Node missing before the projection case.');\n  const baseline=target.innerHTML;let projection:InteractionProjection;\n  switch(family){\n   case'node-drag':projection={type:family,nodes:[{nodeId:a,basePosition:point(shape,10,20),position:point(shape,80,90)}]};break;\n   case'viewport-pan':projection={type:family,baseViewport:viewport(shape,0,0,1),viewport:viewport(shape,20,30,2)};break;\n   case'box-selection':projection={type:family,rect:rect(shape,5,6,70,80)};break;\n   case'connection-preview':projection={type:family,source:{nodeId:a,role:'source'},pointerWorldPoint:point(shape,330,140),target:{type:'none'}};break;\n  }\n  let error:unknown=null,actual:Record<string,unknown>={},passed=false,baselineUnchanged=false,cleanup=false;\n  try{\n   try{renderer.updateInteraction(projection);}catch(caught){error=caught instanceof Error?{name:caught.name,message:caught.message,code:Reflect.get(caught,'code')??null}:caught;}\n   actual={node:attr(target,'[data-nodebraid-node-id=\"a\"]',['x','y']),edge:attr(target,'[data-nodebraid-edge-id=\"edge\"]',['x1','y1','x2','y2']),matrix:attr(target,'[data-nodebraid-renderer-svg-root]',['transform']),box:attr(target,'[data-nodebraid-box-selection]',['x','y','width','height']),connection:attr(target,'[data-nodebraid-connection-preview]',['x1','y1','x2','y2']),sourceNode:kernel.read().query.getNode(a)?.position};\n   baselineUnchanged=kernel.read()===view&&same(kernel.read().query.getNode(a)?.position,{x:10,y:20});\n   if(error===null)switch(family){\n    case'node-drag':passed=same(actual.node,{x:'80',y:'90'})&&same(actual.edge,{x1:'120',y1:'110',x2:'270',y2:'70'});break;\n    case'viewport-pan':passed=same(actual.matrix,{transform:'matrix(2 0 0 2 20 30)'});break;\n    case'box-selection':passed=same(actual.box,{x:'5',y:'6',width:'70',height:'80'});break;\n    case'connection-preview':passed=same(actual.connection,{x1:'90',y1:'40',x2:'330',y2:'140'});break;\n   }\n   if(passed){renderer.updateInteraction(null);passed=target.innerHTML===baseline&&target.querySelector('[data-nodebraid-node-id=\"a\"]')===node;}\n   passed=passed&&baselineUnchanged;\n  }finally{await renderer.dispose();cleanup=target.childElementCount===1&&target.firstElementChild===defs&&!target.hasAttribute('tabindex');target.remove();}\n  observations.push({family,shape,passed:passed&&cleanup,error,actual,baselineUnchanged,cleanup,nativeInputEventsDriven:0});\n }\n return {controls:observations.length,passed:observations.filter(x=>x.passed).length,failed:observations.filter(x=>!x.passed).length,observations,nativeInputEventsDriven:0,userAgent:navigator.userAgent,scope:'Typed public CanvasRenderer.updateInteraction and actual SVG DOM; no native input, Command/Host, arbitrary scheduling or whole Renderer claim.'};\n}\ndeclare global{var __nodebraidProjectionProgress:Observation[];var __nodebraidProjectionDiscovery:typeof investigate;}\nglobalThis.__nodebraidProjectionDiscovery=investigate;\n\n```\n\n## Deduplication\n\nComplete current all-state collections contain 131 Issue/PR records (50+50+31) and 67 PRs (20+20+20+7). All titles and full bodies were checked for the acceptor path and Projection/geometry vocabulary. Relevant #122/#124 full bodies and discussions, and #123/#125 files/reviews/conversation/inline threads were read. Those completed deliveries fix constructor hit tolerances and DOM event-policy booleans in svg-config, not interaction-projection.ts geometry ownership. Existing #130/PR #131 concern Basic Connection callback snapshots, and #128/PR #129 Layout Capabilities, not this SVG Projection boundary. No existing canonical delivery implements this occurrence.\n",
+    "plan": [
+      {
+        "id": "public-red",
+        "blockedBy": [],
+        "acceptance": "Retain original strict compiled12 browser red8/control4 and a failing public SVG regression with complete source/binary preimages."
+      },
+      {
+        "id": "capture-declared-geometry",
+        "blockedBy": [
+          "public-red"
+        ],
+        "acceptance": "Owned Projection geometry captures and validates Point/Viewport/WorldRect declared values once with original receivers and preserves error/copy/order/compatibility behavior."
+      },
+      {
+        "id": "integration-and-independent-review",
+        "blockedBy": [
+          "capture-declared-geometry"
+        ],
+        "acceptance": "Original entry byte-identical12green plus value/error/DOM/Hits/Input/sync/rollback public regressions and affected checks pass; independent exact-head Standards+ponytail and Spec each full risk passed."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "integration-and-independent-review"
+        ],
+        "acceptance": "Only after both reviews pass canonical pinned main verify executes one real full bun run check with stable exact identity and original raw receipts."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "One normal delivery PR/main Refs132, actual remote tree/firstparent bytes and actual current CI/dynamic all-mapped native scenes/full immutable reports/media readback."
+      },
+      {
+        "id": "required-review-and-authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "Preserve canonical main risk route and actual required human/specific authorization, complete current feedback/strict check/ticket/protection before any expected-head immediate merge; no bypass/self-approve/force/auto queue."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "required-review-and-authorized-merge"
+        ],
+        "acceptance": "Actual fresh main whole-Issue public/compiled acceptance, tickets, real main CI/necessary Deploy and separate close authorization before summary/commentID+digest/archive/completed closure."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "fe48ff7c2ffb7eef144f64b4699b042f6acdad19",
+      "tree": "abaf6c01ef863fa36f4a7c760363a2d69c38290a",
+      "patch": "cdbfce62eb18609e954cb47469e7335d9e10d632604850a98da3a1367ca92c40",
+      "report": "What this change does: retains validated Interaction geometry, including inherited and non-enumerable values. Node Drag now separates cached numbers from copy-phase metadata sources.\n\n- Base: `6fd2d016f6330cc422508b3e51229bea4be2cce0`\n- Head: `fe48ff7c2ffb7eef144f64b4699b042f6acdad19`\n- Tree: `abaf6c01ef863fa36f4a7c760363a2d69c38290a`\n- Binary patch SHA256: `cdbfce62eb18609e954cb47469e7335d9e10d632604850a98da3a1367ca92c40`\n- Task digest: `931f3d5bf15180095ee77655c8da3308ac84817af0cf9e85a5726b0e509a25d3`\n\nRe-read the complete four-file/three-commit patch, all 494 fixture lines and 214 browser-case definitions, saved Issue132/empty discussion and independent plan. Traced acceptance, preflight, DOM journal, effective Document/Session, Hit Test and input conversion. Canonical patch bytes, clean checkout and identities passed before/after checks.\n\nHard documented standards: no remaining violation found. ADR0054/0059/0062 preflight and effective-state ownership remain at the shared acceptor. Numeric values are captured and validated before projection. Node Drag retains eager coordinate evaluation; Point, Viewport and Rect keep their sequential failure order. Reflection preserves own enumerable strings/symbols, descriptor checks, receivers, original failures and shallow ownership, without rereading captured coordinates.\n\nBoth earlier P2 findings are closed. The cache uses validated semantic NodeIds, not caller map indices or candidate object identity. Its type retains numeric Point pairs only. Copying now enumerates the actual map candidate's Point sources, preserving unrelated metadata reads/errors when iteration yields independent clones. Existing array traversal and canonical/baseline checks remain unchanged.\n\nJudgment-only Fowler smells: no concrete finding. Ponytail: correct, safe and lean for isolated SVG Targets; the common copying helper carries an actual shared contract without new policy, fallback or dependency.\n\nFresh independent `bun test packages/renderer-api/tests packages/renderer-svg/tests packages/plugin-renderer/tests packages/plugin-interaction/tests packages/plugin-session/tests` exited 0: **295 tests, 2167 assertions**. A separate fresh pure-acceptor program passed **6/6 controls** for callback indices, equivalent clones and both metadata-error directions/Point slots. These controls are not browser execution or strict TypeScript verification.\n\nRisk: **medium**, under deployed `pr-risk` and the public-source floor. Geometry acceptance affects display, Hit Test and input; full-source review and fresh checks support focused human review, not automatic merging. Rollback must undo the complete Issue132 delivery: fe48ff7, cf231f7 and 3ae9d13 in reverse order, or their complete mapped publication, restore the base and recreate Renderers. Code rollback cannot undo application Commands already executed.\n\nNot independently run: browsers, strict TypeScript, product builds, affected/full checks, original compiled12 or remote CI/publication/main acceptance.\n\n**Verdict: passed. Looks good. Ship.** This is not merge approval.\n",
+      "risk": {
+        "level": "medium",
+        "rationale": "Complete Issue132 changes public Renderer implementation for ownership and validation of four Interaction geometry variants, affecting effective display, Hit Test and input state. The public-source minimum is medium and focused human review remains required. Small size, corrected regressions or green checks do not qualify this as low risk.",
+        "evidence": "Independently re-read the complete base 6fd2d016f6330cc422508b3e51229bea4be2cce0 to head fe48ff7c2ffb7eef144f64b4699b042f6acdad19 patch cdbfce62eb18609e954cb47469e7335d9e10d632604850a98da3a1367ca92c40 and current connected code. Fresh public Bun suites passed 295 tests and 2167 assertions. A fresh pure-acceptor program passed six controls covering supplied map callback indices/equivalent clones and four original-versus-clone metadata exception controls. Both prior findings are closed by the current typed cache and copy-source logic. Source identities/canonical bytes/clean checkout checked before and after. No browser/full engineering result is attributed to this reviewer.",
+        "rollback": "Restore base 6fd2d016f6330cc422508b3e51229bea4be2cce0 by reverting the complete Issue132 delivery: fe48ff7c2ffb7eef144f64b4699b042f6acdad19, cf231f772e0f5431281fec172b8c2419e1cce370 and 3ae9d134d0ce7e20509905456f558841d745a05f in reverse order, or reverting their full mapped published delivery. Reverting only the last repair is insufficient. Dispose/recreate affected Renderer instances and resynchronize authoritative Document/Session projections. No schema migration is introduced. Code rollback does not undo application Commands already executed; those require existing application History or recovery."
+      }
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "fe48ff7c2ffb7eef144f64b4699b042f6acdad19",
+      "tree": "abaf6c01ef863fa36f4a7c760363a2d69c38290a",
+      "patch": "cdbfce62eb18609e954cb47469e7335d9e10d632604850a98da3a1367ca92c40",
+      "report": "verdict: passed\n\nbase: 6fd2d016f6330cc422508b3e51229bea4be2cce0\nhead: fe48ff7c2ffb7eef144f64b4699b042f6acdad19\ntree: abaf6c01ef863fa36f4a7c760363a2d69c38290a\nbinary patch SHA256: cdbfce62eb18609e954cb47469e7335d9e10d632604850a98da3a1367ca92c40\ntaskDigest: 931f3d5bf15180095ee77655c8da3308ac84817af0cf9e85a5726b0e509a25d3\n\n独立重读 [Issue132](https://github.com/ZWkang/nodebraid/issues/132) 全文/完整评论；最终读回2026-10-27 08:25:06 UTC，open、bug/ready-for-agent，评论0，request未变。审查完整三提交四路径、494行fixture/214输入及acceptor→DOM Journal→Effective State/Hit/Input链，依据指定main规范/CONTEXT与ADR0054/59/62/63。实际完整补丁与本head归档字节一致。\n\n未发现当前缺漏、scope creep或错误实现。NodeId缓存仅保存validated numeric pairs，不含Point source；原map candidate的basePosition/position仍作为metadata复制源。因而既不依赖callback index/candidate对象identity，又保留 “existing enumerable-copy behavior for unrelated metadata” 的原receiver、阶段、首异常与浅引用。四种Projection数字捕获/finite/positive/nonnegative及原eager/sequential错误顺序重新核对；无新array/ID/Anchor/Port/Input或默认/coercion/record策略。Renderer仍先完整accept，再用Journal投影，成功后替换accepted state。\n\n本人在本head新执行：原index互换程序及等值iterator clone各退出0；独立metadata四场景均rawReads1/cloneReads0，raw异常严格保留原Error、clone异常不传播；四family×own/inherited/non-enumerable的12几何场景全部通过，数字只读一次、owned冻结、caller/metadata不冻结且Kernel不变。这18场景是内部acceptor边界核验，不冒称公共Renderer/DOM/browser。\n\n另执行 `bun test packages/renderer-api/tests packages/renderer-svg/tests packages/plugin-renderer/tests packages/plugin-interaction/tests packages/plugin-history/tests`：296 pass、0 fail、2196 assertions，21文件，exit0；diff-check通过，前后HEAD/tree/patch/clean一致。未复用旧计数；全部程序与原始输出在spec-tests.log。fixture期望补全/工作树214记录不当作本head执行。\n\n未本人运行build/typecheck/affected/browser/full、原12或远端CI/发布/媒体/merge/main验收；外部浏览器进度不代表本人执行或最终job回执。Spec通过不等于人工批准或交付完成。\n\nrisk: {\"level\": \"medium\", \"rationale\": \"完整交付改变公共SVG Projection geometry ownership与Effective State/Hit/Input映射，命中public-src medium下限；数字关联及metadata复制来源均需重点人工审阅，修复与绿测不降为low。\", \"evidence\": \"完整base→fe48四路径、494行fixture/214输入及ADR0054/59/62/63调用链重审；本head新公共Bun296tests/2196assertions通过，内部index2、metadata4、四family×三形态12场景全actualExit0。main6fd2 risk blob596298db784c4f3424968cd05a3aca4a6471b1b3独立核实。\", \"rollback\": \"普通回退完整base6fd2→fe48交付，包括fe48ff7c2ffb7eef144f64b4699b042f6acdad19、cf231f772e0f5431281fec172b8c2419e1cce370、3ae9d134d0ce7e20509905456f558841d745a05f三提交或未来完整published映射；单回最后fix不足。无schema/数据迁移；依既有reset/dispose重建投影，代码回退不能撤销已执行应用Command。\"}\n",
+      "risk": {
+        "level": "medium",
+        "rationale": "完整交付改变公共SVG Projection geometry ownership与Effective State/Hit/Input映射，命中public-src medium下限；数字关联及metadata复制来源均需重点人工审阅，修复与绿测不降为low。",
+        "evidence": "完整base→fe48四路径、494行fixture/214输入及ADR0054/59/62/63调用链重审；本head新公共Bun296tests/2196assertions通过，内部index2、metadata4、四family×三形态12场景全actualExit0。main6fd2 risk blob596298db784c4f3424968cd05a3aca4a6471b1b3独立核实。",
+        "rollback": "普通回退完整base6fd2→fe48交付，包括fe48ff7c2ffb7eef144f64b4699b042f6acdad19、cf231f772e0f5431281fec172b8c2419e1cce370、3ae9d134d0ce7e20509905456f558841d745a05f三提交或未来完整published映射；单回最后fix不足。无schema/数据迁移；依既有reset/dispose重建投影，代码回退不能撤销已执行应用Command。"
+      }
+    }
+  },
+  "changedFiles": [
+    "packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts",
+    "packages/renderer-svg/browser-tests/renderer-contract.browser.ts",
+    "packages/renderer-svg/browser-tests/renderer-contract.entry.ts",
+    "packages/renderer-svg/src/interaction-projection.ts"
+  ],
+  "risk": {
+    "level": "medium",
+    "route": "quick-human",
+    "reasons": [
+      "standards: medium — Complete Issue132 changes public Renderer implementation for ownership and validation of four Interaction geometry variants, affecting effective display, Hit Test and input state. The public-source minimum is medium and focused human review remains required. Small size, corrected regressions or green checks do not qualify this as low risk.",
+      "spec: medium — 完整交付改变公共SVG Projection geometry ownership与Effective State/Hit/Input映射，命中public-src medium下限；数字关联及metadata复制来源均需重点人工审阅，修复与绿测不降为low。",
+      "packages/renderer-svg/src/interaction-projection.ts: minimum medium risk."
+    ]
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-public-compiled-twelve-red",
+      "acceptance": "Actual main6fd strictTSC and public browser bundle succeeded; real Chromium returned8 failed/4 own-value controls across four Projection families. Undefined/NaN DOM values are a product failure, not setup. All Kernel baselines/owned cleanup retained. No native Input is driven.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/20261027T070907-svg-projection-maintenance/browser-probe.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "repository-inherited-position-red",
+      "acceptance": "Initial repository public SVG tracer reports undefined x/y instead of80/90 before production repair. Full original tracked test/source preimages and binary patch plus red bundle retained.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/repository-tracer.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "repository-first-tracer-green",
+      "acceptance": "Initial single Node Drag tracer becomes green after the first owner repair; this was a dirty working tree at base6fd with complete patch/bundle identity, not execution at a later commit.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/repository-tracer.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "first-review-index-regression-red",
+      "acceptance": "At historical3ae9 a new strict typed public SVG program preserves IDs/order but caller map callback index swaps Node geometry in2 cases, including iterator clones. Same entry passes2/2 at main6fd. This is a genuine local review regression, not manufactured online CI failure.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/callback-index-repro/current/browser-probe.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "repository-index-regression-red",
+      "acceptance": "Two added repository public Renderer regressions reproduce the exchanged geometry before the normal cf231 follow-up fix. Their independent original red bundle/source/patch remain retained.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/array-runner.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "second-review-metadata-regression-red",
+      "acceptance": "At historicalcf231 public SVG4cases read iterator-clone metadata rather than raw map Point metadata, skipping an original Error or introducing an unrequested Error; same entry4/4passes at main6fd. Original comparative DOM/count/identity evidence is separate from current-head checks.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/metadata-copy-repro/current/browser-probe.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "repository-copy-source-regression-red",
+      "acceptance": "Four public repository metadata-source regressions fail before fe48 fixes the phase ownership; numeric caching remains keyed by NodeId. Full raw red code/bundle and patch retained.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/metadata-runner.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "current-byte-identical-twelve-green",
+      "acceptance": "At reviewed localfe48, byte-identical62647bc5... original entry strictly typechecks and all12 real Chromium public Renderer/DOM cases pass. Actual affected build generated these public dist modules. Publication maps its full tree to remote source; local execution is not renamed as remote execution.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/original-green/fe48ff7c2ffb7eef144f64b4699b042f6acdad19/browser-probe.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "current-public-index-two-green",
+      "acceptance": "At localfe48 actualpublicdist the exact two comparative callback/index programs both pass, preserving semantic Node geometry and Kernel baseline. Strict TSC/browser receipts and cleanup retained.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/callback-index-repro/final-fe48/browser-probe.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "current-public-metadata-four-green",
+      "acceptance": "At localfe48 actualpublicdist all4 metadata-source cases pass with rawReads1/cloneReads0 and strict original Error identity/atomic DOM. These are public API plus real browser DOM, not native Input.",
+      "command": "bun /Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/metadata-copy-repro/final-fe48/browser-probe.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-10.log"
+    },
+    {
+      "id": "current-exact-head-affected",
+      "acceptance": "Exact localfe48 affected checks pass renderer-svg/examples and both real browser suites, including214 new public geometry controls plus existing native policy/tolerance/Examples/Clipboard/Document tests. This is separate from formal full.",
+      "command": "bun run check:affected --base 6fd2d016f6330cc422508b3e51229bea4be2cce0",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-11.log"
+    },
+    {
+      "id": "current-independent-standards",
+      "acceptance": "Fresh complete three-commit independent standards review passed with its own exact-head tests/risk. Any private acceptor controls are expressly not public Renderer/browser execution; full original Markdown remains unchanged.",
+      "command": "bun test packages/renderer-api/tests packages/renderer-svg/tests packages/plugin-renderer/tests packages/plugin-interaction/tests packages/plugin-session/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-12.log"
+    },
+    {
+      "id": "current-independent-spec",
+      "acceptance": "Fresh complete three-commit independent spec review passed with its own exact-head tests/risk. Any private acceptor controls are expressly not public Renderer/browser execution; full original Markdown remains unchanged.",
+      "command": "bun test packages/renderer-api/tests packages/renderer-svg/tests packages/plugin-renderer/tests packages/plugin-interaction/tests packages/plugin-history/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-13.log"
+    },
+    {
+      "id": "actual-published-linux-ci",
+      "acceptance": "Actual sourceCI40474611485/checks122089640345 at published219a448167dc60d51125b31b26557e1bc15dc31d passes 1280 tests/6571 assertions on Linux, with full native/browser/build/docs. Local formal is1280/6577, a separate real execution. PR Deploy skipped normally; it is not main integration acceptance.",
+      "command": "bun run check",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-14.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "1f17a2bb907a95ecf07ea43fc3dc5c0ec6177f269bdf10ffe6b8e4bb89bce69c"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "0991856ab649019bcd9b24c108e1f697ecd046509b328e1242b1326768279ee9"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "18bdc7f869da29d7619ea1e33c260aba1ba4a4df7e1f350165f536687f4052e3"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "43145be7a80a6ea6ddaf689e6f2286cb6ba39bce67233f837a670f21f418e891"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "633b3357e6b7d63c36a20904f714d9c51955091a24f1725f322e1fc497a3b36c"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "b9c5199d119a48314793cc74eae1ed3b0ba29a729d0f5db19134f73c3ce4de7d"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "0ffa55d5ce88a0a474216f81925297ceca7f4fe93591637521b2a0283e2066d5"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "8a31d90aa8870ed78f3c764e4f37f515f1b819c86b4f3a9f8e6f51898b097b2e"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "f4194d37dd36cb6cceecd069e5c95bf52bf08254fec8bca9eae99c7c22ff1448"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "4527d9ece7df44e7fb3c5066a826380c354f6ca522c3d0020accb6111b4cd38c"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "dd921920ddccb7c47c42a1a4bfb6283a454a1527e387e5ca159a6dac02303db1"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "f2908ce994e9e81c5598ab9009325107af1e40f9d5b79611adb9c5b6700f6e64"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "eab458e98643208856734f423d58bfd24c1c1ed1eab99deff1814ab3d2bb7552"
+    },
+    {
+      "path": "logs/behavior-11.log",
+      "kind": "log",
+      "sha256": "f48b9ddefd5affa24d2cb4525df160b15e681194378ddf4ead443c9ba62f4fcc"
+    },
+    {
+      "path": "logs/behavior-12.log",
+      "kind": "log",
+      "sha256": "d64ce4e693f1293a4882ab7e659688611222f4864a6e2a9cfdb501e9e1d39a8c"
+    },
+    {
+      "path": "logs/behavior-13.log",
+      "kind": "log",
+      "sha256": "e3867e3351073e73b8bf01ba3d8e31fba371664397c9b7494fce88e715a81b26"
+    },
+    {
+      "path": "logs/behavior-14.log",
+      "kind": "log",
+      "sha256": "7d9ebb869a81136bf8f4382f246fc2dff10e87efed904c2770bfec3b2fadf998"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "3d47e2398d1d503d0970936e94871e8496437d1610535cce59218681e2cd8279"
+    },
+    {
+      "path": "source/original/projection-repro.entry.ts.txt",
+      "kind": "log",
+      "sha256": "62647bc5f90e4791e6983eb3ead9429cec31aab2bcfcfe362959b30fecc2469f"
+    },
+    {
+      "path": "source/original/projection-repro.js.txt",
+      "kind": "log",
+      "sha256": "16341d0198eabb5ac018a598921eeb1c071ac32bce658e8e839488c6c8cc14f5"
+    },
+    {
+      "path": "source/original/browser-probe.ts.txt",
+      "kind": "log",
+      "sha256": "0dbbebf077cbff6ec549e88d5eb7e6b8dbe88e903a372cd52c431f3a99b0d8e5"
+    },
+    {
+      "path": "source/original/observations.json",
+      "kind": "report",
+      "sha256": "4a359f7382ff847b4b60df6f0fbc1fd2bed5eb8c3173d5300b5c4e9b66be2e54"
+    },
+    {
+      "path": "source/original/compiled-provenance.json",
+      "kind": "report",
+      "sha256": "d21e5cb63eafb7ca8a40401631fb21350599b61d9ebf132093a23458053730e6"
+    },
+    {
+      "path": "source/original/probe-receipt.json",
+      "kind": "report",
+      "sha256": "d783871236e5322b2e08fcacc267f4140e38f12371b1a08a7a3995316c81abcc"
+    },
+    {
+      "path": "source/original/cleanup.json",
+      "kind": "report",
+      "sha256": "5f30780a476a2bba3416929e9271e5a1efe57d767b7d5265fa4192a0589b7dc5"
+    },
+    {
+      "path": "source/original/typecheck.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/original/typecheck.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/original/browser-probe.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/original/browser-probe.stderr.log",
+      "kind": "log",
+      "sha256": "43145be7a80a6ea6ddaf689e6f2286cb6ba39bce67233f837a670f21f418e891"
+    },
+    {
+      "path": "source/repository-red/public-red-entry-preimage.ts.txt",
+      "kind": "log",
+      "sha256": "36be42128a97ea6a07ea8965319ec678d1ff8df0b4314e30ba4ff618f5af9403"
+    },
+    {
+      "path": "source/repository-red/public-red-driver-preimage.ts.txt",
+      "kind": "log",
+      "sha256": "783816bfca1bd7b95cc209417204df8e12597e3a2c0f96281b69fc2187a230b2"
+    },
+    {
+      "path": "source/repository-red/public-red-source-preimage.ts.txt",
+      "kind": "log",
+      "sha256": "38cda87e73a0b0aefbfd51a78755e595397ab152b5ee45dce347f3d8566b617f"
+    },
+    {
+      "path": "source/repository-red/public-red.patch.txt",
+      "kind": "log",
+      "sha256": "47530d56bde0132ffdeb8ce7675a06c26ff47d0c9064eff2dcc373c81d85c605"
+    },
+    {
+      "path": "source/repository-red/public-red-preimages.json",
+      "kind": "report",
+      "sha256": "066502dd99d0be3c0ced197b9bf0becd4fb736c34072a86d014e92380d92a8a1"
+    },
+    {
+      "path": "source/repository-red/initial/repository-browser-commands.json",
+      "kind": "report",
+      "sha256": "5728ed6ce48cb472dc802a9cd013c36449be55ee82a7160c3c538ae228c2d281"
+    },
+    {
+      "path": "source/repository-red/initial/repository-browser-config.json",
+      "kind": "report",
+      "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+    },
+    {
+      "path": "source/repository-red/initial/repository-cleanup.json",
+      "kind": "report",
+      "sha256": "a2eb3dd5c0d0fc11bb467a8fd4a28bc32ac50d413f2795c2b10ec6ea5d244050"
+    },
+    {
+      "path": "source/repository-red/initial/repository-tracer-observation.json",
+      "kind": "report",
+      "sha256": "9c5534d0a16d35dd2c9580bd502b1bd6f5f0713948635eb8b26f14f994f385dd"
+    },
+    {
+      "path": "source/repository-red/initial/repository-tracer-provenance.json",
+      "kind": "report",
+      "sha256": "bcac866bbbb489bed225f8075d54c6214af696f1cc05f223fd92580f898bd571"
+    },
+    {
+      "path": "source/repository-red/initial/repository-tracer.js.txt",
+      "kind": "log",
+      "sha256": "05abe012b3d346a0b006627566293ff5f7978bf470ff8da4c80143e259001fdb"
+    },
+    {
+      "path": "source/repository-red/initial/repository-tracer.ts.txt",
+      "kind": "log",
+      "sha256": "77397921189c25555d583660b7ad3868a8f9ee68c3f1303dcf0d19af7c0dff3e"
+    },
+    {
+      "path": "source/repository-red/index/array-browser-commands.json",
+      "kind": "report",
+      "sha256": "beb346fc8b4b556b0321606f4044eedd356bba4f0343387fa17c2ef01d4b7ab8"
+    },
+    {
+      "path": "source/repository-red/index/array-cleanup.json",
+      "kind": "report",
+      "sha256": "eabf99c2d03257756fdc477375aba19b038920080db8d21aa5b829bf0a3fbb2a"
+    },
+    {
+      "path": "source/repository-red/index/array-feedback-red.json",
+      "kind": "report",
+      "sha256": "5defafc0daf47547bfef5f64251ce62e70c76ffa175eaaa63c800530004069e0"
+    },
+    {
+      "path": "source/repository-red/index/array-feedback-red.stderr.log",
+      "kind": "log",
+      "sha256": "8a31d90aa8870ed78f3c764e4f37f515f1b819c86b4f3a9f8e6f51898b097b2e"
+    },
+    {
+      "path": "source/repository-red/index/array-runner.ts.txt",
+      "kind": "log",
+      "sha256": "10b5e98773f9ad0e2c37e4873ca73973b3f7508a343caf7dd49071d9f6142f36"
+    },
+    {
+      "path": "source/repository-red/index/array-tracer-observations.json",
+      "kind": "report",
+      "sha256": "537c2bb614b85a4351d9a4d9b739074b0dad7f0aeb7b183137baa86bc2323724"
+    },
+    {
+      "path": "source/repository-red/index/array-tracer-provenance.json",
+      "kind": "report",
+      "sha256": "a4b5cd07684c96d34ca79d5d97cce638479d09584c56f0269122f794e26fe059"
+    },
+    {
+      "path": "source/repository-red/index/array-tracer.js.txt",
+      "kind": "log",
+      "sha256": "ac31d8aecfbdb0943b1c6b010bae044f669d42be28fcc532f35fa8c73d380b51"
+    },
+    {
+      "path": "source/repository-red/metadata/metadata-browser-commands.json",
+      "kind": "report",
+      "sha256": "db5f0a4a117e80a9c5fbe4aa87f37ff6598ce2bcb8b1be32ab9350380b4237bd"
+    },
+    {
+      "path": "source/repository-red/metadata/metadata-cleanup.json",
+      "kind": "report",
+      "sha256": "5c0102c1d4fc2e611933f781cda81317411650085ab8e5fb1b03b4a9e64b956b"
+    },
+    {
+      "path": "source/repository-red/metadata/metadata-feedback-red.json",
+      "kind": "report",
+      "sha256": "bc9b831d2352d1b93a2903d145256cb6e25e6e095144c72b003af676083a3007"
+    },
+    {
+      "path": "source/repository-red/metadata/metadata-feedback-red.stderr.log",
+      "kind": "log",
+      "sha256": "4527d9ece7df44e7fb3c5066a826380c354f6ca522c3d0020accb6111b4cd38c"
+    },
+    {
+      "path": "source/repository-red/metadata/metadata-runner.ts.txt",
+      "kind": "log",
+      "sha256": "4354e599c8ddd9fe391c1ee0ef734d1c1e9ce52a300f17aeb1321264510f4cfe"
+    },
+    {
+      "path": "source/repository-red/metadata/metadata-tracer-observations.json",
+      "kind": "report",
+      "sha256": "48165848a5ca4fd6743ab3cf04e32524a83e15588f5f0c77e642f32260e71db6"
+    },
+    {
+      "path": "source/repository-red/metadata/metadata-tracer-provenance.json",
+      "kind": "report",
+      "sha256": "857e3c9c2f028fa534692315b87fea8247dc6cb599b960fbfca83553a65c626e"
+    },
+    {
+      "path": "source/repository-red/metadata/metadata-tracer.js.txt",
+      "kind": "log",
+      "sha256": "e47c2e159620c7f57f912b196c97826f27e7c6450d099b7d66cea3817efbf24d"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/spec-evidence.json",
+      "kind": "report",
+      "sha256": "aafb2e2159b6733dfbcb857c5e503ac8c7b2b0f34349e70ccd785e89de58ff82"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/spec-live-issue-final-readback.json",
+      "kind": "report",
+      "sha256": "e21f5b6b12b962668c652eb325a9244e829e0d332fbb5e7f10990b12fc29b4cb"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/spec-live-issue-readback.json",
+      "kind": "report",
+      "sha256": "d5db4e1d5f22503bf9e40b24429556b386dd17f7b9f8ac648f9add1e218fafb9"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/spec-tests.log",
+      "kind": "log",
+      "sha256": "1a0209b66ede5e2025efa09ce5cb1869e4e9fb8eb5b576deca6b0ad40e8acc5f"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/spec.md",
+      "kind": "report",
+      "sha256": "00fa650f5d04557940330519b9b767d476e310fb080d0b720fad4af7d944a6a6"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/standards-evidence.json",
+      "kind": "report",
+      "sha256": "41c8a3de48c7d86febc87da597e859ed964569780814d6c36abbb3c0e2ff1e75"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/standards-finding.md",
+      "kind": "report",
+      "sha256": "d470c4a359a90c667e3da3432d4893511e893a766034eaf1b66f00bfb98e5a6a"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/standards-probe-corrected.ts.txt",
+      "kind": "log",
+      "sha256": "7ea5adb41a72f27d58056f5ffd31bc806d73e967580061b1a7e52fc0d0de20d0"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/standards-probe-initial.ts.txt",
+      "kind": "log",
+      "sha256": "c0fa56460c08f4c548dea6c6c3d480a50577242190217be396518fb57b540869"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/standards-probe.log",
+      "kind": "log",
+      "sha256": "28bb5edd33149681cbdef0174cfb5f3f587e6d279eb64f9412731893d99a1d96"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/standards-tests.log",
+      "kind": "log",
+      "sha256": "d7510a3f131d24c1a52fa4b2e9bc73b7ffeca39b3b7b79f406fd1e1b13be7b5f"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/standards.md",
+      "kind": "report",
+      "sha256": "3ed48b48c49a54f385c071dc22ce4f2292e7aaa5c9008197d8f700d5b328e2da"
+    },
+    {
+      "path": "history/cf231f772e0f5431281fec172b8c2419e1cce370/spec-evidence.json",
+      "kind": "report",
+      "sha256": "1ab90945f6807ba05c2c1e1c8ca1a6b3577e090a8d8033b09ec2fe70a6d721a0"
+    },
+    {
+      "path": "history/cf231f772e0f5431281fec172b8c2419e1cce370/spec-tests.log",
+      "kind": "log",
+      "sha256": "23122cfb795838c4b44a087d0b5af8b0c5e640f59ef33a0e4d2a0f95195d1849"
+    },
+    {
+      "path": "history/cf231f772e0f5431281fec172b8c2419e1cce370/spec.md",
+      "kind": "report",
+      "sha256": "df46b31aa1a5557a92a2089296c14b1279aefde31d75fc12e6675082ab6d7af9"
+    },
+    {
+      "path": "history/cf231f772e0f5431281fec172b8c2419e1cce370/standards-evidence.json",
+      "kind": "report",
+      "sha256": "9e1f5e92063fdda48a6aca2ae68d26d15c335944ce93aba19d4d0e78f057e41e"
+    },
+    {
+      "path": "history/cf231f772e0f5431281fec172b8c2419e1cce370/standards-tests.log",
+      "kind": "log",
+      "sha256": "76948e7e9bbe3b4711a5cecbc02b4843a98e7f606fd75398ec6353a0a716acf3"
+    },
+    {
+      "path": "history/cf231f772e0f5431281fec172b8c2419e1cce370/standards.md",
+      "kind": "report",
+      "sha256": "ba26ab0f3b5fdc1bbc782efd6ddf19f2029a4a93d94240d796cec03dada1b803"
+    },
+    {
+      "path": "reviews/support/spec-evidence.json",
+      "kind": "report",
+      "sha256": "3c090fbc03e40f8368eb82f9b2b30bd0defaa56e606d1de8af7a728106baf96c"
+    },
+    {
+      "path": "reviews/support/spec-tests.log",
+      "kind": "log",
+      "sha256": "e3867e3351073e73b8bf01ba3d8e31fba371664397c9b7494fce88e715a81b26"
+    },
+    {
+      "path": "reviews/support/standards-evidence.json",
+      "kind": "report",
+      "sha256": "196e39c410785100a1ec53ce9dc19682d062e74029bc93b9d1362bb895dc7d4f"
+    },
+    {
+      "path": "reviews/support/standards-tests.log",
+      "kind": "log",
+      "sha256": "d64ce4e693f1293a4882ab7e659688611222f4864a6e2a9cfdb501e9e1d39a8c"
+    },
+    {
+      "path": "source/callback-index-repro/entry.ts.txt",
+      "kind": "log",
+      "sha256": "381cbdd89bdb3af2b19ea0e54e523ac0a66c568b5b59f580ad11282abea53750"
+    },
+    {
+      "path": "source/callback-index-repro/base/observations.json",
+      "kind": "report",
+      "sha256": "5e2eb1d16ff5b8c93c0113ea461418c58d75b9edc9d273d5d1c34bdf7b5d7c9b"
+    },
+    {
+      "path": "source/callback-index-repro/base/compiled-provenance.json",
+      "kind": "report",
+      "sha256": "281312f22c7116a6825f739c3ffb426306ad35a0ea95110ba143ba1c8ba88daa"
+    },
+    {
+      "path": "source/callback-index-repro/base/cleanup.json",
+      "kind": "report",
+      "sha256": "4cc334fa02d1a1a9fcc6acbde4f215f9281b5b9fb416624528e472d09295e006"
+    },
+    {
+      "path": "source/callback-index-repro/base/bundle.js.txt",
+      "kind": "log",
+      "sha256": "7588ad4556b32c18ad3ea66ccb7aeb46f53fe1638aff6a8305be752d196b9149"
+    },
+    {
+      "path": "source/callback-index-repro/current/observations.json",
+      "kind": "report",
+      "sha256": "e30a5af38229a26c77bae906f5bd9ac004b3ba492aef3a432c581868a9917d85"
+    },
+    {
+      "path": "source/callback-index-repro/current/compiled-provenance.json",
+      "kind": "report",
+      "sha256": "034f522a5fc38f28744b9484dbed676ed4c7d7e40d62e0a0bbfadc15603f4d6c"
+    },
+    {
+      "path": "source/callback-index-repro/current/cleanup.json",
+      "kind": "report",
+      "sha256": "a08474a2f419856052baba80e728b99e94011c4a5af18b932653bcd00680ef4a"
+    },
+    {
+      "path": "source/callback-index-repro/current/bundle.js.txt",
+      "kind": "log",
+      "sha256": "a6ec83662a68cc7317cf62dedf55b1cda0eb1d92b8cdae254305ae78ce2137d2"
+    },
+    {
+      "path": "source/callback-index-repro/final-fe48/observations.json",
+      "kind": "report",
+      "sha256": "b2cc621a652e0670304281e132b5309badcdbe27bee55406e33bbcfb7de32fac"
+    },
+    {
+      "path": "source/callback-index-repro/final-fe48/compiled-provenance.json",
+      "kind": "report",
+      "sha256": "ec6138fe375229fb855333d715a282d20e5b37bace4e513f722b02fffd429044"
+    },
+    {
+      "path": "source/callback-index-repro/final-fe48/cleanup.json",
+      "kind": "report",
+      "sha256": "51e9be8ab417f0f460f541f2fc5c6da8aad93a55bfc5646169b6108274add7a8"
+    },
+    {
+      "path": "source/callback-index-repro/final-fe48/bundle.js.txt",
+      "kind": "log",
+      "sha256": "dac20ef36eb3878bb14dafe9dd1fc38244fe14322cfecf94127f496bcd6bd17f"
+    },
+    {
+      "path": "source/metadata-copy-repro/entry.ts.txt",
+      "kind": "log",
+      "sha256": "e5eb19bd019918c4411e5f5b10a1d62d05eef02cb9420c89f4c23ea02af8d3b2"
+    },
+    {
+      "path": "source/metadata-copy-repro/base/observations.json",
+      "kind": "report",
+      "sha256": "481318ffeb3cf7cfbcd2051a801f0aa81eca5051817620f376f29582dc7e7be8"
+    },
+    {
+      "path": "source/metadata-copy-repro/base/compiled-provenance.json",
+      "kind": "report",
+      "sha256": "494084aa5e480af16ec0d020efec1d39a51b50489d00538ea36b91af3cd637d3"
+    },
+    {
+      "path": "source/metadata-copy-repro/base/cleanup.json",
+      "kind": "report",
+      "sha256": "98c04a1738a71887dca75403ba56cea6971e78a1749787d387f5c3abef00bb2f"
+    },
+    {
+      "path": "source/metadata-copy-repro/base/bundle.js.txt",
+      "kind": "log",
+      "sha256": "f09f1fa60c6720912e4c95cfdc0efe9a6629beb96dae7902bb2dd21b4dc6cb56"
+    },
+    {
+      "path": "source/metadata-copy-repro/current/observations.json",
+      "kind": "report",
+      "sha256": "0b93b02ea524f88c29ed9b155b2c7586023cb29156a934bf53017c20b3ee7151"
+    },
+    {
+      "path": "source/metadata-copy-repro/current/compiled-provenance.json",
+      "kind": "report",
+      "sha256": "2598c721215f14044d324a3f92af6aaed44344c0224f5f1d3d92eea18c073cfc"
+    },
+    {
+      "path": "source/metadata-copy-repro/current/cleanup.json",
+      "kind": "report",
+      "sha256": "ba79405e9339066b115164ac7fe5c75b1b62a0b85e9625099fcf8c7ef63c4f13"
+    },
+    {
+      "path": "source/metadata-copy-repro/current/bundle.js.txt",
+      "kind": "log",
+      "sha256": "14a80a1f928fcc8ecc51a1e3c0aef8db8271392d1e9258a7363a15cff700e5e5"
+    },
+    {
+      "path": "source/metadata-copy-repro/final-fe48/observations.json",
+      "kind": "report",
+      "sha256": "22f17460ab13c985c2bc36998ce923f0aa6f451ca168d3ba867e828a4664568c"
+    },
+    {
+      "path": "source/metadata-copy-repro/final-fe48/compiled-provenance.json",
+      "kind": "report",
+      "sha256": "294f9cc6d5de38975b0eeaa888395dc7b0453cf308c5cdb6a931e5cf1eacadc9"
+    },
+    {
+      "path": "source/metadata-copy-repro/final-fe48/cleanup.json",
+      "kind": "report",
+      "sha256": "57148cca34dc10142c6ef450a057c31035e2ac713c2611c0610fe5926e57da04"
+    },
+    {
+      "path": "source/metadata-copy-repro/final-fe48/bundle.js.txt",
+      "kind": "log",
+      "sha256": "3f1262aa15d065f3c04b71243be7dc8ecfac1c8e365ef4d0a037761c26c906ee"
+    },
+    {
+      "path": "source/current-original-green/observations.json",
+      "kind": "report",
+      "sha256": "52900c703457f3d444cd368fc93ac1fb1afe2ecb13bc8bb75e80eaa60573786c"
+    },
+    {
+      "path": "source/current-original-green/compiled-provenance.json",
+      "kind": "report",
+      "sha256": "dc03ec7ba8aba530010152cfc1eadb42efb3755bd4cd8c33815a5bd12e9455a6"
+    },
+    {
+      "path": "source/current-original-green/receipts.json",
+      "kind": "report",
+      "sha256": "7112368d141b86b5081e2923a056f64745e78bd0494e4f9915a0ef8e53316374"
+    },
+    {
+      "path": "source/current-original-green/cleanup.json",
+      "kind": "report",
+      "sha256": "42d7cd3087483490526fc8aac4baa80b06b1683da86bb56f5ad2fa79887265ae"
+    },
+    {
+      "path": "source/current-original-green/typecheck.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/current-original-green/typecheck.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/current-original-green/compiled-browser.stdout.log",
+      "kind": "log",
+      "sha256": "dd921920ddccb7c47c42a1a4bfb6283a454a1527e387e5ca159a6dac02303db1"
+    },
+    {
+      "path": "source/current-original-green/compiled-browser.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source/notes/fixture-corrections.json",
+      "kind": "report",
+      "sha256": "4754e5836eca309502ee77b3bb6adf11c3fc8882db714f6d80180a15c9b81934"
+    },
+    {
+      "path": "source/notes/fixture-generic-clarification.json",
+      "kind": "report",
+      "sha256": "3b6dd43a91de2e4ce09e38e1eef46b393fc5207d12169ad7fc0cf6179f3cc63b"
+    },
+    {
+      "path": "source/notes/hit-expectation-correction.json",
+      "kind": "report",
+      "sha256": "1c4fd03f865010459401da6ae1ca20217b1ab93f6f463ad5bf4d3fc8d4da4420"
+    },
+    {
+      "path": "source/notes/remaining-geometry-coordinator-error.json",
+      "kind": "report",
+      "sha256": "817cd9ee4f06356751e0b7b93a8c039767d96899bce58801689eb0b717dbaa60"
+    },
+    {
+      "path": "source/notes/premise-review.json",
+      "kind": "report",
+      "sha256": "b72a5f9a4377b164cf61062fec3b258b46ae4e2ad20cd6db626f9ddb045fa5a1"
+    },
+    {
+      "path": "source/notes/probe-provenance-limitations.json",
+      "kind": "report",
+      "sha256": "c6ec36e9959f7ec8dc31d6e65134c213727dbd2dbabf021a6dd7f1aec9b71069"
+    },
+    {
+      "path": "source/notes/callback-public-confirmation.json",
+      "kind": "report",
+      "sha256": "619fce6cbd5617c9e0e6244272bcd0fdb21715c37b9defded04e89b4e0605887"
+    },
+    {
+      "path": "source/notes/final-feedback-probe-receipts.json",
+      "kind": "report",
+      "sha256": "5080c246dc99db6c4efe248f7addf7a0f18f48e0f7f37477cc331ba953c4935e"
+    },
+    {
+      "path": "source/notes/geometry-fixture-before-generic-fix.ts.txt",
+      "kind": "log",
+      "sha256": "88ed991d47aeccb45d1286a03945aad7861c3151eb874794ecd0d4df30cf60dc"
+    },
+    {
+      "path": "source/notes/typecheck-expanded.log",
+      "kind": "log",
+      "sha256": "4c95dc8cf3d499e4f94dad1c074d140ee86962b404e6e312069add7706181414"
+    },
+    {
+      "path": "source/notes/typecheck-expanded-corrected.log",
+      "kind": "log",
+      "sha256": "ecbe22e013906640d08aaed3542aa5530b49915e71871617b9ac4116471ff705"
+    },
+    {
+      "path": "source/notes/metadata-feedback-source-before.ts.txt",
+      "kind": "log",
+      "sha256": "1e5e05854e924f4f0b71e39f591490d8a1c140fb50498c2aff613f34d2dc7097"
+    },
+    {
+      "path": "source/notes/metadata-feedback-red.patch.txt",
+      "kind": "log",
+      "sha256": "eef819a06399efcf1af67eea052665b56b92aad03df58c243a944f9dada06b03"
+    },
+    {
+      "path": "source/notes/array-feedback-source-before.ts.txt",
+      "kind": "log",
+      "sha256": "96be07e80226606169017392a911cb0a78cbf12c9cb98fb4bd3cd211afdddba0"
+    },
+    {
+      "path": "source/notes/array-feedback-red.patch.txt",
+      "kind": "log",
+      "sha256": "1d896c2adfb266b07eb180a812c9703436dd8ee22cf8fff47992cd1edaa48101"
+    },
+    {
+      "path": "history/fixture-hit-expectation/fixture.entry.ts.txt",
+      "kind": "log",
+      "sha256": "ddd9a3afbc2b1190705d76bab88c07642f642134b26a18438f4f6f2a052bd7b6"
+    },
+    {
+      "path": "history/fixture-hit-expectation/expanded-geometry.js.txt",
+      "kind": "log",
+      "sha256": "fc602c596502ac94ae030f59b5f66793a330326d5527d96951b48a6d3150720a"
+    },
+    {
+      "path": "history/fixture-hit-expectation/expanded-provenance.json",
+      "kind": "report",
+      "sha256": "db1a1ede1570558f7f3ed2905bfef1c22c6c5cbddee6c8b77c9842142d169ab5"
+    },
+    {
+      "path": "history/fixture-hit-expectation/expanded-observations.json",
+      "kind": "report",
+      "sha256": "39cc6198ac0b55a1241add8c8b4d09f4a7c257a3c6507d8bd05b32ad416d4e55"
+    },
+    {
+      "path": "history/fixture-hit-expectation/expanded-geometry.stderr.log",
+      "kind": "log",
+      "sha256": "738c8f31183fc423575bd3706506ddbda596941332c3ee733bbff4e5bc332cc7"
+    },
+    {
+      "path": "publication-notes.md",
+      "kind": "report",
+      "sha256": "5105333ebad388c1506d332beab5a18755e2c43538867852eec0f0e70902c805"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/affected.log",
+      "kind": "log",
+      "sha256": "603f9012021edd1d3ee25d17c99be407b3374dd6434261e3fead3c123f1a4961"
+    },
+    {
+      "path": "history/cf231f772e0f5431281fec172b8c2419e1cce370/affected.log",
+      "kind": "log",
+      "sha256": "f36dee8d3bc73bd52177f15e2c1be0fbfc8e430f490420d0af8d20ac03351d49"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/original-green/observations.json",
+      "kind": "report",
+      "sha256": "94bdc125766c9797d944716f163e1742af7f991729166edd232fc273d4f3189a"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/original-green/compiled-provenance.json",
+      "kind": "report",
+      "sha256": "f12f8674508a09fc927c0aa1b239cbe0f8169d5f2e1eb3e092c90bfa55fdc67c"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/original-green/receipts.json",
+      "kind": "report",
+      "sha256": "31b464d80101d7be84172bbfe4553e8ab95235d3379baff923dd18df34b955c2"
+    },
+    {
+      "path": "history/3ae9d134d0ce7e20509905456f558841d745a05f/original-green/cleanup.json",
+      "kind": "report",
+      "sha256": "f945fcad970dd7e1a95d55de29499e45aa3b558ebd7ee18264114e09e7ddd69e"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "axis": "Spec",
+  "verdict": "changes-requested",
+  "findings": [
+    {
+      "priority": 2,
+      "title": "Associate captured Node Drag geometry with the validated Node, not caller map index",
+      "file": "packages/renderer-svg/src/interaction-projection.ts",
+      "startLine": 120,
+      "endLine": 125,
+      "specClause": "Capture the declared geometry values once with their original receivers; validate and project those same captured values. Keep existing validation phase/order, malformed/canonical arrays and IDs.",
+      "trigger": "Two canonical Nodes [a,b], finite baseline/candidate positions and ordinary iteration; custom map returns the same canonical candidates but passes callback indices [1,0].",
+      "actual": "a receives b basePosition/position and b receives a geometry, despite successful per-Node validation; real Kernel View remains unchanged.",
+      "evidence": "Independent internal acceptInteractionProjection probe: ordinary control correct, custom-map strict assertion actualExit1 in spec-tests.log. Separately read real public SVG current2/2fail vs base2/2pass records using identical entrySHA381cbdd89bdb3af2b19ea0e54e523ac0a66c568b5b59f580ad11282abea53750.",
+      "recommendation": "Associate the captured geometry with its validated Node/candidate identity and resolve it during copying without trusting an application map callback index; preserve the approved array policies."
+    }
+  ],
+  "base": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "expectedParent": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "head": "3ae9d134d0ce7e20509905456f558841d745a05f",
+  "tree": "25e17466d4f7a48b540be9711e9dabdb6fe87b24",
+  "patch": "0beba21066485b57839adada0ee99e442cea14635f5fcd30cc8c84ba9fd7bf9a",
+  "taskDigest": "931f3d5bf15180095ee77655c8da3308ac84817af0cf9e85a5726b0e509a25d3",
+  "changedFiles": [
+    "packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts",
+    "packages/renderer-svg/browser-tests/renderer-contract.browser.ts",
+    "packages/renderer-svg/browser-tests/renderer-contract.entry.ts",
+    "packages/renderer-svg/src/interaction-projection.ts"
+  ],
+  "report": "verdict: changes-requested\n\nbase: 6fd2d016f6330cc422508b3e51229bea4be2cce0\nhead: 3ae9d134d0ce7e20509905456f558841d745a05f\ntree: 25e17466d4f7a48b540be9711e9dabdb6fe87b24\nbinary patch SHA256: 0beba21066485b57839adada0ee99e442cea14635f5fcd30cc8c84ba9fd7bf9a\ntaskDigest: 931f3d5bf15180095ee77655c8da3308ac84817af0cf9e85a5726b0e509a25d3\n\n独立读取 [Issue132](https://github.com/ZWkang/nodebraid/issues/132) 全文/全部评论；最终读回2026-10-27 07:55:06 UTC，open、bug/ready-for-agent，评论0、request未变。完整四文件、208输入、Geometry/Viewport/WorldRect契约及acceptor→DOM Journal→Effective State/Hit/Input调用链已审查，依据指定main规范与ADR0054/0059/0062/0063。实际补丁与归档一致。\n\nP2 — packages/renderer-svg/src/interaction-projection.ts:120–125：违反 “validate and project those same captured values”。验证按for-of顺序保存capturedPositions，却用应用map回调的index取缓存。canonical[a,b]、全部finite的合法候选，只让map传入互换index且仍输出[a,b]，就使a携带b的basePosition/position、b携带a的几何。本人使用真实Kernel baseline及规范Port/Session值的纯acceptor探针已重现：普通map控制正确；自定义map后a期望30/40却收到150/160，严格断言actualExit1。该探针是内部边界观察，不冒称公共Renderer/browser。另读取相同entry的公共SVG对照：base2/2通过、current2/2位置交换（非本人执行）。应按已验证Node/candidate identity关联捕获几何，不依赖调用方callback index，也不新增array限制。\n\n其余字段捕获、有限值/正zoom/非负尺寸及浅metadata规则未发现独立缺口；HitResult.worldPoint补全符合公开契约，不能把fixture初次失败当产品修复。无另行scope creep finding。\n\n本人执行 `bun test packages/renderer-api/tests packages/renderer-svg/tests packages/plugin-renderer/tests packages/plugin-interaction/tests packages/plugin-history/tests`：296 pass、0 fail、2196 assertions，21文件，exit0；diff-check通过，前后HEAD/tree/patch/clean一致。公共Bun不覆盖上述回归；完整探针代码/actualExit1及Bun原始输出在spec-tests.log。\n\n未本人执行build/typecheck/affected/browser/full/原12或远端CI/发布/媒体/merge/main验收；上述失败必须修复后重新审查。\n\nrisk: {\"level\": \"medium\", \"rationale\": \"公共SVG Projection几何所有权影响显示及Effective State/Hit/Input，命中public-src medium下限；已确证Node Drag跨ID错绑，必须先修复，测试通过不能降低风险或覆盖失败verdict。\", \"evidence\": \"完整四文件/208场景和ADR0054/0059/0062/0063调用链独立审查；本人公共Bun296tests/2196assertions通过，但纯acceptor严格几何关联探针actualExit1；另读取相同public SVG entry在base2/2pass、current2/2fail。main6fd2 risk blob596298db784c4f3424968cd05a3aca4a6471b1b3已核对。\", \"rollback\": \"普通回退3ae9d134d0ce7e20509905456f558841d745a05f整项四文件或未来实际映射发布改动，再按既有Renderer reset/dispose生命周期重建投影；无schema/数据迁移，回退会恢复原继承几何缺失问题，代码回退不撤销已执行应用Command。\"}\n",
+  "risk": {
+    "level": "medium",
+    "rationale": "公共SVG Projection几何所有权影响显示及Effective State/Hit/Input，命中public-src medium下限；已确证Node Drag跨ID错绑，必须先修复，测试通过不能降低风险或覆盖失败verdict。",
+    "evidence": "完整四文件/208场景和ADR0054/0059/0062/0063调用链独立审查；本人公共Bun296tests/2196assertions通过，但纯acceptor严格几何关联探针actualExit1；另读取相同public SVG entry在base2/2pass、current2/2fail。main6fd2 risk blob596298db784c4f3424968cd05a3aca4a6471b1b3已核对。",
+    "rollback": "普通回退3ae9d134d0ce7e20509905456f558841d745a05f整项四文件或未来实际映射发布改动，再按既有Renderer reset/dispose生命周期重建投影；无schema/数据迁移，回退会恢复原继承几何缺失问题，代码回退不撤销已执行应用Command。"
+  },
+  "checks": [
+    {
+      "command": [
+        "bun",
+        "test",
+        "packages/renderer-api/tests",
+        "packages/renderer-svg/tests",
+        "packages/plugin-renderer/tests",
+        "packages/plugin-interaction/tests",
+        "packages/plugin-history/tests"
+      ],
+      "exitCode": 0,
+      "tests": 296,
+      "assertions": 2196,
+      "files": 21,
+      "log": "spec-tests.log"
+    },
+    {
+      "command": [
+        "bun",
+        "--eval",
+        "import assert from 'node:assert/strict';\nimport { createCanvasKernel, nodeId } from '@nodebraid/kernel';\nimport { acceptInteractionProjection } from './packages/renderer-svg/src/interaction-projection.ts';\nconst kernel = createCanvasKernel(), a = nodeId('a'), b = nodeId('b');\nkernel.transact(tx => {\n  tx.nodes.add({ id:a, type:'task', position:{x:10,y:20}, size:{width:20,height:20}, data:null });\n  tx.nodes.add({ id:b, type:'task', position:{x:100,y:110}, size:{width:20,height:20}, data:null });\n});\nconst view = kernel.read();\nconst ports = Object.freeze({ documentRevision:view.snapshot.revision, generation:0, nodes:Object.freeze([]) });\nconst session = Object.freeze({ selection:Object.freeze({ nodeIds:Object.freeze([]), edgeIds:Object.freeze([]) }), viewport:Object.freeze({x:0,y:0,zoom:1}) });\nconst candidates = [\n  Object.freeze({nodeId:a,basePosition:view.query.getNode(a).position,position:Object.freeze({x:30,y:40})}),\n  Object.freeze({nodeId:b,basePosition:view.query.getNode(b).position,position:Object.freeze({x:150,y:160})}),\n];\nconst expected = candidates.map(c => ({id:c.nodeId,base:c.basePosition,position:c.position}));\nconst observe = (nodes) => acceptInteractionProjection({type:'node-drag',nodes},view.snapshot,ports,session).nodes.map(c => ({id:c.nodeId,base:c.basePosition,position:c.position}));\nconst ordinary = observe(Object.freeze([...candidates])); assert.deepEqual(ordinary,expected);\nconst custom = [...candidates]; let mapCalls = 0;\nObject.defineProperty(custom,'map',{value:function(callback,thisArg){\n  mapCalls++;\n  return Array.prototype.map.call(this,(candidate,index,array)=>callback.call(thisArg,candidate,1-index,array));\n}});\nObject.freeze(custom);\nconst actual = observe(custom);\nassert.deepEqual(actual.map(row=>row.id),[a,b]);\nassert.equal(mapCalls,1); assert.equal(kernel.read(),view);\nconsole.log(JSON.stringify({ordinaryControl:ordinary,expected,actual,canonicalIds:true,mapCalls,unchangedKernel:true,scope:'pure acceptor/internal boundary; not public Renderer or DOM/browser proof'}));\nassert.deepEqual(actual,expected,'Accepted per-ID geometry must not depend on caller map callback index');"
+      ],
+      "exitCode": 1,
+      "scope": "internal pure acceptor; public Kernel/Port/Session values; ordinary control passed, callback-index geometry check failed",
+      "log": "spec-tests.log"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "6fd2d016f6330cc422508b3e51229bea4be2cce0...3ae9d134d0ce7e20509905456f558841d745a05f"
+      ],
+      "exitCode": 0,
+      "log": "spec-tests.log"
+    }
+  ],
+  "policy": {
+    "sourceCommit": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+    "path": ".agents/skills/pr-risk/SKILL.md",
+    "blob": "596298db784c4f3424968cd05a3aca4a6471b1b3"
+  },
+  "sourceReadback": "spec-live-issue-final-readback.json",
+  "limitations": [
+    "Internal acceptor probe is not a public CanvasRenderer/DOM/browser execution.",
+    "Public SVG base/current confirmation was read, not run by this reviewer.",
+    "No independent build/typecheck/affected/browser/full/original12/remoteCI/publication/media/merge/main acceptance."
+  ]
+}

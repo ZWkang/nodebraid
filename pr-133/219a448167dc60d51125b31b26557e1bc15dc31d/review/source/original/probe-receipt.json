@@ -1,0 +1,12 @@
+{
+  "command": [
+    "bun",
+    "/Users/zhou/.codex/local-workflows/nodebraid/runs/20261027T070907-svg-projection-maintenance/browser-probe.ts"
+  ],
+  "startedAt": "2026-10-27T07:15:31.703696+00:00",
+  "exitCode": 1,
+  "head": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "entrySHA256": "62647bc5f90e4791e6983eb3ead9429cec31aab2bcfcfe362959b30fecc2469f",
+  "stdout": "browser-probe.stdout.log",
+  "stderr": "browser-probe.stderr.log"
+}

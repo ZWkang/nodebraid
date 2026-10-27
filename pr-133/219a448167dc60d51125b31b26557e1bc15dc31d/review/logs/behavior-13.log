@@ -1,0 +1,1363 @@
+Issue132 new fe48 full independent Spec; no old result/count inherited, old review directories not written. Internal probes do not prove public Renderer DOM/browser behavior.
+2026-10-27T08:23:36.537063+00:00
+{
+  "repository": "ZWkang/nodebraid",
+  "issue": {
+    "url": "https://github.com/ZWkang/nodebraid/issues/132",
+    "title": "fix: retain declared SVG Interaction Projection geometry",
+    "issue_number": 132,
+    "body": "## Confirmed defect\n\nAt main `6fd2d016f6330cc422508b3e51229bea4be2cce0`, the public SVG Renderer validates declared Interaction Projection geometry and then snapshots it using own enumerable spreads. Valid inherited getters and non-enumerable own Point/Viewport/WorldRect values disappear before DOM projection.\n\nA fresh strictly typechecked, publicly compiled program ran once in real Chromium: 12 controls, 8 failures and 4 ordinary-own-value controls passing. In each of Node Drag, Viewport Pan, Box Selection and Connection Preview, both inherited and hidden geometry shapes are accepted without throwing but render invalid values:\n\n- Node Drag publishes Node x/y=`undefined` and incident Edge x1/y1=`NaN` instead of the finite candidate geometry.\n- Viewport Pan publishes `matrix(NaN NaN NaN NaN NaN NaN)` instead of `matrix(2 0 0 2 20 30)`.\n- Box Selection publishes `undefined` x/y/width/height instead of 5/6/70/80.\n- Connection Preview publishes `undefined` x2/y2 instead of 330/140.\n\nAll original values satisfy the public readonly structural types. All four ordinary own-value counterparts render correctly and clear back to their original DOM, retaining Node element identity. All 12 leave the real Kernel View unchanged and dispose their owned Renderer/Target cleanly. The driver exits1 on the actual 4-versus-12 assertion. This is a public API plus real SVG DOM test; no native Pointer/Wheel/Keyboard events, Host/Command scheduling or whole-Renderer coverage is claimed.\n\n## Contract and cause\n\n[`InteractionProjection`](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/interaction-api/src/contracts.ts) declares Point, Viewport and WorldRect geometry without an own/enumerability restriction. [ADR0059](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/docs/adr/0059-treat-interaction-projection-as-effective-renderer-state.md) requires synchronous all-or-throw acceptance of complete effective state; [ADR0062](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/docs/adr/0062-project-interaction-through-existing-svg-geometry.md) requires the finite candidate geometry to drive display, hit tests and Input mapping. [The shared acceptor](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/renderer-svg/src/interaction-projection.ts) validates readable declared fields but drops them in later spread copies.\n\n## Acceptance\n\n- Preserve accepted declared Point x/y, Viewport x/y/zoom and WorldRect x/y/width/height in owned frozen Interaction Projection geometry for ordinary, inherited and non-enumerable fields across all four affected Projection variants.\n- Capture the declared geometry values once with their original receivers; validate and project those same captured values. Preserve existing finite/positive/nonnegative rules, baseline compatibility and original first failures. Keep caller-owned values mutable and shallow, including existing enumerable-copy behavior for unrelated metadata; do not reinterpret application data.\n- Keep existing validation phase/order, malformed/canonical arrays and IDs, anchors/Port semantics, all-or-throw DOM/accepted-state recovery, Selection/Viewport synchronization, public API/selectors and lifecycle/Input/Disposition policies. No default/coercion, plain-record/accessor prohibition, cap/retry/fallback or unrelated configuration/Binding policy.\n- The exact original 12-case entry becomes green without overwriting its original red bundle. Add public regressions for once-read validated values, original receiver/error identity, state/DOM rollback and relevant hit/Input geometry. Distinguish public fixture input from native browser evidence.\n- Complete affected checks and the existing independent Standards+ponytail/Spec/risk reviews, formal main-protocol full verification, exact normal publication/current-head CI and immutable full reports/media readback. Keep this Issue open through actual main whole-Issue acceptance.\n\n## Reproduction\n\nAfter building the public packages, bundle the following TypeScript entry for the browser and call `await globalThis.__nodebraidProjectionDiscovery()` in Chromium. The actual run first passed strict TSC and browser compilation, then returned `{controls:12,passed:4,failed:8}`; its driver asserted 12 passes and exited1. Each case uses the real public Kernel and SVG Renderer with its own connected Target, retaining actual DOM attributes in the result.\n\n```ts\nimport {createCanvasKernel,nodeId,edgeId,type Point} from '@nodebraid/kernel';\nimport {createSvgRenderer} from '@nodebraid/renderer-svg';\nimport type {InteractionProjection,WorldRect} from '@nodebraid/interaction-api';\nimport type {Viewport} from '@nodebraid/session-api';\ntype Shape='own'|'inherited'|'non-enumerable';\ntype Family='node-drag'|'viewport-pan'|'box-selection'|'connection-preview';\ninterface Observation{family:Family;shape:Shape;passed:boolean;error:unknown;actual:Record<string,unknown>;baselineUnchanged:boolean;cleanup:boolean;nativeInputEventsDriven:0}\nfunction point(shape:Shape,x:number,y:number):Point{\n class Inherited implements Point{get x(){return x;}get y(){return y;}}\n const own={x,y};if(shape==='non-enumerable')for(const key of ['x','y'])Object.defineProperty(own,key,{enumerable:false});\n return shape==='inherited'?new Inherited():own;\n}\nfunction viewport(shape:Shape,x:number,y:number,zoom:number):Viewport{\n class Inherited implements Viewport{get x(){return x;}get y(){return y;}get zoom(){return zoom;}}\n const own={x,y,zoom};if(shape==='non-enumerable')for(const key of ['x','y','zoom'])Object.defineProperty(own,key,{enumerable:false});\n return shape==='inherited'?new Inherited():own;\n}\nfunction rect(shape:Shape,x:number,y:number,width:number,height:number):WorldRect{\n class Inherited implements WorldRect{get x(){return x;}get y(){return y;}get width(){return width;}get height(){return height;}}\n const own={x,y,width,height};if(shape==='non-enumerable')for(const key of ['x','y','width','height'])Object.defineProperty(own,key,{enumerable:false});\n return shape==='inherited'?new Inherited():own;\n}\nfunction attr(target:SVGSVGElement,selector:string,names:readonly string[]):Record<string,string|null>{\n const element=target.querySelector(selector);return Object.fromEntries(names.map(name=>[name,element?.getAttribute(name)??null]));\n}\nfunction same(a:unknown,b:unknown):boolean{return JSON.stringify(a)===JSON.stringify(b);}\nasync function investigate(){\n const observations:Observation[]=[];globalThis.__nodebraidProjectionProgress=observations;\n for(const family of ['node-drag','viewport-pan','box-selection','connection-preview'] as const)for(const shape of ['own','inherited','non-enumerable'] as const){\n  const target=document.createElementNS('http://www.w3.org/2000/svg','svg');target.setAttribute('width','400');target.setAttribute('height','300');\n  const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');defs.setAttribute('data-caller-owned','');target.append(defs);document.body.append(target);\n  const renderer=createSvgRenderer({target}),kernel=createCanvasKernel(),a=nodeId('a'),b=nodeId('b'),e=edgeId('edge');\n  kernel.transact(tx=>{tx.nodes.add({id:a,type:'task',position:{x:10,y:20},size:{width:80,height:40},data:null});tx.nodes.add({id:b,type:'task',position:{x:220,y:40},size:{width:100,height:60},data:null});tx.edges.add({id:e,type:'link',source:{nodeId:a},target:{nodeId:b},data:null});});\n  const view=kernel.read();renderer.updateDocument({type:'reset',view});renderer.updateSession({selection:{nodeIds:[a],edgeIds:[]},viewport:{x:0,y:0,zoom:1}});\n  const node=target.querySelector('[data-nodebraid-node-id=\"a\"]');if(!node)throw new Error('Real SVG Node missing before the projection case.');\n  const baseline=target.innerHTML;let projection:InteractionProjection;\n  switch(family){\n   case'node-drag':projection={type:family,nodes:[{nodeId:a,basePosition:point(shape,10,20),position:point(shape,80,90)}]};break;\n   case'viewport-pan':projection={type:family,baseViewport:viewport(shape,0,0,1),viewport:viewport(shape,20,30,2)};break;\n   case'box-selection':projection={type:family,rect:rect(shape,5,6,70,80)};break;\n   case'connection-preview':projection={type:family,source:{nodeId:a,role:'source'},pointerWorldPoint:point(shape,330,140),target:{type:'none'}};break;\n  }\n  let error:unknown=null,actual:Record<string,unknown>={},passed=false,baselineUnchanged=false,cleanup=false;\n  try{\n   try{renderer.updateInteraction(projection);}catch(caught){error=caught instanceof Error?{name:caught.name,message:caught.message,code:Reflect.get(caught,'code')??null}:caught;}\n   actual={node:attr(target,'[data-nodebraid-node-id=\"a\"]',['x','y']),edge:attr(target,'[data-nodebraid-edge-id=\"edge\"]',['x1','y1','x2','y2']),matrix:attr(target,'[data-nodebraid-renderer-svg-root]',['transform']),box:attr(target,'[data-nodebraid-box-selection]',['x','y','width','height']),connection:attr(target,'[data-nodebraid-connection-preview]',['x1','y1','x2','y2']),sourceNode:kernel.read().query.getNode(a)?.position};\n   baselineUnchanged=kernel.read()===view&&same(kernel.read().query.getNode(a)?.position,{x:10,y:20});\n   if(error===null)switch(family){\n    case'node-drag':passed=same(actual.node,{x:'80',y:'90'})&&same(actual.edge,{x1:'120',y1:'110',x2:'270',y2:'70'});break;\n    case'viewport-pan':passed=same(actual.matrix,{transform:'matrix(2 0 0 2 20 30)'});break;\n    case'box-selection':passed=same(actual.box,{x:'5',y:'6',width:'70',height:'80'});break;\n    case'connection-preview':passed=same(actual.connection,{x1:'90',y1:'40',x2:'330',y2:'140'});break;\n   }\n   if(passed){renderer.updateInteraction(null);passed=target.innerHTML===baseline&&target.querySelector('[data-nodebraid-node-id=\"a\"]')===node;}\n   passed=passed&&baselineUnchanged;\n  }finally{await renderer.dispose();cleanup=target.childElementCount===1&&target.firstElementChild===defs&&!target.hasAttribute('tabindex');target.remove();}\n  observations.push({family,shape,passed:passed&&cleanup,error,actual,baselineUnchanged,cleanup,nativeInputEventsDriven:0});\n }\n return {controls:observations.length,passed:observations.filter(x=>x.passed).length,failed:observations.filter(x=>!x.passed).length,observations,nativeInputEventsDriven:0,userAgent:navigator.userAgent,scope:'Typed public CanvasRenderer.updateInteraction and actual SVG DOM; no native input, Command/Host, arbitrary scheduling or whole Renderer claim.'};\n}\ndeclare global{var __nodebraidProjectionProgress:Observation[];var __nodebraidProjectionDiscovery:typeof investigate;}\nglobalThis.__nodebraidProjectionDiscovery=investigate;\n\n```\n\n## Deduplication\n\nComplete current all-state collections contain 131 Issue/PR records (50+50+31) and 67 PRs (20+20+20+7). All titles and full bodies were checked for the acceptor path and Projection/geometry vocabulary. Relevant #122/#124 full bodies and discussions, and #123/#125 files/reviews/conversation/inline threads were read. Those completed deliveries fix constructor hit tolerances and DOM event-policy booleans in svg-config, not interaction-projection.ts geometry ownership. Existing #130/PR #131 concern Basic Connection callback snapshots, and #128/PR #129 Layout Capabilities, not this SVG Projection boundary. No existing canonical delivery implements this occurrence.\n",
+    "state": "open",
+    "user": {
+      "login": "ZWkang",
+      "name": "ZWkang",
+      "email": null,
+      "avatar_url": "https://avatars.githubusercontent.com/u/15853907?v=4",
+      "id": 15853907
+    },
+    "assignees": null,
+    "labels": [
+      {
+        "name": "bug",
+        "color": "d73a4a",
+        "description": "Something isn't working"
+      },
+      {
+        "name": "ready-for-agent",
+        "color": "ededed",
+        "description": null
+      }
+    ],
+    "milestone": null,
+    "state_reason": null,
+    "comments": 0,
+    "created_at": "2026-10-27T07:21:12Z",
+    "updated_at": "2026-10-27T07:21:12Z",
+    "closed_at": null,
+    "display_url": "https://github.com/ZWkang/nodebraid/issues/132",
+    "display_title": "fix: retain declared SVG Interaction Projection geometry"
+  },
+  "comments": [],
+  "readAt": "2026-10-27T08:23:36.537063+00:00"
+}
+
+$ ["git", "rev-parse", "HEAD"]
+fe48ff7c2ffb7eef144f64b4699b042f6acdad19
+
+actualExit=0
+
+$ ["git", "rev-parse", "HEAD^{tree}"]
+abaf6c01ef863fa36f4a7c760363a2d69c38290a
+
+actualExit=0
+
+$ ["git", "status", "--porcelain"]
+
+actualExit=0
+
+$ ["git", "log", "6fd2d016f6330cc422508b3e51229bea4be2cce0..fe48ff7c2ffb7eef144f64b4699b042f6acdad19", "--oneline"]
+fe48ff7 fix: preserve projection metadata copy sources
+cf231f7 fix: associate captured geometry by Node identity
+3ae9d13 fix: retain SVG interaction geometry values
+
+actualExit=0
+
+$ ["git", "diff", "--binary", "6fd2d016f6330cc422508b3e51229bea4be2cce0...fe48ff7c2ffb7eef144f64b4699b042f6acdad19"]
+diff --git a/packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts b/packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts
+new file mode 100644
+index 0000000..6169c69
+--- /dev/null
++++ b/packages/renderer-svg/browser-tests/interaction-geometry-values.entry.ts
+@@ -0,0 +1,494 @@
++import { createCanvasKernel, nodeId, edgeId } from '@nodebraid/kernel';
++import type { InteractionProjection, NodeDragProjectionNode } from '@nodebraid/interaction-api';
++import { RendererError } from '@nodebraid/renderer-api';
++import { createSvgRenderer } from '../src';
++
++type Shape = 'own' | 'inherited' | 'non-enumerable';
++type Family = 'node-drag' | 'viewport-pan' | 'box-selection' | 'connection-preview';
++type Mode = 'mutate' | 'throw' | 'metadata-throw' | 'invalid-first' | 'first-error-order';
++interface Focus {
++  readonly slot: string;
++  readonly field: string;
++}
++interface Result {
++  readonly id: string;
++  readonly passed: boolean;
++  readonly error?: string;
++}
++const slots: Readonly<Record<Family, readonly Focus[]>> = {
++  'node-drag': [
++    { slot: 'basePosition', field: 'x' },
++    { slot: 'basePosition', field: 'y' },
++    { slot: 'position', field: 'x' },
++    { slot: 'position', field: 'y' },
++  ],
++  'viewport-pan': [
++    { slot: 'baseViewport', field: 'x' },
++    { slot: 'baseViewport', field: 'y' },
++    { slot: 'baseViewport', field: 'zoom' },
++    { slot: 'viewport', field: 'x' },
++    { slot: 'viewport', field: 'y' },
++    { slot: 'viewport', field: 'zoom' },
++  ],
++  'box-selection': ['x', 'y', 'width', 'height'].map((field) => ({ slot: 'rect', field })),
++  'connection-preview': ['x', 'y'].map((field) => ({ slot: 'pointerWorldPoint', field })),
++};
++function check(value: boolean, message: string): asserts value {
++  if (!value) throw new Error(message);
++}
++function equal(actual: unknown, expected: unknown, message: string): void {
++  check(JSON.stringify(actual) === JSON.stringify(expected), message + ': ' + JSON.stringify(actual));
++}
++function attributes(target: SVGSVGElement, selector: string, keys: readonly string[]): Record<string, string | null> {
++  const element = target.querySelector(selector);
++  check(element !== null, 'Expected public SVG element ' + selector);
++  return Object.fromEntries(keys.map((key) => [key, element.getAttribute(key)]));
++}
++async function geometryCase(family: Family, shape: Shape, focus: Focus, mode: Mode, original?: unknown): Promise<void> {
++  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
++  target.setAttribute('width', '400');
++  target.setAttribute('height', '300');
++  document.body.append(target);
++  const renderer = createSvgRenderer({ target }),
++    kernel = createCanvasKernel();
++  const a = nodeId('a'),
++    b = nodeId('b'),
++    e = edgeId('edge');
++  kernel.transact((tx) => {
++    tx.nodes.add({ id: a, type: 'task', position: { x: 10, y: 20 }, size: { width: 80, height: 40 }, data: null });
++    tx.nodes.add({ id: b, type: 'task', position: { x: 220, y: 40 }, size: { width: 100, height: 60 }, data: null });
++    tx.edges.add({ id: e, type: 'link', source: { nodeId: a }, target: { nodeId: b }, data: null });
++  });
++  const view = kernel.read();
++  const sources = new Map<string, object>(),
++    reads = new Map<string, number>(),
++    metadata = new Map<string, number>();
++  const opaque = { caller: Symbol('metadata') };
++  function geometry<T extends Record<string, number>>(slot: string, values: T): T {
++    const descriptors: PropertyDescriptorMap = {};
++    for (const field of Object.keys(values)) {
++      descriptors[field] = {
++        enumerable: shape === 'own',
++        configurable: true,
++        get(this: object): number {
++          check(this === sources.get(slot), 'Geometry getter original receiver');
++          const key = slot + '.' + field,
++            count = (reads.get(key) ?? 0) + 1;
++          reads.set(key, count);
++          if (mode === 'first-error-order') {
++            if (slot === focus.slot && field === focus.field) return Number.NaN;
++            if (
++              (family === 'node-drag' && slot === 'position' && field === 'y') ||
++              (family !== 'node-drag' && slot === focus.slot && field === 'y')
++            )
++              throw original;
++          }
++
++          if (slot === focus.slot && field === focus.field) {
++            if (mode === 'throw') throw original;
++            if (mode === 'invalid-first') return count === 1 ? Number.NaN : Reflect.get(values, field);
++            if (mode === 'mutate' && count > 1) return Number.NaN;
++          }
++          return Reflect.get(values, field);
++        },
++      };
++    }
++    const source: object =
++      shape === 'inherited'
++        ? Object.create(Object.defineProperties({}, descriptors))
++        : Object.defineProperties({}, descriptors);
++    sources.set(slot, source);
++    Object.defineProperty(source, 'metadata', {
++      enumerable: true,
++      get(this: object) {
++        check(this === source, 'Metadata getter original receiver');
++        metadata.set(slot, (metadata.get(slot) ?? 0) + 1);
++        if (mode === 'metadata-throw' && slot === focus.slot) throw original;
++        return opaque;
++      },
++    });
++    // Each declared key is installed by the descriptor loop; only the fixture changes its representation.
++    return source as T;
++  }
++  let projection: InteractionProjection;
++  switch (family) {
++    case 'node-drag':
++      projection = {
++        type: family,
++        nodes: [
++          {
++            nodeId: a,
++            basePosition: geometry('basePosition', { x: 10, y: 20 }),
++            position: geometry('position', { x: 80, y: 90 }),
++          },
++        ],
++      };
++      break;
++    case 'viewport-pan':
++      projection = {
++        type: family,
++        baseViewport: geometry('baseViewport', { x: 0, y: 0, zoom: 1 }),
++        viewport: geometry('viewport', { x: 20, y: 30, zoom: 2 }),
++      };
++      break;
++    case 'box-selection':
++      projection = { type: family, rect: geometry('rect', { x: 5, y: 6, width: 70, height: 80 }) };
++      break;
++    case 'connection-preview':
++      projection = {
++        type: family,
++        source: { nodeId: a, role: 'source' },
++        pointerWorldPoint: geometry('pointerWorldPoint', { x: 330, y: 140 }),
++        target: { type: 'none' },
++      };
++      break;
++  }
++  try {
++    renderer.updateDocument({ type: 'reset', view });
++    renderer.updateSession({ selection: { nodeIds: [a], edgeIds: [] }, viewport: { x: 0, y: 0, zoom: 1 } });
++    const node = target.querySelector('[data-nodebraid-node-id="a"]');
++    const documentDOM = target.innerHTML;
++    renderer.updateInteraction({ type: 'box-selection', rect: { x: 2, y: 3, width: 20, height: 30 } });
++    const previousDOM = target.innerHTML;
++    let didThrow = false,
++      caught: unknown;
++    try {
++      renderer.updateInteraction(projection);
++    } catch (error) {
++      didThrow = true;
++      caught = error;
++    }
++    if (mode === 'mutate') {
++      check(!didThrow, 'Valid captured geometry must project');
++      for (const candidate of slots[family])
++        check(reads.get(candidate.slot + '.' + candidate.field) === 1, 'Every declared coordinate read once');
++      for (const [slot, source] of sources) {
++        check(metadata.get(slot) === 1, 'Own enumerable metadata copied once');
++        check(!Object.isFrozen(source), 'Caller geometry remains mutable');
++        Object.defineProperty(source, 'callerMutation', { value: true });
++      }
++      check(!Object.isFrozen(opaque), 'Caller metadata remains shallow');
++      switch (family) {
++        case 'node-drag':
++          equal(
++            attributes(target, '[data-nodebraid-node-id="a"]', ['x', 'y']),
++            { x: '80', y: '90' },
++            'Captured Node position',
++          );
++          equal(
++            attributes(target, '[data-nodebraid-edge-id="edge"]', ['x1', 'y1', 'x2', 'y2']),
++            { x1: '120', y1: '110', x2: '270', y2: '70' },
++            'Incident Edge follows captured position',
++          );
++          equal(
++            renderer.hitTest({ x: 100, y: 100 }),
++            { type: 'node', nodeId: a, worldPoint: { x: 100, y: 100 } },
++            'Hit uses effective candidate geometry',
++          );
++          break;
++        case 'viewport-pan':
++          equal(
++            attributes(target, '[data-nodebraid-renderer-svg-root]', ['transform']),
++            { transform: 'matrix(2 0 0 2 20 30)' },
++            'Captured Viewport transform',
++          );
++          equal(
++            renderer.hitTest({ x: 120, y: 110 }),
++            { type: 'node', nodeId: a, worldPoint: { x: 50, y: 40 } },
++            'Hit uses effective candidate Viewport',
++          );
++          break;
++        case 'box-selection':
++          equal(
++            attributes(target, '[data-nodebraid-box-selection]', ['x', 'y', 'width', 'height']),
++            { x: '5', y: '6', width: '70', height: '80' },
++            'Captured rectangle',
++          );
++          break;
++        case 'connection-preview':
++          equal(
++            attributes(target, '[data-nodebraid-connection-preview]', ['x1', 'y1', 'x2', 'y2']),
++            { x1: '90', y1: '40', x2: '330', y2: '140' },
++            'Captured pointer endpoint',
++          );
++          break;
++      }
++      for (const candidate of slots[family])
++        check(reads.get(candidate.slot + '.' + candidate.field) === 1, 'Hit does not re-read caller geometry');
++    } else {
++      check(didThrow, 'Invalid or throwing geometry must throw');
++      if (mode === 'invalid-first' || (mode === 'first-error-order' && family !== 'node-drag')) {
++        check(
++          caught instanceof RendererError && caught.code === 'INVALID_INTERACTION_PROJECTION',
++          'First invalid value remains rejected',
++        );
++        check(reads.get(focus.slot + '.' + focus.field) === 1, 'No retry of invalid first value');
++      } else check(caught === original, 'Original thrown value identity');
++      if (mode === 'first-error-order') {
++        const later = family === 'node-drag' ? 'position.y' : focus.slot + '.y';
++        check(
++          (reads.get(later) ?? 0) === (family === 'node-drag' ? 1 : 0),
++          'Original eager/sequential first-error prefix retained',
++        );
++      }
++      check(target.innerHTML === previousDOM, 'Rejected replacement retains previous accepted DOM');
++    }
++    check(kernel.read() === view, 'Renderer cannot write the Kernel baseline');
++    renderer.updateInteraction(null);
++    check(target.innerHTML === documentDOM, 'Clear restores committed geometry and Session');
++    check(
++      target.querySelector('[data-nodebraid-node-id="a"]') === node,
++      'Keyed Node identity survives replacement/clear',
++    );
++  } finally {
++    await renderer.dispose();
++    check(
++      target.childElementCount === 0 && !target.hasAttribute('tabindex'),
++      'Owned subtree and temporary tabindex removed',
++    );
++    target.remove();
++  }
++}
++export async function runInteractionGeometryValueCases(): Promise<{
++  controls: number;
++  passed: number;
++  results: Result[];
++  nativeInputEventsDriven: 0;
++}> {
++  const results: Result[] = [];
++  const run = async (id: string, execute: () => Promise<void>) => {
++    try {
++      await execute();
++      results.push({ id, passed: true });
++    } catch (error) {
++      results.push({ id, passed: false, error: error instanceof Error ? error.stack : String(error) });
++    }
++  };
++  const failures: unknown[] = [undefined, null, false, 0, '', Symbol('geometry-read'), new Error('same identity')];
++  for (const family of Object.keys(slots) as Family[]) {
++    for (const focus of slots[family]) {
++      for (const shape of ['own', 'inherited', 'non-enumerable'] as const) {
++        await run('captured/' + family + '/' + focus.slot + '.' + focus.field + '/' + shape, () =>
++          geometryCase(family, shape, focus, 'mutate'),
++        );
++      }
++      for (const [index, original] of failures.entries()) {
++        await run('raw-error/' + family + '/' + focus.slot + '.' + focus.field + '/' + index, () =>
++          geometryCase(family, 'own', focus, 'throw', original),
++        );
++      }
++      await run('invalid-first/' + family + '/' + focus.slot + '.' + focus.field, () =>
++        geometryCase(family, 'inherited', focus, 'invalid-first'),
++      );
++    }
++    await run('first-error-order/' + family, () =>
++      geometryCase(family, 'own', slots[family][0]!, 'first-error-order', new Error('later coordinate')),
++    );
++    for (const [index, original] of failures.entries()) {
++      const focus = slots[family][0]!;
++      await run('metadata-error/' + family + '/' + index, () =>
++        geometryCase(family, 'own', focus, 'metadata-throw', original),
++      );
++    }
++  }
++  results.push(...(await runInteractionGeometryArrayCases()).results);
++  results.push(...(await runInteractionGeometryMetadataCases()).results);
++  return {
++    controls: results.length,
++    passed: results.filter((result) => result.passed).length,
++    results,
++    nativeInputEventsDriven: 0,
++  };
++}
++
++async function geometryArrayCase(cloneIterator: boolean): Promise<void> {
++  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
++  target.setAttribute('width', '600');
++  target.setAttribute('height', '400');
++  document.body.append(target);
++  const renderer = createSvgRenderer({ target }),
++    kernel = createCanvasKernel();
++  const a = nodeId('a'),
++    b = nodeId('b');
++  kernel.transact((tx) => {
++    tx.nodes.add({ id: a, type: 'task', position: { x: 10, y: 20 }, size: { width: 80, height: 40 }, data: null });
++    tx.nodes.add({ id: b, type: 'task', position: { x: 220, y: 40 }, size: { width: 100, height: 60 }, data: null });
++  });
++  const nodes: NodeDragProjectionNode[] = [
++    { nodeId: a, basePosition: { x: 10, y: 20 }, position: { x: 80, y: 90 } },
++    { nodeId: b, basePosition: { x: 220, y: 40 }, position: { x: 280, y: 190 } },
++  ];
++  nodes.map = function <U>(
++    callback: (value: NodeDragProjectionNode, index: number, array: NodeDragProjectionNode[]) => U,
++    thisArg?: unknown,
++  ): U[] {
++    const result: U[] = [];
++    for (let index = 0; index < this.length; index += 1)
++      result.push(callback.call(thisArg, this[index]!, 1 - index, this));
++    return result;
++  };
++  if (cloneIterator)
++    nodes[Symbol.iterator] = function () {
++      return [{ ...this[0]! }, { ...this[1]! }].values();
++    };
++  try {
++    const view = kernel.read();
++    renderer.updateDocument({ type: 'reset', view });
++    renderer.updateSession({ selection: { nodeIds: [], edgeIds: [] }, viewport: { x: 0, y: 0, zoom: 1 } });
++    const before = target.innerHTML,
++      nodeA = target.querySelector('[data-nodebraid-node-id="a"]'),
++      nodeB = target.querySelector('[data-nodebraid-node-id="b"]');
++    renderer.updateInteraction({ type: 'node-drag', nodes });
++    equal(
++      attributes(target, '[data-nodebraid-node-id="a"]', ['x', 'y']),
++      { x: '80', y: '90' },
++      'Node a keeps its validated candidate',
++    );
++    equal(
++      attributes(target, '[data-nodebraid-node-id="b"]', ['x', 'y']),
++      { x: '280', y: '190' },
++      'Node b keeps its validated candidate',
++    );
++    equal(
++      renderer.hitTest({ x: 100, y: 100 }),
++      { type: 'node', nodeId: a, worldPoint: { x: 100, y: 100 } },
++      'Candidate a hit',
++    );
++    equal(
++      renderer.hitTest({ x: 310, y: 210 }),
++      { type: 'node', nodeId: b, worldPoint: { x: 310, y: 210 } },
++      'Candidate b hit',
++    );
++    check(kernel.read() === view, 'Array projection leaves Kernel unchanged');
++    renderer.updateInteraction(null);
++    check(target.innerHTML === before, 'Array projection clear restores baseline');
++    check(
++      target.querySelector('[data-nodebraid-node-id="a"]') === nodeA &&
++        target.querySelector('[data-nodebraid-node-id="b"]') === nodeB,
++      'Both keyed Node elements survive',
++    );
++  } finally {
++    await renderer.dispose();
++    check(target.childElementCount === 0 && !target.hasAttribute('tabindex'), 'Array case cleanup');
++    target.remove();
++  }
++}
++export async function runInteractionGeometryArrayCases(): Promise<{
++  controls: number;
++  passed: number;
++  results: Result[];
++}> {
++  const results: Result[] = [];
++  for (const clone of [false, true]) {
++    const id = 'candidate-node-key/' + clone;
++    try {
++      await geometryArrayCase(clone);
++      results.push({ id, passed: true });
++    } catch (error) {
++      results.push({ id, passed: false, error: error instanceof Error ? error.stack : String(error) });
++    }
++  }
++  return { controls: results.length, passed: results.filter((result) => result.passed).length, results };
++}
++
++async function geometryMetadataCase(
++  slot: 'basePosition' | 'position',
++  mode: 'raw-throws' | 'clone-throws',
++): Promise<void> {
++  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
++  target.setAttribute('width', '400');
++  target.setAttribute('height', '300');
++  document.body.append(target);
++  const renderer = createSvgRenderer({ target }),
++    kernel = createCanvasKernel(),
++    id = nodeId('a');
++  kernel.transact((tx) =>
++    tx.nodes.add({ id, type: 'task', position: { x: 10, y: 20 }, size: { width: 80, height: 40 }, data: null }),
++  );
++  const original = new Error(slot + '/' + mode),
++    opaque = { caller: Symbol(mode) };
++  let rawReads = 0,
++    cloneReads = 0;
++  const rawPoint = { x: slot === 'basePosition' ? 10 : 80, y: slot === 'basePosition' ? 20 : 90 };
++  Object.defineProperty(rawPoint, 'metadata', {
++    enumerable: true,
++    get(this: object) {
++      check(this === rawPoint, 'Original map Point metadata receiver');
++      rawReads += 1;
++      if (mode === 'raw-throws') throw original;
++      return opaque;
++    },
++  });
++  const clonePoint = { x: rawPoint.x, y: rawPoint.y };
++  Object.defineProperty(clonePoint, 'metadata', {
++    enumerable: true,
++    get() {
++      cloneReads += 1;
++      if (mode === 'clone-throws') throw original;
++      return opaque;
++    },
++  });
++  const candidate: NodeDragProjectionNode = {
++    nodeId: id,
++    basePosition: slot === 'basePosition' ? rawPoint : { x: 10, y: 20 },
++    position: slot === 'position' ? rawPoint : { x: 80, y: 90 },
++  };
++  const clone: NodeDragProjectionNode = { ...candidate, [slot]: clonePoint };
++  const nodes: NodeDragProjectionNode[] = [candidate];
++  nodes[Symbol.iterator] = function () {
++    return [clone].values();
++  };
++  try {
++    const view = kernel.read();
++    renderer.updateDocument({ type: 'reset', view });
++    renderer.updateSession({ selection: { nodeIds: [], edgeIds: [] }, viewport: { x: 0, y: 0, zoom: 1 } });
++    const documentDOM = target.innerHTML;
++    renderer.updateInteraction({ type: 'box-selection', rect: { x: 2, y: 3, width: 20, height: 30 } });
++    const previousDOM = target.innerHTML;
++    let didThrow = false,
++      caught: unknown;
++    try {
++      renderer.updateInteraction({ type: 'node-drag', nodes });
++    } catch (error) {
++      didThrow = true;
++      caught = error;
++    }
++    check(rawReads === 1 && cloneReads === 0, 'Copy stage reads original map metadata, not validation iterator clone');
++    if (mode === 'raw-throws') {
++      check(didThrow && caught === original, 'Original map metadata error identity retained');
++      check(target.innerHTML === previousDOM, 'Metadata error preserves accepted DOM');
++    } else {
++      check(!didThrow, 'Uncopied iterator metadata cannot introduce an error');
++      equal(
++        attributes(target, '[data-nodebraid-node-id="a"]', ['x', 'y']),
++        { x: '80', y: '90' },
++        'Captured numeric geometry still projects',
++      );
++    }
++    check(kernel.read() === view && !Object.isFrozen(opaque), 'Kernel baseline and shallow caller metadata retained');
++    renderer.updateInteraction(null);
++    check(target.innerHTML === documentDOM, 'Metadata case clears to committed DOM');
++  } finally {
++    await renderer.dispose();
++    check(target.childElementCount === 0 && !target.hasAttribute('tabindex'), 'Metadata case cleanup');
++    target.remove();
++  }
++}
++export async function runInteractionGeometryMetadataCases(): Promise<{
++  controls: number;
++  passed: number;
++  results: Result[];
++}> {
++  const results: Result[] = [];
++  for (const slot of ['basePosition', 'position'] as const)
++    for (const mode of ['raw-throws', 'clone-throws'] as const) {
++      const id = 'copy-stage-metadata/' + slot + '/' + mode;
++      try {
++        await geometryMetadataCase(slot, mode);
++        results.push({ id, passed: true });
++      } catch (error) {
++        results.push({ id, passed: false, error: error instanceof Error ? error.stack : String(error) });
++      }
++    }
++  return { controls: results.length, passed: results.filter((result) => result.passed).length, results };
++}
+diff --git a/packages/renderer-svg/browser-tests/renderer-contract.browser.ts b/packages/renderer-svg/browser-tests/renderer-contract.browser.ts
+index 7dd72d7..615b24c 100644
+--- a/packages/renderer-svg/browser-tests/renderer-contract.browser.ts
++++ b/packages/renderer-svg/browser-tests/renderer-contract.browser.ts
+@@ -58,6 +58,21 @@ const server = Bun.serve({
+ 
+ try {
+   await runAgentBrowser(['open', server.url.href]);
++  const declaredGeometry = await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgDeclaredGeometryTracer()');
++  assert.deepEqual(declaredGeometry, { x: '80', y: '90', baselineUnchanged: true });
++
++  const geometryValues = await evaluateBrowserScenario<{
++    controls: number;
++    passed: number;
++    results: { id: string; passed: boolean; error?: string }[];
++  }>('globalThis.__nodebraidRendererSvgGeometryValueCases()');
++  assert.equal(geometryValues.controls, 214);
++  assert.equal(
++    geometryValues.passed,
++    geometryValues.controls,
++    JSON.stringify(geometryValues.results.filter((result) => !result.passed)),
++  );
++  console.info('SVG Interaction Geometry capture: 214 public browser cases passed.');
+   let nativePolicyCases = 0;
+   await withRendererPageCdp(async (send) => {
+     for (const family of ['pointer', 'wheel', 'keyboard', 'contextMenu'] as const) {
+diff --git a/packages/renderer-svg/browser-tests/renderer-contract.entry.ts b/packages/renderer-svg/browser-tests/renderer-contract.entry.ts
+index 6ada6fe..1492041 100644
+--- a/packages/renderer-svg/browser-tests/renderer-contract.entry.ts
++++ b/packages/renderer-svg/browser-tests/renderer-contract.entry.ts
+@@ -1,3 +1,8 @@
++import {
++  runInteractionGeometryValueCases,
++  runInteractionGeometryArrayCases,
++  runInteractionGeometryMetadataCases,
++} from './interaction-geometry-values.entry';
+ import {
+   setupPolicyCase,
+   readPolicyCase,
+@@ -5971,3 +5976,67 @@ globalThis.__nodebraidRendererSvgReviewResizeObserverMultipleErrors =
+     target.remove();
+     return result;
+   };
++
++declare global {
++  var __nodebraidRendererSvgDeclaredGeometryTracer: () => Promise<{
++    x: string | null;
++    y: string | null;
++    baselineUnchanged: boolean;
++  }>;
++}
++globalThis.__nodebraidRendererSvgDeclaredGeometryTracer = async () => {
++  class InheritedPosition {
++    get x(): number {
++      return 80;
++    }
++    get y(): number {
++      return 90;
++    }
++  }
++  const target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
++  target.setAttribute('width', '400');
++  target.setAttribute('height', '300');
++  document.body.append(target);
++  const renderer = createSvgRenderer({ target });
++  const kernel = createCanvasKernel();
++  const id = nodeId('declared-geometry-tracer');
++  kernel.transact((tx) =>
++    tx.nodes.add({
++      id,
++      type: 'task',
++      position: { x: 10, y: 20 },
++      size: { width: 80, height: 40 },
++      data: null,
++    }),
++  );
++  const baseline = kernel.read();
++  try {
++    renderer.updateDocument({ type: 'reset', view: baseline });
++    renderer.updateSession({ selection: { nodeIds: [], edgeIds: [] }, viewport: { x: 0, y: 0, zoom: 1 } });
++    renderer.updateInteraction({
++      type: 'node-drag',
++      nodes: [{ nodeId: id, basePosition: { x: 10, y: 20 }, position: new InheritedPosition() }],
++    });
++    const node = target.querySelector('[data-nodebraid-node-id="declared-geometry-tracer"]');
++    if (!node) throw new Error('Expected the public SVG Node.');
++    return { x: node.getAttribute('x'), y: node.getAttribute('y'), baselineUnchanged: kernel.read() === baseline };
++  } finally {
++    await renderer.dispose();
++    target.remove();
++  }
++};
++
++declare global {
++  var __nodebraidRendererSvgGeometryValueCases: typeof runInteractionGeometryValueCases;
++}
++globalThis.__nodebraidRendererSvgGeometryValueCases = runInteractionGeometryValueCases;
++
++declare global {
++  var __nodebraidRendererSvgGeometryArrayCases: typeof runInteractionGeometryArrayCases;
++}
++globalThis.__nodebraidRendererSvgGeometryArrayCases = runInteractionGeometryArrayCases;
++
++declare global {
++  var __nodebraidRendererSvgGeometryMetadataCases: typeof runInteractionGeometryMetadataCases;
++}
++globalThis.__nodebraidRendererSvgGeometryMetadataCases = runInteractionGeometryMetadataCases;
+diff --git a/packages/renderer-svg/src/interaction-projection.ts b/packages/renderer-svg/src/interaction-projection.ts
+index 598d7fd..f4c867d 100644
+--- a/packages/renderer-svg/src/interaction-projection.ts
++++ b/packages/renderer-svg/src/interaction-projection.ts
+@@ -6,7 +6,7 @@ import type {
+   NodeDragInteractionProjection,
+   ViewportPanInteractionProjection,
+ } from '@nodebraid/interaction-api';
+-import type { CanvasSnapshot } from '@nodebraid/kernel';
++import type { CanvasSnapshot, NodeId, Point } from '@nodebraid/kernel';
+ import { isConnectionTargetDefined, type PortSnapshot } from '@nodebraid/port-api';
+ import { RendererError } from '@nodebraid/renderer-api';
+ import type { SessionSnapshot } from '@nodebraid/session-api';
+@@ -73,6 +73,7 @@ function acceptNodeDrag(value: Record<string, unknown>, document: CanvasSnapshot
+   const nodes = new Map(document.nodes.map((node) => [node.id, node]));
+   const seenNodeIds = new Set<string>();
+   let previousNodeId: string | undefined;
++  const capturedPositions = new Map<NodeId, { basePosition: Point; position: Point }>();
+   for (const candidate of projection.nodes) {
+     if (seenNodeIds.has(candidate.nodeId)) {
+       throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Interaction Projection Node IDs must be unique.', {
+@@ -88,11 +89,15 @@ function acceptNodeDrag(value: Record<string, unknown>, document: CanvasSnapshot
+       );
+     }
+     previousNodeId = candidate.nodeId;
++    const baseSource = candidate.basePosition;
++    const basePosition = { x: baseSource.x, y: baseSource.y };
++    const positionSource = candidate.position;
++    const position = { x: positionSource.x, y: positionSource.y };
+     for (const [field, coordinate] of [
+-      ['basePosition.x', candidate.basePosition.x],
+-      ['basePosition.y', candidate.basePosition.y],
+-      ['position.x', candidate.position.x],
+-      ['position.y', candidate.position.y],
++      ['basePosition.x', basePosition.x],
++      ['basePosition.y', basePosition.y],
++      ['position.x', position.x],
++      ['position.y', position.y],
+     ] as const) {
+       if (Number.isFinite(coordinate)) continue;
+       throw new RendererError(
+@@ -102,22 +107,25 @@ function acceptNodeDrag(value: Record<string, unknown>, document: CanvasSnapshot
+       );
+     }
+     const node = nodes.get(candidate.nodeId);
+-    if (!node || node.position.x !== candidate.basePosition.x || node.position.y !== candidate.basePosition.y) {
++    if (!node || node.position.x !== basePosition.x || node.position.y !== basePosition.y) {
+       throw new RendererError('INTERACTION_OUT_OF_SYNC', 'Interaction Projection Node Baseline is stale.', {
+         issue: 'NODE_POSITION_MISMATCH',
+       });
+     }
++    capturedPositions.set(node.id, { basePosition, position });
+   }
+   return Object.freeze({
+     type: 'node-drag',
+     nodes: Object.freeze(
+-      projection.nodes.map((candidate) =>
+-        Object.freeze({
+-          nodeId: candidate.nodeId,
+-          basePosition: Object.freeze({ ...candidate.basePosition }),
+-          position: Object.freeze({ ...candidate.position }),
+-        }),
+-      ),
++      projection.nodes.map((candidate) => {
++        const nodeId = candidate.nodeId;
++        const captured = capturedPositions.get(nodeId)!;
++        return Object.freeze({
++          nodeId,
++          basePosition: ownGeometry(candidate.basePosition, captured.basePosition),
++          position: ownGeometry(candidate.position, captured.position),
++        });
++      }),
+     ),
+   });
+ }
+@@ -126,17 +134,19 @@ function acceptViewportPan(value: Record<string, unknown>, session: SessionSnaps
+   if (!isRecord(value.baseViewport)) throwInvalidProjectionStructure('baseViewport');
+   if (!isRecord(value.viewport)) throwInvalidProjectionStructure('viewport');
+   const projection = value as unknown as ViewportPanInteractionProjection;
+-  assertViewport('baseViewport', projection.baseViewport);
+-  assertViewport('viewport', projection.viewport);
+-  if (!viewportsEqual(projection.baseViewport, session.viewport)) {
++  const baseSource = projection.baseViewport;
++  const baseViewport = captureViewport('baseViewport', baseSource);
++  const viewportSource = projection.viewport;
++  const viewport = captureViewport('viewport', viewportSource);
++  if (!viewportsEqual(baseViewport, session.viewport)) {
+     throw new RendererError('INTERACTION_OUT_OF_SYNC', 'Interaction Projection Viewport Baseline is stale.', {
+       issue: 'VIEWPORT_MISMATCH',
+     });
+   }
+   return Object.freeze({
+     type: 'viewport-pan',
+-    baseViewport: Object.freeze({ ...projection.baseViewport }),
+-    viewport: Object.freeze({ ...projection.viewport }),
++    baseViewport: ownGeometry(baseSource, baseViewport),
++    viewport: ownGeometry(viewportSource, viewport),
+   });
+ }
+ 
+@@ -155,14 +165,15 @@ function acceptConnectionPreview(
+     throwInvalidProjectionStructure('target');
+   }
+   const projection = value as unknown as ConnectionPreviewInteractionProjection;
+-  assertPoint('pointerWorldPoint', projection.pointerWorldPoint);
++  const pointerSource = projection.pointerWorldPoint;
++  const pointerWorldPoint = capturePoint('pointerWorldPoint', pointerSource);
+   assertConnectionAnchorBaseline(projection.source, 'source', document, ports);
+   if (projection.target.type !== 'none')
+     assertConnectionAnchorBaseline(projection.target.anchor, 'target', document, ports);
+   return Object.freeze({
+     type: 'connection-preview',
+     source: Object.freeze({ ...projection.source }),
+-    pointerWorldPoint: Object.freeze({ ...projection.pointerWorldPoint }),
++    pointerWorldPoint: ownGeometry(pointerSource, pointerWorldPoint),
+     target:
+       projection.target.type === 'none'
+         ? Object.freeze({ type: 'none' as const })
+@@ -176,15 +187,18 @@ function acceptConnectionPreview(
+ function acceptBoxSelection(value: Record<string, unknown>): BoxSelectionInteractionProjection {
+   if (!isRecord(value.rect)) throwInvalidProjectionStructure('rect');
+   const projection = value as unknown as BoxSelectionInteractionProjection;
+-  for (const field of ['x', 'y', 'width', 'height'] as const) {
+-    const coordinate = projection.rect[field];
+-    if (Number.isFinite(coordinate) && ((field !== 'width' && field !== 'height') || coordinate >= 0)) continue;
++  const rect = projection.rect;
++  const read = (field: 'x' | 'y' | 'width' | 'height'): number => {
++    const coordinate = rect[field];
++    if (Number.isFinite(coordinate) && ((field !== 'width' && field !== 'height') || coordinate >= 0))
++      return coordinate;
+     throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Box Selection rect must be finite and non-negative.', {
+       issue: 'INVALID_BOX_SELECTION_RECT',
+-      field: `rect.${field}`,
++      field: 'rect.' + field,
+     });
+-  }
+-  return Object.freeze({ type: 'box-selection', rect: Object.freeze({ ...projection.rect }) });
++  };
++  const values = { x: read('x'), y: read('y'), width: read('width'), height: read('height') };
++  return Object.freeze({ type: 'box-selection', rect: ownGeometry(rect, values) });
+ }
+ 
+ function assertConnectionAnchorBaseline(
+@@ -204,26 +218,32 @@ function assertConnectionAnchorBaseline(
+   });
+ }
+ 
+-function assertPoint(field: string, point: Readonly<{ x: number; y: number }>): void {
+-  for (const coordinate of ['x', 'y'] as const) {
+-    if (Number.isFinite(point[coordinate])) continue;
++function capturePoint(field: string, point: Point): Point {
++  const read = (coordinate: 'x' | 'y'): number => {
++    const value = point[coordinate];
++    if (Number.isFinite(value)) return value;
+     throw new RendererError('INVALID_INTERACTION_PROJECTION', 'Interaction Projection Point must be finite.', {
+       issue: 'INVALID_POINT',
+-      field: `${field}.${coordinate}`,
++      field: field + '.' + coordinate,
+     });
+-  }
++  };
++  return { x: read('x'), y: read('y') };
+ }
+ 
+-function assertViewport(prefix: 'baseViewport' | 'viewport', viewport: SessionSnapshot['viewport']): void {
+-  for (const field of ['x', 'y', 'zoom'] as const) {
++function captureViewport(
++  prefix: 'baseViewport' | 'viewport',
++  viewport: SessionSnapshot['viewport'],
++): SessionSnapshot['viewport'] {
++  const read = (field: 'x' | 'y' | 'zoom'): number => {
+     const coordinate = viewport[field];
+-    if (Number.isFinite(coordinate) && (field !== 'zoom' || coordinate > 0)) continue;
++    if (Number.isFinite(coordinate) && (field !== 'zoom' || coordinate > 0)) return coordinate;
+     throw new RendererError(
+       'INVALID_INTERACTION_PROJECTION',
+       'Interaction Projection Viewport values must be finite with positive zoom.',
+-      { issue: 'INVALID_VIEWPORT', field: `${prefix}.${field}` },
++      { issue: 'INVALID_VIEWPORT', field: prefix + '.' + field },
+     );
+-  }
++  };
++  return { x: read('x'), y: read('y'), zoom: read('zoom') };
+ }
+ 
+ function isConnectionAnchor(value: unknown): value is ConnectionAnchorIdentity {
+@@ -266,3 +286,18 @@ function isRecord(value: unknown): value is Record<string, unknown> {
+ function viewportsEqual(left: SessionSnapshot['viewport'], right: SessionSnapshot['viewport']): boolean {
+   return left.x === right.x && left.y === right.y && left.zoom === right.zoom;
+ }
++
++function ownGeometry<T extends object>(source: object, values: T): Readonly<T> {
++  const snapshot: Record<PropertyKey, unknown> = {};
++  for (const key of Reflect.ownKeys(source)) {
++    const descriptor = Reflect.getOwnPropertyDescriptor(source, key);
++    if (!descriptor?.enumerable) continue;
++    Object.defineProperty(snapshot, key, {
++      value: Object.hasOwn(values, key) ? Reflect.get(values, key) : Reflect.get(source, key),
++      enumerable: true,
++      configurable: true,
++      writable: true,
++    });
++  }
++  return Object.freeze(Object.assign(snapshot, values));
++}
+
+actualExit=0
+Current value-only numeric cache/raw map-source metadata compiled helper SHA256=0120aac3802889ac36f56ca072a5c966494196c1290de780df6ad5f610e12cd6
+
+$ ["bun", "--eval", "import assert from 'node:assert/strict';\nimport { createCanvasKernel, nodeId } from '@nodebraid/kernel';\nimport { acceptInteractionProjection } from './packages/renderer-svg/src/interaction-projection.ts';\nconst kernel = createCanvasKernel(), a = nodeId('a'), b = nodeId('b');\nkernel.transact(tx => {\n  tx.nodes.add({ id:a, type:'task', position:{x:10,y:20}, size:{width:20,height:20}, data:null });\n  tx.nodes.add({ id:b, type:'task', position:{x:100,y:110}, size:{width:20,height:20}, data:null });\n});\nconst view = kernel.read();\nconst ports = Object.freeze({ documentRevision:view.snapshot.revision, generation:0, nodes:Object.freeze([]) });\nconst session = Object.freeze({ selection:Object.freeze({ nodeIds:Object.freeze([]), edgeIds:Object.freeze([]) }), viewport:Object.freeze({x:0,y:0,zoom:1}) });\nconst candidates = [\n  Object.freeze({nodeId:a,basePosition:view.query.getNode(a).position,position:Object.freeze({x:30,y:40})}),\n  Object.freeze({nodeId:b,basePosition:view.query.getNode(b).position,position:Object.freeze({x:150,y:160})}),\n];\nconst expected = candidates.map(c => ({id:c.nodeId,base:c.basePosition,position:c.position}));\nconst observe = (nodes) => acceptInteractionProjection({type:'node-drag',nodes},view.snapshot,ports,session).nodes.map(c => ({id:c.nodeId,base:c.basePosition,position:c.position}));\nconst ordinary = observe(Object.freeze([...candidates])); assert.deepEqual(ordinary,expected);\nconst custom = [...candidates]; let mapCalls = 0;\nObject.defineProperty(custom,'map',{value:function(callback,thisArg){\n  mapCalls++;\n  return Array.prototype.map.call(this,(candidate,index,array)=>callback.call(thisArg,candidate,1-index,array));\n}});\nObject.freeze(custom);\nconst actual = observe(custom);\nassert.deepEqual(actual.map(row=>row.id),[a,b]);\nassert.equal(mapCalls,1); assert.equal(kernel.read(),view);\nconsole.log(JSON.stringify({ordinaryControl:ordinary,expected,actual,canonicalIds:true,mapCalls,unchangedKernel:true,scope:'pure acceptor/internal boundary; not public Renderer or DOM/browser proof'}));\nassert.deepEqual(actual,expected,'Accepted per-ID geometry must not depend on caller map callback index');"]
+{"ordinaryControl":[{"id":"a","base":{"x":10,"y":20},"position":{"x":30,"y":40}},{"id":"b","base":{"x":100,"y":110},"position":{"x":150,"y":160}}],"expected":[{"id":"a","base":{"x":10,"y":20},"position":{"x":30,"y":40}},{"id":"b","base":{"x":100,"y":110},"position":{"x":150,"y":160}}],"actual":[{"id":"a","base":{"x":10,"y":20},"position":{"x":30,"y":40}},{"id":"b","base":{"x":100,"y":110},"position":{"x":150,"y":160}}],"canonicalIds":true,"mapCalls":1,"unchangedKernel":true,"scope":"pure acceptor/internal boundary; not public Renderer or DOM/browser proof"}
+
+actualExit=0
+
+$ ["bun", "--eval", "import assert from 'node:assert/strict';\nimport { createCanvasKernel, nodeId } from '@nodebraid/kernel';\nimport { acceptInteractionProjection } from './packages/renderer-svg/src/interaction-projection.ts';\nconst kernel = createCanvasKernel(), a = nodeId('a'), b = nodeId('b');\nkernel.transact(tx => {\n  tx.nodes.add({ id:a, type:'task', position:{x:10,y:20}, size:{width:20,height:20}, data:null });\n  tx.nodes.add({ id:b, type:'task', position:{x:100,y:110}, size:{width:20,height:20}, data:null });\n});\nconst view = kernel.read();\nconst ports = Object.freeze({ documentRevision:view.snapshot.revision, generation:0, nodes:Object.freeze([]) });\nconst session = Object.freeze({ selection:Object.freeze({ nodeIds:Object.freeze([]), edgeIds:Object.freeze([]) }), viewport:Object.freeze({x:0,y:0,zoom:1}) });\nconst candidates = [\n  Object.freeze({nodeId:a,basePosition:view.query.getNode(a).position,position:Object.freeze({x:30,y:40})}),\n  Object.freeze({nodeId:b,basePosition:view.query.getNode(b).position,position:Object.freeze({x:150,y:160})}),\n];\nconst expected = candidates.map(c => ({id:c.nodeId,base:c.basePosition,position:c.position}));\nconst observe = (nodes) => acceptInteractionProjection({type:'node-drag',nodes},view.snapshot,ports,session).nodes.map(c => ({id:c.nodeId,base:c.basePosition,position:c.position}));\nconst ordinary = observe(Object.freeze([...candidates])); assert.deepEqual(ordinary,expected);\nconst custom = [...candidates]; let mapCalls = 0;\nObject.defineProperty(custom,'map',{value:function(callback,thisArg){\n  mapCalls++;\n  return Array.prototype.map.call(this,(candidate,index,array)=>callback.call(thisArg,candidate,1-index,array));\n}});\nObject.defineProperty(custom,Symbol.iterator,{value:function*(){for(const candidate of candidates)yield {...candidate};}});\nObject.freeze(custom);\nconst actual = observe(custom);\nassert.deepEqual(actual.map(row=>row.id),[a,b]);\nassert.equal(mapCalls,1); assert.equal(kernel.read(),view);\nconsole.log(JSON.stringify({ordinaryControl:ordinary,expected,actual,canonicalIds:true,mapCalls,unchangedKernel:true,scope:'pure acceptor/internal boundary; not public Renderer or DOM/browser proof'}));\nassert.deepEqual(actual,expected,'Accepted per-ID geometry must not depend on caller map callback index');"]
+{"ordinaryControl":[{"id":"a","base":{"x":10,"y":20},"position":{"x":30,"y":40}},{"id":"b","base":{"x":100,"y":110},"position":{"x":150,"y":160}}],"expected":[{"id":"a","base":{"x":10,"y":20},"position":{"x":30,"y":40}},{"id":"b","base":{"x":100,"y":110},"position":{"x":150,"y":160}}],"actual":[{"id":"a","base":{"x":10,"y":20},"position":{"x":30,"y":40}},{"id":"b","base":{"x":100,"y":110},"position":{"x":150,"y":160}}],"canonicalIds":true,"mapCalls":1,"unchangedKernel":true,"scope":"pure acceptor/internal boundary; not public Renderer or DOM/browser proof"}
+
+actualExit=0
+
+$ ["bun", "--eval", "import assert from 'node:assert/strict';\nimport { createCanvasKernel,nodeId } from '@nodebraid/kernel';\nimport { acceptInteractionProjection } from './packages/renderer-svg/src/interaction-projection.ts';\nconst observations=[];\nfor(const slot of ['basePosition','position']) for(const mode of ['raw-throws','clone-throws']) {\n const kernel=createCanvasKernel(),id=nodeId('a');\n kernel.transact(tx=>tx.nodes.add({id,type:'task',position:{x:10,y:20},size:{width:80,height:40},data:null}));\n const view=kernel.read(),marker=new Error(slot+'/'+mode),opaque={caller:Symbol(mode)};\n const raw={x:slot==='basePosition'?10:80,y:slot==='basePosition'?20:90},copy={...raw};let rawReads=0,cloneReads=0;\n Object.defineProperty(raw,'metadata',{enumerable:true,get(){assert.equal(this,raw);rawReads++;if(mode==='raw-throws')throw marker;return opaque;}});\n Object.defineProperty(copy,'metadata',{enumerable:true,get(){assert.equal(this,copy);cloneReads++;if(mode==='clone-throws')throw marker;return opaque;}});\n const candidate={nodeId:id,basePosition:slot==='basePosition'?raw:{x:10,y:20},position:slot==='position'?raw:{x:80,y:90}};\n const cloned={...candidate,[slot]:copy},nodes=[candidate];\n Object.defineProperty(nodes,Symbol.iterator,{value:function*(){yield cloned;}});\n const ports={documentRevision:view.snapshot.revision,generation:0,nodes:[]},session={selection:{nodeIds:[],edgeIds:[]},viewport:{x:0,y:0,zoom:1}};\n let didThrow=false,caught,accepted;\n try{accepted=acceptInteractionProjection({type:'node-drag',nodes},view.snapshot,ports,session);}catch(error){didThrow=true;caught=error;}\n assert.equal(rawReads,1);assert.equal(cloneReads,0);assert.equal(kernel.read(),view);\n if(mode==='raw-throws'){assert.equal(didThrow,true);assert.equal(caught,marker);}\n else {assert.equal(didThrow,false);assert.equal(accepted.nodes[0][slot].metadata,opaque);assert.deepEqual(accepted.nodes[0].position,{x:80,y:90,...(slot==='position'?{metadata:opaque}:{})});}\n assert.equal(Object.isFrozen(raw),false);assert.equal(Object.isFrozen(copy),false);assert.equal(Object.isFrozen(opaque),false);\n observations.push({slot,mode,rawReads,cloneReads,didThrow,originalError:didThrow&&caught===marker,passed:true});\n}\nconsole.log(JSON.stringify({checks:observations.length,passed:observations.length,scope:'pure internal acceptor with real public Kernel/Port/Session values; not Renderer/browser proof',observations}));"]
+{"checks":4,"passed":4,"scope":"pure internal acceptor with real public Kernel/Port/Session values; not Renderer/browser proof","observations":[{"slot":"basePosition","mode":"raw-throws","rawReads":1,"cloneReads":0,"didThrow":true,"originalError":true,"passed":true},{"slot":"basePosition","mode":"clone-throws","rawReads":1,"cloneReads":0,"didThrow":false,"originalError":false,"passed":true},{"slot":"position","mode":"raw-throws","rawReads":1,"cloneReads":0,"didThrow":true,"originalError":true,"passed":true},{"slot":"position","mode":"clone-throws","rawReads":1,"cloneReads":0,"didThrow":false,"originalError":false,"passed":true}]}
+
+actualExit=0
+
+$ ["bun", "--eval", "import assert from 'node:assert/strict';\nimport {createCanvasKernel,nodeId} from '@nodebraid/kernel';\nimport {acceptInteractionProjection} from './packages/renderer-svg/src/interaction-projection.ts';\nconst kernel=createCanvasKernel(),id=nodeId('a');kernel.transact(tx=>tx.nodes.add({id,type:'task',position:{x:10,y:20},size:{width:80,height:40},data:null}));\nconst view=kernel.read(),ports={documentRevision:view.snapshot.revision,generation:0,nodes:[]},session={selection:{nodeIds:[],edgeIds:[]},viewport:{x:0,y:0,zoom:1}};\nlet checks=0;\nfor(const family of ['node-drag','viewport-pan','box-selection','connection-preview']) for(const shape of ['own','inherited','non-enumerable']) {\n const controls=[],opaque={caller:Symbol(family)};\n function geometry(values){const expected={...values},reads={},holder={};let source,metadataReads=0;\n  for(const field of Object.keys(values))Object.defineProperty(holder,field,{enumerable:shape==='own',get(){assert.equal(this,source);reads[field]=(reads[field]??0)+1;if(reads[field]>1)return NaN;return values[field];}});\n  source=shape==='inherited'?Object.create(holder):holder;\n  Object.defineProperty(source,'metadata',{enumerable:true,get(){assert.equal(this,source);metadataReads++;return opaque;}});\n  const control={source,expected,reads,values,metadata:()=>metadataReads};controls.push(control);return source;}\n let projection;\n if(family==='node-drag')projection={type:family,nodes:[{nodeId:id,basePosition:geometry({x:10,y:20}),position:geometry({x:80,y:90})}]};\n if(family==='viewport-pan')projection={type:family,baseViewport:geometry({x:0,y:0,zoom:1}),viewport:geometry({x:20,y:30,zoom:2})};\n if(family==='box-selection')projection={type:family,rect:geometry({x:5,y:6,width:70,height:80})};\n if(family==='connection-preview')projection={type:family,source:{nodeId:id,role:'source'},pointerWorldPoint:geometry({x:330,y:140}),target:{type:'none'}};\n const accepted=acceptInteractionProjection(projection,view.snapshot,ports,session);\n const owned=family==='node-drag'?[accepted.nodes[0].basePosition,accepted.nodes[0].position]:family==='viewport-pan'?[accepted.baseViewport,accepted.viewport]:family==='box-selection'?[accepted.rect]:[accepted.pointerWorldPoint];\n assert.equal(owned.length,controls.length);assert.equal(Object.isFrozen(accepted),true);\n for(const [index,c] of controls.entries()){assert.equal(Object.isFrozen(owned[index]),true);assert.equal(Object.isFrozen(c.source),false);assert.equal(c.metadata(),1);assert.equal(owned[index].metadata,opaque);for(const field of Object.keys(c.expected)){assert.equal(c.reads[field],1);assert.equal(Object.hasOwn(owned[index],field),true);assert.equal(owned[index][field],c.expected[field]);c.values[field]=NaN;assert.equal(owned[index][field],c.expected[field]);}}\n assert.equal(Object.isFrozen(opaque),false);assert.equal(kernel.read(),view);checks++;\n}\nconsole.log(JSON.stringify({checks,passed:checks,scope:'four families x three shapes, internal acceptor only; not Renderer DOM/browser proof'}));"]
+{"checks":12,"passed":12,"scope":"four families x three shapes, internal acceptor only; not Renderer DOM/browser proof"}
+
+actualExit=0
+
+$ ["git", "diff", "--check", "6fd2d016f6330cc422508b3e51229bea4be2cce0...fe48ff7c2ffb7eef144f64b4699b042f6acdad19"]
+
+actualExit=0
+
+$ ["bun", "test", "packages/renderer-api/tests", "packages/renderer-svg/tests", "packages/plugin-renderer/tests", "packages/plugin-interaction/tests", "packages/plugin-history/tests"]
+bun test v1.4.2 (744846f84)
+
+packages/plugin-history/tests/index.test.ts:
+(pass) @nodebraid/plugin-history > publishes the stable History diagnostic event catalog [0.59ms]
+(pass) @nodebraid/plugin-history > records the first post-Baseline Commit and undoes it through Command Service [18.02ms]
+(pass) @nodebraid/plugin-history > redoes the most recently undone History Entry with diagnostic metadata [2.70ms]
+(pass) @nodebraid/plugin-history > records a Recordable Commit that uses History-like diagnostic metadata [1.56ms]
+(pass) @nodebraid/plugin-history > records Command-originated work but not net-zero or failed Transactions [3.57ms]
+(pass) @nodebraid/plugin-history > clears Redo when a new Recordable Commit creates a branch [0.96ms]
+(pass) @nodebraid/plugin-history > rejects an empty Undo without changing Kernel or History [1.00ms]
+(pass) @nodebraid/plugin-history > publishes only meaningful History Snapshot changes [0.73ms]
+(pass) @nodebraid/plugin-history > snapshots subscriber recipients and isolates their errors [2.10ms]
+(pass) @nodebraid/plugin-history > allows an aligned Recordable Commit subscriber to Undo immediately [1.01ms]
+(pass) @nodebraid/plugin-history > rejects Undo before History catches up to the current Kernel revision [0.74ms]
+(pass) @nodebraid/plugin-history > keeps one queued Replay in flight and rejects a reentrant second Undo [0.61ms]
+(pass) @nodebraid/plugin-history > records a reentrant Recordable Commit and publishes only after catching up [0.77ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy while publishing its History Snapshot [2.48ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through later Kernel Observers [1.01ms]
+(pass) @nodebraid/plugin-history > returns the exact Replay Commit delivered to Kernel Observers [0.69ms]
+(pass) @nodebraid/plugin-history > keeps Replay busy through the final caught-up Snapshot publication [1.25ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Kernel Provider disappears before delivery [0.73ms]
+(pass) @nodebraid/plugin-history > settles a committed queued Replay when Command Provider disappears before delivery [0.51ms]
+(pass) @nodebraid/plugin-history > preserves caller cancellation before starting a Replay [0.49ms]
+(pass) @nodebraid/plugin-history > prioritizes caller cancellation over an empty Undo stack [0.49ms]
+(pass) @nodebraid/plugin-history > closes old History state and reactivates from a fresh Kernel Baseline [0.99ms]
+(pass) @nodebraid/plugin-history > starts a new Baseline when Command Service returns to a retained Kernel [0.89ms]
+
+packages/plugin-history/tests/types.test.ts:
+(pass) keeps the public History seam narrow and type-safe
+
+packages/plugin-history/tests/baseline.test.ts:
+(pass) replaces the Document as a new baseline and only undoes subsequent edits [2.07ms]
+(pass) establishes a baseline without a net Document change and publishes the cleared history [0.76ms]
+(pass) keeps a net-zero baseline busy through publication while recording a subsequent Commit [0.64ms]
+(pass) preserves the original Document and History after callback rejection [0.67ms]
+(pass) preserves the original Document and History after invalid-graph rejection [0.64ms]
+(pass) preserves the original Document and History after async-callback rejection [0.52ms]
+(pass) rejects an already aborted baseline before invoking its update [1.30ms]
+(pass) rejects overlapping baseline and replay Commands before writing [0.72ms]
+(pass) returns the committed baseline when a later observer aborts the caller [0.50ms]
+(pass) rejects a baseline when an earlier observer runs before History catches up [0.58ms]
+(pass) records an ordinary reentrant Commit after the exact baseline Commit [1.13ms]
+(pass) settles a committed queued baseline when its kernel Provider disappears [0.72ms]
+(pass) settles a committed queued baseline when its command Provider disappears [0.46ms]
+
+packages/renderer-api/tests/index.test.ts:
+(pass) publishes backend-neutral Renderer Input values [0.02ms]
+(pass) identifies Renderer contract failures structurally [0.12ms]
+
+packages/renderer-api/tests/types.test.ts:
+(pass) keeps Renderer construction and updates strongly typed
+
+packages/plugin-interaction/tests/input-cleanup.test.ts:
+(pass) a failed Selection transition releases Pointer Capture before reporting the Input fault [3.46ms]
+
+packages/plugin-interaction/tests/types.test.ts:
+(pass) publishes Interaction as a Runtime Plugin with a narrow Shortcut contribution Service [0.02ms]
+
+packages/plugin-interaction/tests/create-edge-input-values.test.ts:
+(pass) Create Edge cannot replace a validated forward Edge with a later self-loop [2.19ms]
+(pass) Create Edge retains first values, receivers and late opaque data from own properties [1.28ms]
+(pass) Create Edge retains first values, receivers and late opaque data from non-enumerable properties [0.98ms]
+(pass) Create Edge retains first values, receivers and late opaque data from inherited properties [1.08ms]
+(pass) Create Edge preserves the original edge read failure and exact committed state [2.39ms]
+(pass) Create Edge preserves the original edge.id read failure and exact committed state [1.09ms]
+(pass) Create Edge preserves the original edge.type read failure and exact committed state [0.90ms]
+(pass) Create Edge preserves the original edge.source read failure and exact committed state [0.79ms]
+(pass) Create Edge preserves the original edge.source.nodeId read failure and exact committed state [0.76ms]
+(pass) Create Edge preserves the original edge.source.portId read failure and exact committed state [0.79ms]
+(pass) Create Edge preserves the original edge.target read failure and exact committed state [0.76ms]
+(pass) Create Edge preserves the original edge.target.nodeId read failure and exact committed state [0.79ms]
+(pass) Create Edge preserves the original edge.target.portId read failure and exact committed state [1.66ms]
+(pass) Create Edge preserves the original edge.data.presence read failure and exact committed state [1.16ms]
+(pass) Create Edge preserves the original source read failure and exact committed state [0.85ms]
+(pass) Create Edge preserves the original source.nodeId read failure and exact committed state [0.73ms]
+(pass) Create Edge preserves the original source.portId read failure and exact committed state [0.72ms]
+(pass) Create Edge preserves the original source.role read failure and exact committed state [0.72ms]
+(pass) Create Edge preserves the original target read failure and exact committed state [0.70ms]
+(pass) Create Edge preserves the original target.nodeId read failure and exact committed state [0.73ms]
+(pass) Create Edge preserves the original target.portId read failure and exact committed state [1.45ms]
+(pass) Create Edge preserves the original target.role read failure and exact committed state [0.75ms]
+(pass) Create Edge preserves the original edge.data read failure and exact committed state [0.76ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.98ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.77ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.76ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.69ms]
+(pass) Create Edge observes abort before input getters [0.89ms]
+(pass) Create Edge self-loop preflight wins before the opaque-data getter [1.84ms]
+(pass) Create Edge mismatched-endpoint preflight wins before the opaque-data getter [0.99ms]
+(pass) Create Edge wrong-role preflight wins before the opaque-data getter [0.83ms]
+(pass) Create Edge missing-node preflight wins before the opaque-data getter [0.75ms]
+(pass) Create Edge missing-port preflight wins before the opaque-data getter [0.86ms]
+(pass) Create Edge duplicate-id preflight wins before the opaque-data getter [0.78ms]
+(pass) Create Edge finishes every shape check before semantic role checks [0.94ms]
+(pass) Create Edge preserves invalid-ID short circuit before Edge type reads [0.76ms]
+(pass) Create Edge validates data presence before reading Anchor roots [0.78ms]
+(pass) Create Edge retains Anchor empty-Port short circuit before the target root [0.71ms]
+(pass) Create Edge keeps an empty Endpoint Port distinct from an absent Anchor Port [1.58ms]
+(pass) Create Edge retains captured Port evidence across application Definition and data callbacks [1.42ms]
+
+packages/plugin-interaction/tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [2.07ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [1.44ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [2.77ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [5.20ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [3.50ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [0.95ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [0.89ms]
+(pass) Delete Selection rejects the first stale Snapshot when later evidence reads would return current state [0.98ms]
+(pass) Delete Selection retains the first Snapshot for explicit-edge preflight [0.97ms]
+(pass) Delete Selection retains the first Snapshot for incident-edge preflight [1.91ms]
+(pass) Delete Selection retains the first Snapshot for new-incident-edge preflight [0.93ms]
+(pass) Delete Selection accepts the first valid own evidence getter and preserves replay data [1.18ms]
+(pass) Delete Selection accepts the first valid inherited evidence getter and preserves replay data [0.81ms]
+(pass) Delete Selection accepts the first valid non-enumerable evidence getter and preserves replay data [0.76ms]
+(pass) Delete Selection rejects malformed first evidence before a later valid Snapshot can replace it [0.79ms]
+(pass) Delete Selection preserves the original evidence getter failure undefined [0.77ms]
+(pass) Delete Selection preserves the original evidence getter failure null [0.73ms]
+(pass) Delete Selection preserves the original evidence getter failure false [0.65ms]
+(pass) Delete Selection preserves the original evidence getter failure 0 [0.66ms]
+(pass) Delete Selection preserves the original evidence getter failure "" [1.86ms]
+(pass) Delete Selection preserves the original evidence getter failure Symbol(evidence failure) [0.76ms]
+(pass) Delete Selection preserves the original evidence getter failure 578 |   expect(runtime.kernel.read()).toBe(before);
+579 |   expect(runtime.history.getSnapshot()).toBe(historyBefore);
+580 |   await runtime.host.dispose();
+581 | });
+582 | 
+583 | test.each([undefined, null, false, 0, '', Symbol('evidence failure'), new Error('evidence failure')])(
+                                                                                ^
+error: evidence failure
+      at /Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:583:75
+ [0.69ms]
+(pass) Delete Selection preserves abort and malformed Selection short circuits before evidence reads [0.79ms]
+(pass) Delete Selection applies the first Selection when later root reads would choose another Node [0.78ms]
+(pass) Delete Selection captures root-own for node targets [1.31ms]
+(pass) Delete Selection captures root-inherited for node targets [0.86ms]
+(pass) Delete Selection captures root-non-enumerable for node targets [0.79ms]
+(pass) Delete Selection captures collection-root for node targets [0.76ms]
+(pass) Delete Selection captures inherited-collection for node targets [1.92ms]
+(pass) Delete Selection captures iterator for node targets [1.15ms]
+(pass) Delete Selection captures array-hooks for node targets [0.81ms]
+(pass) Delete Selection captures index-once for node targets [0.80ms]
+(pass) Delete Selection captures evidence-mutates-ids for node targets [0.76ms]
+(pass) Delete Selection keeps native fractional length 1.5 for node targets [0.99ms]
+(pass) Delete Selection keeps native fractional length "1.5" for node targets [0.77ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for node targets [0.71ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for node targets [0.99ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for node targets [1.07ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for node targets [2.07ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for node targets [1.08ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for node targets [0.82ms]
+(pass) Delete Selection preserves native length failure 1n for node [1.01ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for node [0.73ms]
+(pass) Delete Selection captures root-own for edge targets [0.79ms]
+(pass) Delete Selection captures root-inherited for edge targets [0.76ms]
+(pass) Delete Selection captures root-non-enumerable for edge targets [0.84ms]
+(pass) Delete Selection captures collection-root for edge targets [0.73ms]
+(pass) Delete Selection captures inherited-collection for edge targets [0.81ms]
+(pass) Delete Selection captures iterator for edge targets [2.36ms]
+(pass) Delete Selection captures array-hooks for edge targets [1.00ms]
+(pass) Delete Selection captures index-once for edge targets [0.84ms]
+(pass) Delete Selection captures evidence-mutates-ids for edge targets [0.79ms]
+(pass) Delete Selection keeps native fractional length 1.5 for edge targets [0.71ms]
+(pass) Delete Selection keeps native fractional length "1.5" for edge targets [0.70ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for edge targets [0.77ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for edge targets [0.79ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for edge targets [0.73ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for edge targets [2.05ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for edge targets [0.97ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for edge targets [0.73ms]
+(pass) Delete Selection preserves native length failure 1n for edge [0.68ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for edge [0.65ms]
+(pass) Delete Selection preserves original selection read failures [7.00ms]
+(pass) Delete Selection preserves original length read failures [5.17ms]
+(pass) Delete Selection preserves original index read failures [5.96ms]
+(pass) Delete Selection rejects sparse and invalid indexed IDs before evidence and preserves lazy first failure [5.67ms]
+(pass) Delete Selection admits node IDs before edge IDs and evidence and retains the first coercion [0.93ms]
+(pass) Delete Selection rejects stale first evidence Nodes when later collection reads return current roots [1.02ms]
+(pass) Delete Selection rejects first stale node evidence through root collection access [1.26ms]
+(pass) Delete Selection rejects first stale node evidence through index collection access [0.77ms]
+(pass) Delete Selection rejects first stale node evidence through map collection access [0.71ms]
+(pass) Delete Selection rejects first stale node evidence through hooks collection access [0.73ms]
+(pass) Delete Selection rejects first stale node evidence through later-field-mutation collection access [0.80ms]
+(pass) Delete Selection accepts first valid own node evidence and preserves Undo data [1.36ms]
+(pass) Delete Selection accepts first valid inherited node evidence and preserves Undo data [2.29ms]
+(pass) Delete Selection accepts first valid non-enumerable node evidence and preserves Undo data [1.38ms]
+(pass) Delete Selection uses valid first node entities independently of caller iterator [1.20ms]
+(pass) Delete Selection uses valid first node entities independently of caller methods [0.82ms]
+(pass) Delete Selection uses valid first node entities independently of caller index [0.79ms]
+(pass) Delete Selection uses valid first node entities independently of caller length [0.80ms]
+(pass) Delete Selection rejects first stale edge evidence through root collection access [0.86ms]
+(pass) Delete Selection rejects first stale edge evidence through index collection access [0.78ms]
+(pass) Delete Selection rejects first stale edge evidence through map collection access [0.80ms]
+(pass) Delete Selection rejects first stale edge evidence through hooks collection access [2.06ms]
+(pass) Delete Selection rejects first stale edge evidence through later-field-mutation collection access [1.21ms]
+(pass) Delete Selection accepts first valid own edge evidence and preserves Undo data [0.82ms]
+(pass) Delete Selection accepts first valid inherited edge evidence and preserves Undo data [0.72ms]
+(pass) Delete Selection accepts first valid non-enumerable edge evidence and preserves Undo data [0.67ms]
+(pass) Delete Selection uses valid first edge entities independently of caller iterator [0.68ms]
+(pass) Delete Selection uses valid first edge entities independently of caller methods [0.66ms]
+(pass) Delete Selection uses valid first edge entities independently of caller index [0.66ms]
+(pass) Delete Selection uses valid first edge entities independently of caller length [0.66ms]
+(pass) Delete Selection validates the first malformed evidence revision before later valid values [0.93ms]
+(pass) Delete Selection validates the first malformed evidence nodes before later valid values [1.51ms]
+(pass) Delete Selection validates the first malformed evidence edges before later valid values [0.72ms]
+(pass) Delete Selection preserves original revision evidence failure undefined [1.00ms]
+(pass) Delete Selection preserves original revision evidence failure null [0.67ms]
+(pass) Delete Selection preserves original revision evidence failure false [0.68ms]
+(pass) Delete Selection preserves original revision evidence failure 0 [0.65ms]
+(pass) Delete Selection preserves original revision evidence failure "" [0.66ms]
+(pass) Delete Selection preserves original revision evidence failure Symbol(evidence read) [0.66ms]
+(pass) Delete Selection preserves original revision evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.67ms]
+(pass) Delete Selection preserves original nodes evidence failure undefined [0.80ms]
+(pass) Delete Selection preserves original nodes evidence failure null [3.20ms]
+(pass) Delete Selection preserves original nodes evidence failure false [0.79ms]
+(pass) Delete Selection preserves original nodes evidence failure 0 [0.72ms]
+(pass) Delete Selection preserves original nodes evidence failure "" [0.69ms]
+(pass) Delete Selection preserves original nodes evidence failure Symbol(evidence read) [0.64ms]
+(pass) Delete Selection preserves original nodes evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.62ms]
+(pass) Delete Selection preserves original edges evidence failure undefined [0.63ms]
+(pass) Delete Selection preserves original edges evidence failure null [0.70ms]
+(pass) Delete Selection preserves original edges evidence failure false [0.82ms]
+(pass) Delete Selection preserves original edges evidence failure 0 [0.95ms]
+(pass) Delete Selection preserves original edges evidence failure "" [1.82ms]
+(pass) Delete Selection preserves original edges evidence failure Symbol(evidence read) [0.72ms]
+(pass) Delete Selection preserves original edges evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.64ms]
+(pass) Delete Selection preserves original length evidence failure undefined [0.70ms]
+(pass) Delete Selection preserves original length evidence failure null [0.66ms]
+(pass) Delete Selection preserves original length evidence failure false [0.64ms]
+(pass) Delete Selection preserves original length evidence failure 0 [0.63ms]
+(pass) Delete Selection preserves original length evidence failure "" [0.65ms]
+(pass) Delete Selection preserves original length evidence failure Symbol(evidence read) [0.64ms]
+(pass) Delete Selection preserves original length evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.79ms]
+(pass) Delete Selection preserves original index evidence failure undefined [1.96ms]
+(pass) Delete Selection preserves original index evidence failure null [0.73ms]
+(pass) Delete Selection preserves original index evidence failure false [0.71ms]
+(pass) Delete Selection preserves original index evidence failure 0 [0.68ms]
+(pass) Delete Selection preserves original index evidence failure "" [0.67ms]
+(pass) Delete Selection preserves original index evidence failure Symbol(evidence read) [0.68ms]
+(pass) Delete Selection preserves original index evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.66ms]
+(pass) Delete Selection rejects sparse, hidden-invalid and lazily invalid evidence entities [1.04ms]
+(pass) Delete Selection captures evidence revision before Nodes before Edges and rejects malformed empty Selection evidence [0.87ms]
+(pass) Delete Selection preserves native evidence nodes length normalization and failures [0.99ms]
+(pass) Delete Selection preserves native evidence edges length normalization and failures [1.54ms]
+
+packages/plugin-interaction/tests/create-edge-command.test.ts:
+(pass) Create Edge commits one complete Node-level Edge [1.43ms]
+
+packages/plugin-interaction/tests/selection-transition.test.ts:
+(pass) a Port click selects its owning Node without inventing a Port selection [0.05ms]
+
+packages/plugin-interaction/tests/config.test.ts:
+(pass) Interaction accepts an explicit synchronous Connection materializer [0.82ms]
+(pass) Interaction rejects unknown config fields through Plugin installation [1.46ms]
+(pass) Interaction rejects malformed numeric config without coercion [2.05ms]
+(pass) Interaction revalidates the materializer on recovery and preserves its read failure [0.87ms]
+
+packages/plugin-interaction/tests/move-input-values.test.ts:
+(pass) Move Nodes cannot substitute a stale target through repeated caller array traversal [1.30ms]
+(pass) Move Nodes retains valid first values from own fields and receivers [0.94ms]
+(pass) Move Nodes retains valid first values from non-enumerable fields and receivers [0.77ms]
+(pass) Move Nodes retains valid first values from inherited fields and receivers [2.14ms]
+(pass) Move Nodes preserves the original moves read failure before committing [1.29ms]
+(pass) Move Nodes preserves the original length read failure before committing [0.75ms]
+(pass) Move Nodes preserves the original entry read failure before committing [0.86ms]
+(pass) Move Nodes preserves the original nodeId read failure before committing [0.94ms]
+(pass) Move Nodes preserves the original basePosition read failure before committing [0.79ms]
+(pass) Move Nodes preserves the original base.x read failure before committing [0.76ms]
+(pass) Move Nodes preserves the original base.y read failure before committing [0.85ms]
+(pass) Move Nodes preserves the original position read failure before committing [0.81ms]
+(pass) Move Nodes preserves the original position.x read failure before committing [1.09ms]
+(pass) Move Nodes preserves the original position.y read failure before committing [2.55ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [1.08ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [0.69ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [0.73ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [0.66ms]
+(pass) Move Nodes observes abort before any input read [0.73ms]
+(pass) Move Nodes retains the first nonfinite basePosition.x, rather than a later finite value [0.76ms]
+(pass) Move Nodes retains the first nonfinite basePosition.y, rather than a later finite value [0.66ms]
+(pass) Move Nodes retains the first nonfinite position.x, rather than a later finite value [0.69ms]
+(pass) Move Nodes retains the first nonfinite position.y, rather than a later finite value [0.69ms]
+(pass) Move Nodes keeps whole-input shape failures before duplicate validation [0.86ms]
+(pass) Move Nodes keeps whole-input shape failures before nonfinite validation [1.53ms]
+(pass) Move Nodes rejects a sparse indexed entry even if caller hooks hide it [0.82ms]
+(pass) Move Nodes does not call caller traversal, map, constructor or species hooks [0.76ms]
+(pass) Move Nodes retains native array-like positive length normalization %s [0.74ms]
+(pass) Move Nodes retains native array-like positive length normalization 1.5 [0.68ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.71ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.64ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.65ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.67ms]
+(pass) Move Nodes rejects a native-normalized empty input length 0 [0.81ms]
+(pass) Move Nodes exposes native length coercion failure %s before entries [1.62ms]
+(pass) Move Nodes exposes native length coercion failure %s before entries [0.77ms]
+(pass) Move Nodes reads the length conversion once and cannot hide the original first entry failure behind allocation [0.85ms]
+(pass) Move Nodes retains owned earlier Point values, Node fields and one atomic History entry [0.93ms]
+
+packages/plugin-interaction/tests/lifecycle.test.ts:
+(pass) Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh [1.66ms]
+(pass) Delete Selection registration follows dependency reactivation and disposal lifecycle [0.94ms]
+(pass) Connection materializer failure keeps identity and reports exactly once after terminal cleanup [3.89ms]
+(pass) Connection dependency recovery creates a fresh idle Activation [1.10ms]
+(pass) Connection final Hit Test failure still clears Preview and releases Capture [0.82ms]
+(pass) Connection Escape attempts every terminal cleanup and never materializes after cleanup failure [1.24ms]
+(pass) Box Selection disposal continues after every public Renderer cleanup failure [2.87ms]
+(pass) Box Selection escape exposes every terminal cleanup failure [1.07ms]
+(pass) Box Selection pointer-cancel exposes every terminal cleanup failure [0.59ms]
+(pass) Interaction dependency recovery creates a fresh idle Activation [1.17ms]
+(pass) an input-driven Command rejection is reported exactly once while Interaction is active [2.02ms]
+(pass) a late Command rejection cannot report through an ended Interaction Activation [1.89ms]
+(pass) a recovered Renderer reset receives the still-compatible Active Gesture again [2.14ms]
+
+packages/plugin-interaction/tests/move-nodes-command.test.ts:
+(pass) Move Nodes rejects an empty input without changing Document [1.16ms]
+
+packages/plugin-interaction/tests/diagnostic-events.test.ts:
+(pass) publishes the stable Interaction diagnostic event catalog [0.01ms]
+
+packages/plugin-interaction/tests/port-connection.test.ts:
+(pass) Port Gesture tracks target loss, materializes exact Endpoints once, and cancels on source loss [3.17ms]
+(pass) Connection Gesture uses the materializer accepted before its getter changes [2.24ms]
+
+packages/plugin-interaction/tests/delete-selection-input.test.ts:
+(pass) a live Interaction Shortcut Binding executes its Command and prevents the matched input default [3.77ms]
+(pass) logical Delete key removes the current Selection through the public Renderer Input seam [3.24ms]
+(pass) physical Delete accepts modifiers and repeat while empty Selection and Backspace remain no-ops [3.45ms]
+(pass) Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connection without cancelling them [8.43ms]
+(pass) Delete Transaction failure preserves state and reports the original diagnostic identity exactly once [2.15ms]
+
+packages/plugin-renderer/tests/index.test.ts:
+(pass) @nodebraid/plugin-renderer > publishes the stable Renderer diagnostic event catalog [0.02ms]
+(pass) @nodebraid/plugin-renderer > creates one Renderer and publishes only the narrow Runtime Service [0.84ms]
+(pass) @nodebraid/plugin-renderer > keeps every delivered Session resolvable while Document entities are removed [0.58ms]
+(pass) @nodebraid/plugin-renderer > waits for reentrant Session reconciliation before delivering a deleting Commit [0.58ms]
+(pass) @nodebraid/plugin-renderer > delegates input, hit testing, capture and focus without exposing update methods [0.62ms]
+(pass) @nodebraid/plugin-renderer > binds one exclusive Interaction Projection writer for the Renderer Activation [0.60ms]
+(pass) @nodebraid/plugin-renderer > isolates Input listener faults through Host diagnostics [1.54ms]
+(pass) @nodebraid/plugin-renderer > reports an out-of-sync Renderer and re-establishes its current baseline [0.99ms]
+(pass) @nodebraid/plugin-renderer > attempts one full recovery after an arbitrary internal synchronization fault [0.53ms]
+(pass) @nodebraid/plugin-renderer > enters terminal Sync Failure when the single full recovery also fails [0.55ms]
+(pass) @nodebraid/plugin-renderer > does not report queued Commits already subsumed by an out-of-sync reset [0.59ms]
+
+packages/plugin-renderer/tests/types.test.ts:
+(pass) binds Provider config without exposing CanvasRenderer update authority
+
+packages/renderer-svg/tests/types.test.ts:
+(pass) publishes a synchronous typed SVG Renderer Factory [0.02ms]
+(pass) identifies SVG Provider failures structurally [0.06ms]
+
+ 296 pass
+ 0 fail
+ 2196 expect() calls
+Ran 296 tests across 21 files. [419.00ms]
+
+actualExit=0
+
+All are fresh fe48 executions: callback2, metadata4, geometry12. HEAD/tree/patch/clean unchanged. No build/browser/affected/full/remote operations by reviewer.
+
+Final independent current full Issue/comment readback 2026-10-27 08:25:06 UTC:
+{
+  "repository": "ZWkang/nodebraid",
+  "readAt": "2026-10-27 08:25:06 UTC",
+  "issue": {
+    "url": "https://github.com/ZWkang/nodebraid/issues/132",
+    "title": "fix: retain declared SVG Interaction Projection geometry",
+    "issue_number": 132,
+    "body": "## Confirmed defect\n\nAt main `6fd2d016f6330cc422508b3e51229bea4be2cce0`, the public SVG Renderer validates declared Interaction Projection geometry and then snapshots it using own enumerable spreads. Valid inherited getters and non-enumerable own Point/Viewport/WorldRect values disappear before DOM projection.\n\nA fresh strictly typechecked, publicly compiled program ran once in real Chromium: 12 controls, 8 failures and 4 ordinary-own-value controls passing. In each of Node Drag, Viewport Pan, Box Selection and Connection Preview, both inherited and hidden geometry shapes are accepted without throwing but render invalid values:\n\n- Node Drag publishes Node x/y=`undefined` and incident Edge x1/y1=`NaN` instead of the finite candidate geometry.\n- Viewport Pan publishes `matrix(NaN NaN NaN NaN NaN NaN)` instead of `matrix(2 0 0 2 20 30)`.\n- Box Selection publishes `undefined` x/y/width/height instead of 5/6/70/80.\n- Connection Preview publishes `undefined` x2/y2 instead of 330/140.\n\nAll original values satisfy the public readonly structural types. All four ordinary own-value counterparts render correctly and clear back to their original DOM, retaining Node element identity. All 12 leave the real Kernel View unchanged and dispose their owned Renderer/Target cleanly. The driver exits1 on the actual 4-versus-12 assertion. This is a public API plus real SVG DOM test; no native Pointer/Wheel/Keyboard events, Host/Command scheduling or whole-Renderer coverage is claimed.\n\n## Contract and cause\n\n[`InteractionProjection`](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/interaction-api/src/contracts.ts) declares Point, Viewport and WorldRect geometry without an own/enumerability restriction. [ADR0059](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/docs/adr/0059-treat-interaction-projection-as-effective-renderer-state.md) requires synchronous all-or-throw acceptance of complete effective state; [ADR0062](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/docs/adr/0062-project-interaction-through-existing-svg-geometry.md) requires the finite candidate geometry to drive display, hit tests and Input mapping. [The shared acceptor](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/packages/renderer-svg/src/interaction-projection.ts) validates readable declared fields but drops them in later spread copies.\n\n## Acceptance\n\n- Preserve accepted declared Point x/y, Viewport x/y/zoom and WorldRect x/y/width/height in owned frozen Interaction Projection geometry for ordinary, inherited and non-enumerable fields across all four affected Projection variants.\n- Capture the declared geometry values once with their original receivers; validate and project those same captured values. Preserve existing finite/positive/nonnegative rules, baseline compatibility and original first failures. Keep caller-owned values mutable and shallow, including existing enumerable-copy behavior for unrelated metadata; do not reinterpret application data.\n- Keep existing validation phase/order, malformed/canonical arrays and IDs, anchors/Port semantics, all-or-throw DOM/accepted-state recovery, Selection/Viewport synchronization, public API/selectors and lifecycle/Input/Disposition policies. No default/coercion, plain-record/accessor prohibition, cap/retry/fallback or unrelated configuration/Binding policy.\n- The exact original 12-case entry becomes green without overwriting its original red bundle. Add public regressions for once-read validated values, original receiver/error identity, state/DOM rollback and relevant hit/Input geometry. Distinguish public fixture input from native browser evidence.\n- Complete affected checks and the existing independent Standards+ponytail/Spec/risk reviews, formal main-protocol full verification, exact normal publication/current-head CI and immutable full reports/media readback. Keep this Issue open through actual main whole-Issue acceptance.\n\n## Reproduction\n\nAfter building the public packages, bundle the following TypeScript entry for the browser and call `await globalThis.__nodebraidProjectionDiscovery()` in Chromium. The actual run first passed strict TSC and browser compilation, then returned `{controls:12,passed:4,failed:8}`; its driver asserted 12 passes and exited1. Each case uses the real public Kernel and SVG Renderer with its own connected Target, retaining actual DOM attributes in the result.\n\n```ts\nimport {createCanvasKernel,nodeId,edgeId,type Point} from '@nodebraid/kernel';\nimport {createSvgRenderer} from '@nodebraid/renderer-svg';\nimport type {InteractionProjection,WorldRect} from '@nodebraid/interaction-api';\nimport type {Viewport} from '@nodebraid/session-api';\ntype Shape='own'|'inherited'|'non-enumerable';\ntype Family='node-drag'|'viewport-pan'|'box-selection'|'connection-preview';\ninterface Observation{family:Family;shape:Shape;passed:boolean;error:unknown;actual:Record<string,unknown>;baselineUnchanged:boolean;cleanup:boolean;nativeInputEventsDriven:0}\nfunction point(shape:Shape,x:number,y:number):Point{\n class Inherited implements Point{get x(){return x;}get y(){return y;}}\n const own={x,y};if(shape==='non-enumerable')for(const key of ['x','y'])Object.defineProperty(own,key,{enumerable:false});\n return shape==='inherited'?new Inherited():own;\n}\nfunction viewport(shape:Shape,x:number,y:number,zoom:number):Viewport{\n class Inherited implements Viewport{get x(){return x;}get y(){return y;}get zoom(){return zoom;}}\n const own={x,y,zoom};if(shape==='non-enumerable')for(const key of ['x','y','zoom'])Object.defineProperty(own,key,{enumerable:false});\n return shape==='inherited'?new Inherited():own;\n}\nfunction rect(shape:Shape,x:number,y:number,width:number,height:number):WorldRect{\n class Inherited implements WorldRect{get x(){return x;}get y(){return y;}get width(){return width;}get height(){return height;}}\n const own={x,y,width,height};if(shape==='non-enumerable')for(const key of ['x','y','width','height'])Object.defineProperty(own,key,{enumerable:false});\n return shape==='inherited'?new Inherited():own;\n}\nfunction attr(target:SVGSVGElement,selector:string,names:readonly string[]):Record<string,string|null>{\n const element=target.querySelector(selector);return Object.fromEntries(names.map(name=>[name,element?.getAttribute(name)??null]));\n}\nfunction same(a:unknown,b:unknown):boolean{return JSON.stringify(a)===JSON.stringify(b);}\nasync function investigate(){\n const observations:Observation[]=[];globalThis.__nodebraidProjectionProgress=observations;\n for(const family of ['node-drag','viewport-pan','box-selection','connection-preview'] as const)for(const shape of ['own','inherited','non-enumerable'] as const){\n  const target=document.createElementNS('http://www.w3.org/2000/svg','svg');target.setAttribute('width','400');target.setAttribute('height','300');\n  const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');defs.setAttribute('data-caller-owned','');target.append(defs);document.body.append(target);\n  const renderer=createSvgRenderer({target}),kernel=createCanvasKernel(),a=nodeId('a'),b=nodeId('b'),e=edgeId('edge');\n  kernel.transact(tx=>{tx.nodes.add({id:a,type:'task',position:{x:10,y:20},size:{width:80,height:40},data:null});tx.nodes.add({id:b,type:'task',position:{x:220,y:40},size:{width:100,height:60},data:null});tx.edges.add({id:e,type:'link',source:{nodeId:a},target:{nodeId:b},data:null});});\n  const view=kernel.read();renderer.updateDocument({type:'reset',view});renderer.updateSession({selection:{nodeIds:[a],edgeIds:[]},viewport:{x:0,y:0,zoom:1}});\n  const node=target.querySelector('[data-nodebraid-node-id=\"a\"]');if(!node)throw new Error('Real SVG Node missing before the projection case.');\n  const baseline=target.innerHTML;let projection:InteractionProjection;\n  switch(family){\n   case'node-drag':projection={type:family,nodes:[{nodeId:a,basePosition:point(shape,10,20),position:point(shape,80,90)}]};break;\n   case'viewport-pan':projection={type:family,baseViewport:viewport(shape,0,0,1),viewport:viewport(shape,20,30,2)};break;\n   case'box-selection':projection={type:family,rect:rect(shape,5,6,70,80)};break;\n   case'connection-preview':projection={type:family,source:{nodeId:a,role:'source'},pointerWorldPoint:point(shape,330,140),target:{type:'none'}};break;\n  }\n  let error:unknown=null,actual:Record<string,unknown>={},passed=false,baselineUnchanged=false,cleanup=false;\n  try{\n   try{renderer.updateInteraction(projection);}catch(caught){error=caught instanceof Error?{name:caught.name,message:caught.message,code:Reflect.get(caught,'code')??null}:caught;}\n   actual={node:attr(target,'[data-nodebraid-node-id=\"a\"]',['x','y']),edge:attr(target,'[data-nodebraid-edge-id=\"edge\"]',['x1','y1','x2','y2']),matrix:attr(target,'[data-nodebraid-renderer-svg-root]',['transform']),box:attr(target,'[data-nodebraid-box-selection]',['x','y','width','height']),connection:attr(target,'[data-nodebraid-connection-preview]',['x1','y1','x2','y2']),sourceNode:kernel.read().query.getNode(a)?.position};\n   baselineUnchanged=kernel.read()===view&&same(kernel.read().query.getNode(a)?.position,{x:10,y:20});\n   if(error===null)switch(family){\n    case'node-drag':passed=same(actual.node,{x:'80',y:'90'})&&same(actual.edge,{x1:'120',y1:'110',x2:'270',y2:'70'});break;\n    case'viewport-pan':passed=same(actual.matrix,{transform:'matrix(2 0 0 2 20 30)'});break;\n    case'box-selection':passed=same(actual.box,{x:'5',y:'6',width:'70',height:'80'});break;\n    case'connection-preview':passed=same(actual.connection,{x1:'90',y1:'40',x2:'330',y2:'140'});break;\n   }\n   if(passed){renderer.updateInteraction(null);passed=target.innerHTML===baseline&&target.querySelector('[data-nodebraid-node-id=\"a\"]')===node;}\n   passed=passed&&baselineUnchanged;\n  }finally{await renderer.dispose();cleanup=target.childElementCount===1&&target.firstElementChild===defs&&!target.hasAttribute('tabindex');target.remove();}\n  observations.push({family,shape,passed:passed&&cleanup,error,actual,baselineUnchanged,cleanup,nativeInputEventsDriven:0});\n }\n return {controls:observations.length,passed:observations.filter(x=>x.passed).length,failed:observations.filter(x=>!x.passed).length,observations,nativeInputEventsDriven:0,userAgent:navigator.userAgent,scope:'Typed public CanvasRenderer.updateInteraction and actual SVG DOM; no native input, Command/Host, arbitrary scheduling or whole Renderer claim.'};\n}\ndeclare global{var __nodebraidProjectionProgress:Observation[];var __nodebraidProjectionDiscovery:typeof investigate;}\nglobalThis.__nodebraidProjectionDiscovery=investigate;\n\n```\n\n## Deduplication\n\nComplete current all-state collections contain 131 Issue/PR records (50+50+31) and 67 PRs (20+20+20+7). All titles and full bodies were checked for the acceptor path and Projection/geometry vocabulary. Relevant #122/#124 full bodies and discussions, and #123/#125 files/reviews/conversation/inline threads were read. Those completed deliveries fix constructor hit tolerances and DOM event-policy booleans in svg-config, not interaction-projection.ts geometry ownership. Existing #130/PR #131 concern Basic Connection callback snapshots, and #128/PR #129 Layout Capabilities, not this SVG Projection boundary. No existing canonical delivery implements this occurrence.\n",
+    "state": "open",
+    "user": {
+      "login": "ZWkang",
+      "name": "ZWkang",
+      "email": null,
+      "avatar_url": "https://avatars.githubusercontent.com/u/15853907?v=4",
+      "id": 15853907
+    },
+    "assignees": null,
+    "labels": [
+      {
+        "name": "bug",
+        "color": "d73a4a",
+        "description": "Something isn't working"
+      },
+      {
+        "name": "ready-for-agent",
+        "color": "ededed",
+        "description": null
+      }
+    ],
+    "milestone": null,
+    "state_reason": null,
+    "comments": 0,
+    "created_at": "2026-10-27T07:21:12Z",
+    "updated_at": "2026-10-27T07:21:12Z",
+    "closed_at": null,
+    "display_url": "https://github.com/ZWkang/nodebraid/issues/132",
+    "display_title": "fix: retain declared SVG Interaction Projection geometry"
+  },
+  "comments": []
+}
+
+Read-only external progress, not reviewer browser execution or independently verified final job exit:
+Current affected log tail only; not independently verified job exit:
+
+[check:affected] packages/renderer-svg: /Users/zhou/.bun/bin/bun run test:browser:self
+$ bun run ./browser-tests/renderer-contract.browser.ts
+SVG Interaction Geometry capture: 214 public browser cases passed.
+SVG DOM policy capture: 72 trusted native and 72 constructor failure cases passed.
+SVG tolerance capture: 48 public browser cases passed.

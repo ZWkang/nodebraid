@@ -1,0 +1,45 @@
+{
+  "axis": "standards",
+  "verdict": "changes-requested",
+  "base": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "head": "3ae9d134d0ce7e20509905456f558841d745a05f",
+  "tree": "25e17466d4f7a48b540be9711e9dabdb6fe87b24",
+  "patch": "0beba21066485b57839adada0ee99e442cea14635f5fcd30cc8c84ba9fd7bf9a",
+  "taskDigest": "931f3d5bf15180095ee77655c8da3308ac84817af0cf9e85a5726b0e509a25d3",
+  "report": "What this change does: captures validated Interaction geometry before owning it. It fixes inherited/non-enumerable values, but introduces a Node Drag cache-association regression.\n\n- Base: `6fd2d016f6330cc422508b3e51229bea4be2cce0`\n- Head: `3ae9d134d0ce7e20509905456f558841d745a05f`\n- Tree: `25e17466d4f7a48b540be9711e9dabdb6fe87b24`\n- Binary patch SHA256: `0beba21066485b57839adada0ee99e442cea14635f5fcd30cc8c84ba9fd7bf9a`\n- Task digest: `931f3d5bf15180095ee77655c8da3308ac84817af0cf9e85a5726b0e509a25d3`\n\nReviewed the complete four-file patch, all new browser definitions, full Issue132/empty discussion, plan and connected acceptance, DOM journal, effective-state, Hit Test and input paths. Canonical bytes, clean checkout and source identity passed before/after checks.\n\n**Must fix**\n\n1. **P2: associate captured geometry with its Node identity** (`packages/renderer-svg/src/interaction-projection.ts:120–125`).\n   Captures follow `for-of`, but the copy reads `capturedPositions[index]` using the caller's `.map` callback index. A canonical [a,b] array whose map supplies indices [1,0] retains the same IDs but swaps their validated positions and baselines. My acceptor probe observed base a=(80,90), b=(280,190), versus head a=(280,190), b=(80,90). The coordinator's public SVG records confirm the same DOM swap: base 2/2 passes, head 0/2, including iterator-produced equivalent clones. This violates ADR0059/0062's accepted per-Node effective geometry. Use the validated semantic NodeId for association; object identity alone misses clones. Preserve traversal/copy order and add these regressions. Otherwise display and Hit Test consume another Node's geometry.\n\nHard standards otherwise: no further violation found. Reflect copying retains enumerable metadata, descriptors' enumeration checks, receivers and shallow ownership; eager Node Drag versus sequential Point/Viewport/Rect validation remains deliberate. Judgment-only Fowler smells: no additional finding.\n\nPonytail: the shared boundary is appropriate for isolated SVG Targets; fix the cache association before shipping.\n\nIndependent `bun test packages/renderer-api/tests packages/renderer-svg/tests packages/plugin-renderer/tests packages/plugin-interaction/tests packages/plugin-session/tests`: **295 tests, 2167 assertions**, exit 0. The separate acceptor probe confirms the regression; its initial export-stripping SyntaxError was a retained harness failure.\n\nRisk: **medium**, per the public-source floor. This changes visible/effective Renderer state; complete review, public tests and the concrete regression support focused human review. Rollback: revert the complete `3ae9d13` delivery or mapped publication, recreate Renderers and restore Document/Session projections. Code rollback cannot undo application Commands already executed.\n\nNot independently run: browsers, strict TypeScript, product builds, affected/full checks or remote CI/publication.\n\n**Verdict: changes-requested. Fix 1 first.**\n",
+  "findings": [
+    {
+      "priority": "P2",
+      "file": "packages/renderer-svg/src/interaction-projection.ts",
+      "start": 120,
+      "end": 125,
+      "title": "Associate captured geometry with validated Node identity",
+      "description": "A caller-owned map can supply different callback indices while returning the same canonical Node IDs. capturedPositions[index] then associates another Node's validated baseline and destination. Bind captures by the semantic validated NodeId, including equivalent clones, without new traversal restrictions or defaults."
+    }
+  ],
+  "risk": {
+    "level": "medium",
+    "rationale": "Public renderer implementation changes synchronous ownership and acceptance of Node Drag, Viewport Pan, Box Selection and Connection Preview geometry. The public-source medium floor applies; the newly confirmed Node/Geometry association regression blocks a passed review. Focused human review remains required.",
+    "evidence": "Complete patch 0beba21066485b57839adada0ee99e442cea14635f5fcd30cc8c84ba9fd7bf9a reviewed at head 3ae9d134d0ce7e20509905456f558841d745a05f with connected DOM/effective-state/Hit Test/input code. Fresh independent public Bun suites passed 295 tests and 2167 assertions, while a separate pure acceptor probe showed geometry exchanged between canonical IDs when caller map supplies reversed callback indices. Coordinator public SVG evidence was read separately: base 2/2 passes and this head 0/2 including equivalent iterator clones. Browser execution is not attributed to this reviewer; the initial probe export-stripping SyntaxError is preserved as harness-only failure.",
+    "rollback": "Revert the entire Issue132 commit 3ae9d134d0ce7e20509905456f558841d745a05f or its complete mapped published delivery, restoring base 6fd2d016f6330cc422508b3e51229bea4be2cce0. Dispose/recreate affected Renderer instances and resynchronize their authoritative Document and Session projections. No persisted schema migration is introduced. Code rollback does not undo application Commands already executed; those effects require the application's existing History or recovery contract."
+  },
+  "checks": [
+    {
+      "command": "bun test packages/renderer-api/tests packages/renderer-svg/tests packages/plugin-renderer/tests packages/plugin-interaction/tests packages/plugin-session/tests",
+      "exitCode": 0,
+      "tests": 295,
+      "assertions": 2167,
+      "log": "standards-tests.log"
+    },
+    {
+      "command": "bun - <<'TS' (standards-probe-initial.ts via stdin)",
+      "exitCode": 1,
+      "classification": "harness SyntaxError, not product red"
+    },
+    {
+      "command": "bun - <<'TS' (standards-probe-corrected.ts via stdin)",
+      "exitCode": 0,
+      "classification": "pure acceptance-helper observations; head swaps A/B geometry, base correct; no browser execution"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+Pinned base 6fd2d016f6330cc422508b3e51229bea4be2cce0; head 3ae9d134d0ce7e20509905456f558841d745a05f; tree 25e17466d4f7a48b540be9711e9dabdb6fe87b24; patch 0beba21066485b57839adada0ee99e442cea14635f5fcd30cc8c84ba9fd7bf9a.
+
+P2 candidate: capturedPositions[index] in acceptNodeDrag trusts the index argument delivered by the caller's map, despite captures being ordered by the separate for-of pass. The recorded probe keeps input and output canonical [a,b], changes only map callback indices, and shows a/b Geometry exchanged under head while base retains correct geometry. Pure acceptance helper evidence only; no public SVG DOM or browser assertion has been executed by this reviewer. Parent is checking the public SVG path.
+
+Cache association: candidate object identity alone cannot support a caller iterator that yields equal-ID clones and a later map that returns the original objects. The existing validated unique canonical NodeId is the stronger association key for this case. Keep captured values tied to that validated NodeId, preserve metadata/error order, and do not introduce a new array restriction or silently manufacture a missing capture. Existing unrelated traversal weaknesses are not findings in this patch.
+
+Initial baseline-evaluation probe failed because its harness did not strip export function declarations. Its failure is retained as a harness SyntaxError and is not product red evidence. The corrected probe only fixes that source-loading harness, preserving input and observation.

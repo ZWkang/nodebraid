@@ -1,0 +1,9 @@
+{
+  "initialExit": 1,
+  "initialPass": 178,
+  "total": 208,
+  "failed": 30,
+  "reason": "Fixture omitted public HitResult.worldPoint. Exact Node Drag 100/100 and inverse Viewport 50/40 coordinates added, no assertion removed.",
+  "productSourceUnchanged": true,
+  "originalAttemptDirectory": "/Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/expanded-attempts/initial"
+}

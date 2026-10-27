@@ -1,0 +1,7 @@
+{
+  "head": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "workingBinaryPatchSHA256": "409d78d994dbe741d1b70be00398560ce783c21141063bcb1d04ec69a0635bc9",
+  "entrySHA256": "834697787ee903325b6bbb26514d813b1e1e32b2cb0f5e5c4b9e61988c05885f",
+  "bundleSHA256": "fc602c596502ac94ae030f59b5f66793a330326d5527d96951b48a6d3150720a",
+  "publicPackageResolution": "/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/kernel/dist/index.js"
+}

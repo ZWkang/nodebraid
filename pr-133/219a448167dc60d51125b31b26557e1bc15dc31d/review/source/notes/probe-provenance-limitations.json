@@ -1,0 +1,13 @@
+{
+  "scope": "Standalone callback-index and metadata-copy comparative probes only",
+  "paths": [
+    "callback-index-repro/current/compiled-provenance.json",
+    "callback-index-repro/base/compiled-provenance.json",
+    "metadata-copy-repro/current/compiled-provenance.json",
+    "metadata-copy-repro/base/compiled-provenance.json"
+  ],
+  "limitation": "These adapted drivers recorded artifactPrerequisite as an out-directory path but did not create/read a file there. That nonempty pointer is not prerequisite evidence. Original provenance is preserved unchanged.",
+  "actualEvidence": "Drivers independently checked exact Git HEAD and clean source, resolved actual public dist paths, hashed each resolved module and saved the compiled browser bundle plus raw public DOM outcomes and cleanup. Current3ae9/cf231 distributions came from their actual successful affected logs; base6fd uses the separately byte/blob-verified actual build2c49 prerequisite. Later dist rebuilds are not relabeled as these historical probes.",
+  "currentFinalProbeCorrection": "Final fe48 drivers replace that pointer with actualBuildHead and actualBuildLog, and retain concrete resolved/bundle hashes.",
+  "noHistoricalReceiptRewritten": true
+}

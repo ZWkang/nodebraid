@@ -1,0 +1,6 @@
+{
+  "error": "SyntaxError: missing ) after argument list",
+  "phase": "functions JS parsing before any script body or file write",
+  "cause": "Nested source template-literal delimiters",
+  "correction": "Use equivalent string concatenation for diagnostic field names in the generated source; no product/test run occurred in rejected exec."
+}

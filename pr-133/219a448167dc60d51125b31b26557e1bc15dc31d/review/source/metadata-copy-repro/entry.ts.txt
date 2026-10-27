@@ -1,0 +1,30 @@
+import {createCanvasKernel,nodeId} from '@nodebraid/kernel';
+import {createSvgRenderer} from '@nodebraid/renderer-svg';
+import type {NodeDragProjectionNode} from '@nodebraid/interaction-api';
+async function investigate(){
+ const observations=[];
+ for(const slot of ['basePosition','position'] as const)for(const mode of ['raw-throws','clone-throws'] as const){
+  const target=document.createElementNS('http://www.w3.org/2000/svg','svg');target.setAttribute('width','400');target.setAttribute('height','300');document.body.append(target);
+  const renderer=createSvgRenderer({target}),kernel=createCanvasKernel(),id=nodeId('a');kernel.transact(tx=>tx.nodes.add({id,type:'task',position:{x:10,y:20},size:{width:80,height:40},data:null}));
+  const original=new Error(slot+'/'+mode),opaque={caller:Symbol(mode)};let rawReads=0,cloneReads=0;
+  const rawPoint={x:slot==='basePosition'?10:80,y:slot==='basePosition'?20:90};
+  Object.defineProperty(rawPoint,'metadata',{enumerable:true,get(){rawReads++;if(mode==='raw-throws')throw original;return opaque;}});
+  const clonePoint={x:rawPoint.x,y:rawPoint.y};
+  Object.defineProperty(clonePoint,'metadata',{enumerable:true,get(){cloneReads++;if(mode==='clone-throws')throw original;return opaque;}});
+  const candidate:NodeDragProjectionNode={nodeId:id,basePosition:slot==='basePosition'?rawPoint:{x:10,y:20},position:slot==='position'?rawPoint:{x:80,y:90}};
+  const clone:NodeDragProjectionNode={...candidate,[slot]:clonePoint};
+  const nodes:NodeDragProjectionNode[]=[candidate];nodes[Symbol.iterator]=function(){return[clone].values();};
+  let didThrow=false,caught:unknown,actual:unknown,domUnchanged=false,baselineUnchanged=false;
+  try{
+   const view=kernel.read();renderer.updateDocument({type:'reset',view});renderer.updateSession({selection:{nodeIds:[],edgeIds:[]},viewport:{x:0,y:0,zoom:1}});
+   renderer.updateInteraction({type:'box-selection',rect:{x:2,y:3,width:20,height:30}});const before=target.innerHTML;
+   try{renderer.updateInteraction({type:'node-drag',nodes});}catch(error){didThrow=true;caught=error;}
+   const element=target.querySelector('[data-nodebraid-node-id="a"]');actual={x:element?.getAttribute('x'),y:element?.getAttribute('y')};domUnchanged=target.innerHTML===before;baselineUnchanged=kernel.read()===view;
+  }finally{await renderer.dispose();target.remove();}
+  const passed=rawReads===1&&cloneReads===0&&baselineUnchanged&&(mode==='raw-throws'?didThrow&&caught===original&&domUnchanged:!didThrow&&JSON.stringify(actual)===JSON.stringify({x:'80',y:'90'}));
+  observations.push({slot,mode,rawReads,cloneReads,didThrow,sameErrorIdentity:caught===original,actual,domUnchanged,baselineUnchanged,passed});
+ }
+ return{controls:observations.length,passed:observations.filter(x=>x.passed).length,failed:observations.filter(x=>!x.passed).length,observations,nativeInputEventsDriven:0};
+}
+declare global{var __nodebraidMetadataCopyRepro:typeof investigate;var __nodebraidMetadataCopyProgress:unknown;}
+globalThis.__nodebraidMetadataCopyRepro=investigate;

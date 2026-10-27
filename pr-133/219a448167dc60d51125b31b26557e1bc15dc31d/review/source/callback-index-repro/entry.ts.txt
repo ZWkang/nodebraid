@@ -1,0 +1,25 @@
+import {createCanvasKernel,nodeId} from '@nodebraid/kernel';
+import {createSvgRenderer} from '@nodebraid/renderer-svg';
+import type {NodeDragProjectionNode} from '@nodebraid/interaction-api';
+async function investigate(){
+ const observations=[];
+ for(const cloneIterator of [false,true]){
+  const target=document.createElementNS('http://www.w3.org/2000/svg','svg');target.setAttribute('width','600');target.setAttribute('height','400');document.body.append(target);
+  const renderer=createSvgRenderer({target}),kernel=createCanvasKernel(),a=nodeId('a'),b=nodeId('b');
+  kernel.transact(tx=>{tx.nodes.add({id:a,type:'task',position:{x:10,y:20},size:{width:80,height:40},data:null});tx.nodes.add({id:b,type:'task',position:{x:220,y:40},size:{width:100,height:60},data:null});});
+  const nodes:NodeDragProjectionNode[]=[{nodeId:a,basePosition:{x:10,y:20},position:{x:80,y:90}},{nodeId:b,basePosition:{x:220,y:40},position:{x:280,y:190}}];
+  nodes.map=function<U>(callback:(value:NodeDragProjectionNode,index:number,array:NodeDragProjectionNode[])=>U,thisArg?:unknown):U[]{const result:U[]=[];for(let index=0;index<this.length;index++)result.push(callback.call(thisArg,this[index]!,1-index,this));return result;};
+  if(cloneIterator)nodes[Symbol.iterator]=function(){return[{...this[0]!},{...this[1]!}].values();};
+  let error:unknown=null,actual:unknown,baselineUnchanged=false;
+  try{
+   const view=kernel.read();renderer.updateDocument({type:'reset',view});renderer.updateSession({selection:{nodeIds:[],edgeIds:[]},viewport:{x:0,y:0,zoom:1}});
+   try{renderer.updateInteraction({type:'node-drag',nodes});}catch(caught){error=String(caught);}
+   actual=['a','b'].map(id=>{const element=target.querySelector('[data-nodebraid-node-id="'+id+'"]');return{id,x:element?.getAttribute('x'),y:element?.getAttribute('y')};});
+   baselineUnchanged=kernel.read()===view;
+  }finally{await renderer.dispose();target.remove();}
+  const expected=[{id:'a',x:'80',y:'90'},{id:'b',x:'280',y:'190'}];observations.push({cloneIterator,actual,error,baselineUnchanged,passed:error===null&&baselineUnchanged&&JSON.stringify(actual)===JSON.stringify(expected)});
+ }
+ return{controls:observations.length,passed:observations.filter(x=>x.passed).length,failed:observations.filter(x=>!x.passed).length,observations,nativeInputEventsDriven:0};
+}
+declare global{var __nodebraidCallbackIndexRepro:typeof investigate;var __nodebraidCallbackIndexProgress:unknown;}
+globalThis.__nodebraidCallbackIndexRepro=investigate;

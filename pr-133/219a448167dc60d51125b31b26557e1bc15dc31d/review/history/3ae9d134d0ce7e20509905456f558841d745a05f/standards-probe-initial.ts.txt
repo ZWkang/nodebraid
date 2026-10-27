@@ -1,0 +1,19 @@
+import { createCanvasKernel, nodeId } from '@nodebraid/kernel';
+import { RendererError } from '@nodebraid/renderer-api';
+import { isConnectionTargetDefined } from '@nodebraid/port-api';
+import { execFileSync } from 'node:child_process';
+import { acceptInteractionProjection as current } from './packages/renderer-svg/src/interaction-projection';
+const base = '6fd2d016f6330cc422508b3e51229bea4be2cce0';
+const original = execFileSync('git', ['show', base + ':packages/renderer-svg/src/interaction-projection.ts'], { encoding: 'utf8' });
+const js = new Bun.Transpiler({ loader: 'ts', target: 'bun' }).transformSync(original);
+const executable = js.replace(/^import[\s\S]*?;\n/gm, '').replace(/^export\s*\{[\s\S]*?\};?\s*$/m, '');
+const previous = new Function('RendererError', 'isConnectionTargetDefined', executable + '\nreturn acceptInteractionProjection;')(RendererError, isConnectionTargetDefined);
+const kernel=createCanvasKernel(); const a=nodeId('a'), b=nodeId('b');
+kernel.transact(tx=>{tx.nodes.add({id:a,type:'task',position:{x:10,y:20},data:null});tx.nodes.add({id:b,type:'task',position:{x:200,y:30},data:null});});
+function projection() {
+ const entries=[{nodeId:a,basePosition:{x:10,y:20},position:{x:80,y:90}},{nodeId:b,basePosition:{x:200,y:30},position:{x:280,y:190}}];
+ Object.defineProperty(entries,'map',{value:function(callback:Function){return Array.prototype.map.call(this,(entry:unknown,index:number)=>callback(entry,1-index,this));}});
+ return {type:'node-drag',nodes:entries};
+}
+const document=kernel.read().snapshot, ports={documentRevision:document.revision,generation:0,nodes:[]}, session={selection:{nodeIds:[],edgeIds:[]},viewport:{x:0,y:0,zoom:1}};
+console.log(JSON.stringify({scope:'pure acceptance helper only; no DOM/browser claim',base:previous(projection(),document,ports,session),head:current(projection(),document,ports,session)}));

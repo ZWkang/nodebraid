@@ -1,0 +1,23 @@
+{
+  "head": "fe48ff7c2ffb7eef144f64b4699b042f6acdad19",
+  "tree": "abaf6c01ef863fa36f4a7c760363a2d69c38290a",
+  "resolved": {
+    "@nodebraid/kernel": "/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/kernel/dist/index.js",
+    "@nodebraid/renderer-svg": "/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/renderer-svg/dist/index.js",
+    "@nodebraid/diagnostics": "/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/diagnostics/dist/index.js",
+    "@nodebraid/renderer-api": "/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/renderer-api/dist/index.js",
+    "@nodebraid/port-api": "/Users/zhou/.codex/worktrees/layout-engine-binding/cflow/packages/port-api/dist/index.js"
+  },
+  "hashes": {
+    "@nodebraid/kernel": "c9ff8d863bd1c07313f11443fbf1c8773ff320d6edb4d5b0d18e35cd1b429f92",
+    "@nodebraid/renderer-svg": "7e52fdf53d182112509b6f05e45be953f2e35071228c9c1f772a0671670687cd",
+    "@nodebraid/diagnostics": "438fb75caf4a4ff7e7e73dd3b13a9c188a47448b0892e8b3f7fa3158f6886ac9",
+    "@nodebraid/renderer-api": "e11c931a0082e17755436efecb49079f00db4dae619d382bd60a74f8fe977e7f",
+    "@nodebraid/port-api": "8ba54d04f150cd9baf850c66c5fd4836cfecec90e072ca0d394f48b1d312542e"
+  },
+  "bundle": "/Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/metadata-copy-repro/final-fe48/metadata-copy-repro.js",
+  "bundleSHA256": "3f1262aa15d065f3c04b71243be7dc8ecfac1c8e365ef4d0a037761c26c906ee",
+  "entrySHA256": "e5eb19bd019918c4411e5f5b10a1d62d05eef02cb9420c89f4c23ea02af8d3b2",
+  "actualBuildHead": "fe48ff7c2ffb7eef144f64b4699b042f6acdad19",
+  "actualBuildLog": "/Users/zhou/.codex/local-workflows/nodebraid/runs/afa38d74-62c2-4a42-b32e-4e86c6b9b41f/affected-fe48.log"
+}

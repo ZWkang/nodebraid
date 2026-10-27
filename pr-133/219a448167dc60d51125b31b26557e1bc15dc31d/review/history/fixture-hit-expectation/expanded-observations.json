@@ -1,0 +1,876 @@
+{
+  "success": true,
+  "data": {
+    "origin": "http://127.0.0.1:50760/",
+    "result": {
+      "controls": 208,
+      "nativeInputEventsDriven": 0,
+      "passed": 178,
+      "results": [
+        {
+          "error": "Error: Hit uses effective candidate geometry: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":100,\"y\":100}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3041:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)\n    at <anonymous>:1:12",
+          "id": "captured/node-drag/basePosition.x/own",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate geometry: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":100,\"y\":100}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3041:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/node-drag/basePosition.x/inherited",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate geometry: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":100,\"y\":100}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3041:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/node-drag/basePosition.x/non-enumerable",
+          "passed": false
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.x/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.x/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.x/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.x/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.x/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.x/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.x/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/node-drag/basePosition.x",
+          "passed": true
+        },
+        {
+          "error": "Error: Hit uses effective candidate geometry: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":100,\"y\":100}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3041:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/node-drag/basePosition.y/own",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate geometry: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":100,\"y\":100}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3041:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/node-drag/basePosition.y/inherited",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate geometry: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":100,\"y\":100}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3041:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/node-drag/basePosition.y/non-enumerable",
+          "passed": false
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.y/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.y/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.y/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.y/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.y/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.y/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/basePosition.y/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/node-drag/basePosition.y",
+          "passed": true
+        },
+        {
+          "error": "Error: Hit uses effective candidate geometry: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":100,\"y\":100}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3041:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/node-drag/position.x/own",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate geometry: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":100,\"y\":100}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3041:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/node-drag/position.x/inherited",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate geometry: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":100,\"y\":100}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3041:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/node-drag/position.x/non-enumerable",
+          "passed": false
+        },
+        {
+          "id": "raw-error/node-drag/position.x/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/position.x/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/position.x/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/position.x/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/position.x/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/position.x/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/position.x/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/node-drag/position.x",
+          "passed": true
+        },
+        {
+          "error": "Error: Hit uses effective candidate geometry: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":100,\"y\":100}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3041:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/node-drag/position.y/own",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate geometry: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":100,\"y\":100}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3041:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/node-drag/position.y/inherited",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate geometry: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":100,\"y\":100}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3041:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/node-drag/position.y/non-enumerable",
+          "passed": false
+        },
+        {
+          "id": "raw-error/node-drag/position.y/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/position.y/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/position.y/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/position.y/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/position.y/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/position.y/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/node-drag/position.y/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/node-drag/position.y",
+          "passed": true
+        },
+        {
+          "id": "first-error-order/node-drag",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/node-drag/0",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/node-drag/1",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/node-drag/2",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/node-drag/3",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/node-drag/4",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/node-drag/5",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/node-drag/6",
+          "passed": true
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/baseViewport.x/own",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/baseViewport.x/inherited",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/baseViewport.x/non-enumerable",
+          "passed": false
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.x/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.x/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.x/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.x/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.x/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.x/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.x/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/viewport-pan/baseViewport.x",
+          "passed": true
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/baseViewport.y/own",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/baseViewport.y/inherited",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/baseViewport.y/non-enumerable",
+          "passed": false
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.y/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.y/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.y/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.y/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.y/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.y/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.y/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/viewport-pan/baseViewport.y",
+          "passed": true
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/baseViewport.zoom/own",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/baseViewport.zoom/inherited",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/baseViewport.zoom/non-enumerable",
+          "passed": false
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.zoom/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.zoom/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.zoom/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.zoom/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.zoom/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.zoom/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/baseViewport.zoom/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/viewport-pan/baseViewport.zoom",
+          "passed": true
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/viewport.x/own",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/viewport.x/inherited",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/viewport.x/non-enumerable",
+          "passed": false
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.x/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.x/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.x/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.x/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.x/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.x/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.x/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/viewport-pan/viewport.x",
+          "passed": true
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/viewport.y/own",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/viewport.y/inherited",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/viewport.y/non-enumerable",
+          "passed": false
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.y/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.y/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.y/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.y/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.y/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.y/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.y/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/viewport-pan/viewport.y",
+          "passed": true
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/viewport.zoom/own",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/viewport.zoom/inherited",
+          "passed": false
+        },
+        {
+          "error": "Error: Hit uses effective candidate Viewport: {\"type\":\"node\",\"nodeId\":\"a\",\"worldPoint\":{\"x\":50,\"y\":40}}\n    at check (http://127.0.0.1:50760/probe.js:2913:13)\n    at equal (http://127.0.0.1:50760/probe.js:2916:5)\n    at geometryCase (http://127.0.0.1:50760/probe.js:3045:13)\n    at http://127.0.0.1:50760/probe.js:3093:102\n    at run (http://127.0.0.1:50760/probe.js:3083:15)\n    at runInteractionGeometryValueCases (http://127.0.0.1:50760/probe.js:3093:17)",
+          "id": "captured/viewport-pan/viewport.zoom/non-enumerable",
+          "passed": false
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.zoom/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.zoom/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.zoom/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.zoom/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.zoom/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.zoom/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/viewport-pan/viewport.zoom/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/viewport-pan/viewport.zoom",
+          "passed": true
+        },
+        {
+          "id": "first-error-order/viewport-pan",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/viewport-pan/0",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/viewport-pan/1",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/viewport-pan/2",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/viewport-pan/3",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/viewport-pan/4",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/viewport-pan/5",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/viewport-pan/6",
+          "passed": true
+        },
+        {
+          "id": "captured/box-selection/rect.x/own",
+          "passed": true
+        },
+        {
+          "id": "captured/box-selection/rect.x/inherited",
+          "passed": true
+        },
+        {
+          "id": "captured/box-selection/rect.x/non-enumerable",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.x/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.x/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.x/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.x/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.x/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.x/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.x/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/box-selection/rect.x",
+          "passed": true
+        },
+        {
+          "id": "captured/box-selection/rect.y/own",
+          "passed": true
+        },
+        {
+          "id": "captured/box-selection/rect.y/inherited",
+          "passed": true
+        },
+        {
+          "id": "captured/box-selection/rect.y/non-enumerable",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.y/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.y/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.y/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.y/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.y/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.y/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.y/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/box-selection/rect.y",
+          "passed": true
+        },
+        {
+          "id": "captured/box-selection/rect.width/own",
+          "passed": true
+        },
+        {
+          "id": "captured/box-selection/rect.width/inherited",
+          "passed": true
+        },
+        {
+          "id": "captured/box-selection/rect.width/non-enumerable",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.width/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.width/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.width/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.width/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.width/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.width/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.width/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/box-selection/rect.width",
+          "passed": true
+        },
+        {
+          "id": "captured/box-selection/rect.height/own",
+          "passed": true
+        },
+        {
+          "id": "captured/box-selection/rect.height/inherited",
+          "passed": true
+        },
+        {
+          "id": "captured/box-selection/rect.height/non-enumerable",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.height/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.height/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.height/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.height/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.height/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.height/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/box-selection/rect.height/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/box-selection/rect.height",
+          "passed": true
+        },
+        {
+          "id": "first-error-order/box-selection",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/box-selection/0",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/box-selection/1",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/box-selection/2",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/box-selection/3",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/box-selection/4",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/box-selection/5",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/box-selection/6",
+          "passed": true
+        },
+        {
+          "id": "captured/connection-preview/pointerWorldPoint.x/own",
+          "passed": true
+        },
+        {
+          "id": "captured/connection-preview/pointerWorldPoint.x/inherited",
+          "passed": true
+        },
+        {
+          "id": "captured/connection-preview/pointerWorldPoint.x/non-enumerable",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.x/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.x/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.x/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.x/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.x/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.x/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.x/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/connection-preview/pointerWorldPoint.x",
+          "passed": true
+        },
+        {
+          "id": "captured/connection-preview/pointerWorldPoint.y/own",
+          "passed": true
+        },
+        {
+          "id": "captured/connection-preview/pointerWorldPoint.y/inherited",
+          "passed": true
+        },
+        {
+          "id": "captured/connection-preview/pointerWorldPoint.y/non-enumerable",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.y/0",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.y/1",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.y/2",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.y/3",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.y/4",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.y/5",
+          "passed": true
+        },
+        {
+          "id": "raw-error/connection-preview/pointerWorldPoint.y/6",
+          "passed": true
+        },
+        {
+          "id": "invalid-first/connection-preview/pointerWorldPoint.y",
+          "passed": true
+        },
+        {
+          "id": "first-error-order/connection-preview",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/connection-preview/0",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/connection-preview/1",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/connection-preview/2",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/connection-preview/3",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/connection-preview/4",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/connection-preview/5",
+          "passed": true
+        },
+        {
+          "id": "metadata-error/connection-preview/6",
+          "passed": true
+        }
+      ]
+    }
+  },
+  "error": null
+}
