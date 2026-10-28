@@ -1,6 +1,6 @@
 import { collectCleanupError } from './cleanup-errors';
 import { runtimeDiagnosticEvents } from './diagnostic-events';
-import type { InstallationDiagnostics } from './host-diagnostics';
+import type { InstallationDiagnostics, UndiagnosedError } from './host-diagnostics';
 import type {
   ChildInstaller,
   DependencyCleanupReporter,
@@ -272,7 +272,14 @@ export class CordisPluginInstallation implements PluginInstallation {
           (error: unknown) => {
             this.onDisposed();
             this.#setSnapshot(Object.freeze({ status: 'disposed' }));
-            const diagnosticError = this.diagnostics.findUndiagnosedError(error);
+            let failure = error;
+            let diagnosticError: UndiagnosedError;
+            try {
+              diagnosticError = this.diagnostics.findUndiagnosedError(error);
+            } catch (inspectionFailure) {
+              failure = new AggregateError([error, inspectionFailure], 'Plugin cleanup diagnostics failed.');
+              diagnosticError = { found: true, error: failure };
+            }
             if (diagnosticError.found) {
               this.diagnostics.diagnostics.emit({
                 name: runtimeDiagnosticEvents.installationDisposeFailed,
@@ -281,7 +288,7 @@ export class CordisPluginInstallation implements PluginInstallation {
                 error: diagnosticError.error,
               });
             }
-            throw error;
+            throw failure;
           },
         )
         .then(completeDisposal, failDisposal);
