@@ -65,7 +65,8 @@ export class HostDiagnostics {
     });
     return Object.freeze({
       diagnostics: this.#createPluginDiagnostics(installationScope),
-      findUndiagnosedError: (error: unknown) => this.#findUndiagnosedError(error, new Set()),
+      findUndiagnosedError: (error: unknown) =>
+        this.#sink ? this.#findUndiagnosedError(error, new Set()) : Object.freeze({ found: false }),
       createActivation: () =>
         this.#createPluginDiagnostics(
           Object.freeze({
