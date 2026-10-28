@@ -32,7 +32,7 @@ The pure [`@nodebraid/document`](/en/modules/document) package supports complete
 ## Current gaps
 
 ::: warning No product-level editor shell yet
-The current branch delivers the Basic Canvas Composition, Duplicate/Delete Selection, explicit Clipboard Copy/Paste, the Port Capability, Port-aware/node-level Edge Connection, the SVG Renderer loop, the React Adapter, and a developer-reference Examples Application. It still has no Vue or other framework adapter and no product-level editor shell. It does not include automatic/cloud Persistence, a cross-version Clipboard format, Edge/Port box selection, lasso, snapping, pinch/touch tools, text editing, product Node UI, or an extensible Tool Registry.
+The current branch delivers the Basic Canvas Composition, Duplicate/Delete Selection, explicit Clipboard Copy/Paste, the Port Capability, Port-aware/node-level Edge Connection, the SVG Renderer loop, the React Adapter, and a developer-reference Examples Application. It still has no Vue or other framework adapter and no product-level editor shell. It does not include automatic/cloud Persistence, a cross-version Clipboard format, Edge/Port box selection, lasso, snapping, pinch/touch tools, arbitrary HTML/React component Nodes and inline text editing, or an extensible Tool Registry.
 :::
 
 Versioned complete Document serialization and manual Example file export/import are available. There is no automatic/cloud Persistence, Collaboration, or remote synchronization. A name appearing in the target architecture does not mean it has become a public package.
@@ -50,3 +50,5 @@ The initial npm release must verify and update package identities, site notices,
 Each capability is evidenced by current public exports, package tests, declaration isolation, and real Runtime composition. The repository's aggregate checks cover linting, type checking, formatting, Bun tests, real-browser tests, builds, the Quick Start, and the production documentation build.
 
 The site does not treat README counts, link existence, or design documents as proof of runtime behavior. When evidence conflicts, the current implementation and tests take precedence, while design intent remains documented separately.
+
+Generic Node creation, strict data editing and one-shot placement are available. SVG custom content retains rectangular interaction bounds; the Example owns its Apply/Cancel property form. See [Node Editing](/en/modules/plugin-node-editing).

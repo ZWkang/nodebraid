@@ -18,6 +18,7 @@ import type { SessionSnapshot } from '@nodebraid/session-api';
 
 import { validateCanvasView, validateSessionSnapshot } from './renderer-state';
 import { getNodePortGeometries, resolveConnectionAnchorPoint, resolveEdgeEndpointPoint } from './port-geometry';
+import type { NodeContentBuilder } from './node-content';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
@@ -29,16 +30,16 @@ export function renderReset(
   nodesLayer: SVGGElement,
   interactionLayer: SVGGElement,
   ports: PortSnapshot,
+  nodeContent?: NodeContentBuilder,
 ): void {
   validateCanvasView(view);
-  const nodes = view.snapshot.nodes.map((node) => createNodeElement(document, node));
+  const nodes = view.snapshot.nodes.map((node) => createNodeElement(document, node, nodeContent));
   const nodesById = new Map(view.snapshot.nodes.map((node) => [node.id, node]));
   const edges = view.snapshot.edges.map((edge) => createEdgeElement(document, edge, nodesById, ports));
+  const targets = view.snapshot.nodes.flatMap((node) => createConnectionTargetElements(document, node, ports));
   edgesLayer.replaceChildren(...edges);
   nodesLayer.replaceChildren(...nodes);
-  interactionLayer.replaceChildren(
-    ...view.snapshot.nodes.flatMap((node) => createConnectionTargetElements(document, node, ports)),
-  );
+  interactionLayer.replaceChildren(...targets);
 }
 
 /** @internal */
@@ -51,6 +52,7 @@ export function applyCommit(
   nodesLayer: SVGGElement,
   interactionLayer: SVGGElement,
   ports: PortSnapshot,
+  nodeContent: NodeContentBuilder | undefined,
   completeProjection?: (journal: DomMutationJournal) => void,
 ): void {
   validateCanvasView(commit.before);
@@ -80,8 +82,11 @@ export function applyCommit(
   validateChangeSetConsistency(commit);
   if (acceptedSession) validateSessionSnapshot(acceptedSession, commit.after.snapshot);
   const afterNodesById = new Map(commit.after.snapshot.nodes.map((node) => [node.id, node]));
+  const beforeNodesById = new Map(baselineSnapshot?.nodes.map((node) => [node.id, node]));
   const validatedNodes = new Map(
-    commit.after.snapshot.nodes.map((node) => [node.id, createNodeElement(document, node)] as const),
+    commit.after.snapshot.nodes.map(
+      (node) => [node.id, createNodeElement(document, node, nodeContent, beforeNodesById.get(node.id))] as const,
+    ),
   );
   const validatedEdges = new Map(
     commit.after.snapshot.edges.map(
@@ -266,9 +271,8 @@ export function applyNodeDragProjection(
       }),
     );
     for (const candidate of projection.nodes) {
-      const element = requireEntityElement(nodesLayer, 'data-nodebraid-node-id', candidate.nodeId) as SVGRectElement;
-      setElementAttribute(element, 'x', String(candidate.position.x), journal);
-      setElementAttribute(element, 'y', String(candidate.position.y), journal);
+      const element = requireEntityElement(nodesLayer, 'data-nodebraid-node-id', candidate.nodeId);
+      updateNodePosition(element, candidate.position, journal);
     }
     for (const edge of baselineSnapshot.edges) {
       if (!candidates.has(edge.source.nodeId) && !candidates.has(edge.target.nodeId)) continue;
@@ -286,11 +290,11 @@ export function applyNodeDragProjection(
 
 function applyNodeChange(
   change: Extract<CanvasCommit['changeSet']['changes'][number], { readonly entity: 'node' }>,
-  validatedNodes: ReadonlyMap<NodeId, SVGRectElement>,
+  validatedNodes: ReadonlyMap<NodeId, SVGElement>,
   nodesLayer: SVGGElement,
   journal: DomMutationJournal,
 ): void {
-  const existing = findEntityElement<SVGRectElement>(nodesLayer, 'data-nodebraid-node-id', change.id);
+  const existing = findEntityElement<SVGElement>(nodesLayer, 'data-nodebraid-node-id', change.id);
   if (change.before === null && change.after !== null) {
     if (existing) throwBaselineEntityConflict('node', change.id, 'missing', 'present');
     nodesLayer.append(requireMapValue(validatedNodes, change.id));
@@ -303,6 +307,10 @@ function applyNodeChange(
   }
   if (!existing || change.after === null) throwBaselineEntityConflict('node', change.id, 'present', 'missing');
   updateNodeElement(existing, change.after, journal);
+  const validated = requireMapValue(validatedNodes, change.id);
+  if (existing.localName === 'g' && validated.firstChild) {
+    journal.replaceChildren(existing, [...validated.childNodes]);
+  }
 }
 
 function applyEdgeChange(
@@ -327,31 +335,56 @@ function applyEdgeChange(
   copyGeometryAttributes(validated, existing, ['x1', 'y1', 'x2', 'y2'], journal);
 }
 
-function createNodeElement(document: Document, node: CanvasNode): SVGRectElement {
+function createNodeElement(
+  document: Document,
+  node: CanvasNode,
+  nodeContent?: NodeContentBuilder,
+  previous?: CanvasNode,
+): SVGElement {
   if (!node.size) {
     throw new RendererError('INVALID_DOCUMENT_UPDATE', 'SVG Node projection requires an explicit Size.', {
       issue: 'MISSING_NODE_SIZE',
       nodeId: node.id,
     });
   }
-  const element = createSvgElement(document, 'rect');
+  const element = nodeContent ? createSvgElement(document, 'g') : createSvgElement(document, 'rect');
   element.setAttribute('class', 'nodebraid-renderer-svg__node');
   element.setAttribute('data-nodebraid-node-id', node.id);
   updateNodeElement(element, node);
+  if (
+    nodeContent &&
+    (!previous ||
+      previous.type !== node.type ||
+      previous.size?.width !== node.size.width ||
+      previous.size.height !== node.size.height ||
+      !Object.is(previous.data, node.data))
+  ) {
+    element.append(nodeContent(node, node.size, document));
+  }
   return element;
 }
 
-function updateNodeElement(element: SVGRectElement, node: CanvasNode, journal?: DomMutationJournal): void {
+function updateNodeElement(element: SVGElement, node: CanvasNode, journal?: DomMutationJournal): void {
   if (!node.size) {
     throw new RendererError('INVALID_DOCUMENT_UPDATE', 'SVG Node projection requires an explicit Size.', {
       issue: 'MISSING_NODE_SIZE',
       nodeId: node.id,
     });
   }
-  setElementAttribute(element, 'x', String(node.position.x), journal);
-  setElementAttribute(element, 'y', String(node.position.y), journal);
-  setElementAttribute(element, 'width', String(node.size.width), journal);
-  setElementAttribute(element, 'height', String(node.size.height), journal);
+  updateNodePosition(element, node.position, journal);
+  if (element.localName === 'rect') {
+    setElementAttribute(element, 'width', String(node.size.width), journal);
+    setElementAttribute(element, 'height', String(node.size.height), journal);
+  }
+}
+
+function updateNodePosition(element: SVGElement, position: CanvasNode['position'], journal?: DomMutationJournal): void {
+  if (element.localName === 'g') {
+    setElementAttribute(element, 'transform', `translate(${position.x} ${position.y})`, journal);
+  } else {
+    setElementAttribute(element, 'x', String(position.x), journal);
+    setElementAttribute(element, 'y', String(position.y), journal);
+  }
 }
 
 function createEdgeElement(
@@ -445,7 +478,7 @@ export class DomMutationJournal {
   readonly #edgeChildren: readonly Element[];
   readonly #nodeChildren: readonly Element[];
   readonly #interactionChildren: readonly Element[] | undefined;
-  readonly #attributeUndos: (() => void)[] = [];
+  readonly #undos: (() => void)[] = [];
 
   constructor(
     readonly edgesLayer: SVGGElement,
@@ -460,7 +493,7 @@ export class DomMutationJournal {
   setAttribute(element: SVGElement, name: string, value: string): void {
     const previous = element.getAttribute(name);
     if (previous === value) return;
-    this.#attributeUndos.push(() => {
+    this.#undos.push(() => {
       if (previous === null) element.removeAttribute(name);
       else element.setAttribute(name, previous);
     });
@@ -470,13 +503,19 @@ export class DomMutationJournal {
   removeAttribute(element: SVGElement, name: string): void {
     const previous = element.getAttribute(name);
     if (previous === null) return;
-    this.#attributeUndos.push(() => element.setAttribute(name, previous));
+    this.#undos.push(() => element.setAttribute(name, previous));
     element.removeAttribute(name);
+  }
+
+  replaceChildren(element: SVGElement, children: readonly Node[]): void {
+    const previous = [...element.childNodes];
+    this.#undos.push(() => element.replaceChildren(...previous));
+    element.replaceChildren(...children);
   }
 
   rollback(): readonly unknown[] {
     const errors: unknown[] = [];
-    for (const undo of [...this.#attributeUndos].reverse()) {
+    for (const undo of [...this.#undos].reverse()) {
       try {
         undo();
       } catch (error) {

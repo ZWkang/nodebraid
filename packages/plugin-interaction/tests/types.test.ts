@@ -8,6 +8,7 @@ import {
   interactionPlugin,
   interactionShortcutService,
   moveNodesCommand,
+  nodePlacementService,
   type CreateEdgeInput,
   type CreateEdgeResult,
   type DeleteSelectionInput,
@@ -16,6 +17,10 @@ import {
   type InteractionShortcutService,
   type MoveNodesInput,
   type MoveNodesResult,
+  type NodeMaterializer,
+  type NodePlacement,
+  type NodePlacementResult,
+  type NodePlacementService,
 } from '../src';
 
 test('publishes Interaction as a Runtime Plugin with a narrow Shortcut contribution Service', () => {
@@ -45,6 +50,13 @@ test('publishes Interaction as a Runtime Plugin with a narrow Shortcut contribut
   };
   expectCommand(deleteSelectionCommand.id);
   void verifyDeleteSelection;
+  const placementToken: typeof nodePlacementService = nodePlacementService;
+  const verifyPlacement = (service: NodePlacementService, materializeNode: NodeMaterializer): NodePlacement =>
+    service.begin(materializeNode);
+  const verifyResult = (request: NodePlacement): Promise<NodePlacementResult> => request.result;
+  void placementToken;
+  void verifyPlacement;
+  void verifyResult;
 });
 
 function expectCommand(id: string): void {

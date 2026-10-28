@@ -33,7 +33,7 @@ Renderer 拥有 Focus 且没有 Active Gesture 时，logical `key` 或 physical 
 
 ## 依赖与写入方向
 
-Plugin 静态要求 Renderer、Session、Command、Kernel 与 Port Service，只提供 Shortcut contribution Service，不公开 Active Gesture 状态。
+Plugin 静态要求 Renderer、Session、Command、Kernel 与 Port Service，提供 Shortcut contribution Service 与 Node Placement Service，不公开 Active Gesture 状态。
 
 ```text
 RendererService ─▶ Input / Hit / Capture / Projection
@@ -50,3 +50,9 @@ Pointermove 只替换 Interaction Projection。pointerup 先清 Preview 并回�
 ## 非目标与验证
 
 当前不包含 self-loop、业务 validation、容量/类型规则、Edge/Port 框选、lasso、Backspace、Clipboard、确认弹窗、soft delete、snapping、pinch/touch tool、HTML overlay、文本编辑、协作 presence、产品 UI 或通用 Tool Registry。成功行为由真实 Chromium 中的完整 Runtime + SVG seam 验证。
+
+## 单次 Node Placement
+
+`nodePlacementService.begin(materializeNode)` 开始一次请求。handle 提供 `cancel()` 和 `result` Promise，结果为 `{type: 'created', nodeId, commit}` 或 `{type: 'cancelled'}`；原始失败通过 reject 暴露。应用同步 materializer 接收 `{worldPoint}` 并返回完整 Node。安装 Node Editing 以提供公开 Create Node Command；Basic Composition 已包含它。
+
+Interaction 统一路由放置与普通手势。primary 点击在空白处开始和结束、且未超过现有拖动阈值，才创建一次并选中新 Node。实体点击与拖动不放置，也不同时选择/拖动；Esc 取消。待放置期间保留平移缩放，候选点击不跨 Viewport 变化提交。示例以点击点为 Node 左上角，使用光标与提示反馈。

@@ -13,6 +13,8 @@ const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const indexDeclaration = await readFile(join(dist, 'index.d.ts'), 'utf8');
 assert.match(indexDeclaration, /createSvgRenderer/);
 assert.match(indexDeclaration, /SvgRendererConfig/);
+assert.match(indexDeclaration, /SvgNodeContentContext/);
+assert.match(indexDeclaration, /SvgNodeContentFactory/);
 assert.match(indexDeclaration, /SvgRendererError/);
 const declarations = await collectDeclarations(dist);
 assert.ok(declarations.some((declaration) => /SVGSVGElement/.test(declaration.contents)));

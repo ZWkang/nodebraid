@@ -5,7 +5,7 @@ description: 显式 Renderer、完整 readiness 与统一生命周期的 Basic C
 
 # `@nodebraid/preset-basic`
 
-`@nodebraid/preset-basic` 是后端无关的官方 Basic Canvas Composition。它把已经稳定重复的 Kernel、Command、Session、Renderer、Interaction 与 History 组装收口到一个普通 Plugin，同时保留 Host、Diagnostics、Renderer Provider 与扩展能力的应用所有权。
+`@nodebraid/preset-basic` 是后端无关的官方 Basic Canvas Composition。它把已经稳定重复的 Kernel、Port、Command、Node Editing、Session、Renderer、Interaction 与 History 组装收口到一个普通 Plugin，同时保留 Host、Diagnostics、Renderer Provider 与扩展能力的应用所有权。
 
 ::: warning Package 尚未公开发布
 该名称表示当前源码模块边界，不代表可以从 npm 安装。请按 [Quick Start](/guide/quick-start) 从源码验证。
@@ -13,7 +13,7 @@ description: 显式 Renderer、完整 readiness 与统一生命周期的 Basic C
 
 ## 解决的问题
 
-应用不再需要重复写六个标准 Feature Plugin 的安装、等待和释放代码，也不需要自己维护依赖安全的 cleanup 顺序。Composition Installation 只有在全部 Child Installation active 后才 active，任一必需 child 失败都会回滚整棵树。
+应用不再需要重复写八个标准 Feature Plugin 的安装、等待和释放代码，也不需要自己维护依赖安全的 cleanup 顺序。Composition Installation 只有在全部 Child Installation active 后才 active，任一必需 child 失败都会回滚整棵树。
 
 ## 公共入口
 
@@ -43,7 +43,7 @@ SVG 只是应用在这个示例中显式选择的 Provider，不是 preset 或 c
 
 ## Readiness、失败与释放
 
-Composition 按 Kernel、Command、Session、Renderer、Interaction、History 的顺序创建 children，再等待全部 active。父 active 是首次完整 readiness，不是 Child Service 的原子发布屏障或永久 health signal。
+Composition 按 Kernel、Port、Command、Node Editing、Session、Renderer、Interaction、History 的顺序创建 children，再等待全部 active。父 active 是首次完整 readiness，不是 Child Service 的原子发布屏障或永久 health signal。
 
 Renderer Factory、Interaction config 与其他 child setup 失败保留原始错误身份。已有标准 Provider、第二份 preset 或同一 Host 内的第二个 Renderer 继续按现有 Service reservation 显式冲突，preset 不会跳过或替换。释放逆序进行并等待异步 Renderer dispose；多个清理失败通过 AggregateError 保留。
 
@@ -68,3 +68,5 @@ Failed Composition Installation 不会自重试；恢复需要新 Installation�
 - lifecycle tests 覆盖 readiness、失败身份、回滚、冲突、隔离与异步 cleanup；
 - 真实 SVG + Chromium tracer 覆盖投影、Selection、Box Selection、Move、Undo/Redo、Wheel 与 dispose；
 - declaration isolation、package-name import、pack preview 与根仓库门禁验证发布边界。
+
+Basic Composition 同时安装 `nodeEditingPlugin`，为放置和应用编辑提供 headless Create Node / Update Node Data Command。

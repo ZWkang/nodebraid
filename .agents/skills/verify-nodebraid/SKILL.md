@@ -60,7 +60,7 @@ Changed runtime/Examples source selects relevant scenes deterministically in
 [`preview-scenarios.ts`](../../../scripts/preview-scenarios.ts). Shared code and
 collector/skill changes run all scenes. Docs/tests-only changes are explicitly
 `not-applicable`. The Example's manual Auto layout control is verified by
-`examples/app/browser-tests/basic-svg.browser.ts`. These five preview scenes do
+`examples/app/browser-tests/basic-svg.browser.ts`. These six preview scenes do
 not click it, so their screenshots do not prove Layout execution; capture the
 Layout interaction separately when providing evidence for a Layout change.
 

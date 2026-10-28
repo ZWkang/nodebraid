@@ -14,10 +14,14 @@ import {
   historyService,
   kernelService,
   nodeId,
+  nodePlacementService,
   rendererService,
   sessionService,
   type ClipboardErrorCode,
   type CommandService,
+  type CanvasNode,
+  type NodePlacementService,
+  type Point,
   type HistoryService,
   type KernelService,
   type LayoutCommandInput,
@@ -28,6 +32,9 @@ import { dagreLayoutEngine, type DagreLayoutConfig } from '@nodebraid/layout-dag
 import { createSvgRenderer } from '@nodebraid/renderer-svg';
 
 import { createNavigatorClipboardTransport, exampleCanvasFragmentTextCodec } from './clipboard-adapters';
+import { createExampleNodeContent } from './node-content';
+
+export type ExampleNodeType = 'step' | 'note';
 
 export const exampleLayoutCommand = defineCommand<LayoutCommandInput<DagreLayoutConfig>, LayoutCommandResult>(
   'nodebraid.examples.layout.dagre',
@@ -43,6 +50,8 @@ export interface ExampleRuntime {
   readonly history: HistoryService;
   readonly kernel: KernelService;
   readonly session: SessionService;
+  readonly placement: NodePlacementService;
+  materializeNode(type: ExampleNodeType, position: Point, label: string): CanvasNode;
   getClipboardFailure(): ClipboardFailureSnapshot | undefined;
   subscribeClipboardFailure(listener: () => void): () => void;
   disposeClipboardShortcuts(): Promise<void>;
@@ -67,11 +76,13 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
           code: clipboardError.code,
           causeName: describeCauseName(clipboardError.cause),
         });
-        for (const listener of [...clipboardFailureListeners]) listener();
+        const listeners = Array.from(clipboardFailureListeners);
+        for (const listener of listeners) listener();
       },
     },
   });
   let nextEdgeSequence = 1;
+  let nextNodeSequence = 1;
   let nextDuplicateNodeSequence = 1;
   let nextDuplicateEdgeSequence = 1;
   let nextClipboardNodeSequence = 1;
@@ -80,6 +91,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
   let history: HistoryService | undefined;
   let kernel: KernelService | undefined;
   let session: SessionService | undefined;
+  let placement: NodePlacementService | undefined;
   const basicCanvasPlugin = createBasicCanvasPlugin(createSvgRenderer, {
     interaction: {
       minZoom: 0.25,
@@ -144,16 +156,22 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       kernel: kernelService,
       renderer: rendererService,
       session: sessionService,
+      placement: nodePlacementService,
     },
     setup(context) {
       commands = context.services.commands;
       history = context.services.history;
       kernel = context.services.kernel;
       session = context.services.session;
+      placement = context.services.placement;
     },
   });
   const stepPorts = host.install(stepPortsPlugin);
-  const composition = host.install(basicCanvasPlugin, { target, connectionAnchorHitTolerance: 12 });
+  const composition = host.install(basicCanvasPlugin, {
+    target,
+    connectionAnchorHitTolerance: 12,
+    createNodeContent: createExampleNodeContent,
+  });
   const layout = host.install(createLayoutPlugin({ engine: dagreLayoutEngine, command: exampleLayoutCommand }));
   const duplicateSelection = host.install(duplicateSelectionPlugin);
   const duplicateSelectionShortcut = host.install(duplicateSelectionShortcutPlugin);
@@ -172,7 +190,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       clipboardShortcuts.whenActive(),
       application.whenActive(),
     ]);
-    if (!commands || !history || !kernel || !session) {
+    if (!commands || !history || !kernel || !session || !placement) {
       throw new Error('Expected all Basic SVG Example Runtime Services.');
     }
 
@@ -217,6 +235,16 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       history,
       kernel,
       session,
+      placement,
+      materializeNode(type: ExampleNodeType, position: Point, label: string): CanvasNode {
+        return {
+          id: freshNodeId('example-node', () => nextNodeSequence++),
+          type,
+          position,
+          size: { width: 160, height: 88 },
+          data: Object.freeze({ label, tags: Object.freeze([]) }),
+        };
+      },
       getClipboardFailure: () => clipboardFailure,
       subscribeClipboardFailure(listener: () => void) {
         clipboardFailureListeners.add(listener);

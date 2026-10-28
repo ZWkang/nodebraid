@@ -1,4 +1,4 @@
-import type { SvgDomEventPolicy, SvgInputPolicies, SvgRendererConfig } from './contracts';
+import type { SvgDomEventPolicy, SvgInputPolicies, SvgRendererConfig, SvgNodeContentFactory } from './contracts';
 import { SvgRendererError } from './svg-renderer-error';
 
 /** @internal */
@@ -13,6 +13,7 @@ interface ValidatedSvgConfig {
   readonly target: SVGSVGElement;
   readonly edgeHitTolerance: number;
   readonly connectionAnchorHitTolerance: number;
+  readonly createNodeContent: SvgNodeContentFactory | undefined;
 }
 
 /** @internal */
@@ -20,7 +21,11 @@ export function validateConfig(config: Readonly<SvgRendererConfig>): ValidatedSv
   if (typeof config !== 'object' || config === null) {
     throw new SvgRendererError('INVALID_CONFIG', 'SVG Renderer config must be an object.');
   }
-  assertKnownConfigKeys(config, ['target', 'edgeHitTolerance', 'connectionAnchorHitTolerance', 'input'], '');
+  assertKnownConfigKeys(
+    config,
+    ['target', 'edgeHitTolerance', 'connectionAnchorHitTolerance', 'input', 'createNodeContent'],
+    '',
+  );
   const target = (config as Readonly<{ target?: unknown }>).target;
   const ownerDocument = isRecord(target) ? Reflect.get(target, 'ownerDocument') : undefined;
   const ownerWindow = isRecord(ownerDocument) ? Reflect.get(ownerDocument, 'defaultView') : undefined;
@@ -46,10 +51,17 @@ export function validateConfig(config: Readonly<SvgRendererConfig>): ValidatedSv
       field: 'connectionAnchorHitTolerance',
     });
   }
+  const createNodeContent = config.createNodeContent;
+  if (createNodeContent !== undefined && typeof createNodeContent !== 'function') {
+    throw new SvgRendererError('INVALID_CONFIG', 'createNodeContent must be a synchronous function.', {
+      field: 'createNodeContent',
+    });
+  }
   return {
     target: target as SVGSVGElement,
     edgeHitTolerance: edgeHitTolerance ?? 4,
     connectionAnchorHitTolerance: connectionAnchorHitTolerance ?? 8,
+    createNodeContent,
   };
 }
 

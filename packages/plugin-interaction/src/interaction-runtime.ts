@@ -8,6 +8,7 @@ import {
 import type { CanvasNode, NodeId, Point } from '@nodebraid/kernel';
 import { commandService, type CommandRegistration, type CommandService } from '@nodebraid/plugin-command';
 import { kernelService } from '@nodebraid/plugin-kernel';
+import { createNodeCommand } from '@nodebraid/plugin-node-editing';
 import { portService, type PortService } from '@nodebraid/plugin-port';
 import { rendererService } from '@nodebraid/plugin-renderer';
 import { sessionService, type Viewport } from '@nodebraid/plugin-session';
@@ -29,6 +30,7 @@ import { InteractionError } from './interaction-error';
 import { createMoveNodesHandler, moveNodesCommand } from './move-nodes-command';
 import type { InteractionShortcutService } from './shortcut-contracts';
 import { createShortcutRuntime } from './shortcut-runtime';
+import type { NodeMaterializer, NodePlacementResult, NodePlacementService } from './node-placement';
 
 type InteractionRequirements = {
   readonly renderer: typeof rendererService;
@@ -84,14 +86,37 @@ interface ConnectionGesture {
   target: ConnectionPreviewTarget;
 }
 
-type ActiveGesture = SelectionGesture | NodeDragGesture | ViewportPanGesture | BoxSelectionGesture | ConnectionGesture;
-type GestureCancellationReason = 'lifecycle' | 'pointer-cancel' | 'stale' | 'escape' | 'invalid-target';
+interface NodePlacementRequest {
+  readonly materializeNode: NodeMaterializer;
+  readonly resolve: (result: NodePlacementResult) => void;
+  readonly reject: (error: unknown) => void;
+  phase: 'armed' | 'materializing' | 'committing' | 'settled';
+}
+
+interface NodePlacementGesture {
+  readonly type: 'node-placement';
+  readonly pointerId: number;
+  readonly request: NodePlacementRequest;
+  readonly startScreenPoint: Point;
+  readonly baseViewport: Viewport;
+  eligible: boolean;
+}
+
+type ActiveGesture =
+  | SelectionGesture
+  | NodeDragGesture
+  | ViewportPanGesture
+  | BoxSelectionGesture
+  | ConnectionGesture
+  | NodePlacementGesture;
+type GestureCancellationReason =
+  'lifecycle' | 'pointer-cancel' | 'stale' | 'escape' | 'invalid-target' | 'cancelled' | 'replaced';
 
 /** @internal */
 export function activateInteractionRuntime(
   context: PluginContext<InteractionRequirements>,
   config: EffectiveInteractionConfig,
-): InteractionShortcutService {
+): { readonly shortcuts: InteractionShortcutService; readonly placement: NodePlacementService } {
   const renderer = context.services.renderer;
   const session = context.services.session;
   const kernel = context.services.kernel;
@@ -99,6 +124,7 @@ export function activateInteractionRuntime(
   const ports = context.services.ports;
   let closing = false;
   let activeGesture: ActiveGesture | undefined;
+  let placementRequest: NodePlacementRequest | undefined;
   let spacePressed = false;
   const rejectedPointerIds = new Set<number>();
   let moveRegistration: CommandRegistration | undefined;
@@ -155,11 +181,116 @@ export function activateInteractionRuntime(
     if (errors.length > 1) throw new AggregateError(errors, 'Interaction Gesture cancellation failed.');
   };
 
+  const failPlacement = (request: NodePlacementRequest, error: unknown): void => {
+    if (placementRequest === request) placementRequest = undefined;
+    if (request.phase === 'settled') {
+      context.diagnostics.reportFault(error, { name: interactionDiagnosticEvents.nodePlacementFault });
+      return;
+    }
+    request.phase = 'settled';
+    request.reject(error);
+  };
+
+  const finishPlacementCancellation = (request: NodePlacementRequest, reason: GestureCancellationReason): void => {
+    try {
+      if (activeGesture?.type === 'node-placement' && activeGesture.request === request) {
+        cancelGesture(activeGesture, reason, true);
+      }
+    } catch (error) {
+      request.phase = 'settled';
+      request.reject(error);
+      throw error;
+    }
+    request.phase = 'settled';
+    request.resolve({ type: 'cancelled' });
+  };
+
+  const cancelPlacement = (request: NodePlacementRequest, reason: GestureCancellationReason): void => {
+    if (placementRequest !== request || request.phase === 'committing') return;
+    placementRequest = undefined;
+    finishPlacementCancellation(request, reason);
+  };
+
+  const placement: NodePlacementService = Object.freeze({
+    begin(materializeNode: NodeMaterializer) {
+      if (closing) throw new InteractionError('PLACEMENT_DISPOSED', 'Node Placement Service is disposed.');
+      if (typeof materializeNode !== 'function') {
+        throw new InteractionError('INVALID_NODE_PLACEMENT', 'Node materializer must be a function.');
+      }
+      if (activeGesture && activeGesture.type !== 'node-placement') {
+        throw new InteractionError('PLACEMENT_BUSY', 'An active Pointer Gesture must finish before Node placement.');
+      }
+      const previous = placementRequest;
+      let resolve!: NodePlacementRequest['resolve'];
+      let reject!: NodePlacementRequest['reject'];
+      const result = new Promise<NodePlacementResult>((onResolve, onReject) => {
+        resolve = onResolve;
+        reject = onReject;
+      });
+      const request: NodePlacementRequest = { materializeNode, resolve, reject, phase: 'armed' };
+      placementRequest = request;
+      try {
+        if (previous && previous.phase !== 'committing') finishPlacementCancellation(previous, 'replaced');
+        if (placementRequest === request) renderer.focus();
+      } catch (error) {
+        failPlacement(request, error);
+      }
+      return Object.freeze({ result, cancel: () => cancelPlacement(request, 'cancelled') });
+    },
+  });
+
+  const commitPlacement = (request: NodePlacementRequest, worldPoint: Point): void => {
+    if (placementRequest !== request || closing) return;
+    const selection = session.getSnapshot().selection;
+    request.phase = 'materializing';
+    let node: CanvasNode;
+    try {
+      node = request.materializeNode(
+        Object.freeze({ worldPoint: Object.freeze({ x: worldPoint.x, y: worldPoint.y }) }),
+      );
+    } catch (error) {
+      failPlacement(request, error);
+      return;
+    }
+    if (placementRequest !== request || closing) return;
+    request.phase = 'committing';
+    void commands.execute(createNodeCommand, { node }).then(
+      (commit) => {
+        try {
+          const created = commit.changeSet.changes.find((change) => change.entity === 'node' && change.before === null);
+          if (!created || created.entity !== 'node' || !created.after) {
+            throw new Error('Create Node Command must return its created Node.');
+          }
+          if (
+            !closing &&
+            placementRequest === request &&
+            session.getSnapshot().selection === selection &&
+            kernel.read().query.getNode(created.id) === created.after
+          ) {
+            session.setSelection({ nodeIds: [created.id], edgeIds: [] });
+          }
+          if (placementRequest === request) placementRequest = undefined;
+          request.phase = 'settled';
+          request.resolve({ type: 'created', nodeId: created.id, commit });
+        } catch (error) {
+          failPlacement(request, error);
+        }
+      },
+      (error: unknown) => failPlacement(request, error),
+    );
+  };
+
   context.signal.addEventListener('abort', () => {
     closing = true;
   });
   context.own(async () => {
     closing = true;
+    const waitingPlacement = placementRequest;
+    placementRequest = undefined;
+    if (waitingPlacement && waitingPlacement.phase !== 'committing') {
+      waitingPlacement.phase = 'settled';
+      waitingPlacement.resolve({ type: 'cancelled' });
+    }
     const gesture = activeGesture;
     const cleanupErrors: unknown[] = [];
     const attempt = (cleanup: () => void): void => {
@@ -263,9 +394,14 @@ export function activateInteractionRuntime(
   stopSession = session.subscribe(() => {
     if (closing || !activeGesture) return;
     const gesture = activeGesture;
-    if (gesture.type === 'viewport-pan' || gesture.type === 'box-selection') {
+    if (gesture.type === 'viewport-pan' || gesture.type === 'box-selection' || gesture.type === 'node-placement') {
       if (!viewportsEqual(session.getSnapshot().viewport, gesture.baseViewport)) {
-        cancelGesture(gesture, 'stale', true);
+        try {
+          cancelGesture(gesture, 'stale', true);
+        } catch (error) {
+          if (gesture.type === 'node-placement') failPlacement(gesture.request, error);
+          throw error;
+        }
       } else {
         reapplyGestureProjection(gesture);
       }
@@ -277,6 +413,12 @@ export function activateInteractionRuntime(
     (input) => {
       if (closing) return;
       if (input.type === 'key.down' || input.type === 'key.up') {
+        if (input.type === 'key.down' && input.code === 'Escape' && placementRequest?.phase !== 'committing') {
+          if (placementRequest) {
+            cancelPlacement(placementRequest, 'escape');
+            return;
+          }
+        }
         const shortcutDisposition = shortcutRuntime.handleInput(input);
         if (shortcutDisposition) return shortcutDisposition;
         if (input.type === 'key.down' && (input.key === 'Delete' || input.code === 'Delete')) {
@@ -367,8 +509,49 @@ export function activateInteractionRuntime(
           return;
         }
         if (input.button !== 'primary' && input.button !== 'auxiliary') return;
-        const hit = renderer.hitTest(input.screenPoint);
+        let hit: HitResult | null;
+        try {
+          hit = renderer.hitTest(input.screenPoint);
+        } catch (error) {
+          if (placementRequest?.phase === 'armed' && input.button === 'primary' && !spacePressed) {
+            failPlacement(placementRequest, error);
+            return;
+          }
+          throw error;
+        }
         if (hit === null) return;
+        if (placementRequest?.phase === 'armed' && input.button === 'primary' && !spacePressed) {
+          const request = placementRequest;
+          try {
+            renderer.focus();
+            if (closing || placementRequest !== request) return;
+            renderer.capturePointer(input.pointerId);
+            if (closing || placementRequest !== request) {
+              renderer.releasePointer(input.pointerId);
+              return;
+            }
+            activeGesture = {
+              type: 'node-placement',
+              pointerId: input.pointerId,
+              request,
+              startScreenPoint: input.screenPoint,
+              baseViewport: session.getSnapshot().viewport,
+              eligible: hit.type === 'canvas',
+            };
+          } catch (error) {
+            try {
+              renderer.releasePointer(input.pointerId);
+            } catch (cleanupError) {
+              failPlacement(
+                request,
+                new AggregateError([error, cleanupError], 'Node placement and capture cleanup failed.'),
+              );
+              return;
+            }
+            failPlacement(request, error);
+          }
+          return;
+        }
         const additive = input.modifiers.shift || input.modifiers.meta || input.modifiers.control;
         const connectionHit = toConnectionAnchor(hit);
         if (connectionHit?.role === 'source' && config.connection && !additive && input.pointerType !== 'mouse') {
@@ -470,7 +653,11 @@ export function activateInteractionRuntime(
       }
       const gesture = activeGesture;
       if (input.type === 'pointer.move' && gesture && input.pointerId === gesture.pointerId) {
-        if (gesture.type === 'node-drag') {
+        if (gesture.type === 'node-placement') {
+          if (!isPlacementClick(gesture.startScreenPoint, input.screenPoint, config.dragThreshold)) {
+            gesture.eligible = false;
+          }
+        } else if (gesture.type === 'node-drag') {
           if (
             !gesture.active &&
             isBelowDragThreshold(gesture.startScreenPoint, input.screenPoint, config.dragThreshold)
@@ -524,6 +711,24 @@ export function activateInteractionRuntime(
         return;
       }
       if (input.type === 'pointer.up' && gesture && input.pointerId === gesture.pointerId) {
+        if (gesture.type === 'node-placement') {
+          activeGesture = undefined;
+          try {
+            renderer.releasePointer(gesture.pointerId);
+            if (
+              gesture.eligible &&
+              input.button === 'primary' &&
+              isPlacementClick(gesture.startScreenPoint, input.screenPoint, config.dragThreshold) &&
+              viewportsEqual(session.getSnapshot().viewport, gesture.baseViewport) &&
+              renderer.hitTest(input.screenPoint)?.type === 'canvas'
+            ) {
+              commitPlacement(gesture.request, input.worldPoint);
+            }
+          } catch (error) {
+            failPlacement(gesture.request, error);
+          }
+          return;
+        }
         if (gesture.type === 'connection') {
           activeGesture = undefined;
           const terminalErrors: unknown[] = [];
@@ -566,21 +771,46 @@ export function activateInteractionRuntime(
           gesture.completeClick?.();
         }
       } else if (input.type === 'pointer.cancel' && gesture && input.pointerId === gesture.pointerId) {
-        cancelGesture(gesture, 'pointer-cancel', true);
+        try {
+          cancelGesture(gesture, 'pointer-cancel', true);
+        } catch (error) {
+          if (gesture.type === 'node-placement') failPlacement(gesture.request, error);
+          throw error;
+        }
       }
     },
-    (input) =>
-      input.type === 'key.down' || input.type === 'key.up' ? shortcutRuntime.decideDisposition(input) : undefined,
+    (input) => {
+      if (
+        input.type === 'key.down' &&
+        input.code === 'Escape' &&
+        placementRequest &&
+        placementRequest.phase !== 'committing'
+      ) {
+        return { defaultAction: 'prevent' };
+      }
+      return input.type === 'key.down' || input.type === 'key.up'
+        ? shortcutRuntime.decideDisposition(input)
+        : undefined;
+    },
   );
-  return shortcutRuntime.service;
+  return { shortcuts: shortcutRuntime.service, placement };
 }
 
 function hasPreview(gesture: ActiveGesture): boolean {
-  return gesture.type === 'connection' || (gesture.type !== 'selection' && gesture.active);
+  return (
+    gesture.type === 'connection' ||
+    ((gesture.type === 'node-drag' || gesture.type === 'viewport-pan' || gesture.type === 'box-selection') &&
+      gesture.active)
+  );
 }
 
 function isBelowDragThreshold(start: Point, current: Point, threshold: number): boolean {
   return Math.hypot(current.x - start.x, current.y - start.y) < threshold;
+}
+
+function isPlacementClick(start: Point, current: Point, threshold: number): boolean {
+  const distance = Math.hypot(current.x - start.x, current.y - start.y);
+  return distance === 0 || distance < threshold;
 }
 
 function updateConnectionGesture(gesture: ConnectionGesture, pointerWorldPoint: Point, hit: HitResult | null): void {

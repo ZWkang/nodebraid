@@ -36,6 +36,47 @@ all end the Gesture without committing Preview state. Cleanup releases Input,
 Projection, Capture, local state, and all three Command registrations as one
 failure-preserving lifecycle operation.
 
+## One-shot Node placement
+
+`interactionPlugin` also provides `nodePlacementService`. Install
+`@nodebraid/plugin-node-editing` in the same Host so its Create Node Command is
+available. The placement Service focuses the Renderer and owns the input routing;
+applications do not add a competing DOM or Renderer Input listener.
+
+```ts
+const placement = services.placement.begin(({ worldPoint }) => ({
+  id: allocateNodeId(),
+  type: 'note',
+  position: worldPoint,
+  size: { width: 180, height: 90 },
+  data: { text: '' },
+}));
+
+const result = await placement.result;
+// result.type is 'created' (with nodeId and commit) or 'cancelled'.
+// placement.cancel() only affects this request before its Command starts.
+```
+
+A complete primary click on blank Canvas creates once, then returns to ordinary
+editing. Entity clicks and movement beyond the existing drag threshold do not
+create or run selection/drag behavior, and leave the request armed. Pan and Wheel
+Zoom remain available before a candidate click. A Viewport change during that
+click invalidates the candidate. Escape, explicit cancellation, replacement and
+Activation disposal end the appropriate waiting request; old handles cannot
+cancel later requests. There is no following Node preview or Tool Registry.
+
+The application materializer runs synchronously once for an accepted click and
+receives a captured world point. Its Node values and schema remain application
+owned. A successful Commit is selected only while the request remains current
+and no newer Selection has appeared. The pure Create Command does not change
+Selection. Cancellation after Command execution starts cannot undo a Commit.
+
+Materialization and pre-commit failures reject `result` with the original error;
+cleanup failures remain explicit. Selection or rendering failures after Commit
+do not roll back Document or History. A failure occurring after a reentrant
+cancellation has already settled `result` is reported through the existing
+Fault Reporter as `nodebraid.plugin.interaction.node-placement.fault`.
+
 ## Development
 
 Run package scripts from the monorepo root. Public-seam tests also build History

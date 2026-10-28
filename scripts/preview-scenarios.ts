@@ -4,6 +4,7 @@ export const previewScenes = [
   { id: 'port-connection', title: 'Connect source and target Ports' },
   { id: 'clipboard', title: 'Copy and paste through the system clipboard' },
   { id: 'document-files', title: 'Export and restore a complete Document file' },
+  { id: 'node-authoring', title: 'Create custom SVG Nodes and edit application data' },
 ] as const;
 
 export type PreviewScene = (typeof previewScenes)[number];
@@ -15,9 +16,15 @@ export function selectPreviewScenes(files: readonly string[], all = false): read
     if (/\/(tests|browser-tests|artifacts)\//.test(file) || /\.(test|browser)\.[^.]+$/.test(file)) continue;
     if (/^packages\/(plugin-duplicate-selection|plugin-history)\/src\//.test(file)) {
       selected.add('selection-history');
-      if (file.startsWith('packages/plugin-history/')) selected.add('document-files');
+      if (file.startsWith('packages/plugin-history/')) {
+        selected.add('document-files');
+        selected.add('node-authoring');
+      }
     } else if (file.startsWith('packages/document/src/')) {
       selected.add('document-files');
+      selected.add('node-authoring');
+    } else if (file.startsWith('packages/plugin-node-editing/src/')) {
+      selected.add('node-authoring');
     } else if (/^packages\/(port-api|plugin-port)\/src\//.test(file)) {
       selected.add('port-connection');
     } else if (/^packages\/(plugin-clipboard|canvas-fragment)\/src\//.test(file)) {

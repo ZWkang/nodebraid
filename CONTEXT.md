@@ -117,7 +117,7 @@ _Avoid_: Load Order, Plugin List
 _Avoid_: Default Canvas, Hard-coded Runtime, Preset Class
 
 **Basic Canvas Composition**:
-NodeBraid 官方、渲染后端无关的基础 Canvas Composition，组合 Kernel、Command、Session、Renderer、Interaction 与 History，并由应用显式选择 Renderer Provider。
+NodeBraid 官方、渲染后端无关的基础 Canvas Composition，组合 Kernel、Port、Command、Node Editing、Session、Renderer、Interaction 与 History，并由应用显式选择 Renderer Provider。
 _Avoid_: Default Canvas, SVG Canvas, Basic Runtime Class
 
 **Documentation Site**:
@@ -383,6 +383,18 @@ _Avoid_: Old Pointer, Stale Renderer, Rebased Gesture
 **Move Nodes Command**:
 仅在每个目标 Node 的当前 position 与声明起点一致时，原子提交所有绝对目标 position 的强类型 Command。
 _Avoid_: Move Delta, Drag Commit, Position Patch
+
+**Create Node Command**:
+以应用提供的完整 Node 值，在一个同步 Transaction 中新增实体并返回 Commit 的强类型 Command；它不改变 Selection。
+_Avoid_: Node Factory, Direct UI Write
+
+**Update Node Data Command**:
+仅在目标仍与编辑起点的精确 Node 值相同时，原子替换其不透明 data 的强类型 Command。
+_Avoid_: Node Patch, Field Merge, Global Revision Lock
+
+**Node Placement**:
+一次由应用开始、在有效画布落点创建并选中 Node，或显式取消、失败结束的交互请求。
+_Avoid_: Tool Registry, Node Draft, Drop Import
 
 **Create Edge Command**:
 仅在完整 Edge 与 source、target Connection Anchor 证据一致，且所需 Node、Port 定义与 Edge ID 仍可用时，原子提交该 Edge 的强类型 Command。

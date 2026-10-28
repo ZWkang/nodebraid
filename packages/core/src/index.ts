@@ -11,6 +11,7 @@ export * from '@nodebraid/plugin-history';
 export * from '@nodebraid/plugin-interaction';
 export * from '@nodebraid/plugin-kernel';
 export * from '@nodebraid/plugin-layout';
+export * from '@nodebraid/plugin-node-editing';
 export * from '@nodebraid/plugin-port';
 export * from '@nodebraid/plugin-renderer';
 export * from '@nodebraid/plugin-session';

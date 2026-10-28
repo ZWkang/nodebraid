@@ -142,6 +142,14 @@ export const capabilityGroups: readonly CapabilityGroup[] = Object.freeze([
     },
     modules: [
       {
+        name: '@nodebraid/plugin-node-editing',
+        slug: 'plugin-node-editing',
+        summary: {
+          zh: '通用 Node 创建与严格起点 data 编辑。',
+          en: 'Generic Node creation and source-guarded data editing.',
+        },
+      },
+      {
         name: '@nodebraid/plugin-command',
         slug: 'plugin-command',
         summary: { zh: 'Activation-scoped typed Command Service。', en: 'An Activation-scoped typed Command Service.' },

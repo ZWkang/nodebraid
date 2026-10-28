@@ -47,12 +47,14 @@ import {
 } from './svg-projection';
 import { acceptInteractionProjection, isInteractionCompatibleWithDocument } from './interaction-projection';
 import { SvgRendererError } from './svg-renderer-error';
+import { createNodeContentBuilder } from './node-content';
 import { type AffineMatrix, formatSvgMatrix, readTargetMatrix } from './target-mapping';
 
 const targetReservations = new WeakSet<SVGSVGElement>();
 
 export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRenderer {
-  const { target, edgeHitTolerance, connectionAnchorHitTolerance } = validateConfig(config);
+  const { target, edgeHitTolerance, connectionAnchorHitTolerance, createNodeContent } = validateConfig(config);
+  const nodeContent = createNodeContent === undefined ? undefined : createNodeContentBuilder(createNodeContent);
   const inputPolicies = normalizeInputPolicies(config.input);
   readTargetMatrix(target, 'INVALID_TARGET');
   if (targetReservations.has(target) || target.querySelector(':scope > [data-nodebraid-renderer-svg-root]')) {
@@ -127,8 +129,8 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
     const localToUser = acceptedTargetMatrix ?? readTargetMatrix(target, 'TARGET_UNAVAILABLE');
     const selectedNodeIds = new Set<string>(snapshot.selection.nodeIds);
     const selectedEdgeIds = new Set<string>(snapshot.selection.edgeIds);
-    for (const node of nodesLayer.querySelectorAll<SVGRectElement>('[data-nodebraid-node-id]')) {
-      setSelected(node, selectedNodeIds.has(node.getAttribute('data-nodebraid-node-id') ?? ''), journal);
+    for (const node of nodesLayer.children) {
+      setSelected(node as SVGElement, selectedNodeIds.has(node.getAttribute('data-nodebraid-node-id') ?? ''), journal);
     }
     for (const edge of edgesLayer.querySelectorAll<SVGLineElement>('[data-nodebraid-edge-id]')) {
       setSelected(edge, selectedEdgeIds.has(edge.getAttribute('data-nodebraid-edge-id') ?? ''), journal);
@@ -442,7 +444,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         const nextPorts = acceptPortSnapshot(acceptedUpdate.ports, acceptedUpdate.view.snapshot);
         const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
         try {
-          renderReset(acceptedUpdate.view, document, edgesLayer, nodesLayer, interactionLayer, nextPorts);
+          renderReset(acceptedUpdate.view, document, edgesLayer, nodesLayer, interactionLayer, nextPorts, nodeContent);
           if (acceptedSession) applySession(acceptedSession, journal, targetMatrix);
         } catch (error) {
           const rollbackErrors = journal.rollback();
@@ -479,6 +481,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
             nodesLayer,
             interactionLayer,
             nextPorts,
+            nodeContent,
             (journal) => {
               if (session) {
                 applyInteractionProjection(

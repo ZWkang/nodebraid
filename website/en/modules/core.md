@@ -38,7 +38,7 @@ If you are building an internal NodeBraid package or need only one narrow low-le
 - backend-neutral Interaction Projection values from `@nodebraid/interaction-api`;
 - Port definition/Snapshot values from `@nodebraid/port-api` and the `@nodebraid/plugin-port` Runtime;
 - the NodeBraid-owned Plugin Host API from `@nodebraid/runtime-cordis`;
-- the Kernel, Port, Command, Session, Renderer, Interaction, Duplicate Selection, Clipboard, and History Runtime Plugins;
+- the Kernel, Port, Command, Node Editing, Session, Renderer, Interaction, Duplicate Selection, Clipboard, and History Runtime Plugins;
 - the backend-neutral Basic Canvas Composition from `@nodebraid/preset-basic`;
 - the generic Layout API and Layout Runtime Plugin.
 
