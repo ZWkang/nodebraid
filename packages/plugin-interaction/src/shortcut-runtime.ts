@@ -158,16 +158,15 @@ export function createShortcutRuntime(options: {
 }
 
 function acceptBinding<Output>(binding: InteractionShortcutBinding<Output>): InteractionShortcutBinding<Output> {
-  if (
-    typeof binding !== 'object' ||
-    binding === null ||
-    typeof binding.command !== 'object' ||
-    binding.command === null
-  ) {
+  if (typeof binding !== 'object' || binding === null) {
+    throw new InteractionError('INVALID_SHORTCUT', 'Interaction Shortcut Binding is malformed.');
+  }
+  const command = binding.command;
+  if (typeof command !== 'object' || command === null) {
     throw new InteractionError('INVALID_SHORTCUT', 'Interaction Shortcut Binding is malformed.');
   }
   const shortcut = defineInteractionShortcut(binding.shortcut);
-  return Object.freeze({ shortcut, command: binding.command });
+  return Object.freeze({ shortcut, command });
 }
 
 function bindingKey(code: string, modifiers: KeyboardInput['modifiers']): string {
