@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "localReviewedAndVerifiedHead": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+    "publishedSourceHead": "e4c996cf4eed17639d81a5be554f22d8374e1b05",
+    "completeTree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+    "patch": "c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476",
+    "localOrderedParents": [
+      "fe94ea93ed6b06e65e5d29f7846e132a53f8cded"
+    ],
+    "actualPublishedOrderedParents": [
+      "fe94ea93ed6b06e65e5d29f7846e132a53f8cded"
+    ],
+    "all919SourceLeavesAndTwoChangedFileBytesVerified": true,
+    "localTestsNotExecutedAtPublishedSHA": true
+  },
+  "localFormal": {
+    "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+    "tests": 1665,
+    "assertions": 10708,
+    "command": "bun run check",
+    "exitCode": 0,
+    "stable": true,
+    "logSHA256": "27eabbaf8e8122e68348886571b0481e7c0f1487cf4699ab8c1e55377ef3af81"
+  },
+  "sourceCI": {
+    "run": 40662344964,
+    "checksJob": 122728205404,
+    "previewJob": 122728204990,
+    "deployJob": 122730262613,
+    "checks": "success",
+    "preview": "success",
+    "deploy": "skipped",
+    "linuxTests": 1665,
+    "linuxAssertions": 10702,
+    "checkedTestMergeHead": "615e160440faeccdb0006e355f8939fca38b1616",
+    "checkedTree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+    "checkedOrderedParents": [
+      "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+      "e4c996cf4eed17639d81a5be554f22d8374e1b05"
+    ],
+    "previewActualCheckout": "e4c996cf4eed17639d81a5be554f22d8374e1b05",
+    "testMergeIsNotActualPRIntegration": true
+  },
+  "trustedPublisher": {
+    "run": 40662969912,
+    "job": 122730291964,
+    "actualCheckout": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "eligibleSourceRun": 40662344964,
+    "eligiblePR": 138,
+    "eligibleHead": "e4c996cf4eed17639d81a5be554f22d8374e1b05",
+    "previewImmutableCommit": "5eec5972e742f46a99277ae5d91022bc9b9e1e85",
+    "previewOrderedParents": [
+      "91d440286fcd94f98e43d46159bdfc823bc1f68b"
+    ],
+    "previewTree": "40de3457397b6bf28b54a5e7a0ced5694ea83326"
+  },
+  "nativeMedia": {
+    "files": 55,
+    "artifactEntries": 54,
+    "sceneIDs": [
+      "viewport",
+      "selection-history",
+      "port-connection",
+      "clipboard",
+      "document-files"
+    ],
+    "allMappedNativeScenes": true,
+    "sourceCISelectedAllMapped": true,
+    "extraLocalAllRun": false,
+    "allBytesSizeSHA256GitBlobHeaderReadBack": true,
+    "recordingsAnd15xReviewsDistinct": true,
+    "actualSetpts15EncodingLogs": true,
+    "mediaRecaptures": 0,
+    "mediaUploadsByThisRound": 0,
+    "sameHeadBeforeAfterNotBaseOrPerformance": true,
+    "notProxyFaultBrowserUI": true
+  },
+  "remainingStages": [
+    "focused human review and authorized normal merge",
+    "fresh actualmain wholeIssue acceptance and mainCI/necessaryDeploy",
+    "independent closing step under canonical workflow"
+  ]
+}

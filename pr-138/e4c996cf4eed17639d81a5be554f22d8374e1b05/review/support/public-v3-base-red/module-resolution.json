@@ -1,0 +1,6 @@
+{
+  "interaction": "file:///Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow/packages/plugin-interaction/dist/index.js",
+  "command": "file:///Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow/packages/plugin-command/dist/index.js",
+  "runtime": "file:///Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow/packages/runtime-cordis/dist/index.js",
+  "basic": "file:///Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow/packages/preset-basic/dist/index.js"
+}

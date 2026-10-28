@@ -1,0 +1,981 @@
+import { expect, test } from 'bun:test';
+
+import type { DiagnosticFault } from '@nodebraid/diagnostics';
+import type { InteractionProjection } from '@nodebraid/interaction-api';
+import { commandPlugin, commandService, defineCommand, type CommandService } from '@nodebraid/plugin-command';
+import { nodeId } from '@nodebraid/kernel';
+import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+import { portPlugin } from '@nodebraid/plugin-port';
+import { createRendererPlugin, rendererService, type RendererService } from '@nodebraid/plugin-renderer';
+import { sessionPlugin, sessionService, type SessionService } from '@nodebraid/plugin-session';
+import type {
+  CanvasRenderer,
+  HitResult,
+  RendererDocumentUpdate,
+  RendererInput,
+  RendererInputListener,
+  ScreenPoint,
+} from '@nodebraid/renderer-api';
+import type { SessionSnapshot } from '@nodebraid/session-api';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
+
+import {
+  defineInteractionShortcut,
+  deleteSelectionCommand,
+  interactionPlugin,
+  interactionShortcutService,
+  moveNodesCommand,
+  type InteractionShortcutRegistration,
+  type InteractionShortcutService,
+} from '../src';
+
+test('Shortcut rejection inspection retains failures and releases the Binding', async () => {
+  const renderer = new LifecycleRenderer();
+  const command = defineCommand<void, void>('test.shortcut.rejection-inspection');
+  const original = new Error('original Command rejection');
+  const inspectionFailure = new Error('Command rejection prototype read failed');
+  const rejection = new Proxy(original, {
+    getPrototypeOf() {
+      throw inspectionFailure;
+    },
+  });
+  const observed = Promise.withResolvers<DiagnosticFault>();
+  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => observed.resolve(fault) } });
+  let shortcuts!: InteractionShortcutService;
+  let registration!: InteractionShortcutRegistration;
+  const binding = {
+    shortcut: {
+      code: 'KeyP',
+      modifierAlternatives: [{ alt: false, control: false, meta: false, shift: false }],
+    },
+    command,
+  };
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => renderer)),
+    host.install(interactionPlugin),
+    host.install(
+      definePlugin({
+        requires: { commands: commandService, shortcuts: interactionShortcutService },
+        setup(context) {
+          const commandRegistration = context.services.commands.register(command, () => {
+            throw rejection;
+          });
+          context.own(() => commandRegistration.dispose());
+          shortcuts = context.services.shortcuts;
+          registration = shortcuts.register(binding);
+          context.own(() => registration.dispose());
+        },
+      }),
+    ),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  try {
+    expect(
+      renderer.emit({
+        type: 'key.down',
+        key: 'p',
+        code: 'KeyP',
+        repeat: false,
+        modifiers: { alt: false, control: false, meta: false, shift: false },
+      }),
+    ).toEqual({ defaultAction: 'prevent' });
+    const fault = await observed.promise;
+    expect(fault.event.name).toBe('nodebraid.plugin.interaction.command.fault');
+    expect(fault.event.attributes.commandId).toBe(command.id);
+    expect(fault.error).toBeInstanceOf(AggregateError);
+    const failures: unknown[] = (fault.error as AggregateError).errors;
+    expect(failures).toHaveLength(2);
+    expect(Object.is(failures[0], rejection)).toBe(true);
+    expect(Object.is(failures[1], inspectionFailure)).toBe(true);
+    const disposal = registration.dispose();
+    expect(registration.dispose()).toBe(disposal);
+    await disposal;
+    const replacement = shortcuts.register(binding);
+    expect(registration.dispose()).toBe(disposal);
+    await replacement.dispose();
+  } finally {
+    await host.dispose();
+  }
+  expect(installations.every((installation) => installation.getSnapshot().status === 'disposed')).toBe(true);
+});
+
+test('Shortcut Binding preserves the Command accepted from a caller getter', async () => {
+  const renderer = new LifecycleRenderer();
+  const firstCommand = defineCommand<void, void>('test.shortcut.capture.first');
+  const laterCommand = defineCommand<void, void>('test.shortcut.capture.later');
+  const observed = Promise.withResolvers<void>();
+  const calls: string[] = [];
+  let commandReads = 0;
+  let shortcutReads = 0;
+  const host = createPluginHost();
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => renderer)),
+    host.install(interactionPlugin),
+    host.install(
+      definePlugin({
+        requires: { commands: commandService, shortcuts: interactionShortcutService },
+        setup(context) {
+          const first = context.services.commands.register(firstCommand, () => {
+            calls.push('first');
+            observed.resolve();
+          });
+          const later = context.services.commands.register(laterCommand, () => {
+            calls.push('later');
+            observed.resolve();
+          });
+          context.own(() => first.dispose());
+          context.own(() => later.dispose());
+          let invalidCommandReads = 0;
+          let invalidShortcutReads = 0;
+          expect(() =>
+            context.services.shortcuts.register({
+              get command(): typeof firstCommand {
+                invalidCommandReads += 1;
+                return invalidCommandReads === 1 ? (null as never) : firstCommand;
+              },
+              get shortcut(): never {
+                invalidShortcutReads += 1;
+                throw new Error('Later Shortcut must not mask the first invalid Command.');
+              },
+            }),
+          ).toThrow(expect.objectContaining({ code: 'INVALID_SHORTCUT' }));
+          expect(invalidCommandReads).toBe(1);
+          expect(invalidShortcutReads).toBe(0);
+          const binding = {
+            get shortcut() {
+              expect(this).toBe(binding);
+              shortcutReads += 1;
+              if (shortcutReads > 1) throw new Error('Later Shortcut must not replace the captured value.');
+              return {
+                code: 'KeyP',
+                modifierAlternatives: [{ alt: false, control: false, meta: false, shift: false }],
+              };
+            },
+            get command(): typeof firstCommand {
+              expect(this).toBe(binding);
+              commandReads += 1;
+              return commandReads < 3 ? firstCommand : laterCommand;
+            },
+          };
+          const registration = context.services.shortcuts.register(binding);
+          context.own(() => registration.dispose());
+        },
+      }),
+    ),
+  ];
+  try {
+    await Promise.all(installations.map((installation) => installation.whenActive()));
+    expect(
+      renderer.emit({
+        type: 'key.down',
+        key: 'p',
+        code: 'KeyP',
+        repeat: false,
+        modifiers: { alt: false, control: false, meta: false, shift: false },
+      }),
+    ).toEqual({ defaultAction: 'prevent' });
+    await observed.promise;
+    expect(calls).toEqual(['first']);
+    expect(commandReads).toBe(1);
+    expect(shortcutReads).toBe(1);
+  } finally {
+    await host.dispose();
+  }
+});
+
+test('captured modifier values retain distinct Shortcut matching and reservations', async () => {
+  const renderer = new LifecycleRenderer();
+  const firstCommand = defineCommand<void, void>('test.shortcut.modifier.first');
+  const oppositeCommand = defineCommand<void, void>('test.shortcut.modifier.opposite');
+  const observed = Promise.withResolvers<void>();
+  const calls: string[] = [];
+  let reads = 0;
+  const captured = defineInteractionShortcut({
+    code: 'KeyP',
+    modifierAlternatives: [
+      {
+        get alt() {
+          reads += 1;
+          return reads === 1 ? false : true;
+        },
+        control: false,
+        meta: false,
+        shift: false,
+      },
+    ],
+  });
+  const host = createPluginHost();
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => renderer)),
+    host.install(interactionPlugin),
+    host.install(
+      definePlugin({
+        requires: { commands: commandService, shortcuts: interactionShortcutService },
+        setup(context) {
+          const first = context.services.commands.register(firstCommand, () => {
+            calls.push('first');
+          });
+          const opposite = context.services.commands.register(oppositeCommand, () => {
+            calls.push('opposite');
+            observed.resolve();
+          });
+          context.own(() => first.dispose());
+          context.own(() => opposite.dispose());
+          const firstBinding = context.services.shortcuts.register({ shortcut: captured, command: firstCommand });
+          const oppositeBinding = context.services.shortcuts.register({
+            shortcut: {
+              code: 'KeyP',
+              modifierAlternatives: [{ alt: true, control: false, meta: false, shift: false }],
+            },
+            command: oppositeCommand,
+          });
+          context.own(() => firstBinding.dispose());
+          context.own(() => oppositeBinding.dispose());
+        },
+      }),
+    ),
+  ];
+  try {
+    await Promise.all(installations.map((installation) => installation.whenActive()));
+    for (const alt of [false, true]) {
+      expect(
+        renderer.emit({
+          type: 'key.down',
+          key: 'p',
+          code: 'KeyP',
+          repeat: false,
+          modifiers: { alt, control: false, meta: false, shift: false },
+        }),
+      ).toEqual({ defaultAction: 'prevent' });
+    }
+    await observed.promise;
+    expect(calls).toEqual(['first', 'opposite']);
+    expect(reads).toBe(1);
+  } finally {
+    await host.dispose();
+  }
+});
+
+test('Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh', async () => {
+  const renderer = new LifecycleRenderer();
+  const command = defineCommand<void, void>('test.shortcut.lifecycle');
+  let abortObserved = false;
+  let releaseAbort!: () => void;
+  let shortcutActivations = 0;
+  const commandProvider = definePlugin({
+    requires: { commands: commandService },
+    setup(context) {
+      const registration = context.services.commands.register(command, (_input, execution) => {
+        return new Promise<void>((_resolve, reject) => {
+          execution.signal.addEventListener(
+            'abort',
+            () => {
+              abortObserved = true;
+              releaseAbort = () => reject(execution.signal.reason);
+            },
+            { once: true },
+          );
+        });
+      });
+      context.own(() => registration.dispose());
+    },
+  });
+  const shortcutProvider = definePlugin({
+    requires: { shortcuts: interactionShortcutService },
+    setup(context) {
+      const registration = context.services.shortcuts.register({
+        shortcut: {
+          code: 'KeyL',
+          modifierAlternatives: [{ alt: false, control: true, meta: false, shift: false }],
+        },
+        command,
+      });
+      shortcutActivations += 1;
+      context.own(() => registration.dispose());
+    },
+  });
+  const host = createPluginHost();
+  const rendererInstallation = host.install(createRendererPlugin(() => renderer));
+  const interaction = host.install(interactionPlugin);
+  const shortcut = host.install(shortcutProvider);
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    rendererInstallation,
+    interaction,
+    host.install(commandProvider),
+    shortcut,
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  const input: RendererInput = {
+    type: 'key.down',
+    key: 'l',
+    code: 'KeyL',
+    repeat: false,
+    modifiers: { alt: false, control: true, meta: false, shift: false },
+  };
+  expect(renderer.emit(input)).toEqual({ defaultAction: 'prevent' });
+
+  let disposed = false;
+  const disposal = shortcut.dispose().then(() => {
+    disposed = true;
+  });
+  await Promise.resolve();
+  expect(abortObserved).toBeTrue();
+  expect(disposed).toBeFalse();
+  expect(renderer.emit(input)).toEqual({ defaultAction: 'prevent' });
+  const conflict = host.install(shortcutProvider);
+  await expect(conflict.whenActive()).rejects.toMatchObject({ code: 'SHORTCUT_ALREADY_REGISTERED' });
+  await conflict.dispose();
+
+  releaseAbort();
+  await disposal;
+  const replacementShortcut = host.install(shortcutProvider);
+  await replacementShortcut.whenActive();
+
+  await rendererInstallation.dispose();
+  expect(interaction.getSnapshot().status).toBe('pending');
+  expect(replacementShortcut.getSnapshot().status).toBe('pending');
+  const replacementRenderer = host.install(createRendererPlugin(() => new LifecycleRenderer()));
+  await Promise.all([replacementRenderer.whenActive(), interaction.whenActive(), replacementShortcut.whenActive()]);
+  expect(shortcutActivations).toBe(3);
+  await host.dispose();
+});
+
+test('Delete Selection registration follows dependency reactivation and disposal lifecycle', async () => {
+  const first = new LifecycleRenderer();
+  const second = new LifecycleRenderer();
+  let commands: CommandService | undefined;
+  let kernel: KernelService | undefined;
+  let session: SessionService | undefined;
+  const consumer = definePlugin({
+    requires: { commands: commandService, kernel: kernelService, session: sessionService },
+    setup(context) {
+      commands = context.services.commands;
+      kernel = context.services.kernel;
+      session = context.services.session;
+    },
+  });
+  const host = createPluginHost();
+  const rendererInstallation = host.install(createRendererPlugin(() => first));
+  const interaction = host.install(interactionPlugin);
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    rendererInstallation,
+    interaction,
+    host.install(consumer),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (!commands || !kernel || !session) throw new Error('Expected Delete Selection lifecycle Runtime Services.');
+  const selectedId = nodeId('delete-lifecycle-node');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({ id: selectedId, type: 'task', position: { x: 0, y: 0 }, data: null });
+  });
+  session.setSelection({ nodeIds: [selectedId], edgeIds: [] });
+  const input = { selection: session.getSnapshot().selection, evidence: kernel.read().snapshot };
+
+  await rendererInstallation.dispose();
+  expect(interaction.getSnapshot().status).toBe('pending');
+  await expect(commands.execute(deleteSelectionCommand, input)).rejects.toMatchObject({
+    domain: 'plugin.command',
+    code: 'COMMAND_NOT_FOUND',
+  });
+
+  const replacement = host.install(createRendererPlugin(() => second));
+  await Promise.all([replacement.whenActive(), interaction.whenActive()]);
+  await expect(commands.execute(deleteSelectionCommand, input)).resolves.toMatchObject({
+    changeSet: { commandId: 'interaction.selection.delete' },
+  });
+
+  await interaction.dispose();
+  await expect(commands.execute(deleteSelectionCommand, input)).rejects.toMatchObject({
+    domain: 'plugin.command',
+    code: 'COMMAND_NOT_FOUND',
+  });
+  await host.dispose();
+});
+
+test('Connection materializer failure keeps identity and reports exactly once after terminal cleanup', async () => {
+  const faults: DiagnosticFault[] = [];
+  const recording = new CleanupFailureRenderer();
+  recording.connectionMode = true;
+  const materializerError = new Error('injected Connection materializer failure');
+  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => recording)),
+    host.install(interactionPlugin, {
+      connection: {
+        materializeEdge() {
+          throw materializerError;
+        },
+      },
+    }),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+
+  recording.emit(pointerInput('pointer.down', 0));
+  recording.emit(pointerInput('pointer.up', 10));
+  await nextTask();
+
+  expect(recording.projectionClearCount).toBe(1);
+  expect(recording.releasePointerCount).toBe(1);
+  expect(faults).toHaveLength(1);
+  expect(faults[0]?.event.name).toBe('nodebraid.plugin.interaction.connection-materializer.fault');
+  expect(faults[0]?.error).toBe(materializerError);
+  await host.dispose();
+});
+
+test('Connection dependency recovery creates a fresh idle Activation', async () => {
+  const first = new LifecycleRenderer();
+  const second = new LifecycleRenderer();
+  first.connectionMode = true;
+  second.connectionMode = true;
+  const host = createPluginHost();
+  const rendererInstallation = host.install(createRendererPlugin(() => first));
+  const interaction = host.install(interactionPlugin, {
+    connection: {
+      materializeEdge({ source, target }) {
+        return { id: 'connection' as never, type: 'flow', source, target, data: null };
+      },
+    },
+  });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    rendererInstallation,
+    interaction,
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  first.emit(pointerInput('pointer.down', 0));
+  expect(first.interactions.at(-1)?.type).toBe('connection-preview');
+
+  await rendererInstallation.dispose();
+  expect(interaction.getSnapshot().status).toBe('pending');
+  expect(first.interactions.at(-1)).toBeNull();
+  const replacement = host.install(createRendererPlugin(() => second));
+  await Promise.all([replacement.whenActive(), interaction.whenActive()]);
+  expect(second.interactions).toEqual([]);
+  second.emit(pointerInput('pointer.down', 0));
+  expect(second.interactions.at(-1)?.type).toBe('connection-preview');
+  await host.dispose();
+});
+
+test('Connection final Hit Test failure still clears Preview and releases Capture', async () => {
+  const faults: DiagnosticFault[] = [];
+  const recording = new CleanupFailureRenderer();
+  recording.connectionMode = true;
+  const hitError = new Error('injected final Connection Hit Test failure');
+  let materialized = 0;
+  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => recording)),
+    host.install(interactionPlugin, {
+      connection: {
+        materializeEdge({ source, target }) {
+          materialized += 1;
+          return { id: 'never' as never, type: 'flow', source, target, data: null };
+        },
+      },
+    }),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+
+  recording.emit(pointerInput('pointer.down', 0));
+  recording.hitTestError = hitError;
+  recording.emit(pointerInput('pointer.up', 10));
+
+  expect(recording.projectionClearCount).toBe(1);
+  expect(recording.releasePointerCount).toBe(1);
+  expect(materialized).toBe(0);
+  expect(faults).toHaveLength(1);
+  expect(faults[0]?.error).toBe(hitError);
+  recording.hitTestError = undefined;
+  await host.dispose();
+});
+
+test('Connection Escape attempts every terminal cleanup and never materializes after cleanup failure', async () => {
+  const faults: DiagnosticFault[] = [];
+  const recording = new CleanupFailureRenderer();
+  recording.connectionMode = true;
+  let materialized = 0;
+  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => recording)),
+    host.install(interactionPlugin, {
+      connection: {
+        materializeEdge({ source, target }) {
+          materialized += 1;
+          return { id: 'never' as never, type: 'flow', source, target, data: null };
+        },
+      },
+    }),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+
+  recording.emit(pointerInput('pointer.down', 0));
+  recording.failCleanup = true;
+  recording.emit(escapeInput());
+
+  expect(recording.cleanupCalls).toEqual(['clear-projection', 'release:7']);
+  expect(materialized).toBe(0);
+  expect(faults).toHaveLength(1);
+  const fault = faults[0];
+  if (!fault) throw new Error('Expected the Connection cleanup Fault.');
+  expect(fault.error).toBeInstanceOf(AggregateError);
+  expect((fault.error as AggregateError).errors).toEqual([
+    recording.clearProjectionError,
+    recording.releasePointerError,
+  ]);
+  recording.failCleanup = false;
+  await host.dispose();
+});
+
+test('Box Selection disposal continues after every public Renderer cleanup failure', async () => {
+  const recording = new CleanupFailureRenderer();
+  let commands: CommandService | undefined;
+  let renderer: RendererService | undefined;
+  const consumer = definePlugin({
+    requires: { commands: commandService, renderer: rendererService },
+    setup(context) {
+      commands = context.services.commands;
+      renderer = context.services.renderer;
+    },
+  });
+  const host = createPluginHost();
+  const interaction = host.install(interactionPlugin);
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => recording)),
+    interaction,
+    host.install(consumer),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (!commands || !renderer) throw new Error('Expected Interaction cleanup Runtime Services.');
+  const activeRenderer = renderer;
+
+  recording.emit(pointerInput('pointer.down', 0));
+  recording.emit(pointerInput('pointer.move', 10));
+  recording.failCleanup = true;
+
+  let cleanupFailure: unknown;
+  try {
+    await interaction.dispose();
+  } catch (error) {
+    cleanupFailure = error;
+  }
+  expect(cleanupFailure).toBeInstanceOf(AggregateError);
+  const activationFailure = (cleanupFailure as AggregateError).errors[0];
+  expect(activationFailure).toBeInstanceOf(AggregateError);
+  const interactionFailure = (activationFailure as AggregateError).errors[0];
+  expect(interactionFailure).toBeInstanceOf(AggregateError);
+  expect((interactionFailure as AggregateError).errors).toEqual([
+    recording.stopInputError,
+    recording.clearProjectionError,
+    recording.releasePointerError,
+  ]);
+  expect(recording.cleanupCalls).toEqual(['stop-input', 'clear-projection', 'release:7']);
+  await expect(commands.execute(moveNodesCommand, { moves: [] })).rejects.toMatchObject({
+    code: 'COMMAND_NOT_FOUND',
+  });
+  expect(() => activeRenderer.bindInteractionProjection()).toThrow(
+    expect.objectContaining({ code: 'INTERACTION_ALREADY_BOUND' }),
+  );
+
+  await host.dispose();
+});
+
+for (const terminal of ['escape', 'pointer-cancel'] as const) {
+  test(`Box Selection ${terminal} exposes every terminal cleanup failure`, async () => {
+    const faults: DiagnosticFault[] = [];
+    const recording = new CleanupFailureRenderer();
+    const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
+    const installations = [
+      host.install(kernelPlugin),
+      host.install(portPlugin),
+      host.install(commandPlugin),
+      host.install(sessionPlugin),
+      host.install(createRendererPlugin(() => recording)),
+      host.install(interactionPlugin),
+    ];
+    await Promise.all(installations.map((installation) => installation.whenActive()));
+
+    recording.emit(pointerInput('pointer.down', 0));
+    recording.emit(pointerInput('pointer.move', 10));
+    recording.failCleanup = true;
+    recording.emit(terminal === 'escape' ? escapeInput() : pointerInput('pointer.cancel', 10));
+
+    expect(recording.cleanupCalls).toEqual(['clear-projection', 'release:7']);
+    expect(faults).toHaveLength(1);
+    const failure = faults[0]?.error;
+    expect(failure).toBeInstanceOf(AggregateError);
+    expect((failure as AggregateError).errors).toEqual([recording.clearProjectionError, recording.releasePointerError]);
+    recording.failCleanup = false;
+    await host.dispose();
+  });
+}
+
+test('Interaction dependency recovery creates a fresh idle Activation', async () => {
+  const first = new LifecycleRenderer();
+  const second = new LifecycleRenderer();
+  let commands: CommandService | undefined;
+  let kernel: KernelService | undefined;
+  const consumer = definePlugin({
+    requires: { commands: commandService, kernel: kernelService },
+    setup(context) {
+      commands = context.services.commands;
+      kernel = context.services.kernel;
+    },
+  });
+  const host = createPluginHost();
+  const rendererInstallation = host.install(createRendererPlugin(() => first));
+  const interaction = host.install(interactionPlugin);
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    rendererInstallation,
+    interaction,
+    host.install(consumer),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (!commands || !kernel) throw new Error('Expected Interaction recovery Runtime Services.');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({
+      id: nodeId('recovered-interaction-node'),
+      type: 'task',
+      position: { x: 0, y: 0 },
+      data: null,
+    });
+  });
+
+  first.emit(spaceInput('key.down'));
+  first.emit(pointerInput('pointer.down', 0));
+  first.emit(pointerInput('pointer.move', 10));
+  expect(first.interactions.at(-1)?.type).toBe('viewport-pan');
+
+  await rendererInstallation.dispose();
+  expect(interaction.getSnapshot().status).toBe('pending');
+  expect(first.interactions.at(-1)).toBeNull();
+  expect(first.controls.at(-1)).toBe('release:7');
+
+  const replacement = host.install(createRendererPlugin(() => second));
+  await Promise.all([replacement.whenActive(), interaction.whenActive()]);
+  second.emit(pointerInput('pointer.down', 0));
+  second.emit(pointerInput('pointer.move', 10));
+  expect(second.interactions.at(-1)?.type).toBe('node-drag');
+  await expect(commands.execute(moveNodesCommand, { moves: [] })).rejects.toMatchObject({
+    domain: 'interaction',
+    code: 'INVALID_MOVE',
+  });
+
+  await host.dispose();
+});
+
+test('an input-driven Command rejection is reported exactly once while Interaction is active', async () => {
+  const faults: DiagnosticFault[] = [];
+  const runtime = await activateCommandFaultScenario(faults);
+
+  runtime.renderer.emit(pointerInput('pointer.down', 0));
+  runtime.renderer.emit(pointerInput('pointer.move', Number.NaN));
+  runtime.renderer.emit(pointerInput('pointer.up', Number.NaN));
+  await nextTask();
+
+  expect(faults).toHaveLength(1);
+  expect(faults[0]?.event.name).toBe('nodebraid.plugin.interaction.command.fault');
+  expect(faults[0]?.error).toMatchObject({ domain: 'interaction', code: 'INVALID_MOVE' });
+  await runtime.host.dispose();
+});
+
+test('a late Command rejection cannot report through an ended Interaction Activation', async () => {
+  const faults: DiagnosticFault[] = [];
+  const runtime = await activateCommandFaultScenario(faults);
+
+  runtime.renderer.emit(pointerInput('pointer.down', 0));
+  runtime.renderer.emit(pointerInput('pointer.move', Number.NaN));
+  runtime.renderer.emit(pointerInput('pointer.up', Number.NaN));
+  await runtime.interaction.dispose();
+  await nextTask();
+
+  expect(faults).toEqual([]);
+  await runtime.host.dispose();
+});
+
+test('a recovered Renderer reset receives the still-compatible Active Gesture again', async () => {
+  const faults: DiagnosticFault[] = [];
+  const renderer = new LifecycleRenderer();
+  let kernel: KernelService | undefined;
+  const consumer = definePlugin({
+    requires: { kernel: kernelService },
+    setup(context) {
+      kernel = context.services.kernel;
+    },
+  });
+  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => renderer)),
+    host.install(interactionPlugin),
+    host.install(consumer),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (!kernel) throw new Error('Expected recovered Gesture Kernel Service.');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({
+      id: nodeId('recovered-interaction-node'),
+      type: 'task',
+      position: { x: 0, y: 0 },
+      data: null,
+    });
+  });
+  renderer.emit(pointerInput('pointer.down', 0));
+  renderer.emit(pointerInput('pointer.move', 10));
+  const preview = renderer.interactions.at(-1);
+  if (!preview) throw new Error('Expected Active Gesture Preview before Renderer recovery.');
+  const syncError = new Error('injected active Gesture synchronization failure');
+  renderer.rejectNextCommitWith = syncError;
+
+  kernel.transact((transaction) => {
+    transaction.nodes.add({
+      id: nodeId('unrelated-during-drag'),
+      type: 'task',
+      position: { x: 100, y: 100 },
+      data: null,
+    });
+  });
+
+  expect(faults.map((fault) => fault.error)).toEqual([syncError]);
+  expect(renderer.interactions).toEqual([preview, preview]);
+  renderer.emit(pointerInput('pointer.up', 10));
+  await nextTask();
+  expect(kernel.read().query.getNode(nodeId('recovered-interaction-node'))?.position).toEqual({ x: 10, y: 10 });
+  await host.dispose();
+});
+
+async function activateCommandFaultScenario(faults: DiagnosticFault[]): Promise<{
+  readonly host: ReturnType<typeof createPluginHost>;
+  readonly interaction: ReturnType<ReturnType<typeof createPluginHost>['install']>;
+  readonly renderer: LifecycleRenderer;
+}> {
+  const renderer = new LifecycleRenderer();
+  let kernel: KernelService | undefined;
+  const consumer = definePlugin({
+    requires: { kernel: kernelService },
+    setup(context) {
+      kernel = context.services.kernel;
+    },
+  });
+  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault) } });
+  const interaction = host.install(interactionPlugin);
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => renderer)),
+    interaction,
+    host.install(consumer),
+  ];
+  await Promise.all(installations.map((installation) => installation.whenActive()));
+  if (!kernel) throw new Error('Expected Command fault Kernel Service.');
+  kernel.transact((transaction) => {
+    transaction.nodes.add({
+      id: nodeId('recovered-interaction-node'),
+      type: 'task',
+      position: { x: 0, y: 0 },
+      data: null,
+    });
+  });
+  return { host, interaction, renderer };
+}
+
+class CleanupFailureRenderer implements CanvasRenderer {
+  readonly stopInputError = new Error('injected Input unsubscribe failure');
+  readonly clearProjectionError = new Error('injected Projection clear failure');
+  readonly releasePointerError = new Error('injected Pointer release failure');
+  readonly cleanupCalls: string[] = [];
+  readonly #listeners = new Set<RendererInputListener>();
+  failCleanup = false;
+  connectionMode = false;
+  hitTestError: unknown;
+  projectionClearCount = 0;
+  releasePointerCount = 0;
+
+  updateDocument(_update: RendererDocumentUpdate): void {}
+  updateSession(_snapshot: SessionSnapshot): void {}
+  updateInteraction(projection: InteractionProjection | null): void {
+    if (projection !== null) return;
+    this.projectionClearCount += 1;
+    if (!this.failCleanup) return;
+    this.cleanupCalls.push('clear-projection');
+    throw this.clearProjectionError;
+  }
+  subscribeInput(listener: RendererInputListener): () => void {
+    this.#listeners.add(listener);
+    return () => {
+      if (this.failCleanup) {
+        this.cleanupCalls.push('stop-input');
+        throw this.stopInputError;
+      }
+      this.#listeners.delete(listener);
+    };
+  }
+  hitTest(point: ScreenPoint): HitResult {
+    if (point.x !== 0 && this.hitTestError !== undefined) throw this.hitTestError;
+    if (this.connectionMode) {
+      return {
+        type: 'connection-anchor',
+        nodeId: nodeId(point.x === 0 ? 'source' : 'target'),
+        role: point.x === 0 ? 'source' : 'target',
+        worldPoint: point,
+      };
+    }
+    return { type: 'canvas', worldPoint: { x: 0, y: 0 } };
+  }
+  capturePointer(_pointerId: number): void {}
+  releasePointer(pointerId: number): void {
+    this.releasePointerCount += 1;
+    if (!this.failCleanup) return;
+    this.cleanupCalls.push(`release:${pointerId}`);
+    throw this.releasePointerError;
+  }
+  focus(): void {}
+  dispose(): Promise<void> {
+    this.#listeners.clear();
+    return Promise.resolve();
+  }
+  emit(input: RendererInput) {
+    let disposition;
+    for (const listener of this.#listeners) disposition = listener(input) ?? disposition;
+    return disposition;
+  }
+}
+
+class LifecycleRenderer implements CanvasRenderer {
+  readonly controls: string[] = [];
+  readonly interactions: Array<InteractionProjection | null> = [];
+  readonly #listeners = new Set<RendererInputListener>();
+  rejectNextCommitWith: unknown;
+  connectionMode = false;
+
+  updateDocument(update: RendererDocumentUpdate): void {
+    if (update.type !== 'commit' || this.rejectNextCommitWith === undefined) return;
+    const error = this.rejectNextCommitWith;
+    this.rejectNextCommitWith = undefined;
+    throw error;
+  }
+  updateSession(_snapshot: SessionSnapshot): void {}
+  updateInteraction(projection: InteractionProjection | null): void {
+    this.interactions.push(projection);
+  }
+  subscribeInput(listener: RendererInputListener): () => void {
+    this.#listeners.add(listener);
+    return () => this.#listeners.delete(listener);
+  }
+  hitTest(point: ScreenPoint): HitResult {
+    if (this.connectionMode) {
+      return {
+        type: 'connection-anchor',
+        nodeId: nodeId(point.x === 0 ? 'source' : 'target'),
+        role: point.x === 0 ? 'source' : 'target',
+        worldPoint: point,
+      };
+    }
+    return { type: 'node', nodeId: nodeId('recovered-interaction-node'), worldPoint: { x: 0, y: 0 } };
+  }
+  capturePointer(pointerId: number): void {
+    this.controls.push(`capture:${pointerId}`);
+  }
+  releasePointer(pointerId: number): void {
+    this.controls.push(`release:${pointerId}`);
+  }
+  focus(): void {
+    this.controls.push('focus');
+  }
+  dispose(): Promise<void> {
+    this.#listeners.clear();
+    return Promise.resolve();
+  }
+  emit(input: RendererInput) {
+    let disposition;
+    for (const listener of this.#listeners) disposition = listener(input) ?? disposition;
+    return disposition;
+  }
+}
+
+function pointerInput(
+  type: 'pointer.down' | 'pointer.move' | 'pointer.up' | 'pointer.cancel',
+  coordinate: number,
+): RendererInput {
+  return {
+    type,
+    pointerId: 7,
+    pointerType: 'mouse',
+    screenPoint: { x: coordinate, y: coordinate },
+    worldPoint: { x: coordinate, y: coordinate },
+    button: type === 'pointer.move' ? null : 'primary',
+    pressedButtons: type === 'pointer.up' || type === 'pointer.cancel' ? [] : ['primary'],
+    modifiers: { alt: false, control: false, meta: false, shift: false },
+  };
+}
+
+function spaceInput(type: 'key.down' | 'key.up'): RendererInput {
+  return {
+    type,
+    key: ' ',
+    code: 'Space',
+    repeat: false,
+    modifiers: { alt: false, control: false, meta: false, shift: false },
+  };
+}
+
+function escapeInput(): RendererInput {
+  return {
+    type: 'key.down',
+    key: 'Escape',
+    code: 'Escape',
+    repeat: false,
+    modifiers: { alt: false, control: false, meta: false, shift: false },
+  };
+}
+
+function nextTask(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}

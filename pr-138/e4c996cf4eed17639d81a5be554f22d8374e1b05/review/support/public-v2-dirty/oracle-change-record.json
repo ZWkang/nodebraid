@@ -1,0 +1,13 @@
+{
+  "originalSourceSHA256": "1e759b79df9d0528d6c9ac636e3f03134173a2a57fa462b1d71ed4b62e4d1f2a",
+  "newSourceSHA256": "ecd4cdbaa0e247ee36ddd1af4f7d10561823397cd64f721c5db4b65e72409701",
+  "originalProgramsAndFailuresUnchanged": true,
+  "originalRootObservationRetained": true,
+  "ordinaryRootIdentityRequirementUnchanged": true,
+  "compoundRequirement": "exactly1Fault, nativeAggregateError2members,slot0 original by Object.is,slot1 actual inspection failure by Object.is",
+  "allOriginalLifecycleInputRequirementsRetained": true,
+  "additionalRendererDisposalAndSubscriptionAssertions": true,
+  "inputValuesUnchanged": true,
+  "oracleClarificationURL": "https://github.com/ZWkang/nodebraid/issues/136#issuecomment-6463977910",
+  "oldOracleNotRelabeledGreen": true
+}

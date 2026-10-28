@@ -1,0 +1,50 @@
+[
+  {
+    "label": "format",
+    "argv": [
+      "./node_modules/.bin/prettier",
+      "--write",
+      "packages/plugin-interaction/src/shortcut-runtime.ts",
+      "packages/plugin-interaction/tests/lifecycle.test.ts"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+    "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "workingPatchSHA256": "c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476",
+    "exitCode": 0,
+    "startedAt": "2026-10-28T08:24:17.766575+00:00",
+    "endedAt": "2026-10-28T08:24:18.720678+00:00"
+  },
+  {
+    "label": "typecheck",
+    "argv": [
+      "bun",
+      "run",
+      "--filter",
+      "@nodebraid/plugin-interaction",
+      "typecheck"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+    "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "workingPatchSHA256": "c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476",
+    "exitCode": 0,
+    "startedAt": "2026-10-28T08:24:18.721175+00:00",
+    "endedAt": "2026-10-28T08:24:21.375668+00:00"
+  },
+  {
+    "label": "related-bun",
+    "argv": [
+      "bun",
+      "test",
+      "packages/plugin-interaction/tests",
+      "packages/plugin-command/tests",
+      "packages/runtime-cordis/tests",
+      "packages/diagnostics/tests"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+    "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "workingPatchSHA256": "c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476",
+    "exitCode": 0,
+    "startedAt": "2026-10-28T08:24:21.376216+00:00",
+    "endedAt": "2026-10-28T08:24:22.044436+00:00"
+  }
+]

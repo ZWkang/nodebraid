@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "strict": true,
+    "noUnusedLocals": true,
+    "noImplicitAny": true,
+    "skipLibCheck": false,
+    "noEmit": false,
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/node_modules/@types"
+    ],
+    "outDir": "/Users/zhou/.codex/local-workflows/nodebraid/runs/0190bc60-7c9b-4f72-8cd2-28acb0ee31d1/public-v3-head-green/compiled",
+    "rootDir": "/Users/zhou/.codex/local-workflows/nodebraid/runs/0190bc60-7c9b-4f72-8cd2-28acb0ee31d1/public-v3-head-green",
+    "sourceMap": true
+  },
+  "files": [
+    "shortcut-rejection-compound-oracle-v3.ts"
+  ],
+  "include": []
+}

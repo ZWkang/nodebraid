@@ -1,0 +1,326 @@
+diff --git a/packages/plugin-interaction/src/shortcut-runtime.ts b/packages/plugin-interaction/src/shortcut-runtime.ts
+index 2cd24a3..7576cd3 100644
+--- a/packages/plugin-interaction/src/shortcut-runtime.ts
++++ b/packages/plugin-interaction/src/shortcut-runtime.ts
+@@ -119,24 +119,37 @@ export function createShortcutRuntime(options: {
+     entry.executions.add(running);
+     void options.commands.execute(entry.binding.command, undefined, { signal: controller.signal }).then(
+       () => finish(),
+-      (error) => {
+-        const expectedDisposalAbort =
+-          entry.disposePromise !== undefined && controller.signal.aborted && error === controller.signal.reason;
+-        if (!expectedDisposalAbort) {
+-          if (error instanceof CommandError && error.code === 'COMMAND_NOT_FOUND') {
+-            options.diagnostics.emit({
+-              name: interactionDiagnosticEvents.inputRejected,
+-              level: 'info',
+-              attributes: { inputType: 'key.down', reason: 'capability-unavailable' },
+-            });
+-          } else {
+-            options.diagnostics.reportFault(error, {
+-              name: interactionDiagnosticEvents.commandFault,
+-              attributes: { commandId: entry.binding.command.id },
+-            });
++      (error: unknown) => {
++        try {
++          const expectedDisposalAbort =
++            entry.disposePromise !== undefined && controller.signal.aborted && error === controller.signal.reason;
++          if (!expectedDisposalAbort) {
++            let unavailable = false;
++            let rejection = error;
++            try {
++              unavailable = error instanceof CommandError && error.code === 'COMMAND_NOT_FOUND';
++            } catch (inspectionFailure) {
++              rejection = new AggregateError(
++                [error, inspectionFailure],
++                'Shortcut Command rejection inspection failed.',
++              );
++            }
++            if (unavailable) {
++              options.diagnostics.emit({
++                name: interactionDiagnosticEvents.inputRejected,
++                level: 'info',
++                attributes: { inputType: 'key.down', reason: 'capability-unavailable' },
++              });
++            } else {
++              options.diagnostics.reportFault(rejection, {
++                name: interactionDiagnosticEvents.commandFault,
++                attributes: { commandId: entry.binding.command.id },
++              });
++            }
+           }
++        } finally {
++          finish();
+         }
+-        finish();
+       },
+     );
+ 
+diff --git a/packages/plugin-interaction/tests/lifecycle.test.ts b/packages/plugin-interaction/tests/lifecycle.test.ts
+index 378e76d..2684aac 100644
+--- a/packages/plugin-interaction/tests/lifecycle.test.ts
++++ b/packages/plugin-interaction/tests/lifecycle.test.ts
+@@ -2,7 +2,13 @@ import { expect, test } from 'bun:test';
+ 
+ import type { DiagnosticFault } from '@nodebraid/diagnostics';
+ import type { InteractionProjection } from '@nodebraid/interaction-api';
+-import { commandPlugin, commandService, defineCommand, type CommandService } from '@nodebraid/plugin-command';
++import {
++  CommandError,
++  commandPlugin,
++  commandService,
++  defineCommand,
++  type CommandService,
++} from '@nodebraid/plugin-command';
+ import { nodeId } from '@nodebraid/kernel';
+ import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
+ import { portPlugin } from '@nodebraid/plugin-port';
+@@ -25,8 +31,105 @@ import {
+   interactionPlugin,
+   interactionShortcutService,
+   moveNodesCommand,
++  type InteractionShortcutRegistration,
++  type InteractionShortcutService,
+ } from '../src';
+ 
++test('Shortcut rejection inspection retains failures and releases the Binding', async () => {
++  const renderer = new LifecycleRenderer();
++  const command = defineCommand<void, void>('test.shortcut.rejection-inspection');
++  const original = new Error('original Command rejection');
++  const inspectionFailure = new Error('Command rejection prototype read failed');
++  const rejection = new Proxy(original, {
++    getPrototypeOf() {
++      throw inspectionFailure;
++    },
++  });
++  const observed = Promise.withResolvers<DiagnosticFault>();
++  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => observed.resolve(fault) } });
++  let shortcuts!: InteractionShortcutService;
++  let registration!: InteractionShortcutRegistration;
++  const binding = {
++    shortcut: {
++      code: 'KeyP',
++      modifierAlternatives: [{ alt: false, control: false, meta: false, shift: false }],
++    },
++    command,
++  };
++  const installations = [
++    host.install(kernelPlugin),
++    host.install(portPlugin),
++    host.install(commandPlugin),
++    host.install(sessionPlugin),
++    host.install(createRendererPlugin(() => renderer)),
++    host.install(interactionPlugin),
++    host.install(
++      definePlugin({
++        requires: { commands: commandService, shortcuts: interactionShortcutService },
++        setup(context) {
++          const commandRegistration = context.services.commands.register(command, () => {
++            throw rejection;
++          });
++          context.own(() => commandRegistration.dispose());
++          shortcuts = context.services.shortcuts;
++          registration = shortcuts.register(binding);
++          context.own(() => registration.dispose());
++        },
++      }),
++    ),
++  ];
++  await Promise.all(installations.map((installation) => installation.whenActive()));
++  try {
++    expect(
++      renderer.emit({
++        type: 'key.down',
++        key: 'p',
++        code: 'KeyP',
++        repeat: false,
++        modifiers: { alt: false, control: false, meta: false, shift: false },
++      }),
++    ).toEqual({ defaultAction: 'prevent' });
++    const fault = await observed.promise;
++    expect(fault.event.name).toBe('nodebraid.plugin.interaction.command.fault');
++    expect(fault.event.attributes.commandId).toBe(command.id);
++    expect(fault.error).toBeInstanceOf(AggregateError);
++    const failures: unknown[] = (fault.error as AggregateError).errors;
++    expect(failures).toHaveLength(2);
++    expect(Object.is(failures[0], rejection)).toBe(true);
++    expect(Object.is(failures[1], inspectionFailure)).toBe(true);
++    const disposal = registration.dispose();
++    expect(registration.dispose()).toBe(disposal);
++    await disposal;
++    const replacement = shortcuts.register(binding);
++    expect(registration.dispose()).toBe(disposal);
++    await replacement.dispose();
++  } finally {
++    await host.dispose();
++  }
++  expect(installations.every((installation) => installation.getSnapshot().status === 'disposed')).toBe(true);
++});
++
++const shortcutInspectionFailures: readonly unknown[] = [
++  undefined,
++  null,
++  false,
++  0,
++  '',
++  Symbol('Shortcut inspection failure'),
++  new Error('Shortcut inspection failure'),
++];
++for (const site of ['prototype', 'code'] as const) {
++  for (const sinkEnabled of [false, true]) {
++    for (const disposeBeforeRejection of [false, true]) {
++      for (const [index, failure] of shortcutInspectionFailures.entries()) {
++        test(`Shortcut ${site} inspection preserves raw failure ${index}, Sink ${sinkEnabled}, dispose first ${disposeBeforeRejection}`, async () => {
++          await verifyShortcutInspectionFailure(site, failure, sinkEnabled, disposeBeforeRejection);
++        });
++      }
++    }
++  }
++}
++
+ test('Shortcut Binding preserves the Command accepted from a caller getter', async () => {
+   const renderer = new LifecycleRenderer();
+   const firstCommand = defineCommand<void, void>('test.shortcut.capture.first');
+@@ -750,6 +853,142 @@ async function activateCommandFaultScenario(faults: DiagnosticFault[]): Promise<
+   return { host, interaction, renderer };
+ }
+ 
++async function verifyShortcutInspectionFailure(
++  site: 'prototype' | 'code',
++  inspectionFailure: unknown,
++  sinkEnabled: boolean,
++  disposeBeforeRejection: boolean,
++): Promise<void> {
++  const renderer = new LifecycleRenderer();
++  const command = defineCommand<void, void>('test.shortcut.native-inspection');
++  const original =
++    site === 'code'
++      ? new CommandError('COMMAND_NOT_FOUND', 'Caller-owned CommandError')
++      : new Error('Caller-owned Command rejection');
++  let inspections = 0;
++  let nativeReceiverPreserved = true;
++  const handler: ProxyHandler<Error> = {
++    getPrototypeOf(target) {
++      if (site === 'prototype') {
++        inspections += 1;
++        nativeReceiverPreserved &&= this === handler && target === original;
++        throw inspectionFailure;
++      }
++      return Reflect.getPrototypeOf(target);
++    },
++    get(target, key, receiver) {
++      if (site === 'code' && key === 'code') {
++        inspections += 1;
++        nativeReceiverPreserved &&= this === handler && target === original && receiver === rejection;
++        throw inspectionFailure;
++      }
++      return Reflect.get(target, key, receiver);
++    },
++  };
++  const rejection = new Proxy(original, handler);
++  const entered = Promise.withResolvers<AbortSignal>();
++  const pending = Promise.withResolvers<void>();
++  const observed = Promise.withResolvers<DiagnosticFault>();
++  const faults: DiagnosticFault[] = [];
++  const host = createPluginHost({
++    diagnostics: {
++      ...(sinkEnabled ? { sink() {} } : {}),
++      faultReporter(fault) {
++        faults.push(fault);
++        observed.resolve(fault);
++      },
++    },
++  });
++  let shortcuts!: InteractionShortcutService;
++  let registration!: InteractionShortcutRegistration;
++  let handlerCalls = 0;
++  const binding = {
++    shortcut: {
++      code: 'KeyP',
++      modifierAlternatives: [{ alt: false, control: false, meta: false, shift: false }],
++    },
++    command,
++  };
++  const installations = [
++    host.install(kernelPlugin),
++    host.install(portPlugin),
++    host.install(commandPlugin),
++    host.install(sessionPlugin),
++    host.install(createRendererPlugin(() => renderer)),
++    host.install(interactionPlugin),
++    host.install(
++      definePlugin({
++        requires: { commands: commandService, shortcuts: interactionShortcutService },
++        setup(context) {
++          const commandRegistration = context.services.commands.register(command, (_input, execution) => {
++            handlerCalls += 1;
++            entered.resolve(execution.signal);
++            return pending.promise;
++          });
++          context.own(() => commandRegistration.dispose());
++          shortcuts = context.services.shortcuts;
++          registration = shortcuts.register(binding);
++          context.own(() => registration.dispose());
++        },
++      }),
++    ),
++  ];
++  await Promise.all(installations.map((installation) => installation.whenActive()));
++  try {
++    const input: RendererInput = {
++      type: 'key.down',
++      key: 'p',
++      code: 'KeyP',
++      repeat: false,
++      modifiers: { alt: false, control: false, meta: false, shift: false },
++    };
++    expect(renderer.emit(input)).toEqual({ defaultAction: 'prevent' });
++    const signal = await entered.promise;
++    let disposal: Promise<void> | undefined;
++    let disposed = false;
++    if (disposeBeforeRejection) {
++      disposal = registration.dispose();
++      void disposal.then(() => {
++        disposed = true;
++      });
++      expect(registration.dispose()).toBe(disposal);
++      expect(signal.aborted).toBe(true);
++      expect(disposed).toBe(false);
++      expect(() => shortcuts.register(binding)).toThrow(
++        expect.objectContaining({ code: 'SHORTCUT_ALREADY_REGISTERED' }),
++      );
++      expect(renderer.emit(input)).toEqual({ defaultAction: 'prevent' });
++      expect(handlerCalls).toBe(1);
++    }
++    pending.reject(rejection);
++    const fault = await observed.promise;
++    expect(fault.event.name).toBe('nodebraid.plugin.interaction.command.fault');
++    expect(fault.event.attributes.commandId).toBe(command.id);
++    expect(fault.event.scope.pluginName).toBe('@nodebraid/plugin-interaction');
++    expect(Object.isFrozen(fault) && Object.isFrozen(fault.event) && Object.isFrozen(fault.event.scope)).toBe(true);
++    expect(fault.error).toBeInstanceOf(AggregateError);
++    const failures: unknown[] = (fault.error as AggregateError).errors;
++    expect(failures).toHaveLength(2);
++    expect(Object.is(failures[0], rejection)).toBe(true);
++    expect(Object.is(failures[1], inspectionFailure)).toBe(true);
++    expect(inspections).toBeGreaterThan(0);
++    expect(nativeReceiverPreserved).toBe(true);
++    disposal ??= registration.dispose();
++    expect(registration.dispose()).toBe(disposal);
++    await disposal;
++    const replacement = shortcuts.register(binding);
++    expect(registration.dispose()).toBe(disposal);
++    expect(() => shortcuts.register(binding)).toThrow(expect.objectContaining({ code: 'SHORTCUT_ALREADY_REGISTERED' }));
++    await replacement.dispose();
++    await nextTask();
++    expect(handlerCalls).toBe(1);
++    expect(faults).toHaveLength(1);
++  } finally {
++    await host.dispose();
++  }
++  expect(installations.every((installation) => installation.getSnapshot().status === 'disposed')).toBe(true);
++}
++
+ class CleanupFailureRenderer implements CanvasRenderer {
+   readonly stopInputError = new Error('injected Input unsubscribe failure');
+   readonly clearProjectionError = new Error('injected Projection clear failure');

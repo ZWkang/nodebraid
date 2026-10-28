@@ -1,0 +1,823 @@
+
+packages/plugin-command/tests/index.test.ts:
+(pass) @nodebraid/plugin-command > rejects an empty Command ID with a stable structural error [1.88ms]
+(pass) @nodebraid/plugin-command > classifies a non-string JavaScript Command ID without copying it [1.37ms]
+(pass) @nodebraid/plugin-command > registers and executes one typed Command in an Activation [4.26ms]
+(pass) @nodebraid/plugin-command > preserves asynchronous Command results and handler errors [1.30ms]
+(pass) @nodebraid/plugin-command > enforces Command token identity and diagnostic ID uniqueness [1.08ms]
+(pass) @nodebraid/plugin-command > unregisters, aborts, and awaits in-flight Command executions [1.15ms]
+(pass) @nodebraid/plugin-command > keeps Registration disposal idempotent when abort handling reenters dispose [1.92ms]
+(pass) @nodebraid/plugin-command > closes residual registrations before disposing the Command Service Activation [3.83ms]
+(pass) @nodebraid/plugin-command > isolates caller cancellation to one Command execution [0.67ms]
+(pass) @nodebraid/plugin-command > preserves the original caller signal after execution options are reused [0.45ms]
+(pass) @nodebraid/plugin-command > detaches the original caller signal after reused-options execution settles [0.43ms]
+(pass) @nodebraid/plugin-command > does not start a Command when execution options dispose its Registration [0.69ms]
+(pass) @nodebraid/plugin-command > keeps existing executions owned while options dispose their Registration [1.13ms]
+(pass) @nodebraid/plugin-command > preserves structural errors before reading execution options [0.46ms]
+(pass) @nodebraid/plugin-command > preserves option failures and permits unrelated Registration disposal [0.60ms]
+(pass) @nodebraid/plugin-command > reinstalls an empty Command Service after Provider disposal [0.56ms]
+
+packages/plugin-command/tests/types.test.ts:
+(pass) keeps Command input and output types invariant
+
+packages/plugin-interaction/tests/input-cleanup.test.ts:
+(pass) a failed Selection transition releases Pointer Capture before reporting the Input fault [3.53ms]
+
+packages/plugin-interaction/tests/types.test.ts:
+(pass) publishes Interaction as a Runtime Plugin with a narrow Shortcut contribution Service [0.03ms]
+
+packages/plugin-interaction/tests/create-edge-input-values.test.ts:
+(pass) Create Edge cannot replace a validated forward Edge with a later self-loop [4.78ms]
+(pass) Create Edge retains first values, receivers and late opaque data from own properties [5.59ms]
+(pass) Create Edge retains first values, receivers and late opaque data from non-enumerable properties [1.39ms]
+(pass) Create Edge retains first values, receivers and late opaque data from inherited properties [1.71ms]
+(pass) Create Edge preserves the original edge read failure and exact committed state [1.48ms]
+(pass) Create Edge preserves the original edge.id read failure and exact committed state [1.06ms]
+(pass) Create Edge preserves the original edge.type read failure and exact committed state [1.09ms]
+(pass) Create Edge preserves the original edge.source read failure and exact committed state [1.26ms]
+(pass) Create Edge preserves the original edge.source.nodeId read failure and exact committed state [1.29ms]
+(pass) Create Edge preserves the original edge.source.portId read failure and exact committed state [2.35ms]
+(pass) Create Edge preserves the original edge.target read failure and exact committed state [1.08ms]
+(pass) Create Edge preserves the original edge.target.nodeId read failure and exact committed state [1.02ms]
+(pass) Create Edge preserves the original edge.target.portId read failure and exact committed state [0.93ms]
+(pass) Create Edge preserves the original edge.data.presence read failure and exact committed state [1.16ms]
+(pass) Create Edge preserves the original source read failure and exact committed state [0.92ms]
+(pass) Create Edge preserves the original source.nodeId read failure and exact committed state [0.82ms]
+(pass) Create Edge preserves the original source.portId read failure and exact committed state [0.83ms]
+(pass) Create Edge preserves the original source.role read failure and exact committed state [2.92ms]
+(pass) Create Edge preserves the original target read failure and exact committed state [1.35ms]
+(pass) Create Edge preserves the original target.nodeId read failure and exact committed state [0.88ms]
+(pass) Create Edge preserves the original target.portId read failure and exact committed state [0.85ms]
+(pass) Create Edge preserves the original target.role read failure and exact committed state [0.82ms]
+(pass) Create Edge preserves the original edge.data read failure and exact committed state [0.89ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [1.14ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [1.30ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [1.78ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.89ms]
+(pass) Create Edge observes abort before input getters [1.13ms]
+(pass) Create Edge self-loop preflight wins before the opaque-data getter [1.06ms]
+(pass) Create Edge mismatched-endpoint preflight wins before the opaque-data getter [0.80ms]
+(pass) Create Edge wrong-role preflight wins before the opaque-data getter [0.75ms]
+(pass) Create Edge missing-node preflight wins before the opaque-data getter [0.73ms]
+(pass) Create Edge missing-port preflight wins before the opaque-data getter [0.86ms]
+(pass) Create Edge duplicate-id preflight wins before the opaque-data getter [0.94ms]
+(pass) Create Edge finishes every shape check before semantic role checks [2.23ms]
+(pass) Create Edge preserves invalid-ID short circuit before Edge type reads [1.19ms]
+(pass) Create Edge validates data presence before reading Anchor roots [0.91ms]
+(pass) Create Edge retains Anchor empty-Port short circuit before the target root [0.83ms]
+(pass) Create Edge keeps an empty Endpoint Port distinct from an absent Anchor Port [0.81ms]
+(pass) Create Edge retains captured Port evidence across application Definition and data callbacks [2.16ms]
+
+packages/plugin-interaction/tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [2.07ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [1.49ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [4.09ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [5.50ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [2.80ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [1.85ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [1.95ms]
+(pass) Delete Selection rejects the first stale Snapshot when later evidence reads would return current state [1.07ms]
+(pass) Delete Selection retains the first Snapshot for explicit-edge preflight [0.93ms]
+(pass) Delete Selection retains the first Snapshot for incident-edge preflight [0.83ms]
+(pass) Delete Selection retains the first Snapshot for new-incident-edge preflight [0.73ms]
+(pass) Delete Selection accepts the first valid own evidence getter and preserves replay data [1.09ms]
+(pass) Delete Selection accepts the first valid inherited evidence getter and preserves replay data [0.88ms]
+(pass) Delete Selection accepts the first valid non-enumerable evidence getter and preserves replay data [1.19ms]
+(pass) Delete Selection rejects malformed first evidence before a later valid Snapshot can replace it [0.97ms]
+(pass) Delete Selection preserves the original evidence getter failure undefined [0.86ms]
+(pass) Delete Selection preserves the original evidence getter failure null [2.98ms]
+(pass) Delete Selection preserves the original evidence getter failure false [0.92ms]
+(pass) Delete Selection preserves the original evidence getter failure 0 [1.12ms]
+(pass) Delete Selection preserves the original evidence getter failure "" [0.92ms]
+(pass) Delete Selection preserves the original evidence getter failure Symbol(evidence failure) [0.73ms]
+(pass) Delete Selection preserves the original evidence getter failure 578 |   expect(runtime.kernel.read()).toBe(before);
+579 |   expect(runtime.history.getSnapshot()).toBe(historyBefore);
+580 |   await runtime.host.dispose();
+581 | });
+582 | 
+583 | test.each([undefined, null, false, 0, '', Symbol('evidence failure'), new Error('evidence failure')])(
+                                                                                ^
+error: evidence failure
+      at /Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:583:75
+ [0.72ms]
+(pass) Delete Selection preserves abort and malformed Selection short circuits before evidence reads [1.04ms]
+(pass) Delete Selection applies the first Selection when later root reads would choose another Node [1.26ms]
+(pass) Delete Selection captures root-own for node targets [1.64ms]
+(pass) Delete Selection captures root-inherited for node targets [1.35ms]
+(pass) Delete Selection captures root-non-enumerable for node targets [4.26ms]
+(pass) Delete Selection captures collection-root for node targets [1.06ms]
+(pass) Delete Selection captures inherited-collection for node targets [1.01ms]
+(pass) Delete Selection captures iterator for node targets [1.34ms]
+(pass) Delete Selection captures array-hooks for node targets [1.10ms]
+(pass) Delete Selection captures index-once for node targets [1.23ms]
+(pass) Delete Selection captures evidence-mutates-ids for node targets [1.10ms]
+(pass) Delete Selection keeps native fractional length 1.5 for node targets [1.16ms]
+(pass) Delete Selection keeps native fractional length "1.5" for node targets [0.87ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for node targets [1.85ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for node targets [1.26ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for node targets [0.95ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for node targets [1.01ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for node targets [0.79ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for node targets [0.87ms]
+(pass) Delete Selection preserves native length failure 1n for node [1.11ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for node [0.80ms]
+(pass) Delete Selection captures root-own for edge targets [1.12ms]
+(pass) Delete Selection captures root-inherited for edge targets [1.55ms]
+(pass) Delete Selection captures root-non-enumerable for edge targets [2.22ms]
+(pass) Delete Selection captures collection-root for edge targets [0.85ms]
+(pass) Delete Selection captures inherited-collection for edge targets [0.78ms]
+(pass) Delete Selection captures iterator for edge targets [0.76ms]
+(pass) Delete Selection captures array-hooks for edge targets [0.77ms]
+(pass) Delete Selection captures index-once for edge targets [1.12ms]
+(pass) Delete Selection captures evidence-mutates-ids for edge targets [1.21ms]
+(pass) Delete Selection keeps native fractional length 1.5 for edge targets [0.94ms]
+(pass) Delete Selection keeps native fractional length "1.5" for edge targets [1.00ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for edge targets [1.03ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for edge targets [2.16ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for edge targets [0.83ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for edge targets [0.88ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for edge targets [0.78ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for edge targets [0.92ms]
+(pass) Delete Selection preserves native length failure 1n for edge [0.92ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for edge [0.80ms]
+(pass) Delete Selection preserves original selection read failures [7.60ms]
+(pass) Delete Selection preserves original length read failures [7.19ms]
+(pass) Delete Selection preserves original index read failures [6.02ms]
+(pass) Delete Selection rejects sparse and invalid indexed IDs before evidence and preserves lazy first failure [6.43ms]
+(pass) Delete Selection admits node IDs before edge IDs and evidence and retains the first coercion [1.20ms]
+(pass) Delete Selection rejects stale first evidence Nodes when later collection reads return current roots [1.07ms]
+(pass) Delete Selection rejects first stale node evidence through root collection access [1.08ms]
+(pass) Delete Selection rejects first stale node evidence through index collection access [0.95ms]
+(pass) Delete Selection rejects first stale node evidence through map collection access [0.87ms]
+(pass) Delete Selection rejects first stale node evidence through hooks collection access [0.83ms]
+(pass) Delete Selection rejects first stale node evidence through later-field-mutation collection access [2.56ms]
+(pass) Delete Selection accepts first valid own node evidence and preserves Undo data [1.38ms]
+(pass) Delete Selection accepts first valid inherited node evidence and preserves Undo data [0.80ms]
+(pass) Delete Selection accepts first valid non-enumerable node evidence and preserves Undo data [0.77ms]
+(pass) Delete Selection uses valid first node entities independently of caller iterator [0.96ms]
+(pass) Delete Selection uses valid first node entities independently of caller methods [0.73ms]
+(pass) Delete Selection uses valid first node entities independently of caller index [0.77ms]
+(pass) Delete Selection uses valid first node entities independently of caller length [0.75ms]
+(pass) Delete Selection rejects first stale edge evidence through root collection access [0.79ms]
+(pass) Delete Selection rejects first stale edge evidence through index collection access [0.92ms]
+(pass) Delete Selection rejects first stale edge evidence through map collection access [2.13ms]
+(pass) Delete Selection rejects first stale edge evidence through hooks collection access [0.75ms]
+(pass) Delete Selection rejects first stale edge evidence through later-field-mutation collection access [0.75ms]
+(pass) Delete Selection accepts first valid own edge evidence and preserves Undo data [0.84ms]
+(pass) Delete Selection accepts first valid inherited edge evidence and preserves Undo data [0.81ms]
+(pass) Delete Selection accepts first valid non-enumerable edge evidence and preserves Undo data [0.75ms]
+(pass) Delete Selection uses valid first edge entities independently of caller iterator [0.96ms]
+(pass) Delete Selection uses valid first edge entities independently of caller methods [1.25ms]
+(pass) Delete Selection uses valid first edge entities independently of caller index [1.11ms]
+(pass) Delete Selection uses valid first edge entities independently of caller length [0.82ms]
+(pass) Delete Selection validates the first malformed evidence revision before later valid values [1.75ms]
+(pass) Delete Selection validates the first malformed evidence nodes before later valid values [0.69ms]
+(pass) Delete Selection validates the first malformed evidence edges before later valid values [0.66ms]
+(pass) Delete Selection preserves original revision evidence failure undefined [1.18ms]
+(pass) Delete Selection preserves original revision evidence failure null [0.83ms]
+(pass) Delete Selection preserves original revision evidence failure false [0.77ms]
+(pass) Delete Selection preserves original revision evidence failure 0 [0.73ms]
+(pass) Delete Selection preserves original revision evidence failure "" [0.83ms]
+(pass) Delete Selection preserves original revision evidence failure Symbol(evidence read) [0.70ms]
+(pass) Delete Selection preserves original revision evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.71ms]
+(pass) Delete Selection preserves original nodes evidence failure undefined [1.59ms]
+(pass) Delete Selection preserves original nodes evidence failure null [0.86ms]
+(pass) Delete Selection preserves original nodes evidence failure false [0.91ms]
+(pass) Delete Selection preserves original nodes evidence failure 0 [0.84ms]
+(pass) Delete Selection preserves original nodes evidence failure "" [0.94ms]
+(pass) Delete Selection preserves original nodes evidence failure Symbol(evidence read) [0.86ms]
+(pass) Delete Selection preserves original nodes evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.69ms]
+(pass) Delete Selection preserves original edges evidence failure undefined [0.66ms]
+(pass) Delete Selection preserves original edges evidence failure null [0.68ms]
+(pass) Delete Selection preserves original edges evidence failure false [0.74ms]
+(pass) Delete Selection preserves original edges evidence failure 0 [1.60ms]
+(pass) Delete Selection preserves original edges evidence failure "" [0.89ms]
+(pass) Delete Selection preserves original edges evidence failure Symbol(evidence read) [0.73ms]
+(pass) Delete Selection preserves original edges evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.70ms]
+(pass) Delete Selection preserves original length evidence failure undefined [0.79ms]
+(pass) Delete Selection preserves original length evidence failure null [0.72ms]
+(pass) Delete Selection preserves original length evidence failure false [0.84ms]
+(pass) Delete Selection preserves original length evidence failure 0 [0.72ms]
+(pass) Delete Selection preserves original length evidence failure "" [0.69ms]
+(pass) Delete Selection preserves original length evidence failure Symbol(evidence read) [0.76ms]
+(pass) Delete Selection preserves original length evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [2.28ms]
+(pass) Delete Selection preserves original index evidence failure undefined [1.14ms]
+(pass) Delete Selection preserves original index evidence failure null [0.82ms]
+(pass) Delete Selection preserves original index evidence failure false [1.07ms]
+(pass) Delete Selection preserves original index evidence failure 0 [0.78ms]
+(pass) Delete Selection preserves original index evidence failure "" [0.69ms]
+(pass) Delete Selection preserves original index evidence failure Symbol(evidence read) [0.66ms]
+(pass) Delete Selection preserves original index evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [0.99ms]
+(pass) Delete Selection rejects sparse, hidden-invalid and lazily invalid evidence entities [1.31ms]
+(pass) Delete Selection captures evidence revision before Nodes before Edges and rejects malformed empty Selection evidence [1.28ms]
+(pass) Delete Selection preserves native evidence nodes length normalization and failures [1.15ms]
+(pass) Delete Selection preserves native evidence edges length normalization and failures [2.01ms]
+
+packages/plugin-interaction/tests/shortcut-values.test.ts:
+(pass) Shortcut definition retains the nonempty code accepted from a getter [0.11ms]
+(pass) Shortcut definition retains the nonempty alternatives accepted from a getter [0.04ms]
+(pass) Shortcut definition retains the modifier value accepted from a getter [0.03ms]
+(pass) Shortcut retains first enumerable alt value false [0.05ms]
+(pass) Shortcut retains first enumerable alt value true
+(pass) Shortcut retains first inherited alt value false
+(pass) Shortcut retains first inherited alt value true
+(pass) Shortcut retains first non-enumerable alt value false
+(pass) Shortcut retains first non-enumerable alt value true
+(pass) Shortcut retains first enumerable control value false
+(pass) Shortcut retains first enumerable control value true
+(pass) Shortcut retains first inherited control value false
+(pass) Shortcut retains first inherited control value true
+(pass) Shortcut retains first non-enumerable control value false
+(pass) Shortcut retains first non-enumerable control value true
+(pass) Shortcut retains first enumerable meta value false
+(pass) Shortcut retains first enumerable meta value true
+(pass) Shortcut retains first inherited meta value false
+(pass) Shortcut retains first inherited meta value true
+(pass) Shortcut retains first non-enumerable meta value false
+(pass) Shortcut retains first non-enumerable meta value true
+(pass) Shortcut retains first enumerable shift value false
+(pass) Shortcut retains first enumerable shift value true
+(pass) Shortcut retains first inherited shift value false
+(pass) Shortcut retains first inherited shift value true [0.01ms]
+(pass) Shortcut retains first non-enumerable shift value false
+(pass) Shortcut retains first non-enumerable shift value true
+(pass) Shortcut preserves the original code getter failure undefined [0.05ms]
+(pass) Shortcut preserves the original code getter failure null
+(pass) Shortcut preserves the original code getter failure false
+(pass) Shortcut preserves the original code getter failure 0
+(pass) Shortcut preserves the original code getter failure ""
+(pass) Shortcut preserves the original code getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original modifierAlternatives getter failure undefined
+(pass) Shortcut preserves the original modifierAlternatives getter failure null
+(pass) Shortcut preserves the original modifierAlternatives getter failure false
+(pass) Shortcut preserves the original modifierAlternatives getter failure 0
+(pass) Shortcut preserves the original modifierAlternatives getter failure ""
+(pass) Shortcut preserves the original modifierAlternatives getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original alt getter failure undefined [0.02ms]
+(pass) Shortcut preserves the original alt getter failure null [0.02ms]
+(pass) Shortcut preserves the original alt getter failure false
+(pass) Shortcut preserves the original alt getter failure 0
+(pass) Shortcut preserves the original alt getter failure ""
+(pass) Shortcut preserves the original alt getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original control getter failure undefined
+(pass) Shortcut preserves the original control getter failure null
+(pass) Shortcut preserves the original control getter failure false
+(pass) Shortcut preserves the original control getter failure 0
+(pass) Shortcut preserves the original control getter failure ""
+(pass) Shortcut preserves the original control getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original meta getter failure undefined
+(pass) Shortcut preserves the original meta getter failure null
+(pass) Shortcut preserves the original meta getter failure false
+(pass) Shortcut preserves the original meta getter failure 0
+(pass) Shortcut preserves the original meta getter failure ""
+(pass) Shortcut preserves the original meta getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original shift getter failure undefined
+(pass) Shortcut preserves the original shift getter failure null
+(pass) Shortcut preserves the original shift getter failure false
+(pass) Shortcut preserves the original shift getter failure 0
+(pass) Shortcut preserves the original shift getter failure ""
+(pass) Shortcut preserves the original shift getter failure Symbol(Shortcut getter)
+(pass) Shortcut rejects the first empty code before reading alternatives [0.03ms]
+(pass) Shortcut rejects the first empty alternatives instead of accepting a later collection [0.02ms]
+(pass) Shortcut rejects the first invalid alt without reading later fields [0.05ms]
+(pass) Shortcut rejects the first invalid control without reading later fields
+(pass) Shortcut rejects the first invalid meta without reading later fields
+(pass) Shortcut rejects the first invalid shift without reading later fields
+(pass) Shortcut owns its alternatives and modifier shells after caller mutation [0.02ms]
+
+packages/plugin-interaction/tests/create-edge-command.test.ts:
+(pass) Create Edge commits one complete Node-level Edge [1.67ms]
+
+packages/plugin-interaction/tests/selection-transition.test.ts:
+(pass) a Port click selects its owning Node without inventing a Port selection [0.07ms]
+
+packages/plugin-interaction/tests/config.test.ts:
+(pass) Interaction accepts an explicit synchronous Connection materializer [1.17ms]
+(pass) Interaction rejects unknown config fields through Plugin installation [1.61ms]
+(pass) Interaction rejects malformed numeric config without coercion [2.12ms]
+(pass) Interaction revalidates the materializer on recovery and preserves its read failure [1.16ms]
+
+packages/plugin-interaction/tests/move-input-values.test.ts:
+(pass) Move Nodes cannot substitute a stale target through repeated caller array traversal [1.63ms]
+(pass) Move Nodes retains valid first values from own fields and receivers [1.23ms]
+(pass) Move Nodes retains valid first values from non-enumerable fields and receivers [1.08ms]
+(pass) Move Nodes retains valid first values from inherited fields and receivers [2.12ms]
+(pass) Move Nodes preserves the original moves read failure before committing [1.42ms]
+(pass) Move Nodes preserves the original length read failure before committing [0.83ms]
+(pass) Move Nodes preserves the original entry read failure before committing [0.89ms]
+(pass) Move Nodes preserves the original nodeId read failure before committing [1.08ms]
+(pass) Move Nodes preserves the original basePosition read failure before committing [1.28ms]
+(pass) Move Nodes preserves the original base.x read failure before committing [0.89ms]
+(pass) Move Nodes preserves the original base.y read failure before committing [0.83ms]
+(pass) Move Nodes preserves the original position read failure before committing [1.19ms]
+(pass) Move Nodes preserves the original position.x read failure before committing [1.23ms]
+(pass) Move Nodes preserves the original position.y read failure before committing [4.00ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [1.56ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [0.95ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [1.35ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [2.09ms]
+(pass) Move Nodes observes abort before any input read [1.76ms]
+(pass) Move Nodes retains the first nonfinite basePosition.x, rather than a later finite value [1.04ms]
+(pass) Move Nodes retains the first nonfinite basePosition.y, rather than a later finite value [0.75ms]
+(pass) Move Nodes retains the first nonfinite position.x, rather than a later finite value [0.77ms]
+(pass) Move Nodes retains the first nonfinite position.y, rather than a later finite value [0.94ms]
+(pass) Move Nodes keeps whole-input shape failures before duplicate validation [1.13ms]
+(pass) Move Nodes keeps whole-input shape failures before nonfinite validation [2.56ms]
+(pass) Move Nodes rejects a sparse indexed entry even if caller hooks hide it [1.31ms]
+(pass) Move Nodes does not call caller traversal, map, constructor or species hooks [1.13ms]
+(pass) Move Nodes retains native array-like positive length normalization %s [0.90ms]
+(pass) Move Nodes retains native array-like positive length normalization 1.5 [0.88ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [1.13ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.82ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.74ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.75ms]
+(pass) Move Nodes rejects a native-normalized empty input length 0 [1.01ms]
+(pass) Move Nodes exposes native length coercion failure %s before entries [2.04ms]
+(pass) Move Nodes exposes native length coercion failure %s before entries [0.92ms]
+(pass) Move Nodes reads the length conversion once and cannot hide the original first entry failure behind allocation [1.01ms]
+(pass) Move Nodes retains owned earlier Point values, Node fields and one atomic History entry [1.13ms]
+
+packages/plugin-interaction/tests/lifecycle.test.ts:
+(pass) Shortcut rejection inspection retains failures and releases the Binding [1.74ms]
+(pass) Shortcut prototype inspection preserves raw failure 0, Sink false, dispose first false [2.35ms]
+(pass) Shortcut prototype inspection preserves raw failure 1, Sink false, dispose first false [2.04ms]
+(pass) Shortcut prototype inspection preserves raw failure 2, Sink false, dispose first false [2.06ms]
+(pass) Shortcut prototype inspection preserves raw failure 3, Sink false, dispose first false [1.98ms]
+(pass) Shortcut prototype inspection preserves raw failure 4, Sink false, dispose first false [1.95ms]
+(pass) Shortcut prototype inspection preserves raw failure 5, Sink false, dispose first false [2.23ms]
+(pass) Shortcut prototype inspection preserves raw failure 6, Sink false, dispose first false [2.28ms]
+(pass) Shortcut prototype inspection preserves raw failure 0, Sink false, dispose first true [3.19ms]
+(pass) Shortcut prototype inspection preserves raw failure 1, Sink false, dispose first true [1.89ms]
+(pass) Shortcut prototype inspection preserves raw failure 2, Sink false, dispose first true [2.02ms]
+(pass) Shortcut prototype inspection preserves raw failure 3, Sink false, dispose first true [2.09ms]
+(pass) Shortcut prototype inspection preserves raw failure 4, Sink false, dispose first true [2.05ms]
+(pass) Shortcut prototype inspection preserves raw failure 5, Sink false, dispose first true [1.92ms]
+(pass) Shortcut prototype inspection preserves raw failure 6, Sink false, dispose first true [2.08ms]
+(pass) Shortcut prototype inspection preserves raw failure 0, Sink true, dispose first false [2.21ms]
+(pass) Shortcut prototype inspection preserves raw failure 1, Sink true, dispose first false [1.98ms]
+(pass) Shortcut prototype inspection preserves raw failure 2, Sink true, dispose first false [1.90ms]
+(pass) Shortcut prototype inspection preserves raw failure 3, Sink true, dispose first false [2.03ms]
+(pass) Shortcut prototype inspection preserves raw failure 4, Sink true, dispose first false [2.16ms]
+(pass) Shortcut prototype inspection preserves raw failure 5, Sink true, dispose first false [3.17ms]
+(pass) Shortcut prototype inspection preserves raw failure 6, Sink true, dispose first false [2.14ms]
+(pass) Shortcut prototype inspection preserves raw failure 0, Sink true, dispose first true [2.15ms]
+(pass) Shortcut prototype inspection preserves raw failure 1, Sink true, dispose first true [2.17ms]
+(pass) Shortcut prototype inspection preserves raw failure 2, Sink true, dispose first true [1.93ms]
+(pass) Shortcut prototype inspection preserves raw failure 3, Sink true, dispose first true [2.02ms]
+(pass) Shortcut prototype inspection preserves raw failure 4, Sink true, dispose first true [2.18ms]
+(pass) Shortcut prototype inspection preserves raw failure 5, Sink true, dispose first true [2.04ms]
+(pass) Shortcut prototype inspection preserves raw failure 6, Sink true, dispose first true [2.00ms]
+(pass) Shortcut code inspection preserves raw failure 0, Sink false, dispose first false [1.99ms]
+(pass) Shortcut code inspection preserves raw failure 1, Sink false, dispose first false [1.96ms]
+(pass) Shortcut code inspection preserves raw failure 2, Sink false, dispose first false [2.09ms]
+(pass) Shortcut code inspection preserves raw failure 3, Sink false, dispose first false [2.92ms]
+(pass) Shortcut code inspection preserves raw failure 4, Sink false, dispose first false [1.91ms]
+(pass) Shortcut code inspection preserves raw failure 5, Sink false, dispose first false [1.90ms]
+(pass) Shortcut code inspection preserves raw failure 6, Sink false, dispose first false [1.93ms]
+(pass) Shortcut code inspection preserves raw failure 0, Sink false, dispose first true [1.77ms]
+(pass) Shortcut code inspection preserves raw failure 1, Sink false, dispose first true [1.80ms]
+(pass) Shortcut code inspection preserves raw failure 2, Sink false, dispose first true [1.86ms]
+(pass) Shortcut code inspection preserves raw failure 3, Sink false, dispose first true [1.91ms]
+(pass) Shortcut code inspection preserves raw failure 4, Sink false, dispose first true [1.88ms]
+(pass) Shortcut code inspection preserves raw failure 5, Sink false, dispose first true [1.88ms]
+(pass) Shortcut code inspection preserves raw failure 6, Sink false, dispose first true [2.16ms]
+(pass) Shortcut code inspection preserves raw failure 0, Sink true, dispose first false [2.58ms]
+(pass) Shortcut code inspection preserves raw failure 1, Sink true, dispose first false [4.82ms]
+(pass) Shortcut code inspection preserves raw failure 2, Sink true, dispose first false [2.05ms]
+(pass) Shortcut code inspection preserves raw failure 3, Sink true, dispose first false [1.95ms]
+(pass) Shortcut code inspection preserves raw failure 4, Sink true, dispose first false [1.80ms]
+(pass) Shortcut code inspection preserves raw failure 5, Sink true, dispose first false [1.81ms]
+(pass) Shortcut code inspection preserves raw failure 6, Sink true, dispose first false [2.17ms]
+(pass) Shortcut code inspection preserves raw failure 0, Sink true, dispose first true [2.14ms]
+(pass) Shortcut code inspection preserves raw failure 1, Sink true, dispose first true [1.83ms]
+(pass) Shortcut code inspection preserves raw failure 2, Sink true, dispose first true [1.94ms]
+(pass) Shortcut code inspection preserves raw failure 3, Sink true, dispose first true [2.03ms]
+(pass) Shortcut code inspection preserves raw failure 4, Sink true, dispose first true [2.79ms]
+(pass) Shortcut code inspection preserves raw failure 5, Sink true, dispose first true [3.12ms]
+(pass) Shortcut code inspection preserves raw failure 6, Sink true, dispose first true [2.40ms]
+(pass) Shortcut Binding preserves the Command accepted from a caller getter [1.44ms]
+(pass) captured modifier values retain distinct Shortcut matching and reservations [1.20ms]
+(pass) Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh [1.50ms]
+(pass) Delete Selection registration follows dependency reactivation and disposal lifecycle [1.31ms]
+(pass) Connection materializer failure keeps identity and reports exactly once after terminal cleanup [2.26ms]
+(pass) Connection dependency recovery creates a fresh idle Activation [1.10ms]
+(pass) Connection final Hit Test failure still clears Preview and releases Capture [0.65ms]
+(pass) Connection Escape attempts every terminal cleanup and never materializes after cleanup failure [0.71ms]
+(pass) Box Selection disposal continues after every public Renderer cleanup failure [1.01ms]
+(pass) Box Selection escape exposes every terminal cleanup failure [0.68ms]
+(pass) Box Selection pointer-cancel exposes every terminal cleanup failure [1.78ms]
+(pass) Interaction dependency recovery creates a fresh idle Activation [1.35ms]
+(pass) an input-driven Command rejection is reported exactly once while Interaction is active [1.91ms]
+(pass) a late Command rejection cannot report through an ended Interaction Activation [2.06ms]
+(pass) a recovered Renderer reset receives the still-compatible Active Gesture again [2.11ms]
+
+packages/plugin-interaction/tests/move-nodes-command.test.ts:
+(pass) Move Nodes rejects an empty input without changing Document [1.15ms]
+
+packages/plugin-interaction/tests/diagnostic-events.test.ts:
+(pass) publishes the stable Interaction diagnostic event catalog [0.01ms]
+
+packages/plugin-interaction/tests/port-connection.test.ts:
+(pass) Port Gesture tracks target loss, materializes exact Endpoints once, and cancels on source loss [2.82ms]
+(pass) Connection Gesture uses the materializer accepted before its getter changes [2.07ms]
+
+packages/plugin-interaction/tests/delete-selection-input.test.ts:
+(pass) a live Interaction Shortcut Binding executes its Command and prevents the matched input default [3.62ms]
+(pass) logical Delete key removes the current Selection through the public Renderer Input seam [2.41ms]
+(pass) physical Delete accepts modifiers and repeat while empty Selection and Backspace remain no-ops [3.31ms]
+(pass) Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connection without cancelling them [9.55ms]
+(pass) Delete Transaction failure preserves state and reports the original diagnostic identity exactly once [2.37ms]
+
+packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:
+(pass) terminal cleanup diagnostics do not invoke a supplied map hook [0.88ms]
+(pass) terminal cleanup diagnostics do not invoke a supplied forEach hook [0.31ms]
+(pass) terminal cleanup diagnostics do not invoke a supplied constructor hook [0.16ms]
+(pass) terminal cleanup diagnostics do not invoke a supplied %s hook [0.13ms]
+(pass) cleanup diagnostics preserve sparse inherited members, native Proxy length and the raw failure [0.31ms]
+(pass) terminal cleanup preserves a circular AggregateError without passing it through Cordis traversal [0.21ms]
+(pass) terminal cleanup preserves failures when aborted setup will resolve [0.27ms]
+(pass) terminal cleanup preserves failures when aborted setup will reject [0.15ms]
+
+packages/runtime-cordis/tests/index.test.ts:
+(pass) @nodebraid/runtime-cordis > keeps Service Token identity separate from its diagnostic name [0.02ms]
+(pass) @nodebraid/runtime-cordis > keeps Plugin Service Bindings fixed after definition [0.06ms]
+(pass) @nodebraid/runtime-cordis > keeps a Consumer pending until every Required Service is active [0.25ms]
+(pass) @nodebraid/runtime-cordis > activates a Consumer-first installation with its declared Service Binding [0.40ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that omits a declared Service without publishing partial results [0.31ms]
+(pass) @nodebraid/runtime-cordis > publishes every Provided Service together after setup completes [0.34ms]
+(pass) @nodebraid/runtime-cordis > publishes every Provided Service before any one Service can activate a Consumer [0.65ms]
+(pass) @nodebraid/runtime-cordis > materializes each Provided Service getter exactly once before publication [0.28ms]
+(pass) @nodebraid/runtime-cordis > preserves a Provided Service getter error as the Activation failure [0.21ms]
+(pass) @nodebraid/runtime-cordis > rejects non-record Provided Service results with a stable contract error [0.53ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that returns an undeclared Service Binding [0.17ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that returns null for a Provided Service [0.19ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that returns undefined for a Provided Service [0.14ms]
+(pass) @nodebraid/runtime-cordis > fails duplicate bindings after "primary" before publishing a Service [0.26ms]
+(pass) @nodebraid/runtime-cordis > fails duplicate bindings after "" before publishing a Service [0.20ms]
+(pass) @nodebraid/runtime-cordis > allows an empty Binding when its Provided Service Token is unique [1.86ms]
+(pass) @nodebraid/runtime-cordis > reserves a Provided Service Token from installation until disposal [0.57ms]
+(pass) @nodebraid/runtime-cordis > retains a failed Provider reservation until disposal [0.34ms]
+(pass) @nodebraid/runtime-cordis > does not retain any reservation from a rejected multi-Service Provider [0.28ms]
+(pass) @nodebraid/runtime-cordis > activates a Provider-first Consumer with no missing Service Tokens [0.26ms]
+(pass) @nodebraid/runtime-cordis > deactivates a Consumer before cleaning up a disappearing Provider [0.28ms]
+(pass) @nodebraid/runtime-cordis > reports a dependency-driven Consumer as pending while its cleanup is still running [0.36ms]
+(pass) @nodebraid/runtime-cordis > deactivates indirect Consumers in reverse dependency order [0.37ms]
+(pass) @nodebraid/runtime-cordis > awaits Provided Service withdrawal sequentially in reverse registration order [0.56ms]
+(pass) @nodebraid/runtime-cordis > reactivates a pending Consumer with fresh Activation state and fixed configuration [0.42ms]
+(pass) @nodebraid/runtime-cordis > cancels only one pending whenActive waiter [0.27ms]
+(pass) @nodebraid/runtime-cordis > settles whenActive immediately for active and rejects it for disposed [0.14ms]
+(pass) @nodebraid/runtime-cordis > aborts an in-progress Consumer setup and waits for it when its Required Service disappears [0.30ms]
+(pass) @nodebraid/runtime-cordis > keeps a business setup error terminal when dependency cancellation races with it [0.47ms]
+(pass) @nodebraid/runtime-cordis > fails an aborting Consumer when dependency cleanup fails without duplicating the error [0.35ms]
+(pass) @nodebraid/runtime-cordis > propagates an active Consumer cleanup failure to its disappearing Provider once [0.29ms]
+(pass) @nodebraid/runtime-cordis > keeps a failed Consumer terminal across unrelated Service availability changes [0.38ms]
+(pass) @nodebraid/runtime-cordis > allows independent Plugin Installations to activate concurrently [0.23ms]
+(pass) @nodebraid/runtime-cordis > serializes setup and cleanup within one Plugin Installation [0.17ms]
+(pass) @nodebraid/runtime-cordis > rejects a dependency cycle with the complete Plugin and Service path [0.41ms]
+(pass) @nodebraid/runtime-cordis > rejects a Plugin definition that requires and provides the same Service Token [0.06ms]
+(pass) @nodebraid/runtime-cordis > rejects forged Plugin and Service Token values as invalid definitions [0.10ms]
+(pass) @nodebraid/runtime-cordis > rejects malformed Plugin definitions before creating Plugin metadata [0.04ms]
+(pass) @nodebraid/runtime-cordis > accepts only plain enumerable string-key Service Binding records [0.08ms]
+(pass) @nodebraid/runtime-cordis > captures every Plugin definition field exactly once before validation [0.30ms]
+(pass) @nodebraid/runtime-cordis > infers configuration, Service Bindings, and Provided Service results [0.02ms]
+(pass) @nodebraid/runtime-cordis > keeps Service Token values and Plugin configurations invariant [0.01ms]
+(pass) @nodebraid/runtime-cordis > returns a pending installation before activating a plugin [0.11ms]
+(pass) @nodebraid/runtime-cordis > preserves one setup failure without affecting another installation [0.21ms]
+(pass) @nodebraid/runtime-cordis > publishes each snapshot change to removable subscribers [0.14ms]
+(pass) @nodebraid/runtime-cordis > reports subscriber errors without interrupting lifecycle observers [0.51ms]
+(pass) @nodebraid/runtime-cordis > schedules subscriber errors when platform reportError is unavailable [4.97ms]
+(pass) @nodebraid/runtime-cordis > keeps subscriber reporting failures outside the Plugin lifecycle [0.43ms]
+(pass) @nodebraid/runtime-cordis > disposes owned resources in reverse registration order [0.16ms]
+(pass) @nodebraid/runtime-cordis > owns a typed Child Installation at its resource registration position [0.24ms]
+(pass) @nodebraid/runtime-cordis > rejects a detached Child installation through an ended parent Activation [0.14ms]
+(pass) @nodebraid/runtime-cordis > keeps an unawaited Child failure isolated from its parent Activation [0.25ms]
+(pass) @nodebraid/runtime-cordis > rolls back a Composition tree when an awaited Child fails [0.33ms]
+(pass) @nodebraid/runtime-cordis > validates Child Installations in the same Service reservation graph [0.36ms]
+(pass) @nodebraid/runtime-cordis > releases and recreates a Canvas-shaped Child tree with dependency-safe LIFO cleanup [0.97ms]
+(pass) @nodebraid/runtime-cordis > returns one idempotent installation disposal promise [0.15ms]
+(pass) @nodebraid/runtime-cordis > keeps installation disposal idempotent during abort reentry with successful cleanup [0.27ms]
+(pass) @nodebraid/runtime-cordis > keeps installation disposal idempotent during abort reentry with failed cleanup [0.18ms]
+(pass) @nodebraid/runtime-cordis > keeps host disposal idempotent during abort reentry with successful cleanup [0.13ms]
+(pass) @nodebraid/runtime-cordis > keeps host disposal idempotent during abort reentry with failed cleanup [0.13ms]
+(pass) @nodebraid/runtime-cordis > keeps Host disposal idempotent during Diagnostic Sink reentry [1.37ms]
+(pass) @nodebraid/runtime-cordis > aborts pending setup and waits for it before becoming disposed [0.33ms]
+(pass) @nodebraid/runtime-cordis > disposes every independent installation and closes the host [0.29ms]
+(pass) @nodebraid/runtime-cordis > rolls back owned resources when setup fails [0.21ms]
+(pass) @nodebraid/runtime-cordis > rolls back Owned Resources and Children on Provided Service missing binding [0.45ms]
+(pass) @nodebraid/runtime-cordis > rolls back Owned Resources and Children on Provided Service getter error [0.35ms]
+(pass) @nodebraid/runtime-cordis > preserves a Provided getter error without inspecting its name after rollback [0.24ms]
+(pass) @nodebraid/runtime-cordis > continues cleanup and reports every disposer failure [0.22ms]
+(pass) @nodebraid/runtime-cordis > reports cleanup failures from every host installation together [0.26ms]
+(pass) @nodebraid/runtime-cordis > preserves cleanup aggregation stages through Host disposal [0.17ms]
+(pass) @nodebraid/runtime-cordis > reports an owned Child cleanup failure once during terminal Host disposal [0.26ms]
+
+packages/runtime-cordis/tests/diagnostic-input-values.test.ts:
+(pass) Host diagnostics retains the Host ID accepted during validation [0.24ms]
+(pass) a Diagnostic Event retains the name accepted during validation [0.29ms]
+(pass) a Diagnostic Event retains the level accepted during validation [0.17ms]
+(pass) Host diagnostics rejects the first invalid Host ID: "" [0.16ms]
+(pass) Host diagnostics rejects the first invalid Host ID: null [0.07ms]
+(pass) Host diagnostics rejects the first invalid Host ID: 42 [0.05ms]
+(pass) Host diagnostics rejects the first invalid Host ID: {} [0.05ms]
+(pass) an omitted captured Host ID still creates a stable default Host scope [0.31ms]
+(pass) Host diagnostics preserves the original Host ID read failure [0.10ms]
+(pass) a Diagnostic Event rejects its first invalid name: "" [0.23ms]
+(pass) a Diagnostic Event rejects its first invalid name: null [0.13ms]
+(pass) a Diagnostic Event rejects its first invalid name: {} [0.13ms]
+(pass) a Diagnostic Event rejects its first invalid level: "fatal" [0.16ms]
+(pass) a Diagnostic Event rejects its first invalid level: null [0.12ms]
+(pass) a Diagnostic Event rejects its first invalid level: 42 [0.11ms]
+(pass) a Diagnostic Event retains its normalized attributes and original error [0.24ms]
+(pass) a Diagnostic Event preserves the original name read failure [0.18ms]
+(pass) a Diagnostic Event preserves the original level read failure [0.10ms]
+(pass) a Diagnostic Event preserves the original attributes read failure [0.15ms]
+(pass) a Diagnostic Event preserves the original error read failure [0.11ms]
+(pass) Sink failure context retains the accepted Event name after the callback changes the input [0.20ms]
+(pass) an asynchronous Sink retains the accepted name for both explicit failures [0.21ms]
+(pass) disabled ordinary diagnostics validates inputs without consuming the optional error [0.16ms]
+(pass) invalid Fault attributes retain the accepted name and original Fault at the Reporter [0.30ms]
+(pass) invalid Fault names retain their first captured value in failure diagnostics [0.19ms]
+(pass) a Fault name read failure reaches the Reporter alongside the original Fault [0.17ms]
+(pass) a Fault attributes read failure reaches the Reporter alongside the original Fault [0.12ms]
+
+packages/runtime-cordis/tests/binding-records.test.ts:
+(pass) rejects a listed requires Binding without an own descriptor [0.05ms]
+(pass) rejects a requires Binding removed by an earlier Binding getter [0.04ms]
+(pass) preserves the original requires Binding getPrototypeOf failure [0.03ms]
+(pass) preserves the original requires Binding ownKeys failure
+(pass) preserves the original requires Binding getOwnPropertyDescriptor failure
+(pass) preserves the original requires Binding get failure
+(pass) rejects a listed provides Binding without an own descriptor
+(pass) rejects a provides Binding removed by an earlier Binding getter
+(pass) preserves the original provides Binding getPrototypeOf failure
+(pass) preserves the original provides Binding ownKeys failure
+(pass) preserves the original provides Binding getOwnPropertyDescriptor failure
+(pass) preserves the original provides Binding get failure
+(pass) retains valid null-prototype accessor Bindings through the public Plugin definition [0.03ms]
+
+packages/runtime-cordis/tests/diagnostic-inspection.test.ts:
+(pass) terminal cleanup retains resource and diagnostic inspection failures together [0.39ms]
+(pass) disabled ordinary diagnostics does not inspect cleanup error members [0.17ms]
+(pass) retains errors read failure 0 through installation disposal (Sink false) [0.28ms]
+(pass) retains errors read failure 1 through installation disposal (Sink false) [0.12ms]
+(pass) retains errors read failure 2 through installation disposal (Sink false) [0.10ms]
+(pass) retains errors read failure 3 through installation disposal (Sink false) [0.11ms]
+(pass) retains errors read failure 4 through installation disposal (Sink false) [0.10ms]
+(pass) retains errors read failure 5 through installation disposal (Sink false) [0.11ms]
+(pass) retains errors read failure 6 through installation disposal (Sink false) [0.12ms]
+(pass) retains length read failure 0 through installation disposal (Sink false) [0.11ms]
+(pass) retains length read failure 1 through installation disposal (Sink false) [0.11ms]
+(pass) retains length read failure 2 through installation disposal (Sink false) [0.12ms]
+(pass) retains length read failure 3 through installation disposal (Sink false) [0.09ms]
+(pass) retains length read failure 4 through installation disposal (Sink false) [0.10ms]
+(pass) retains length read failure 5 through installation disposal (Sink false) [0.09ms]
+(pass) retains length read failure 6 through installation disposal (Sink false) [0.09ms]
+(pass) retains membership read failure 0 through installation disposal (Sink false) [0.09ms]
+(pass) retains membership read failure 1 through installation disposal (Sink false) [0.10ms]
+(pass) retains membership read failure 2 through installation disposal (Sink false) [0.10ms]
+(pass) retains membership read failure 3 through installation disposal (Sink false) [0.10ms]
+(pass) retains membership read failure 4 through installation disposal (Sink false) [0.10ms]
+(pass) retains membership read failure 5 through installation disposal (Sink false) [0.11ms]
+(pass) retains membership read failure 6 through installation disposal (Sink false) [0.09ms]
+(pass) retains member read failure 0 through installation disposal (Sink false) [1.43ms]
+(pass) retains member read failure 1 through installation disposal (Sink false) [0.11ms]
+(pass) retains member read failure 2 through installation disposal (Sink false) [0.09ms]
+(pass) retains member read failure 3 through installation disposal (Sink false) [0.12ms]
+(pass) retains member read failure 4 through installation disposal (Sink false) [0.09ms]
+(pass) retains member read failure 5 through installation disposal (Sink false) [0.09ms]
+(pass) retains member read failure 6 through installation disposal (Sink false) [0.08ms]
+(pass) retains message read failure 0 through installation disposal (Sink false) [0.09ms]
+(pass) retains message read failure 1 through installation disposal (Sink false) [0.10ms]
+(pass) retains message read failure 2 through installation disposal (Sink false) [0.08ms]
+(pass) retains message read failure 3 through installation disposal (Sink false) [0.10ms]
+(pass) retains message read failure 4 through installation disposal (Sink false) [0.08ms]
+(pass) retains message read failure 5 through installation disposal (Sink false) [0.09ms]
+(pass) retains message read failure 6 through installation disposal (Sink false) [0.10ms]
+(pass) retains errors read failure 0 through installation disposal (Sink true) [0.19ms]
+(pass) retains errors read failure 1 through installation disposal (Sink true) [0.14ms]
+(pass) retains errors read failure 2 through installation disposal (Sink true) [0.10ms]
+(pass) retains errors read failure 3 through installation disposal (Sink true) [0.10ms]
+(pass) retains errors read failure 4 through installation disposal (Sink true) [0.12ms]
+(pass) retains errors read failure 5 through installation disposal (Sink true) [0.11ms]
+(pass) retains errors read failure 6 through installation disposal (Sink true) [0.11ms]
+(pass) retains length read failure 0 through installation disposal (Sink true) [0.11ms]
+(pass) retains length read failure 1 through installation disposal (Sink true) [0.09ms]
+(pass) retains length read failure 2 through installation disposal (Sink true) [0.10ms]
+(pass) retains length read failure 3 through installation disposal (Sink true) [0.10ms]
+(pass) retains length read failure 4 through installation disposal (Sink true) [0.10ms]
+(pass) retains length read failure 5 through installation disposal (Sink true) [0.09ms]
+(pass) retains length read failure 6 through installation disposal (Sink true) [0.11ms]
+(pass) retains membership read failure 0 through installation disposal (Sink true) [0.12ms]
+(pass) retains membership read failure 1 through installation disposal (Sink true) [0.14ms]
+(pass) retains membership read failure 2 through installation disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 3 through installation disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 4 through installation disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 5 through installation disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 6 through installation disposal (Sink true) [0.12ms]
+(pass) retains member read failure 0 through installation disposal (Sink true) [0.10ms]
+(pass) retains member read failure 1 through installation disposal (Sink true) [0.11ms]
+(pass) retains member read failure 2 through installation disposal (Sink true) [0.10ms]
+(pass) retains member read failure 3 through installation disposal (Sink true) [0.10ms]
+(pass) retains member read failure 4 through installation disposal (Sink true) [0.10ms]
+(pass) retains member read failure 5 through installation disposal (Sink true) [0.09ms]
+(pass) retains member read failure 6 through installation disposal (Sink true) [0.11ms]
+(pass) retains message read failure 0 through installation disposal (Sink true) [0.11ms]
+(pass) retains message read failure 1 through installation disposal (Sink true) [0.26ms]
+(pass) retains message read failure 2 through installation disposal (Sink true) [0.16ms]
+(pass) retains message read failure 3 through installation disposal (Sink true) [0.15ms]
+(pass) retains message read failure 4 through installation disposal (Sink true) [0.15ms]
+(pass) retains message read failure 5 through installation disposal (Sink true) [0.11ms]
+(pass) retains message read failure 6 through installation disposal (Sink true) [0.10ms]
+(pass) retains errors read failure 0 through host disposal (Sink false) [0.14ms]
+(pass) retains errors read failure 1 through host disposal (Sink false) [0.10ms]
+(pass) retains errors read failure 2 through host disposal (Sink false) [0.10ms]
+(pass) retains errors read failure 3 through host disposal (Sink false) [0.11ms]
+(pass) retains errors read failure 4 through host disposal (Sink false) [0.08ms]
+(pass) retains errors read failure 5 through host disposal (Sink false) [0.10ms]
+(pass) retains errors read failure 6 through host disposal (Sink false) [0.10ms]
+(pass) retains length read failure 0 through host disposal (Sink false) [0.09ms]
+(pass) retains length read failure 1 through host disposal (Sink false) [0.09ms]
+(pass) retains length read failure 2 through host disposal (Sink false) [0.10ms]
+(pass) retains length read failure 3 through host disposal (Sink false) [0.09ms]
+(pass) retains length read failure 4 through host disposal (Sink false) [0.10ms]
+(pass) retains length read failure 5 through host disposal (Sink false) [0.10ms]
+(pass) retains length read failure 6 through host disposal (Sink false) [0.09ms]
+(pass) retains membership read failure 0 through host disposal (Sink false) [1.15ms]
+(pass) retains membership read failure 1 through host disposal (Sink false) [0.11ms]
+(pass) retains membership read failure 2 through host disposal (Sink false) [0.08ms]
+(pass) retains membership read failure 3 through host disposal (Sink false) [0.09ms]
+(pass) retains membership read failure 4 through host disposal (Sink false) [0.08ms]
+(pass) retains membership read failure 5 through host disposal (Sink false) [0.09ms]
+(pass) retains membership read failure 6 through host disposal (Sink false) [0.08ms]
+(pass) retains member read failure 0 through host disposal (Sink false) [0.09ms]
+(pass) retains member read failure 1 through host disposal (Sink false) [0.09ms]
+(pass) retains member read failure 2 through host disposal (Sink false) [0.08ms]
+(pass) retains member read failure 3 through host disposal (Sink false) [0.09ms]
+(pass) retains member read failure 4 through host disposal (Sink false) [0.08ms]
+(pass) retains member read failure 5 through host disposal (Sink false) [0.08ms]
+(pass) retains member read failure 6 through host disposal (Sink false) [0.11ms]
+(pass) retains message read failure 0 through host disposal (Sink false) [0.09ms]
+(pass) retains message read failure 1 through host disposal (Sink false) [0.09ms]
+(pass) retains message read failure 2 through host disposal (Sink false) [0.10ms]
+(pass) retains message read failure 3 through host disposal (Sink false) [0.09ms]
+(pass) retains message read failure 4 through host disposal (Sink false) [0.11ms]
+(pass) retains message read failure 5 through host disposal (Sink false) [0.10ms]
+(pass) retains message read failure 6 through host disposal (Sink false) [0.11ms]
+(pass) retains errors read failure 0 through host disposal (Sink true) [0.12ms]
+(pass) retains errors read failure 1 through host disposal (Sink true) [0.21ms]
+(pass) retains errors read failure 2 through host disposal (Sink true) [0.12ms]
+(pass) retains errors read failure 3 through host disposal (Sink true) [0.13ms]
+(pass) retains errors read failure 4 through host disposal (Sink true) [0.10ms]
+(pass) retains errors read failure 5 through host disposal (Sink true) [0.12ms]
+(pass) retains errors read failure 6 through host disposal (Sink true) [0.09ms]
+(pass) retains length read failure 0 through host disposal (Sink true) [0.10ms]
+(pass) retains length read failure 1 through host disposal (Sink true) [0.10ms]
+(pass) retains length read failure 2 through host disposal (Sink true) [0.11ms]
+(pass) retains length read failure 3 through host disposal (Sink true) [0.10ms]
+(pass) retains length read failure 4 through host disposal (Sink true) [0.10ms]
+(pass) retains length read failure 5 through host disposal (Sink true) [0.12ms]
+(pass) retains length read failure 6 through host disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 0 through host disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 1 through host disposal (Sink true) [0.11ms]
+(pass) retains membership read failure 2 through host disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 3 through host disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 4 through host disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 5 through host disposal (Sink true) [0.11ms]
+(pass) retains membership read failure 6 through host disposal (Sink true) [0.14ms]
+(pass) retains member read failure 0 through host disposal (Sink true) [0.12ms]
+(pass) retains member read failure 1 through host disposal (Sink true) [0.11ms]
+(pass) retains member read failure 2 through host disposal (Sink true) [0.11ms]
+(pass) retains member read failure 3 through host disposal (Sink true) [0.10ms]
+(pass) retains member read failure 4 through host disposal (Sink true) [0.12ms]
+(pass) retains member read failure 5 through host disposal (Sink true) [0.10ms]
+(pass) retains member read failure 6 through host disposal (Sink true) [0.13ms]
+(pass) retains message read failure 0 through host disposal (Sink true) [0.15ms]
+(pass) retains message read failure 1 through host disposal (Sink true) [0.11ms]
+(pass) retains message read failure 2 through host disposal (Sink true) [0.10ms]
+(pass) retains message read failure 3 through host disposal (Sink true) [0.10ms]
+(pass) retains message read failure 4 through host disposal (Sink true) [0.10ms]
+(pass) retains message read failure 5 through host disposal (Sink true) [0.12ms]
+(pass) retains message read failure 6 through host disposal (Sink true) [0.12ms]
+(pass) malformed members retain cleanup and explicit validation failures (Sink false) [0.31ms]
+(pass) malformed members retain cleanup and explicit validation failures (Sink true) [0.15ms]
+(pass) parent cleanup does not reinspect an already diagnosed child inspection failure [0.39ms]
+
+packages/runtime-cordis/tests/error-contract.test.ts:
+(pass) Plugin Host structural failures expose the shared NodeBraid error identity [0.14ms]
+
+packages/runtime-cordis/tests/diagnostics.test.ts:
+(pass) the Runtime diagnostic event catalog has stable searchable names [0.01ms]
+(pass) a Plugin emits an immutable Diagnostic Event scoped to its Host Activation [0.45ms]
+(pass) a Fault Reporter failure stays outside the Plugin lifecycle and preserves both errors [0.33ms]
+(pass) a Diagnostic Sink failure becomes a non-recursive Fault without failing Plugin setup [1.13ms]
+(pass) an asynchronous Diagnostic Sink is reported as an explicit contract failure [0.21ms]
+(pass) an asynchronous Fault Reporter is exposed without changing Plugin state [0.26ms]
+(pass) an invalid Diagnostic Event fails explicitly even when no Sink is configured [0.23ms]
+(pass) an invalid reportFault input preserves the original Fault through the final Reporter [0.17ms]
+(pass) an unsafe Diagnostic attribute fails with a structured path and original cause [0.19ms]
+(pass) an array Diagnostic accessor fails without executing it during Plugin setup [0.17ms]
+(pass) an unknown Diagnostic level fails as an invalid event contract [0.15ms]
+(pass) Plugin Host rejects an empty diagnostic host ID [0.06ms]
+(pass) Installation subscriber Faults use the Host-scoped diagnostics path [0.26ms]
+(pass) an empty Plugin Host emits an ordered lifecycle [0.09ms]
+(pass) Installation status events follow Snapshot replacement and precede subscribers [0.18ms]
+(pass) a Plugin Setup failure emits one error status while preserving its identity [0.18ms]
+(pass) Activation events surround Plugin setup and completed cleanup [0.24ms]
+(pass) a terminal Installation cleanup failure emits one error event and still disposes [0.36ms]
+(pass) dependency cleanup records one Error-level Event across Consumer and Provider disposal [0.59ms]
+
+packages/runtime-cordis/tests/diagnostic-description.test.ts:
+(pass) a real Host Sink describes AggregateError members while preserving the original event error [1.16ms]
+
+packages/diagnostics/tests/index.test.ts:
+(pass) the Diagnostics event catalog has stable searchable names [0.01ms]
+(pass) Diagnostic normalization rejects an accessor without invoking it [0.06ms]
+(pass) Diagnostic normalization rejects a Symbol key instead of dropping it [0.17ms]
+(pass) Diagnostic arrays are normalized without executing an input map method [0.06ms]
+(pass) Diagnostic normalization rejects own array index accessors without invoking them [0.03ms]
+(pass) Diagnostic normalization rejects inherited array index accessors without invoking them [0.01ms]
+(pass) Diagnostic arrays reject Symbol keys instead of dropping them [0.02ms]
+(pass) Diagnostic arrays validate inherited elements instead of replacing them with holes [0.03ms]
+(pass) Diagnostic arrays copy inherited data while preserving genuine holes [0.03ms]
+(pass) Diagnostic arrays are copied without reading a constructor hook [0.02ms]
+(pass) structural error details reject an unsafe nested array element at its exact path [0.03ms]
+(pass) describeNonFiniteNumber provides the canonical diagnostic representation [0.03ms]
+(pass) a NodeBraid structural error exposes stable identity, cause, and immutable details [0.05ms]
+(pass) a NodeBraid structural error rejects an unsafe detail at its exact path [0.03ms]
+(pass) a NodeBraid structural error rejects a non-finite numeric detail [0.02ms]
+(pass) a NodeBraid structural error rejects class instances instead of traversing them [0.03ms]
+(pass) a NodeBraid structural error rejects a circular detail at the first back-reference [0.03ms]
+(pass) describeError returns a JSON-ready NodeBraid error with its original cause [0.09ms]
+(pass) describeError preserves nested AggregateError stages [0.05ms]
+(pass) describeError represents a circular cause as an explicit reference [0.02ms]
+(pass) describeError preserves a safe primitive thrown value
+(pass) describeDiagnosticEvent replaces the raw error with its JSON-ready description [0.06ms]
+
+packages/diagnostics/tests/types.test.ts:
+(pass) keeps the public Diagnostics seam narrow and immutable
+
+packages/diagnostics/tests/error-description.test.ts:
+(pass) AggregateError member map cannot replace descriptions with raw Errors [0.09ms]
+(pass) AggregateError metadata failures precede indexed member reads [0.07ms]
+(pass) AggregateError descriptions ignore collection method, iterator and constructor hooks [0.05ms]
+(pass) AggregateError descriptions preserve holes, inherited members and circular paths [0.06ms]
+(pass) AggregateError traversal uses native integer length semantics for Proxy arrays [0.04ms]
+(pass) AggregateError indexed read failures retain their original identity [0.03ms]
+(pass) malformed AggregateError collections fail instead of becoming an empty description [0.04ms]
+
+packages/diagnostics/tests/package-import.test.ts:
+(pass) @nodebraid/diagnostics exposes the NodeBraidError seam by package name [0.03ms]
+
+ 704 pass
+ 0 fail
+ 5742 expect() calls
+Ran 704 tests across 28 files. [619.00ms]

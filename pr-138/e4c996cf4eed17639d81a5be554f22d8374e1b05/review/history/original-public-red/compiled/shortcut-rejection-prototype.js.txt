@@ -1,0 +1,131 @@
+import assert from 'node:assert/strict';
+import { writeFileSync } from 'node:fs';
+import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
+import { createBasicCanvasPlugin } from '@nodebraid/preset-basic';
+import { commandService, defineCommand } from '@nodebraid/plugin-command';
+import { interactionShortcutService } from '@nodebraid/plugin-interaction';
+class RecordingRenderer {
+    subscriptions = new Map();
+    disposed = false;
+    updateDocument(_update) { }
+    updateSession(_snapshot) { }
+    updateInteraction() { }
+    subscribeInput(listener, decide) {
+        this.subscriptions.set(listener, decide);
+        return () => { this.subscriptions.delete(listener); };
+    }
+    hitTest(point) { return { type: 'canvas', worldPoint: point }; }
+    capturePointer(_id) { }
+    releasePointer(_id) { }
+    focus() { }
+    dispose() { this.disposed = true; this.subscriptions.clear(); return Promise.resolve(); }
+    emit(input) {
+        let control, behavior;
+        const entries = Array.from(this.subscriptions);
+        for (const [, decide] of entries)
+            control = decide?.(input) ?? control;
+        for (const [listener] of entries)
+            behavior = listener(input) ?? behavior;
+        return { control, behavior };
+    }
+}
+const output = process.env.NODEBRAID_SHORTCUT_CLASSIFICATION_RESULTS;
+assert.ok(output);
+const rows = [];
+const unhandled = [];
+const onUnhandled = (error) => { unhandled.push(error); };
+process.on('unhandledRejection', onUnhandled);
+const turn = () => new Promise(resolve => setImmediate(resolve));
+const capture = (promise) => promise.then(value => ({ ok: true, value }), error => ({ ok: false, error: error }));
+try {
+    for (const route of ['direct-command-proxy-control', 'shortcut-ordinary-error-control', 'shortcut-proxy-rejection']) {
+        const renderer = new RecordingRenderer();
+        const faults = [];
+        const host = createPluginHost({ diagnostics: { faultReporter(fault) { faults.push(fault); } } });
+        let commands, shortcuts;
+        const composition = host.install(createBasicCanvasPlugin(() => renderer));
+        const consumer = host.install(definePlugin({
+            requires: { commands: commandService, shortcuts: interactionShortcutService },
+            setup(context) { commands = context.services.commands; shortcuts = context.services.shortcuts; },
+        }));
+        await Promise.all([composition.whenActive(), consumer.whenActive()]);
+        const original = new Error('caller-owned Command rejection');
+        const inspectionFailure = new Error('native getPrototypeOf failed');
+        let prototypeReads = 0;
+        const proxy = new Proxy(original, { getPrototypeOf() { prototypeReads++; throw inspectionFailure; } });
+        const failure = route === 'shortcut-ordinary-error-control' ? original : proxy;
+        let handlerCalls = 0;
+        const command = defineCommand('probe.classification/' + route);
+        const commandRegistration = commands.register(command, () => { handlerCalls++; throw failure; });
+        const startUnhandled = unhandled.length;
+        if (route === 'direct-command-proxy-control') {
+            const result = await capture(commands.execute(command, undefined));
+            const passed = !result.ok && Object.is(result.error, proxy) && prototypeReads === 0;
+            await commandRegistration.dispose();
+            await host.dispose();
+            rows.push({ route, passed, originalIdentity: !result.ok && Object.is(result.error, proxy), prototypeReads, handlerCalls,
+                commandRegistrationDisposed: true, hostDisposed: true, rendererDisposed: renderer.disposed });
+        }
+        else {
+            const binding = { shortcut: { code: 'KeyP', modifierAlternatives: [{ alt: false, control: false, meta: false, shift: false }] }, command };
+            const registration = shortcuts.register(binding);
+            const disposition = renderer.emit({ type: 'key.down', key: 'p', code: 'KeyP', repeat: false,
+                modifiers: { alt: false, control: false, meta: false, shift: false } });
+            assert.deepEqual(disposition, { control: { defaultAction: 'prevent' }, behavior: { defaultAction: 'prevent' } });
+            await turn();
+            await turn();
+            let commandDisposed = false;
+            const commandDisposal = commandRegistration.dispose().then(() => { commandDisposed = true; });
+            await turn();
+            await turn();
+            if (commandDisposed)
+                await commandDisposal;
+            let bindingDisposed = false;
+            const bindingDisposal = registration.dispose().then(() => { bindingDisposed = true; });
+            await turn();
+            await turn();
+            let reservationReleased = false;
+            let fresh;
+            let conflictCode;
+            try {
+                fresh = shortcuts.register(binding);
+                reservationReleased = true;
+            }
+            catch (error) {
+                conflictCode = error !== null && typeof error === 'object' && 'code' in error ? error.code : undefined;
+            }
+            if (fresh)
+                await fresh.dispose();
+            const ownUnhandled = unhandled.slice(startUnhandled);
+            const originalFaultPreserved = faults.some(fault => Object.is(fault.error, failure));
+            let hostDisposed = false;
+            const hostDisposal = host.dispose().then(() => { hostDisposed = true; });
+            await turn();
+            await turn();
+            if (hostDisposed)
+                await hostDisposal;
+            if (bindingDisposed)
+                await bindingDisposal;
+            const passed = handlerCalls === 1 && commandDisposed && originalFaultPreserved && bindingDisposed && reservationReleased && ownUnhandled.length === 0 && hostDisposed;
+            rows.push({ route, passed, handlerCalls, prototypeReads, faults: faults.length, originalFaultPreserved,
+                unhandledRejections: ownUnhandled.length, unhandledIsInspectionFailure: ownUnhandled.some(error => Object.is(error, inspectionFailure)),
+                commandRegistrationDisposed: commandDisposed, bindingDisposed, reservationReleased, conflictCode,
+                hostDisposed, rendererDisposed: renderer.disposed, remainingRendererSubscriptions: renderer.subscriptions.size,
+                observation: 'Each public disposal attempted; state read after actual handler rejection and finite native event-loop turns. A pending public Promise is not reported as cleanup success.' });
+        }
+        writeFileSync(output, JSON.stringify(rows, null, 2) + '\n');
+        console.log(JSON.stringify(rows.at(-1)));
+    }
+    assert.equal(rows.length, 3);
+    assert.equal(rows.filter(row => row.passed).length, 3, 'Shortcut classification must not replace a caller rejection, strand finished execution ownership, or retain its Binding reservation.');
+}
+catch (error) {
+    console.error(error);
+    process.exitCode = 1;
+    throw error;
+}
+finally {
+    await turn();
+    process.off('unhandledRejection', onUnhandled);
+}
+//# sourceMappingURL=shortcut-rejection-prototype.js.map

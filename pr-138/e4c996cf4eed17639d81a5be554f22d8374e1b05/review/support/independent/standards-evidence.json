@@ -1,0 +1,128 @@
+{
+  "verdict": "passed",
+  "axis": "standards",
+  "base": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+  "expectedParent": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+  "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+  "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+  "patch": "c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476",
+  "taskDigest": "c21362e67c91892b2f4caf6fd624c9218f305c7e5140875a5e40ba036f4852c0",
+  "changedFiles": [
+    "packages/plugin-interaction/src/shortcut-runtime.ts",
+    "packages/plugin-interaction/tests/lifecycle.test.ts"
+  ],
+  "comparisonCommand": "git diff --binary fe94ea93ed6b06e65e5d29f7846e132a53f8cded...618cb61d25990415e4ab27f0132f2247dc7b8972",
+  "commits": [
+    "618cb61 fix: settle Shortcut rejection inspection"
+  ],
+  "report": "What this change does: Keeps Shortcut execution completion reliable when native Command-error inspection throws. One stable command Fault retains the original rejection and actual inspection failure; completion runs in finally.\n\n- Base: `fe94ea93ed6b06e65e5d29f7846e132a53f8cded`\n- Head: `618cb61d25990415e4ab27f0132f2247dc7b8972`\n- Tree: `bf0a2377f8e5cd5596b692e98d936d9ae4905a39`\n- Binary patch SHA256: `c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476`\n- Changed files: `packages/plugin-interaction/src/shortcut-runtime.ts`; `packages/plugin-interaction/tests/lifecycle.test.ts`.\n\n**Hard standards:** No documented violation found. ADR0074's wait/reservation/release contract and ADR0028/0029's Fault and original-failure contracts remain intact. The narrow classification catch preserves two exact failure references without flattening. The outer finally releases only the completed execution; concurrent executions remain tracked. Genuine capability-unavailable and expected disposal-abort branches retain their existing behavior.\n\nI traced Command execution, Interaction wiring, scoped Runtime diagnostics, Basic Composition and Duplicate/Clipboard registrations. Public tests cover prototype/code inspection, seven actual thrown values, Sink enabled/disabled, disposal before/after rejection, cached disposal and replacement Binding isolation. The fixture implements the public Renderer seam; it is not native keyboard evidence.\n\n**Judgment:** No concrete Fowler smell needs a change. Classification and completion belong at this existing Shortcut owner; another abstraction would add no needed responsibility. Assumed load: isolated per-Canvas Hosts with concurrent Shortcut executions and arbitrary application Handler failures. Looks good. Ship.\n\n**Independent checks:** `/Users/zhou/.bun/bin/bun test packages/plugin-interaction/tests packages/plugin-command/tests packages/runtime-cordis/tests packages/diagnostics/tests packages/plugin-duplicate-selection/tests packages/plugin-clipboard/tests packages/preset-basic/tests` exited 0: **867 pass, 0 fail, 6557 assertions**, 48 files. Full raw output retained. Exact canonical patch bytes, two paths, unchanged policy, clean head/tree and current compiled repair matched before/after.\n\n**Discussion/evidence:** Read Issue 136 and comment 6463977910. Historical root-only public-program failures remain failures; no old program or dirty-tree result is certified green at this head. Repository assertions directly check Fault name, Command ID/scope and both failure identities.\n\n**Risk: medium.** Public implementation changes Fault propagation and execution ownership. Evidence is the complete connected-code review and fresh 867-test run. Revert the entire 618cb61 delivery to base fe94 and recreate affected Bindings/Hosts. Rollback cannot undo application Commands already executed. Focused human review/merge remains required under canonical pr-risk.\n\nNot checked independently: build, formal full check, browsers, corrected compiled-program certification, publication or current-head CI. Worktree access stopped.\n\n**Verdict: passed** (Standards + ponytail-review).\n",
+  "reportPath": "reviews/standards.md",
+  "findings": [],
+  "hardStandardViolations": [],
+  "judgmentFindings": [],
+  "risk": {
+    "level": "medium",
+    "rationale": "Public framework implementation changes Shortcut failure reporting and lifecycle execution completion. Runtime ownership and compatible behavior changes require medium at the public src path floor; small scope and passing checks do not establish low risk.",
+    "evidence": "Complete two-path patch and connected Command/Interaction/Runtime/Basic/Duplicate/Clipboard callers reviewed at exact head618cb61; fresh independent public Bun run passed867 tests/6557 assertions. Before/after identity checks matched full tree, canonical binary bytes/SHA256, clean status, current compiled repair and unchanged policies. Historical dirty/public program results are kept separate and not relabeled.",
+    "rollback": "Revert the complete Issue136 commit618cb61d25990415e4ab27f0132f2247dc7b8972 (or its complete future published mapping) back to basefe94ea93ed6b06e65e5d29f7846e132a53f8cded and recreate affected Shortcut Bindings/Hosts rather than relying on cached disposal outcomes. This restores the earlier classification defect and cannot undo application Commands already executed."
+  },
+  "checks": [
+    {
+      "command": "/Users/zhou/.bun/bin/bun test packages/plugin-interaction/tests packages/plugin-command/tests packages/runtime-cordis/tests packages/diagnostics/tests packages/plugin-duplicate-selection/tests packages/plugin-clipboard/tests packages/preset-basic/tests",
+      "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+      "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+      "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+      "exitCode": 0,
+      "passed": 867,
+      "failed": 0,
+      "assertions": 6557,
+      "files": 48,
+      "rawLog": "reviews/standards-tests.log",
+      "independent": true
+    }
+  ],
+  "identityChecks": {
+    "beforeAndAfter": true,
+    "canonicalBytesMatch": "review.patch",
+    "clean": true,
+    "compiledRepairPresent": true,
+    "policiesUnchanged": true,
+    "worktreeAccessStopped": true
+  },
+  "standardsSources": [
+    "AGENTS.md",
+    "CONTRIBUTING.md",
+    "CONTEXT.md",
+    "docs/agents/issue-tracker.md",
+    "docs/agents/discussion-workflow.md",
+    "docs/agents/principles.md",
+    ".agents/skills/code-review/SKILL.md",
+    ".agents/skills/ponytail/SKILL.md",
+    ".agents/skills/ponytail-review/SKILL.md",
+    ".agents/skills/control-nodebraid/SKILL.md",
+    ".agents/skills/principle-boundary-discipline/SKILL.md",
+    ".agents/skills/principle-fix-root-causes/SKILL.md",
+    ".agents/skills/principle-prove-it-works/SKILL.md",
+    ".agents/skills/principle-test-behavior-not-implementation/SKILL.md",
+    ".agents/skills/principle-type-system-discipline/SKILL.md",
+    ".agents/skills/principle-laziness-protocol/SKILL.md",
+    ".agents/skills/principle-explain-the-number/SKILL.md",
+    "ADR0074",
+    "ADR0028",
+    "ADR0029"
+  ],
+  "riskPolicy": {
+    "path": "canonical-main/.agents/skills/pr-risk/SKILL.md",
+    "blob": "596298db784c4f3424968cd05a3aca4a6471b1b3",
+    "verified": true,
+    "pathFloor": "medium",
+    "route": "quick-human",
+    "noThirdReviewer": true
+  },
+  "source": {
+    "issue": 136,
+    "url": "https://github.com/ZWkang/nodebraid/issues/136",
+    "readBody": "source-issue.json",
+    "readFullComments": "source-comments.json",
+    "commentIds": [
+      6463977910
+    ],
+    "independentPreparedTask": "prepared-task.json",
+    "unresolvedContractQuestionsObserved": []
+  },
+  "connectedCode": [
+    "CommandService.execute/disposeRegistration",
+    "Interaction Shortcut execution/disposeEntry/input disposition",
+    "Activation-scoped diagnostics.reportFault and Host Sink/Reporter paths",
+    "Basic Canvas Composition",
+    "Duplicate and Clipboard Shortcut registration owners"
+  ],
+  "testAssessment": {
+    "newMatrix": "2 native inspection sites x7 thrown values x2 Sink states x2 disposal timings, plus the original public tracer.",
+    "promisedBehavior": "One stable command Fault; exact two AggregateError slots; preserved raw receiver/errors; cached Binding disposal, waiting/reservation release and fresh Binding isolation.",
+    "fixtureBoundary": "Public CanvasRenderer fixture and real Runtime/Command plugins; no native keyboard/SVG verification claim.",
+    "assumedLoad": "Isolated per-Canvas Hosts, concurrent/reentrant Shortcut executions and arbitrary external Handler failures."
+  },
+  "retainedHistoricalEvidence": {
+    "tracer": "Prior run84337303-5bcc-471d-b2f1-ea874dc4fb1b/tdd retained actual production-unchanged red0/1 and identical-tracer dirty green1/10; historical only.",
+    "legacyProgram": "Root-only source1e759b79... and both actual failures are not certified green or upgraded.",
+    "v2Program": "Sourceecd4cd... dirty-tree receipts/observations read as historical scope evidence; not independently executed or recast as exact-head certification.",
+    "correctedPublicCertification": "Stronger compound-program current-head certification is coordinator-owned and not independently executed in this review."
+  },
+  "notCheckedIndependently": [
+    "Build",
+    "TypeScript compilation",
+    "Canonical formal full engineering check",
+    "Browser/native keyboard input",
+    "Corrected compiled-program current-head certification",
+    "Remote publication/current-head CI",
+    "Merge/main acceptance or Issue closure"
+  ],
+  "reviewOperations": {
+    "sourceEdited": false,
+    "gitRefsChanged": false,
+    "generatedArtifactsChanged": false,
+    "githubWrites": false,
+    "worktreeAccessStopped": true
+  }
+}

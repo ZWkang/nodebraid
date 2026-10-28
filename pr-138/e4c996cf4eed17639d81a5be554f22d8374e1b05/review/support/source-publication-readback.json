@@ -1,0 +1,35 @@
+{
+  "localReviewHead": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+  "publishedHead": "e4c996cf4eed17639d81a5be554f22d8374e1b05",
+  "sameCompleteTree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+  "localAndActualRemoteGitAndAPITreeAllEqual": true,
+  "leafEntries": 919,
+  "apiRecursiveEntries": 1159,
+  "actualOrderedParents": [
+    "fe94ea93ed6b06e65e5d29f7846e132a53f8cded"
+  ],
+  "baseInherited": true,
+  "sourceChangedFiles": [
+    {
+      "path": "packages/plugin-interaction/src/shortcut-runtime.ts",
+      "bytes": 7075,
+      "characters": 7075,
+      "sha256": "1292065a21397878d63d1ed38716975228f974a400b4a71c606291b26be481bb",
+      "gitBlob": "7576cd3a7539adc438e245ecaddb6d36966ac5ed",
+      "mode": "100644",
+      "actualRemoteGitBlob": "7576cd3a7539adc438e245ecaddb6d36966ac5ed",
+      "allBytesEqual": true
+    },
+    {
+      "path": "packages/plugin-interaction/tests/lifecycle.test.ts",
+      "bytes": 42433,
+      "characters": 42433,
+      "sha256": "5ec4523c105d2a86ab89969860ec7e288667cee233e78ca1a18f2e6b4ecb8e8b",
+      "gitBlob": "2684aac8de1f44c53ea1f0fa94b9a76ff00cbe06",
+      "mode": "100644",
+      "actualRemoteGitBlob": "2684aac8de1f44c53ea1f0fa94b9a76ff00cbe06",
+      "allBytesEqual": true
+    }
+  ],
+  "localTestsNotExecutedAtPublishedSHA": true
+}

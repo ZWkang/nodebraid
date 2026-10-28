@@ -1,0 +1,33 @@
+AssertionError [ERR_ASSERTION]: Shortcut classification must not replace a caller rejection, strand finished execution ownership, or retain its Binding reservation.
+
+2 !== 3
+
+    at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261028T072819-maintenance/interaction-classification-probe/compiled/shortcut-rejection-prototype.js:120:12 {
+  generatedMessage: false,
+  actual: 2,
+  expected: 3,
+  operator: 'strictEqual',
+  code: 'ERR_ASSERTION',
+  diff: 'simple'
+}
+115 |         }
+116 |         writeFileSync(output, JSON.stringify(rows, null, 2) + '\n');
+117 |         console.log(JSON.stringify(rows.at(-1)));
+118 |     }
+119 |     assert.equal(rows.length, 3);
+120 |     assert.equal(rows.filter(row => row.passed).length, 3, 'Shortcut classification must not replace a caller rejection, strand finished execution ownership, or retain its Binding reservation.');
+                 ^
+AssertionError: Shortcut classification must not replace a caller rejection, strand finished execution ownership, or retain its Binding reservation.
+
+2 !== 3
+
+ generatedMessage: false,
+     actual: 2,
+   expected: 3,
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261028T072819-maintenance/interaction-classification-probe/compiled/shortcut-rejection-prototype.js:120:12
+
+Bun v1.4.2 (macOS arm64)

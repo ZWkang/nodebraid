@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "bun",
+    "test",
+    "packages/plugin-interaction/tests/lifecycle.test.ts",
+    "--test-name-pattern",
+    "Shortcut rejection inspection"
+  ],
+  "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+  "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+  "workingPatchSHA256": "7deb54f5b210308c4dbddffea7b314685c1ad50146cbccb26b3220b717b95b4b",
+  "testSHA256": "828561c53b2a0792f9a33592015368aa924cc89a0fa767eee433d76ada898f54",
+  "productionUnchanged": true,
+  "exitCode": 1,
+  "startedAt": "2026-10-28T07:58:04.598467+00:00",
+  "endedAt": "2026-10-28T07:58:04.769453+00:00",
+  "testFrameworkTimeoutNotOverridden": true
+}

@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "strict": true,
+    "noUnusedLocals": true,
+    "noImplicitAny": true,
+    "skipLibCheck": false,
+    "noEmit": false,
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/node_modules/@types"
+    ],
+    "outDir": "/Users/zhou/.codex/local-workflows/nodebraid/runs/84337303-5bcc-471d-b2f1-ea874dc4fb1b/public-fixed-original-oracle/compiled",
+    "rootDir": "/Users/zhou/.codex/local-workflows/nodebraid/runs/84337303-5bcc-471d-b2f1-ea874dc4fb1b/public-fixed-original-oracle",
+    "sourceMap": true
+  },
+  "files": [
+    "shortcut-rejection-prototype.ts"
+  ],
+  "include": []
+}

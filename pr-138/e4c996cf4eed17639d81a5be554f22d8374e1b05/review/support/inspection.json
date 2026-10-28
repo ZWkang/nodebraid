@@ -1,0 +1,1 @@
+{"taskDigest":"c21362e67c91892b2f4caf6fd624c9218f305c7e5140875a5e40ba036f4852c0","head":"618cb61d25990415e4ab27f0132f2247dc7b8972","tree":"bf0a2377f8e5cd5596b692e98d936d9ae4905a39","patch":"c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476","changedFiles":["packages/plugin-interaction/src/shortcut-runtime.ts","packages/plugin-interaction/tests/lifecycle.test.ts"]}

@@ -1,0 +1,1 @@
+console.log(JSON.stringify({interaction:import.meta.resolve('@nodebraid/plugin-interaction'),command:import.meta.resolve('@nodebraid/plugin-command'),runtime:import.meta.resolve('@nodebraid/runtime-cordis'),basic:import.meta.resolve('@nodebraid/preset-basic')}));

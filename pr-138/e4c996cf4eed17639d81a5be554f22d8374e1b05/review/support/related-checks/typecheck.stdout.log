@@ -1,0 +1,37 @@
+@nodebraid/plugin-interaction typecheck: $ bun run ../../scripts/build-workspaces.ts --test-dependencies @nodebraid/plugin-interaction
+@nodebraid/plugin-interaction typecheck: [build] @nodebraid/diagnostics
+@nodebraid/plugin-interaction typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction typecheck: [build] @nodebraid/kernel
+@nodebraid/plugin-interaction typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction typecheck: [build] @nodebraid/port-api
+@nodebraid/plugin-interaction typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction typecheck: [build] @nodebraid/session-api
+@nodebraid/plugin-interaction typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction typecheck: [build] @nodebraid/interaction-api
+@nodebraid/plugin-interaction typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction typecheck: [build] @nodebraid/runtime-cordis
+@nodebraid/plugin-interaction typecheck: $ tsgo -p tsconfig.build.json
+@nodebraid/plugin-interaction typecheck: [build] @nodebraid/plugin-command
+@nodebraid/plugin-interaction typecheck: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction typecheck: [build] @nodebraid/plugin-kernel
+@nodebraid/plugin-interaction typecheck: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction typecheck: [build] @nodebraid/plugin-port
+@nodebraid/plugin-interaction typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction typecheck: [build] @nodebraid/plugin-session
+@nodebraid/plugin-interaction typecheck: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction typecheck: [build] @nodebraid/renderer-api
+@nodebraid/plugin-interaction typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction typecheck: [build] @nodebraid/plugin-renderer
+@nodebraid/plugin-interaction typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction typecheck: [build] @nodebraid/plugin-history
+@nodebraid/plugin-interaction typecheck: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction typecheck: $ tsgo --noEmit -p tsconfig.json
+@nodebraid/plugin-interaction typecheck: Exited with code 0

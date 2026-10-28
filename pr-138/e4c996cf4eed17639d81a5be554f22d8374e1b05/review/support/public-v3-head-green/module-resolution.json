@@ -1,0 +1,6 @@
+{
+  "interaction": "file:///Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/plugin-interaction/dist/index.js",
+  "command": "file:///Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/plugin-command/dist/index.js",
+  "runtime": "file:///Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/runtime-cordis/dist/index.js",
+  "basic": "file:///Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/preset-basic/dist/index.js"
+}

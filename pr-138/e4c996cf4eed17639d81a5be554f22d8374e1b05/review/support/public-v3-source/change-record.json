@@ -1,0 +1,9 @@
+{
+  "v2SHA256": "ecd4cdbaa0e247ee36ddd1af4f7d10561823397cd64f721c5db4b65e72409701",
+  "v3SHA256": "46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004",
+  "v2DirtySuccessRetainedNotFinalPublicCertificate": true,
+  "finding": "Spec review: public v2 did not assert stable event name, commandId or scope required by Issue136 clarification",
+  "resolution": "strict additional event name/level, commandId, pluginName/host/installation/activation scope presence and frozen Fault/event/scope/attributes; no previous assertions removed",
+  "sourceHeadUnchanged": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+  "caseInputsUnchanged": true
+}

@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "bun",
+    "run",
+    "check:affected",
+    "--base",
+    "fe94ea93ed6b06e65e5d29f7846e132a53f8cded"
+  ],
+  "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+  "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+  "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+  "exitCode": 0,
+  "seconds": 270.3270437080064,
+  "startedAt": "2026-10-28T08:28:46.782371+00:00",
+  "endedAt": "2026-10-28T08:33:17.110416+00:00",
+  "headUnchanged": true,
+  "sourceClean": true
+}

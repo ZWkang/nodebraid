@@ -1,0 +1,30 @@
+[
+  {
+    "argv": [
+      "bun",
+      "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/node_modules/typescript/bin/tsc",
+      "-p",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/84337303-5bcc-471d-b2f1-ea874dc4fb1b/public-fixed-original-oracle/tsconfig.json"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+    "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "workingPatchSHA256": "2e311f5cf8d0028a02e07d4eeb30fae2830280c9411abcc7609cce1b3013dcab",
+    "sourceSHA256": "1e759b79df9d0528d6c9ac636e3f03134173a2a57fa462b1d71ed4b62e4d1f2a",
+    "exitCode": 0,
+    "startedAt": "2026-10-28T08:04:57.907493+00:00",
+    "endedAt": "2026-10-28T08:04:58.294568+00:00"
+  },
+  {
+    "argv": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/84337303-5bcc-471d-b2f1-ea874dc4fb1b/public-fixed-original-oracle/compiled/shortcut-rejection-prototype.js"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+    "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "workingPatchSHA256": "2e311f5cf8d0028a02e07d4eeb30fae2830280c9411abcc7609cce1b3013dcab",
+    "sourceSHA256": "1e759b79df9d0528d6c9ac636e3f03134173a2a57fa462b1d71ed4b62e4d1f2a",
+    "exitCode": 1,
+    "startedAt": "2026-10-28T08:04:58.294851+00:00",
+    "endedAt": "2026-10-28T08:04:58.395646+00:00"
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "mode": "affected",
+  "files": [
+    "packages/plugin-interaction/src/shortcut-runtime.ts",
+    "packages/plugin-interaction/tests/lifecycle.test.ts"
+  ],
+  "packages": [
+    "@nodebraid/core",
+    "@nodebraid/examples",
+    "@nodebraid/plugin-clipboard",
+    "@nodebraid/plugin-duplicate-selection",
+    "@nodebraid/plugin-interaction",
+    "@nodebraid/preset-basic",
+    "@nodebraid/renderer-svg"
+  ],
+  "tests": [
+    "tests/layout-providers.test.ts"
+  ],
+  "browser": [
+    "@nodebraid/examples",
+    "@nodebraid/renderer-svg"
+  ],
+  "docs": true,
+  "shared": []
+}

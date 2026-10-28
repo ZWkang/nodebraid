@@ -1,0 +1,27 @@
+{
+  "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+  "sourceSHA256": "46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004",
+  "controls": 3,
+  "passed": 2,
+  "actualCompiledExit": 1,
+  "moduleResolutionVerifiedAgainstOwnedWorktree": true,
+  "all629ArtifactsUnchanged": true,
+  "sourceClean": true,
+  "sourceAndCompiled": [
+    {
+      "path": "shortcut-rejection-compound-oracle-v3.ts",
+      "bytes": 9620,
+      "sha256": "46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004"
+    },
+    {
+      "path": "compiled/shortcut-rejection-compound-oracle-v3.js",
+      "bytes": 9341,
+      "sha256": "2c718a314fce1531ba582648473a48c64070f4b8ffe535c5cc7807af18b640b3"
+    },
+    {
+      "path": "compiled/shortcut-rejection-compound-oracle-v3.js.map",
+      "bytes": 9262,
+      "sha256": "43946b93bc30ed3d33a5494ce31e0f5284882b01dd8aa4ef62c6c4cd8cf42c3d"
+    }
+  ]
+}

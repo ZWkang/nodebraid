@@ -1,0 +1,49 @@
+[
+  {
+    "label": "actual-package-build",
+    "argv": [
+      "bun",
+      "run",
+      "--filter",
+      "@nodebraid/plugin-interaction",
+      "build"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+    "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "workingPatchSHA256": "811d93db64d45eb7358036c6a0046289bf754bc00388988449095a87b2346f64",
+    "sourceSHA256": "ecd4cdbaa0e247ee36ddd1af4f7d10561823397cd64f721c5db4b65e72409701",
+    "exitCode": 0,
+    "startedAt": "2026-10-28T08:17:19.856358+00:00",
+    "endedAt": "2026-10-28T08:17:21.777625+00:00"
+  },
+  {
+    "label": "strict-typecheck-and-emit",
+    "argv": [
+      "bun",
+      "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/node_modules/typescript/bin/tsc",
+      "-p",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/0190bc60-7c9b-4f72-8cd2-28acb0ee31d1/public-compound-oracle/tsconfig.json"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+    "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "workingPatchSHA256": "811d93db64d45eb7358036c6a0046289bf754bc00388988449095a87b2346f64",
+    "sourceSHA256": "ecd4cdbaa0e247ee36ddd1af4f7d10561823397cd64f721c5db4b65e72409701",
+    "exitCode": 0,
+    "startedAt": "2026-10-28T08:17:21.777875+00:00",
+    "endedAt": "2026-10-28T08:17:22.073784+00:00"
+  },
+  {
+    "label": "compiled",
+    "argv": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/0190bc60-7c9b-4f72-8cd2-28acb0ee31d1/public-compound-oracle/compiled/shortcut-rejection-compound-oracle.js"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+    "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "workingPatchSHA256": "811d93db64d45eb7358036c6a0046289bf754bc00388988449095a87b2346f64",
+    "sourceSHA256": "ecd4cdbaa0e247ee36ddd1af4f7d10561823397cd64f721c5db4b65e72409701",
+    "exitCode": 0,
+    "startedAt": "2026-10-28T08:17:22.074133+00:00",
+    "endedAt": "2026-10-28T08:17:22.135190+00:00"
+  }
+]

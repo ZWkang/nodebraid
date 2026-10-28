@@ -1,0 +1,30 @@
+[
+  {
+    "label": "strict-typecheck-and-emit",
+    "argv": [
+      "bun",
+      "/Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow/node_modules/typescript/bin/tsc",
+      "-p",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/20261028T072819-maintenance/interaction-classification-probe/tsconfig.json"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow",
+    "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "sourceSHA256": "1e759b79df9d0528d6c9ac636e3f03134173a2a57fa462b1d71ed4b62e4d1f2a",
+    "exitCode": 0,
+    "startedAt": "2026-10-28T07:35:45.301001+00:00",
+    "endedAt": "2026-10-28T07:35:45.771415+00:00"
+  },
+  {
+    "label": "compiled",
+    "argv": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/20261028T072819-maintenance/interaction-classification-probe/compiled/shortcut-rejection-prototype.js"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow",
+    "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "sourceSHA256": "1e759b79df9d0528d6c9ac636e3f03134173a2a57fa462b1d71ed4b62e4d1f2a",
+    "exitCode": 1,
+    "startedAt": "2026-10-28T07:35:45.771947+00:00",
+    "endedAt": "2026-10-28T07:35:45.878471+00:00"
+  }
+]

@@ -1,0 +1,28 @@
+--- original-root-only-oracle.ts
++++ compound-stage-oracle.ts
+@@ -89,13 +89,23 @@
+       if (fresh) await fresh.dispose();
+       const ownUnhandled = unhandled.slice(startUnhandled);
+       const originalFaultPreserved = faults.some(fault => Object.is(fault.error, failure));
++      const faultError = faults.length === 1 ? faults[0]!.error : undefined;
++      const descriptor = (typeof faultError === 'object' && faultError !== null) || typeof faultError === 'function'
++        ? Object.getOwnPropertyDescriptor(faultError, 'errors') : undefined;
++      const members: unknown = descriptor && 'value' in descriptor ? descriptor.value : undefined;
++      const compoundOriginalAndInspectionSlotsPreserved = Array.isArray(members) && members.length === 2
++        && Object.is(members[0], failure) && Object.is(members[1], inspectionFailure)
++        && faultError instanceof AggregateError;
++      const exactlyOneFault = faults.length === 1;
++      const requiredIdentityStagePreserved = route === 'shortcut-proxy-rejection'
++        ? compoundOriginalAndInspectionSlotsPreserved : originalFaultPreserved;
+       let hostDisposed = false;
+       const hostDisposal = host.dispose().then(() => { hostDisposed = true; });
+       await turn(); await turn();
+       if (hostDisposed) await hostDisposal;
+       if (bindingDisposed) await bindingDisposal;
+-      const passed = handlerCalls === 1 && commandDisposed && originalFaultPreserved && bindingDisposed && reservationReleased && ownUnhandled.length === 0 && hostDisposed;
+-      rows.push({ route, passed, handlerCalls, prototypeReads, faults: faults.length, originalFaultPreserved,
++      const passed = handlerCalls === 1 && commandDisposed && requiredIdentityStagePreserved && exactlyOneFault && bindingDisposed && reservationReleased && ownUnhandled.length === 0 && hostDisposed && renderer.disposed && renderer.subscriptions.size === 0;
++      rows.push({ route, passed, handlerCalls, prototypeReads, faults: faults.length, originalFaultPreserved, compoundOriginalAndInspectionSlotsPreserved, exactlyOneFault, requiredIdentityStagePreserved,
+         unhandledRejections: ownUnhandled.length, unhandledIsInspectionFailure: ownUnhandled.some(error => Object.is(error, inspectionFailure)),
+         commandRegistrationDisposed: commandDisposed, bindingDisposed, reservationReleased, conflictCode,
+         hostDisposed, rendererDisposed: renderer.disposed, remainingRendererSubscriptions: renderer.subscriptions.size,

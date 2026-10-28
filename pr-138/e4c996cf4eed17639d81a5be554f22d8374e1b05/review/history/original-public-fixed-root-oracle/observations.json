@@ -1,0 +1,46 @@
+[
+  {
+    "route": "direct-command-proxy-control",
+    "passed": true,
+    "originalIdentity": true,
+    "prototypeReads": 0,
+    "handlerCalls": 1,
+    "commandRegistrationDisposed": true,
+    "hostDisposed": true,
+    "rendererDisposed": true
+  },
+  {
+    "route": "shortcut-ordinary-error-control",
+    "passed": true,
+    "handlerCalls": 1,
+    "prototypeReads": 0,
+    "faults": 1,
+    "originalFaultPreserved": true,
+    "unhandledRejections": 0,
+    "unhandledIsInspectionFailure": false,
+    "commandRegistrationDisposed": true,
+    "bindingDisposed": true,
+    "reservationReleased": true,
+    "hostDisposed": true,
+    "rendererDisposed": true,
+    "remainingRendererSubscriptions": 0,
+    "observation": "Each public disposal attempted; state read after actual handler rejection and finite native event-loop turns. A pending public Promise is not reported as cleanup success."
+  },
+  {
+    "route": "shortcut-proxy-rejection",
+    "passed": false,
+    "handlerCalls": 1,
+    "prototypeReads": 1,
+    "faults": 1,
+    "originalFaultPreserved": false,
+    "unhandledRejections": 0,
+    "unhandledIsInspectionFailure": false,
+    "commandRegistrationDisposed": true,
+    "bindingDisposed": true,
+    "reservationReleased": true,
+    "hostDisposed": true,
+    "rendererDisposed": true,
+    "remainingRendererSubscriptions": 0,
+    "observation": "Each public disposal attempted; state read after actual handler rejection and finite native event-loop turns. A pending public Promise is not reported as cleanup success."
+  }
+]

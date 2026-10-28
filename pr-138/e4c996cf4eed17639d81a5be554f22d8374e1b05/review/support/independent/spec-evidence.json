@@ -1,0 +1,220 @@
+{
+  "axis": "Spec",
+  "verdict": "passed",
+  "verdictScope": "Implemented code and functional requirements at exact reviewed source; not full delivery completion.",
+  "base": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+  "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+  "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+  "patch": "c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476",
+  "changedFiles": [
+    "packages/plugin-interaction/src/shortcut-runtime.ts",
+    "packages/plugin-interaction/tests/lifecycle.test.ts"
+  ],
+  "preparedTaskDigest": "c21362e67c91892b2f4caf6fd624c9218f305c7e5140875a5e40ba036f4852c0",
+  "report": "Spec verdict: **passed（已实现代码/功能）**；无未解决实现缺口或范围扩张。Risk **medium**。\n\nbase `fe94ea93ed6b06e65e5d29f7846e132a53f8cded`；head `618cb61d25990415e4ab27f0132f2247dc7b8972`；tree `bf0a2377f8e5cd5596b692e98d936d9ae4905a39`；完整 binary patch SHA256 `c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476`。完整两文件已审，prepared digest `c21362e67c91892b2f4caf6fd624c9218f305c7e5140875a5e40ba036f4852c0`。\n\nIssue136 要求“cannot strand Shortcut execution ownership”和“inspection failure alongside the original”：窄 catch 只处理 native `instanceof`/`code` 分类，严格保留 `[原 rejection, 实际 inspection]` 两引用，之后仍走一个稳定 command Fault；finally 完成该已结算 execution。没有吞错、flatten、Proxy 禁令或 fallback。普通错误保持根身份；真 `COMMAND_NOT_FOUND`、expected disposal abort、Command ID/scope、Disposition、repeat/Gesture 仲裁、cached disposal、reservation 等待及 fresh Binding 语义保持。\n\n**审查发现并解决的验收缺口：**公共 v2 未检查 Fault 名称、commandId、scope，与澄清评论6463977910的要求不完整。源码未为此改动；独立 v3 加入这些精确断言及冻结检查，输入与原生命周期要求不减弱。同一 v3（SHA256 `46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004`）在真实 base 红2/3、exit1，在618绿3/3、exit0，两个 strict TSC 均0；模块路径、实际输出及源/JS/map hash 已核验。这是协调器执行，非我的计数。原1e759两次失败、v2 dirty结果与旧 root-only false 均原样保留，不冒称原程序 green。\n\n独立执行 `bun test packages/plugin-interaction/tests packages/plugin-command/tests packages/runtime-cordis/tests packages/diagnostics/tests packages/plugin-history/tests packages/preset-basic/tests packages/core/tests`：**833 pass /6377 assertions，exit0**。前后精确身份、clean、完整patch及相关dist hash未变。已完整读取修订Issue/唯一澄清评论、六条验收、七步计划与公共调用链；父 affected exit0单独记录。\n\n当前仅认证实现：正式 full、远端发布/CI、报告媒体回读、人审合并及实际 main/关闭阶段仍 pending，逐项见JSON。未执行 full/build/affected/browser/GitHub，未认证其它Issue；Recording Renderer不证明 native keyboard，已停读工作树。\n\n公开源码改变异步失败与生命周期所有权，风险 medium。回滚需完整回退618或其未来真实发布映射到fe94；回退会重新暴露原缺陷，不能撤销已执行Command或自动处理已有活跃/挂起Runtime。\n",
+  "reportPath": "/Users/zhou/.codex/local-workflows/nodebraid/runs/0190bc60-7c9b-4f72-8cd2-28acb0ee31d1/reviews/spec.md",
+  "findings": [],
+  "resolvedFindings": [
+    {
+      "id": "SPEC-ORACLE-1",
+      "priority": "P2",
+      "category": "public-acceptance-coverage",
+      "requirementSource": "https://github.com/ZWkang/nodebraid/issues/136#issuecomment-6463977910",
+      "quote": "Exactly one stable command Fault with the existing command ID/scope.",
+      "originalEvidence": "public-compound-oracle/shortcut-rejection-compound-oracle.ts v2 SHAecd4cdbaa0e247ee36ddd1af4f7d10561823397cd64f721c5db4b65e72409701只检查唯一Fault与2slots，不检查name/commandId/pluginName；若名字或scope错误其程序仍可绿。仓库helper已有检查，因此这不是产品实现bug。",
+      "status": "resolved",
+      "resolution": "public-v3-source/v2-to-v3.patch只增加Fault metadata/冻结断言并纳入passed条件；新同字节v3 SHA46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004在实际base red2/3 exit1及618green3/3 exit0，严格TSC0，source/JS/map与module paths分别核验。原v2dirty成功保持原记录。",
+      "productSourceChangedForThisFinding": false
+    }
+  ],
+  "risk": {
+    "level": "medium",
+    "rationale": "公开Interaction源码改变异步Command拒绝分类及execution完成/Binding预约释放；影响失败可见性与生命周期，但未改变公共API、依赖、权限或构建/审查政策。publicsrc最低medium，范围窄及绿检查不使其降为low。",
+    "evidence": "精确618/treebf0/完整patchc2fc两文件独立审查；own新公共833tests6377assertions0并核对前后clean/targetbase/patch/相关dist hash。修订Issue136+唯一澄清评论、ADR74/28/29、prototype/code×7原值×Sink×dispose矩阵；另核验协调器affected0与v3真实base红/head绿，旧错误oracle未被涂绿。",
+    "rollback": "正常审核后完整revert618cb61d25990415e4ab27f0132f2247dc7b8972，或未来实际published映射的整项生产/回归改动，到fe94ea93ed6b06e65e5d29f7846e132a53f8cded。将重新暴露已确认的分类异常/挂起缺陷；代码回退不会撤销已经执行的应用Command、替换现有Activation代码或自动释放此前挂起的execution/reservation。"
+  },
+  "requirementCoverage": [
+    {
+      "id": "136-A1",
+      "quote": "A completed Handler rejection cannot strand Shortcut execution ownership. Binding disposal settles after all started Commands finish and releases the reservation; original/cached disposal behavior and fresh Binding isolation remain valid.",
+      "status": "satisfied-implemented",
+      "assessment": "reject callback finally删除本次running并结算owned promise；仅在Command已settle后执行，未改admission/cached dispose/wait-all/reservation/fresh handle。新56matrix与既有生命周期own suite验证先dispose/后reject等。"
+    },
+    {
+      "id": "136-A2",
+      "quote": "Preserve the original application rejection by reference. If native error classification itself fails, expose that actual inspection failure alongside the original through the existing stable command Fault path, without silent success, replacement, empty errors or flattening.",
+      "status": "satisfied-implemented",
+      "assessment": "catch仅限instanceof及code分类；native实际抛值和原rejection通过一个AggregateError恰2slots传给原commandFault；falsey/Symbol/Error引用严格Object.is，未flatten或任意包装普通错误。"
+    },
+    {
+      "id": "136-A3",
+      "quote": "Preserve genuine `COMMAND_NOT_FOUND` capability-unavailable rejection, expected disposal aborts, ordinary Handler result/error identity, command ID/scope, input Disposition, repeat/gesture arbitration and concurrent/reentrant waiting/reservations. Do not add a Proxy/accessor/record ban, API, timeout, retry, cap, fallback or cancellation policy.",
+      "status": "satisfied-implemented",
+      "assessment": "真COMMAND_NOT_FOUND仍走capability-unavailable；expected abort先于分类且按原reason比较；普通Handler错误root同一值，CommandService/Binding/输入/gesture仲裁未改。"
+    },
+    {
+      "id": "136-A4",
+      "quote": "Preserve the original independent three-control compiled source, both actual failed executions and every observation unchanged; do not relabel its root-only compound-error predicate green. Ordinary direct/Shortcut controls still require original root identity. Independently execute a clearly versioned public verification that keeps all existing lifecycle/input requirements and additionally requires exactly one compound command Fault, an AggregateError with exactly two slots, and Object.is(slot0, original rejection) plus Object.is(slot1, actual inspection failure). Retain the old root-only observation separately. Repository public Host/Command/Shortcut regressions must be red before implementation and green afterward; no fake collector or weakened failure/completion assertion.",
+      "status": "satisfied-with-resolved-public-oracle-gap",
+      "assessment": "修订source+comment和新prepared记录清楚分离v1原失败/v2dirty/v3独立程序。发现v2缺name/id/scope后以不弱化输入的v3补足；同bytes分别在base red与headgreen，旧root-only false与全部旧证据保留。"
+    },
+    {
+      "id": "136-A5",
+      "quote": "Run related/affected consumers, independent Standards + ponytail-review and Spec with exact head/tree/patch/path risk, then canonical formal full verification. Verify actual remote tree/first parent, current-head CI, complete immutable report and mapped native media publication/readback.",
+      "status": "implementation-review-satisfied-delivery-stages-pending",
+      "assessment": "父affected exit0与本轴833/6377及v3headgreen已读取/执行并区分；另一axis独立，正式verify/full/remote tree/CI/完整report/media发布回读尚待后续，不能据review标完成。"
+    },
+    {
+      "id": "136-A6",
+      "quote": "Keep this Issue open with Refs through normal integration and actual-main whole-Issue acceptance; apply the deployed human-review/merge route and separate closing authority.",
+      "status": "pending-normal-integration",
+      "assessment": "Issue仍open/Refs范围；medium须后续人审/人工merge、实际main whole-Issue验收及独立closing gate。本review没有给出写入/合并/关闭权限。"
+    }
+  ],
+  "planCoverage": [
+    {
+      "id": "public-red",
+      "blockedBy": [],
+      "acceptance": "Preserve independent strict compiled3 red at fe94 (two controls pass, Shortcut native classification fails with original loss and pending ownership). Add a genuine public Host/Command/Shortcut repository tracer red before implementation, preserving original source/logs.",
+      "status": "historical-evidence-verified",
+      "assessment": "旧独立compiled3真red及最小仓库tracer原实现0/1、修复1/10；red/green testcase文件bytes相等，历史记录未改或换头。"
+    },
+    {
+      "id": "classify-and-complete",
+      "blockedBy": [
+        "public-red"
+      ],
+      "acceptance": "Shortcut-owned completed execution always settles; native CommandError classification failures remain explicit together with the original rejection through stable command Fault. Preserve ordinary identity, genuine capability unavailable, expected aborts, reservations, cached disposal and fresh Binding isolation; no API, policy, cap, retry or fallback.",
+      "status": "satisfied-this-head",
+      "assessment": "完整生产修复与真实公共tests在618已核对，own833/6377通过，native原值/完成/预约与保留行为满足。"
+    },
+    {
+      "id": "affected-and-independent-review",
+      "blockedBy": [
+        "classify-and-complete"
+      ],
+      "acceptance": "Related tests and affected consumers pass; independently execute a clearly versioned compound-error public3 program with exactly one Aggregate Fault and two exact original/inspection slots while preserving every lifecycle/input requirement. Retain original root-only source and both failed runs unchanged and never label them green. Expand legitimate native classification, ordinary identity, capability, abort and waiting controls. Exact-head independent Standards+ponytail and Spec full Markdown/risk both pass.",
+      "status": "spec-and-public-evidence-satisfied-other-axis-separate",
+      "assessment": "本轴已新审完整patch并own执行；父affected0、v3同字节base红/head绿已核验；Standards独立由协调者汇总，不借其判断。"
+    },
+    {
+      "id": "formal-engineering-check",
+      "blockedBy": [
+        "affected-and-independent-review"
+      ],
+      "acceptance": "Only after both axes passed, fixed fetched-main agents:run verify really executes this attempt complete bun run check with independent stable head/tree/patch and full raw logs. Preserve all failed/corrected attempts.",
+      "status": "pending",
+      "assessment": "按计划待两轴后canonical verify真实执行完整check；本轴未提前执行或伪报。"
+    },
+    {
+      "id": "publish-current-head",
+      "blockedBy": [
+        "formal-engineering-check"
+      ],
+      "acceptance": "One normal append-only delivery PR targeting main with Refs136, actual remote complete tree/ordered firstparent/base inheritance and identity readback. Real current source CI, complete current immutable report and dynamic mapped native manifest/media byte/size/SHA256/Gitblob readback before readiness.",
+      "status": "pending",
+      "assessment": "当前尚未远端source/PR publication/currentCI/report/media实际readback。"
+    },
+    {
+      "id": "required-review-and-authorized-merge",
+      "blockedBy": [
+        "publish-current-head"
+      ],
+      "acceptance": "All current feedback/checks/evidence/premerge tickets/protection and canonical required focused human review/specific authorization pass before normal immediate expected-head merge. Risk does not create authority; no selfapprove/dismiss/force/bypass/auto queue.",
+      "status": "pending",
+      "assessment": "canonical medium须focused人审与人工merge，所有当前feedback/checks/protection/tickets及具体权限仍须满足。"
+    },
+    {
+      "id": "main-integration-acceptance",
+      "blockedBy": [
+        "required-review-and-authorized-merge"
+      ],
+      "acceptance": "After actual integration fetch main, whole Issue/public program/all tickets and actual main CI/necessary Deploy pass before separately authorized acceptance summary ID+digest/readback/archive and completed close. Keep source open otherwise.",
+      "status": "pending",
+      "assessment": "须后续actual main fresh whole-Issue/public/CI/Deploy及独立summary/closing授权；代码review不代表已完成交付。"
+    }
+  ],
+  "ownChecks": [
+    {
+      "command": "bun test packages/plugin-interaction/tests packages/plugin-command/tests packages/runtime-cordis/tests packages/diagnostics/tests packages/plugin-history/tests packages/preset-basic/tests packages/core/tests",
+      "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+      "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+      "exitCode": 0,
+      "tests": 833,
+      "assertions": 6377,
+      "files": 42,
+      "rawLog": "spec-tests.log"
+    },
+    {
+      "command": "read-only exactGit/clean/base/fullbinarypatch/changedFiles/canonicalrisk/source digest checks plus related built artifact hash comparison",
+      "exitCode": 0,
+      "rawLog": "spec-tests.log"
+    }
+  ],
+  "readEvidence": [
+    {
+      "artifact": "affected-receipt.json",
+      "executor": "coordinator",
+      "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+      "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+      "exitCode": 0,
+      "notOwnExecution": true
+    },
+    {
+      "artifact": "public-v3-base-red/receipts.json",
+      "executor": "coordinator",
+      "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+      "strictTSCExit": 0,
+      "compiledExit": 1,
+      "controlsPassed": 2,
+      "controls": 3,
+      "sourceSHA256": "46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004",
+      "notOwnExecution": true
+    },
+    {
+      "artifact": "public-v3-head-green/receipts.json",
+      "executor": "coordinator",
+      "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+      "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+      "strictTSCExit": 0,
+      "compiledExit": 0,
+      "controlsPassed": 3,
+      "controls": 3,
+      "sourceSHA256": "46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004",
+      "notOwnExecution": true
+    },
+    {
+      "artifact": "prior tdd/red+green lifecycle snapshots/rawlog",
+      "executor": "coordinator",
+      "result": "same testcase filebytes before/after,0pass1fail→1pass10assertions; no relabelling as this head own run",
+      "notOwnExecution": true
+    }
+  ],
+  "discussion": {
+    "issueStateObserved": "open",
+    "commentsReadCompletely": [
+      6463977910
+    ],
+    "sourceIssue": "source-issue.json",
+    "sourceComments": "source-comments.json",
+    "oracleCorrectionIsNotPublicContractChange": true,
+    "noUnresolvedDesignFeedbackObserved": true,
+    "prNotYetPublished": true
+  },
+  "pendingDelivery": [
+    "Separate Standards aggregation",
+    "Formal full engineering verify",
+    "Actual remote source/firstparent/CI and complete immutable report/media publication/readback",
+    "Required focused human review/human merge",
+    "Actual-main whole-Issue acceptance and separate summary/closing steps"
+  ],
+  "limits": [
+    "No build/full/affected/browser/GitHub/source/state/branch modifications by this reviewer.",
+    "No other Gesture classifiers investigated or repaired; source pattern similarity is not a proved public defect.",
+    "Recording Renderer normalized Keyboard Input is not native keyboard/browser evidence.",
+    "Original v1 root-only oracle remains two real failures; v2 dirty success remains distinct; only versioned v3 is current public-acceptance evidence.",
+    "No old plan/oracle review was reused as formal exact-head review; no old Issue completion or authorization certified."
+  ],
+  "stoppedWorktreeAccess": true,
+  "completedAt": "2026-10-28T08:46:31.325678+00:00"
+}

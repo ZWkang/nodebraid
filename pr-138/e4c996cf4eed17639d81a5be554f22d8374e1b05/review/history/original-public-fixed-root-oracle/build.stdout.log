@@ -1,0 +1,36 @@
+@nodebraid/plugin-interaction build: [build] @nodebraid/diagnostics
+@nodebraid/plugin-interaction build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction build: [build] @nodebraid/kernel
+@nodebraid/plugin-interaction build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction build: [build] @nodebraid/port-api
+@nodebraid/plugin-interaction build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction build: [build] @nodebraid/session-api
+@nodebraid/plugin-interaction build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction build: [build] @nodebraid/interaction-api
+@nodebraid/plugin-interaction build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction build: [build] @nodebraid/runtime-cordis
+@nodebraid/plugin-interaction build: $ tsgo -p tsconfig.build.json
+@nodebraid/plugin-interaction build: [build] @nodebraid/plugin-command
+@nodebraid/plugin-interaction build: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction build: [build] @nodebraid/plugin-kernel
+@nodebraid/plugin-interaction build: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction build: [build] @nodebraid/plugin-port
+@nodebraid/plugin-interaction build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction build: [build] @nodebraid/plugin-session
+@nodebraid/plugin-interaction build: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction build: [build] @nodebraid/renderer-api
+@nodebraid/plugin-interaction build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction build: [build] @nodebraid/plugin-renderer
+@nodebraid/plugin-interaction build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction build: [build] @nodebraid/plugin-interaction
+@nodebraid/plugin-interaction build: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/plugin-interaction build: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/plugin-interaction build: Exited with code 0

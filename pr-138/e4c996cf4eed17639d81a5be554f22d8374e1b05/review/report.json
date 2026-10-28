@@ -1,0 +1,1225 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "expectedParent": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "head": "e4c996cf4eed17639d81a5be554f22d8374e1b05",
+    "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+    "patch": "c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476",
+    "localHead": "618cb61d25990415e4ab27f0132f2247dc7b8972"
+  },
+  "task": {
+    "run": "0190bc60-7c9b-4f72-8cd2-28acb0ee31d1",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 136
+    },
+    "request": "## Confirmed defect\n\nBase: `fe94ea93ed6b06e65e5d29f7846e132a53f8cded`.\nPublic seam: real Plugin Host + Basic Canvas Composition + Command Service + Interaction Shortcut, driven through a typed Recording Renderer’s public normalized Keyboard Input control/behavior phases. This is not a native keyboard or SVG claim.\n\nA Command Handler throws an application-owned Proxy(Error). Its native `getPrototypeOf` trap throws a separate inspection failure. Direct Command execution rejects with the original Proxy by reference and does not invoke that trap. The Shortcut rejection classifier invokes it through `error instanceof CommandError`; the classifier’s exception escapes an ignored Promise before Fault reporting and execution completion.\n\nThe original strict TypeScript compile exited **0**. The emitted-JS native Bun probe exited **1**, with two passing controls and one failure:\n\n```json\n{\"route\":\"direct-command-proxy-control\",\"passed\":true,\"originalIdentity\":true,\"prototypeReads\":0,\"commandRegistrationDisposed\":true,\"hostDisposed\":true}\n{\"route\":\"shortcut-ordinary-error-control\",\"passed\":true,\"faults\":1,\"originalFaultPreserved\":true,\"bindingDisposed\":true,\"reservationReleased\":true,\"hostDisposed\":true}\n{\"route\":\"shortcut-proxy-rejection\",\"passed\":false,\"handlerCalls\":1,\"prototypeReads\":1,\"faults\":0,\"originalFaultPreserved\":false,\"unhandledRejections\":1,\"unhandledIsInspectionFailure\":true,\"commandRegistrationDisposed\":true,\"bindingDisposed\":false,\"reservationReleased\":false,\"conflictCode\":\"SHORTCUT_ALREADY_REGISTERED\",\"hostDisposed\":false,\"rendererDisposed\":false}\n```\n\nAll public disposals were attempted. The failed control records pending public cleanup after the Handler rejection and finite native event-loop turns; it does not claim cleanup success or infer a wall-clock timeout. The isolated Bun child actually exited1, and no browser/server was started. Both ordinary controls completed their Host/Renderer cleanup.\n\nOriginal full public-program SHA256: `1e759b79df9d0528d6c9ac636e3f03134173a2a57fa462b1d71ed4b62e4d1f2a`. Source, emitted JS/map, original stdout/stderr, all observations, command/exit receipts and exact production artifact hashes are retained unchanged.\n\n## Reproduction\n\nAfter the public workspace build, use a real Host with `createBasicCanvasPlugin(() => recordingRenderer)` and a Consumer requiring `commandService` and `interactionShortcutService`. The recording fixture implements the existing `CanvasRenderer` interface and drives the subscribed control and behavior callbacks with ordinary normalized `key.down`.\n\n```ts\nconst original = new Error('caller-owned Command rejection');\nconst inspectionFailure = new Error('native getPrototypeOf failed');\nconst rejection = new Proxy(original, {\n  getPrototypeOf() { throw inspectionFailure; },\n});\nconst command = defineCommand<void, void>('repro.shortcut.classification');\nconst commandRegistration = commands.register(command, () => { throw rejection; });\nconst binding = {\n  shortcut: {\n    code: 'KeyP',\n    modifierAlternatives: [{ alt: false, control: false, meta: false, shift: false }],\n  },\n  command,\n};\nconst registration = shortcuts.register(binding);\n// recordingRenderer emits key.down, KeyP, repeat:false, all modifiers:false.\n// Both control and behavior phases return {defaultAction:'prevent'}.\n// The Handler finishes; Command Registration disposal resolves.\nawait commandRegistration.dispose();\n// Actual: the Binding disposal Promise remains pending and a new\n// shortcuts.register(binding) still throws SHORTCUT_ALREADY_REGISTERED.\nconst disposal = registration.dispose();\n```\n\nThe full probe also captures the actual unhandled rejection and verifies its identity against `inspectionFailure`, so the observation is not based only on a pending flag.\n\n## Contract and cause\n\n- [ADR0074](https://github.com/ZWkang/nodebraid/blob/fe94ea93ed6b06e65e5d29f7846e132a53f8cded/docs/adr/0074-compose-shortcuts-through-interaction-authority.md) requires a disposed Binding to stop admission, abort and wait for its started Commands, then release its reservation. Non-capability Command rejections use the stable command Fault path.\n- [ADR0028](https://github.com/ZWkang/nodebraid/blob/fe94ea93ed6b06e65e5d29f7846e132a53f8cded/docs/adr/0028-separate-diagnostics-from-error-propagation.md) separates diagnostic observation from failure propagation.\n- [ADR0029](https://github.com/ZWkang/nodebraid/blob/fe94ea93ed6b06e65e5d29f7846e132a53f8cded/docs/adr/0029-preserve-domain-and-external-error-identity.md) preserves original external failures and aggregate stages.\n\nIn `packages/plugin-interaction/src/shortcut-runtime.ts`, the rejected-execution callback performs native CommandError classification before `finish()`. A classification exception bypasses the completion of the Shortcut-owned execution. The Command Service already settles its own execution; the missing handling belongs to this Shortcut boundary.\n\n## Acceptance\n\n1. A completed Handler rejection cannot strand Shortcut execution ownership. Binding disposal settles after all started Commands finish and releases the reservation; original/cached disposal behavior and fresh Binding isolation remain valid.\n2. Preserve the original application rejection by reference. If native error classification itself fails, expose that actual inspection failure alongside the original through the existing stable command Fault path, without silent success, replacement, empty errors or flattening.\n3. Preserve genuine `COMMAND_NOT_FOUND` capability-unavailable rejection, expected disposal aborts, ordinary Handler result/error identity, command ID/scope, input Disposition, repeat/gesture arbitration and concurrent/reentrant waiting/reservations. Do not add a Proxy/accessor/record ban, API, timeout, retry, cap, fallback or cancellation policy.\n4. Preserve the original independent three-control compiled source, both actual failed executions and every observation unchanged; do not relabel its root-only compound-error predicate green. Ordinary direct/Shortcut controls still require original root identity. Independently execute a clearly versioned public verification that keeps all existing lifecycle/input requirements and additionally requires exactly one compound command Fault, an AggregateError with exactly two slots, and Object.is(slot0, original rejection) plus Object.is(slot1, actual inspection failure). Retain the old root-only observation separately. Repository public Host/Command/Shortcut regressions must be red before implementation and green afterward; no fake collector or weakened failure/completion assertion.\n5. Run related/affected consumers, independent Standards + ponytail-review and Spec with exact head/tree/patch/path risk, then canonical formal full verification. Verify actual remote tree/first parent, current-head CI, complete immutable report and mapped native media publication/readback.\n6. Keep this Issue open with Refs through normal integration and actual-main whole-Issue acceptance; apply the deployed human-review/merge route and separate closing authority.\n\n## Deduplication\n\nComplete all-state collections: **135 unique Issue/PR records (100+35)** and **69 unique PRs**, with final short pages and unique-ID checks. Related Issue bodies/all comments and PR descriptions/files/reviews/inline threads/replies were read completely:\n\n- #16/#17 retains the original caller signal; #33/#34 rechecks Command admission after options reentry. They do not change Shortcut rejection classification.\n- #21/#23 caches Host/Installation disposal before abort reentry. This Binding has a cached Promise, but its already-finished execution is never completed.\n- #35/#36 captures Duplicate factory options; #126/#127 captures Shortcut/Binding values. Their implemented value ownership remains intact.\n- #69/#70 and #80/#81 concern Runtime diagnostic traversal and event field capture; #134/#135 handles terminal Runtime cleanup inspection. This is the separate Shortcut Command-rejection classifier and its completion path.\n- The existing open #110/#128/#130/#132 acceptance/owner records stay separate. No active delivery covers this reproduction.\n\n## Verification clarification\n\nSee https://github.com/ZWkang/nodebraid/issues/136#issuecomment-6463977910 for the existing-contract distinction between ordinary root identity and a compound Fault retaining both failures. The original probe SHA256 and all its failed runs remain unchanged; the corrected verification has a separate source hash and actual execution. This is an oracle correction under ADR0028/0029, not a new public API, error policy or permission.\n",
+    "plan": [
+      {
+        "id": "public-red",
+        "blockedBy": [],
+        "acceptance": "Preserve independent strict compiled3 red at fe94 (two controls pass, Shortcut native classification fails with original loss and pending ownership). Add a genuine public Host/Command/Shortcut repository tracer red before implementation, preserving original source/logs."
+      },
+      {
+        "id": "classify-and-complete",
+        "blockedBy": [
+          "public-red"
+        ],
+        "acceptance": "Shortcut-owned completed execution always settles; native CommandError classification failures remain explicit together with the original rejection through stable command Fault. Preserve ordinary identity, genuine capability unavailable, expected aborts, reservations, cached disposal and fresh Binding isolation; no API, policy, cap, retry or fallback."
+      },
+      {
+        "id": "affected-and-independent-review",
+        "blockedBy": [
+          "classify-and-complete"
+        ],
+        "acceptance": "Related tests and affected consumers pass; independently execute a clearly versioned compound-error public3 program with exactly one Aggregate Fault and two exact original/inspection slots while preserving every lifecycle/input requirement. Retain original root-only source and both failed runs unchanged and never label them green. Expand legitimate native classification, ordinary identity, capability, abort and waiting controls. Exact-head independent Standards+ponytail and Spec full Markdown/risk both pass."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "affected-and-independent-review"
+        ],
+        "acceptance": "Only after both axes passed, fixed fetched-main agents:run verify really executes this attempt complete bun run check with independent stable head/tree/patch and full raw logs. Preserve all failed/corrected attempts."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "One normal append-only delivery PR targeting main with Refs136, actual remote complete tree/ordered firstparent/base inheritance and identity readback. Real current source CI, complete current immutable report and dynamic mapped native manifest/media byte/size/SHA256/Gitblob readback before readiness."
+      },
+      {
+        "id": "required-review-and-authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "All current feedback/checks/evidence/premerge tickets/protection and canonical required focused human review/specific authorization pass before normal immediate expected-head merge. Risk does not create authority; no selfapprove/dismiss/force/bypass/auto queue."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "required-review-and-authorized-merge"
+        ],
+        "acceptance": "After actual integration fetch main, whole Issue/public program/all tickets and actual main CI/necessary Deploy pass before separately authorized acceptance summary ID+digest/readback/archive and completed close. Keep source open otherwise."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "axis": "standards",
+      "base": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+      "expectedParent": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+      "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+      "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+      "patch": "c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476",
+      "taskDigest": "c21362e67c91892b2f4caf6fd624c9218f305c7e5140875a5e40ba036f4852c0",
+      "changedFiles": [
+        "packages/plugin-interaction/src/shortcut-runtime.ts",
+        "packages/plugin-interaction/tests/lifecycle.test.ts"
+      ],
+      "comparisonCommand": "git diff --binary fe94ea93ed6b06e65e5d29f7846e132a53f8cded...618cb61d25990415e4ab27f0132f2247dc7b8972",
+      "commits": [
+        "618cb61 fix: settle Shortcut rejection inspection"
+      ],
+      "report": "What this change does: Keeps Shortcut execution completion reliable when native Command-error inspection throws. One stable command Fault retains the original rejection and actual inspection failure; completion runs in finally.\n\n- Base: `fe94ea93ed6b06e65e5d29f7846e132a53f8cded`\n- Head: `618cb61d25990415e4ab27f0132f2247dc7b8972`\n- Tree: `bf0a2377f8e5cd5596b692e98d936d9ae4905a39`\n- Binary patch SHA256: `c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476`\n- Changed files: `packages/plugin-interaction/src/shortcut-runtime.ts`; `packages/plugin-interaction/tests/lifecycle.test.ts`.\n\n**Hard standards:** No documented violation found. ADR0074's wait/reservation/release contract and ADR0028/0029's Fault and original-failure contracts remain intact. The narrow classification catch preserves two exact failure references without flattening. The outer finally releases only the completed execution; concurrent executions remain tracked. Genuine capability-unavailable and expected disposal-abort branches retain their existing behavior.\n\nI traced Command execution, Interaction wiring, scoped Runtime diagnostics, Basic Composition and Duplicate/Clipboard registrations. Public tests cover prototype/code inspection, seven actual thrown values, Sink enabled/disabled, disposal before/after rejection, cached disposal and replacement Binding isolation. The fixture implements the public Renderer seam; it is not native keyboard evidence.\n\n**Judgment:** No concrete Fowler smell needs a change. Classification and completion belong at this existing Shortcut owner; another abstraction would add no needed responsibility. Assumed load: isolated per-Canvas Hosts with concurrent Shortcut executions and arbitrary application Handler failures. Looks good. Ship.\n\n**Independent checks:** `/Users/zhou/.bun/bin/bun test packages/plugin-interaction/tests packages/plugin-command/tests packages/runtime-cordis/tests packages/diagnostics/tests packages/plugin-duplicate-selection/tests packages/plugin-clipboard/tests packages/preset-basic/tests` exited 0: **867 pass, 0 fail, 6557 assertions**, 48 files. Full raw output retained. Exact canonical patch bytes, two paths, unchanged policy, clean head/tree and current compiled repair matched before/after.\n\n**Discussion/evidence:** Read Issue 136 and comment 6463977910. Historical root-only public-program failures remain failures; no old program or dirty-tree result is certified green at this head. Repository assertions directly check Fault name, Command ID/scope and both failure identities.\n\n**Risk: medium.** Public implementation changes Fault propagation and execution ownership. Evidence is the complete connected-code review and fresh 867-test run. Revert the entire 618cb61 delivery to base fe94 and recreate affected Bindings/Hosts. Rollback cannot undo application Commands already executed. Focused human review/merge remains required under canonical pr-risk.\n\nNot checked independently: build, formal full check, browsers, corrected compiled-program certification, publication or current-head CI. Worktree access stopped.\n\n**Verdict: passed** (Standards + ponytail-review).\n",
+      "reportPath": "reviews/standards.md",
+      "findings": [],
+      "hardStandardViolations": [],
+      "judgmentFindings": [],
+      "risk": {
+        "level": "medium",
+        "rationale": "Public framework implementation changes Shortcut failure reporting and lifecycle execution completion. Runtime ownership and compatible behavior changes require medium at the public src path floor; small scope and passing checks do not establish low risk.",
+        "evidence": "Complete two-path patch and connected Command/Interaction/Runtime/Basic/Duplicate/Clipboard callers reviewed at exact head618cb61; fresh independent public Bun run passed867 tests/6557 assertions. Before/after identity checks matched full tree, canonical binary bytes/SHA256, clean status, current compiled repair and unchanged policies. Historical dirty/public program results are kept separate and not relabeled.",
+        "rollback": "Revert the complete Issue136 commit618cb61d25990415e4ab27f0132f2247dc7b8972 (or its complete future published mapping) back to basefe94ea93ed6b06e65e5d29f7846e132a53f8cded and recreate affected Shortcut Bindings/Hosts rather than relying on cached disposal outcomes. This restores the earlier classification defect and cannot undo application Commands already executed."
+      },
+      "checks": [
+        {
+          "command": "/Users/zhou/.bun/bin/bun test packages/plugin-interaction/tests packages/plugin-command/tests packages/runtime-cordis/tests packages/diagnostics/tests packages/plugin-duplicate-selection/tests packages/plugin-clipboard/tests packages/preset-basic/tests",
+          "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+          "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+          "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+          "exitCode": 0,
+          "passed": 867,
+          "failed": 0,
+          "assertions": 6557,
+          "files": 48,
+          "rawLog": "reviews/standards-tests.log",
+          "independent": true
+        }
+      ],
+      "identityChecks": {
+        "beforeAndAfter": true,
+        "canonicalBytesMatch": "review.patch",
+        "clean": true,
+        "compiledRepairPresent": true,
+        "policiesUnchanged": true,
+        "worktreeAccessStopped": true
+      },
+      "standardsSources": [
+        "AGENTS.md",
+        "CONTRIBUTING.md",
+        "CONTEXT.md",
+        "docs/agents/issue-tracker.md",
+        "docs/agents/discussion-workflow.md",
+        "docs/agents/principles.md",
+        ".agents/skills/code-review/SKILL.md",
+        ".agents/skills/ponytail/SKILL.md",
+        ".agents/skills/ponytail-review/SKILL.md",
+        ".agents/skills/control-nodebraid/SKILL.md",
+        ".agents/skills/principle-boundary-discipline/SKILL.md",
+        ".agents/skills/principle-fix-root-causes/SKILL.md",
+        ".agents/skills/principle-prove-it-works/SKILL.md",
+        ".agents/skills/principle-test-behavior-not-implementation/SKILL.md",
+        ".agents/skills/principle-type-system-discipline/SKILL.md",
+        ".agents/skills/principle-laziness-protocol/SKILL.md",
+        ".agents/skills/principle-explain-the-number/SKILL.md",
+        "ADR0074",
+        "ADR0028",
+        "ADR0029"
+      ],
+      "riskPolicy": {
+        "path": "canonical-main/.agents/skills/pr-risk/SKILL.md",
+        "blob": "596298db784c4f3424968cd05a3aca4a6471b1b3",
+        "verified": true,
+        "pathFloor": "medium",
+        "route": "quick-human",
+        "noThirdReviewer": true
+      },
+      "source": {
+        "issue": 136,
+        "url": "https://github.com/ZWkang/nodebraid/issues/136",
+        "readBody": "source-issue.json",
+        "readFullComments": "source-comments.json",
+        "commentIds": [
+          6463977910
+        ],
+        "independentPreparedTask": "prepared-task.json",
+        "unresolvedContractQuestionsObserved": []
+      },
+      "connectedCode": [
+        "CommandService.execute/disposeRegistration",
+        "Interaction Shortcut execution/disposeEntry/input disposition",
+        "Activation-scoped diagnostics.reportFault and Host Sink/Reporter paths",
+        "Basic Canvas Composition",
+        "Duplicate and Clipboard Shortcut registration owners"
+      ],
+      "testAssessment": {
+        "newMatrix": "2 native inspection sites x7 thrown values x2 Sink states x2 disposal timings, plus the original public tracer.",
+        "promisedBehavior": "One stable command Fault; exact two AggregateError slots; preserved raw receiver/errors; cached Binding disposal, waiting/reservation release and fresh Binding isolation.",
+        "fixtureBoundary": "Public CanvasRenderer fixture and real Runtime/Command plugins; no native keyboard/SVG verification claim.",
+        "assumedLoad": "Isolated per-Canvas Hosts, concurrent/reentrant Shortcut executions and arbitrary external Handler failures."
+      },
+      "retainedHistoricalEvidence": {
+        "tracer": "Prior run84337303-5bcc-471d-b2f1-ea874dc4fb1b/tdd retained actual production-unchanged red0/1 and identical-tracer dirty green1/10; historical only.",
+        "legacyProgram": "Root-only source1e759b79... and both actual failures are not certified green or upgraded.",
+        "v2Program": "Sourceecd4cd... dirty-tree receipts/observations read as historical scope evidence; not independently executed or recast as exact-head certification.",
+        "correctedPublicCertification": "Stronger compound-program current-head certification is coordinator-owned and not independently executed in this review."
+      },
+      "notCheckedIndependently": [
+        "Build",
+        "TypeScript compilation",
+        "Canonical formal full engineering check",
+        "Browser/native keyboard input",
+        "Corrected compiled-program current-head certification",
+        "Remote publication/current-head CI",
+        "Merge/main acceptance or Issue closure"
+      ],
+      "reviewOperations": {
+        "sourceEdited": false,
+        "gitRefsChanged": false,
+        "generatedArtifactsChanged": false,
+        "githubWrites": false,
+        "worktreeAccessStopped": true
+      }
+    },
+    "spec": {
+      "axis": "Spec",
+      "verdict": "passed",
+      "verdictScope": "Implemented code and functional requirements at exact reviewed source; not full delivery completion.",
+      "base": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+      "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+      "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+      "patch": "c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476",
+      "changedFiles": [
+        "packages/plugin-interaction/src/shortcut-runtime.ts",
+        "packages/plugin-interaction/tests/lifecycle.test.ts"
+      ],
+      "preparedTaskDigest": "c21362e67c91892b2f4caf6fd624c9218f305c7e5140875a5e40ba036f4852c0",
+      "report": "Spec verdict: **passed（已实现代码/功能）**；无未解决实现缺口或范围扩张。Risk **medium**。\n\nbase `fe94ea93ed6b06e65e5d29f7846e132a53f8cded`；head `618cb61d25990415e4ab27f0132f2247dc7b8972`；tree `bf0a2377f8e5cd5596b692e98d936d9ae4905a39`；完整 binary patch SHA256 `c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476`。完整两文件已审，prepared digest `c21362e67c91892b2f4caf6fd624c9218f305c7e5140875a5e40ba036f4852c0`。\n\nIssue136 要求“cannot strand Shortcut execution ownership”和“inspection failure alongside the original”：窄 catch 只处理 native `instanceof`/`code` 分类，严格保留 `[原 rejection, 实际 inspection]` 两引用，之后仍走一个稳定 command Fault；finally 完成该已结算 execution。没有吞错、flatten、Proxy 禁令或 fallback。普通错误保持根身份；真 `COMMAND_NOT_FOUND`、expected disposal abort、Command ID/scope、Disposition、repeat/Gesture 仲裁、cached disposal、reservation 等待及 fresh Binding 语义保持。\n\n**审查发现并解决的验收缺口：**公共 v2 未检查 Fault 名称、commandId、scope，与澄清评论6463977910的要求不完整。源码未为此改动；独立 v3 加入这些精确断言及冻结检查，输入与原生命周期要求不减弱。同一 v3（SHA256 `46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004`）在真实 base 红2/3、exit1，在618绿3/3、exit0，两个 strict TSC 均0；模块路径、实际输出及源/JS/map hash 已核验。这是协调器执行，非我的计数。原1e759两次失败、v2 dirty结果与旧 root-only false 均原样保留，不冒称原程序 green。\n\n独立执行 `bun test packages/plugin-interaction/tests packages/plugin-command/tests packages/runtime-cordis/tests packages/diagnostics/tests packages/plugin-history/tests packages/preset-basic/tests packages/core/tests`：**833 pass /6377 assertions，exit0**。前后精确身份、clean、完整patch及相关dist hash未变。已完整读取修订Issue/唯一澄清评论、六条验收、七步计划与公共调用链；父 affected exit0单独记录。\n\n当前仅认证实现：正式 full、远端发布/CI、报告媒体回读、人审合并及实际 main/关闭阶段仍 pending，逐项见JSON。未执行 full/build/affected/browser/GitHub，未认证其它Issue；Recording Renderer不证明 native keyboard，已停读工作树。\n\n公开源码改变异步失败与生命周期所有权，风险 medium。回滚需完整回退618或其未来真实发布映射到fe94；回退会重新暴露原缺陷，不能撤销已执行Command或自动处理已有活跃/挂起Runtime。\n",
+      "reportPath": "/Users/zhou/.codex/local-workflows/nodebraid/runs/0190bc60-7c9b-4f72-8cd2-28acb0ee31d1/reviews/spec.md",
+      "findings": [],
+      "resolvedFindings": [
+        {
+          "id": "SPEC-ORACLE-1",
+          "priority": "P2",
+          "category": "public-acceptance-coverage",
+          "requirementSource": "https://github.com/ZWkang/nodebraid/issues/136#issuecomment-6463977910",
+          "quote": "Exactly one stable command Fault with the existing command ID/scope.",
+          "originalEvidence": "public-compound-oracle/shortcut-rejection-compound-oracle.ts v2 SHAecd4cdbaa0e247ee36ddd1af4f7d10561823397cd64f721c5db4b65e72409701只检查唯一Fault与2slots，不检查name/commandId/pluginName；若名字或scope错误其程序仍可绿。仓库helper已有检查，因此这不是产品实现bug。",
+          "status": "resolved",
+          "resolution": "public-v3-source/v2-to-v3.patch只增加Fault metadata/冻结断言并纳入passed条件；新同字节v3 SHA46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004在实际base red2/3 exit1及618green3/3 exit0，严格TSC0，source/JS/map与module paths分别核验。原v2dirty成功保持原记录。",
+          "productSourceChangedForThisFinding": false
+        }
+      ],
+      "risk": {
+        "level": "medium",
+        "rationale": "公开Interaction源码改变异步Command拒绝分类及execution完成/Binding预约释放；影响失败可见性与生命周期，但未改变公共API、依赖、权限或构建/审查政策。publicsrc最低medium，范围窄及绿检查不使其降为low。",
+        "evidence": "精确618/treebf0/完整patchc2fc两文件独立审查；own新公共833tests6377assertions0并核对前后clean/targetbase/patch/相关dist hash。修订Issue136+唯一澄清评论、ADR74/28/29、prototype/code×7原值×Sink×dispose矩阵；另核验协调器affected0与v3真实base红/head绿，旧错误oracle未被涂绿。",
+        "rollback": "正常审核后完整revert618cb61d25990415e4ab27f0132f2247dc7b8972，或未来实际published映射的整项生产/回归改动，到fe94ea93ed6b06e65e5d29f7846e132a53f8cded。将重新暴露已确认的分类异常/挂起缺陷；代码回退不会撤销已经执行的应用Command、替换现有Activation代码或自动释放此前挂起的execution/reservation。"
+      },
+      "requirementCoverage": [
+        {
+          "id": "136-A1",
+          "quote": "A completed Handler rejection cannot strand Shortcut execution ownership. Binding disposal settles after all started Commands finish and releases the reservation; original/cached disposal behavior and fresh Binding isolation remain valid.",
+          "status": "satisfied-implemented",
+          "assessment": "reject callback finally删除本次running并结算owned promise；仅在Command已settle后执行，未改admission/cached dispose/wait-all/reservation/fresh handle。新56matrix与既有生命周期own suite验证先dispose/后reject等。"
+        },
+        {
+          "id": "136-A2",
+          "quote": "Preserve the original application rejection by reference. If native error classification itself fails, expose that actual inspection failure alongside the original through the existing stable command Fault path, without silent success, replacement, empty errors or flattening.",
+          "status": "satisfied-implemented",
+          "assessment": "catch仅限instanceof及code分类；native实际抛值和原rejection通过一个AggregateError恰2slots传给原commandFault；falsey/Symbol/Error引用严格Object.is，未flatten或任意包装普通错误。"
+        },
+        {
+          "id": "136-A3",
+          "quote": "Preserve genuine `COMMAND_NOT_FOUND` capability-unavailable rejection, expected disposal aborts, ordinary Handler result/error identity, command ID/scope, input Disposition, repeat/gesture arbitration and concurrent/reentrant waiting/reservations. Do not add a Proxy/accessor/record ban, API, timeout, retry, cap, fallback or cancellation policy.",
+          "status": "satisfied-implemented",
+          "assessment": "真COMMAND_NOT_FOUND仍走capability-unavailable；expected abort先于分类且按原reason比较；普通Handler错误root同一值，CommandService/Binding/输入/gesture仲裁未改。"
+        },
+        {
+          "id": "136-A4",
+          "quote": "Preserve the original independent three-control compiled source, both actual failed executions and every observation unchanged; do not relabel its root-only compound-error predicate green. Ordinary direct/Shortcut controls still require original root identity. Independently execute a clearly versioned public verification that keeps all existing lifecycle/input requirements and additionally requires exactly one compound command Fault, an AggregateError with exactly two slots, and Object.is(slot0, original rejection) plus Object.is(slot1, actual inspection failure). Retain the old root-only observation separately. Repository public Host/Command/Shortcut regressions must be red before implementation and green afterward; no fake collector or weakened failure/completion assertion.",
+          "status": "satisfied-with-resolved-public-oracle-gap",
+          "assessment": "修订source+comment和新prepared记录清楚分离v1原失败/v2dirty/v3独立程序。发现v2缺name/id/scope后以不弱化输入的v3补足；同bytes分别在base red与headgreen，旧root-only false与全部旧证据保留。"
+        },
+        {
+          "id": "136-A5",
+          "quote": "Run related/affected consumers, independent Standards + ponytail-review and Spec with exact head/tree/patch/path risk, then canonical formal full verification. Verify actual remote tree/first parent, current-head CI, complete immutable report and mapped native media publication/readback.",
+          "status": "implementation-review-satisfied-delivery-stages-pending",
+          "assessment": "父affected exit0与本轴833/6377及v3headgreen已读取/执行并区分；另一axis独立，正式verify/full/remote tree/CI/完整report/media发布回读尚待后续，不能据review标完成。"
+        },
+        {
+          "id": "136-A6",
+          "quote": "Keep this Issue open with Refs through normal integration and actual-main whole-Issue acceptance; apply the deployed human-review/merge route and separate closing authority.",
+          "status": "pending-normal-integration",
+          "assessment": "Issue仍open/Refs范围；medium须后续人审/人工merge、实际main whole-Issue验收及独立closing gate。本review没有给出写入/合并/关闭权限。"
+        }
+      ],
+      "planCoverage": [
+        {
+          "id": "public-red",
+          "blockedBy": [],
+          "acceptance": "Preserve independent strict compiled3 red at fe94 (two controls pass, Shortcut native classification fails with original loss and pending ownership). Add a genuine public Host/Command/Shortcut repository tracer red before implementation, preserving original source/logs.",
+          "status": "historical-evidence-verified",
+          "assessment": "旧独立compiled3真red及最小仓库tracer原实现0/1、修复1/10；red/green testcase文件bytes相等，历史记录未改或换头。"
+        },
+        {
+          "id": "classify-and-complete",
+          "blockedBy": [
+            "public-red"
+          ],
+          "acceptance": "Shortcut-owned completed execution always settles; native CommandError classification failures remain explicit together with the original rejection through stable command Fault. Preserve ordinary identity, genuine capability unavailable, expected aborts, reservations, cached disposal and fresh Binding isolation; no API, policy, cap, retry or fallback.",
+          "status": "satisfied-this-head",
+          "assessment": "完整生产修复与真实公共tests在618已核对，own833/6377通过，native原值/完成/预约与保留行为满足。"
+        },
+        {
+          "id": "affected-and-independent-review",
+          "blockedBy": [
+            "classify-and-complete"
+          ],
+          "acceptance": "Related tests and affected consumers pass; independently execute a clearly versioned compound-error public3 program with exactly one Aggregate Fault and two exact original/inspection slots while preserving every lifecycle/input requirement. Retain original root-only source and both failed runs unchanged and never label them green. Expand legitimate native classification, ordinary identity, capability, abort and waiting controls. Exact-head independent Standards+ponytail and Spec full Markdown/risk both pass.",
+          "status": "spec-and-public-evidence-satisfied-other-axis-separate",
+          "assessment": "本轴已新审完整patch并own执行；父affected0、v3同字节base红/head绿已核验；Standards独立由协调者汇总，不借其判断。"
+        },
+        {
+          "id": "formal-engineering-check",
+          "blockedBy": [
+            "affected-and-independent-review"
+          ],
+          "acceptance": "Only after both axes passed, fixed fetched-main agents:run verify really executes this attempt complete bun run check with independent stable head/tree/patch and full raw logs. Preserve all failed/corrected attempts.",
+          "status": "pending",
+          "assessment": "按计划待两轴后canonical verify真实执行完整check；本轴未提前执行或伪报。"
+        },
+        {
+          "id": "publish-current-head",
+          "blockedBy": [
+            "formal-engineering-check"
+          ],
+          "acceptance": "One normal append-only delivery PR targeting main with Refs136, actual remote complete tree/ordered firstparent/base inheritance and identity readback. Real current source CI, complete current immutable report and dynamic mapped native manifest/media byte/size/SHA256/Gitblob readback before readiness.",
+          "status": "pending",
+          "assessment": "当前尚未远端source/PR publication/currentCI/report/media实际readback。"
+        },
+        {
+          "id": "required-review-and-authorized-merge",
+          "blockedBy": [
+            "publish-current-head"
+          ],
+          "acceptance": "All current feedback/checks/evidence/premerge tickets/protection and canonical required focused human review/specific authorization pass before normal immediate expected-head merge. Risk does not create authority; no selfapprove/dismiss/force/bypass/auto queue.",
+          "status": "pending",
+          "assessment": "canonical medium须focused人审与人工merge，所有当前feedback/checks/protection/tickets及具体权限仍须满足。"
+        },
+        {
+          "id": "main-integration-acceptance",
+          "blockedBy": [
+            "required-review-and-authorized-merge"
+          ],
+          "acceptance": "After actual integration fetch main, whole Issue/public program/all tickets and actual main CI/necessary Deploy pass before separately authorized acceptance summary ID+digest/readback/archive and completed close. Keep source open otherwise.",
+          "status": "pending",
+          "assessment": "须后续actual main fresh whole-Issue/public/CI/Deploy及独立summary/closing授权；代码review不代表已完成交付。"
+        }
+      ],
+      "ownChecks": [
+        {
+          "command": "bun test packages/plugin-interaction/tests packages/plugin-command/tests packages/runtime-cordis/tests packages/diagnostics/tests packages/plugin-history/tests packages/preset-basic/tests packages/core/tests",
+          "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+          "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+          "exitCode": 0,
+          "tests": 833,
+          "assertions": 6377,
+          "files": 42,
+          "rawLog": "spec-tests.log"
+        },
+        {
+          "command": "read-only exactGit/clean/base/fullbinarypatch/changedFiles/canonicalrisk/source digest checks plus related built artifact hash comparison",
+          "exitCode": 0,
+          "rawLog": "spec-tests.log"
+        }
+      ],
+      "readEvidence": [
+        {
+          "artifact": "affected-receipt.json",
+          "executor": "coordinator",
+          "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+          "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+          "exitCode": 0,
+          "notOwnExecution": true
+        },
+        {
+          "artifact": "public-v3-base-red/receipts.json",
+          "executor": "coordinator",
+          "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+          "strictTSCExit": 0,
+          "compiledExit": 1,
+          "controlsPassed": 2,
+          "controls": 3,
+          "sourceSHA256": "46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004",
+          "notOwnExecution": true
+        },
+        {
+          "artifact": "public-v3-head-green/receipts.json",
+          "executor": "coordinator",
+          "head": "618cb61d25990415e4ab27f0132f2247dc7b8972",
+          "tree": "bf0a2377f8e5cd5596b692e98d936d9ae4905a39",
+          "strictTSCExit": 0,
+          "compiledExit": 0,
+          "controlsPassed": 3,
+          "controls": 3,
+          "sourceSHA256": "46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004",
+          "notOwnExecution": true
+        },
+        {
+          "artifact": "prior tdd/red+green lifecycle snapshots/rawlog",
+          "executor": "coordinator",
+          "result": "same testcase filebytes before/after,0pass1fail→1pass10assertions; no relabelling as this head own run",
+          "notOwnExecution": true
+        }
+      ],
+      "discussion": {
+        "issueStateObserved": "open",
+        "commentsReadCompletely": [
+          6463977910
+        ],
+        "sourceIssue": "source-issue.json",
+        "sourceComments": "source-comments.json",
+        "oracleCorrectionIsNotPublicContractChange": true,
+        "noUnresolvedDesignFeedbackObserved": true,
+        "prNotYetPublished": true
+      },
+      "pendingDelivery": [
+        "Separate Standards aggregation",
+        "Formal full engineering verify",
+        "Actual remote source/firstparent/CI and complete immutable report/media publication/readback",
+        "Required focused human review/human merge",
+        "Actual-main whole-Issue acceptance and separate summary/closing steps"
+      ],
+      "limits": [
+        "No build/full/affected/browser/GitHub/source/state/branch modifications by this reviewer.",
+        "No other Gesture classifiers investigated or repaired; source pattern similarity is not a proved public defect.",
+        "Recording Renderer normalized Keyboard Input is not native keyboard/browser evidence.",
+        "Original v1 root-only oracle remains two real failures; v2 dirty success remains distinct; only versioned v3 is current public-acceptance evidence.",
+        "No old plan/oracle review was reused as formal exact-head review; no old Issue completion or authorization certified."
+      ],
+      "stoppedWorktreeAccess": true,
+      "completedAt": "2026-10-28T08:46:31.325678+00:00"
+    }
+  },
+  "changedFiles": [
+    "packages/plugin-interaction/src/shortcut-runtime.ts",
+    "packages/plugin-interaction/tests/lifecycle.test.ts"
+  ],
+  "risk": {
+    "level": "medium",
+    "route": "quick-human",
+    "reasons": [
+      "standards: medium — Public framework implementation changes Shortcut failure reporting and lifecycle execution completion. Runtime ownership and compatible behavior changes require medium at the public src path floor; small scope and passing checks do not establish low risk.",
+      "spec: medium — 公开Interaction源码改变异步Command拒绝分类及execution完成/Binding预约释放；影响失败可见性与生命周期，但未改变公共API、依赖、权限或构建/审查政策。publicsrc最低medium，范围窄及绿检查不使其降为low。",
+      "packages/plugin-interaction/src/shortcut-runtime.ts: minimum medium risk."
+    ]
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-public-v1-main-red",
+      "acceptance": "Historical original strict program1e759 at basefe94 actually failed2/3, exit1, with original rejection loss/unhandled inspection and pending Binding/Host. Expected red reproduction; not product success.",
+      "command": "native Bun original public3 at basefe94",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "original-public-v1-fixed-root-only-oracle-failure",
+      "acceptance": "Retained original byte-identical program still fails2/3 at minimal fixed dirty patch2e311 because its root-only predicate rejects a compound Fault; lifecycle is fixed. This historical failure remains FAILED, not a current-head acceptance certificate.",
+      "command": "native Bun unchanged original public3 at minimal fixed dirty source",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "repository-primary-red",
+      "acceptance": "Actual public Host/Command/Shortcut tracer fails before production edit;0pass1fail with native prototype-inspection error.",
+      "command": "bun test packages/plugin-interaction/tests/lifecycle.test.ts --test-name-pattern Shortcut rejection inspection",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "repository-primary-green",
+      "acceptance": "The exact same primary tracer bytes pass1test/10assertions after the minimal fix; historical dirty-stage result kept separate.",
+      "command": "bun test packages/plugin-interaction/tests/lifecycle.test.ts --test-name-pattern Shortcut rejection inspection",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "public-v2-dirty-partial-success",
+      "acceptance": "Historical ecd4 public3 passed compound-slot/lifecycle checks at dirty source, but lacked direct Fault name/id/scope assertions. Retained as partial evidence only; superseded by explicit v3, not final eligibility.",
+      "command": "native Bun public v2 partial compound oracle",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "public-v3-base-red",
+      "acceptance": "The stricter v3 with stable name/id/scope/freeze, exact two error slots and all prior cleanup constraints really fails2/3 at actual basefe94; same bytes as head green.",
+      "command": "native Bun strict emitted public v3 at basefe94",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "public-v3-head-green",
+      "acceptance": "Exact same v3 bytes at local618 strictTSC0/nativeBun0,3/3; one stable immutable Fault, original+inspection reference slots, complete Binding/Host/Renderer cleanup; legacy root observation remains false in compound case.",
+      "command": "native Bun strict emitted public v3 at local618",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "related-typecheck",
+      "acceptance": "Related Interaction typecheck and test dependencies passed at precommit source contents c2fc; not called a remote/head execution.",
+      "command": "bun run --filter @nodebraid/plugin-interaction typecheck",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "related-public-suite",
+      "acceptance": "Related public Interaction/Command/Runtime/Diagnostics suite704tests5742assertions passed at precommit c2fc source contents; current formal full is recorded separately.",
+      "command": "bun test packages/plugin-interaction/tests packages/plugin-command/tests packages/runtime-cordis/tests packages/diagnostics/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "affected-current-head",
+      "acceptance": "Exact local618 affected consumers7packages, SVG/Examples browser and Docs pass, source stable; sourceCI later is a separate execution.",
+      "command": "bun run check:affected --base fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-10.log"
+    },
+    {
+      "id": "independent-standards-current-head",
+      "acceptance": "Independent Standards own867tests6557assertions at618, source/identity stable, medium; not counted as coordinator execution.",
+      "command": "independent Standards public Bun suite",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-11.log"
+    },
+    {
+      "id": "independent-spec-current-head",
+      "acceptance": "Independent Spec own833tests6377assertions at618, source/identity stable, medium; v2 finding and v3 actual resolution are retained.",
+      "command": "independent Spec public Bun suite",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-12.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "27eabbaf8e8122e68348886571b0481e7c0f1487cf4699ab8c1e55377ef3af81"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "6702f8b6036cf3467a2fbc6b21b4e31adbfc4b373c3c3bbe85616bb98d991550"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "209b0c6202d6f379e02ffc0a0942edd3b872640f0fc328d643465cfe254f93a1"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "54e1fa2a87df84296de76fdcb953e63759765e60ba26a79da8e9468e6827740c"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "131aded222df628b0f3e513fd9333137fbfabc5ca83b63d97278bdf5a064db08"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "57349caa071bdfbb234f6d61ef06c7442afa19f1b188afc754db6d9805c34506"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "00224d41bcfb2f5792ff0f5abef7825c42a863bd7026bfaad66c43e18b15d23c"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "835019fc3a81cb089e19a6925d79cb9f13a2ba92c0259d68311c09f8a9395158"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "2fa58e68f9128b371ee70baabfa7f58ad0053b3db1f3fba9efb6162085aafa82"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "efb14a73f16242617baae5083e078bca9111133c9589d8a9f93952a229a42522"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "df9c212c7827a1a387d5f63f3a85013ca83180e265587b3d3a33a495c1f20b86"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "ed5c88b8277394eb6681b57e2276c3a47a246a0fe5bf5af2b2b6364f61c59f69"
+    },
+    {
+      "path": "logs/behavior-11.log",
+      "kind": "log",
+      "sha256": "99ee5626354552e7f355395a876771b0f8fef83cedcdf9926101f50b3bd0fd09"
+    },
+    {
+      "path": "logs/behavior-12.log",
+      "kind": "log",
+      "sha256": "f66ffaf5f0c45b9d5e62b435797fd21ddb5472b58f69409d72bc4c6a4f6802ca"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "d26ca1c4f87279d404f0642d5d9bbe54b8723a29df79c4b228e2c227f1a81a08"
+    },
+    {
+      "path": "history/original-public-red/artifact-prerequisite.json",
+      "kind": "report",
+      "sha256": "6ecc34bf0e6d21c3c867cf3de8a14a99095f51a8a82da3fcd71a8d7aa51b005b"
+    },
+    {
+      "path": "history/original-public-red/compiled/shortcut-rejection-prototype.js.txt",
+      "kind": "log",
+      "sha256": "a146992be7e156af7e708fe21d64ddcd33f06b75c4582ac82926cc843fc2ba86"
+    },
+    {
+      "path": "history/original-public-red/compiled/shortcut-rejection-prototype.js.map.txt",
+      "kind": "log",
+      "sha256": "f5a17a0cdf142cfdd12240608412e1f4a8f322a1679a4c5bf031a8630fb261ba"
+    },
+    {
+      "path": "history/original-public-red/compiled.stderr.log",
+      "kind": "log",
+      "sha256": "54e1fa2a87df84296de76fdcb953e63759765e60ba26a79da8e9468e6827740c"
+    },
+    {
+      "path": "history/original-public-red/compiled.stdout.log",
+      "kind": "log",
+      "sha256": "3514339f56dfc5431a4b545b2607a6249b97825434d29d35d547cb3106fae4b1"
+    },
+    {
+      "path": "history/original-public-red/confirmed-local-defect.md",
+      "kind": "report",
+      "sha256": "227bb3820a61571a37bfe6b7b09f118e3857e7208f106e44d50ec4d1d709ace8"
+    },
+    {
+      "path": "history/original-public-red/observations.json",
+      "kind": "report",
+      "sha256": "327ad9c5948ef991bc2bb3e0f842cd923b98a07f2ceebe384e63efe961229b59"
+    },
+    {
+      "path": "history/original-public-red/post-probe-integrity.json",
+      "kind": "report",
+      "sha256": "dbddd2b7f182b93b372f3389bbe8bb8c28a5d7aa018e5eea4f4ac23f7fdc8397"
+    },
+    {
+      "path": "history/original-public-red/receipts.json",
+      "kind": "report",
+      "sha256": "5933969ec9f92f38f8ed4f6adb2d2cebcaaf15936c878c1726c76e7edddb15fb"
+    },
+    {
+      "path": "history/original-public-red/shortcut-rejection-prototype.ts.txt",
+      "kind": "log",
+      "sha256": "1e759b79df9d0528d6c9ac636e3f03134173a2a57fa462b1d71ed4b62e4d1f2a"
+    },
+    {
+      "path": "history/original-public-red/strict-typecheck-and-emit.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "history/original-public-red/strict-typecheck-and-emit.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/build-receipt.json",
+      "kind": "report",
+      "sha256": "9144516319e6733c5b836d5f991367737a0c06d17a14b08cc0d72219f9dcf528"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/build.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/build.stdout.log",
+      "kind": "log",
+      "sha256": "281f7986319bd735691aa628105cde892e26d14abe57ed849a41808c5ecb991b"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/compiled/shortcut-rejection-prototype.js.txt",
+      "kind": "log",
+      "sha256": "a146992be7e156af7e708fe21d64ddcd33f06b75c4582ac82926cc843fc2ba86"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/compiled/shortcut-rejection-prototype.js.map.txt",
+      "kind": "log",
+      "sha256": "f5a17a0cdf142cfdd12240608412e1f4a8f322a1679a4c5bf031a8630fb261ba"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/compiled.stderr.log",
+      "kind": "log",
+      "sha256": "131aded222df628b0f3e513fd9333137fbfabc5ca83b63d97278bdf5a064db08"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/compiled.stdout.log",
+      "kind": "log",
+      "sha256": "7978dc66e0b70381c6c8e2c32f1ef83c91c40d148123acee7c4ae8f2fab7a066"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/observations.json",
+      "kind": "report",
+      "sha256": "50035e50f859635a224a695072e89a8428c2bc83aafc80b6c0d1556711e1dc26"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/receipts.json",
+      "kind": "report",
+      "sha256": "222a9a2231148070a623da9339f67ebd900b382c76dcf9431c53b1a690ce0155"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/shortcut-rejection-prototype.ts.txt",
+      "kind": "log",
+      "sha256": "1e759b79df9d0528d6c9ac636e3f03134173a2a57fa462b1d71ed4b62e4d1f2a"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/strict-typecheck-and-emit.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/strict-typecheck-and-emit.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/tsconfig.json",
+      "kind": "report",
+      "sha256": "d508be4b56cc23098d0ca466697d550728ade8c2db766e7713d8e66e1f87dc74"
+    },
+    {
+      "path": "history/original-public-fixed-root-oracle/working.patch.txt",
+      "kind": "log",
+      "sha256": "2e311f5cf8d0028a02e07d4eeb30fae2830280c9411abcc7609cce1b3013dcab"
+    },
+    {
+      "path": "history/repository-primary-red/lifecycle.test.ts.txt",
+      "kind": "log",
+      "sha256": "828561c53b2a0792f9a33592015368aa924cc89a0fa767eee433d76ada898f54"
+    },
+    {
+      "path": "history/repository-primary-red/receipt.json",
+      "kind": "report",
+      "sha256": "0c580d833bca5c9626c94d4ae647aca7fba04d09eb852690648ef4e51b18c24c"
+    },
+    {
+      "path": "history/repository-primary-red/shortcut-runtime.ts.txt",
+      "kind": "log",
+      "sha256": "51c3f0c6bf6625567fd6f7a94efce5246b0d4974decf711dc735e6f5b3b564de"
+    },
+    {
+      "path": "history/repository-primary-red/stderr.log",
+      "kind": "log",
+      "sha256": "57349caa071bdfbb234f6d61ef06c7442afa19f1b188afc754db6d9805c34506"
+    },
+    {
+      "path": "history/repository-primary-red/stdout.log",
+      "kind": "log",
+      "sha256": "6043908c8d26d62698476b88f737f39d5d3e91008d4155a81730902f5a37479c"
+    },
+    {
+      "path": "history/repository-primary-red/test-only.patch.txt",
+      "kind": "log",
+      "sha256": "7deb54f5b210308c4dbddffea7b314685c1ad50146cbccb26b3220b717b95b4b"
+    },
+    {
+      "path": "history/repository-primary-green/lifecycle.test.ts.txt",
+      "kind": "log",
+      "sha256": "828561c53b2a0792f9a33592015368aa924cc89a0fa767eee433d76ada898f54"
+    },
+    {
+      "path": "history/repository-primary-green/minimal-green.patch.txt",
+      "kind": "log",
+      "sha256": "2e311f5cf8d0028a02e07d4eeb30fae2830280c9411abcc7609cce1b3013dcab"
+    },
+    {
+      "path": "history/repository-primary-green/receipt.json",
+      "kind": "report",
+      "sha256": "6bd934f782fca75a58071b623d45abe66342838160cc6993bc002a9c487bc87c"
+    },
+    {
+      "path": "history/repository-primary-green/shortcut-runtime.ts.txt",
+      "kind": "log",
+      "sha256": "1a6fee861dc9e8475413402a5eb1512eee85b34a66cdec2a16765d200d20d689"
+    },
+    {
+      "path": "history/repository-primary-green/stderr.log",
+      "kind": "log",
+      "sha256": "00224d41bcfb2f5792ff0f5abef7825c42a863bd7026bfaad66c43e18b15d23c"
+    },
+    {
+      "path": "history/repository-primary-green/stdout.log",
+      "kind": "log",
+      "sha256": "6043908c8d26d62698476b88f737f39d5d3e91008d4155a81730902f5a37479c"
+    },
+    {
+      "path": "support/public-v2-dirty/actual-package-build.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "support/public-v2-dirty/actual-package-build.stdout.log",
+      "kind": "log",
+      "sha256": "281f7986319bd735691aa628105cde892e26d14abe57ed849a41808c5ecb991b"
+    },
+    {
+      "path": "support/public-v2-dirty/compiled/shortcut-rejection-compound-oracle.js.txt",
+      "kind": "log",
+      "sha256": "bf5aa61473e7187eeb3d63dca045a968c19696737985d55324a1634d13b1bf5d"
+    },
+    {
+      "path": "support/public-v2-dirty/compiled/shortcut-rejection-compound-oracle.js.map.txt",
+      "kind": "log",
+      "sha256": "93146b7423d22fe6ed8cd875579fb251eb5eb831ef42c249b1e7dcaab26ad1f3"
+    },
+    {
+      "path": "support/public-v2-dirty/compiled.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "support/public-v2-dirty/compiled.stdout.log",
+      "kind": "log",
+      "sha256": "835019fc3a81cb089e19a6925d79cb9f13a2ba92c0259d68311c09f8a9395158"
+    },
+    {
+      "path": "support/public-v2-dirty/observations.json",
+      "kind": "report",
+      "sha256": "55313500fda315fcbf0bac39714cb84b517858dcd5f561adb41f4779ba754d45"
+    },
+    {
+      "path": "support/public-v2-dirty/oracle-change-record.json",
+      "kind": "report",
+      "sha256": "a22275501f70be8734f238eb87477ced8b1b20fc587173954c6c3b8d63907ee6"
+    },
+    {
+      "path": "support/public-v2-dirty/original-to-compound-oracle.patch.txt",
+      "kind": "log",
+      "sha256": "2865853537f8293399becfbba99b90c9f4ae32fde1aef76795aa485840516791"
+    },
+    {
+      "path": "support/public-v2-dirty/receipts.json",
+      "kind": "report",
+      "sha256": "cd435f3e35f3e1bd4b74a6265388f3c3369dfc7a853e064f1dc187ca416195c6"
+    },
+    {
+      "path": "support/public-v2-dirty/shortcut-rejection-compound-oracle.ts.txt",
+      "kind": "log",
+      "sha256": "ecd4cdbaa0e247ee36ddd1af4f7d10561823397cd64f721c5db4b65e72409701"
+    },
+    {
+      "path": "support/public-v2-dirty/strict-typecheck-and-emit.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "support/public-v2-dirty/strict-typecheck-and-emit.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "support/public-v2-dirty/tsconfig.json",
+      "kind": "report",
+      "sha256": "e99767bfe8f01ca9282836375ddb57c2418ecbde888caa068dcf59e8c5efdc9b"
+    },
+    {
+      "path": "support/public-v2-dirty/working.patch.txt",
+      "kind": "log",
+      "sha256": "811d93db64d45eb7358036c6a0046289bf754bc00388988449095a87b2346f64"
+    },
+    {
+      "path": "support/public-v3-source/change-record.json",
+      "kind": "report",
+      "sha256": "5004ef3c63088ad251e37bbfb95b3c766e6877f4d626f4fd7b6fef385145e551"
+    },
+    {
+      "path": "support/public-v3-source/shortcut-rejection-compound-oracle-v3.ts.txt",
+      "kind": "log",
+      "sha256": "46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004"
+    },
+    {
+      "path": "support/public-v3-source/v2-to-v3.patch.txt",
+      "kind": "log",
+      "sha256": "aaed906c3edd5296f4b24cc1878ab1d4564698df9c43d2d700a57b1e08e996f2"
+    },
+    {
+      "path": "support/public-v3-base-red/compiled/shortcut-rejection-compound-oracle-v3.js.txt",
+      "kind": "log",
+      "sha256": "2c718a314fce1531ba582648473a48c64070f4b8ffe535c5cc7807af18b640b3"
+    },
+    {
+      "path": "support/public-v3-base-red/compiled/shortcut-rejection-compound-oracle-v3.js.map.txt",
+      "kind": "log",
+      "sha256": "43946b93bc30ed3d33a5494ce31e0f5284882b01dd8aa4ef62c6c4cd8cf42c3d"
+    },
+    {
+      "path": "support/public-v3-base-red/compiled.stderr.log",
+      "kind": "log",
+      "sha256": "2fa58e68f9128b371ee70baabfa7f58ad0053b3db1f3fba9efb6162085aafa82"
+    },
+    {
+      "path": "support/public-v3-base-red/compiled.stdout.log",
+      "kind": "log",
+      "sha256": "17d4238dd29cd82926f4bc3d04577de66b9c19683fceb829d8fd5e2e3c33fcc4"
+    },
+    {
+      "path": "support/public-v3-base-red/module-resolution.json",
+      "kind": "report",
+      "sha256": "4aa71bab28907dd4bd7844bec5b98d69f8e22758cb590b974479b34f3aec30d8"
+    },
+    {
+      "path": "support/public-v3-base-red/module-resolution.mjs.txt",
+      "kind": "log",
+      "sha256": "c32aefed53207cab3ca67eba876b0c17ef12fbda03b7c4db4696c869282b5afe"
+    },
+    {
+      "path": "support/public-v3-base-red/observations.json",
+      "kind": "report",
+      "sha256": "584217fbc97aeea14642c83adf4a13ca4e7274c2cf9d36e01291b7af1b7f0075"
+    },
+    {
+      "path": "support/public-v3-base-red/provenance.json",
+      "kind": "report",
+      "sha256": "5705e7ccdfc46428db6ca78b1ca5b599d40aff3d589a037493910b6bcf795579"
+    },
+    {
+      "path": "support/public-v3-base-red/public-artifacts.json",
+      "kind": "report",
+      "sha256": "59ea4d501f74ac2afb962879e5ec7b566fbe36551f4d1f871830f7535ef049fc"
+    },
+    {
+      "path": "support/public-v3-base-red/receipts.json",
+      "kind": "report",
+      "sha256": "6ac8542da94dd21a817c4656567bb99dce691feba5ea35eef13cfc833da80ec9"
+    },
+    {
+      "path": "support/public-v3-base-red/shortcut-rejection-compound-oracle-v3.ts.txt",
+      "kind": "log",
+      "sha256": "46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004"
+    },
+    {
+      "path": "support/public-v3-base-red/strict-typecheck-and-emit.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "support/public-v3-base-red/strict-typecheck-and-emit.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "support/public-v3-base-red/tsconfig.json",
+      "kind": "report",
+      "sha256": "f16114de29f4761de881c18b3faf951aa9e5ac725b427baa76f9c9cca6cf9b26"
+    },
+    {
+      "path": "support/public-v3-head-green/compiled/shortcut-rejection-compound-oracle-v3.js.txt",
+      "kind": "log",
+      "sha256": "2c718a314fce1531ba582648473a48c64070f4b8ffe535c5cc7807af18b640b3"
+    },
+    {
+      "path": "support/public-v3-head-green/compiled/shortcut-rejection-compound-oracle-v3.js.map.txt",
+      "kind": "log",
+      "sha256": "43946b93bc30ed3d33a5494ce31e0f5284882b01dd8aa4ef62c6c4cd8cf42c3d"
+    },
+    {
+      "path": "support/public-v3-head-green/compiled.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "support/public-v3-head-green/compiled.stdout.log",
+      "kind": "log",
+      "sha256": "efb14a73f16242617baae5083e078bca9111133c9589d8a9f93952a229a42522"
+    },
+    {
+      "path": "support/public-v3-head-green/module-resolution.json",
+      "kind": "report",
+      "sha256": "d7fb5ebd8c720514529417ace19b85cc3b300a396f87f979bb63382e8a2393ee"
+    },
+    {
+      "path": "support/public-v3-head-green/module-resolution.mjs.txt",
+      "kind": "log",
+      "sha256": "c32aefed53207cab3ca67eba876b0c17ef12fbda03b7c4db4696c869282b5afe"
+    },
+    {
+      "path": "support/public-v3-head-green/observations.json",
+      "kind": "report",
+      "sha256": "d9e346d35779c8295943bfe896e8f576074274b7ce3e3ac502eb94b26a5f3cbe"
+    },
+    {
+      "path": "support/public-v3-head-green/provenance.json",
+      "kind": "report",
+      "sha256": "df893344997990bba5c72ccf2fa4a2018684adcd1a0374cb53c49cdcfe4ec4b0"
+    },
+    {
+      "path": "support/public-v3-head-green/public-artifacts.json",
+      "kind": "report",
+      "sha256": "7751b2b0c00cb644dbf958a65a49395871690d09e888492416cd449c938b1d97"
+    },
+    {
+      "path": "support/public-v3-head-green/receipts.json",
+      "kind": "report",
+      "sha256": "b2ed2926d91ec288c92dc30cff8e3e589dad85957a6c8cdf64baed6ba2bced31"
+    },
+    {
+      "path": "support/public-v3-head-green/shortcut-rejection-compound-oracle-v3.ts.txt",
+      "kind": "log",
+      "sha256": "46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004"
+    },
+    {
+      "path": "support/public-v3-head-green/strict-typecheck-and-emit.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "support/public-v3-head-green/strict-typecheck-and-emit.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "support/public-v3-head-green/tsconfig.json",
+      "kind": "report",
+      "sha256": "8d90f7999de91a599274c49a62babba97de86eb8c0a732686e9a4ba772dbb438"
+    },
+    {
+      "path": "support/related-checks/format.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "support/related-checks/format.stdout.log",
+      "kind": "log",
+      "sha256": "20b4ae269bd3e975c839b88afbc8735649b011735eccfb0690ede9e808d37bd9"
+    },
+    {
+      "path": "support/related-checks/receipts.json",
+      "kind": "report",
+      "sha256": "3d202a9b5f9c51bac3adca65e1f40f1522c8a666da257c3ac53dab51f582f019"
+    },
+    {
+      "path": "support/related-checks/related-bun.stderr.log",
+      "kind": "log",
+      "sha256": "df9c212c7827a1a387d5f63f3a85013ca83180e265587b3d3a33a495c1f20b86"
+    },
+    {
+      "path": "support/related-checks/related-bun.stdout.log",
+      "kind": "log",
+      "sha256": "6043908c8d26d62698476b88f737f39d5d3e91008d4155a81730902f5a37479c"
+    },
+    {
+      "path": "support/related-checks/typecheck.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "support/related-checks/typecheck.stdout.log",
+      "kind": "log",
+      "sha256": "4eb46d71027bfd6cedb1c984ebaf7c33c161fee57c90ec217b7a330d35bda170"
+    },
+    {
+      "path": "support/expanded-inspection-tests/lifecycle.test.ts.txt",
+      "kind": "log",
+      "sha256": "9a1c26b58431a29141c4bc586455eeb4ad312a892fae3c3c980abab3c3a7463a"
+    },
+    {
+      "path": "support/expanded-inspection-tests/receipt.json",
+      "kind": "report",
+      "sha256": "396a604e8d7e22822e01f9b3aea7fc16cb582653ebe0575b62a4afd21f697f93"
+    },
+    {
+      "path": "support/expanded-inspection-tests/stderr.log",
+      "kind": "log",
+      "sha256": "ef51a4c0169827fb2c122380348871be86cd8cbe7806de2b94d8fb1ea2fa0f8c"
+    },
+    {
+      "path": "support/expanded-inspection-tests/stdout.log",
+      "kind": "log",
+      "sha256": "6043908c8d26d62698476b88f737f39d5d3e91008d4155a81730902f5a37479c"
+    },
+    {
+      "path": "support/expanded-inspection-tests/working.patch.txt",
+      "kind": "log",
+      "sha256": "a6363981f0f5280e5dac4ef676a94a9a993842bf036e391088b90c8a2da9ae1a"
+    },
+    {
+      "path": "support/affected.stdout.log",
+      "kind": "log",
+      "sha256": "ed5c88b8277394eb6681b57e2276c3a47a246a0fe5bf5af2b2b6364f61c59f69"
+    },
+    {
+      "path": "support/affected.stderr.log",
+      "kind": "log",
+      "sha256": "c55068e212a008d38fb07fa57bf1b237f31922126453fcdb304fd9364dbba513"
+    },
+    {
+      "path": "support/affected-receipt.json",
+      "kind": "report",
+      "sha256": "79515f578719d8353181d918f8f07ea3726b744b2a6dce9703bbb28088445aca"
+    },
+    {
+      "path": "support/affected-plan.json",
+      "kind": "report",
+      "sha256": "214096d02a7b9b13c9eb945c86b759d494fb343c9adeba35d149fe15c5f27e7c"
+    },
+    {
+      "path": "support/inspection.json",
+      "kind": "report",
+      "sha256": "fe7c2f83eb6a9bb8268d4dfea7171f29a98e3c70ff47948d5e86249efa5671ab"
+    },
+    {
+      "path": "support/review.patch.txt",
+      "kind": "log",
+      "sha256": "c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476"
+    },
+    {
+      "path": "support/formal-attempt-result.json",
+      "kind": "report",
+      "sha256": "f1db959a00be9b145f570b81dacd0358e6d2b3ec7a768e84f9ab7ed1e8aeb21d"
+    },
+    {
+      "path": "support/source-publication-readback.json",
+      "kind": "report",
+      "sha256": "918e7cc5cecaf189aac6913656eb1cb804c48cd7d155a2f27e17f31a1d63694e"
+    },
+    {
+      "path": "support/ci/source-checks.log",
+      "kind": "log",
+      "sha256": "9c0d8656f2223e8fdac770e4caf13b8be1bf5a9e769a3e71f82c9d8fd241a084"
+    },
+    {
+      "path": "support/ci/source-preview.log",
+      "kind": "log",
+      "sha256": "be986183052057ae924639eec7c7de20bec9e1fe312c227cb80386c43d98970e"
+    },
+    {
+      "path": "support/ci/trusted-publisher.log",
+      "kind": "log",
+      "sha256": "9af5f7778109318947e5d3214e8c6d51402100e34ee018e9b178379bbf9012b3"
+    },
+    {
+      "path": "support/ci/native-media-readback.json",
+      "kind": "report",
+      "sha256": "066d14860b211339f6c1fc786e34071e16df7e9d2f4b6515f4901943e7c8beb9"
+    },
+    {
+      "path": "support/ci/dynamic-scene-selection.json",
+      "kind": "report",
+      "sha256": "148a2e3c94d8827c36b793235e61a7569286e8b56f29635d82687296ce1c3efa"
+    },
+    {
+      "path": "support/independent/standards-evidence.json",
+      "kind": "report",
+      "sha256": "6b00f0fa0660f4eb266522dc20585dd37ac659881de0e8cd16d738ef6a1aee96"
+    },
+    {
+      "path": "support/independent/spec-evidence.json",
+      "kind": "report",
+      "sha256": "e65b7971432677f806d8adb4685eea73cb21031c91f10f8ca4c6bd3de2bce5ca"
+    },
+    {
+      "path": "support/independent/standards-tests.log",
+      "kind": "log",
+      "sha256": "99ee5626354552e7f355395a876771b0f8fef83cedcdf9926101f50b3bd0fd09"
+    },
+    {
+      "path": "support/independent/spec-tests.log",
+      "kind": "log",
+      "sha256": "f66ffaf5f0c45b9d5e62b435797fd21ddb5472b58f69409d72bc4c6a4f6802ca"
+    },
+    {
+      "path": "history/oracle-review/oracle-spec-review.md",
+      "kind": "report",
+      "sha256": "ef9b7cfe0d60fe51006aa50fdaadbe42857dec4f28f16e9d975ad1e5a6ff1e1d"
+    },
+    {
+      "path": "history/oracle-review/oracle-spec-review.json",
+      "kind": "report",
+      "sha256": "d23ff56b4eb86d5f6918fa0b3267d62b3ee6b7796a26a8f10ddca349ca3037f0"
+    },
+    {
+      "path": "support/attachment-origin-index.json",
+      "kind": "report",
+      "sha256": "88387a584deb896084eda768d796ae283ae543b37f85a5626dc6321444b14de8"
+    },
+    {
+      "path": "support/ci/current-ci-provenance.json",
+      "kind": "report",
+      "sha256": "f89ebe6a208532c95a5480e899d6248e8d6bd930efd82d94cd7cf7a7e8943a24"
+    },
+    {
+      "path": "notes/scope-and-history.md",
+      "kind": "report",
+      "sha256": "12e249210a0293ceb21c7619ead7ed8d7ac440ef0d2b3e714c2a4940e698db6c"
+    }
+  ]
+}

@@ -1,0 +1,812 @@
+{
+  "attachments": [
+    {
+      "artifactPath": "history/original-public-red/artifact-prerequisite.json",
+      "kind": "report",
+      "originalName": "artifact-prerequisite.json",
+      "bytes": 496,
+      "sha256": "6ecc34bf0e6d21c3c867cf3de8a14a99095f51a8a82da3fcd71a8d7aa51b005b"
+    },
+    {
+      "artifactPath": "history/original-public-red/compiled/shortcut-rejection-prototype.js.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-prototype.js",
+      "bytes": 7155,
+      "sha256": "a146992be7e156af7e708fe21d64ddcd33f06b75c4582ac82926cc843fc2ba86"
+    },
+    {
+      "artifactPath": "history/original-public-red/compiled/shortcut-rejection-prototype.js.map.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-prototype.js.map",
+      "bytes": 7176,
+      "sha256": "f5a17a0cdf142cfdd12240608412e1f4a8f322a1679a4c5bf031a8630fb261ba"
+    },
+    {
+      "artifactPath": "history/original-public-red/compiled.stderr.log",
+      "kind": "log",
+      "originalName": "compiled.stderr.log",
+      "bytes": 1381,
+      "sha256": "54e1fa2a87df84296de76fdcb953e63759765e60ba26a79da8e9468e6827740c"
+    },
+    {
+      "artifactPath": "history/original-public-red/compiled.stdout.log",
+      "kind": "log",
+      "originalName": "compiled.stdout.log",
+      "bytes": 1331,
+      "sha256": "3514339f56dfc5431a4b545b2607a6249b97825434d29d35d547cb3106fae4b1"
+    },
+    {
+      "artifactPath": "history/original-public-red/confirmed-local-defect.md",
+      "kind": "report",
+      "originalName": "confirmed-local-defect.md",
+      "bytes": 2688,
+      "sha256": "227bb3820a61571a37bfe6b7b09f118e3857e7208f106e44d50ec4d1d709ace8"
+    },
+    {
+      "artifactPath": "history/original-public-red/observations.json",
+      "kind": "report",
+      "originalName": "observations.json",
+      "bytes": 1586,
+      "sha256": "327ad9c5948ef991bc2bb3e0f842cd923b98a07f2ceebe384e63efe961229b59"
+    },
+    {
+      "artifactPath": "history/original-public-red/post-probe-integrity.json",
+      "kind": "report",
+      "originalName": "post-probe-integrity.json",
+      "bytes": 284,
+      "sha256": "dbddd2b7f182b93b372f3389bbe8bb8c28a5d7aa018e5eea4f4ac23f7fdc8397"
+    },
+    {
+      "artifactPath": "history/original-public-red/receipts.json",
+      "kind": "report",
+      "originalName": "receipts.json",
+      "bytes": 1230,
+      "sha256": "5933969ec9f92f38f8ed4f6adb2d2cebcaaf15936c878c1726c76e7edddb15fb"
+    },
+    {
+      "artifactPath": "history/original-public-red/shortcut-rejection-prototype.ts.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-prototype.ts",
+      "bytes": 7574,
+      "sha256": "1e759b79df9d0528d6c9ac636e3f03134173a2a57fa462b1d71ed4b62e4d1f2a"
+    },
+    {
+      "artifactPath": "history/original-public-red/strict-typecheck-and-emit.stderr.log",
+      "kind": "log",
+      "originalName": "strict-typecheck-and-emit.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "history/original-public-red/strict-typecheck-and-emit.stdout.log",
+      "kind": "log",
+      "originalName": "strict-typecheck-and-emit.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/build-receipt.json",
+      "kind": "report",
+      "originalName": "build-receipt.json",
+      "bytes": 445,
+      "sha256": "9144516319e6733c5b836d5f991367737a0c06d17a14b08cc0d72219f9dcf528"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/build.stderr.log",
+      "kind": "log",
+      "originalName": "build.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/build.stdout.log",
+      "kind": "log",
+      "originalName": "build.stdout.log",
+      "bytes": 2928,
+      "sha256": "281f7986319bd735691aa628105cde892e26d14abe57ed849a41808c5ecb991b"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/compiled/shortcut-rejection-prototype.js.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-prototype.js",
+      "bytes": 7155,
+      "sha256": "a146992be7e156af7e708fe21d64ddcd33f06b75c4582ac82926cc843fc2ba86"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/compiled/shortcut-rejection-prototype.js.map.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-prototype.js.map",
+      "bytes": 7176,
+      "sha256": "f5a17a0cdf142cfdd12240608412e1f4a8f322a1679a4c5bf031a8630fb261ba"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/compiled.stderr.log",
+      "kind": "log",
+      "originalName": "compiled.stderr.log",
+      "bytes": 1391,
+      "sha256": "131aded222df628b0f3e513fd9333137fbfabc5ca83b63d97278bdf5a064db08"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/compiled.stdout.log",
+      "kind": "log",
+      "originalName": "compiled.stdout.log",
+      "bytes": 1283,
+      "sha256": "7978dc66e0b70381c6c8e2c32f1ef83c91c40d148123acee7c4ae8f2fab7a066"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/observations.json",
+      "kind": "report",
+      "originalName": "observations.json",
+      "bytes": 1532,
+      "sha256": "50035e50f859635a224a695072e89a8428c2bc83aafc80b6c0d1556711e1dc26"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/receipts.json",
+      "kind": "report",
+      "originalName": "receipts.json",
+      "bytes": 1382,
+      "sha256": "222a9a2231148070a623da9339f67ebd900b382c76dcf9431c53b1a690ce0155"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/shortcut-rejection-prototype.ts.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-prototype.ts",
+      "bytes": 7574,
+      "sha256": "1e759b79df9d0528d6c9ac636e3f03134173a2a57fa462b1d71ed4b62e4d1f2a"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/strict-typecheck-and-emit.stderr.log",
+      "kind": "log",
+      "originalName": "strict-typecheck-and-emit.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/strict-typecheck-and-emit.stdout.log",
+      "kind": "log",
+      "originalName": "strict-typecheck-and-emit.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/tsconfig.json",
+      "kind": "report",
+      "originalName": "tsconfig.json",
+      "bytes": 808,
+      "sha256": "d508be4b56cc23098d0ca466697d550728ade8c2db766e7713d8e66e1f87dc74"
+    },
+    {
+      "artifactPath": "history/original-public-fixed-root-oracle/working.patch.txt",
+      "kind": "log",
+      "originalName": "working.patch",
+      "bytes": 6130,
+      "sha256": "2e311f5cf8d0028a02e07d4eeb30fae2830280c9411abcc7609cce1b3013dcab"
+    },
+    {
+      "artifactPath": "history/repository-primary-red/lifecycle.test.ts.txt",
+      "kind": "log",
+      "originalName": "lifecycle.test.ts",
+      "bytes": 36491,
+      "sha256": "828561c53b2a0792f9a33592015368aa924cc89a0fa767eee433d76ada898f54"
+    },
+    {
+      "artifactPath": "history/repository-primary-red/receipt.json",
+      "kind": "report",
+      "originalName": "receipt.json",
+      "bytes": 663,
+      "sha256": "0c580d833bca5c9626c94d4ae647aca7fba04d09eb852690648ef4e51b18c24c"
+    },
+    {
+      "artifactPath": "history/repository-primary-red/shortcut-runtime.ts.txt",
+      "kind": "log",
+      "originalName": "shortcut-runtime.ts",
+      "bytes": 6625,
+      "sha256": "51c3f0c6bf6625567fd6f7a94efce5246b0d4974decf711dc735e6f5b3b564de"
+    },
+    {
+      "artifactPath": "history/repository-primary-red/stderr.log",
+      "kind": "log",
+      "originalName": "stderr.log",
+      "bytes": 856,
+      "sha256": "57349caa071bdfbb234f6d61ef06c7442afa19f1b188afc754db6d9805c34506"
+    },
+    {
+      "artifactPath": "history/repository-primary-red/stdout.log",
+      "kind": "log",
+      "originalName": "stdout.log",
+      "bytes": 28,
+      "sha256": "6043908c8d26d62698476b88f737f39d5d3e91008d4155a81730902f5a37479c"
+    },
+    {
+      "artifactPath": "history/repository-primary-red/test-only.patch.txt",
+      "kind": "log",
+      "originalName": "test-only.patch",
+      "bytes": 3683,
+      "sha256": "7deb54f5b210308c4dbddffea7b314685c1ad50146cbccb26b3220b717b95b4b"
+    },
+    {
+      "artifactPath": "history/repository-primary-green/lifecycle.test.ts.txt",
+      "kind": "log",
+      "originalName": "lifecycle.test.ts",
+      "bytes": 36491,
+      "sha256": "828561c53b2a0792f9a33592015368aa924cc89a0fa767eee433d76ada898f54"
+    },
+    {
+      "artifactPath": "history/repository-primary-green/minimal-green.patch.txt",
+      "kind": "log",
+      "originalName": "minimal-green.patch",
+      "bytes": 6130,
+      "sha256": "2e311f5cf8d0028a02e07d4eeb30fae2830280c9411abcc7609cce1b3013dcab"
+    },
+    {
+      "artifactPath": "history/repository-primary-green/receipt.json",
+      "kind": "report",
+      "originalName": "receipt.json",
+      "bytes": 530,
+      "sha256": "6bd934f782fca75a58071b623d45abe66342838160cc6993bc002a9c487bc87c"
+    },
+    {
+      "artifactPath": "history/repository-primary-green/shortcut-runtime.ts.txt",
+      "kind": "log",
+      "originalName": "shortcut-runtime.ts",
+      "bytes": 7017,
+      "sha256": "1a6fee861dc9e8475413402a5eb1512eee85b34a66cdec2a16765d200d20d689"
+    },
+    {
+      "artifactPath": "history/repository-primary-green/stderr.log",
+      "kind": "log",
+      "originalName": "stderr.log",
+      "bytes": 234,
+      "sha256": "00224d41bcfb2f5792ff0f5abef7825c42a863bd7026bfaad66c43e18b15d23c"
+    },
+    {
+      "artifactPath": "history/repository-primary-green/stdout.log",
+      "kind": "log",
+      "originalName": "stdout.log",
+      "bytes": 28,
+      "sha256": "6043908c8d26d62698476b88f737f39d5d3e91008d4155a81730902f5a37479c"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/actual-package-build.stderr.log",
+      "kind": "log",
+      "originalName": "actual-package-build.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/actual-package-build.stdout.log",
+      "kind": "log",
+      "originalName": "actual-package-build.stdout.log",
+      "bytes": 2928,
+      "sha256": "281f7986319bd735691aa628105cde892e26d14abe57ed849a41808c5ecb991b"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/compiled/shortcut-rejection-compound-oracle.js.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-compound-oracle.js",
+      "bytes": 8221,
+      "sha256": "bf5aa61473e7187eeb3d63dca045a968c19696737985d55324a1634d13b1bf5d"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/compiled/shortcut-rejection-compound-oracle.js.map.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-compound-oracle.js.map",
+      "bytes": 8065,
+      "sha256": "93146b7423d22fe6ed8cd875579fb251eb5eb831ef42c249b1e7dcaab26ad1f3"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/compiled.stderr.log",
+      "kind": "log",
+      "originalName": "compiled.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/compiled.stdout.log",
+      "kind": "log",
+      "originalName": "compiled.stdout.log",
+      "bytes": 1507,
+      "sha256": "835019fc3a81cb089e19a6925d79cb9f13a2ba92c0259d68311c09f8a9395158"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/observations.json",
+      "kind": "report",
+      "originalName": "observations.json",
+      "bytes": 1792,
+      "sha256": "55313500fda315fcbf0bac39714cb84b517858dcd5f561adb41f4779ba754d45"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/oracle-change-record.json",
+      "kind": "report",
+      "originalName": "oracle-change-record.json",
+      "bytes": 766,
+      "sha256": "a22275501f70be8734f238eb87477ced8b1b20fc587173954c6c3b8d63907ee6"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/original-to-compound-oracle.patch.txt",
+      "kind": "log",
+      "originalName": "original-to-compound-oracle.patch",
+      "bytes": 2478,
+      "sha256": "2865853537f8293399becfbba99b90c9f4ae32fde1aef76795aa485840516791"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/receipts.json",
+      "kind": "report",
+      "originalName": "receipts.json",
+      "bytes": 2044,
+      "sha256": "cd435f3e35f3e1bd4b74a6265388f3c3369dfc7a853e064f1dc187ca416195c6"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/shortcut-rejection-compound-oracle.ts.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-compound-oracle.ts",
+      "bytes": 8576,
+      "sha256": "ecd4cdbaa0e247ee36ddd1af4f7d10561823397cd64f721c5db4b65e72409701"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/strict-typecheck-and-emit.stderr.log",
+      "kind": "log",
+      "originalName": "strict-typecheck-and-emit.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/strict-typecheck-and-emit.stdout.log",
+      "kind": "log",
+      "originalName": "strict-typecheck-and-emit.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/tsconfig.json",
+      "kind": "report",
+      "originalName": "tsconfig.json",
+      "bytes": 802,
+      "sha256": "e99767bfe8f01ca9282836375ddb57c2418ecbde888caa068dcf59e8c5efdc9b"
+    },
+    {
+      "artifactPath": "support/public-v2-dirty/working.patch.txt",
+      "kind": "log",
+      "originalName": "working.patch",
+      "bytes": 6195,
+      "sha256": "811d93db64d45eb7358036c6a0046289bf754bc00388988449095a87b2346f64"
+    },
+    {
+      "artifactPath": "support/public-v3-source/change-record.json",
+      "kind": "report",
+      "originalName": "change-record.json",
+      "bytes": 646,
+      "sha256": "5004ef3c63088ad251e37bbfb95b3c766e6877f4d626f4fd7b6fef385145e551"
+    },
+    {
+      "artifactPath": "support/public-v3-source/shortcut-rejection-compound-oracle-v3.ts.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-compound-oracle-v3.ts",
+      "bytes": 9620,
+      "sha256": "46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004"
+    },
+    {
+      "artifactPath": "support/public-v3-source/v2-to-v3.patch.txt",
+      "kind": "log",
+      "originalName": "v2-to-v3.patch",
+      "bytes": 2982,
+      "sha256": "aaed906c3edd5296f4b24cc1878ab1d4564698df9c43d2d700a57b1e08e996f2"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/compiled/shortcut-rejection-compound-oracle-v3.js.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-compound-oracle-v3.js",
+      "bytes": 9341,
+      "sha256": "2c718a314fce1531ba582648473a48c64070f4b8ffe535c5cc7807af18b640b3"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/compiled/shortcut-rejection-compound-oracle-v3.js.map.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-compound-oracle-v3.js.map",
+      "bytes": 9262,
+      "sha256": "43946b93bc30ed3d33a5494ce31e0f5284882b01dd8aa4ef62c6c4cd8cf42c3d"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/compiled.stderr.log",
+      "kind": "log",
+      "originalName": "compiled.stderr.log",
+      "bytes": 1389,
+      "sha256": "2fa58e68f9128b371ee70baabfa7f58ad0053b3db1f3fba9efb6162085aafa82"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/compiled.stdout.log",
+      "kind": "log",
+      "originalName": "compiled.stdout.log",
+      "bytes": 1948,
+      "sha256": "17d4238dd29cd82926f4bc3d04577de66b9c19683fceb829d8fd5e2e3c33fcc4"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/module-resolution.json",
+      "kind": "report",
+      "originalName": "module-resolution.json",
+      "bytes": 475,
+      "sha256": "4aa71bab28907dd4bd7844bec5b98d69f8e22758cb590b974479b34f3aec30d8"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/module-resolution.mjs.txt",
+      "kind": "log",
+      "originalName": "module-resolution.mjs",
+      "bytes": 264,
+      "sha256": "c32aefed53207cab3ca67eba876b0c17ef12fbda03b7c4db4696c869282b5afe"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/observations.json",
+      "kind": "report",
+      "originalName": "observations.json",
+      "bytes": 2306,
+      "sha256": "584217fbc97aeea14642c83adf4a13ca4e7274c2cf9d36e01291b7af1b7f0075"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/provenance.json",
+      "kind": "report",
+      "originalName": "provenance.json",
+      "bytes": 893,
+      "sha256": "5705e7ccdfc46428db6ca78b1ca5b599d40aff3d589a037493910b6bcf795579"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/public-artifacts.json",
+      "kind": "report",
+      "originalName": "public-artifacts.json",
+      "bytes": 114327,
+      "sha256": "59ea4d501f74ac2afb962879e5ec7b566fbe36551f4d1f871830f7535ef049fc"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/receipts.json",
+      "kind": "report",
+      "originalName": "receipts.json",
+      "bytes": 1615,
+      "sha256": "6ac8542da94dd21a817c4656567bb99dce691feba5ea35eef13cfc833da80ec9"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/shortcut-rejection-compound-oracle-v3.ts.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-compound-oracle-v3.ts",
+      "bytes": 9620,
+      "sha256": "46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/strict-typecheck-and-emit.stderr.log",
+      "kind": "log",
+      "originalName": "strict-typecheck-and-emit.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/strict-typecheck-and-emit.stdout.log",
+      "kind": "log",
+      "originalName": "strict-typecheck-and-emit.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "support/public-v3-base-red/tsconfig.json",
+      "kind": "report",
+      "originalName": "tsconfig.json",
+      "bytes": 790,
+      "sha256": "f16114de29f4761de881c18b3faf951aa9e5ac725b427baa76f9c9cca6cf9b26"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/compiled/shortcut-rejection-compound-oracle-v3.js.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-compound-oracle-v3.js",
+      "bytes": 9341,
+      "sha256": "2c718a314fce1531ba582648473a48c64070f4b8ffe535c5cc7807af18b640b3"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/compiled/shortcut-rejection-compound-oracle-v3.js.map.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-compound-oracle-v3.js.map",
+      "bytes": 9262,
+      "sha256": "43946b93bc30ed3d33a5494ce31e0f5284882b01dd8aa4ef62c6c4cd8cf42c3d"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/compiled.stderr.log",
+      "kind": "log",
+      "originalName": "compiled.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/compiled.stdout.log",
+      "kind": "log",
+      "originalName": "compiled.stdout.log",
+      "bytes": 2208,
+      "sha256": "efb14a73f16242617baae5083e078bca9111133c9589d8a9f93952a229a42522"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/module-resolution.json",
+      "kind": "report",
+      "originalName": "module-resolution.json",
+      "bytes": 503,
+      "sha256": "d7fb5ebd8c720514529417ace19b85cc3b300a396f87f979bb63382e8a2393ee"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/module-resolution.mjs.txt",
+      "kind": "log",
+      "originalName": "module-resolution.mjs",
+      "bytes": 264,
+      "sha256": "c32aefed53207cab3ca67eba876b0c17ef12fbda03b7c4db4696c869282b5afe"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/observations.json",
+      "kind": "report",
+      "originalName": "observations.json",
+      "bytes": 2615,
+      "sha256": "d9e346d35779c8295943bfe896e8f576074274b7ce3e3ac502eb94b26a5f3cbe"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/provenance.json",
+      "kind": "report",
+      "originalName": "provenance.json",
+      "bytes": 893,
+      "sha256": "df893344997990bba5c72ccf2fa4a2018684adcd1a0374cb53c49cdcfe4ec4b0"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/public-artifacts.json",
+      "kind": "report",
+      "originalName": "public-artifacts.json",
+      "bytes": 114326,
+      "sha256": "7751b2b0c00cb644dbf958a65a49395871690d09e888492416cd449c938b1d97"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/receipts.json",
+      "kind": "report",
+      "originalName": "receipts.json",
+      "bytes": 1638,
+      "sha256": "b2ed2926d91ec288c92dc30cff8e3e589dad85957a6c8cdf64baed6ba2bced31"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/shortcut-rejection-compound-oracle-v3.ts.txt",
+      "kind": "log",
+      "originalName": "shortcut-rejection-compound-oracle-v3.ts",
+      "bytes": 9620,
+      "sha256": "46ebafd3cb55210872817d4a6b32ee57be1f64b5c559e605c6d47df38d642004"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/strict-typecheck-and-emit.stderr.log",
+      "kind": "log",
+      "originalName": "strict-typecheck-and-emit.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/strict-typecheck-and-emit.stdout.log",
+      "kind": "log",
+      "originalName": "strict-typecheck-and-emit.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "support/public-v3-head-green/tsconfig.json",
+      "kind": "report",
+      "originalName": "tsconfig.json",
+      "bytes": 801,
+      "sha256": "8d90f7999de91a599274c49a62babba97de86eb8c0a732686e9a4ba772dbb438"
+    },
+    {
+      "artifactPath": "support/related-checks/format.stderr.log",
+      "kind": "log",
+      "originalName": "format.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "support/related-checks/format.stdout.log",
+      "kind": "log",
+      "originalName": "format.stdout.log",
+      "bytes": 115,
+      "sha256": "20b4ae269bd3e975c839b88afbc8735649b011735eccfb0690ede9e808d37bd9"
+    },
+    {
+      "artifactPath": "support/related-checks/receipts.json",
+      "kind": "report",
+      "originalName": "receipts.json",
+      "bytes": 1677,
+      "sha256": "3d202a9b5f9c51bac3adca65e1f40f1522c8a666da257c3ac53dab51f582f019"
+    },
+    {
+      "artifactPath": "support/related-checks/related-bun.stderr.log",
+      "kind": "log",
+      "originalName": "related-bun.stderr.log",
+      "bytes": 68347,
+      "sha256": "df9c212c7827a1a387d5f63f3a85013ca83180e265587b3d3a33a495c1f20b86"
+    },
+    {
+      "artifactPath": "support/related-checks/related-bun.stdout.log",
+      "kind": "log",
+      "originalName": "related-bun.stdout.log",
+      "bytes": 28,
+      "sha256": "6043908c8d26d62698476b88f737f39d5d3e91008d4155a81730902f5a37479c"
+    },
+    {
+      "artifactPath": "support/related-checks/typecheck.stderr.log",
+      "kind": "log",
+      "originalName": "typecheck.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifactPath": "support/related-checks/typecheck.stdout.log",
+      "kind": "log",
+      "originalName": "typecheck.stdout.log",
+      "bytes": 3211,
+      "sha256": "4eb46d71027bfd6cedb1c984ebaf7c33c161fee57c90ec217b7a330d35bda170"
+    },
+    {
+      "artifactPath": "support/expanded-inspection-tests/lifecycle.test.ts.txt",
+      "kind": "log",
+      "originalName": "lifecycle.test.ts",
+      "bytes": 42383,
+      "sha256": "9a1c26b58431a29141c4bc586455eeb4ad312a892fae3c3c980abab3c3a7463a"
+    },
+    {
+      "artifactPath": "support/expanded-inspection-tests/receipt.json",
+      "kind": "report",
+      "originalName": "receipt.json",
+      "bytes": 439,
+      "sha256": "396a604e8d7e22822e01f9b3aea7fc16cb582653ebe0575b62a4afd21f697f93"
+    },
+    {
+      "artifactPath": "support/expanded-inspection-tests/stderr.log",
+      "kind": "log",
+      "originalName": "stderr.log",
+      "bytes": 7203,
+      "sha256": "ef51a4c0169827fb2c122380348871be86cd8cbe7806de2b94d8fb1ea2fa0f8c"
+    },
+    {
+      "artifactPath": "support/expanded-inspection-tests/stdout.log",
+      "kind": "log",
+      "originalName": "stdout.log",
+      "bytes": 28,
+      "sha256": "6043908c8d26d62698476b88f737f39d5d3e91008d4155a81730902f5a37479c"
+    },
+    {
+      "artifactPath": "support/expanded-inspection-tests/working.patch.txt",
+      "kind": "log",
+      "originalName": "working.patch",
+      "bytes": 13223,
+      "sha256": "a6363981f0f5280e5dac4ef676a94a9a993842bf036e391088b90c8a2da9ae1a"
+    },
+    {
+      "artifactPath": "support/affected.stdout.log",
+      "kind": "log",
+      "originalName": "affected.stdout.log",
+      "bytes": 5077,
+      "sha256": "ed5c88b8277394eb6681b57e2276c3a47a246a0fe5bf5af2b2b6364f61c59f69"
+    },
+    {
+      "artifactPath": "support/affected.stderr.log",
+      "kind": "log",
+      "originalName": "affected.stderr.log",
+      "bytes": 57001,
+      "sha256": "c55068e212a008d38fb07fa57bf1b237f31922126453fcdb304fd9364dbba513"
+    },
+    {
+      "artifactPath": "support/affected-receipt.json",
+      "kind": "report",
+      "originalName": "affected-receipt.json",
+      "bytes": 505,
+      "sha256": "79515f578719d8353181d918f8f07ea3726b744b2a6dce9703bbb28088445aca"
+    },
+    {
+      "artifactPath": "support/affected-plan.json",
+      "kind": "report",
+      "originalName": "affected-plan.json",
+      "bytes": 573,
+      "sha256": "214096d02a7b9b13c9eb945c86b759d494fb343c9adeba35d149fe15c5f27e7c"
+    },
+    {
+      "artifactPath": "support/inspection.json",
+      "kind": "report",
+      "originalName": "inspection.json",
+      "bytes": 382,
+      "sha256": "fe7c2f83eb6a9bb8268d4dfea7171f29a98e3c70ff47948d5e86249efa5671ab"
+    },
+    {
+      "artifactPath": "support/review.patch.txt",
+      "kind": "log",
+      "originalName": "review.patch",
+      "bytes": 13337,
+      "sha256": "c2fc1bdcb28af89dc09cd4c44b4137503e5e02f3b36d589762e64db655caf476"
+    },
+    {
+      "artifactPath": "support/formal-attempt-result.json",
+      "kind": "report",
+      "originalName": "formal-attempt-result.json",
+      "bytes": 925,
+      "sha256": "f1db959a00be9b145f570b81dacd0358e6d2b3ec7a768e84f9ab7ed1e8aeb21d"
+    },
+    {
+      "artifactPath": "support/source-publication-readback.json",
+      "kind": "report",
+      "originalName": "source-publication-readback.json",
+      "bytes": 1285,
+      "sha256": "918e7cc5cecaf189aac6913656eb1cb804c48cd7d155a2f27e17f31a1d63694e"
+    },
+    {
+      "artifactPath": "support/ci/source-checks.log",
+      "kind": "log",
+      "originalName": "source-checks.log",
+      "bytes": 282094,
+      "sha256": "9c0d8656f2223e8fdac770e4caf13b8be1bf5a9e769a3e71f82c9d8fd241a084"
+    },
+    {
+      "artifactPath": "support/ci/source-preview.log",
+      "kind": "log",
+      "originalName": "source-preview.log",
+      "bytes": 93751,
+      "sha256": "be986183052057ae924639eec7c7de20bec9e1fe312c227cb80386c43d98970e"
+    },
+    {
+      "artifactPath": "support/ci/trusted-publisher.log",
+      "kind": "log",
+      "originalName": "trusted-publisher.log",
+      "bytes": 19539,
+      "sha256": "9af5f7778109318947e5d3214e8c6d51402100e34ee018e9b178379bbf9012b3"
+    },
+    {
+      "artifactPath": "support/ci/native-media-readback.json",
+      "kind": "report",
+      "originalName": "native-media-readback.json",
+      "bytes": 23781,
+      "sha256": "066d14860b211339f6c1fc786e34071e16df7e9d2f4b6515f4901943e7c8beb9"
+    },
+    {
+      "artifactPath": "support/ci/dynamic-scene-selection.json",
+      "kind": "report",
+      "originalName": "dynamic-scene-selection.json",
+      "bytes": 324,
+      "sha256": "148a2e3c94d8827c36b793235e61a7569286e8b56f29635d82687296ce1c3efa"
+    },
+    {
+      "artifactPath": "support/independent/standards-evidence.json",
+      "kind": "report",
+      "originalName": "standards-evidence.json",
+      "bytes": 9620,
+      "sha256": "6b00f0fa0660f4eb266522dc20585dd37ac659881de0e8cd16d738ef6a1aee96"
+    },
+    {
+      "artifactPath": "support/independent/spec-evidence.json",
+      "kind": "report",
+      "originalName": "spec-evidence.json",
+      "bytes": 17613,
+      "sha256": "e65b7971432677f806d8adb4685eea73cb21031c91f10f8ca4c6bd3de2bce5ca"
+    },
+    {
+      "artifactPath": "support/independent/standards-tests.log",
+      "kind": "log",
+      "originalName": "standards-tests.log",
+      "bytes": 85538,
+      "sha256": "99ee5626354552e7f355395a876771b0f8fef83cedcdf9926101f50b3bd0fd09"
+    },
+    {
+      "artifactPath": "support/independent/spec-tests.log",
+      "kind": "log",
+      "originalName": "spec-tests.log",
+      "bytes": 83570,
+      "sha256": "f66ffaf5f0c45b9d5e62b435797fd21ddb5472b58f69409d72bc4c6a4f6802ca"
+    },
+    {
+      "artifactPath": "history/oracle-review/oracle-spec-review.md",
+      "kind": "report",
+      "originalName": "oracle-spec-review.md",
+      "bytes": 2823,
+      "sha256": "ef9b7cfe0d60fe51006aa50fdaadbe42857dec4f28f16e9d975ad1e5a6ff1e1d"
+    },
+    {
+      "artifactPath": "history/oracle-review/oracle-spec-review.json",
+      "kind": "report",
+      "originalName": "oracle-spec-review.json",
+      "bytes": 6395,
+      "sha256": "d23ff56b4eb86d5f6918fa0b3267d62b3ee6b7796a26a8f10ddca349ca3037f0"
+    }
+  ],
+  "sourceByteContentUnchanged": true,
+  "nonWhitelistedCodeExtensionsCarriedAsDeclaredPlainText": true,
+  "noPolicyWhitelistChange": true
+}

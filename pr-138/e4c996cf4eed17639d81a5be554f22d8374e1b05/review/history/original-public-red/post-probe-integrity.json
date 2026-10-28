@@ -1,0 +1,9 @@
+{
+  "head": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+  "sourceClean": true,
+  "all629ArtifactsUnchanged": true,
+  "isolatedNativeBunProcessExited": true,
+  "nativeProcessExitCode": 1,
+  "publicHostCleanupReportedByEachActualObservation": true,
+  "noBrowserOrServerStarted": true
+}

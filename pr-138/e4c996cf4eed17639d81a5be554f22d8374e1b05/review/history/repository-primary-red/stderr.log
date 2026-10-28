@@ -1,0 +1,18 @@
+
+packages/plugin-interaction/tests/lifecycle.test.ts:
+31 | 
+32 | test('Shortcut rejection inspection retains failures and releases the Binding', async () => {
+33 |   const renderer = new LifecycleRenderer();
+34 |   const command = defineCommand<void, void>('test.shortcut.rejection-inspection');
+35 |   const original = new Error('original Command rejection');
+36 |   const inspectionFailure = new Error('Command rejection prototype read failed');
+                                     ^
+error: Command rejection prototype read failed
+      at <anonymous> (/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/plugin-interaction/tests/lifecycle.test.ts:36:33)
+(fail) Shortcut rejection inspection retains failures and releases the Binding [37.34ms]
+
+ 0 pass
+ 15 filtered out
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [131.00ms]

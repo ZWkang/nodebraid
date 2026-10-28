@@ -1,0 +1,31 @@
+--- v2-compound-slots.ts
++++ v3-compound-slots-and-fault-metadata.ts
+@@ -97,6 +97,16 @@
+         && Object.is(members[0], failure) && Object.is(members[1], inspectionFailure)
+         && faultError instanceof AggregateError;
+       const exactlyOneFault = faults.length === 1;
++      const stableCommandFaultMetadata = exactlyOneFault
++        && faults[0]!.event.name === 'nodebraid.plugin.interaction.command.fault'
++        && faults[0]!.event.level === 'error'
++        && faults[0]!.event.attributes.commandId === command.id
++        && faults[0]!.event.scope.pluginName === '@nodebraid/plugin-interaction'
++        && typeof faults[0]!.event.scope.hostId === 'string' && faults[0]!.event.scope.hostId.length > 0
++        && typeof faults[0]!.event.scope.installationId === 'string' && faults[0]!.event.scope.installationId.length > 0
++        && typeof faults[0]!.event.scope.activationId === 'string' && faults[0]!.event.scope.activationId.length > 0
++        && Object.isFrozen(faults[0]) && Object.isFrozen(faults[0]!.event)
++        && Object.isFrozen(faults[0]!.event.scope) && Object.isFrozen(faults[0]!.event.attributes);
+       const requiredIdentityStagePreserved = route === 'shortcut-proxy-rejection'
+         ? compoundOriginalAndInspectionSlotsPreserved : originalFaultPreserved;
+       let hostDisposed = false;
+@@ -104,8 +114,9 @@
+       await turn(); await turn();
+       if (hostDisposed) await hostDisposal;
+       if (bindingDisposed) await bindingDisposal;
+-      const passed = handlerCalls === 1 && commandDisposed && requiredIdentityStagePreserved && exactlyOneFault && bindingDisposed && reservationReleased && ownUnhandled.length === 0 && hostDisposed && renderer.disposed && renderer.subscriptions.size === 0;
+-      rows.push({ route, passed, handlerCalls, prototypeReads, faults: faults.length, originalFaultPreserved, compoundOriginalAndInspectionSlotsPreserved, exactlyOneFault, requiredIdentityStagePreserved,
++      const passed = handlerCalls === 1 && commandDisposed && requiredIdentityStagePreserved && exactlyOneFault && stableCommandFaultMetadata && bindingDisposed && reservationReleased && ownUnhandled.length === 0 && hostDisposed && renderer.disposed && renderer.subscriptions.size === 0;
++      rows.push({ route, passed, handlerCalls, prototypeReads, faults: faults.length, originalFaultPreserved, compoundOriginalAndInspectionSlotsPreserved, exactlyOneFault, stableCommandFaultMetadata, requiredIdentityStagePreserved,
++        faultEventName: faults[0]?.event.name, faultCommandId: faults[0]?.event.attributes.commandId, faultScope: faults[0]?.event.scope,
+         unhandledRejections: ownUnhandled.length, unhandledIsInspectionFailure: ownUnhandled.some(error => Object.is(error, inspectionFailure)),
+         commandRegistrationDisposed: commandDisposed, bindingDisposed, reservationReleased, conflictCode,
+         hostDisposed, rendererDisposed: renderer.disposed, remainingRendererSubscriptions: renderer.subscriptions.size,

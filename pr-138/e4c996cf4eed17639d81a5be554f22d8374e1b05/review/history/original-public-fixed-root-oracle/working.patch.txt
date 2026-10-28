@@ -1,0 +1,142 @@
+diff --git a/packages/plugin-interaction/src/shortcut-runtime.ts b/packages/plugin-interaction/src/shortcut-runtime.ts
+index 2cd24a3..5dbbf49 100644
+--- a/packages/plugin-interaction/src/shortcut-runtime.ts
++++ b/packages/plugin-interaction/src/shortcut-runtime.ts
+@@ -120,23 +120,33 @@ export function createShortcutRuntime(options: {
+     void options.commands.execute(entry.binding.command, undefined, { signal: controller.signal }).then(
+       () => finish(),
+       (error) => {
+-        const expectedDisposalAbort =
+-          entry.disposePromise !== undefined && controller.signal.aborted && error === controller.signal.reason;
+-        if (!expectedDisposalAbort) {
+-          if (error instanceof CommandError && error.code === 'COMMAND_NOT_FOUND') {
+-            options.diagnostics.emit({
+-              name: interactionDiagnosticEvents.inputRejected,
+-              level: 'info',
+-              attributes: { inputType: 'key.down', reason: 'capability-unavailable' },
+-            });
+-          } else {
+-            options.diagnostics.reportFault(error, {
+-              name: interactionDiagnosticEvents.commandFault,
+-              attributes: { commandId: entry.binding.command.id },
+-            });
++        try {
++          const expectedDisposalAbort =
++            entry.disposePromise !== undefined && controller.signal.aborted && error === controller.signal.reason;
++          if (!expectedDisposalAbort) {
++            let unavailable = false;
++            let rejection = error;
++            try {
++              unavailable = error instanceof CommandError && error.code === 'COMMAND_NOT_FOUND';
++            } catch (inspectionFailure) {
++              rejection = new AggregateError([error, inspectionFailure], 'Shortcut Command rejection inspection failed.');
++            }
++            if (unavailable) {
++              options.diagnostics.emit({
++                name: interactionDiagnosticEvents.inputRejected,
++                level: 'info',
++                attributes: { inputType: 'key.down', reason: 'capability-unavailable' },
++              });
++            } else {
++              options.diagnostics.reportFault(rejection, {
++                name: interactionDiagnosticEvents.commandFault,
++                attributes: { commandId: entry.binding.command.id },
++              });
++            }
+           }
++        } finally {
++          finish();
+         }
+-        finish();
+       },
+     );
+ 
+diff --git a/packages/plugin-interaction/tests/lifecycle.test.ts b/packages/plugin-interaction/tests/lifecycle.test.ts
+index 378e76d..4ceb414 100644
+--- a/packages/plugin-interaction/tests/lifecycle.test.ts
++++ b/packages/plugin-interaction/tests/lifecycle.test.ts
+@@ -25,8 +25,84 @@ import {
+   interactionPlugin,
+   interactionShortcutService,
+   moveNodesCommand,
++  type InteractionShortcutRegistration,
++  type InteractionShortcutService,
+ } from '../src';
+ 
++test('Shortcut rejection inspection retains failures and releases the Binding', async () => {
++  const renderer = new LifecycleRenderer();
++  const command = defineCommand<void, void>('test.shortcut.rejection-inspection');
++  const original = new Error('original Command rejection');
++  const inspectionFailure = new Error('Command rejection prototype read failed');
++  const rejection = new Proxy(original, {
++    getPrototypeOf() {
++      throw inspectionFailure;
++    },
++  });
++  const observed = Promise.withResolvers<DiagnosticFault>();
++  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => observed.resolve(fault) } });
++  let shortcuts!: InteractionShortcutService;
++  let registration!: InteractionShortcutRegistration;
++  const binding = {
++    shortcut: {
++      code: 'KeyP',
++      modifierAlternatives: [{ alt: false, control: false, meta: false, shift: false }],
++    },
++    command,
++  };
++  const installations = [
++    host.install(kernelPlugin),
++    host.install(portPlugin),
++    host.install(commandPlugin),
++    host.install(sessionPlugin),
++    host.install(createRendererPlugin(() => renderer)),
++    host.install(interactionPlugin),
++    host.install(
++      definePlugin({
++        requires: { commands: commandService, shortcuts: interactionShortcutService },
++        setup(context) {
++          const commandRegistration = context.services.commands.register(command, () => {
++            throw rejection;
++          });
++          context.own(() => commandRegistration.dispose());
++          shortcuts = context.services.shortcuts;
++          registration = shortcuts.register(binding);
++          context.own(() => registration.dispose());
++        },
++      }),
++    ),
++  ];
++  await Promise.all(installations.map((installation) => installation.whenActive()));
++  try {
++    expect(
++      renderer.emit({
++        type: 'key.down',
++        key: 'p',
++        code: 'KeyP',
++        repeat: false,
++        modifiers: { alt: false, control: false, meta: false, shift: false },
++      }),
++    ).toEqual({ defaultAction: 'prevent' });
++    const fault = await observed.promise;
++    expect(fault.event.name).toBe('nodebraid.plugin.interaction.command.fault');
++    expect(fault.event.attributes.commandId).toBe(command.id);
++    expect(fault.error).toBeInstanceOf(AggregateError);
++    const failures: unknown[] = (fault.error as AggregateError).errors;
++    expect(failures).toHaveLength(2);
++    expect(Object.is(failures[0], rejection)).toBe(true);
++    expect(Object.is(failures[1], inspectionFailure)).toBe(true);
++    const disposal = registration.dispose();
++    expect(registration.dispose()).toBe(disposal);
++    await disposal;
++    const replacement = shortcuts.register(binding);
++    expect(registration.dispose()).toBe(disposal);
++    await replacement.dispose();
++  } finally {
++    await host.dispose();
++  }
++  expect(installations.every((installation) => installation.getSnapshot().status === 'disposed')).toBe(true);
++});
++
+ test('Shortcut Binding preserves the Command accepted from a caller getter', async () => {
+   const renderer = new LifecycleRenderer();
+   const firstCommand = defineCommand<void, void>('test.shortcut.capture.first');
