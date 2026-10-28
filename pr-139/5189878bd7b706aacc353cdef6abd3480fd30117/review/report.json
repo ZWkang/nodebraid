@@ -1,0 +1,480 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "expectedParent": "fe94ea93ed6b06e65e5d29f7846e132a53f8cded",
+    "head": "5189878bd7b706aacc353cdef6abd3480fd30117",
+    "tree": "3ae24e9cebec83c6ec06106ce5e1f78aa6441cc5",
+    "patch": "bacd378539447c512f65ceae30d607a3ef519fc7501b61c0f31214984c96657a",
+    "localHead": "ea78f28d4362868174d7b2848652f26e70d7a093"
+  },
+  "task": {
+    "run": "issue-137-20261028-reset-semantics",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 137
+    },
+    "request": "Deliver the generic Node authoring capability in Issue #137: headless Node creation and strict source-Node data updates, synchronous custom SVG content with rectangular interaction bounds, one-shot placement, application-owned Apply/Cancel drafts, and real public/browser/file verification. Explicit reset always reconstructs custom SVG content, including same-revision Runtime Port Contribution refreshes; ordinary incremental updates retain the agreed content identity.",
+    "plan": [
+      {
+        "id": "node-commands",
+        "blockedBy": [],
+        "acceptance": "Public headless create/data-update commands preserve atomicity, exact source identity and History; meaningful package tests pass."
+      },
+      {
+        "id": "svg-content",
+        "blockedBy": [],
+        "acceptance": "Optional synchronous SVG content preserves legacy behavior, geometric interactions, stable ownership and failure rollback; real browser contracts pass. Real Runtime Port registration/disposal confirms same-revision reset reconstruction."
+      },
+      {
+        "id": "node-placement",
+        "blockedBy": [
+          "node-commands"
+        ],
+        "acceptance": "Unified Interaction one-shot placement supports creation, cancellation, coordinates and lifecycle without double actions; public seam tests pass."
+      },
+      {
+        "id": "example-authoring",
+        "blockedBy": [
+          "node-commands",
+          "svg-content",
+          "node-placement"
+        ],
+        "acceptance": "Real Example allows two node types, placement, Apply/Cancel, draft switch/conflict recovery, Undo/Redo and file round trip."
+      },
+      {
+        "id": "documentation-and-affected",
+        "blockedBy": [
+          "example-authoring"
+        ],
+        "acceptance": "Exports, package artifacts, ADR/domain/bilingual docs and capability/evidence maps are current; affected development checks pass."
+      },
+      {
+        "id": "reviews-and-verification",
+        "blockedBy": [
+          "documentation-and-affected"
+        ],
+        "acceptance": "Independent Standards+ponytail and Spec/risk reviews pass on current head/tree/patch; agents:run verify executes full check successfully."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "reviews-and-verification"
+        ],
+        "acceptance": "One PR to main has exact source publication, current-head CI and immutable full report/media readback; premerge steps complete."
+      },
+      {
+        "id": "main-acceptance",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "After merge, fetch and prove actual main integration and whole-Issue acceptance; record any remaining post-merge results."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "ea78f28d4362868174d7b2848652f26e70d7a093",
+      "tree": "3ae24e9cebec83c6ec06106ce5e1f78aa6441cc5",
+      "patch": "bacd378539447c512f65ceae30d607a3ef519fc7501b61c0f31214984c96657a",
+      "report": "What this change does: Adds headless Node creation and source-guarded data editing, one-shot placement, synchronous custom SVG content, and application-owned drafts. Every Renderer reset rebuilds content, including same-revision Port Contribution resets.\n\nReview identity: base `fe94ea93ed6b06e65e5d29f7846e132a53f8cded`; head `ea78f28d4362868174d7b2848652f26e70d7a093`; tree `3ae24e9cebec83c6ec06106ce5e1f78aa6441cc5`; binary patch SHA256 `bacd378539447c512f65ceae30d607a3ef519fc7501b61c0f31214984c96657a`.\n\nLooks good. Ship. No remaining documented-standard breaches or concrete smell findings.\n\nThe previous P3 capability-map finding is fixed: the drag recipe reads the custom Node outer group's actual translate matrix. The reset contract agrees with [Issue #137 comment 6465202920](https://github.com/ZWkang/nodebraid/issues/137#issuecomment-6465202920) and ADR-0086.\n\nReviewed the complete feature against AGENTS/CONTRIBUTING, domain/ADR contracts and applicable principles, including connected Command, Kernel, Session, Interaction, Port and Renderer callers. Assumed load is interactive editing within one Canvas Runtime. Public boundary checks, failure identity, request replacement/cleanup, SVG preflight/deep rollback, draft conflicts and file round trips retain their documented owners.\n\nThe final two-line collector change scrolls the Place node control into view, then waits for the observable placement state before clicking Canvas. It preserves native input and all graph, Selection, revision, SVG and file assertions. It adds no retry, fallback or weaker success condition. Production code is unchanged from the preceding review.\n\nObserved evidence: the current-head six-scene preview passed; its manifest source matches the head/tree/patch above. The formerly failing second placement now creates the Note and completes the real file round trip. Original failure evidence remains preserved. Scene-selector tests passed (8 tests, 30 assertions), and agents:typecheck completed. The preceding SVG suite exited 0 with real Runtime Port registration/disposal reset coverage plus 214 geometry, 72 native policy, 72 constructor-failure and 48 tolerance cases; those browser sources are unchanged by the collector fix. Earlier 36-test independent and 329-test Interaction checks were not represented as new-head executions.\n\nRisk: **high**. Public lifecycle and SVG ownership changes plus Agent skills, scripts, package/build configuration and declaration checks trigger the high path floor. Full human review remains required. Revert this feature commit to restore previous behavior; there is no persistent-format migration or server write, and exported files remain intact.\n\nNot checked: formal full verify, remote CI and report publication/readback remain delivery work. Passing review does not establish ready or merge status.\n\nStandards: 0 findings. Verdict: Ship.\n",
+      "risk": {
+        "level": "high",
+        "rationale": "The complete feature changes public Node editing, Placement lifecycle and SVG ownership. Agent skills, scripts, package/build configuration and declaration checks trigger the high path floor and require full human review.",
+        "evidence": "Recomputed full review identity and reviewed the final collector-only two-line change. All six current-head preview scenes passed with exact manifest source identity; scene-selector tests passed 8 tests/30 assertions and agents:typecheck completed. Earlier real SVG/Runtime, Interaction and independent targeted checks apply to unchanged code. Formal full verify remains pending.",
+        "rollback": "Revert feature commit ea78f28d4362868174d7b2848652f26e70d7a093 to restore prior interfaces, Example and collector. No persistent-format migration or server write occurs; retain exported Document files."
+      }
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "ea78f28d4362868174d7b2848652f26e70d7a093",
+      "tree": "3ae24e9cebec83c6ec06106ce5e1f78aa6441cc5",
+      "patch": "bacd378539447c512f65ceae30d607a3ef519fc7501b61c0f31214984c96657a",
+      "report": "# Spec review — Issue #137\n\nVerdict: passed. No missing or partial implementation, scope creep, or demonstrable logic mismatch remains against [Issue #137](https://github.com/ZWkang/nodebraid/issues/137), including [the reset contract decision](https://github.com/ZWkang/nodebraid/issues/137#issuecomment-6465202920).\n\nReviewed the complete feature from `fe94ea93ed6b06e65e5d29f7846e132a53f8cded` to `ea78f28d4362868174d7b2848652f26e70d7a093`. Independently recomputed tree `3ae24e9cebec83c6ec06106ce5e1f78aa6441cc5` and binary patch SHA-256 `bacd378539447c512f65ceae30d607a3ef519fc7501b61c0f31214984c96657a`; the worktree is clean. Prior complete implementation/caller findings remain applicable: the only change since the passed review is two lines in `scripts/collect-preview.ts`.\n\nThe collector now scrolls the real Place node button into view and waits for the observable waiting state after clicking, before sending native Canvas input. It retains all creation, Selection, revision, SVG content, Apply/Undo/Redo and full-file comparison assertions. No product code, protocol or accepted requirement changed; there is no retry, fallback or weakened acceptance.\n\nThe earlier Port-only reconstruction finding remains resolved against the explicit specification: all resets rebuild content, including same-revision Runtime resets after independent Port registration/disposal. The real Runtime/SVG browser case verifies reconstruction and DOM replacement, unchanged Document/Session, correct Port/Anchor geometry and hits, and content retention during ordinary position Commits. ADR and bilingual documentation match. `svg-reset-browser.log` records the complete SVG suite passing.\n\nCurrent-head evidence: `preview-preflight-2/preview.json` matches the head/tree/patch above and records all six scenes passed, including Node authoring and the real Document file round trip; `preview-preflight-2.log` confirms completion. Scene-selector tests passed 8/8. Earlier Node/Placement/draft and Examples evidence still covers unchanged production code. The failed preflight remains preserved. This reviewer did not rerun builds or full checks.\n\nRisk: **high**. Public editing/Placement/SVG ownership changes and Agent instructions, skills, scripts, dependency/build configuration and declaration artifacts impose the high path floor. Human review should cover request/failure ownership, reset semantics and evidence collection. Rollback is a feature-commit revert plus rebuilding dependents; no persisted-format migration or destructive operation is introduced, and exported data remains ordinary Document values.\n\nFull managed verification, current-head CI, report/media publication/readback and post-merge acceptance remain pending delivery gates. Spec findings: 0.\n",
+      "risk": {
+        "level": "high",
+        "rationale": "The complete feature changes public Node Editing and Placement contracts, SVG content ownership and lifecycle behavior. Agent instructions, skills, scripts, dependency/build configuration and declaration artifacts impose the high path floor. The two-line collector visibility/state-wait fix retains the accepted behavior and assertions.",
+        "evidence": "Verified current head/tree/binary patch digest and clean worktree. Prior complete implementation/caller review and reset-contract review remain applicable; only scripts/collect-preview.ts gained scrollintoview and an observable waiting-state wait. Current-head preview-preflight-2 manifest and log prove all six scenes passed; scene-selector tests passed 8/8. Runtime/SVG browser suite passes. Full delivery gates remain pending.",
+        "rollback": "Revert ea78f28d4362868174d7b2848652f26e70d7a093 as a unit and rebuild dependents. No persisted-format migration or destructive operation; exported Nodes/data remain ordinary Document values, while reverting removes authoring UI and custom SVG visuals."
+      }
+    }
+  },
+  "changedFiles": [
+    ".agents/skills/control-nodebraid/references/capabilities.md",
+    ".agents/skills/verify-nodebraid/SKILL.md",
+    ".agents/skills/verify-nodebraid/features/README.md",
+    ".agents/skills/verify-nodebraid/features/node-authoring.md",
+    "AGENTS.md",
+    "CONTEXT.md",
+    "README.md",
+    "README.zh-CN.md",
+    "bun.lock",
+    "docs/adr/0050-publish-a-stable-svg-dom-seam.md",
+    "docs/adr/0054-preflight-svg-projection-updates.md",
+    "docs/adr/0086-own-custom-svg-content-with-provider-geometry.md",
+    "docs/adr/0087-guard-node-data-edits-with-source-identity.md",
+    "docs/adr/0088-route-node-placement-through-interaction.md",
+    "docs/agents/pr-evidence.md",
+    "docs/architecture-baseline-v0.md",
+    "examples/app/browser-tests/basic-svg.browser.ts",
+    "examples/app/browser-tests/clipboard.browser.ts",
+    "examples/app/browser-tests/document.browser.ts",
+    "examples/app/browser-tests/node-authoring.browser.ts",
+    "examples/app/package.json",
+    "examples/app/src/components/node-authoring.tsx",
+    "examples/app/src/example-runtime/create-example-runtime.ts",
+    "examples/app/src/example-runtime/node-content.ts",
+    "examples/app/src/example-runtime/node-draft.ts",
+    "examples/app/src/routes/basic-svg.tsx",
+    "examples/app/src/styles.css",
+    "examples/app/tests/node-draft.test.ts",
+    "package.json",
+    "packages/core/artifacts/check-declarations.ts",
+    "packages/core/package.json",
+    "packages/core/src/index.ts",
+    "packages/plugin-interaction/README.md",
+    "packages/plugin-interaction/artifacts/check-declarations.ts",
+    "packages/plugin-interaction/package.json",
+    "packages/plugin-interaction/src/diagnostic-events.ts",
+    "packages/plugin-interaction/src/index.ts",
+    "packages/plugin-interaction/src/interaction-error.ts",
+    "packages/plugin-interaction/src/interaction-plugin.ts",
+    "packages/plugin-interaction/src/interaction-runtime.ts",
+    "packages/plugin-interaction/src/node-placement.ts",
+    "packages/plugin-interaction/tests/diagnostic-events.test.ts",
+    "packages/plugin-interaction/tests/node-placement.test.ts",
+    "packages/plugin-interaction/tests/types.test.ts",
+    "packages/plugin-node-editing/LICENSE",
+    "packages/plugin-node-editing/README.md",
+    "packages/plugin-node-editing/artifacts/check-declarations.ts",
+    "packages/plugin-node-editing/package.json",
+    "packages/plugin-node-editing/src/contracts.ts",
+    "packages/plugin-node-editing/src/index.ts",
+    "packages/plugin-node-editing/src/node-editing-error.ts",
+    "packages/plugin-node-editing/src/node-editing-plugin.ts",
+    "packages/plugin-node-editing/tests/index.test.ts",
+    "packages/plugin-node-editing/tsconfig.build.json",
+    "packages/plugin-node-editing/tsconfig.json",
+    "packages/preset-basic/README.md",
+    "packages/preset-basic/package.json",
+    "packages/preset-basic/src/preset-basic-plugin.ts",
+    "packages/preset-basic/tests/lifecycle.test.ts",
+    "packages/preset-basic/tests/node-editing.test.ts",
+    "packages/renderer-svg/README.md",
+    "packages/renderer-svg/artifacts/check-declarations.ts",
+    "packages/renderer-svg/browser-tests/node-content.entry.ts",
+    "packages/renderer-svg/browser-tests/renderer-contract.browser.ts",
+    "packages/renderer-svg/browser-tests/renderer-contract.entry.ts",
+    "packages/renderer-svg/src/contracts.ts",
+    "packages/renderer-svg/src/index.ts",
+    "packages/renderer-svg/src/node-content.ts",
+    "packages/renderer-svg/src/svg-config.ts",
+    "packages/renderer-svg/src/svg-projection.ts",
+    "packages/renderer-svg/src/svg-renderer-error.ts",
+    "packages/renderer-svg/src/svg-renderer.ts",
+    "packages/renderer-svg/tests/types.test.ts",
+    "scripts/collect-preview.ts",
+    "scripts/preview-scenarios.ts",
+    "tests/preview-scenes.test.ts",
+    "website/.vitepress/module-catalog.mts",
+    "website/capabilities/composition.md",
+    "website/capabilities/execution-history.md",
+    "website/en/capabilities/composition.md",
+    "website/en/capabilities/execution-history.md",
+    "website/en/guide/interactive-example.md",
+    "website/en/modules/core.md",
+    "website/en/modules/plugin-interaction.md",
+    "website/en/modules/plugin-node-editing.md",
+    "website/en/modules/preset-basic.md",
+    "website/en/modules/renderer-svg.md",
+    "website/en/status.md",
+    "website/guide/interactive-example.md",
+    "website/modules/core.md",
+    "website/modules/plugin-interaction.md",
+    "website/modules/plugin-node-editing.md",
+    "website/modules/preset-basic.md",
+    "website/modules/renderer-svg.md",
+    "website/status.md"
+  ],
+  "risk": {
+    "level": "high",
+    "route": "full-human",
+    "reasons": [
+      "standards: high — The complete feature changes public Node editing, Placement lifecycle and SVG ownership. Agent skills, scripts, package/build configuration and declaration checks trigger the high path floor and require full human review.",
+      "spec: high — The complete feature changes public Node Editing and Placement contracts, SVG content ownership and lifecycle behavior. Agent instructions, skills, scripts, dependency/build configuration and declaration artifacts impose the high path floor. The two-line collector visibility/state-wait fix retains the accepted behavior and assertions.",
+      ".agents/skills/control-nodebraid/references/capabilities.md: minimum high risk.",
+      ".agents/skills/verify-nodebraid/SKILL.md: minimum high risk.",
+      ".agents/skills/verify-nodebraid/features/README.md: minimum high risk.",
+      ".agents/skills/verify-nodebraid/features/node-authoring.md: minimum high risk.",
+      "AGENTS.md: minimum high risk.",
+      "bun.lock: minimum high risk.",
+      "docs/agents/pr-evidence.md: minimum high risk.",
+      "examples/app/package.json: minimum high risk.",
+      "package.json: minimum high risk.",
+      "packages/core/artifacts/check-declarations.ts: minimum high risk.",
+      "packages/core/package.json: minimum high risk.",
+      "packages/core/src/index.ts: minimum medium risk.",
+      "packages/plugin-interaction/artifacts/check-declarations.ts: minimum high risk.",
+      "packages/plugin-interaction/package.json: minimum high risk.",
+      "packages/plugin-interaction/src/diagnostic-events.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/index.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/interaction-error.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/interaction-plugin.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/interaction-runtime.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/node-placement.ts: minimum medium risk.",
+      "packages/plugin-node-editing/artifacts/check-declarations.ts: minimum high risk.",
+      "packages/plugin-node-editing/package.json: minimum high risk.",
+      "packages/plugin-node-editing/src/contracts.ts: minimum medium risk.",
+      "packages/plugin-node-editing/src/index.ts: minimum medium risk.",
+      "packages/plugin-node-editing/src/node-editing-error.ts: minimum medium risk.",
+      "packages/plugin-node-editing/src/node-editing-plugin.ts: minimum medium risk.",
+      "packages/plugin-node-editing/tsconfig.build.json: minimum high risk.",
+      "packages/plugin-node-editing/tsconfig.json: minimum high risk.",
+      "packages/preset-basic/package.json: minimum high risk.",
+      "packages/preset-basic/src/preset-basic-plugin.ts: minimum medium risk.",
+      "packages/renderer-svg/artifacts/check-declarations.ts: minimum high risk.",
+      "packages/renderer-svg/src/contracts.ts: minimum medium risk.",
+      "packages/renderer-svg/src/index.ts: minimum medium risk.",
+      "packages/renderer-svg/src/node-content.ts: minimum medium risk.",
+      "packages/renderer-svg/src/svg-config.ts: minimum medium risk.",
+      "packages/renderer-svg/src/svg-projection.ts: minimum medium risk.",
+      "packages/renderer-svg/src/svg-renderer-error.ts: minimum medium risk.",
+      "packages/renderer-svg/src/svg-renderer.ts: minimum medium risk.",
+      "scripts/collect-preview.ts: minimum high risk.",
+      "scripts/preview-scenarios.ts: minimum high risk."
+    ]
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "commands-and-composition",
+      "acceptance": "Real Host/Kernel/Command/History verifies Node create/data-only updates, strict stale evidence, net-zero, undo/redo and Basic integration.",
+      "command": "bun test packages/plugin-node-editing/tests packages/preset-basic/tests packages/core/tests",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "placement-public-api-red",
+      "acceptance": "Before implementation the public Node Placement export is absent; this is API availability evidence, not a behavioral assertion.",
+      "command": "bun test packages/plugin-interaction/tests/node-placement.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "placement-behavior-red",
+      "acceptance": "New edge-case placement tests expose request/gesture behavior before correction; see exact assertions and cases in the retained log.",
+      "command": "bun test packages/plugin-interaction/tests/node-placement.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "placement-package",
+      "acceptance": "Public Interaction suite validates one-shot placement, cancellation, replacement, coordinates and cleanup alongside existing gestures.",
+      "command": "bun run --filter '@nodebraid/plugin-interaction' test:self",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "svg-content-red",
+      "acceptance": "Real Chromium rejects createNodeContent as an unknown config before the feature is implemented.",
+      "command": "bun run --filter '@nodebraid/renderer-svg' test:browser:self",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "svg-brand-red",
+      "acceptance": "Real Chromium exposes a spoofed ordinary object being accepted as SVG content before native brand checks.",
+      "command": "bun run --filter '@nodebraid/renderer-svg' test:browser:self",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "svg-content-green",
+      "acceptance": "Real Chromium old+new SVG contracts verify custom content, rectangular interaction, stable identity, DOM rollback and native cross-realm ownership.",
+      "command": "bun run --filter '@nodebraid/renderer-svg' test:browser:self",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "example-development-browser",
+      "acceptance": "All four real Example suites verify creation, drafts, conflicts/reload, Undo/Redo and actual files. A later CSS Port radius/equivalent subscriber-snapshot edit is covered by the final formal full check.",
+      "command": "bun run --filter '@nodebraid/examples' test:browser:self",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "preview-selection",
+      "acceptance": "Preview selection includes node authoring and preserves source identity/environment checks.",
+      "command": "bun test tests/preview-scenes.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "static-development",
+      "acceptance": "Lint, formatting, bilingual module catalog and local workflow contracts pass; full check remains the canonical formal verify step.",
+      "command": "bun run lint && bun run format:check && bun run docs:verify && bun run agents:check",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-10.log"
+    },
+    {
+      "id": "runtime-port-reset",
+      "acceptance": "Real Runtime and SVG registration/disposal of Port Contributions keeps Document revision and Session while rebuilding all custom content on reset; an ordinary position commit preserves content. Full existing SVG browser suite also passes.",
+      "command": "bun run --filter '@nodebraid/renderer-svg' test:browser:self",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-11.log"
+    },
+    {
+      "id": "preview-preflight-original",
+      "acceptance": "First full preview attempt passes five existing scenes but node authoring fails because the second placement button was outside the visible viewport. The retained failed artifacts show no second creation.",
+      "command": "bun run agents:preview --base fe94ea93ed6b06e65e5d29f7846e132a53f8cded --out /Users/zhou/.codex/local-workflows/nodebraid/runs/issue-137-20261028-reset-semantics/preview-preflight",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-12.log"
+    },
+    {
+      "id": "preview-preflight-current",
+      "acceptance": "After explicitly scrolling the placement control into view and verifying waiting state, all six real recorded scenarios pass, including two node types, Apply/Undo/Redo and actual file round trip.",
+      "command": "bun run agents:preview --base fe94ea93ed6b06e65e5d29f7846e132a53f8cded --out /Users/zhou/.codex/local-workflows/nodebraid/runs/issue-137-20261028-reset-semantics/preview-preflight-2",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-13.log"
+    },
+    {
+      "id": "published-head-preview",
+      "acceptance": "All six recorded native UI scenarios pass on the exact published source head, including custom Nodes and complete file round trip.",
+      "command": "bun run agents:preview --base fe94ea93ed6b06e65e5d29f7846e132a53f8cded --out /Users/zhou/.codex/local-workflows/nodebraid/runs/issue-137-20261028-reset-semantics/published-evidence",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-14.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "c3f8f028210ca0a4a31114b9e01ab2b512986cf09a69b42d69d537f26149d82d"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "e7ea38c07a3c96f237a77688bbfc9ccc52625444910c7f361028c9be28fdb48c"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "94ea85dfdc2e1b8b2e657a8208d15e6a559477fb3128d1bdcea6daeaf29d07cb"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "798058c22ad4ef6dd625c3cc775ef819915ccb194b2a9e060cdf0b801fc81ab0"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "a2110fc39715ddb57ec6766a1242210d8bbfcd7de1016bb0d39a601f32e152b2"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "8e79e9e218da7b9f7ab151cb815595ea4a2a83f3cf2c2ac8423284862a686aaa"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "1812d9d2a1382e89c99e3fe9acbccbdc604b88e71750e4259c3abb634c6c8192"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "5d41abf71f59835c04cee86f94b9c2c57806758c39b6230746bf94345710cf65"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "8ceeede58033ad6dfb3c5922ccf183e24ba711a357b12c7c9cc775fd8f114327"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "15011cab13ccc32346300d17476b7f7f634db1163e0393c2fee196183ef905d0"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "5c0e50399472845a0db3b895ce04448181473cb0d1eea88d8ffbec3c22228b6a"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "ca8526e2d3fec263ceaf2381c7c73cc7405639379d042df8566ce98f9dc4e2a6"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "39b9890c2acbb0f476ff778ddec8589517b53978d6abf64697731f15f8e7cf90"
+    },
+    {
+      "path": "logs/behavior-11.log",
+      "kind": "log",
+      "sha256": "15011cab13ccc32346300d17476b7f7f634db1163e0393c2fee196183ef905d0"
+    },
+    {
+      "path": "logs/behavior-12.log",
+      "kind": "log",
+      "sha256": "c3627afd8068727dd132db75d47937db8f63d0feed49a4d30b628f227913b682"
+    },
+    {
+      "path": "logs/behavior-13.log",
+      "kind": "log",
+      "sha256": "f2dbcd4f0fe37c4ed3373d8161ef5f65855f65a81ab76fb2502fc1e185505b45"
+    },
+    {
+      "path": "logs/behavior-14.log",
+      "kind": "log",
+      "sha256": "cb9ce637cbb7828207507258169aefd62d567b060ef358a6a556aa679f096991"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "21d4372da6080ca65b5ca9300c8b059394de45ade064f61107b37f93b5d93973"
+    }
+  ]
+}

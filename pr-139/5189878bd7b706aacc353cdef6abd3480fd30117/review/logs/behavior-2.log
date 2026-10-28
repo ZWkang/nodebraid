@@ -1,0 +1,14 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/node-placement.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'nodePlacementService' not found in module '/Users/zhou/.codex/worktrees/3a32/cflow/packages/plugin-interaction/src/index.ts'.
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [37.00ms]

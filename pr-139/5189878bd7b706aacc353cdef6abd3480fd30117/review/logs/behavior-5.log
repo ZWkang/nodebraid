@@ -1,0 +1,25 @@
+@nodebraid/renderer-svg test:browser:self: 1984 |   const [stdout, stderr, exitCode] = await Promise.all([
+@nodebraid/renderer-svg test:browser:self: 1985 |     new Response(process.stdout).text(),
+@nodebraid/renderer-svg test:browser:self: 1986 |     new Response(process.stderr).text(),
+@nodebraid/renderer-svg test:browser:self: 1987 |     process.exited,
+@nodebraid/renderer-svg test:browser:self: 1988 |   ]);
+@nodebraid/renderer-svg test:browser:self: 1989 |   assert.equal(exitCode, 0, stderr || stdout);
+@nodebraid/renderer-svg test:browser:self:                 ^
+@nodebraid/renderer-svg test:browser:self: AssertionError: {"success":false,"data":null,"error":"Evaluation error: SvgRendererError: SVG Renderer config contains an unknown field.\n    at assertKnownConfigKeys (http://127.0.0.1:64252/renderer-contract.js:1602:13)\n    at validateConfig (http://127.0.0.1:64252/renderer-contract.js:1537:5)\n    at createSvgRenderer (http://127.0.0.1:64252/renderer-contract.js:2315:72)\n    at projectionAndLifecycle (http://127.0.0.1:64252/renderer-contract.js:2957:22)\n    at runNodeContentCases (http://127.0.0.1:64252/renderer-contract.js:3219:13)\n    at <anonymous>:1:12"}
+@nodebraid/renderer-svg test:browser:self: 
+@nodebraid/renderer-svg test:browser:self: 
+@nodebraid/renderer-svg test:browser:self: 1 !== 0
+@nodebraid/renderer-svg test:browser:self: 
+@nodebraid/renderer-svg test:browser:self:  generatedMessage: false,
+@nodebraid/renderer-svg test:browser:self:      actual: 1,
+@nodebraid/renderer-svg test:browser:self:    expected: 0,
+@nodebraid/renderer-svg test:browser:self:    operator: "strictEqual",
+@nodebraid/renderer-svg test:browser:self:        diff: "simple",
+@nodebraid/renderer-svg test:browser:self:        code: "ERR_ASSERTION"
+@nodebraid/renderer-svg test:browser:self: 
+@nodebraid/renderer-svg test:browser:self:       at runAgentBrowser (/Users/zhou/.codex/worktrees/3a32/cflow/packages/renderer-svg/browser-tests/renderer-contract.browser.ts:1989:10)
+@nodebraid/renderer-svg test:browser:self:       at evaluateBrowserScenario (/Users/zhou/.codex/worktrees/3a32/cflow/packages/renderer-svg/browser-tests/renderer-contract.browser.ts:1994:24)
+@nodebraid/renderer-svg test:browser:self:       at assertBrowserScenario (/Users/zhou/.codex/worktrees/3a32/cflow/packages/renderer-svg/browser-tests/renderer-contract.browser.ts:2002:26)
+@nodebraid/renderer-svg test:browser:self: 
+@nodebraid/renderer-svg test:browser:self: Bun v1.4.2 (macOS arm64)
+@nodebraid/renderer-svg test:browser:self: Exited with code 1

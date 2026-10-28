@@ -1,0 +1,25 @@
+@nodebraid/renderer-svg test:browser:self: 1985 |   const [stdout, stderr, exitCode] = await Promise.all([
+@nodebraid/renderer-svg test:browser:self: 1986 |     new Response(process.stdout).text(),
+@nodebraid/renderer-svg test:browser:self: 1987 |     new Response(process.stderr).text(),
+@nodebraid/renderer-svg test:browser:self: 1988 |     process.exited,
+@nodebraid/renderer-svg test:browser:self: 1989 |   ]);
+@nodebraid/renderer-svg test:browser:self: 1990 |   assert.equal(exitCode, 0, stderr || stdout);
+@nodebraid/renderer-svg test:browser:self:                 ^
+@nodebraid/renderer-svg test:browser:self: AssertionError: {"success":false,"data":null,"error":"Evaluation error: Error: Invalid or multiply-owned spoofed-svg output must fail without changing accepted DOM.\n    at check (http://127.0.0.1:55771/renderer-contract.js:2972:13)\n    at outputOwnership (http://127.0.0.1:55771/renderer-contract.js:3244:9)\n    at async runNodeContentCases (http://127.0.0.1:55771/renderer-contract.js:3389:7)"}
+@nodebraid/renderer-svg test:browser:self: 
+@nodebraid/renderer-svg test:browser:self: 
+@nodebraid/renderer-svg test:browser:self: 1 !== 0
+@nodebraid/renderer-svg test:browser:self: 
+@nodebraid/renderer-svg test:browser:self:  generatedMessage: false,
+@nodebraid/renderer-svg test:browser:self:      actual: 1,
+@nodebraid/renderer-svg test:browser:self:    expected: 0,
+@nodebraid/renderer-svg test:browser:self:    operator: "strictEqual",
+@nodebraid/renderer-svg test:browser:self:        diff: "simple",
+@nodebraid/renderer-svg test:browser:self:        code: "ERR_ASSERTION"
+@nodebraid/renderer-svg test:browser:self: 
+@nodebraid/renderer-svg test:browser:self:       at runAgentBrowser (/Users/zhou/.codex/worktrees/3a32/cflow/packages/renderer-svg/browser-tests/renderer-contract.browser.ts:1990:10)
+@nodebraid/renderer-svg test:browser:self:       at evaluateBrowserScenario (/Users/zhou/.codex/worktrees/3a32/cflow/packages/renderer-svg/browser-tests/renderer-contract.browser.ts:1995:24)
+@nodebraid/renderer-svg test:browser:self:       at assertBrowserScenario (/Users/zhou/.codex/worktrees/3a32/cflow/packages/renderer-svg/browser-tests/renderer-contract.browser.ts:2003:26)
+@nodebraid/renderer-svg test:browser:self: 
+@nodebraid/renderer-svg test:browser:self: Bun v1.4.2 (macOS arm64)
+@nodebraid/renderer-svg test:browser:self: Exited with code 1

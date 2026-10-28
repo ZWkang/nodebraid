@@ -1,0 +1,59 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/node-placement.test.ts:
+(pass) one placement creates at the accepted world point, selects the Node and records one Undo [10.56ms]
+(pass) entity clicks and drags do not create or run ordinary selection while placement remains armed [2.26ms]
+(pass) replacement, old cancellation and Escape preserve request identity and the graph [1.93ms]
+(pass) a Viewport change invalidates only the candidate click and retains placement [3.47ms]
+(pass) materializer and duplicate-ID failures reject without changing graph or Selection [2.12ms]
+(pass) cancellation during materialization prevents a later write [3.72ms]
+(pass) post-commit Selection changes are not overwritten by placement completion [1.69ms]
+(pass) lifecycle disposal cancels waiting placement and releases its captured Pointer [1.45ms]
+198 | test('a zero drag threshold still accepts a stationary click', async () => {
+199 |   const f = await fixture({ dragThreshold: 0 });
+200 |   try {
+201 |     const request = f.placement.begin(({ worldPoint }) => makeNode('created', worldPoint));
+202 |     f.renderer.click({ x: 100, y: 100 });
+203 |     expect(f.kernel.read().query.getNode(nodeId('created'))).toBeDefined();
+                                                                   ^
+error: expect(received).toBeDefined()
+
+Received: undefined
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/3a32/cflow/packages/plugin-interaction/tests/node-placement.test.ts:203:62)
+(fail) a zero drag threshold still accepts a stationary click [1.56ms]
+217 |     };
+218 |     const outer = f.placement.begin(({ worldPoint }) => makeNode('outer', worldPoint));
+219 |     let outerResult: unknown;
+220 |     void outer.result.then((result) => { outerResult = result; });
+221 |     await Promise.resolve();
+222 |     expect(outerResult).toEqual({ type: 'cancelled' });
+                              ^
+error: expect(received).toEqual(expected)
+
+- {
+-   "type": "cancelled",
+- }
++ undefined
+
+- Expected  - 3
++ Received  + 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/3a32/cflow/packages/plugin-interaction/tests/node-placement.test.ts:222:25)
+(fail) reentrant begin during Focus supersedes the outer request without losing either result [1.79ms]
+231 | });
+232 | 
+233 | test('Focus failure is the request failure and does not leave placement armed', async () => {
+234 |   const f = await fixture();
+235 |   try {
+236 |     const failure = new Error('focus failed');
+                              ^
+error: focus failed
+      at <anonymous> (/Users/zhou/.codex/worktrees/3a32/cflow/packages/plugin-interaction/tests/node-placement.test.ts:236:25)
+(fail) Focus failure is the request failure and does not leave placement armed [1.40ms]
+(pass) explicit cancellation exposes capture cleanup failure through its original error [5.25ms]
+
+ 9 pass
+ 3 fail
+ 44 expect() calls
+Ran 12 tests across 1 file. [64.00ms]

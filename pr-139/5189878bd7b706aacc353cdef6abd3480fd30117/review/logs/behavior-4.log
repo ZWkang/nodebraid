@@ -1,0 +1,423 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/node-placement.test.ts:
+(pass) one placement creates at the accepted world point, selects the Node and records one Undo [63.63ms]
+(pass) entity clicks and drags do not create or run ordinary selection while placement remains armed [7.21ms]
+(pass) replacement, old cancellation and Escape preserve request identity and the graph [4.69ms]
+(pass) a Viewport change invalidates only the candidate click and retains placement [5.42ms]
+(pass) materializer and duplicate-ID failures reject without changing graph or Selection [17.67ms]
+(pass) cancellation during materialization prevents a later write [3.52ms]
+(pass) post-commit Selection changes are not overwritten by placement completion [2.75ms]
+(pass) lifecycle disposal cancels waiting placement and releases its captured Pointer [2.81ms]
+(pass) a zero drag threshold still accepts a stationary click [3.08ms]
+(pass) reentrant begin during Focus supersedes the outer request without losing either result [1.67ms]
+(pass) Focus failure is the request failure and does not leave placement armed [1.56ms]
+(pass) explicit cancellation exposes capture cleanup failure through its original error [4.27ms]
+(pass) an application failure after reentrant cancellation remains observable [3.91ms]
+(pass) armed placement retains normal zoom and pan before a candidate click [2.19ms]
+(pass) a failed placement Hit Test rejects the request without capturing a Pointer [2.62ms]
+
+packages/plugin-interaction/tests/input-cleanup.test.ts:
+(pass) a failed Selection transition releases Pointer Capture before reporting the Input fault [2.71ms]
+
+packages/plugin-interaction/tests/types.test.ts:
+(pass) publishes Interaction as a Runtime Plugin with a narrow Shortcut contribution Service [0.04ms]
+
+packages/plugin-interaction/tests/create-edge-input-values.test.ts:
+(pass) Create Edge cannot replace a validated forward Edge with a later self-loop [2.56ms]
+(pass) Create Edge retains first values, receivers and late opaque data from own properties [1.95ms]
+(pass) Create Edge retains first values, receivers and late opaque data from non-enumerable properties [1.29ms]
+(pass) Create Edge retains first values, receivers and late opaque data from inherited properties [1.60ms]
+(pass) Create Edge preserves the original edge read failure and exact committed state [3.30ms]
+(pass) Create Edge preserves the original edge.id read failure and exact committed state [3.20ms]
+(pass) Create Edge preserves the original edge.type read failure and exact committed state [1.38ms]
+(pass) Create Edge preserves the original edge.source read failure and exact committed state [2.09ms]
+(pass) Create Edge preserves the original edge.source.nodeId read failure and exact committed state [1.23ms]
+(pass) Create Edge preserves the original edge.source.portId read failure and exact committed state [2.15ms]
+(pass) Create Edge preserves the original edge.target read failure and exact committed state [2.19ms]
+(pass) Create Edge preserves the original edge.target.nodeId read failure and exact committed state [1.11ms]
+(pass) Create Edge preserves the original edge.target.portId read failure and exact committed state [3.84ms]
+(pass) Create Edge preserves the original edge.data.presence read failure and exact committed state [1.98ms]
+(pass) Create Edge preserves the original source read failure and exact committed state [0.99ms]
+(pass) Create Edge preserves the original source.nodeId read failure and exact committed state [1.07ms]
+(pass) Create Edge preserves the original source.portId read failure and exact committed state [0.85ms]
+(pass) Create Edge preserves the original source.role read failure and exact committed state [0.94ms]
+(pass) Create Edge preserves the original target read failure and exact committed state [1.67ms]
+(pass) Create Edge preserves the original target.nodeId read failure and exact committed state [1.75ms]
+(pass) Create Edge preserves the original target.portId read failure and exact committed state [4.20ms]
+(pass) Create Edge preserves the original target.role read failure and exact committed state [1.42ms]
+(pass) Create Edge preserves the original edge.data read failure and exact committed state [1.65ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [1.32ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.96ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [1.38ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [2.62ms]
+(pass) Create Edge observes abort before input getters [1.63ms]
+(pass) Create Edge self-loop preflight wins before the opaque-data getter [11.02ms]
+(pass) Create Edge mismatched-endpoint preflight wins before the opaque-data getter [3.60ms]
+(pass) Create Edge wrong-role preflight wins before the opaque-data getter [3.16ms]
+(pass) Create Edge missing-node preflight wins before the opaque-data getter [2.20ms]
+(pass) Create Edge missing-port preflight wins before the opaque-data getter [1.71ms]
+(pass) Create Edge duplicate-id preflight wins before the opaque-data getter [2.67ms]
+(pass) Create Edge finishes every shape check before semantic role checks [2.65ms]
+(pass) Create Edge preserves invalid-ID short circuit before Edge type reads [2.50ms]
+(pass) Create Edge validates data presence before reading Anchor roots [3.42ms]
+(pass) Create Edge retains Anchor empty-Port short circuit before the target root [3.67ms]
+(pass) Create Edge keeps an empty Endpoint Port distinct from an absent Anchor Port [2.54ms]
+(pass) Create Edge retains captured Port evidence across application Definition and data callbacks [3.58ms]
+
+packages/plugin-interaction/tests/delete-selection-command.test.ts:
+(pass) Delete Selection removes a selected Node and its incident Edge as one undoable Commit [4.07ms]
+(pass) Delete Selection canonicalizes overlapping Node, explicit Edge, self-loop, and parallel Edge targets [2.23ms]
+(pass) Delete Selection allows unrelated Commits but rejects changed targets and incident Edge closure [3.86ms]
+(pass) Delete Selection rejects missing targets and replaced or removed explicit and incident Edges atomically [6.53ms]
+(pass) Delete Selection rejects same-value ABA replacement of selected Nodes and explicit or incident Edges [3.98ms]
+(pass) Delete Selection keeps Selection and History unchanged when the Kernel rejects the Transaction [1.50ms]
+(pass) Delete Selection validates malformed evidence and returns null for an empty Selection [1.08ms]
+(pass) Delete Selection rejects the first stale Snapshot when later evidence reads would return current state [1.13ms]
+(pass) Delete Selection retains the first Snapshot for explicit-edge preflight [3.69ms]
+(pass) Delete Selection retains the first Snapshot for incident-edge preflight [1.50ms]
+(pass) Delete Selection retains the first Snapshot for new-incident-edge preflight [2.11ms]
+(pass) Delete Selection accepts the first valid own evidence getter and preserves replay data [1.32ms]
+(pass) Delete Selection accepts the first valid inherited evidence getter and preserves replay data [0.86ms]
+(pass) Delete Selection accepts the first valid non-enumerable evidence getter and preserves replay data [1.47ms]
+(pass) Delete Selection rejects malformed first evidence before a later valid Snapshot can replace it [1.02ms]
+(pass) Delete Selection preserves the original evidence getter failure undefined [0.88ms]
+(pass) Delete Selection preserves the original evidence getter failure null [0.76ms]
+(pass) Delete Selection preserves the original evidence getter failure false [0.81ms]
+(pass) Delete Selection preserves the original evidence getter failure 0 [2.02ms]
+(pass) Delete Selection preserves the original evidence getter failure "" [0.78ms]
+(pass) Delete Selection preserves the original evidence getter failure Symbol(evidence failure) [2.34ms]
+(pass) Delete Selection preserves the original evidence getter failure 578 |   expect(runtime.kernel.read()).toBe(before);
+579 |   expect(runtime.history.getSnapshot()).toBe(historyBefore);
+580 |   await runtime.host.dispose();
+581 | });
+582 | 
+583 | test.each([undefined, null, false, 0, '', Symbol('evidence failure'), new Error('evidence failure')])(
+                                                                                ^
+error: evidence failure
+      at /Users/zhou/.codex/worktrees/3a32/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:583:75
+ [2.87ms]
+(pass) Delete Selection preserves abort and malformed Selection short circuits before evidence reads [2.29ms]
+(pass) Delete Selection applies the first Selection when later root reads would choose another Node [3.13ms]
+(pass) Delete Selection captures root-own for node targets [3.04ms]
+(pass) Delete Selection captures root-inherited for node targets [1.30ms]
+(pass) Delete Selection captures root-non-enumerable for node targets [1.19ms]
+(pass) Delete Selection captures collection-root for node targets [3.58ms]
+(pass) Delete Selection captures inherited-collection for node targets [2.37ms]
+(pass) Delete Selection captures iterator for node targets [2.99ms]
+(pass) Delete Selection captures array-hooks for node targets [1.39ms]
+(pass) Delete Selection captures index-once for node targets [1.33ms]
+(pass) Delete Selection captures evidence-mutates-ids for node targets [2.16ms]
+(pass) Delete Selection keeps native fractional length 1.5 for node targets [2.95ms]
+(pass) Delete Selection keeps native fractional length "1.5" for node targets [2.23ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for node targets [2.80ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for node targets [4.32ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for node targets [8.31ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for node targets [1.79ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for node targets [2.48ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for node targets [1.73ms]
+(pass) Delete Selection preserves native length failure 1n for node [3.97ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for node [3.23ms]
+(pass) Delete Selection captures root-own for edge targets [1.98ms]
+(pass) Delete Selection captures root-inherited for edge targets [1.07ms]
+(pass) Delete Selection captures root-non-enumerable for edge targets [1.07ms]
+(pass) Delete Selection captures collection-root for edge targets [2.55ms]
+(pass) Delete Selection captures inherited-collection for edge targets [2.49ms]
+(pass) Delete Selection captures iterator for edge targets [1.12ms]
+(pass) Delete Selection captures array-hooks for edge targets [0.91ms]
+(pass) Delete Selection captures index-once for edge targets [0.87ms]
+(pass) Delete Selection captures evidence-mutates-ids for edge targets [1.10ms]
+(pass) Delete Selection keeps native fractional length 1.5 for edge targets [0.83ms]
+(pass) Delete Selection keeps native fractional length "1.5" for edge targets [1.62ms]
+(pass) Delete Selection keeps native fractional length {
+  valueOf: [Function: valueOf],
+} for edge targets [2.33ms]
+(pass) Delete Selection validates evidence and preserves native empty length 0.5 for edge targets [5.63ms]
+(pass) Delete Selection validates evidence and preserves native empty length -1 for edge targets [2.16ms]
+(pass) Delete Selection validates evidence and preserves native empty length NaN for edge targets [1.82ms]
+(pass) Delete Selection validates evidence and preserves native empty length undefined for edge targets [0.90ms]
+(pass) Delete Selection validates evidence and preserves native empty length "0" for edge targets [0.83ms]
+(pass) Delete Selection preserves native length failure 1n for edge [1.12ms]
+(pass) Delete Selection preserves native length failure Symbol(length) for edge [2.59ms]
+(pass) Delete Selection preserves original selection read failures [9.80ms]
+(pass) Delete Selection preserves original length read failures [14.87ms]
+(pass) Delete Selection preserves original index read failures [8.75ms]
+(pass) Delete Selection rejects sparse and invalid indexed IDs before evidence and preserves lazy first failure [10.97ms]
+(pass) Delete Selection admits node IDs before edge IDs and evidence and retains the first coercion [1.10ms]
+(pass) Delete Selection rejects stale first evidence Nodes when later collection reads return current roots [1.24ms]
+(pass) Delete Selection rejects first stale node evidence through root collection access [3.11ms]
+(pass) Delete Selection rejects first stale node evidence through index collection access [1.41ms]
+(pass) Delete Selection rejects first stale node evidence through map collection access [1.37ms]
+(pass) Delete Selection rejects first stale node evidence through hooks collection access [2.63ms]
+(pass) Delete Selection rejects first stale node evidence through later-field-mutation collection access [0.97ms]
+(pass) Delete Selection accepts first valid own node evidence and preserves Undo data [2.24ms]
+(pass) Delete Selection accepts first valid inherited node evidence and preserves Undo data [1.00ms]
+(pass) Delete Selection accepts first valid non-enumerable node evidence and preserves Undo data [1.03ms]
+(pass) Delete Selection uses valid first node entities independently of caller iterator [1.23ms]
+(pass) Delete Selection uses valid first node entities independently of caller methods [0.92ms]
+(pass) Delete Selection uses valid first node entities independently of caller index [0.90ms]
+(pass) Delete Selection uses valid first node entities independently of caller length [2.33ms]
+(pass) Delete Selection rejects first stale edge evidence through root collection access [5.05ms]
+(pass) Delete Selection rejects first stale edge evidence through index collection access [1.66ms]
+(pass) Delete Selection rejects first stale edge evidence through map collection access [1.83ms]
+(pass) Delete Selection rejects first stale edge evidence through hooks collection access [2.24ms]
+(pass) Delete Selection rejects first stale edge evidence through later-field-mutation collection access [2.50ms]
+(pass) Delete Selection accepts first valid own edge evidence and preserves Undo data [2.54ms]
+(pass) Delete Selection accepts first valid inherited edge evidence and preserves Undo data [2.37ms]
+(pass) Delete Selection accepts first valid non-enumerable edge evidence and preserves Undo data [1.91ms]
+(pass) Delete Selection uses valid first edge entities independently of caller iterator [1.07ms]
+(pass) Delete Selection uses valid first edge entities independently of caller methods [3.08ms]
+(pass) Delete Selection uses valid first edge entities independently of caller index [2.37ms]
+(pass) Delete Selection uses valid first edge entities independently of caller length [1.29ms]
+(pass) Delete Selection validates the first malformed evidence revision before later valid values [1.00ms]
+(pass) Delete Selection validates the first malformed evidence nodes before later valid values [1.41ms]
+(pass) Delete Selection validates the first malformed evidence edges before later valid values [2.62ms]
+(pass) Delete Selection preserves original revision evidence failure undefined [1.28ms]
+(pass) Delete Selection preserves original revision evidence failure null [2.07ms]
+(pass) Delete Selection preserves original revision evidence failure false [1.33ms]
+(pass) Delete Selection preserves original revision evidence failure 0 [0.92ms]
+(pass) Delete Selection preserves original revision evidence failure "" [3.63ms]
+(pass) Delete Selection preserves original revision evidence failure Symbol(evidence read) [1.73ms]
+(pass) Delete Selection preserves original revision evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/3a32/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [1.35ms]
+(pass) Delete Selection preserves original nodes evidence failure undefined [0.83ms]
+(pass) Delete Selection preserves original nodes evidence failure null [0.81ms]
+(pass) Delete Selection preserves original nodes evidence failure false [2.12ms]
+(pass) Delete Selection preserves original nodes evidence failure 0 [3.26ms]
+(pass) Delete Selection preserves original nodes evidence failure "" [2.99ms]
+(pass) Delete Selection preserves original nodes evidence failure Symbol(evidence read) [2.49ms]
+(pass) Delete Selection preserves original nodes evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/3a32/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [2.74ms]
+(pass) Delete Selection preserves original edges evidence failure undefined [8.29ms]
+(pass) Delete Selection preserves original edges evidence failure null [2.14ms]
+(pass) Delete Selection preserves original edges evidence failure false [0.86ms]
+(pass) Delete Selection preserves original edges evidence failure 0 [2.30ms]
+(pass) Delete Selection preserves original edges evidence failure "" [2.55ms]
+(pass) Delete Selection preserves original edges evidence failure Symbol(evidence read) [1.46ms]
+(pass) Delete Selection preserves original edges evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/3a32/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [1.34ms]
+(pass) Delete Selection preserves original length evidence failure undefined [1.66ms]
+(pass) Delete Selection preserves original length evidence failure null [3.79ms]
+(pass) Delete Selection preserves original length evidence failure false [2.92ms]
+(pass) Delete Selection preserves original length evidence failure 0 [5.79ms]
+(pass) Delete Selection preserves original length evidence failure "" [0.92ms]
+(pass) Delete Selection preserves original length evidence failure Symbol(evidence read) [1.98ms]
+(pass) Delete Selection preserves original length evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/3a32/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [2.37ms]
+(pass) Delete Selection preserves original index evidence failure undefined [1.39ms]
+(pass) Delete Selection preserves original index evidence failure null [1.62ms]
+(pass) Delete Selection preserves original index evidence failure false [1.47ms]
+(pass) Delete Selection preserves original index evidence failure 0 [1.80ms]
+(pass) Delete Selection preserves original index evidence failure "" [3.22ms]
+(pass) Delete Selection preserves original index evidence failure Symbol(evidence read) [2.98ms]
+(pass) Delete Selection preserves original index evidence failure 1411 |     }
+1412 |   },
+1413 | );
+1414 | 
+1415 | for (const field of ['revision', 'nodes', 'edges', 'length', 'index'] as const) {
+1416 |   test.each([undefined, null, false, 0, '', Symbol('evidence read'), new Error('evidence read')])(
+                                                                                ^
+error: evidence read
+      at /Users/zhou/.codex/worktrees/3a32/cflow/packages/plugin-interaction/tests/delete-selection-command.test.ts:1416:74
+ [2.54ms]
+(pass) Delete Selection rejects sparse, hidden-invalid and lazily invalid evidence entities [2.39ms]
+(pass) Delete Selection captures evidence revision before Nodes before Edges and rejects malformed empty Selection evidence [1.08ms]
+(pass) Delete Selection preserves native evidence nodes length normalization and failures [1.05ms]
+(pass) Delete Selection preserves native evidence edges length normalization and failures [1.64ms]
+
+packages/plugin-interaction/tests/shortcut-values.test.ts:
+(pass) Shortcut definition retains the nonempty code accepted from a getter [0.10ms]
+(pass) Shortcut definition retains the nonempty alternatives accepted from a getter [0.04ms]
+(pass) Shortcut definition retains the modifier value accepted from a getter [0.03ms]
+(pass) Shortcut retains first enumerable alt value false [0.04ms]
+(pass) Shortcut retains first enumerable alt value true
+(pass) Shortcut retains first inherited alt value false
+(pass) Shortcut retains first inherited alt value true
+(pass) Shortcut retains first non-enumerable alt value false
+(pass) Shortcut retains first non-enumerable alt value true
+(pass) Shortcut retains first enumerable control value false
+(pass) Shortcut retains first enumerable control value true
+(pass) Shortcut retains first inherited control value false
+(pass) Shortcut retains first inherited control value true
+(pass) Shortcut retains first non-enumerable control value false
+(pass) Shortcut retains first non-enumerable control value true
+(pass) Shortcut retains first enumerable meta value false
+(pass) Shortcut retains first enumerable meta value true
+(pass) Shortcut retains first inherited meta value false
+(pass) Shortcut retains first inherited meta value true
+(pass) Shortcut retains first non-enumerable meta value false
+(pass) Shortcut retains first non-enumerable meta value true
+(pass) Shortcut retains first enumerable shift value false
+(pass) Shortcut retains first enumerable shift value true
+(pass) Shortcut retains first inherited shift value false
+(pass) Shortcut retains first inherited shift value true
+(pass) Shortcut retains first non-enumerable shift value false
+(pass) Shortcut retains first non-enumerable shift value true
+(pass) Shortcut preserves the original code getter failure undefined [0.05ms]
+(pass) Shortcut preserves the original code getter failure null
+(pass) Shortcut preserves the original code getter failure false
+(pass) Shortcut preserves the original code getter failure 0
+(pass) Shortcut preserves the original code getter failure ""
+(pass) Shortcut preserves the original code getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original modifierAlternatives getter failure undefined
+(pass) Shortcut preserves the original modifierAlternatives getter failure null
+(pass) Shortcut preserves the original modifierAlternatives getter failure false
+(pass) Shortcut preserves the original modifierAlternatives getter failure 0
+(pass) Shortcut preserves the original modifierAlternatives getter failure ""
+(pass) Shortcut preserves the original modifierAlternatives getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original alt getter failure undefined [0.02ms]
+(pass) Shortcut preserves the original alt getter failure null
+(pass) Shortcut preserves the original alt getter failure false
+(pass) Shortcut preserves the original alt getter failure 0
+(pass) Shortcut preserves the original alt getter failure ""
+(pass) Shortcut preserves the original alt getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original control getter failure undefined
+(pass) Shortcut preserves the original control getter failure null
+(pass) Shortcut preserves the original control getter failure false
+(pass) Shortcut preserves the original control getter failure 0 [0.02ms]
+(pass) Shortcut preserves the original control getter failure ""
+(pass) Shortcut preserves the original control getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original meta getter failure undefined
+(pass) Shortcut preserves the original meta getter failure null
+(pass) Shortcut preserves the original meta getter failure false
+(pass) Shortcut preserves the original meta getter failure 0
+(pass) Shortcut preserves the original meta getter failure ""
+(pass) Shortcut preserves the original meta getter failure Symbol(Shortcut getter)
+(pass) Shortcut preserves the original shift getter failure undefined
+(pass) Shortcut preserves the original shift getter failure null
+(pass) Shortcut preserves the original shift getter failure false
+(pass) Shortcut preserves the original shift getter failure 0 [0.09ms]
+(pass) Shortcut preserves the original shift getter failure ""
+(pass) Shortcut preserves the original shift getter failure Symbol(Shortcut getter)
+(pass) Shortcut rejects the first empty code before reading alternatives [0.30ms]
+(pass) Shortcut rejects the first empty alternatives instead of accepting a later collection [0.10ms]
+(pass) Shortcut rejects the first invalid alt without reading later fields [0.15ms]
+(pass) Shortcut rejects the first invalid control without reading later fields [0.02ms]
+(pass) Shortcut rejects the first invalid meta without reading later fields [0.01ms]
+(pass) Shortcut rejects the first invalid shift without reading later fields [0.01ms]
+(pass) Shortcut owns its alternatives and modifier shells after caller mutation [0.07ms]
+
+packages/plugin-interaction/tests/create-edge-command.test.ts:
+(pass) Create Edge commits one complete Node-level Edge [2.51ms]
+
+packages/plugin-interaction/tests/selection-transition.test.ts:
+(pass) a Port click selects its owning Node without inventing a Port selection [0.03ms]
+
+packages/plugin-interaction/tests/config.test.ts:
+(pass) Interaction accepts an explicit synchronous Connection materializer [1.12ms]
+(pass) Interaction rejects unknown config fields through Plugin installation [4.11ms]
+(pass) Interaction rejects malformed numeric config without coercion [2.53ms]
+(pass) Interaction revalidates the materializer on recovery and preserves its read failure [3.78ms]
+
+packages/plugin-interaction/tests/move-input-values.test.ts:
+(pass) Move Nodes cannot substitute a stale target through repeated caller array traversal [3.73ms]
+(pass) Move Nodes retains valid first values from own fields and receivers [1.25ms]
+(pass) Move Nodes retains valid first values from non-enumerable fields and receivers [0.82ms]
+(pass) Move Nodes retains valid first values from inherited fields and receivers [1.24ms]
+(pass) Move Nodes preserves the original moves read failure before committing [3.11ms]
+(pass) Move Nodes preserves the original length read failure before committing [1.83ms]
+(pass) Move Nodes preserves the original entry read failure before committing [1.88ms]
+(pass) Move Nodes preserves the original nodeId read failure before committing [1.54ms]
+(pass) Move Nodes preserves the original basePosition read failure before committing [2.19ms]
+(pass) Move Nodes preserves the original base.x read failure before committing [2.25ms]
+(pass) Move Nodes preserves the original base.y read failure before committing [0.89ms]
+(pass) Move Nodes preserves the original position read failure before committing [0.84ms]
+(pass) Move Nodes preserves the original position.x read failure before committing [1.96ms]
+(pass) Move Nodes preserves the original position.y read failure before committing [2.05ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [1.72ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [2.38ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [1.73ms]
+(pass) Move Nodes preserves the original non-Error thrown value %s [1.81ms]
+(pass) Move Nodes observes abort before any input read [1.21ms]
+(pass) Move Nodes retains the first nonfinite basePosition.x, rather than a later finite value [2.49ms]
+(pass) Move Nodes retains the first nonfinite basePosition.y, rather than a later finite value [0.84ms]
+(pass) Move Nodes retains the first nonfinite position.x, rather than a later finite value [1.11ms]
+(pass) Move Nodes retains the first nonfinite position.y, rather than a later finite value [0.98ms]
+(pass) Move Nodes keeps whole-input shape failures before duplicate validation [1.49ms]
+(pass) Move Nodes keeps whole-input shape failures before nonfinite validation [2.60ms]
+(pass) Move Nodes rejects a sparse indexed entry even if caller hooks hide it [2.27ms]
+(pass) Move Nodes does not call caller traversal, map, constructor or species hooks [1.28ms]
+(pass) Move Nodes retains native array-like positive length normalization %s [2.06ms]
+(pass) Move Nodes retains native array-like positive length normalization 1.5 [1.34ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [2.72ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [1.20ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [0.95ms]
+(pass) Move Nodes rejects a native-normalized empty input length %s [2.08ms]
+(pass) Move Nodes rejects a native-normalized empty input length 0 [0.99ms]
+(pass) Move Nodes exposes native length coercion failure %s before entries [1.64ms]
+(pass) Move Nodes exposes native length coercion failure %s before entries [1.64ms]
+(pass) Move Nodes reads the length conversion once and cannot hide the original first entry failure behind allocation [1.38ms]
+(pass) Move Nodes retains owned earlier Point values, Node fields and one atomic History entry [2.70ms]
+
+packages/plugin-interaction/tests/lifecycle.test.ts:
+(pass) Shortcut Binding preserves the Command accepted from a caller getter [2.44ms]
+(pass) captured modifier values retain distinct Shortcut matching and reservations [5.16ms]
+(pass) Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh [2.54ms]
+(pass) Delete Selection registration follows dependency reactivation and disposal lifecycle [3.52ms]
+(pass) Connection materializer failure keeps identity and reports exactly once after terminal cleanup [5.19ms]
+(pass) Connection dependency recovery creates a fresh idle Activation [1.52ms]
+(pass) Connection final Hit Test failure still clears Preview and releases Capture [1.16ms]
+(pass) Connection Escape attempts every terminal cleanup and never materializes after cleanup failure [1.66ms]
+(pass) Box Selection disposal continues after every public Renderer cleanup failure [1.87ms]
+(pass) Box Selection escape exposes every terminal cleanup failure [1.04ms]
+(pass) Box Selection pointer-cancel exposes every terminal cleanup failure [0.95ms]
+(pass) Interaction dependency recovery creates a fresh idle Activation [1.66ms]
+(pass) an input-driven Command rejection is reported exactly once while Interaction is active [7.15ms]
+(pass) a late Command rejection cannot report through an ended Interaction Activation [2.41ms]
+(pass) a recovered Renderer reset receives the still-compatible Active Gesture again [3.73ms]
+
+packages/plugin-interaction/tests/move-nodes-command.test.ts:
+(pass) Move Nodes rejects an empty input without changing Document [2.89ms]
+
+packages/plugin-interaction/tests/diagnostic-events.test.ts:
+(pass) publishes the stable Interaction diagnostic event catalog [0.02ms]
+
+packages/plugin-interaction/tests/port-connection.test.ts:
+(pass) Port Gesture tracks target loss, materializes exact Endpoints once, and cancels on source loss [6.07ms]
+(pass) Connection Gesture uses the materializer accepted before its getter changes [2.81ms]
+
+packages/plugin-interaction/tests/delete-selection-input.test.ts:
+(pass) a live Interaction Shortcut Binding executes its Command and prevents the matched input default [5.51ms]
+(pass) logical Delete key removes the current Selection through the public Renderer Input seam [3.32ms]
+(pass) physical Delete accepts modifiers and repeat while empty Selection and Backspace remain no-ops [4.86ms]
+(pass) Delete rejects active Box Selection, Node Drag, Viewport Pan, and Connection without cancelling them [22.57ms]
+(pass) Delete Transaction failure preserves state and reports the original diagnostic identity exactly once [3.67ms]
+
+ 329 pass
+ 0 fail
+ 2274 expect() calls
+Ran 329 tests across 15 files. [841.00ms]

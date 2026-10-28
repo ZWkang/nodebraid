@@ -1,0 +1,16 @@
+bun test v1.4.2 (744846f84)
+
+tests/preview-scenes.test.ts:
+(pass) preview commands use an owned empty config and exclude inherited browser configuration [575.25ms]
+(pass) selects visible scenes for changed public capabilities without duplicate runs [1.45ms]
+(pass) the CLI records committed source for a docs-only change and rejects dirty source [881.02ms]
+(pass) clipboard and preview maintenance select their real scenes, with uncovered Layout made explicit [0.48ms]
+(pass) a base branch that advanced independently selects the common ancestor for the PR diff [512.61ms]
+(pass) shared rendering changes exercise all scenes, while docs and tests have no visible change [0.12ms]
+(pass) Document changes select the real file round-trip scene [0.02ms]
+(pass) Node Editing changes select the real authoring workflow [0.01ms]
+
+ 8 pass
+ 0 fail
+ 30 expect() calls
+Ran 8 tests across 1 file. [2.00s]

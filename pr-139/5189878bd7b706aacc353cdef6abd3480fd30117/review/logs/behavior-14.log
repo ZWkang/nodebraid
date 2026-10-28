@@ -1,0 +1,2 @@
+$ bun run scripts/collect-preview.ts --base "fe94ea93ed6b06e65e5d29f7846e132a53f8cded" --out "/Users/zhou/.codex/local-workflows/nodebraid/runs/issue-137-20261028-reset-semantics/published-evidence"
+{"status":"passed","manifest":"/Users/zhou/.codex/local-workflows/nodebraid/runs/issue-137-20261028-reset-semantics/published-evidence/preview.json"}

@@ -1,0 +1,20 @@
+$ oxlint .
+packages/diagnostics/src/diagnostic-value.ts:58:22: warning unicorn(no-new-array): Do not use `new Array(singleArgument)`. help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+packages/plugin-session/tests/input-values.test.ts:105:14: warning eslint(require-yield): This generator function does not have `yield` help: Add a `yield` expression inside the generator body, or convert it to a regular function if iteration behavior is not needed.
+packages/diagnostics/tests/index.test.ts:71:20: warning unicorn(no-new-array): Do not use `new Array(singleArgument)`. help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+packages/diagnostics/tests/index.test.ts:97:18: warning unicorn(no-new-array): Do not use `new Array(singleArgument)`. help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+packages/diagnostics/tests/index.test.ts:107:18: warning unicorn(no-new-array): Do not use `new Array(singleArgument)`. help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+packages/kernel/tests/commit-preparation.test.ts:111:17: warning unicorn(no-thenable): Do not add `then` to an object. help: If an object is defined as 'thenable', once it's accidentally used in an await expression, it may cause problems
+packages/runtime-cordis/tests/diagnostic-input-values.test.ts:361:13: warning eslint(no-unsafe-optional-chaining): Unsafe usage of optional chaining help: If this short-circuits with 'undefined' the evaluation will throw TypeError
+packages/runtime-cordis/tests/diagnostic-input-values.test.ts:389:15: warning eslint(no-unsafe-optional-chaining): Unsafe usage of optional chaining help: If this short-circuits with 'undefined' the evaluation will throw TypeError
+packages/plugin-interaction/tests/delete-selection-command.test.ts:962:41: warning unicorn(no-new-array): Do not use `new Array(singleArgument)`. help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+examples/app/browser-tests/clipboard.browser.ts:256:30: warning eslint(no-unsafe-finally): Unsafe `finally` block. help: Control flow inside `try` or `catch` blocks will be overwritten by this statement.
+examples/app/browser-tests/clipboard.browser.ts:257:28: warning eslint(no-unsafe-finally): Unsafe `finally` block. help: Control flow inside `try` or `catch` blocks will be overwritten by this statement.
+packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:53:30: warning unicorn(no-new-array): Do not use `new Array(singleArgument)`. help: It's not clear whether the argument is meant to be the length of the array or the only element. If the argument is the array's length, consider using `Array.from({ length: n })`. If the argument is the only element, use `[element]`.
+$ prettier --check --ignore-unknown .
+Checking formatting...
+All matched files use Prettier code style!
+$ bun run website/scripts/verify-content.ts
+documentation content verified (27 modules)
+$ bun run scripts/check-agent-workflows.ts
+Local agent workflow sources verified; no hosted API workflow is active in this checkout.
