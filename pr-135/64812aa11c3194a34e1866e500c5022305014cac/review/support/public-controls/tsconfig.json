@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "strict": true,
+    "noUnusedLocals": true,
+    "noImplicitAny": true,
+    "skipLibCheck": false,
+    "noEmit": false,
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/node_modules/@types"
+    ],
+    "outDir": "/Users/zhou/.codex/local-workflows/nodebraid/runs/5297ba1b-e4d6-414f-9a95-d7cb19392296/public-controls/compiled",
+    "rootDir": "/Users/zhou/.codex/local-workflows/nodebraid/runs/5297ba1b-e4d6-414f-9a95-d7cb19392296/public-controls",
+    "sourceMap": true
+  },
+  "files": [
+    "runtime-disposal-error-inspection.ts"
+  ],
+  "include": []
+}

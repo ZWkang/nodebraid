@@ -1,0 +1,17 @@
+{
+  "originalBase": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "currentBase": "e282d6291c98deac2fd65879c94b6bf2881ede6b",
+  "exactDirectoryTrees": [
+    {
+      "path": "packages/runtime-cordis",
+      "original": "f6be338c4f79b960115493148363f106369b98c0",
+      "currentPreparedBase": "f6be338c4f79b960115493148363f106369b98c0"
+    },
+    {
+      "path": "packages/diagnostics",
+      "original": "b94c8160027cf3336b73ad424b4d1107fcf3c97b",
+      "currentPreparedBase": "b94c8160027cf3336b73ad424b4d1107fcf3c97b"
+    }
+  ],
+  "limits": "Only Runtime/Diagnostics source baseline equality supports original red reuse; not a claim that all628old production artifacts equal newmain. New affected/formal build runs current tree."
+}

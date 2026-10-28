@@ -1,0 +1,463 @@
+Independent Standards + ponytail-review, third Issue134 preparation
+Base e282d6291c98deac2fd65879c94b6bf2881ede6b
+Head 37d7131df1b2ffff2c37fb83ac4bc3877795e377
+Tree 4800054aa64c34564818f5a5533b4e6698a35e32
+Canonical binary patch SHA256 3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b
+Task digest 613d5f6a05a5231f6d9a41b64cc61b06d6df2e548b60c191145fa259567fa883
+Full combined stdout/stderr follows.
+
+Pre-test exact new base/head/tree/clean/parent/canonical saved patch/task and compiled Runtime/Basic integration checks:
+PRE-TEST THIRD-PREPARED BASE/HEAD/TREE/CLEAN/PARENT/CANONICAL PATCH/TASK/COMPILED RUNTIME AND BASIC: PASS
+
+Exit code: 0
+
+$ /Users/zhou/.bun/bin/bun test packages/runtime-cordis/tests packages/diagnostics/tests packages/preset-basic/tests
+Shell login: false. No build/full/browser invocation.
+bun test v1.4.2 (744846f84)
+
+packages/preset-basic/tests/index.test.ts:
+(pass) Composition readiness publishes every base Service through static bindings [7.15ms]
+
+packages/preset-basic/tests/types.test.ts:
+(pass) Basic Canvas Composition preserves required Renderer config and provides no Service [2.72ms]
+
+packages/preset-basic/tests/numeric-policy.test.ts:
+(pass) Composition preserves invalid dragThreshold from enumerable policy fields [1.83ms]
+(pass) Composition preserves invalid dragThreshold from inherited policy fields [1.17ms]
+(pass) Composition preserves invalid dragThreshold from non-enumerable policy fields [1.31ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from enumerable policy fields [1.02ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from inherited policy fields [0.96ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from non-enumerable policy fields [3.12ms]
+(pass) Composition preserves invalid minZoom from enumerable policy fields [1.00ms]
+(pass) Composition preserves invalid minZoom from inherited policy fields [0.80ms]
+(pass) Composition preserves invalid minZoom from non-enumerable policy fields [0.92ms]
+(pass) Composition preserves invalid maxZoom from enumerable policy fields [1.02ms]
+(pass) Composition preserves invalid maxZoom from inherited policy fields [0.86ms]
+(pass) Composition preserves invalid maxZoom from non-enumerable policy fields [0.84ms]
+(pass) Composition retains valid enumerable policies across mutation and fresh Hosts [2.87ms]
+(pass) Composition retains valid inherited policies across mutation and fresh Hosts [2.94ms]
+(pass) Composition retains valid non-enumerable policies across mutation and fresh Hosts [1.68ms]
+(pass) Composition preserves the original enumerable dragThreshold getter failure [0.12ms]
+(pass) Composition preserves the original inherited dragThreshold getter failure [0.01ms]
+(pass) Composition preserves the original non-enumerable dragThreshold getter failure
+(pass) Composition preserves the original enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original inherited wheelZoomSensitivity getter failure
+(pass) Composition preserves the original non-enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original enumerable minZoom getter failure
+(pass) Composition preserves the original inherited minZoom getter failure
+(pass) Composition preserves the original non-enumerable minZoom getter failure
+(pass) Composition preserves the original enumerable maxZoom getter failure
+(pass) Composition preserves the original inherited maxZoom getter failure
+(pass) Composition preserves the original non-enumerable maxZoom getter failure
+
+packages/preset-basic/tests/readiness.test.ts:
+(pass) invalid Interaction options fail the Composition with the original Interaction error [0.90ms]
+(pass) Composition snapshots Interaction options when the Plugin is created [1.04ms]
+(pass) Composition snapshots nested Connection options when the Plugin is created [0.78ms]
+(pass) Composition keeps the Connection value captured before a caller getter changes [0.99ms]
+(pass) Composition owns inherited Connection options across fresh Host installations [1.47ms]
+(pass) Composition owns non-enumerable Connection options across fresh Host installations [2.43ms]
+(pass) Composition preserves the original Connection getter failure at creation [0.10ms]
+(pass) Composition leaves malformed Connection validation with Interaction [1.05ms]
+(pass) Composition creation rejects malformed or unknown top-level options [0.42ms]
+(pass) Composition waits for an asynchronous Renderer before becoming active [0.89ms]
+(pass) Renderer Factory failure keeps its identity and releases the Child tree for reinstall [1.41ms]
+
+packages/preset-basic/tests/connection-values.test.ts:
+(pass) Composition retains a declared Connection materializer inherited from its prototype [0.91ms]
+(pass) Composition retains the inherited materializer across mutation and fresh Hosts [6.94ms]
+(pass) Composition retains the non-enumerable materializer across mutation and fresh Hosts [4.28ms]
+(pass) Composition retains the enumerable materializer across mutation and fresh Hosts [5.41ms]
+(pass) Composition preserves the first inherited materializer read failure 0 [0.13ms]
+(pass) Composition preserves the first inherited materializer read failure 1 [0.01ms]
+(pass) Composition preserves the first inherited materializer read failure 2
+(pass) Composition preserves the first inherited materializer read failure 3
+(pass) Composition preserves the first inherited materializer read failure 4
+(pass) Composition preserves the first inherited materializer read failure 5
+(pass) Composition preserves the first non-enumerable materializer read failure 0
+(pass) Composition preserves the first non-enumerable materializer read failure 1
+(pass) Composition preserves the first non-enumerable materializer read failure 2
+(pass) Composition preserves the first non-enumerable materializer read failure 3
+(pass) Composition preserves the first non-enumerable materializer read failure 4
+(pass) Composition preserves the first non-enumerable materializer read failure 5
+(pass) Composition preserves the first enumerable materializer read failure 0
+(pass) Composition preserves the first enumerable materializer read failure 1
+(pass) Composition preserves the first enumerable materializer read failure 2
+(pass) Composition preserves the first enumerable materializer read failure 3
+(pass) Composition preserves the first enumerable materializer read failure 4
+(pass) Composition preserves the first enumerable materializer read failure 5
+(pass) Composition retains an invalid first inherited callback for existing validation 0 [0.90ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 1 [0.74ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 2 [0.69ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 3 [0.63ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 4 [0.60ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 5 [0.61ms]
+(pass) Composition preserves original own-key reflection failure before reading an inherited callback [0.07ms]
+(pass) Composition preserves unknown own Connection fields for Interaction validation [0.76ms]
+
+packages/preset-basic/tests/lifecycle.test.ts:
+(pass) existing standard Provider makes Basic Canvas Composition fail explicitly [0.50ms]
+(pass) second Basic Canvas Composition conflicts without disturbing the active one [0.86ms]
+(pass) a later Renderer Provider conflict rolls back earlier Child reservations [2.44ms]
+(pass) Composition disposes consumers before Renderer and awaits asynchronous Renderer cleanup [1.14ms]
+(pass) Composition cleanup attempts every Renderer resource and preserves all failures [1.15ms]
+(pass) Composition diagnostics expose the complete reverse Child cleanup order [0.85ms]
+
+packages/preset-basic/tests/package-import.test.ts:
+(pass) package-name import exposes the Basic Canvas Composition factory [0.79ms]
+
+packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:
+(pass) terminal cleanup diagnostics do not invoke a supplied map hook [0.92ms]
+(pass) terminal cleanup diagnostics do not invoke a supplied forEach hook [0.27ms]
+(pass) terminal cleanup diagnostics do not invoke a supplied constructor hook [0.17ms]
+(pass) terminal cleanup diagnostics do not invoke a supplied %s hook [0.13ms]
+(pass) cleanup diagnostics preserve sparse inherited members, native Proxy length and the raw failure [0.29ms]
+(pass) terminal cleanup preserves a circular AggregateError without passing it through Cordis traversal [0.22ms]
+(pass) terminal cleanup preserves failures when aborted setup will resolve [0.28ms]
+(pass) terminal cleanup preserves failures when aborted setup will reject [0.16ms]
+
+packages/runtime-cordis/tests/index.test.ts:
+(pass) @nodebraid/runtime-cordis > keeps Service Token identity separate from its diagnostic name [0.02ms]
+(pass) @nodebraid/runtime-cordis > keeps Plugin Service Bindings fixed after definition [0.05ms]
+(pass) @nodebraid/runtime-cordis > keeps a Consumer pending until every Required Service is active [0.18ms]
+(pass) @nodebraid/runtime-cordis > activates a Consumer-first installation with its declared Service Binding [0.34ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that omits a declared Service without publishing partial results [0.37ms]
+(pass) @nodebraid/runtime-cordis > publishes every Provided Service together after setup completes [0.42ms]
+(pass) @nodebraid/runtime-cordis > publishes every Provided Service before any one Service can activate a Consumer [0.71ms]
+(pass) @nodebraid/runtime-cordis > materializes each Provided Service getter exactly once before publication [0.32ms]
+(pass) @nodebraid/runtime-cordis > preserves a Provided Service getter error as the Activation failure [0.20ms]
+(pass) @nodebraid/runtime-cordis > rejects non-record Provided Service results with a stable contract error [0.48ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that returns an undeclared Service Binding [0.14ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that returns null for a Provided Service [0.15ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that returns undefined for a Provided Service [0.11ms]
+(pass) @nodebraid/runtime-cordis > fails duplicate bindings after "primary" before publishing a Service [0.26ms]
+(pass) @nodebraid/runtime-cordis > fails duplicate bindings after "" before publishing a Service [0.14ms]
+(pass) @nodebraid/runtime-cordis > allows an empty Binding when its Provided Service Token is unique [0.28ms]
+(pass) @nodebraid/runtime-cordis > reserves a Provided Service Token from installation until disposal [1.15ms]
+(pass) @nodebraid/runtime-cordis > retains a failed Provider reservation until disposal [0.28ms]
+(pass) @nodebraid/runtime-cordis > does not retain any reservation from a rejected multi-Service Provider [0.26ms]
+(pass) @nodebraid/runtime-cordis > activates a Provider-first Consumer with no missing Service Tokens [0.24ms]
+(pass) @nodebraid/runtime-cordis > deactivates a Consumer before cleaning up a disappearing Provider [0.26ms]
+(pass) @nodebraid/runtime-cordis > reports a dependency-driven Consumer as pending while its cleanup is still running [0.34ms]
+(pass) @nodebraid/runtime-cordis > deactivates indirect Consumers in reverse dependency order [1.49ms]
+(pass) @nodebraid/runtime-cordis > awaits Provided Service withdrawal sequentially in reverse registration order [0.56ms]
+(pass) @nodebraid/runtime-cordis > reactivates a pending Consumer with fresh Activation state and fixed configuration [0.43ms]
+(pass) @nodebraid/runtime-cordis > cancels only one pending whenActive waiter [0.27ms]
+(pass) @nodebraid/runtime-cordis > settles whenActive immediately for active and rejects it for disposed [0.16ms]
+(pass) @nodebraid/runtime-cordis > aborts an in-progress Consumer setup and waits for it when its Required Service disappears [0.31ms]
+(pass) @nodebraid/runtime-cordis > keeps a business setup error terminal when dependency cancellation races with it [0.46ms]
+(pass) @nodebraid/runtime-cordis > fails an aborting Consumer when dependency cleanup fails without duplicating the error [0.34ms]
+(pass) @nodebraid/runtime-cordis > propagates an active Consumer cleanup failure to its disappearing Provider once [0.29ms]
+(pass) @nodebraid/runtime-cordis > keeps a failed Consumer terminal across unrelated Service availability changes [0.34ms]
+(pass) @nodebraid/runtime-cordis > allows independent Plugin Installations to activate concurrently [0.21ms]
+(pass) @nodebraid/runtime-cordis > serializes setup and cleanup within one Plugin Installation [0.16ms]
+(pass) @nodebraid/runtime-cordis > rejects a dependency cycle with the complete Plugin and Service path [0.38ms]
+(pass) @nodebraid/runtime-cordis > rejects a Plugin definition that requires and provides the same Service Token [0.05ms]
+(pass) @nodebraid/runtime-cordis > rejects forged Plugin and Service Token values as invalid definitions [0.12ms]
+(pass) @nodebraid/runtime-cordis > rejects malformed Plugin definitions before creating Plugin metadata [0.04ms]
+(pass) @nodebraid/runtime-cordis > accepts only plain enumerable string-key Service Binding records [0.09ms]
+(pass) @nodebraid/runtime-cordis > captures every Plugin definition field exactly once before validation [0.28ms]
+(pass) @nodebraid/runtime-cordis > infers configuration, Service Bindings, and Provided Service results [0.02ms]
+(pass) @nodebraid/runtime-cordis > keeps Service Token values and Plugin configurations invariant [0.01ms]
+(pass) @nodebraid/runtime-cordis > returns a pending installation before activating a plugin [0.10ms]
+(pass) @nodebraid/runtime-cordis > preserves one setup failure without affecting another installation [0.17ms]
+(pass) @nodebraid/runtime-cordis > publishes each snapshot change to removable subscribers [0.12ms]
+(pass) @nodebraid/runtime-cordis > reports subscriber errors without interrupting lifecycle observers [0.31ms]
+(pass) @nodebraid/runtime-cordis > schedules subscriber errors when platform reportError is unavailable [3.57ms]
+(pass) @nodebraid/runtime-cordis > keeps subscriber reporting failures outside the Plugin lifecycle [0.57ms]
+(pass) @nodebraid/runtime-cordis > disposes owned resources in reverse registration order [0.20ms]
+(pass) @nodebraid/runtime-cordis > owns a typed Child Installation at its resource registration position [0.25ms]
+(pass) @nodebraid/runtime-cordis > rejects a detached Child installation through an ended parent Activation [0.15ms]
+(pass) @nodebraid/runtime-cordis > keeps an unawaited Child failure isolated from its parent Activation [0.24ms]
+(pass) @nodebraid/runtime-cordis > rolls back a Composition tree when an awaited Child fails [0.31ms]
+(pass) @nodebraid/runtime-cordis > validates Child Installations in the same Service reservation graph [0.40ms]
+(pass) @nodebraid/runtime-cordis > releases and recreates a Canvas-shaped Child tree with dependency-safe LIFO cleanup [0.97ms]
+(pass) @nodebraid/runtime-cordis > returns one idempotent installation disposal promise [0.15ms]
+(pass) @nodebraid/runtime-cordis > keeps installation disposal idempotent during abort reentry with successful cleanup [0.25ms]
+(pass) @nodebraid/runtime-cordis > keeps installation disposal idempotent during abort reentry with failed cleanup [0.18ms]
+(pass) @nodebraid/runtime-cordis > keeps host disposal idempotent during abort reentry with successful cleanup [0.12ms]
+(pass) @nodebraid/runtime-cordis > keeps host disposal idempotent during abort reentry with failed cleanup [0.13ms]
+(pass) @nodebraid/runtime-cordis > keeps Host disposal idempotent during Diagnostic Sink reentry [0.11ms]
+(pass) @nodebraid/runtime-cordis > aborts pending setup and waits for it before becoming disposed [0.20ms]
+(pass) @nodebraid/runtime-cordis > disposes every independent installation and closes the host [0.21ms]
+(pass) @nodebraid/runtime-cordis > rolls back owned resources when setup fails [0.17ms]
+(pass) @nodebraid/runtime-cordis > rolls back Owned Resources and Children on Provided Service missing binding [0.46ms]
+(pass) @nodebraid/runtime-cordis > rolls back Owned Resources and Children on Provided Service getter error [2.05ms]
+(pass) @nodebraid/runtime-cordis > preserves a Provided getter error without inspecting its name after rollback [0.29ms]
+(pass) @nodebraid/runtime-cordis > continues cleanup and reports every disposer failure [0.24ms]
+(pass) @nodebraid/runtime-cordis > reports cleanup failures from every host installation together [0.24ms]
+(pass) @nodebraid/runtime-cordis > preserves cleanup aggregation stages through Host disposal [0.17ms]
+(pass) @nodebraid/runtime-cordis > reports an owned Child cleanup failure once during terminal Host disposal [0.27ms]
+
+packages/runtime-cordis/tests/diagnostic-input-values.test.ts:
+(pass) Host diagnostics retains the Host ID accepted during validation [0.25ms]
+(pass) a Diagnostic Event retains the name accepted during validation [0.28ms]
+(pass) a Diagnostic Event retains the level accepted during validation [0.16ms]
+(pass) Host diagnostics rejects the first invalid Host ID: "" [0.11ms]
+(pass) Host diagnostics rejects the first invalid Host ID: null [0.05ms]
+(pass) Host diagnostics rejects the first invalid Host ID: 42 [0.07ms]
+(pass) Host diagnostics rejects the first invalid Host ID: {} [0.04ms]
+(pass) an omitted captured Host ID still creates a stable default Host scope [0.14ms]
+(pass) Host diagnostics preserves the original Host ID read failure [0.05ms]
+(pass) a Diagnostic Event rejects its first invalid name: "" [0.17ms]
+(pass) a Diagnostic Event rejects its first invalid name: null [0.10ms]
+(pass) a Diagnostic Event rejects its first invalid name: {} [0.11ms]
+(pass) a Diagnostic Event rejects its first invalid level: "fatal" [0.13ms]
+(pass) a Diagnostic Event rejects its first invalid level: null [0.10ms]
+(pass) a Diagnostic Event rejects its first invalid level: 42 [0.13ms]
+(pass) a Diagnostic Event retains its normalized attributes and original error [0.18ms]
+(pass) a Diagnostic Event preserves the original name read failure [0.17ms]
+(pass) a Diagnostic Event preserves the original level read failure [0.12ms]
+(pass) a Diagnostic Event preserves the original attributes read failure [0.12ms]
+(pass) a Diagnostic Event preserves the original error read failure [0.10ms]
+(pass) Sink failure context retains the accepted Event name after the callback changes the input [0.18ms]
+(pass) an asynchronous Sink retains the accepted name for both explicit failures [0.19ms]
+(pass) disabled ordinary diagnostics validates inputs without consuming the optional error [0.15ms]
+(pass) invalid Fault attributes retain the accepted name and original Fault at the Reporter [0.23ms]
+(pass) invalid Fault names retain their first captured value in failure diagnostics [0.15ms]
+(pass) a Fault name read failure reaches the Reporter alongside the original Fault [0.17ms]
+(pass) a Fault attributes read failure reaches the Reporter alongside the original Fault [0.11ms]
+
+packages/runtime-cordis/tests/binding-records.test.ts:
+(pass) rejects a listed requires Binding without an own descriptor [0.05ms]
+(pass) rejects a requires Binding removed by an earlier Binding getter [0.03ms]
+(pass) preserves the original requires Binding getPrototypeOf failure [0.03ms]
+(pass) preserves the original requires Binding ownKeys failure
+(pass) preserves the original requires Binding getOwnPropertyDescriptor failure
+(pass) preserves the original requires Binding get failure
+(pass) rejects a listed provides Binding without an own descriptor
+(pass) rejects a provides Binding removed by an earlier Binding getter
+(pass) preserves the original provides Binding getPrototypeOf failure
+(pass) preserves the original provides Binding ownKeys failure
+(pass) preserves the original provides Binding getOwnPropertyDescriptor failure
+(pass) preserves the original provides Binding get failure
+(pass) retains valid null-prototype accessor Bindings through the public Plugin definition [0.03ms]
+
+packages/runtime-cordis/tests/diagnostic-inspection.test.ts:
+(pass) terminal cleanup retains resource and diagnostic inspection failures together [0.41ms]
+(pass) disabled ordinary diagnostics does not inspect cleanup error members [0.18ms]
+(pass) retains errors read failure 0 through installation disposal (Sink false) [0.71ms]
+(pass) retains errors read failure 1 through installation disposal (Sink false) [0.16ms]
+(pass) retains errors read failure 2 through installation disposal (Sink false) [0.20ms]
+(pass) retains errors read failure 3 through installation disposal (Sink false) [0.15ms]
+(pass) retains errors read failure 4 through installation disposal (Sink false) [0.22ms]
+(pass) retains errors read failure 5 through installation disposal (Sink false) [0.14ms]
+(pass) retains errors read failure 6 through installation disposal (Sink false) [0.25ms]
+(pass) retains length read failure 0 through installation disposal (Sink false) [0.15ms]
+(pass) retains length read failure 1 through installation disposal (Sink false) [0.25ms]
+(pass) retains length read failure 2 through installation disposal (Sink false) [0.22ms]
+(pass) retains length read failure 3 through installation disposal (Sink false) [0.14ms]
+(pass) retains length read failure 4 through installation disposal (Sink false) [0.13ms]
+(pass) retains length read failure 5 through installation disposal (Sink false) [0.13ms]
+(pass) retains length read failure 6 through installation disposal (Sink false) [0.10ms]
+(pass) retains membership read failure 0 through installation disposal (Sink false) [0.14ms]
+(pass) retains membership read failure 1 through installation disposal (Sink false) [0.20ms]
+(pass) retains membership read failure 2 through installation disposal (Sink false) [0.27ms]
+(pass) retains membership read failure 3 through installation disposal (Sink false) [0.23ms]
+(pass) retains membership read failure 4 through installation disposal (Sink false) [0.15ms]
+(pass) retains membership read failure 5 through installation disposal (Sink false) [0.20ms]
+(pass) retains membership read failure 6 through installation disposal (Sink false) [1.28ms]
+(pass) retains member read failure 0 through installation disposal (Sink false) [0.29ms]
+(pass) retains member read failure 1 through installation disposal (Sink false) [0.12ms]
+(pass) retains member read failure 2 through installation disposal (Sink false) [0.18ms]
+(pass) retains member read failure 3 through installation disposal (Sink false) [0.14ms]
+(pass) retains member read failure 4 through installation disposal (Sink false) [0.16ms]
+(pass) retains member read failure 5 through installation disposal (Sink false) [0.14ms]
+(pass) retains member read failure 6 through installation disposal (Sink false) [0.17ms]
+(pass) retains message read failure 0 through installation disposal (Sink false) [0.16ms]
+(pass) retains message read failure 1 through installation disposal (Sink false) [0.15ms]
+(pass) retains message read failure 2 through installation disposal (Sink false) [0.16ms]
+(pass) retains message read failure 3 through installation disposal (Sink false) [0.20ms]
+(pass) retains message read failure 4 through installation disposal (Sink false) [0.18ms]
+(pass) retains message read failure 5 through installation disposal (Sink false) [0.16ms]
+(pass) retains message read failure 6 through installation disposal (Sink false) [0.12ms]
+(pass) retains errors read failure 0 through installation disposal (Sink true) [0.25ms]
+(pass) retains errors read failure 1 through installation disposal (Sink true) [0.17ms]
+(pass) retains errors read failure 2 through installation disposal (Sink true) [0.13ms]
+(pass) retains errors read failure 3 through installation disposal (Sink true) [0.14ms]
+(pass) retains errors read failure 4 through installation disposal (Sink true) [0.15ms]
+(pass) retains errors read failure 5 through installation disposal (Sink true) [0.17ms]
+(pass) retains errors read failure 6 through installation disposal (Sink true) [0.15ms]
+(pass) retains length read failure 0 through installation disposal (Sink true) [0.18ms]
+(pass) retains length read failure 1 through installation disposal (Sink true) [0.17ms]
+(pass) retains length read failure 2 through installation disposal (Sink true) [0.15ms]
+(pass) retains length read failure 3 through installation disposal (Sink true) [0.14ms]
+(pass) retains length read failure 4 through installation disposal (Sink true) [0.15ms]
+(pass) retains length read failure 5 through installation disposal (Sink true) [0.11ms]
+(pass) retains length read failure 6 through installation disposal (Sink true) [0.18ms]
+(pass) retains membership read failure 0 through installation disposal (Sink true) [0.16ms]
+(pass) retains membership read failure 1 through installation disposal (Sink true) [0.16ms]
+(pass) retains membership read failure 2 through installation disposal (Sink true) [0.25ms]
+(pass) retains membership read failure 3 through installation disposal (Sink true) [0.17ms]
+(pass) retains membership read failure 4 through installation disposal (Sink true) [0.15ms]
+(pass) retains membership read failure 5 through installation disposal (Sink true) [0.15ms]
+(pass) retains membership read failure 6 through installation disposal (Sink true) [0.15ms]
+(pass) retains member read failure 0 through installation disposal (Sink true) [0.14ms]
+(pass) retains member read failure 1 through installation disposal (Sink true) [0.15ms]
+(pass) retains member read failure 2 through installation disposal (Sink true) [0.13ms]
+(pass) retains member read failure 3 through installation disposal (Sink true) [0.14ms]
+(pass) retains member read failure 4 through installation disposal (Sink true) [0.14ms]
+(pass) retains member read failure 5 through installation disposal (Sink true) [0.12ms]
+(pass) retains member read failure 6 through installation disposal (Sink true) [0.17ms]
+(pass) retains message read failure 0 through installation disposal (Sink true) [0.14ms]
+(pass) retains message read failure 1 through installation disposal (Sink true) [0.16ms]
+(pass) retains message read failure 2 through installation disposal (Sink true) [0.14ms]
+(pass) retains message read failure 3 through installation disposal (Sink true) [0.10ms]
+(pass) retains message read failure 4 through installation disposal (Sink true) [0.23ms]
+(pass) retains message read failure 5 through installation disposal (Sink true) [0.12ms]
+(pass) retains message read failure 6 through installation disposal (Sink true) [0.11ms]
+(pass) retains errors read failure 0 through host disposal (Sink false) [0.23ms]
+(pass) retains errors read failure 1 through host disposal (Sink false) [0.12ms]
+(pass) retains errors read failure 2 through host disposal (Sink false) [0.14ms]
+(pass) retains errors read failure 3 through host disposal (Sink false) [0.13ms]
+(pass) retains errors read failure 4 through host disposal (Sink false) [0.15ms]
+(pass) retains errors read failure 5 through host disposal (Sink false) [0.17ms]
+(pass) retains errors read failure 6 through host disposal (Sink false) [1.21ms]
+(pass) retains length read failure 0 through host disposal (Sink false) [0.12ms]
+(pass) retains length read failure 1 through host disposal (Sink false) [0.11ms]
+(pass) retains length read failure 2 through host disposal (Sink false) [0.19ms]
+(pass) retains length read failure 3 through host disposal (Sink false) [0.15ms]
+(pass) retains length read failure 4 through host disposal (Sink false) [0.14ms]
+(pass) retains length read failure 5 through host disposal (Sink false) [0.14ms]
+(pass) retains length read failure 6 through host disposal (Sink false) [0.16ms]
+(pass) retains membership read failure 0 through host disposal (Sink false) [0.16ms]
+(pass) retains membership read failure 1 through host disposal (Sink false) [0.09ms]
+(pass) retains membership read failure 2 through host disposal (Sink false) [0.14ms]
+(pass) retains membership read failure 3 through host disposal (Sink false) [0.10ms]
+(pass) retains membership read failure 4 through host disposal (Sink false) [0.13ms]
+(pass) retains membership read failure 5 through host disposal (Sink false) [0.10ms]
+(pass) retains membership read failure 6 through host disposal (Sink false) [0.12ms]
+(pass) retains member read failure 0 through host disposal (Sink false) [0.18ms]
+(pass) retains member read failure 1 through host disposal (Sink false) [0.11ms]
+(pass) retains member read failure 2 through host disposal (Sink false) [0.11ms]
+(pass) retains member read failure 3 through host disposal (Sink false) [0.16ms]
+(pass) retains member read failure 4 through host disposal (Sink false) [0.09ms]
+(pass) retains member read failure 5 through host disposal (Sink false) [0.17ms]
+(pass) retains member read failure 6 through host disposal (Sink false) [0.18ms]
+(pass) retains message read failure 0 through host disposal (Sink false) [0.14ms]
+(pass) retains message read failure 1 through host disposal (Sink false) [0.10ms]
+(pass) retains message read failure 2 through host disposal (Sink false) [0.11ms]
+(pass) retains message read failure 3 through host disposal (Sink false) [0.20ms]
+(pass) retains message read failure 4 through host disposal (Sink false) [0.09ms]
+(pass) retains message read failure 5 through host disposal (Sink false) [0.11ms]
+(pass) retains message read failure 6 through host disposal (Sink false) [0.21ms]
+(pass) retains errors read failure 0 through host disposal (Sink true) [0.18ms]
+(pass) retains errors read failure 1 through host disposal (Sink true) [0.14ms]
+(pass) retains errors read failure 2 through host disposal (Sink true) [0.16ms]
+(pass) retains errors read failure 3 through host disposal (Sink true) [0.13ms]
+(pass) retains errors read failure 4 through host disposal (Sink true) [0.20ms]
+(pass) retains errors read failure 5 through host disposal (Sink true) [0.20ms]
+(pass) retains errors read failure 6 through host disposal (Sink true) [0.11ms]
+(pass) retains length read failure 0 through host disposal (Sink true) [0.24ms]
+(pass) retains length read failure 1 through host disposal (Sink true) [0.12ms]
+(pass) retains length read failure 2 through host disposal (Sink true) [0.12ms]
+(pass) retains length read failure 3 through host disposal (Sink true) [0.41ms]
+(pass) retains length read failure 4 through host disposal (Sink true) [0.12ms]
+(pass) retains length read failure 5 through host disposal (Sink true) [0.19ms]
+(pass) retains length read failure 6 through host disposal (Sink true) [0.14ms]
+(pass) retains membership read failure 0 through host disposal (Sink true) [0.14ms]
+(pass) retains membership read failure 1 through host disposal (Sink true) [0.15ms]
+(pass) retains membership read failure 2 through host disposal (Sink true) [0.13ms]
+(pass) retains membership read failure 3 through host disposal (Sink true) [0.16ms]
+(pass) retains membership read failure 4 through host disposal (Sink true) [0.13ms]
+(pass) retains membership read failure 5 through host disposal (Sink true) [0.16ms]
+(pass) retains membership read failure 6 through host disposal (Sink true) [0.17ms]
+(pass) retains member read failure 0 through host disposal (Sink true) [0.14ms]
+(pass) retains member read failure 1 through host disposal (Sink true) [0.15ms]
+(pass) retains member read failure 2 through host disposal (Sink true) [0.17ms]
+(pass) retains member read failure 3 through host disposal (Sink true) [0.14ms]
+(pass) retains member read failure 4 through host disposal (Sink true) [0.12ms]
+(pass) retains member read failure 5 through host disposal (Sink true) [0.11ms]
+(pass) retains member read failure 6 through host disposal (Sink true) [0.97ms]
+(pass) retains message read failure 0 through host disposal (Sink true) [0.52ms]
+(pass) retains message read failure 1 through host disposal (Sink true) [0.16ms]
+(pass) retains message read failure 2 through host disposal (Sink true) [0.13ms]
+(pass) retains message read failure 3 through host disposal (Sink true) [0.16ms]
+(pass) retains message read failure 4 through host disposal (Sink true) [0.11ms]
+(pass) retains message read failure 5 through host disposal (Sink true) [0.10ms]
+(pass) retains message read failure 6 through host disposal (Sink true) [0.12ms]
+(pass) malformed members retain cleanup and explicit validation failures (Sink false) [0.39ms]
+(pass) malformed members retain cleanup and explicit validation failures (Sink true) [0.20ms]
+(pass) parent cleanup does not reinspect an already diagnosed child inspection failure [0.45ms]
+
+packages/runtime-cordis/tests/error-contract.test.ts:
+(pass) Plugin Host structural failures expose the shared NodeBraid error identity [0.17ms]
+
+packages/runtime-cordis/tests/diagnostics.test.ts:
+(pass) the Runtime diagnostic event catalog has stable searchable names [0.02ms]
+(pass) a Plugin emits an immutable Diagnostic Event scoped to its Host Activation [0.41ms]
+(pass) a Fault Reporter failure stays outside the Plugin lifecycle and preserves both errors [0.37ms]
+(pass) a Diagnostic Sink failure becomes a non-recursive Fault without failing Plugin setup [0.27ms]
+(pass) an asynchronous Diagnostic Sink is reported as an explicit contract failure [0.27ms]
+(pass) an asynchronous Fault Reporter is exposed without changing Plugin state [0.33ms]
+(pass) an invalid Diagnostic Event fails explicitly even when no Sink is configured [0.28ms]
+(pass) an invalid reportFault input preserves the original Fault through the final Reporter [0.28ms]
+(pass) an unsafe Diagnostic attribute fails with a structured path and original cause [0.25ms]
+(pass) an array Diagnostic accessor fails without executing it during Plugin setup [0.21ms]
+(pass) an unknown Diagnostic level fails as an invalid event contract [0.32ms]
+(pass) Plugin Host rejects an empty diagnostic host ID [0.18ms]
+(pass) Installation subscriber Faults use the Host-scoped diagnostics path [0.36ms]
+(pass) an empty Plugin Host emits an ordered lifecycle [0.13ms]
+(pass) Installation status events follow Snapshot replacement and precede subscribers [0.23ms]
+(pass) a Plugin Setup failure emits one error status while preserving its identity [0.41ms]
+(pass) Activation events surround Plugin setup and completed cleanup [0.27ms]
+(pass) a terminal Installation cleanup failure emits one error event and still disposes [0.42ms]
+(pass) dependency cleanup records one Error-level Event across Consumer and Provider disposal [0.54ms]
+
+packages/runtime-cordis/tests/diagnostic-description.test.ts:
+(pass) a real Host Sink describes AggregateError members while preserving the original event error [0.58ms]
+
+packages/diagnostics/tests/index.test.ts:
+(pass) the Diagnostics event catalog has stable searchable names [0.01ms]
+(pass) Diagnostic normalization rejects an accessor without invoking it [0.07ms]
+(pass) Diagnostic normalization rejects a Symbol key instead of dropping it [0.31ms]
+(pass) Diagnostic arrays are normalized without executing an input map method [0.07ms]
+(pass) Diagnostic normalization rejects own array index accessors without invoking them [0.06ms]
+(pass) Diagnostic normalization rejects inherited array index accessors without invoking them [0.01ms]
+(pass) Diagnostic arrays reject Symbol keys instead of dropping them [0.02ms]
+(pass) Diagnostic arrays validate inherited elements instead of replacing them with holes [0.03ms]
+(pass) Diagnostic arrays copy inherited data while preserving genuine holes [0.05ms]
+(pass) Diagnostic arrays are copied without reading a constructor hook [0.02ms]
+(pass) structural error details reject an unsafe nested array element at its exact path [0.04ms]
+(pass) describeNonFiniteNumber provides the canonical diagnostic representation [0.02ms]
+(pass) a NodeBraid structural error exposes stable identity, cause, and immutable details [0.05ms]
+(pass) a NodeBraid structural error rejects an unsafe detail at its exact path [0.03ms]
+(pass) a NodeBraid structural error rejects a non-finite numeric detail [0.03ms]
+(pass) a NodeBraid structural error rejects class instances instead of traversing them [0.04ms]
+(pass) a NodeBraid structural error rejects a circular detail at the first back-reference [0.03ms]
+(pass) describeError returns a JSON-ready NodeBraid error with its original cause [0.08ms]
+(pass) describeError preserves nested AggregateError stages [0.05ms]
+(pass) describeError represents a circular cause as an explicit reference [0.02ms]
+(pass) describeError preserves a safe primitive thrown value
+(pass) describeDiagnosticEvent replaces the raw error with its JSON-ready description [0.15ms]
+
+packages/diagnostics/tests/types.test.ts:
+(pass) keeps the public Diagnostics seam narrow and immutable
+
+packages/diagnostics/tests/error-description.test.ts:
+(pass) AggregateError member map cannot replace descriptions with raw Errors [0.11ms]
+(pass) AggregateError metadata failures precede indexed member reads [0.07ms]
+(pass) AggregateError descriptions ignore collection method, iterator and constructor hooks [0.05ms]
+(pass) AggregateError descriptions preserve holes, inherited members and circular paths [0.07ms]
+(pass) AggregateError traversal uses native integer length semantics for Proxy arrays [0.05ms]
+(pass) AggregateError indexed read failures retain their original identity [0.06ms]
+(pass) malformed AggregateError collections fail instead of becoming an empty description [0.04ms]
+
+packages/diagnostics/tests/package-import.test.ts:
+(pass) @nodebraid/diagnostics exposes the NodeBraidError seam by package name [0.03ms]
+
+ 393 pass
+ 0 fail
+ 2773 expect() calls
+Ran 393 tests across 19 files. [184.00ms]
+
+Exit code: 0
+
+Post-test new exact source/clean/parent/canonical patch/task/empty discussion/whitespace checks and actual single-commit list:
+POST-TEST THIRD-PREPARED EXACT SOURCE/CLEAN/PARENT/CANONICAL PATCH/TASK/EMPTY DISCUSSION/WHITESPACE: PASS
+37d7131 fix: retain Runtime cleanup inspection failures
+WORKTREE ACCESS STOPPED; THIS REVIEW DOES NOT CERTIFY A LATER BASE OR HEAD.
+
+Exit code: 0
+
+Worktree access stopped after the post-test audit. This log contains only the actual newly invoked tests above. Older 8baf799/8aed64e reports/full checks are historical and not certified for this base/head.

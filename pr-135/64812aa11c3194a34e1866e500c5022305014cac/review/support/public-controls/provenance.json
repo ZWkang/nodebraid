@@ -1,0 +1,18 @@
+{
+  "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+  "base": "e282d6291c98deac2fd65879c94b6bf2881ede6b",
+  "originalSourceSHA256": "a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b",
+  "originalSourceBytesUnchanged": true,
+  "nodeModules": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/node_modules",
+  "artifacts": {
+    "packages/runtime-cordis/dist/index.js": {
+      "sha256": "c51e03769fd58eee903f81f5556ad3ac653917eab47c6dd6226d5e8c1972d5f4",
+      "bytes": 311
+    },
+    "packages/runtime-cordis/dist/index.d.ts": {
+      "sha256": "bb03507a5cd3adb2258a6c732463666937be6a3e7484404ab3d412b29ba37cb2",
+      "bytes": 890
+    }
+  },
+  "limits": "Actual new TS compiler/native Bun execution on37d7131. Original6fd red,8baf/8aed results retained at their identities. Not remote execution or formal full."
+}

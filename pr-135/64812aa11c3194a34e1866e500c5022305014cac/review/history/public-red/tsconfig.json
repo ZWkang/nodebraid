@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "strict": true,
+    "noUnusedLocals": true,
+    "noImplicitAny": true,
+    "skipLibCheck": false,
+    "noEmit": false,
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "/Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow/node_modules/@types"
+    ],
+    "outDir": "/Users/zhou/.codex/local-workflows/nodebraid/runs/20261028T025848-runtime-boundaries/compiled",
+    "rootDir": "/Users/zhou/.codex/local-workflows/nodebraid/runs/20261028T025848-runtime-boundaries",
+    "sourceMap": true
+  },
+  "files": [
+    "runtime-disposal-error-inspection.ts"
+  ],
+  "include": []
+}

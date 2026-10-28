@@ -1,0 +1,603 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "e282d6291c98deac2fd65879c94b6bf2881ede6b",
+    "expectedParent": "e282d6291c98deac2fd65879c94b6bf2881ede6b",
+    "head": "64812aa11c3194a34e1866e500c5022305014cac",
+    "tree": "4800054aa64c34564818f5a5533b4e6698a35e32",
+    "patch": "3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b",
+    "localHead": "37d7131df1b2ffff2c37fb83ac4bc3877795e377"
+  },
+  "task": {
+    "run": "5297ba1b-e4d6-414f-9a95-d7cb19392296",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 134
+    },
+    "request": "## Confirmed defect\n\nBase: `6fd2d016f6330cc422508b3e51229bea4be2cce0`.\nPublic seam: `@nodebraid/runtime-cordis.createPluginHost()` → `PluginContext.own()` → Installation or Host `dispose()`.\n\nA resource throws an application-owned `AggregateError`. Reading that error's `errors` property throws a separate inspection failure. Terminal Runtime diagnostic filtering then replaces the resource failure with the inspection failure. Host disposal retains only that replacement, so the original resource failure is absent from both returned error trees.\n\nThe original strictly typechecked, emitted-JS public probe ran once against the real production package. It produced two failures and two ordinary-aggregate controls:\n\n```json\n{\"route\":\"installation\",\"kind\":\"throwing-errors-getter\",\"originalAggregateIdentityPreserved\":false,\"rootIsSecondaryFailure\":true,\"getterReads\":1,\"cleanupOrder\":[\"late\",\"failing\",\"early\"],\"installationState\":\"disposed\"}\n{\"route\":\"host\",\"kind\":\"throwing-errors-getter\",\"originalAggregateIdentityPreserved\":false,\"secondaryInspectionFailureInReturnedTree\":true,\"getterReads\":1,\"cleanupOrder\":[\"late\",\"failing\",\"early\"],\"installationState\":\"disposed\"}\n```\n\nThe actual final assertion exits 1 (2/4 controls preserve the original).\nThis is rejection replacement, **not** a hanging disposal Promise. No product rebuild, full check, online CI failure or mocked Runtime was used.\n\n## Minimal reproduction\n\nRun with the already built public packages:\n\n```ts\nimport { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';\n\nconst original = new AggregateError([new Error('owned resource failed')], 'cleanup');\nconst inspectionFailure = new Error('errors getter failed');\nObject.defineProperty(original, 'errors', {\n  get() { throw inspectionFailure; },\n});\nconst host = createPluginHost({ diagnostics: { sink() {} } });\nconst installation = host.install(definePlugin({\n  setup(context) {\n    context.own(() => { throw original; });\n  },\n}));\nawait installation.whenActive();\nconst result = await installation.dispose().then(\n  () => ({ ok: true as const }),\n  error => ({ ok: false as const, error }),\n);\nif (!result.ok) console.log(result.error === inspectionFailure); // actual true\nawait host.dispose();\n```\n\nThe independent full probe uses descriptor-only traversal of framework wrappers, checks original identities before reading member descriptors, and never invokes the failing application getter itself. Source SHA256: `a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b`.\n\n## Contract and scope\n\n- [ADR 0004](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/docs/adr/0004-own-resources-per-plugin-activation.md) requires all resource cleanup to be attempted and its failures explicitly aggregated.\n- [ADR 0028](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/docs/adr/0028-separate-diagnostics-from-error-propagation.md) separates diagnostic observation from error propagation and disables ordinary diagnostics without a Sink.\n- [ADR 0029](https://github.com/ZWkang/nodebraid/blob/6fd2d016f6330cc422508b3e51229bea4be2cce0/docs/adr/0029-preserve-domain-and-external-error-identity.md) preserves original external failure references and aggregation stages.\n\n`PluginInstallation.dispose()` selects undiagnosed members before rethrowing the original cleanup error. A native inspection exception exits that selection and reaches the final rejection handler instead. Repair this boundary without suppressing either failure or imposing a new error/accessor policy.\n\n## Acceptance\n\n1. Installation and Host disposal retain every original resource failure by reference, with their existing aggregate stages, even when diagnostic member inspection fails.\n2. Any inspection failure that actually occurs remains explicitly observable alongside the resource failure; do not swallow it, replace the original with it, return success, or substitute an empty error list.\n3. Ordinary diagnostics disabled without a Sink must not introduce diagnostic-only inspection effects. Preserve configured Sink/Fault Reporter behavior, single cleanup observation and existing de-duplication.\n4. Preserve reverse resource cleanup, terminal status, cached disposal Promise/outcome, sparse/inherited members, cycles, supported native indexed reads and original read exceptions. No public API, dependencies, accessor/record ban, cap, retry, fallback or error-tree flattening.\n5. Public red/green regressions, affected consumers, independent Standards + ponytail-review and Spec with current-head risk, then canonical formal full verification. Verify actual remote tree/parent, current-head CI and complete immutable report/media publication/readback.\n6. Keep this Issue open with Refs until normal merge and actual-main whole-task acceptance. Apply the current main human-review/merge and independent closing gates.\n\n## Deduplication\n\nFresh complete all-state collections contain 133 unique Issue/PR records and 68 unique PRs, with final short pages and no duplicate IDs. Related requirements and delivery discussions/files/reviews/threads were read completely.\n\n- Closed #69 / merged #70 removes caller-owned map/filter/iterator hooks from Runtime member traversal. That repair remains valid; this is the still-unhandled **native inspection failure boundary**, which needs to retain both resource and inspection failures rather than reimplement the hook removal.\n- #31 / #32 concerns the separate Diagnostics error-description output. Its native read failures remain visible; that pure description API is outside this repair.\n- #80 / #81 captures Host/event fields once. It does not protect disposal rejection from inspection exceptions.\n- No active Issue/PR covers this new public reproduction. Existing managed #127/#129/#131/#133 remain separate and unchanged.\n",
+    "plan": [
+      {
+        "id": "public-red",
+        "blockedBy": [],
+        "acceptance": "Retain original typed compiled4 source/binary/log (2 red, 2 controls), and a repository public Host/own/dispose tracer genuinely red with complete source/preimage."
+      },
+      {
+        "id": "preserve-disposal-failures",
+        "blockedBy": [
+          "public-red"
+        ],
+        "acceptance": "Retain original resource aggregate references and any native diagnostic inspection failure explicitly; disabled ordinary diagnostics performs no diagnostic-only error traversal; preserve cleanup/caching/de-duplication and no policy/API expansion."
+      },
+      {
+        "id": "affected-and-independent-review",
+        "blockedBy": [
+          "preserve-disposal-failures"
+        ],
+        "acceptance": "Affected public consumers plus original byte-identical compiled4 green and expanded public failure/normal lifecycle controls pass; independent exact-head Standards+ponytail and Spec full Markdown/risk pass."
+      },
+      {
+        "id": "formal-engineering-check",
+        "blockedBy": [
+          "affected-and-independent-review"
+        ],
+        "acceptance": "Only after both axes pass, fixed fetched-main agents:run verify really executes this attempt full bun run check and records stable exact identity with original logs/receipt."
+      },
+      {
+        "id": "publish-current-head",
+        "blockedBy": [
+          "formal-engineering-check"
+        ],
+        "acceptance": "One normal append-only delivery PR to main Refs134; actual remote full tree/firstparent and user identity readbacks, real source CI, current dynamic mapped native manifest and immutable full report/media byte/hash/Gitblob readback."
+      },
+      {
+        "id": "required-review-and-authorized-merge",
+        "blockedBy": [
+          "publish-current-head"
+        ],
+        "acceptance": "All current feedback/checks/evidence/premerge tickets/protection and actual canonical human/specific authorization satisfied before any expected-head immediate merge. No selfapprove/dismiss/force/bypass/auto queue."
+      },
+      {
+        "id": "main-integration-acceptance",
+        "blockedBy": [
+          "required-review-and-authorized-merge"
+        ],
+        "acceptance": "After actual normal integration fetch main; whole Issue public/compiled acceptance and all tickets, actual main CI/required Deploy pass, then separate closing authority, summary comment ID+digest/readback/archive and completed close."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+      "tree": "4800054aa64c34564818f5a5533b4e6698a35e32",
+      "patch": "3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b",
+      "report": "What this change does: preserves original Runtime cleanup trees alongside diagnostic inspection failures. With no ordinary Sink, diagnostic-only inspection is disabled.\n\n- Base: `e282d6291c98deac2fd65879c94b6bf2881ede6b`\n- Head: `37d7131df1b2ffff2c37fb83ac4bc3877795e377`\n- Tree: `4800054aa64c34564818f5a5533b4e6698a35e32`\n- Binary patch SHA256: `3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b`\n- Task digest: `613d5f6a05a5231f6d9a41b64cc61b06d6df2e548b60c191145fa259567fa883`\n\nIndependently reviewed the current complete three-file patch and all 323 new test lines, full Issue134/empty discussion and new preparation. Read the present Runtime chain plus newly integrated Basic Connection snapshot/tests, Interaction validation, Gesture/Command invocation and Child resource ownership. Canonical saved bytes, parent, clean checkout and exact identities passed fresh before/after checks.\n\nHard documented standards: no violations found. ADR0004 cleanup still attempts resources in reverse order and explicitly aggregates failures. The terminal catch retains the existing resource tree and the actual inspection failure as separate members, preserving references and stages under ADR0029. ADR0028 ordinary-diagnostics disabling avoids member-read side effects without changing the cleanup rejection or required Fault Reporter behavior.\n\nInstallation/Host cached disposal outcomes, terminal status, dependency cleanup and child de-duplication retain their flow. Basic's inherited/non-enumerable materializer ownership remains at its configuration boundary; its readiness, cleanup and genuine Command/History paths compose with the Runtime repair without new policy.\n\nJudgment-only Fowler smells: no concrete finding. Ponytail: correct, safe and lean for bounded application Host lifecycles. The existing terminal boundary contains the fix; no extra abstraction, accessor ban, retry, cap, flattening or success substitute is introduced.\n\nFresh independent `/Users/zhou/.bun/bin/bun test packages/runtime-cordis/tests packages/diagnostics/tests packages/preset-basic/tests` exited 0: **393 tests, 2773 assertions**. This invocation covers current inspection-failure controls and the new Basic boundary, including configuration rejection, Host isolation, materialization, Undo/Redo and cleanup. Full raw output is retained; older execution counts were not transferred.\n\nRisk: **medium**, under the deployed public-source floor. Cleanup error/observation behavior affects all Runtime consumers; the complete review and fresh public checks support focused human review. Rollback: revert the entire `37d7131` delivery or mapped publication to this base, preserving integrated fixes, and create fresh Hosts. Code rollback cannot reverse completed resource cleanup or application Commands already executed.\n\nNot independently run: strict TypeScript, product builds, browsers, affected/full checks, compiled-four controls or remote CI/publication. This report covers only the pinned comparison. Worktree access has stopped.\n\n**Verdict: passed. Looks good. Ship.** This is not merge approval.\n",
+      "risk": {
+        "level": "medium",
+        "rationale": "Public Runtime code changes terminal cleanup rejection and diagnostic member observation across all Plugin Host consumers. This retains the deployed public-source medium floor and warrants focused human review. The newly integrated Basic Connection configuration/Child lifecycle caller was independently checked; a small unchanged relative patch or green prior attempt cannot establish low risk.",
+        "evidence": "Complete newly prepared base e282d6291c98deac2fd65879c94b6bf2881ede6b to head 37d7131df1b2ffff2c37fb83ac4bc3877795e377, tree 4800054aa64c34564818f5a5533b4e6698a35e32 and canonical patch 3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b independently verified. Current Runtime source/test, full Issue134 and Basic/Interaction/Command/History caller chain were read. Fresh independent Runtime/Diagnostics/Basic suites passed 393 tests and 2773 assertions, with compiled Runtime/Basic path presence and exact source checks before/after. No earlier review or full-check result is relabeled as this identity.",
+        "rollback": "Revert the complete Issue134 commit 37d7131df1b2ffff2c37fb83ac4bc3877795e377, or its full mapped published delivery, restoring base e282d6291c98deac2fd65879c94b6bf2881ede6b and preserving its already integrated Basic/Shortcut/SVG/Layout fixes. Create fresh Host/Installation instances because disposal promises/outcomes are cached. No schema migration is introduced. Code rollback cannot reverse completed cleanup effects or application Commands already executed; those require the application's existing recovery."
+      }
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+      "tree": "4800054aa64c34564818f5a5533b4e6698a35e32",
+      "patch": "3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b",
+      "report": "verdict: passed\n\nbase: e282d6291c98deac2fd65879c94b6bf2881ede6b\nhead: 37d7131df1b2ffff2c37fb83ac4bc3877795e377\ntree: 4800054aa64c34564818f5a5533b4e6698a35e32\nbinary patch SHA256: 3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b\ntaskDigest: 613d5f6a05a5231f6d9a41b64cc61b06d6df2e548b60c191145fa259567fa883\n\n读取本轮 [Issue134](https://github.com/ZWkang/nodebraid/issues/134) 完整正文/空评论快照和独立新prepared request/plan，重新审查完整三文件/323行测试及Host→Installation→Activation→诊断/Fault/清理链。新maine282的Basic materializer→Composition七Child→Renderer/Interaction资源与相关公共用例已核对，依据当前main规范/CONTEXT、ADR0004/0028/0029。实际补丁与本轮review.patch字节一致；旧报告/正式verify未复用。\n\n未发现缺失、scope creep或错误实现。对照 “retain every original resource failure by reference”，诊断选择的窄catch用固定消息并列保留原cleanup完整树与发生的inspection原值，原阶段/falsey值不丢失；无Sink先禁用普通诊断遍历，仍reject原树，required Fault不受影响。原逆序清理、disposed终态、缓存Promise/outcome、native读取异常和父子去重保留，没有flatten、重试或新API/策略。新增Basic声明回调复制不改变这些清理职责。\n\n本人新进程执行 `bun test packages/runtime-cordis/tests packages/diagnostics/tests packages/preset-basic/tests packages/plugin-command/tests packages/plugin-kernel/tests packages/plugin-renderer/tests packages/plugin-interaction/tests/lifecycle.test.ts packages/core/tests`：460 pass、0 fail、3024 assertions，30文件，exit0。六场景SOURCE逐字节新执行6/6，验证二次native读取、无Sink必需Fault与Sink故障；另真实Basic七Child+继承Connection的Renderer清理错误两场景2/2：Sink无/有时inspection读取0/1，原失败/实际inspection保留、dispose一次、终态及缓存拒绝保持。显式Renderer是公共Provider fixture，不是native浏览器证明。\n\ndiff-check通过，最后HEAD/tree/patch/clean核对后已停读工作树；精确程序/命令/原始输出在spec-tests.log。协调器public4/affected仅只读核验，未重复执行。未本人运行build/typecheck/affected/browser/full、GitHub/远端CI/发布/媒体/merge/main验收；结论仅绑定e282→37，不是人工批准或整项完成。\n\nrisk: {\"level\": \"medium\", \"rationale\": \"公共Runtime cleanup rejection/诊断遍历边界改变，命中packages/*/src的medium下限；新Basic Child生命周期兼容性通过仍需重点人工审阅原树/inspection并列、Sink开关和去重，不能以相同diff或绿测判low。\", \"evidence\": \"当前完整三文件/323行测试及Host/Installation/Activation/Diagnostics调用链重新核对，新maine282的Basic inherited/hidden materializer→Renderer Child资源链已审查；本人新460tests/3024assertions及6+2公共Host/Basic场景通过。采用basee282 canonical risk blob596298db784c4f3424968cd05a3aca4a6471b1b3。\", \"rollback\": \"正常回退37d7131df1b2ffff2c37fb83ac4bc3877795e377完整三文件或未来实际mapped publication，保留e282已有其它修复；无schema/依赖/数据迁移，会恢复inspection替换cleanup及无Sink遍历缺陷。代码回退不能恢复已释放资源或撤销既有Command/cleanup副作用，需依既有生命周期重建Host/Installation。\"}\n",
+      "risk": {
+        "level": "medium",
+        "rationale": "公共Runtime cleanup rejection/诊断遍历边界改变，命中packages/*/src的medium下限；新Basic Child生命周期兼容性通过仍需重点人工审阅原树/inspection并列、Sink开关和去重，不能以相同diff或绿测判low。",
+        "evidence": "当前完整三文件/323行测试及Host/Installation/Activation/Diagnostics调用链重新核对，新maine282的Basic inherited/hidden materializer→Renderer Child资源链已审查；本人新460tests/3024assertions及6+2公共Host/Basic场景通过。采用basee282 canonical risk blob596298db784c4f3424968cd05a3aca4a6471b1b3。",
+        "rollback": "正常回退37d7131df1b2ffff2c37fb83ac4bc3877795e377完整三文件或未来实际mapped publication，保留e282已有其它修复；无schema/依赖/数据迁移，会恢复inspection替换cleanup及无Sink遍历缺陷。代码回退不能恢复已释放资源或撤销既有Command/cleanup副作用，需依既有生命周期重建Host/Installation。"
+      }
+    }
+  },
+  "changedFiles": [
+    "packages/runtime-cordis/src/host-diagnostics.ts",
+    "packages/runtime-cordis/src/plugin-installation.ts",
+    "packages/runtime-cordis/tests/diagnostic-inspection.test.ts"
+  ],
+  "risk": {
+    "level": "medium",
+    "route": "quick-human",
+    "reasons": [
+      "standards: medium — Public Runtime code changes terminal cleanup rejection and diagnostic member observation across all Plugin Host consumers. This retains the deployed public-source medium floor and warrants focused human review. The newly integrated Basic Connection configuration/Child lifecycle caller was independently checked; a small unchanged relative patch or green prior attempt cannot establish low risk.",
+      "spec: medium — 公共Runtime cleanup rejection/诊断遍历边界改变，命中packages/*/src的medium下限；新Basic Child生命周期兼容性通过仍需重点人工审阅原树/inspection并列、Sink开关和去重，不能以相同diff或绿测判low。",
+      "packages/runtime-cordis/src/host-diagnostics.ts: minimum medium risk.",
+      "packages/runtime-cordis/src/plugin-installation.ts: minimum medium risk."
+    ]
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "original-public-red",
+      "acceptance": "Original public main6fd red remains 2 failed /2 ordinary controls; not re-executed after newmain. Logs and exact TS are retained as history.",
+      "command": "bun compiled/runtime-disposal-error-inspection.js",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "original-repo-red",
+      "acceptance": "First repository tracer true behavioral failure loses original cleanup AggregateError at6fd.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-inspection.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "no-sink-tracer-red",
+      "acceptance": "Intermediate correction still unnecessarily inspects ordinary diagnostics with no Sink; getter reads1 expected0. Preserved pre-final source.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-inspection.test.ts --test-name-pattern disabled",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "historical-fixture-type-failure",
+      "acceptance": "Original probe TS2740 direct {} assignment to declared AggregateError.errors any[]; intentionally invalid runtime value corrected via native Object.defineProperty without changing assertions/product source. Historical failure not newmain execution.",
+      "command": "bun run --cwd packages/runtime-cordis typecheck:self",
+      "exitCode": 2,
+      "phase": "check",
+      "status": "failed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "current-public-green",
+      "acceptance": "Actual current37d7131 strictTS0 and new native Bun4/4; byte-identical original TS with actual current Runtime production artifacts, original+secondary error identities preserved, reverse cleanup/disposed/cache intact.",
+      "command": "bun public-controls/compiled/runtime-disposal-error-inspection.js",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "historical-type-corrected",
+      "acceptance": "Original fixture typing corrected with native Object.defineProperty preserving malformed {} input/assertions, no production bytes changed; original strict Runtime typecheck0 atpre-commit final source. Current formal full provides separate newidentity type validation.",
+      "command": "bun run --cwd packages/runtime-cordis typecheck:self",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "prior-8aed-formal",
+      "acceptance": "Prior8aed/basebafb actual formal full0/stable,1578tests9289assertions,313.145s. Publication gate detected realmain e282 and preserved this receipt as historical; never a current37d claim or remote execution.",
+      "command": "bun canonical local-agent.ts verify prior-8aed-run reviews.json decisions.json",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "affected-current",
+      "acceptance": "Actual current37d affected0/262.641s, consumers, browsers and docs, separate from full.",
+      "command": "bun run check:affected --base e282d6291c98deac2fd65879c94b6bf2881ede6b",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "standards-current",
+      "acceptance": "Independent current37d Standards393 tests/2773assertions, no old counts reused.",
+      "command": "bun test current Runtime/Diagnostics/Basic public suites",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "spec-current",
+      "acceptance": "Independent current37d Spec460 tests/3024assertions plus6+2 actual public Host/Basic controls; recording Renderer fixture is explicitly nonbrowser/nonnative.",
+      "command": "bun test current public suites; saved6+2 actual programs",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-10.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "eb867feecaf3d56d06cadd4685fadec57e7a728bf7d6f95439ae57e03042a014"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "60c824933d0715eaa934548785a832f4e5205b7f5acd6a58749f8e4f2858bbbc"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "c16c6edf1568dfc00bbf8f8d77d7ed48a1dfb2c5dea98c8a8d05e8cb118137b3"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "71e44cb189b0e1f87b9cc057540adfbcdca4c1ed4ce54d6777d45ae2710d9cc5"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "4b0616b4fd2badda6a4bd61c748b83ded47d3f66f888ddcafeaaf13fd87d3234"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "37df83dbbe3adb9f17ad695dab04ad748af3dd406612e53beee541502640b3de"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "9ebb712eca3c4a7d39de591fe832199a835b6aaf6cb9499e406713cebb5ef71d"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "ed27e4550192069593d85911e3b02ced031108c216d8c760551e43734bc07a66"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "a75e88c5b8b9f7127e06b3c73a5afc2436be60cb0653a68da18b204c75c7bb59"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "6b9bf9a4c6b112eecbd1b44970ef369f6127870e2eb0d1d5df0b66d9bd300ee9"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "cb54e8cb89ada32f93cbf2f0ca3e2986d0d1c0e402e646cedd94db3b60c3e11c"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "9d037ce20b12fed724e6b664711e48ab80e2c2323883c694255072eaccade3e3"
+    },
+    {
+      "path": "history/public-red/compiled.stderr.log",
+      "kind": "log",
+      "sha256": "71e44cb189b0e1f87b9cc057540adfbcdca4c1ed4ce54d6777d45ae2710d9cc5"
+    },
+    {
+      "path": "history/public-red/compiled.stdout.log",
+      "kind": "log",
+      "sha256": "2780c2e3acb28f7c003b3c476c1557f4a7d9aab815de91d32ad2a5f6170bbe1c"
+    },
+    {
+      "path": "history/public-red/observations.json",
+      "kind": "report",
+      "sha256": "09e17ca037ca0821cb2a4be62d550bccb6ddd72e163c0acbb3785a1999023200"
+    },
+    {
+      "path": "history/public-red/probe-receipts.json",
+      "kind": "report",
+      "sha256": "894babed24051c4cb9250391dcd55e0491054bef5c0641e2734e7b7cd1de04a7"
+    },
+    {
+      "path": "history/public-red/runtime-disposal-error-inspection.ts.txt",
+      "kind": "log",
+      "sha256": "a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b"
+    },
+    {
+      "path": "history/public-red/strict-typecheck-and-emit.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "history/public-red/strict-typecheck-and-emit.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "history/public-red/tsconfig.json",
+      "kind": "report",
+      "sha256": "1cc6edb2a79a45e566a873c1844b12020573a6cc7f677797886c13c9250f9bcd"
+    },
+    {
+      "path": "history/tracers/red/diagnostic-inspection.test.ts.txt",
+      "kind": "log",
+      "sha256": "0b7c6592e951ff7c03d3122c3ecf8bc30b01587fd3a482ef44eb7cbaf2fbad5c"
+    },
+    {
+      "path": "history/tracers/red/receipt.json",
+      "kind": "report",
+      "sha256": "0a695a679f5b3dd55a907a7f8126d2250f6053bd20b9260162cb771138ae51fd"
+    },
+    {
+      "path": "history/tracers/red/source-before-host-diagnostics.ts.txt",
+      "kind": "log",
+      "sha256": "e45d116cb559e6198289fa6ed8c3d15be9bb698c91373a800053461cf6313281"
+    },
+    {
+      "path": "history/tracers/red/source-before-plugin-installation.ts.txt",
+      "kind": "log",
+      "sha256": "49ca59ffdc5009ac47a6aac7cc95fcc8bc551bb2151bed35c27117d59ba24ad4"
+    },
+    {
+      "path": "history/tracers/red/stderr.log",
+      "kind": "log",
+      "sha256": "4b0616b4fd2badda6a4bd61c748b83ded47d3f66f888ddcafeaaf13fd87d3234"
+    },
+    {
+      "path": "history/tracers/red/stdout.log",
+      "kind": "log",
+      "sha256": "6043908c8d26d62698476b88f737f39d5d3e91008d4155a81730902f5a37479c"
+    },
+    {
+      "path": "history/tracers/red/worktree.binary.patch.txt",
+      "kind": "log",
+      "sha256": "025c802937574555416f159b2bb9add28bdab52082483fdbef2954a00ad23533"
+    },
+    {
+      "path": "history/tracers/no-sink-red/diagnostic-inspection.test.ts.txt",
+      "kind": "log",
+      "sha256": "f6bbe5795064c218041edfcb7c70a143a0e088604fa42924767ccc3645a9897e"
+    },
+    {
+      "path": "history/tracers/no-sink-red/host-diagnostics.ts.txt",
+      "kind": "log",
+      "sha256": "e45d116cb559e6198289fa6ed8c3d15be9bb698c91373a800053461cf6313281"
+    },
+    {
+      "path": "history/tracers/no-sink-red/plugin-installation.ts.txt",
+      "kind": "log",
+      "sha256": "0f8953bcf99a7c599d14dc6d213d4e68d77ab732ee5c75079034604a93cd03a5"
+    },
+    {
+      "path": "history/tracers/no-sink-red/receipt.json",
+      "kind": "report",
+      "sha256": "83507aeed53859b4120751705cae576c49059be71fc2b41cbf287d7fdb2dce84"
+    },
+    {
+      "path": "history/tracers/no-sink-red/stderr.log",
+      "kind": "log",
+      "sha256": "37df83dbbe3adb9f17ad695dab04ad748af3dd406612e53beee541502640b3de"
+    },
+    {
+      "path": "history/tracers/no-sink-red/stdout.log",
+      "kind": "log",
+      "sha256": "6043908c8d26d62698476b88f737f39d5d3e91008d4155a81730902f5a37479c"
+    },
+    {
+      "path": "history/tracers/no-sink-red/worktree.binary.patch.txt",
+      "kind": "log",
+      "sha256": "08d1c7f830eefb213c4285b501d52614be3fafd7507c5de70ee63a1a8f0a1c46"
+    },
+    {
+      "path": "history/fixture-type-attempts/ts2740/diagnostic-inspection.test.ts.txt",
+      "kind": "log",
+      "sha256": "ae49bcec9b7cd3bafea91b22116ad753c43cc3dd7d3cb40f03d5e3ea33fda953"
+    },
+    {
+      "path": "history/fixture-type-attempts/ts2740/expanded-explicit-rejections.stderr.log",
+      "kind": "log",
+      "sha256": "cc5685ac4956cc10e5c2108df7bbafc8ce1989078a910e8053284da9d1398ed8"
+    },
+    {
+      "path": "history/fixture-type-attempts/ts2740/runtime-typecheck-self.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "history/fixture-type-attempts/ts2740/runtime-typecheck-self.stdout.log",
+      "kind": "log",
+      "sha256": "d684fe6f6537ec9025bb6613ddc5d7d6761ffe0cb855ec3ad5612893050fa435"
+    },
+    {
+      "path": "history/public-red/compiled/runtime-disposal-error-inspection.js.txt",
+      "kind": "log",
+      "sha256": "ad4f954820b7a1205789c2cba77f0caf5ad9ba35909fe93f17372eb6473d2116"
+    },
+    {
+      "path": "history/public-red/compiled/runtime-disposal-error-inspection.js.map.json",
+      "kind": "report",
+      "sha256": "c58a6174db90ac16846a91f17114a53c1bcdb7b9ceb355f656fd78f5fa8dfae5"
+    },
+    {
+      "path": "history/public-red/run-probe.py.txt",
+      "kind": "log",
+      "sha256": "811087f60342545891dd1c8a1d5c6f19304e60c278b2dcd1e1f15d8f01c9f980"
+    },
+    {
+      "path": "history/prior-8aed-formal/verification.json",
+      "kind": "report",
+      "sha256": "acbd23439c40216f4892db0ec715f49ba5b994a0e22b948e16c26ba68536649c"
+    },
+    {
+      "path": "history/prior-8aed-formal/formal-verify-receipt.json",
+      "kind": "report",
+      "sha256": "981feda48be75d86001be8e805e9dc9d54214e2147e13070284b72afa0190daf"
+    },
+    {
+      "path": "history/prior-8aed-formal/formal-verify.stdout.log",
+      "kind": "log",
+      "sha256": "c7111372faeb8621646f4c82e38ce3b9698ceba58012a6f54fc8e6bdd4350dd5"
+    },
+    {
+      "path": "history/prior-8aed-formal/formal-verify.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "history/prior-8aed-formal/source-publication-main-before.json",
+      "kind": "report",
+      "sha256": "7d2a66593415c394a69a0825c03dd92ace59b15c310ecca28290ac1cf396276b"
+    },
+    {
+      "path": "history/prior-8aed-formal/original-full-check.log",
+      "kind": "log",
+      "sha256": "ed27e4550192069593d85911e3b02ced031108c216d8c760551e43734bc07a66"
+    },
+    {
+      "path": "notes/history-and-limits.md",
+      "kind": "report",
+      "sha256": "3a8296c277aa8e8949e50566ab2ad09f8f7664586959f24684d5e1175e6d9fa1"
+    },
+    {
+      "path": "support/affected-receipt.json",
+      "kind": "report",
+      "sha256": "cf2af4a35d6fa8c1728a926cf374828a00d84dd9a5442e5ebb1e6a7b503dd343"
+    },
+    {
+      "path": "support/formal-verify-receipt.json",
+      "kind": "report",
+      "sha256": "25355f72ee28be296eee25d796a0e29e52ac6142ecb97d8dc8f65a7c8481473f"
+    },
+    {
+      "path": "support/unchanged-baseline-root-cause.json",
+      "kind": "report",
+      "sha256": "d12b1f48581269592c79fd05a45e192452096d0dd30429343799b1b5743ba526"
+    },
+    {
+      "path": "support/public-controls/receipts.json",
+      "kind": "report",
+      "sha256": "d04cb9599782b1f7a47d3429830d815cffc58a0fdb4a79c3f4a3dbceff406c08"
+    },
+    {
+      "path": "support/public-controls/provenance.json",
+      "kind": "report",
+      "sha256": "316c1951168b42613d38ce4775b31ad64204b685617b85526c8d8d4520e99d33"
+    },
+    {
+      "path": "support/public-controls/observations.json",
+      "kind": "report",
+      "sha256": "6841ace1e16ed5629e7f34cc6d2b5f1981da5169ebeb1b7c7bdbb3bf13789fef"
+    },
+    {
+      "path": "support/public-controls/tsconfig.json",
+      "kind": "report",
+      "sha256": "237b3c080c8ce78454b5f9d831fcddd18128567af98bea0f9de20f96db70fa1b"
+    },
+    {
+      "path": "support/affected.stdout.log",
+      "kind": "log",
+      "sha256": "8a9e065afb7bfc4b7644a44df47addba036ea2a8b9a6448fded057a630cf8b8a"
+    },
+    {
+      "path": "support/affected.stderr.log",
+      "kind": "log",
+      "sha256": "a75e88c5b8b9f7127e06b3c73a5afc2436be60cb0653a68da18b204c75c7bb59"
+    },
+    {
+      "path": "support/public-controls/strict-typecheck-and-emit.stdout.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "support/public-controls/strict-typecheck-and-emit.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "support/public-controls/compiled.stdout.log",
+      "kind": "log",
+      "sha256": "9ebb712eca3c4a7d39de591fe832199a835b6aaf6cb9499e406713cebb5ef71d"
+    },
+    {
+      "path": "support/public-controls/compiled.stderr.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "review-evidence/standards.json",
+      "kind": "report",
+      "sha256": "e156e8c733eb1d1d5b5a66679ab473e1bf7c5bfc82b7d2f456ab621063ffd010"
+    },
+    {
+      "path": "review-evidence/standards-tests.log",
+      "kind": "log",
+      "sha256": "6b9bf9a4c6b112eecbd1b44970ef369f6127870e2eb0d1d5df0b66d9bd300ee9"
+    },
+    {
+      "path": "review-evidence/spec.json",
+      "kind": "report",
+      "sha256": "d9ed7086324496e0dab92850a200e136dbb62f721d069ca371799041c793c999"
+    },
+    {
+      "path": "review-evidence/spec-tests.log",
+      "kind": "log",
+      "sha256": "cb54e8cb89ada32f93cbf2f0ca3e2986d0d1c0e402e646cedd94db3b60c3e11c"
+    },
+    {
+      "path": "public-program/runtime-disposal-error-inspection.ts.txt",
+      "kind": "log",
+      "sha256": "a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b"
+    },
+    {
+      "path": "public-program/runtime-disposal-error-inspection.js.txt",
+      "kind": "log",
+      "sha256": "ad4f954820b7a1205789c2cba77f0caf5ad9ba35909fe93f17372eb6473d2116"
+    },
+    {
+      "path": "review-evidence/identity.json",
+      "kind": "report",
+      "sha256": "81e84ac5879635558e8ae2819e70157d7acaab09b382edfd8db102dddb96e2c9"
+    },
+    {
+      "path": "review-evidence/review.patch.txt",
+      "kind": "log",
+      "sha256": "3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b"
+    },
+    {
+      "path": "ci/source-ci-checks.log",
+      "kind": "log",
+      "sha256": "d8fda6ce6d2e80dcd2ff79dd8f6431077eb109d1e7a96f271323d40461f852c4"
+    },
+    {
+      "path": "ci/source-ci-preview.log",
+      "kind": "log",
+      "sha256": "07add40d21573cf93214cd03239073ef767ba49c0cd027073263bbbb22eed55f"
+    },
+    {
+      "path": "ci/trusted-publisher.log",
+      "kind": "log",
+      "sha256": "9d8ebad7005e34b92e288cfd6abc16409093a7a1e2f856c50753de61d29c52d8"
+    },
+    {
+      "path": "ci/provenance.json",
+      "kind": "report",
+      "sha256": "7f2802457a3daddb09aebdb56a3b53f2485b9d1d622839a079872697d8840ebb"
+    },
+    {
+      "path": "ci/provenance.md",
+      "kind": "report",
+      "sha256": "3d1613422fd171f095e8002ebb85845a515f87a98784297b17fcddb6dd0ba7b9"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "bun",
+    "test",
+    "packages/runtime-cordis/tests/diagnostic-inspection.test.ts"
+  ],
+  "exitCode": 1,
+  "head": "6fd2d016f6330cc422508b3e51229bea4be2cce0",
+  "sourceSHA256": "0b7c6592e951ff7c03d3122c3ecf8bc30b01587fd3a482ef44eb7cbaf2fbad5c",
+  "patchSHA256": "025c802937574555416f159b2bb9add28bdab52082483fdbef2954a00ad23533"
+}

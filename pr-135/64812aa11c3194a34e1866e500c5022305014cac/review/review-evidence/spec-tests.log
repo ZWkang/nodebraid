@@ -1,0 +1,1161 @@
+Independent third immutable comparison Issue134: basee282 -> head37d7131. Earlier packet historical bafb/8aed paragraph is superseded by FINAL CURRENT MAIN UPDATE and exact identity; no prior result/count reused. No GitHub calls.
+2026-10-28T04:13:36.314597+00:00
+
+$ ["git", "rev-parse", "HEAD"]
+37d7131df1b2ffff2c37fb83ac4bc3877795e377
+
+actualExit=0
+
+$ ["git", "rev-parse", "HEAD^{tree}"]
+4800054aa64c34564818f5a5533b4e6698a35e32
+
+actualExit=0
+
+$ ["git", "rev-parse", "HEAD^1"]
+e282d6291c98deac2fd65879c94b6bf2881ede6b
+
+actualExit=0
+
+$ ["git", "status", "--porcelain"]
+
+actualExit=0
+
+$ ["git", "log", "e282d6291c98deac2fd65879c94b6bf2881ede6b..37d7131df1b2ffff2c37fb83ac4bc3877795e377", "--oneline"]
+37d7131 fix: retain Runtime cleanup inspection failures
+
+actualExit=0
+
+$ ["git", "diff", "--binary", "e282d6291c98deac2fd65879c94b6bf2881ede6b...37d7131df1b2ffff2c37fb83ac4bc3877795e377"]
+diff --git a/packages/runtime-cordis/src/host-diagnostics.ts b/packages/runtime-cordis/src/host-diagnostics.ts
+index 590a8f0..0c02c69 100644
+--- a/packages/runtime-cordis/src/host-diagnostics.ts
++++ b/packages/runtime-cordis/src/host-diagnostics.ts
+@@ -65,7 +65,8 @@ export class HostDiagnostics {
+     });
+     return Object.freeze({
+       diagnostics: this.#createPluginDiagnostics(installationScope),
+-      findUndiagnosedError: (error: unknown) => this.#findUndiagnosedError(error, new Set()),
++      findUndiagnosedError: (error: unknown) =>
++        this.#sink ? this.#findUndiagnosedError(error, new Set()) : Object.freeze({ found: false }),
+       createActivation: () =>
+         this.#createPluginDiagnostics(
+           Object.freeze({
+diff --git a/packages/runtime-cordis/src/plugin-installation.ts b/packages/runtime-cordis/src/plugin-installation.ts
+index 73b0e23..0e7ff5b 100644
+--- a/packages/runtime-cordis/src/plugin-installation.ts
++++ b/packages/runtime-cordis/src/plugin-installation.ts
+@@ -1,6 +1,6 @@
+ import { collectCleanupError } from './cleanup-errors';
+ import { runtimeDiagnosticEvents } from './diagnostic-events';
+-import type { InstallationDiagnostics } from './host-diagnostics';
++import type { InstallationDiagnostics, UndiagnosedError } from './host-diagnostics';
+ import type {
+   ChildInstaller,
+   DependencyCleanupReporter,
+@@ -272,7 +272,14 @@ export class CordisPluginInstallation implements PluginInstallation {
+           (error: unknown) => {
+             this.onDisposed();
+             this.#setSnapshot(Object.freeze({ status: 'disposed' }));
+-            const diagnosticError = this.diagnostics.findUndiagnosedError(error);
++            let failure = error;
++            let diagnosticError: UndiagnosedError;
++            try {
++              diagnosticError = this.diagnostics.findUndiagnosedError(error);
++            } catch (inspectionFailure) {
++              failure = new AggregateError([error, inspectionFailure], 'Plugin cleanup diagnostics failed.');
++              diagnosticError = { found: true, error: failure };
++            }
+             if (diagnosticError.found) {
+               this.diagnostics.diagnostics.emit({
+                 name: runtimeDiagnosticEvents.installationDisposeFailed,
+@@ -281,7 +288,7 @@ export class CordisPluginInstallation implements PluginInstallation {
+                 error: diagnosticError.error,
+               });
+             }
+-            throw error;
++            throw failure;
+           },
+         )
+         .then(completeDisposal, failDisposal);
+diff --git a/packages/runtime-cordis/tests/diagnostic-inspection.test.ts b/packages/runtime-cordis/tests/diagnostic-inspection.test.ts
+new file mode 100644
+index 0000000..29b9d9e
+--- /dev/null
++++ b/packages/runtime-cordis/tests/diagnostic-inspection.test.ts
+@@ -0,0 +1,323 @@
++import { expect, test } from 'bun:test';
++import type { DiagnosticEvent } from '@nodebraid/diagnostics';
++
++import { createPluginHost, definePlugin, runtimeDiagnosticEvents } from '../src';
++
++test('terminal cleanup retains resource and diagnostic inspection failures together', async () => {
++  const original = new AggregateError([new Error('resource failed')], 'application cleanup');
++  const inspectionFailure = new Error('errors getter failed');
++  let reads = 0;
++  Object.defineProperty(original, 'errors', {
++    get() {
++      reads += 1;
++      throw inspectionFailure;
++    },
++  });
++  const events: DiagnosticEvent[] = [];
++  const cleanup: string[] = [];
++  const host = createPluginHost({
++    diagnostics: {
++      sink: (event) => {
++        events.push(event);
++      },
++    },
++  });
++  const installation = host.install(
++    definePlugin({
++      setup(context) {
++        context.own(() => {
++          cleanup.push('early');
++        });
++        context.own(() => {
++          cleanup.push('failing');
++          throw original;
++        });
++        context.own(() => {
++          cleanup.push('late');
++        });
++      },
++    }),
++  );
++  try {
++    await installation.whenActive();
++    const disposal = installation.dispose();
++    expect(installation.dispose()).toBe(disposal);
++    const failure = await rejectedDisposal(disposal);
++    expect(containsReference(failure, original)).toBe(true);
++    expect(containsReference(failure, inspectionFailure)).toBe(true);
++    expect(cleanup).toEqual(['late', 'failing', 'early']);
++    expect(installation.getSnapshot()).toEqual({ status: 'disposed' });
++    expect(reads).toBe(1);
++    const failures = events.filter((event) => event.name === runtimeDiagnosticEvents.installationDisposeFailed);
++    expect(failures).toHaveLength(1);
++    expect(failures[0]?.error).toBe(failure);
++  } finally {
++    await host.dispose();
++  }
++});
++
++test('disabled ordinary diagnostics does not inspect cleanup error members', async () => {
++  const original = new AggregateError([new Error('resource failed')], 'application cleanup');
++  const inspectionFailure = new Error('disabled diagnostic getter');
++  let reads = 0;
++  Object.defineProperty(original, 'errors', {
++    get() {
++      reads += 1;
++      throw inspectionFailure;
++    },
++  });
++  const host = createPluginHost();
++  const installation = host.install(
++    definePlugin({
++      setup(context) {
++        context.own(() => {
++          throw original;
++        });
++      },
++    }),
++  );
++  try {
++    await installation.whenActive();
++    const failure = await rejectedDisposal(installation.dispose());
++    expect(reads).toBe(0);
++    expect(containsReference(failure, original)).toBe(true);
++    expect(containsReference(failure, inspectionFailure)).toBe(false);
++  } finally {
++    await host.dispose();
++  }
++});
++
++type InspectionSite = 'errors' | 'length' | 'membership' | 'member' | 'message';
++const inspectionSites: readonly InspectionSite[] = ['errors', 'length', 'membership', 'member', 'message'];
++const inspectionFailures: readonly unknown[] = [
++  undefined,
++  null,
++  false,
++  0,
++  '',
++  Symbol('inspection'),
++  new Error('inspection'),
++];
++
++for (const route of ['installation', 'host'] as const) {
++  for (const withSink of [false, true]) {
++    for (const site of inspectionSites) {
++      for (const [failureIndex, inspectionFailure] of inspectionFailures.entries()) {
++        test(`retains ${site} read failure ${failureIndex} through ${route} disposal (Sink ${withSink})`, async () => {
++          const diagnosed = new Error('already diagnosed');
++          const leaf = new Error('new cleanup failure');
++          const original = new AggregateError(site === 'message' ? [diagnosed, leaf] : [leaf], 'application cleanup');
++          let reads = 0;
++          const fail = (): never => {
++            reads += 1;
++            throw inspectionFailure;
++          };
++          if (site === 'errors') Object.defineProperty(original, 'errors', { get: fail });
++          else if (site === 'message') Object.defineProperty(original, 'message', { get: fail });
++          else
++            original.errors = new Proxy([leaf], {
++              get(target, key, receiver) {
++                if ((site === 'length' && key === 'length') || (site === 'member' && key === '0')) fail();
++                return Reflect.get(target, key, receiver);
++              },
++              has(target, key) {
++                if (site === 'membership' && key === '0') fail();
++                return Reflect.has(target, key);
++              },
++            });
++          const events: DiagnosticEvent[] = [];
++          const cleanup: string[] = [];
++          const host = createPluginHost({
++            diagnostics: withSink
++              ? {
++                  sink: (event) => {
++                    events.push(event);
++                  },
++                }
++              : {},
++          });
++          const installation = host.install(
++            definePlugin({
++              setup(context) {
++                if (site === 'message')
++                  context.diagnostics.emit({ name: 'probe.already-diagnosed', level: 'error', error: diagnosed });
++                context.own(() => {
++                  cleanup.push('first');
++                });
++                context.own(() => {
++                  cleanup.push('failure');
++                  throw original;
++                });
++                context.own(() => {
++                  cleanup.push('last');
++                });
++              },
++            }),
++          );
++          let failure: unknown;
++          try {
++            await installation.whenActive();
++            const disposal = route === 'host' ? host.dispose() : installation.dispose();
++            expect(route === 'host' ? host.dispose() : installation.dispose()).toBe(disposal);
++            failure = await rejectedDisposal(disposal);
++            expect(containsReference(failure, original)).toBe(true);
++            expect(cleanup).toEqual(['last', 'failure', 'first']);
++            expect(installation.getSnapshot()).toEqual({ status: 'disposed' });
++            expect(reads).toBe(withSink ? 1 : 0);
++            if (withSink) {
++              const reported = events.filter(
++                (event) => event.name === runtimeDiagnosticEvents.installationDisposeFailed,
++              );
++              expect(reported).toHaveLength(1);
++              const combined = reported[0]?.error;
++              expect(combined instanceof AggregateError).toBe(true);
++              const members: unknown[] = (combined as AggregateError).errors;
++              expect(members).toHaveLength(2);
++              expect(containsReference(members[0], original)).toBe(true);
++              expect(Object.is(members[1], inspectionFailure)).toBe(true);
++              expect(containsReference(failure, combined)).toBe(true);
++            } else expect(events).toEqual([]);
++            const repeated = await rejectedDisposal(route === 'host' ? host.dispose() : installation.dispose());
++            expect(repeated).toBe(failure);
++          } finally {
++            if (route === 'host')
++              await host.dispose().catch((error) => {
++                expect(Object.is(error, failure)).toBe(true);
++              });
++            else await host.dispose();
++          }
++        });
++      }
++    }
++  }
++}
++
++test.each([false, true])(
++  'malformed members retain cleanup and explicit validation failures (Sink %p)',
++  async (withSink) => {
++    const original = new AggregateError([], 'application cleanup');
++    Object.defineProperty(original, 'errors', { value: {} });
++    const events: DiagnosticEvent[] = [];
++    const host = createPluginHost({
++      diagnostics: withSink
++        ? {
++            sink: (event) => {
++              events.push(event);
++            },
++          }
++        : {},
++    });
++    const installation = host.install(
++      definePlugin({
++        setup(context) {
++          context.own(() => {
++            throw original;
++          });
++        },
++      }),
++    );
++    try {
++      await installation.whenActive();
++      const failure = await rejectedDisposal(installation.dispose());
++      expect(containsReference(failure, original)).toBe(true);
++      if (withSink) {
++        const reported = events.find(
++          (event) => event.name === runtimeDiagnosticEvents.installationDisposeFailed,
++        )?.error;
++        expect(reported instanceof AggregateError).toBe(true);
++        const members: unknown[] = (reported as AggregateError).errors;
++        expect(members).toHaveLength(2);
++        expect(members[1] instanceof TypeError).toBe(true);
++        expect(containsReference(failure, reported)).toBe(true);
++      } else expect(events).toEqual([]);
++    } finally {
++      await host.dispose();
++    }
++  },
++);
++
++test('parent cleanup does not reinspect an already diagnosed child inspection failure', async () => {
++  const original = new AggregateError([new Error('child resource')], 'child cleanup');
++  const inspectionFailure = new Error('child errors getter');
++  const parentFailure = new Error('parent resource');
++  let reads = 0;
++  Object.defineProperty(original, 'errors', {
++    get() {
++      reads += 1;
++      throw inspectionFailure;
++    },
++  });
++  const events: DiagnosticEvent[] = [];
++  const cleanup: string[] = [];
++  const host = createPluginHost({
++    diagnostics: {
++      sink: (event) => {
++        events.push(event);
++      },
++    },
++  });
++  const child = definePlugin({
++    name: 'inspection-child',
++    setup(context) {
++      context.own(() => {
++        cleanup.push('child');
++        throw original;
++      });
++    },
++  });
++  const parent = host.install(
++    definePlugin({
++      name: 'inspection-parent',
++      async setup(context) {
++        const installation = context.install(child);
++        context.own(() => {
++          cleanup.push('parent');
++          throw parentFailure;
++        });
++        await installation.whenActive();
++      },
++    }),
++  );
++  try {
++    await parent.whenActive();
++    const failure = await rejectedDisposal(parent.dispose());
++    expect(containsReference(failure, original)).toBe(true);
++    expect(containsReference(failure, inspectionFailure)).toBe(true);
++    expect(containsReference(failure, parentFailure)).toBe(true);
++    expect(cleanup).toEqual(['parent', 'child']);
++    expect(reads).toBe(1);
++    const failures = events.filter((event) => event.name === runtimeDiagnosticEvents.installationDisposeFailed);
++    expect(failures).toHaveLength(2);
++    const childEvent = failures.find((event) => event.scope.pluginName === 'inspection-child');
++    const parentEvent = failures.find((event) => event.scope.pluginName === 'inspection-parent');
++    expect(containsReference(childEvent?.error, original)).toBe(true);
++    expect(containsReference(childEvent?.error, inspectionFailure)).toBe(true);
++    expect(containsReference(parentEvent?.error, parentFailure)).toBe(true);
++    expect(containsReference(parentEvent?.error, original)).toBe(false);
++    expect(containsReference(parentEvent?.error, inspectionFailure)).toBe(false);
++  } finally {
++    await host.dispose();
++  }
++});
++
++async function rejectedDisposal(disposal: Promise<void>): Promise<unknown> {
++  let rejected = false;
++  let failure: unknown;
++  try {
++    await disposal;
++  } catch (error) {
++    rejected = true;
++    failure = error;
++  }
++  expect(rejected).toBe(true);
++  return failure;
++}
++
++function containsReference(error: unknown, expected: unknown, seen = new Set<unknown>()): boolean {
++  if (Object.is(error, expected)) return true;
++  if (typeof error !== 'object' || error === null || seen.has(error)) return false;
++  seen.add(error);
++  const members = Object.getOwnPropertyDescriptor(error, 'errors');
++  if (!members || !('value' in members) || !Array.isArray(members.value)) return false;
++  return members.value.some((member: unknown) => containsReference(member, expected, seen));
++}
+
+actualExit=0
+Current new-base artifact runtime-cordis/dist/plugin-installation.js SHA256=08cf4bfff4e317a6a828fedee0760c1cb3e02474d11b5518c58afcaa120fd71c
+Current new-base artifact preset-basic/dist/preset-basic-plugin.js SHA256=e7896d52ee91904227c316a565386f03d4c8bf4ebdd97ce41a687f7a258ef5a5
+
+$ ["git", "diff", "--check", "e282d6291c98deac2fd65879c94b6bf2881ede6b...37d7131df1b2ffff2c37fb83ac4bc3877795e377"]
+
+actualExit=0
+
+$ ["bun", "test", "packages/runtime-cordis/tests", "packages/diagnostics/tests", "packages/preset-basic/tests", "packages/plugin-command/tests", "packages/plugin-kernel/tests", "packages/plugin-renderer/tests", "packages/plugin-interaction/tests/lifecycle.test.ts", "packages/core/tests"]
+bun test v1.4.2 (744846f84)
+
+packages/core/tests/index.test.ts:
+(pass) @nodebraid/core > publishes Port values and Runtime contribution seams [1.21ms]
+(pass) @nodebraid/core > publishes Canvas Fragment and Clipboard through the public facade [0.01ms]
+(pass) @nodebraid/core > publishes Duplicate Selection through the public facade
+(pass) @nodebraid/core > publishes the shared Diagnostics seam [4.75ms]
+(pass) @nodebraid/core > publishes the typed Plugin Host seam [15.64ms]
+(pass) @nodebraid/core > publishes the reversible Kernel seam [2.14ms]
+(pass) @nodebraid/core > publishes the Kernel Runtime Plugin seam [2.52ms]
+(pass) @nodebraid/core > publishes the Session Runtime Plugin seam [1.21ms]
+(pass) @nodebraid/core > publishes the backend-neutral Renderer and Runtime integration seams [0.04ms]
+(pass) @nodebraid/core > publishes backend-neutral Interaction values and Runtime behavior [0.01ms]
+(pass) @nodebraid/core > composes asynchronous Command preparation with a synchronous Kernel Transaction [1.56ms]
+(pass) @nodebraid/core > publishes the History Runtime Plugin seam [0.01ms]
+
+packages/core/tests/preset-basic.test.ts:
+(pass) Core facade exports Basic Canvas Composition without a concrete Renderer [0.01ms]
+
+packages/core/tests/layout.test.ts:
+(pass) the Core facade exports generic Layout seams without concrete Providers [0.01ms]
+
+packages/core/tests/document-roundtrip.test.ts:
+(pass) the public facade restores a file and records only subsequent editing [4.02ms]
+
+packages/preset-basic/tests/index.test.ts:
+(pass) Composition readiness publishes every base Service through static bindings [2.65ms]
+
+packages/preset-basic/tests/types.test.ts:
+(pass) Basic Canvas Composition preserves required Renderer config and provides no Service [2.27ms]
+
+packages/preset-basic/tests/numeric-policy.test.ts:
+(pass) Composition preserves invalid dragThreshold from enumerable policy fields [1.92ms]
+(pass) Composition preserves invalid dragThreshold from inherited policy fields [1.16ms]
+(pass) Composition preserves invalid dragThreshold from non-enumerable policy fields [6.52ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from enumerable policy fields [1.17ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from inherited policy fields [0.90ms]
+(pass) Composition preserves invalid wheelZoomSensitivity from non-enumerable policy fields [0.82ms]
+(pass) Composition preserves invalid minZoom from enumerable policy fields [0.87ms]
+(pass) Composition preserves invalid minZoom from inherited policy fields [0.86ms]
+(pass) Composition preserves invalid minZoom from non-enumerable policy fields [1.00ms]
+(pass) Composition preserves invalid maxZoom from enumerable policy fields [0.93ms]
+(pass) Composition preserves invalid maxZoom from inherited policy fields [0.84ms]
+(pass) Composition preserves invalid maxZoom from non-enumerable policy fields [0.76ms]
+(pass) Composition retains valid enumerable policies across mutation and fresh Hosts [4.20ms]
+(pass) Composition retains valid inherited policies across mutation and fresh Hosts [1.69ms]
+(pass) Composition retains valid non-enumerable policies across mutation and fresh Hosts [1.52ms]
+(pass) Composition preserves the original enumerable dragThreshold getter failure [0.10ms]
+(pass) Composition preserves the original inherited dragThreshold getter failure
+(pass) Composition preserves the original non-enumerable dragThreshold getter failure
+(pass) Composition preserves the original enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original inherited wheelZoomSensitivity getter failure
+(pass) Composition preserves the original non-enumerable wheelZoomSensitivity getter failure
+(pass) Composition preserves the original enumerable minZoom getter failure
+(pass) Composition preserves the original inherited minZoom getter failure
+(pass) Composition preserves the original non-enumerable minZoom getter failure
+(pass) Composition preserves the original enumerable maxZoom getter failure
+(pass) Composition preserves the original inherited maxZoom getter failure
+(pass) Composition preserves the original non-enumerable maxZoom getter failure
+
+packages/preset-basic/tests/readiness.test.ts:
+(pass) invalid Interaction options fail the Composition with the original Interaction error [0.94ms]
+(pass) Composition snapshots Interaction options when the Plugin is created [0.73ms]
+(pass) Composition snapshots nested Connection options when the Plugin is created [0.71ms]
+(pass) Composition keeps the Connection value captured before a caller getter changes [0.73ms]
+(pass) Composition owns inherited Connection options across fresh Host installations [2.48ms]
+(pass) Composition owns non-enumerable Connection options across fresh Host installations [1.41ms]
+(pass) Composition preserves the original Connection getter failure at creation [0.07ms]
+(pass) Composition leaves malformed Connection validation with Interaction [0.88ms]
+(pass) Composition creation rejects malformed or unknown top-level options [1.06ms]
+(pass) Composition waits for an asynchronous Renderer before becoming active [0.92ms]
+(pass) Renderer Factory failure keeps its identity and releases the Child tree for reinstall [1.41ms]
+
+packages/preset-basic/tests/connection-values.test.ts:
+(pass) Composition retains a declared Connection materializer inherited from its prototype [0.99ms]
+(pass) Composition retains the inherited materializer across mutation and fresh Hosts [8.33ms]
+(pass) Composition retains the non-enumerable materializer across mutation and fresh Hosts [5.27ms]
+(pass) Composition retains the enumerable materializer across mutation and fresh Hosts [4.40ms]
+(pass) Composition preserves the first inherited materializer read failure 0 [0.14ms]
+(pass) Composition preserves the first inherited materializer read failure 1 [0.01ms]
+(pass) Composition preserves the first inherited materializer read failure 2
+(pass) Composition preserves the first inherited materializer read failure 3
+(pass) Composition preserves the first inherited materializer read failure 4
+(pass) Composition preserves the first inherited materializer read failure 5
+(pass) Composition preserves the first non-enumerable materializer read failure 0
+(pass) Composition preserves the first non-enumerable materializer read failure 1
+(pass) Composition preserves the first non-enumerable materializer read failure 2
+(pass) Composition preserves the first non-enumerable materializer read failure 3
+(pass) Composition preserves the first non-enumerable materializer read failure 4
+(pass) Composition preserves the first non-enumerable materializer read failure 5
+(pass) Composition preserves the first enumerable materializer read failure 0
+(pass) Composition preserves the first enumerable materializer read failure 1
+(pass) Composition preserves the first enumerable materializer read failure 2
+(pass) Composition preserves the first enumerable materializer read failure 3
+(pass) Composition preserves the first enumerable materializer read failure 4
+(pass) Composition preserves the first enumerable materializer read failure 5
+(pass) Composition retains an invalid first inherited callback for existing validation 0 [0.94ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 1 [0.72ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 2 [0.63ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 3 [0.62ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 4 [0.61ms]
+(pass) Composition retains an invalid first inherited callback for existing validation 5 [0.62ms]
+(pass) Composition preserves original own-key reflection failure before reading an inherited callback [0.08ms]
+(pass) Composition preserves unknown own Connection fields for Interaction validation [0.77ms]
+
+packages/preset-basic/tests/lifecycle.test.ts:
+(pass) existing standard Provider makes Basic Canvas Composition fail explicitly [1.38ms]
+(pass) second Basic Canvas Composition conflicts without disturbing the active one [0.94ms]
+(pass) a later Renderer Provider conflict rolls back earlier Child reservations [1.47ms]
+(pass) Composition disposes consumers before Renderer and awaits asynchronous Renderer cleanup [1.21ms]
+(pass) Composition cleanup attempts every Renderer resource and preserves all failures [0.99ms]
+(pass) Composition diagnostics expose the complete reverse Child cleanup order [0.89ms]
+
+packages/preset-basic/tests/package-import.test.ts:
+(pass) package-name import exposes the Basic Canvas Composition factory [0.31ms]
+
+packages/plugin-command/tests/index.test.ts:
+(pass) @nodebraid/plugin-command > rejects an empty Command ID with a stable structural error [0.08ms]
+(pass) @nodebraid/plugin-command > classifies a non-string JavaScript Command ID without copying it [1.48ms]
+(pass) @nodebraid/plugin-command > registers and executes one typed Command in an Activation [0.47ms]
+(pass) @nodebraid/plugin-command > preserves asynchronous Command results and handler errors [0.49ms]
+(pass) @nodebraid/plugin-command > enforces Command token identity and diagnostic ID uniqueness [0.29ms]
+(pass) @nodebraid/plugin-command > unregisters, aborts, and awaits in-flight Command executions [0.33ms]
+(pass) @nodebraid/plugin-command > keeps Registration disposal idempotent when abort handling reenters dispose [0.23ms]
+(pass) @nodebraid/plugin-command > closes residual registrations before disposing the Command Service Activation [1.35ms]
+(pass) @nodebraid/plugin-command > isolates caller cancellation to one Command execution [0.25ms]
+(pass) @nodebraid/plugin-command > preserves the original caller signal after execution options are reused [0.24ms]
+(pass) @nodebraid/plugin-command > detaches the original caller signal after reused-options execution settles [0.24ms]
+(pass) @nodebraid/plugin-command > does not start a Command when execution options dispose its Registration [0.25ms]
+(pass) @nodebraid/plugin-command > keeps existing executions owned while options dispose their Registration [0.32ms]
+(pass) @nodebraid/plugin-command > preserves structural errors before reading execution options [0.23ms]
+(pass) @nodebraid/plugin-command > preserves option failures and permits unrelated Registration disposal [0.23ms]
+(pass) @nodebraid/plugin-command > reinstalls an empty Command Service after Provider disposal [0.33ms]
+
+packages/plugin-command/tests/types.test.ts:
+(pass) keeps Command input and output types invariant
+
+packages/plugin-interaction/tests/lifecycle.test.ts:
+(pass) Shortcut Binding preserves the Command accepted from a caller getter [2.56ms]
+(pass) captured modifier values retain distinct Shortcut matching and reservations [0.90ms]
+(pass) Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh [1.41ms]
+(pass) Delete Selection registration follows dependency reactivation and disposal lifecycle [1.46ms]
+(pass) Connection materializer failure keeps identity and reports exactly once after terminal cleanup [2.23ms]
+(pass) Connection dependency recovery creates a fresh idle Activation [1.33ms]
+(pass) Connection final Hit Test failure still clears Preview and releases Capture [0.84ms]
+(pass) Connection Escape attempts every terminal cleanup and never materializes after cleanup failure [0.70ms]
+(pass) Box Selection disposal continues after every public Renderer cleanup failure [0.79ms]
+(pass) Box Selection escape exposes every terminal cleanup failure [0.61ms]
+(pass) Box Selection pointer-cancel exposes every terminal cleanup failure [0.53ms]
+(pass) Interaction dependency recovery creates a fresh idle Activation [2.63ms]
+(pass) an input-driven Command rejection is reported exactly once while Interaction is active [2.20ms]
+(pass) a late Command rejection cannot report through an ended Interaction Activation [1.98ms]
+(pass) a recovered Renderer reset receives the still-compatible Active Gesture again [2.13ms]
+
+packages/plugin-renderer/tests/index.test.ts:
+(pass) @nodebraid/plugin-renderer > publishes the stable Renderer diagnostic event catalog
+(pass) @nodebraid/plugin-renderer > creates one Renderer and publishes only the narrow Runtime Service [0.88ms]
+(pass) @nodebraid/plugin-renderer > keeps every delivered Session resolvable while Document entities are removed [0.66ms]
+(pass) @nodebraid/plugin-renderer > waits for reentrant Session reconciliation before delivering a deleting Commit [0.65ms]
+(pass) @nodebraid/plugin-renderer > delegates input, hit testing, capture and focus without exposing update methods [0.65ms]
+(pass) @nodebraid/plugin-renderer > binds one exclusive Interaction Projection writer for the Renderer Activation [0.50ms]
+(pass) @nodebraid/plugin-renderer > isolates Input listener faults through Host diagnostics [0.75ms]
+(pass) @nodebraid/plugin-renderer > reports an out-of-sync Renderer and re-establishes its current baseline [0.53ms]
+(pass) @nodebraid/plugin-renderer > attempts one full recovery after an arbitrary internal synchronization fault [0.47ms]
+(pass) @nodebraid/plugin-renderer > enters terminal Sync Failure when the single full recovery also fails [0.56ms]
+(pass) @nodebraid/plugin-renderer > does not report queued Commits already subsumed by an out-of-sync reset [0.64ms]
+
+packages/plugin-renderer/tests/types.test.ts:
+(pass) binds Provider config without exposing CanvasRenderer update authority
+
+packages/plugin-kernel/tests/index.test.ts:
+(pass) @nodebraid/plugin-kernel > publishes the stable Kernel Plugin diagnostic event catalog [0.01ms]
+(pass) @nodebraid/plugin-kernel > provides one revision-zero Kernel Service for an Activation [0.62ms]
+(pass) @nodebraid/plugin-kernel > synchronously observes only successful net-changing Transactions [0.47ms]
+(pass) @nodebraid/plugin-kernel > reports Observer errors without rolling back or blocking later Observers [1.62ms]
+(pass) @nodebraid/plugin-kernel > schedules an explicit Observer error when platform reporting is unavailable [4.35ms]
+(pass) @nodebraid/plugin-kernel > queues reentrant Commits until every Observer sees the current revision [0.44ms]
+(pass) @nodebraid/plugin-kernel > stops Consumers before closing the Service and reinstalls a fresh Kernel [0.67ms]
+
+packages/plugin-kernel/tests/types.test.ts:
+(pass) keeps the public Kernel Service contract type-safe
+
+packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:
+(pass) terminal cleanup diagnostics do not invoke a supplied map hook [1.14ms]
+(pass) terminal cleanup diagnostics do not invoke a supplied forEach hook [0.28ms]
+(pass) terminal cleanup diagnostics do not invoke a supplied constructor hook [0.17ms]
+(pass) terminal cleanup diagnostics do not invoke a supplied %s hook [0.13ms]
+(pass) cleanup diagnostics preserve sparse inherited members, native Proxy length and the raw failure [0.30ms]
+(pass) terminal cleanup preserves a circular AggregateError without passing it through Cordis traversal [0.23ms]
+(pass) terminal cleanup preserves failures when aborted setup will resolve [0.28ms]
+(pass) terminal cleanup preserves failures when aborted setup will reject [0.15ms]
+
+packages/runtime-cordis/tests/index.test.ts:
+(pass) @nodebraid/runtime-cordis > keeps Service Token identity separate from its diagnostic name [0.02ms]
+(pass) @nodebraid/runtime-cordis > keeps Plugin Service Bindings fixed after definition [0.07ms]
+(pass) @nodebraid/runtime-cordis > keeps a Consumer pending until every Required Service is active [0.32ms]
+(pass) @nodebraid/runtime-cordis > activates a Consumer-first installation with its declared Service Binding [0.45ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that omits a declared Service without publishing partial results [0.44ms]
+(pass) @nodebraid/runtime-cordis > publishes every Provided Service together after setup completes [0.38ms]
+(pass) @nodebraid/runtime-cordis > publishes every Provided Service before any one Service can activate a Consumer [0.66ms]
+(pass) @nodebraid/runtime-cordis > materializes each Provided Service getter exactly once before publication [0.29ms]
+(pass) @nodebraid/runtime-cordis > preserves a Provided Service getter error as the Activation failure [0.23ms]
+(pass) @nodebraid/runtime-cordis > rejects non-record Provided Service results with a stable contract error [0.51ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that returns an undeclared Service Binding [0.16ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that returns null for a Provided Service [0.15ms]
+(pass) @nodebraid/runtime-cordis > fails a Provider that returns undefined for a Provided Service [0.11ms]
+(pass) @nodebraid/runtime-cordis > fails duplicate bindings after "primary" before publishing a Service [0.24ms]
+(pass) @nodebraid/runtime-cordis > fails duplicate bindings after "" before publishing a Service [0.17ms]
+(pass) @nodebraid/runtime-cordis > allows an empty Binding when its Provided Service Token is unique [0.27ms]
+(pass) @nodebraid/runtime-cordis > reserves a Provided Service Token from installation until disposal [0.37ms]
+(pass) @nodebraid/runtime-cordis > retains a failed Provider reservation until disposal [0.30ms]
+(pass) @nodebraid/runtime-cordis > does not retain any reservation from a rejected multi-Service Provider [0.28ms]
+(pass) @nodebraid/runtime-cordis > activates a Provider-first Consumer with no missing Service Tokens [0.26ms]
+(pass) @nodebraid/runtime-cordis > deactivates a Consumer before cleaning up a disappearing Provider [0.28ms]
+(pass) @nodebraid/runtime-cordis > reports a dependency-driven Consumer as pending while its cleanup is still running [0.35ms]
+(pass) @nodebraid/runtime-cordis > deactivates indirect Consumers in reverse dependency order [0.38ms]
+(pass) @nodebraid/runtime-cordis > awaits Provided Service withdrawal sequentially in reverse registration order [0.57ms]
+(pass) @nodebraid/runtime-cordis > reactivates a pending Consumer with fresh Activation state and fixed configuration [2.08ms]
+(pass) @nodebraid/runtime-cordis > cancels only one pending whenActive waiter [0.38ms]
+(pass) @nodebraid/runtime-cordis > settles whenActive immediately for active and rejects it for disposed [0.17ms]
+(pass) @nodebraid/runtime-cordis > aborts an in-progress Consumer setup and waits for it when its Required Service disappears [0.34ms]
+(pass) @nodebraid/runtime-cordis > keeps a business setup error terminal when dependency cancellation races with it [0.53ms]
+(pass) @nodebraid/runtime-cordis > fails an aborting Consumer when dependency cleanup fails without duplicating the error [0.37ms]
+(pass) @nodebraid/runtime-cordis > propagates an active Consumer cleanup failure to its disappearing Provider once [0.34ms]
+(pass) @nodebraid/runtime-cordis > keeps a failed Consumer terminal across unrelated Service availability changes [0.38ms]
+(pass) @nodebraid/runtime-cordis > allows independent Plugin Installations to activate concurrently [0.23ms]
+(pass) @nodebraid/runtime-cordis > serializes setup and cleanup within one Plugin Installation [0.19ms]
+(pass) @nodebraid/runtime-cordis > rejects a dependency cycle with the complete Plugin and Service path [0.42ms]
+(pass) @nodebraid/runtime-cordis > rejects a Plugin definition that requires and provides the same Service Token [0.06ms]
+(pass) @nodebraid/runtime-cordis > rejects forged Plugin and Service Token values as invalid definitions [0.12ms]
+(pass) @nodebraid/runtime-cordis > rejects malformed Plugin definitions before creating Plugin metadata [0.04ms]
+(pass) @nodebraid/runtime-cordis > accepts only plain enumerable string-key Service Binding records [0.07ms]
+(pass) @nodebraid/runtime-cordis > captures every Plugin definition field exactly once before validation [0.32ms]
+(pass) @nodebraid/runtime-cordis > infers configuration, Service Bindings, and Provided Service results [0.02ms]
+(pass) @nodebraid/runtime-cordis > keeps Service Token values and Plugin configurations invariant [0.02ms]
+(pass) @nodebraid/runtime-cordis > returns a pending installation before activating a plugin [0.11ms]
+(pass) @nodebraid/runtime-cordis > preserves one setup failure without affecting another installation [0.18ms]
+(pass) @nodebraid/runtime-cordis > publishes each snapshot change to removable subscribers [0.14ms]
+(pass) @nodebraid/runtime-cordis > reports subscriber errors without interrupting lifecycle observers [0.32ms]
+(pass) @nodebraid/runtime-cordis > schedules subscriber errors when platform reportError is unavailable [0.30ms]
+(pass) @nodebraid/runtime-cordis > keeps subscriber reporting failures outside the Plugin lifecycle [0.41ms]
+(pass) @nodebraid/runtime-cordis > disposes owned resources in reverse registration order [0.15ms]
+(pass) @nodebraid/runtime-cordis > owns a typed Child Installation at its resource registration position [0.24ms]
+(pass) @nodebraid/runtime-cordis > rejects a detached Child installation through an ended parent Activation [0.15ms]
+(pass) @nodebraid/runtime-cordis > keeps an unawaited Child failure isolated from its parent Activation [0.23ms]
+(pass) @nodebraid/runtime-cordis > rolls back a Composition tree when an awaited Child fails [0.30ms]
+(pass) @nodebraid/runtime-cordis > validates Child Installations in the same Service reservation graph [0.37ms]
+(pass) @nodebraid/runtime-cordis > releases and recreates a Canvas-shaped Child tree with dependency-safe LIFO cleanup [0.90ms]
+(pass) @nodebraid/runtime-cordis > returns one idempotent installation disposal promise [0.15ms]
+(pass) @nodebraid/runtime-cordis > keeps installation disposal idempotent during abort reentry with successful cleanup [0.25ms]
+(pass) @nodebraid/runtime-cordis > keeps installation disposal idempotent during abort reentry with failed cleanup [0.17ms]
+(pass) @nodebraid/runtime-cordis > keeps host disposal idempotent during abort reentry with successful cleanup [0.12ms]
+(pass) @nodebraid/runtime-cordis > keeps host disposal idempotent during abort reentry with failed cleanup [0.13ms]
+(pass) @nodebraid/runtime-cordis > keeps Host disposal idempotent during Diagnostic Sink reentry [0.11ms]
+(pass) @nodebraid/runtime-cordis > aborts pending setup and waits for it before becoming disposed [0.19ms]
+(pass) @nodebraid/runtime-cordis > disposes every independent installation and closes the host [0.21ms]
+(pass) @nodebraid/runtime-cordis > rolls back owned resources when setup fails [0.15ms]
+(pass) @nodebraid/runtime-cordis > rolls back Owned Resources and Children on Provided Service missing binding [0.48ms]
+(pass) @nodebraid/runtime-cordis > rolls back Owned Resources and Children on Provided Service getter error [0.29ms]
+(pass) @nodebraid/runtime-cordis > preserves a Provided getter error without inspecting its name after rollback [1.24ms]
+(pass) @nodebraid/runtime-cordis > continues cleanup and reports every disposer failure [0.32ms]
+(pass) @nodebraid/runtime-cordis > reports cleanup failures from every host installation together [0.24ms]
+(pass) @nodebraid/runtime-cordis > preserves cleanup aggregation stages through Host disposal [0.16ms]
+(pass) @nodebraid/runtime-cordis > reports an owned Child cleanup failure once during terminal Host disposal [0.23ms]
+
+packages/runtime-cordis/tests/diagnostic-input-values.test.ts:
+(pass) Host diagnostics retains the Host ID accepted during validation [0.16ms]
+(pass) a Diagnostic Event retains the name accepted during validation [0.20ms]
+(pass) a Diagnostic Event retains the level accepted during validation [0.14ms]
+(pass) Host diagnostics rejects the first invalid Host ID: "" [0.11ms]
+(pass) Host diagnostics rejects the first invalid Host ID: null [0.05ms]
+(pass) Host diagnostics rejects the first invalid Host ID: 42 [0.05ms]
+(pass) Host diagnostics rejects the first invalid Host ID: {} [0.04ms]
+(pass) an omitted captured Host ID still creates a stable default Host scope [0.60ms]
+(pass) Host diagnostics preserves the original Host ID read failure [0.06ms]
+(pass) a Diagnostic Event rejects its first invalid name: "" [0.15ms]
+(pass) a Diagnostic Event rejects its first invalid name: null [0.12ms]
+(pass) a Diagnostic Event rejects its first invalid name: {} [0.11ms]
+(pass) a Diagnostic Event rejects its first invalid level: "fatal" [0.13ms]
+(pass) a Diagnostic Event rejects its first invalid level: null [0.10ms]
+(pass) a Diagnostic Event rejects its first invalid level: 42 [0.10ms]
+(pass) a Diagnostic Event retains its normalized attributes and original error [0.17ms]
+(pass) a Diagnostic Event preserves the original name read failure [0.20ms]
+(pass) a Diagnostic Event preserves the original level read failure [0.10ms]
+(pass) a Diagnostic Event preserves the original attributes read failure [0.13ms]
+(pass) a Diagnostic Event preserves the original error read failure [0.09ms]
+(pass) Sink failure context retains the accepted Event name after the callback changes the input [0.18ms]
+(pass) an asynchronous Sink retains the accepted name for both explicit failures [0.23ms]
+(pass) disabled ordinary diagnostics validates inputs without consuming the optional error [0.15ms]
+(pass) invalid Fault attributes retain the accepted name and original Fault at the Reporter [0.29ms]
+(pass) invalid Fault names retain their first captured value in failure diagnostics [0.18ms]
+(pass) a Fault name read failure reaches the Reporter alongside the original Fault [0.20ms]
+(pass) a Fault attributes read failure reaches the Reporter alongside the original Fault [0.12ms]
+
+packages/runtime-cordis/tests/binding-records.test.ts:
+(pass) rejects a listed requires Binding without an own descriptor [0.06ms]
+(pass) rejects a requires Binding removed by an earlier Binding getter [0.03ms]
+(pass) preserves the original requires Binding getPrototypeOf failure [0.03ms]
+(pass) preserves the original requires Binding ownKeys failure
+(pass) preserves the original requires Binding getOwnPropertyDescriptor failure
+(pass) preserves the original requires Binding get failure
+(pass) rejects a listed provides Binding without an own descriptor
+(pass) rejects a provides Binding removed by an earlier Binding getter
+(pass) preserves the original provides Binding getPrototypeOf failure
+(pass) preserves the original provides Binding ownKeys failure
+(pass) preserves the original provides Binding getOwnPropertyDescriptor failure
+(pass) preserves the original provides Binding get failure
+(pass) retains valid null-prototype accessor Bindings through the public Plugin definition [0.03ms]
+
+packages/runtime-cordis/tests/diagnostic-inspection.test.ts:
+(pass) terminal cleanup retains resource and diagnostic inspection failures together [0.41ms]
+(pass) disabled ordinary diagnostics does not inspect cleanup error members [0.18ms]
+(pass) retains errors read failure 0 through installation disposal (Sink false) [0.29ms]
+(pass) retains errors read failure 1 through installation disposal (Sink false) [0.12ms]
+(pass) retains errors read failure 2 through installation disposal (Sink false) [0.11ms]
+(pass) retains errors read failure 3 through installation disposal (Sink false) [0.09ms]
+(pass) retains errors read failure 4 through installation disposal (Sink false) [0.11ms]
+(pass) retains errors read failure 5 through installation disposal (Sink false) [0.10ms]
+(pass) retains errors read failure 6 through installation disposal (Sink false) [0.10ms]
+(pass) retains length read failure 0 through installation disposal (Sink false) [0.11ms]
+(pass) retains length read failure 1 through installation disposal (Sink false) [0.11ms]
+(pass) retains length read failure 2 through installation disposal (Sink false) [0.11ms]
+(pass) retains length read failure 3 through installation disposal (Sink false) [0.11ms]
+(pass) retains length read failure 4 through installation disposal (Sink false) [0.11ms]
+(pass) retains length read failure 5 through installation disposal (Sink false) [0.09ms]
+(pass) retains length read failure 6 through installation disposal (Sink false) [0.10ms]
+(pass) retains membership read failure 0 through installation disposal (Sink false) [0.10ms]
+(pass) retains membership read failure 1 through installation disposal (Sink false) [0.10ms]
+(pass) retains membership read failure 2 through installation disposal (Sink false) [0.11ms]
+(pass) retains membership read failure 3 through installation disposal (Sink false) [0.19ms]
+(pass) retains membership read failure 4 through installation disposal (Sink false) [0.16ms]
+(pass) retains membership read failure 5 through installation disposal (Sink false) [0.12ms]
+(pass) retains membership read failure 6 through installation disposal (Sink false) [0.15ms]
+(pass) retains member read failure 0 through installation disposal (Sink false) [0.11ms]
+(pass) retains member read failure 1 through installation disposal (Sink false) [0.11ms]
+(pass) retains member read failure 2 through installation disposal (Sink false) [1.50ms]
+(pass) retains member read failure 3 through installation disposal (Sink false) [0.16ms]
+(pass) retains member read failure 4 through installation disposal (Sink false) [0.12ms]
+(pass) retains member read failure 5 through installation disposal (Sink false) [0.10ms]
+(pass) retains member read failure 6 through installation disposal (Sink false) [0.11ms]
+(pass) retains message read failure 0 through installation disposal (Sink false) [0.10ms]
+(pass) retains message read failure 1 through installation disposal (Sink false) [0.09ms]
+(pass) retains message read failure 2 through installation disposal (Sink false) [0.10ms]
+(pass) retains message read failure 3 through installation disposal (Sink false) [0.09ms]
+(pass) retains message read failure 4 through installation disposal (Sink false) [0.09ms]
+(pass) retains message read failure 5 through installation disposal (Sink false) [0.10ms]
+(pass) retains message read failure 6 through installation disposal (Sink false) [0.09ms]
+(pass) retains errors read failure 0 through installation disposal (Sink true) [0.19ms]
+(pass) retains errors read failure 1 through installation disposal (Sink true) [0.12ms]
+(pass) retains errors read failure 2 through installation disposal (Sink true) [0.12ms]
+(pass) retains errors read failure 3 through installation disposal (Sink true) [0.14ms]
+(pass) retains errors read failure 4 through installation disposal (Sink true) [0.10ms]
+(pass) retains errors read failure 5 through installation disposal (Sink true) [0.11ms]
+(pass) retains errors read failure 6 through installation disposal (Sink true) [0.11ms]
+(pass) retains length read failure 0 through installation disposal (Sink true) [0.12ms]
+(pass) retains length read failure 1 through installation disposal (Sink true) [0.12ms]
+(pass) retains length read failure 2 through installation disposal (Sink true) [0.10ms]
+(pass) retains length read failure 3 through installation disposal (Sink true) [0.12ms]
+(pass) retains length read failure 4 through installation disposal (Sink true) [0.24ms]
+(pass) retains length read failure 5 through installation disposal (Sink true) [0.14ms]
+(pass) retains length read failure 6 through installation disposal (Sink true) [0.14ms]
+(pass) retains membership read failure 0 through installation disposal (Sink true) [0.16ms]
+(pass) retains membership read failure 1 through installation disposal (Sink true) [0.16ms]
+(pass) retains membership read failure 2 through installation disposal (Sink true) [0.12ms]
+(pass) retains membership read failure 3 through installation disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 4 through installation disposal (Sink true) [0.12ms]
+(pass) retains membership read failure 5 through installation disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 6 through installation disposal (Sink true) [0.10ms]
+(pass) retains member read failure 0 through installation disposal (Sink true) [0.11ms]
+(pass) retains member read failure 1 through installation disposal (Sink true) [0.12ms]
+(pass) retains member read failure 2 through installation disposal (Sink true) [0.10ms]
+(pass) retains member read failure 3 through installation disposal (Sink true) [0.10ms]
+(pass) retains member read failure 4 through installation disposal (Sink true) [0.10ms]
+(pass) retains member read failure 5 through installation disposal (Sink true) [0.10ms]
+(pass) retains member read failure 6 through installation disposal (Sink true) [0.09ms]
+(pass) retains message read failure 0 through installation disposal (Sink true) [0.11ms]
+(pass) retains message read failure 1 through installation disposal (Sink true) [0.16ms]
+(pass) retains message read failure 2 through installation disposal (Sink true) [0.11ms]
+(pass) retains message read failure 3 through installation disposal (Sink true) [0.11ms]
+(pass) retains message read failure 4 through installation disposal (Sink true) [0.10ms]
+(pass) retains message read failure 5 through installation disposal (Sink true) [0.12ms]
+(pass) retains message read failure 6 through installation disposal (Sink true) [0.12ms]
+(pass) retains errors read failure 0 through host disposal (Sink false) [0.13ms]
+(pass) retains errors read failure 1 through host disposal (Sink false) [0.10ms]
+(pass) retains errors read failure 2 through host disposal (Sink false) [0.10ms]
+(pass) retains errors read failure 3 through host disposal (Sink false) [0.09ms]
+(pass) retains errors read failure 4 through host disposal (Sink false) [0.10ms]
+(pass) retains errors read failure 5 through host disposal (Sink false) [0.11ms]
+(pass) retains errors read failure 6 through host disposal (Sink false) [0.09ms]
+(pass) retains length read failure 0 through host disposal (Sink false) [0.77ms]
+(pass) retains length read failure 1 through host disposal (Sink false) [0.18ms]
+(pass) retains length read failure 2 through host disposal (Sink false) [0.11ms]
+(pass) retains length read failure 3 through host disposal (Sink false) [0.09ms]
+(pass) retains length read failure 4 through host disposal (Sink false) [0.08ms]
+(pass) retains length read failure 5 through host disposal (Sink false) [0.09ms]
+(pass) retains length read failure 6 through host disposal (Sink false) [0.08ms]
+(pass) retains membership read failure 0 through host disposal (Sink false) [0.08ms]
+(pass) retains membership read failure 1 through host disposal (Sink false) [0.10ms]
+(pass) retains membership read failure 2 through host disposal (Sink false) [0.08ms]
+(pass) retains membership read failure 3 through host disposal (Sink false) [0.09ms]
+(pass) retains membership read failure 4 through host disposal (Sink false) [0.08ms]
+(pass) retains membership read failure 5 through host disposal (Sink false) [0.08ms]
+(pass) retains membership read failure 6 through host disposal (Sink false) [0.09ms]
+(pass) retains member read failure 0 through host disposal (Sink false) [0.08ms]
+(pass) retains member read failure 1 through host disposal (Sink false) [0.10ms]
+(pass) retains member read failure 2 through host disposal (Sink false) [0.09ms]
+(pass) retains member read failure 3 through host disposal (Sink false) [0.08ms]
+(pass) retains member read failure 4 through host disposal (Sink false) [0.09ms]
+(pass) retains member read failure 5 through host disposal (Sink false) [0.11ms]
+(pass) retains member read failure 6 through host disposal (Sink false) [0.08ms]
+(pass) retains message read failure 0 through host disposal (Sink false) [0.09ms]
+(pass) retains message read failure 1 through host disposal (Sink false) [0.09ms]
+(pass) retains message read failure 2 through host disposal (Sink false) [0.10ms]
+(pass) retains message read failure 3 through host disposal (Sink false) [0.09ms]
+(pass) retains message read failure 4 through host disposal (Sink false) [0.10ms]
+(pass) retains message read failure 5 through host disposal (Sink false) [0.09ms]
+(pass) retains message read failure 6 through host disposal (Sink false) [0.09ms]
+(pass) retains errors read failure 0 through host disposal (Sink true) [0.12ms]
+(pass) retains errors read failure 1 through host disposal (Sink true) [0.11ms]
+(pass) retains errors read failure 2 through host disposal (Sink true) [0.11ms]
+(pass) retains errors read failure 3 through host disposal (Sink true) [0.10ms]
+(pass) retains errors read failure 4 through host disposal (Sink true) [0.10ms]
+(pass) retains errors read failure 5 through host disposal (Sink true) [0.10ms]
+(pass) retains errors read failure 6 through host disposal (Sink true) [0.09ms]
+(pass) retains length read failure 0 through host disposal (Sink true) [0.09ms]
+(pass) retains length read failure 1 through host disposal (Sink true) [0.09ms]
+(pass) retains length read failure 2 through host disposal (Sink true) [0.10ms]
+(pass) retains length read failure 3 through host disposal (Sink true) [0.10ms]
+(pass) retains length read failure 4 through host disposal (Sink true) [0.10ms]
+(pass) retains length read failure 5 through host disposal (Sink true) [0.10ms]
+(pass) retains length read failure 6 through host disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 0 through host disposal (Sink true) [0.09ms]
+(pass) retains membership read failure 1 through host disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 2 through host disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 3 through host disposal (Sink true) [0.09ms]
+(pass) retains membership read failure 4 through host disposal (Sink true) [0.10ms]
+(pass) retains membership read failure 5 through host disposal (Sink true) [0.09ms]
+(pass) retains membership read failure 6 through host disposal (Sink true) [0.10ms]
+(pass) retains member read failure 0 through host disposal (Sink true) [0.10ms]
+(pass) retains member read failure 1 through host disposal (Sink true) [0.12ms]
+(pass) retains member read failure 2 through host disposal (Sink true) [0.11ms]
+(pass) retains member read failure 3 through host disposal (Sink true) [0.09ms]
+(pass) retains member read failure 4 through host disposal (Sink true) [0.11ms]
+(pass) retains member read failure 5 through host disposal (Sink true) [0.09ms]
+(pass) retains member read failure 6 through host disposal (Sink true) [0.10ms]
+(pass) retains message read failure 0 through host disposal (Sink true) [0.52ms]
+(pass) retains message read failure 1 through host disposal (Sink true) [1.03ms]
+(pass) retains message read failure 2 through host disposal (Sink true) [0.13ms]
+(pass) retains message read failure 3 through host disposal (Sink true) [0.12ms]
+(pass) retains message read failure 4 through host disposal (Sink true) [0.09ms]
+(pass) retains message read failure 5 through host disposal (Sink true) [0.12ms]
+(pass) retains message read failure 6 through host disposal (Sink true) [0.10ms]
+(pass) malformed members retain cleanup and explicit validation failures (Sink false) [0.30ms]
+(pass) malformed members retain cleanup and explicit validation failures (Sink true) [0.17ms]
+(pass) parent cleanup does not reinspect an already diagnosed child inspection failure [0.38ms]
+
+packages/runtime-cordis/tests/error-contract.test.ts:
+(pass) Plugin Host structural failures expose the shared NodeBraid error identity [0.13ms]
+
+packages/runtime-cordis/tests/diagnostics.test.ts:
+(pass) the Runtime diagnostic event catalog has stable searchable names [0.02ms]
+(pass) a Plugin emits an immutable Diagnostic Event scoped to its Host Activation [0.52ms]
+(pass) a Fault Reporter failure stays outside the Plugin lifecycle and preserves both errors [0.28ms]
+(pass) a Diagnostic Sink failure becomes a non-recursive Fault without failing Plugin setup [0.20ms]
+(pass) an asynchronous Diagnostic Sink is reported as an explicit contract failure [0.15ms]
+(pass) an asynchronous Fault Reporter is exposed without changing Plugin state [0.22ms]
+(pass) an invalid Diagnostic Event fails explicitly even when no Sink is configured [0.21ms]
+(pass) an invalid reportFault input preserves the original Fault through the final Reporter [0.16ms]
+(pass) an unsafe Diagnostic attribute fails with a structured path and original cause [0.19ms]
+(pass) an array Diagnostic accessor fails without executing it during Plugin setup [0.18ms]
+(pass) an unknown Diagnostic level fails as an invalid event contract [0.14ms]
+(pass) Plugin Host rejects an empty diagnostic host ID [0.06ms]
+(pass) Installation subscriber Faults use the Host-scoped diagnostics path [0.23ms]
+(pass) an empty Plugin Host emits an ordered lifecycle [0.08ms]
+(pass) Installation status events follow Snapshot replacement and precede subscribers [0.17ms]
+(pass) a Plugin Setup failure emits one error status while preserving its identity [0.18ms]
+(pass) Activation events surround Plugin setup and completed cleanup [0.16ms]
+(pass) a terminal Installation cleanup failure emits one error event and still disposes [0.18ms]
+(pass) dependency cleanup records one Error-level Event across Consumer and Provider disposal [0.35ms]
+
+packages/runtime-cordis/tests/diagnostic-description.test.ts:
+(pass) a real Host Sink describes AggregateError members while preserving the original event error [0.39ms]
+
+packages/diagnostics/tests/index.test.ts:
+(pass) the Diagnostics event catalog has stable searchable names [0.01ms]
+(pass) Diagnostic normalization rejects an accessor without invoking it [0.24ms]
+(pass) Diagnostic normalization rejects a Symbol key instead of dropping it [0.27ms]
+(pass) Diagnostic arrays are normalized without executing an input map method [0.05ms]
+(pass) Diagnostic normalization rejects own array index accessors without invoking them [0.03ms]
+(pass) Diagnostic normalization rejects inherited array index accessors without invoking them
+(pass) Diagnostic arrays reject Symbol keys instead of dropping them [0.02ms]
+(pass) Diagnostic arrays validate inherited elements instead of replacing them with holes [0.04ms]
+(pass) Diagnostic arrays copy inherited data while preserving genuine holes [0.03ms]
+(pass) Diagnostic arrays are copied without reading a constructor hook [0.01ms]
+(pass) structural error details reject an unsafe nested array element at its exact path [0.03ms]
+(pass) describeNonFiniteNumber provides the canonical diagnostic representation [0.02ms]
+(pass) a NodeBraid structural error exposes stable identity, cause, and immutable details [0.05ms]
+(pass) a NodeBraid structural error rejects an unsafe detail at its exact path [0.03ms]
+(pass) a NodeBraid structural error rejects a non-finite numeric detail [0.02ms]
+(pass) a NodeBraid structural error rejects class instances instead of traversing them [0.03ms]
+(pass) a NodeBraid structural error rejects a circular detail at the first back-reference [0.03ms]
+(pass) describeError returns a JSON-ready NodeBraid error with its original cause [0.07ms]
+(pass) describeError preserves nested AggregateError stages [0.04ms]
+(pass) describeError represents a circular cause as an explicit reference [0.02ms]
+(pass) describeError preserves a safe primitive thrown value
+(pass) describeDiagnosticEvent replaces the raw error with its JSON-ready description [0.05ms]
+
+packages/diagnostics/tests/types.test.ts:
+(pass) keeps the public Diagnostics seam narrow and immutable
+
+packages/diagnostics/tests/error-description.test.ts:
+(pass) AggregateError member map cannot replace descriptions with raw Errors [0.06ms]
+(pass) AggregateError metadata failures precede indexed member reads [0.06ms]
+(pass) AggregateError descriptions ignore collection method, iterator and constructor hooks [0.04ms]
+(pass) AggregateError descriptions preserve holes, inherited members and circular paths [0.05ms]
+(pass) AggregateError traversal uses native integer length semantics for Proxy arrays [0.05ms]
+(pass) AggregateError indexed read failures retain their original identity [0.02ms]
+(pass) malformed AggregateError collections fail instead of becoming an empty description [0.03ms]
+
+packages/diagnostics/tests/package-import.test.ts:
+(pass) @nodebraid/diagnostics exposes the NodeBraidError seam by package name [0.03ms]
+
+ 460 pass
+ 0 fail
+ 3024 expect() calls
+Ran 460 tests across 30 files. [311.00ms]
+
+actualExit=0
+Prior6 SOURCE copied byte-identically SHA256=7a7709b4074b5725a5feba4500011ae9320470862927ee396390836429411acc, now new execution on current37 public artifacts:
+
+$ ["bun", "--eval", "import assert from 'node:assert/strict';\nimport {createPluginHost,definePlugin,runtimeDiagnosticEvents} from '@nodebraid/runtime-cordis';\nconst observations=[];\nfor(const route of ['installation','host']) for(const mode of ['second-native-read','no-sink-required-fault','sink-fault']) {\n const leaf=new Error('resource leaf'),original=new AggregateError([leaf],'application cleanup'),inspection=new Error('second indexed read'),sinkFailure=new Error('sink failure'),required=new Error('required fault');\n let memberReads=0;const members=new Proxy([leaf],{get(target,key,receiver){if(key==='0'&&++memberReads===2)throw inspection;return Reflect.get(target,key,receiver);}});original.errors=members;\n const events=[],faults=[],cleanup=[];\n const diagnostics={faultReporter:f=>faults.push(f),...(mode==='no-sink-required-fault'?{}:{sink:event=>{events.push(event);if(mode==='sink-fault'&&event.name===runtimeDiagnosticEvents.installationDisposeFailed)throw sinkFailure;}})};\n const host=createPluginHost({diagnostics});\n const installation=host.install(definePlugin({setup(context){\n  if(mode==='no-sink-required-fault')context.diagnostics.reportFault(required,{name:'probe.required-fault'});\n  context.own(()=>{cleanup.push('early');});context.own(()=>{cleanup.push('failure');throw original;});context.own(()=>{cleanup.push('late');});\n }}));\n await installation.whenActive();\n const promise=route==='host'?host.dispose():installation.dispose();assert.equal(route==='host'?host.dispose():installation.dispose(),promise);\n const outcome=await promise.then(()=>({ok:true}),error=>({ok:false,error}));assert.equal(outcome.ok,false);\n function contains(root,expected,seen=new Set()) {\n  if(Object.is(root,expected))return true;\n  if(root===original||root===null||typeof root!=='object'||seen.has(root))return false;\n  seen.add(root);const descriptor=Object.getOwnPropertyDescriptor(root,'errors');\n  if(!descriptor||!('value'in descriptor)||!Array.isArray(descriptor.value)||descriptor.value===members)return false;\n  for(let index=0;index<descriptor.value.length;index++){const child=Object.getOwnPropertyDescriptor(descriptor.value,String(index));if(child&&'value'in child&&contains(child.value,expected,seen))return true;}\n  return false;\n }\n assert.equal(contains(outcome.error,original),true);assert.deepEqual(cleanup,['late','failure','early']);assert.equal(installation.getSnapshot().status,'disposed');\n const repeated=await (route==='host'?host.dispose():installation.dispose()).then(()=>undefined,error=>error);assert.equal(repeated,outcome.error);\n if(mode==='no-sink-required-fault'){assert.equal(memberReads,0);assert.equal(contains(outcome.error,inspection),false);assert.equal(events.length,0);assert.equal(faults.length,1);assert.equal(faults[0].error,required);}\n else {assert.equal(memberReads,2);assert.equal(contains(outcome.error,inspection),true);const failures=events.filter(e=>e.name===runtimeDiagnosticEvents.installationDisposeFailed);assert.equal(failures.length,1);assert.equal(contains(outcome.error,failures[0].error),true);if(route==='installation')assert.equal(outcome.error,failures[0].error);if(mode==='sink-fault'){assert.equal(faults.length,1);assert.equal(faults[0].error,sinkFailure);assert.equal(contains(outcome.error,sinkFailure),false);}else assert.equal(faults.length,0);}\n if(route==='installation')await host.dispose();else await host.dispose().catch(error=>assert.equal(error,outcome.error));\n assert.equal(Object.isFrozen(members),false);\n observations.push({route,mode,memberReads,requiredFaults:faults.length,originalRetained:true,inspectionRetained:mode!=='no-sink-required-fault',cachedOutcome:true,passed:true});\n}\nconsole.log(JSON.stringify({checks:observations.length,passed:observations.length,scope:'fresh public package-name Host/own/dispose controls; no fake Runtime, no original probe rerun',observations}));"]
+{"checks":6,"passed":6,"scope":"fresh public package-name Host/own/dispose controls; no fake Runtime, no original probe rerun","observations":[{"route":"installation","mode":"second-native-read","memberReads":2,"requiredFaults":0,"originalRetained":true,"inspectionRetained":true,"cachedOutcome":true,"passed":true},{"route":"installation","mode":"no-sink-required-fault","memberReads":0,"requiredFaults":1,"originalRetained":true,"inspectionRetained":false,"cachedOutcome":true,"passed":true},{"route":"installation","mode":"sink-fault","memberReads":2,"requiredFaults":1,"originalRetained":true,"inspectionRetained":true,"cachedOutcome":true,"passed":true},{"route":"host","mode":"second-native-read","memberReads":2,"requiredFaults":0,"originalRetained":true,"inspectionRetained":true,"cachedOutcome":true,"passed":true},{"route":"host","mode":"no-sink-required-fault","memberReads":0,"requiredFaults":1,"originalRetained":true,"inspectionRetained":false,"cachedOutcome":true,"passed":true},{"route":"host","mode":"sink-fault","memberReads":2,"requiredFaults":1,"originalRetained":true,"inspectionRetained":true,"cachedOutcome":true,"passed":true}]}
+
+actualExit=0
+
+$ ["bun", "--eval", "import assert from 'node:assert/strict';\nimport {createPluginHost} from '@nodebraid/runtime-cordis';\nimport {createBasicCanvasPlugin} from '@nodebraid/preset-basic';\nimport {edgeId} from '@nodebraid/kernel';\nconst observations=[];\nfor(const withSink of [false,true]) {\n const original=new AggregateError([new Error('Renderer cleanup resource')],'owned Renderer failure'),inspection=new Error('Renderer errors read');let reads=0,disposeCalls=0,materializeCalls=0;\n Object.defineProperty(original,'errors',{get(){reads++;throw inspection;}});\n const events=[],faults=[];\n const renderer={updateDocument(){},updateSession(){},updateInteraction(){},subscribeInput(){return ()=>{};},hitTest(){return null;},capturePointer(){},releasePointer(){},focus(){},async dispose(){disposeCalls++;throw original;}};\n class Connection {materializeEdge(input){materializeCalls++;return{id:edgeId('unused'),type:'link',source:input.source,target:input.target,data:null};}}\n const host=createPluginHost({diagnostics:{faultReporter:f=>faults.push(f),...(withSink?{sink:e=>events.push(e)}:{})}});\n const composition=host.install(createBasicCanvasPlugin(()=>renderer,{interaction:{connection:new Connection()}}));\n await composition.whenActive();assert.equal(composition.getSnapshot().status,'active');assert.equal(materializeCalls,0);\n const promise=host.dispose();assert.equal(host.dispose(),promise);const outcome=await promise.then(()=>({ok:true}),error=>({ok:false,error}));assert.equal(outcome.ok,false);\n function contains(root,expected,seen=new Set()) {if(Object.is(root,expected))return true;if(root===original||root===null||typeof root!=='object'||seen.has(root))return false;seen.add(root);const d=Object.getOwnPropertyDescriptor(root,'errors');if(!d||!('value'in d)||!Array.isArray(d.value))return false;for(let i=0;i<d.value.length;i++){const c=Object.getOwnPropertyDescriptor(d.value,String(i));if(c&&'value'in c&&contains(c.value,expected,seen))return true;}return false;}\n assert.equal(contains(outcome.error,original),true);assert.equal(disposeCalls,1);assert.equal(materializeCalls,0);assert.equal(composition.getSnapshot().status,'disposed');assert.equal(faults.length,0);\n if(withSink){assert.ok(events.some(e=>e.level==='error'&&contains(e.error,original)));if(reads>0)assert.equal(contains(outcome.error,inspection),true);}\n else {assert.equal(reads,0);assert.equal(events.length,0);assert.equal(contains(outcome.error,inspection),false);}\n const repeated=await host.dispose().then(()=>undefined,error=>error);assert.equal(repeated,outcome.error);assert.equal(disposeCalls,1);\n observations.push({withSink,activeInheritedConnection:true,materializeCalls,disposeCalls,inspectionReads:reads,originalRetained:true,inspectionRetainedIfRead:reads===0||contains(outcome.error,inspection),cachedOutcome:true,passed:true,scope:'actual Basic+seven public Plugin children with explicit public Renderer provider; no native/browser claim'});\n}\nconsole.log(JSON.stringify({checks:observations.length,passed:observations.length,observations}));"]
+{"checks":2,"passed":2,"observations":[{"withSink":false,"activeInheritedConnection":true,"materializeCalls":0,"disposeCalls":1,"inspectionReads":0,"originalRetained":true,"inspectionRetainedIfRead":true,"cachedOutcome":true,"passed":true,"scope":"actual Basic+seven public Plugin children with explicit public Renderer provider; no native/browser claim"},{"withSink":true,"activeInheritedConnection":true,"materializeCalls":0,"disposeCalls":1,"inspectionReads":1,"originalRetained":true,"inspectionRetainedIfRead":true,"cachedOutcome":true,"passed":true,"scope":"actual Basic+seven public Plugin children with explicit public Renderer provider; no native/browser claim"}]}
+
+actualExit=0
+
+$ ["git", "rev-parse", "HEAD"]
+37d7131df1b2ffff2c37fb83ac4bc3877795e377
+
+actualExit=0
+
+$ ["git", "rev-parse", "HEAD^{tree}"]
+4800054aa64c34564818f5a5533b4e6698a35e32
+
+actualExit=0
+
+$ ["git", "status", "--porcelain"]
+
+actualExit=0
+
+FINAL WORKTREE READ STOP 2026-10-28T04:13:36.929099+00:00; new e282/head37 identity and clean tree verified. No further worktree reads after this command; remaining report writes external run only. No build/full/browser/GitHub operations by reviewer.
+
+Read-only coordinator new public4 provenance.json, not reviewer execution:
+{
+  "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+  "base": "e282d6291c98deac2fd65879c94b6bf2881ede6b",
+  "originalSourceSHA256": "a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b",
+  "originalSourceBytesUnchanged": true,
+  "nodeModules": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/node_modules",
+  "artifacts": {
+    "packages/runtime-cordis/dist/index.js": {
+      "sha256": "c51e03769fd58eee903f81f5556ad3ac653917eab47c6dd6226d5e8c1972d5f4",
+      "bytes": 311
+    },
+    "packages/runtime-cordis/dist/index.d.ts": {
+      "sha256": "bb03507a5cd3adb2258a6c732463666937be6a3e7484404ab3d412b29ba37cb2",
+      "bytes": 890
+    }
+  },
+  "limits": "Actual new TS compiler/native Bun execution on37d7131. Original6fd red,8baf/8aed results retained at their identities. Not remote execution or formal full."
+}
+
+Read-only coordinator new public4 receipts.json, not reviewer execution:
+[
+  {
+    "label": "strict-typecheck-and-emit",
+    "argv": [
+      "bun",
+      "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/node_modules/typescript/bin/tsc",
+      "-p",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/5297ba1b-e4d6-414f-9a95-d7cb19392296/public-controls/tsconfig.json"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+    "exitCode": 0,
+    "startedAt": "2026-10-28T04:08:59.662699+00:00",
+    "endedAt": "2026-10-28T04:08:59.995234+00:00",
+    "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+    "sourceSHA256": "a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b"
+  },
+  {
+    "label": "compiled",
+    "argv": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/5297ba1b-e4d6-414f-9a95-d7cb19392296/public-controls/compiled/runtime-disposal-error-inspection.js"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+    "exitCode": 0,
+    "startedAt": "2026-10-28T04:09:00.019401+00:00",
+    "endedAt": "2026-10-28T04:09:00.054511+00:00",
+    "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+    "sourceSHA256": "a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b"
+  }
+]
+
+Read-only coordinator new public4 observations.json, not reviewer execution:
+[
+  {
+    "route": "installation",
+    "kind": "ordinary-aggregate",
+    "passed": true,
+    "originalAggregateIdentityPreserved": true,
+    "secondaryInspectionFailureInReturnedTree": false,
+    "rootIsSecondaryFailure": false,
+    "rootName": "AggregateError",
+    "rootMessage": "Plugin resource cleanup failed.",
+    "getterReads": 0,
+    "receiverCorrect": true,
+    "cleanupOrder": [
+      "late",
+      "failing",
+      "early"
+    ],
+    "installationState": "disposed",
+    "eventNames": [
+      "nodebraid.runtime.host.created",
+      "nodebraid.runtime.installation.status.changed",
+      "nodebraid.runtime.activation.started",
+      "nodebraid.runtime.installation.status.changed",
+      "nodebraid.runtime.activation.ended",
+      "nodebraid.runtime.installation.status.changed",
+      "nodebraid.runtime.installation.dispose.failed",
+      "nodebraid.runtime.host.disposing",
+      "nodebraid.runtime.host.disposed"
+    ]
+  },
+  {
+    "route": "installation",
+    "kind": "throwing-errors-getter",
+    "passed": true,
+    "originalAggregateIdentityPreserved": true,
+    "secondaryInspectionFailureInReturnedTree": true,
+    "rootIsSecondaryFailure": false,
+    "rootName": "AggregateError",
+    "rootMessage": "Plugin cleanup diagnostics failed.",
+    "getterReads": 1,
+    "receiverCorrect": true,
+    "cleanupOrder": [
+      "late",
+      "failing",
+      "early"
+    ],
+    "installationState": "disposed",
+    "eventNames": [
+      "nodebraid.runtime.host.created",
+      "nodebraid.runtime.installation.status.changed",
+      "nodebraid.runtime.activation.started",
+      "nodebraid.runtime.installation.status.changed",
+      "nodebraid.runtime.activation.ended",
+      "nodebraid.runtime.installation.status.changed",
+      "nodebraid.runtime.installation.dispose.failed",
+      "nodebraid.runtime.host.disposing",
+      "nodebraid.runtime.host.disposed"
+    ]
+  },
+  {
+    "route": "host",
+    "kind": "ordinary-aggregate",
+    "passed": true,
+    "originalAggregateIdentityPreserved": true,
+    "secondaryInspectionFailureInReturnedTree": false,
+    "rootIsSecondaryFailure": false,
+    "rootName": "AggregateError",
+    "rootMessage": "Plugin Host cleanup failed.",
+    "getterReads": 0,
+    "receiverCorrect": true,
+    "cleanupOrder": [
+      "late",
+      "failing",
+      "early"
+    ],
+    "installationState": "disposed",
+    "eventNames": [
+      "nodebraid.runtime.host.created",
+      "nodebraid.runtime.installation.status.changed",
+      "nodebraid.runtime.activation.started",
+      "nodebraid.runtime.installation.status.changed",
+      "nodebraid.runtime.host.disposing",
+      "nodebraid.runtime.activation.ended",
+      "nodebraid.runtime.installation.status.changed",
+      "nodebraid.runtime.installation.dispose.failed"
+    ]
+  },
+  {
+    "route": "host",
+    "kind": "throwing-errors-getter",
+    "passed": true,
+    "originalAggregateIdentityPreserved": true,
+    "secondaryInspectionFailureInReturnedTree": true,
+    "rootIsSecondaryFailure": false,
+    "rootName": "AggregateError",
+    "rootMessage": "Plugin Host cleanup failed.",
+    "getterReads": 1,
+    "receiverCorrect": true,
+    "cleanupOrder": [
+      "late",
+      "failing",
+      "early"
+    ],
+    "installationState": "disposed",
+    "eventNames": [
+      "nodebraid.runtime.host.created",
+      "nodebraid.runtime.installation.status.changed",
+      "nodebraid.runtime.activation.started",
+      "nodebraid.runtime.installation.status.changed",
+      "nodebraid.runtime.host.disposing",
+      "nodebraid.runtime.activation.ended",
+      "nodebraid.runtime.installation.status.changed",
+      "nodebraid.runtime.installation.dispose.failed"
+    ]
+  }
+]
+
+Read-only affected receipt, not reviewer execution:
+{
+  "command": [
+    "bun",
+    "run",
+    "check:affected",
+    "--base",
+    "e282d6291c98deac2fd65879c94b6bf2881ede6b"
+  ],
+  "exitCode": 0,
+  "startedAt": "2026-10-28T04:07:32.914443+00:00",
+  "endedAt": "2026-10-28T04:11:55.555456+00:00",
+  "durationSeconds": 262.6412331659958,
+  "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+  "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+  "tree": "4800054aa64c34564818f5a5533b4e6698a35e32"
+}

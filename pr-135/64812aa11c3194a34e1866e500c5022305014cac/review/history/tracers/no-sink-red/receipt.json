@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "bun",
+    "test",
+    "packages/runtime-cordis/tests/diagnostic-inspection.test.ts",
+    "--test-name-pattern",
+    "disabled ordinary diagnostics"
+  ],
+  "exitCode": 1,
+  "testSHA256": "f6bbe5795064c218041edfcb7c70a143a0e088604fa42924767ccc3645a9897e",
+  "head": "6fd2d016f6330cc422508b3e51229bea4be2cce0"
+}

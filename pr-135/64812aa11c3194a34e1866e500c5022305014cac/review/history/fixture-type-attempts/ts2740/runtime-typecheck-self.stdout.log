@@ -1,0 +1,2 @@
+@nodebraid/runtime-cordis typecheck:self: tests/diagnostic-inspection.test.ts(199,5): error TS2740: Type '{}' is missing the following properties from type 'any[]': length, pop, push, concat, and 35 more.
+@nodebraid/runtime-cordis typecheck:self: Exited with code 1

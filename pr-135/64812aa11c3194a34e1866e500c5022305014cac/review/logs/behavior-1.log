@@ -1,0 +1,21 @@
+47 |         }
+48 |         else
+49 |             assert.equal(hostAfter.ok, true);
+50 |     }
+51 | assert.equal(rows.length, 4);
+52 | assert.equal(rows.filter(x => x.passed).length, 4, 'Diagnostic inspection must not replace the original resource failure');
+            ^
+AssertionError: Diagnostic inspection must not replace the original resource failure
+
+2 !== 4
+
+ generatedMessage: false,
+     actual: 2,
+   expected: 4,
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/zhou/.codex/local-workflows/nodebraid/runs/20261028T025848-runtime-boundaries/compiled/runtime-disposal-error-inspection.js:52:8
+
+Bun v1.4.2 (macOS arm64)

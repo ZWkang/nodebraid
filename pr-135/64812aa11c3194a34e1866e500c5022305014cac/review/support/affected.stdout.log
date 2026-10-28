@@ -1,0 +1,187 @@
+{
+  "mode": "affected",
+  "files": [
+    "packages/runtime-cordis/src/host-diagnostics.ts",
+    "packages/runtime-cordis/src/plugin-installation.ts",
+    "packages/runtime-cordis/tests/diagnostic-inspection.test.ts"
+  ],
+  "packages": [
+    "@nodebraid/adapter-react",
+    "@nodebraid/core",
+    "@nodebraid/examples",
+    "@nodebraid/plugin-clipboard",
+    "@nodebraid/plugin-command",
+    "@nodebraid/plugin-duplicate-selection",
+    "@nodebraid/plugin-history",
+    "@nodebraid/plugin-interaction",
+    "@nodebraid/plugin-kernel",
+    "@nodebraid/plugin-layout",
+    "@nodebraid/plugin-port",
+    "@nodebraid/plugin-renderer",
+    "@nodebraid/plugin-session",
+    "@nodebraid/preset-basic",
+    "@nodebraid/renderer-svg",
+    "@nodebraid/runtime-cordis"
+  ],
+  "tests": [
+    "tests/kernel-commit-preparation.test.ts",
+    "tests/layout-providers.test.ts"
+  ],
+  "browser": [
+    "@nodebraid/adapter-react",
+    "@nodebraid/examples",
+    "@nodebraid/renderer-svg"
+  ],
+  "docs": true,
+  "shared": []
+}
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install prettier --check --ignore-unknown packages/runtime-cordis/src/host-diagnostics.ts packages/runtime-cordis/src/plugin-installation.ts packages/runtime-cordis/tests/diagnostic-inspection.test.ts
+Checking formatting...
+All matched files use Prettier code style!
+
+[check:affected] .: /Users/zhou/.bun/bin/bun x --no-install oxlint packages/runtime-cordis/src/host-diagnostics.ts packages/runtime-cordis/src/plugin-installation.ts packages/runtime-cordis/tests/diagnostic-inspection.test.ts
+[build] @nodebraid/diagnostics
+[build] @nodebraid/kernel
+[build] @nodebraid/runtime-cordis
+[build] @nodebraid/plugin-command
+[build] @nodebraid/plugin-kernel
+[build] @nodebraid/plugin-history
+[build] @nodebraid/session-api
+[build] @nodebraid/plugin-session
+[build] @nodebraid/adapter-react
+[build] @nodebraid/canvas-fragment
+[build] @nodebraid/port-api
+[build] @nodebraid/interaction-api
+[build] @nodebraid/layout-api
+[build] @nodebraid/plugin-port
+[build] @nodebraid/renderer-api
+[build] @nodebraid/plugin-renderer
+[build] @nodebraid/plugin-interaction
+[build] @nodebraid/plugin-clipboard
+[build] @nodebraid/plugin-duplicate-selection
+[build] @nodebraid/plugin-layout
+[build] @nodebraid/preset-basic
+[build] @nodebraid/document
+[build] @nodebraid/core
+[build] @nodebraid/layout-dagre
+[build] @nodebraid/renderer-svg
+[build] @nodebraid/examples
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 2190 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                              0.62 kB │ gzip:   0.34 kB
+dist/assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2    7.42 kB
+dist/assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2      8.00 kB
+dist/assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2       15.08 kB
+dist/assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2      16.51 kB
+dist/assets/geist-latin-wght-normal-BgDaEnEv.woff2          29.40 kB
+dist/assets/index-BJoUvGm6.css                              38.33 kB │ gzip:   8.11 kB
+dist/assets/routes-B7OiKx89.js                               0.56 kB │ gzip:   0.41 kB
+dist/assets/rolldown-runtime-CbXtAM7H.js                     0.58 kB │ gzip:   0.36 kB
+dist/assets/preload-helper-nlOK6TZ5.js                      35.01 kB │ gzip:  12.63 kB
+dist/assets/basic-svg-B-8aQNeT.js                          251.48 kB │ gzip:  75.10 kB
+dist/assets/index-DnQuMY2C.js                              348.54 kB │ gzip: 113.55 kB
+
+✓ built in 410ms
+[build] @nodebraid/layout-elk
+
+[check:affected] packages/adapter-react: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/adapter-react: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/core: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/plugin-clipboard: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/plugin-clipboard: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/plugin-command: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/plugin-command: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/plugin-duplicate-selection: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/plugin-duplicate-selection: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/plugin-history: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/plugin-history: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/plugin-interaction: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/plugin-interaction: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/plugin-kernel: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/plugin-kernel: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/plugin-layout: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/plugin-layout: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/plugin-port: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/plugin-port: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/plugin-renderer: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/plugin-renderer: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/plugin-session: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/plugin-session: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/preset-basic: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/preset-basic: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/renderer-svg: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/renderer-svg: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/runtime-cordis: /Users/zhou/.bun/bin/bun run typecheck:self
+
+[check:affected] packages/runtime-cordis: /Users/zhou/.bun/bin/bun run test:self
+bun test v1.4.2 (744846f84)
+
+[check:affected] .: /Users/zhou/.bun/bin/bun test tests/kernel-commit-preparation.test.ts tests/layout-providers.test.ts
+bun test v1.4.2 (744846f84)
+
+[check:affected] packages/adapter-react: /Users/zhou/.bun/bin/bun run test:browser:self
+
+[check:affected] examples/app: /Users/zhou/.bun/bin/bun run test:browser:self
+Document file workflow passed; evidence: /Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/.tmp/document-browser-QZNf6M
+
+[check:affected] packages/renderer-svg: /Users/zhou/.bun/bin/bun run test:browser:self
+SVG Interaction Geometry capture: 214 public browser cases passed.
+SVG DOM policy capture: 72 trusted native and 72 constructor failure cases passed.
+SVG tolerance capture: 48 public browser cases passed.
+
+[check:affected] .: /Users/zhou/.bun/bin/bun run docs:check:self
+documentation content verified (26 modules)
+revision=1 nodes=1
+
+  vitepress v1.6.4
+
+build complete in 19.53s.

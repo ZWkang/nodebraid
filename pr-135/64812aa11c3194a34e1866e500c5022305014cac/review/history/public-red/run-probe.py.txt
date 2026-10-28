@@ -1,0 +1,13 @@
+from pathlib import Path
+import subprocess,json,os,hashlib,datetime
+R=Path(__file__).parent;W=Path('/Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow');receipts=[]
+commands=[('strict-typecheck-and-emit',['bun',str(W/'node_modules/typescript/bin/tsc'),'-p',str(R/'tsconfig.json')]),('compiled',['bun',str(R/'compiled/runtime-disposal-error-inspection.js')])]
+for name,argv in commands:
+ env=os.environ.copy()
+ if name=='compiled':env.update(NODEBRAID_RUNTIME_RESULTS=str(R/'observations.json'))
+ started=datetime.datetime.now(datetime.timezone.utc).isoformat()
+ with (R/(name+'.stdout.log')).open('wb') as out,(R/(name+'.stderr.log')).open('wb') as err:proc=subprocess.run(argv,cwd=W,env=env,stdout=out,stderr=err)
+ row=dict(name=name,argv=argv,cwd=str(W),started=started,exitCode=proc.returncode,sourceSHA256=hashlib.sha256((R/'runtime-disposal-error-inspection.ts').read_bytes()).hexdigest())
+ if name=='compiled':row['envAdded']={k:env[k] for k in ['NODEBRAID_RUNTIME_RESULTS']}
+ receipts.append(row);(R/'probe-receipts.json').write_text(json.dumps(receipts,indent=2)+'\n')
+ if proc.returncode:raise SystemExit(proc.returncode)

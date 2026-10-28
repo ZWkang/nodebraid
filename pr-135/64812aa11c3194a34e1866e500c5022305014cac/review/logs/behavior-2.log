@@ -1,0 +1,21 @@
+
+packages/runtime-cordis/tests/diagnostic-inspection.test.ts:
+26 |   try {
+27 |     await installation.whenActive();
+28 |     const disposal = installation.dispose();
+29 |     expect(installation.dispose()).toBe(disposal);
+30 |     const failure = await disposal.catch((error: unknown) => error);
+31 |     expect(containsReference(failure, original)).toBe(true);
+                                                      ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/runtime-cordis/tests/diagnostic-inspection.test.ts:31:50)
+(fail) terminal cleanup retains resource and diagnostic inspection failures together [25.92ms]
+
+ 0 pass
+ 1 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [93.00ms]

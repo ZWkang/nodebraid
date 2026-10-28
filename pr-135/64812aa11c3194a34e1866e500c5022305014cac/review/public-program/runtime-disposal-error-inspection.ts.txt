@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import process from 'node:process';
+import {writeFileSync} from 'node:fs';
+import {createPluginHost,definePlugin} from '@nodebraid/runtime-cordis';
+function contains(root:unknown,expected:unknown,seen=new Set<unknown>()):boolean{
+ if(Object.is(root,expected))return true;
+ if(root===null||typeof root!=='object'||seen.has(root))return false;
+ seen.add(root);const descriptor=Object.getOwnPropertyDescriptor(root,'errors');
+ return !!descriptor&&'value'in descriptor&&Array.isArray(descriptor.value)&&descriptor.value.some((child:unknown)=>contains(child,expected,seen));
+}
+const output=process.env.NODEBRAID_RUNTIME_RESULTS;assert.ok(output);const rows:Record<string,unknown>[]=[];
+for(const route of ['installation','host']as const)for(const kind of ['ordinary-aggregate','throwing-errors-getter']as const){
+ const originalLeaf=new Error('original resource failure '+route+'/'+kind);
+ const original=new AggregateError([originalLeaf],'application-owned AggregateError');
+ const inspectionFailure=new Error('secondary errors getter failure '+route);
+ let getterReads=0,receiverCorrect=true;
+ if(kind==='throwing-errors-getter')Object.defineProperty(original,'errors',{configurable:true,get:function(this:AggregateError){getterReads++;receiverCorrect&&=this===original;throw inspectionFailure;}});
+ const cleanup:string[]=[],eventNames:string[]=[];
+ const host=createPluginHost({diagnostics:{sink:event=>{eventNames.push(event.name);}}});
+ const installation=host.install(definePlugin({name:'probe-disposal-'+kind,setup(context){context.own(()=>{cleanup.push('early');});context.own(()=>{cleanup.push('failing');throw original;});context.own(()=>{cleanup.push('late');});}}));
+ await installation.whenActive();
+ const operation=route==='installation'?installation.dispose():host.dispose();
+ assert.equal(route==='installation'?installation.dispose():host.dispose(),operation);
+ const outcome=await operation.then(()=>({ok:true as const}),error=>({ok:false as const,error}));
+ assert.equal(outcome.ok,false);if(outcome.ok)throw new Error('Expected actual resource disposal failure');
+ assert.deepEqual(cleanup,['late','failing','early']);assert.equal(installation.getSnapshot().status,'disposed');
+ const preserved=contains(outcome.error,original),inspectionReturned=contains(outcome.error,inspectionFailure);
+ const row={route,kind,passed:preserved,originalAggregateIdentityPreserved:preserved,secondaryInspectionFailureInReturnedTree:inspectionReturned,rootIsSecondaryFailure:Object.is(outcome.error,inspectionFailure),rootName:outcome.error instanceof Error?outcome.error.name:typeof outcome.error,rootMessage:outcome.error instanceof Error?outcome.error.message:String(outcome.error),getterReads,receiverCorrect,cleanupOrder:cleanup,installationState:'disposed',eventNames};
+ rows.push(row);writeFileSync(output,JSON.stringify(rows,null,2)+'\n');console.log(JSON.stringify(row));
+ const hostAfter=await host.dispose().then(()=>({ok:true as const}),error=>({ok:false as const,error}));
+ if(route==='host'){assert.equal(hostAfter.ok,false);if(!hostAfter.ok)assert.ok(Object.is(hostAfter.error,outcome.error));}
+ else assert.equal(hostAfter.ok,true);
+}
+assert.equal(rows.length,4);assert.equal(rows.filter(x=>x.passed).length,4,'Diagnostic inspection must not replace the original resource failure');

@@ -1,0 +1,275 @@
+{
+  "axis": "Spec",
+  "verdict": "passed",
+  "findings": [],
+  "base": "e282d6291c98deac2fd65879c94b6bf2881ede6b",
+  "expectedParent": "e282d6291c98deac2fd65879c94b6bf2881ede6b",
+  "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+  "tree": "4800054aa64c34564818f5a5533b4e6698a35e32",
+  "patch": "3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b",
+  "taskDigest": "613d5f6a05a5231f6d9a41b64cc61b06d6df2e548b60c191145fa259567fa883",
+  "changedFiles": [
+    "packages/runtime-cordis/src/host-diagnostics.ts",
+    "packages/runtime-cordis/src/plugin-installation.ts",
+    "packages/runtime-cordis/tests/diagnostic-inspection.test.ts"
+  ],
+  "report": "verdict: passed\n\nbase: e282d6291c98deac2fd65879c94b6bf2881ede6b\nhead: 37d7131df1b2ffff2c37fb83ac4bc3877795e377\ntree: 4800054aa64c34564818f5a5533b4e6698a35e32\nbinary patch SHA256: 3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b\ntaskDigest: 613d5f6a05a5231f6d9a41b64cc61b06d6df2e548b60c191145fa259567fa883\n\n读取本轮 [Issue134](https://github.com/ZWkang/nodebraid/issues/134) 完整正文/空评论快照和独立新prepared request/plan，重新审查完整三文件/323行测试及Host→Installation→Activation→诊断/Fault/清理链。新maine282的Basic materializer→Composition七Child→Renderer/Interaction资源与相关公共用例已核对，依据当前main规范/CONTEXT、ADR0004/0028/0029。实际补丁与本轮review.patch字节一致；旧报告/正式verify未复用。\n\n未发现缺失、scope creep或错误实现。对照 “retain every original resource failure by reference”，诊断选择的窄catch用固定消息并列保留原cleanup完整树与发生的inspection原值，原阶段/falsey值不丢失；无Sink先禁用普通诊断遍历，仍reject原树，required Fault不受影响。原逆序清理、disposed终态、缓存Promise/outcome、native读取异常和父子去重保留，没有flatten、重试或新API/策略。新增Basic声明回调复制不改变这些清理职责。\n\n本人新进程执行 `bun test packages/runtime-cordis/tests packages/diagnostics/tests packages/preset-basic/tests packages/plugin-command/tests packages/plugin-kernel/tests packages/plugin-renderer/tests packages/plugin-interaction/tests/lifecycle.test.ts packages/core/tests`：460 pass、0 fail、3024 assertions，30文件，exit0。六场景SOURCE逐字节新执行6/6，验证二次native读取、无Sink必需Fault与Sink故障；另真实Basic七Child+继承Connection的Renderer清理错误两场景2/2：Sink无/有时inspection读取0/1，原失败/实际inspection保留、dispose一次、终态及缓存拒绝保持。显式Renderer是公共Provider fixture，不是native浏览器证明。\n\ndiff-check通过，最后HEAD/tree/patch/clean核对后已停读工作树；精确程序/命令/原始输出在spec-tests.log。协调器public4/affected仅只读核验，未重复执行。未本人运行build/typecheck/affected/browser/full、GitHub/远端CI/发布/媒体/merge/main验收；结论仅绑定e282→37，不是人工批准或整项完成。\n\nrisk: {\"level\": \"medium\", \"rationale\": \"公共Runtime cleanup rejection/诊断遍历边界改变，命中packages/*/src的medium下限；新Basic Child生命周期兼容性通过仍需重点人工审阅原树/inspection并列、Sink开关和去重，不能以相同diff或绿测判low。\", \"evidence\": \"当前完整三文件/323行测试及Host/Installation/Activation/Diagnostics调用链重新核对，新maine282的Basic inherited/hidden materializer→Renderer Child资源链已审查；本人新460tests/3024assertions及6+2公共Host/Basic场景通过。采用basee282 canonical risk blob596298db784c4f3424968cd05a3aca4a6471b1b3。\", \"rollback\": \"正常回退37d7131df1b2ffff2c37fb83ac4bc3877795e377完整三文件或未来实际mapped publication，保留e282已有其它修复；无schema/依赖/数据迁移，会恢复inspection替换cleanup及无Sink遍历缺陷。代码回退不能恢复已释放资源或撤销既有Command/cleanup副作用，需依既有生命周期重建Host/Installation。\"}\n",
+  "risk": {
+    "level": "medium",
+    "rationale": "公共Runtime cleanup rejection/诊断遍历边界改变，命中packages/*/src的medium下限；新Basic Child生命周期兼容性通过仍需重点人工审阅原树/inspection并列、Sink开关和去重，不能以相同diff或绿测判low。",
+    "evidence": "当前完整三文件/323行测试及Host/Installation/Activation/Diagnostics调用链重新核对，新maine282的Basic inherited/hidden materializer→Renderer Child资源链已审查；本人新460tests/3024assertions及6+2公共Host/Basic场景通过。采用basee282 canonical risk blob596298db784c4f3424968cd05a3aca4a6471b1b3。",
+    "rollback": "正常回退37d7131df1b2ffff2c37fb83ac4bc3877795e377完整三文件或未来实际mapped publication，保留e282已有其它修复；无schema/依赖/数据迁移，会恢复inspection替换cleanup及无Sink遍历缺陷。代码回退不能恢复已释放资源或撤销既有Command/cleanup副作用，需依既有生命周期重建Host/Installation。"
+  },
+  "checks": [
+    {
+      "command": [
+        "bun",
+        "test",
+        "packages/runtime-cordis/tests",
+        "packages/diagnostics/tests",
+        "packages/preset-basic/tests",
+        "packages/plugin-command/tests",
+        "packages/plugin-kernel/tests",
+        "packages/plugin-renderer/tests",
+        "packages/plugin-interaction/tests/lifecycle.test.ts",
+        "packages/core/tests"
+      ],
+      "exitCode": 0,
+      "tests": 460,
+      "assertions": 3024,
+      "files": 30,
+      "log": "spec-tests.log"
+    },
+    {
+      "command": [
+        "bun",
+        "--eval",
+        "import assert from 'node:assert/strict';\nimport {createPluginHost,definePlugin,runtimeDiagnosticEvents} from '@nodebraid/runtime-cordis';\nconst observations=[];\nfor(const route of ['installation','host']) for(const mode of ['second-native-read','no-sink-required-fault','sink-fault']) {\n const leaf=new Error('resource leaf'),original=new AggregateError([leaf],'application cleanup'),inspection=new Error('second indexed read'),sinkFailure=new Error('sink failure'),required=new Error('required fault');\n let memberReads=0;const members=new Proxy([leaf],{get(target,key,receiver){if(key==='0'&&++memberReads===2)throw inspection;return Reflect.get(target,key,receiver);}});original.errors=members;\n const events=[],faults=[],cleanup=[];\n const diagnostics={faultReporter:f=>faults.push(f),...(mode==='no-sink-required-fault'?{}:{sink:event=>{events.push(event);if(mode==='sink-fault'&&event.name===runtimeDiagnosticEvents.installationDisposeFailed)throw sinkFailure;}})};\n const host=createPluginHost({diagnostics});\n const installation=host.install(definePlugin({setup(context){\n  if(mode==='no-sink-required-fault')context.diagnostics.reportFault(required,{name:'probe.required-fault'});\n  context.own(()=>{cleanup.push('early');});context.own(()=>{cleanup.push('failure');throw original;});context.own(()=>{cleanup.push('late');});\n }}));\n await installation.whenActive();\n const promise=route==='host'?host.dispose():installation.dispose();assert.equal(route==='host'?host.dispose():installation.dispose(),promise);\n const outcome=await promise.then(()=>({ok:true}),error=>({ok:false,error}));assert.equal(outcome.ok,false);\n function contains(root,expected,seen=new Set()) {\n  if(Object.is(root,expected))return true;\n  if(root===original||root===null||typeof root!=='object'||seen.has(root))return false;\n  seen.add(root);const descriptor=Object.getOwnPropertyDescriptor(root,'errors');\n  if(!descriptor||!('value'in descriptor)||!Array.isArray(descriptor.value)||descriptor.value===members)return false;\n  for(let index=0;index<descriptor.value.length;index++){const child=Object.getOwnPropertyDescriptor(descriptor.value,String(index));if(child&&'value'in child&&contains(child.value,expected,seen))return true;}\n  return false;\n }\n assert.equal(contains(outcome.error,original),true);assert.deepEqual(cleanup,['late','failure','early']);assert.equal(installation.getSnapshot().status,'disposed');\n const repeated=await (route==='host'?host.dispose():installation.dispose()).then(()=>undefined,error=>error);assert.equal(repeated,outcome.error);\n if(mode==='no-sink-required-fault'){assert.equal(memberReads,0);assert.equal(contains(outcome.error,inspection),false);assert.equal(events.length,0);assert.equal(faults.length,1);assert.equal(faults[0].error,required);}\n else {assert.equal(memberReads,2);assert.equal(contains(outcome.error,inspection),true);const failures=events.filter(e=>e.name===runtimeDiagnosticEvents.installationDisposeFailed);assert.equal(failures.length,1);assert.equal(contains(outcome.error,failures[0].error),true);if(route==='installation')assert.equal(outcome.error,failures[0].error);if(mode==='sink-fault'){assert.equal(faults.length,1);assert.equal(faults[0].error,sinkFailure);assert.equal(contains(outcome.error,sinkFailure),false);}else assert.equal(faults.length,0);}\n if(route==='installation')await host.dispose();else await host.dispose().catch(error=>assert.equal(error,outcome.error));\n assert.equal(Object.isFrozen(members),false);\n observations.push({route,mode,memberReads,requiredFaults:faults.length,originalRetained:true,inspectionRetained:mode!=='no-sink-required-fault',cachedOutcome:true,passed:true});\n}\nconsole.log(JSON.stringify({checks:observations.length,passed:observations.length,scope:'fresh public package-name Host/own/dispose controls; no fake Runtime, no original probe rerun',observations}));"
+      ],
+      "exitCode": 0,
+      "checks": 6,
+      "scope": "byte-identical prior probe SOURCE, new actual public Host execution",
+      "log": "spec-tests.log"
+    },
+    {
+      "command": [
+        "bun",
+        "--eval",
+        "import assert from 'node:assert/strict';\nimport {createPluginHost} from '@nodebraid/runtime-cordis';\nimport {createBasicCanvasPlugin} from '@nodebraid/preset-basic';\nimport {edgeId} from '@nodebraid/kernel';\nconst observations=[];\nfor(const withSink of [false,true]) {\n const original=new AggregateError([new Error('Renderer cleanup resource')],'owned Renderer failure'),inspection=new Error('Renderer errors read');let reads=0,disposeCalls=0,materializeCalls=0;\n Object.defineProperty(original,'errors',{get(){reads++;throw inspection;}});\n const events=[],faults=[];\n const renderer={updateDocument(){},updateSession(){},updateInteraction(){},subscribeInput(){return ()=>{};},hitTest(){return null;},capturePointer(){},releasePointer(){},focus(){},async dispose(){disposeCalls++;throw original;}};\n class Connection {materializeEdge(input){materializeCalls++;return{id:edgeId('unused'),type:'link',source:input.source,target:input.target,data:null};}}\n const host=createPluginHost({diagnostics:{faultReporter:f=>faults.push(f),...(withSink?{sink:e=>events.push(e)}:{})}});\n const composition=host.install(createBasicCanvasPlugin(()=>renderer,{interaction:{connection:new Connection()}}));\n await composition.whenActive();assert.equal(composition.getSnapshot().status,'active');assert.equal(materializeCalls,0);\n const promise=host.dispose();assert.equal(host.dispose(),promise);const outcome=await promise.then(()=>({ok:true}),error=>({ok:false,error}));assert.equal(outcome.ok,false);\n function contains(root,expected,seen=new Set()) {if(Object.is(root,expected))return true;if(root===original||root===null||typeof root!=='object'||seen.has(root))return false;seen.add(root);const d=Object.getOwnPropertyDescriptor(root,'errors');if(!d||!('value'in d)||!Array.isArray(d.value))return false;for(let i=0;i<d.value.length;i++){const c=Object.getOwnPropertyDescriptor(d.value,String(i));if(c&&'value'in c&&contains(c.value,expected,seen))return true;}return false;}\n assert.equal(contains(outcome.error,original),true);assert.equal(disposeCalls,1);assert.equal(materializeCalls,0);assert.equal(composition.getSnapshot().status,'disposed');assert.equal(faults.length,0);\n if(withSink){assert.ok(events.some(e=>e.level==='error'&&contains(e.error,original)));if(reads>0)assert.equal(contains(outcome.error,inspection),true);}\n else {assert.equal(reads,0);assert.equal(events.length,0);assert.equal(contains(outcome.error,inspection),false);}\n const repeated=await host.dispose().then(()=>undefined,error=>error);assert.equal(repeated,outcome.error);assert.equal(disposeCalls,1);\n observations.push({withSink,activeInheritedConnection:true,materializeCalls,disposeCalls,inspectionReads:reads,originalRetained:true,inspectionRetainedIfRead:reads===0||contains(outcome.error,inspection),cachedOutcome:true,passed:true,scope:'actual Basic+seven public Plugin children with explicit public Renderer provider; no native/browser claim'});\n}\nconsole.log(JSON.stringify({checks:observations.length,passed:observations.length,observations}));"
+      ],
+      "exitCode": 0,
+      "checks": 2,
+      "scope": "new actual public Basic/Host/Renderer Child cleanup controls, no native browser claim",
+      "log": "spec-tests.log"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "e282d6291c98deac2fd65879c94b6bf2881ede6b...37d7131df1b2ffff2c37fb83ac4bc3877795e377"
+      ],
+      "exitCode": 0,
+      "log": "spec-tests.log"
+    }
+  ],
+  "reviewScope": {
+    "immutableComparisonOnly": true,
+    "certifiesLaterBaseOrHead": false,
+    "worktreeReadsStopped": true,
+    "newMainCallerRead": "PR131 Basic declared Connection materializer/Composition and Renderer Child cleanup"
+  },
+  "policy": {
+    "sourceCommit": "e282d6291c98deac2fd65879c94b6bf2881ede6b",
+    "path": ".agents/skills/pr-risk/SKILL.md",
+    "blob": "596298db784c4f3424968cd05a3aca4a6471b1b3"
+  },
+  "externalEvidenceReadbackOnly": {
+    "provenance.json": {
+      "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+      "base": "e282d6291c98deac2fd65879c94b6bf2881ede6b",
+      "originalSourceSHA256": "a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b",
+      "originalSourceBytesUnchanged": true,
+      "nodeModules": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/node_modules",
+      "artifacts": {
+        "packages/runtime-cordis/dist/index.js": {
+          "sha256": "c51e03769fd58eee903f81f5556ad3ac653917eab47c6dd6226d5e8c1972d5f4",
+          "bytes": 311
+        },
+        "packages/runtime-cordis/dist/index.d.ts": {
+          "sha256": "bb03507a5cd3adb2258a6c732463666937be6a3e7484404ab3d412b29ba37cb2",
+          "bytes": 890
+        }
+      },
+      "limits": "Actual new TS compiler/native Bun execution on37d7131. Original6fd red,8baf/8aed results retained at their identities. Not remote execution or formal full."
+    },
+    "receipts.json": [
+      {
+        "label": "strict-typecheck-and-emit",
+        "argv": [
+          "bun",
+          "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/node_modules/typescript/bin/tsc",
+          "-p",
+          "/Users/zhou/.codex/local-workflows/nodebraid/runs/5297ba1b-e4d6-414f-9a95-d7cb19392296/public-controls/tsconfig.json"
+        ],
+        "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+        "exitCode": 0,
+        "startedAt": "2026-10-28T04:08:59.662699+00:00",
+        "endedAt": "2026-10-28T04:08:59.995234+00:00",
+        "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+        "sourceSHA256": "a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b"
+      },
+      {
+        "label": "compiled",
+        "argv": [
+          "bun",
+          "/Users/zhou/.codex/local-workflows/nodebraid/runs/5297ba1b-e4d6-414f-9a95-d7cb19392296/public-controls/compiled/runtime-disposal-error-inspection.js"
+        ],
+        "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+        "exitCode": 0,
+        "startedAt": "2026-10-28T04:09:00.019401+00:00",
+        "endedAt": "2026-10-28T04:09:00.054511+00:00",
+        "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+        "sourceSHA256": "a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b"
+      }
+    ],
+    "observations.json": [
+      {
+        "route": "installation",
+        "kind": "ordinary-aggregate",
+        "passed": true,
+        "originalAggregateIdentityPreserved": true,
+        "secondaryInspectionFailureInReturnedTree": false,
+        "rootIsSecondaryFailure": false,
+        "rootName": "AggregateError",
+        "rootMessage": "Plugin resource cleanup failed.",
+        "getterReads": 0,
+        "receiverCorrect": true,
+        "cleanupOrder": [
+          "late",
+          "failing",
+          "early"
+        ],
+        "installationState": "disposed",
+        "eventNames": [
+          "nodebraid.runtime.host.created",
+          "nodebraid.runtime.installation.status.changed",
+          "nodebraid.runtime.activation.started",
+          "nodebraid.runtime.installation.status.changed",
+          "nodebraid.runtime.activation.ended",
+          "nodebraid.runtime.installation.status.changed",
+          "nodebraid.runtime.installation.dispose.failed",
+          "nodebraid.runtime.host.disposing",
+          "nodebraid.runtime.host.disposed"
+        ]
+      },
+      {
+        "route": "installation",
+        "kind": "throwing-errors-getter",
+        "passed": true,
+        "originalAggregateIdentityPreserved": true,
+        "secondaryInspectionFailureInReturnedTree": true,
+        "rootIsSecondaryFailure": false,
+        "rootName": "AggregateError",
+        "rootMessage": "Plugin cleanup diagnostics failed.",
+        "getterReads": 1,
+        "receiverCorrect": true,
+        "cleanupOrder": [
+          "late",
+          "failing",
+          "early"
+        ],
+        "installationState": "disposed",
+        "eventNames": [
+          "nodebraid.runtime.host.created",
+          "nodebraid.runtime.installation.status.changed",
+          "nodebraid.runtime.activation.started",
+          "nodebraid.runtime.installation.status.changed",
+          "nodebraid.runtime.activation.ended",
+          "nodebraid.runtime.installation.status.changed",
+          "nodebraid.runtime.installation.dispose.failed",
+          "nodebraid.runtime.host.disposing",
+          "nodebraid.runtime.host.disposed"
+        ]
+      },
+      {
+        "route": "host",
+        "kind": "ordinary-aggregate",
+        "passed": true,
+        "originalAggregateIdentityPreserved": true,
+        "secondaryInspectionFailureInReturnedTree": false,
+        "rootIsSecondaryFailure": false,
+        "rootName": "AggregateError",
+        "rootMessage": "Plugin Host cleanup failed.",
+        "getterReads": 0,
+        "receiverCorrect": true,
+        "cleanupOrder": [
+          "late",
+          "failing",
+          "early"
+        ],
+        "installationState": "disposed",
+        "eventNames": [
+          "nodebraid.runtime.host.created",
+          "nodebraid.runtime.installation.status.changed",
+          "nodebraid.runtime.activation.started",
+          "nodebraid.runtime.installation.status.changed",
+          "nodebraid.runtime.host.disposing",
+          "nodebraid.runtime.activation.ended",
+          "nodebraid.runtime.installation.status.changed",
+          "nodebraid.runtime.installation.dispose.failed"
+        ]
+      },
+      {
+        "route": "host",
+        "kind": "throwing-errors-getter",
+        "passed": true,
+        "originalAggregateIdentityPreserved": true,
+        "secondaryInspectionFailureInReturnedTree": true,
+        "rootIsSecondaryFailure": false,
+        "rootName": "AggregateError",
+        "rootMessage": "Plugin Host cleanup failed.",
+        "getterReads": 1,
+        "receiverCorrect": true,
+        "cleanupOrder": [
+          "late",
+          "failing",
+          "early"
+        ],
+        "installationState": "disposed",
+        "eventNames": [
+          "nodebraid.runtime.host.created",
+          "nodebraid.runtime.installation.status.changed",
+          "nodebraid.runtime.activation.started",
+          "nodebraid.runtime.installation.status.changed",
+          "nodebraid.runtime.host.disposing",
+          "nodebraid.runtime.activation.ended",
+          "nodebraid.runtime.installation.status.changed",
+          "nodebraid.runtime.installation.dispose.failed"
+        ]
+      }
+    ],
+    "affectedReceipt": {
+      "command": [
+        "bun",
+        "run",
+        "check:affected",
+        "--base",
+        "e282d6291c98deac2fd65879c94b6bf2881ede6b"
+      ],
+      "exitCode": 0,
+      "startedAt": "2026-10-28T04:07:32.914443+00:00",
+      "endedAt": "2026-10-28T04:11:55.555456+00:00",
+      "durationSeconds": 262.6412331659958,
+      "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+      "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+      "tree": "4800054aa64c34564818f5a5533b4e6698a35e32"
+    }
+  },
+  "limitations": [
+    "No GitHub access: complete provided Issue/comments/related69 snapshots only.",
+    "No independent build/typecheck/affected/browser/full/original4/remote publication/CI/media/merge/main acceptance.",
+    "Only e282..37 current comparison reviewed; earlier identities and full verify are historical, no results inherited.",
+    "Explicit Renderer fixture is a public backend seam, not native input or real SVG/browser evidence."
+  ]
+}

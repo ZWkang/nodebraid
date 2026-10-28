@@ -1,0 +1,11 @@
+{
+  "taskDigest": "613d5f6a05a5231f6d9a41b64cc61b06d6df2e548b60c191145fa259567fa883",
+  "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+  "tree": "4800054aa64c34564818f5a5533b4e6698a35e32",
+  "patch": "3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b",
+  "changedFiles": [
+    "packages/runtime-cordis/src/host-diagnostics.ts",
+    "packages/runtime-cordis/src/plugin-installation.ts",
+    "packages/runtime-cordis/tests/diagnostic-inspection.test.ts"
+  ]
+}

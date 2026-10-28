@@ -1,0 +1,29 @@
+[
+  {
+    "name": "strict-typecheck-and-emit",
+    "argv": [
+      "bun",
+      "/Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow/node_modules/typescript/bin/tsc",
+      "-p",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/20261028T025848-runtime-boundaries/tsconfig.json"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow",
+    "started": "2026-10-28T03:06:43.969511+00:00",
+    "exitCode": 0,
+    "sourceSHA256": "a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b"
+  },
+  {
+    "name": "compiled",
+    "argv": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/20261028T025848-runtime-boundaries/compiled/runtime-disposal-error-inspection.js"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow",
+    "started": "2026-10-28T03:06:45.074739+00:00",
+    "exitCode": 1,
+    "sourceSHA256": "a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b",
+    "envAdded": {
+      "NODEBRAID_RUNTIME_RESULTS": "/Users/zhou/.codex/local-workflows/nodebraid/runs/20261028T025848-runtime-boundaries/observations.json"
+    }
+  }
+]

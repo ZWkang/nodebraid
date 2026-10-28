@@ -1,0 +1,16 @@
+{
+  "command": [
+    "bun",
+    "run",
+    "check:affected",
+    "--base",
+    "e282d6291c98deac2fd65879c94b6bf2881ede6b"
+  ],
+  "exitCode": 0,
+  "startedAt": "2026-10-28T04:07:32.914443+00:00",
+  "endedAt": "2026-10-28T04:11:55.555456+00:00",
+  "durationSeconds": 262.6412331659958,
+  "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+  "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+  "tree": "4800054aa64c34564818f5a5533b4e6698a35e32"
+}

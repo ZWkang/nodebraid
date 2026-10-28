@@ -1,0 +1,46 @@
+{
+  "taskDigest": "d7374f622f52c6df987eaa1d5296514b8f4d382a6977b0969ff1098548d7327c",
+  "head": "8aed64e0d6fb496a568115e1fa389e65ec5bf172",
+  "tree": "75dc7474a1355f9957bdc9d976ac686c34641c06",
+  "patch": "3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b",
+  "changedFiles": [
+    "packages/runtime-cordis/src/host-diagnostics.ts",
+    "packages/runtime-cordis/src/plugin-installation.ts",
+    "packages/runtime-cordis/tests/diagnostic-inspection.test.ts"
+  ],
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "/Users/zhou/.codex/local-workflows/nodebraid/runs/9ad3448b-4f33-4353-87ab-934dcc74dd8a/check-ac84e70a-bcaa-45ed-88aa-6ac63b382db9.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "8aed64e0d6fb496a568115e1fa389e65ec5bf172",
+      "tree": "75dc7474a1355f9957bdc9d976ac686c34641c06",
+      "patch": "3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b",
+      "report": "What this change does: retains Runtime cleanup errors when diagnostic inspection also fails. Disabled ordinary diagnostics avoid member inspection.\n\n- Base: `bafb2173212b0ab926f9f6c4ffaa00bf510863c8`\n- Head: `8aed64e0d6fb496a568115e1fa389e65ec5bf172`\n- Tree: `75dc7474a1355f9957bdc9d976ac686c34641c06`\n- Binary patch SHA256: `3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b`\n- Task digest: `d7374f622f52c6df987eaa1d5296514b8f4d382a6977b0969ff1098548d7327c`\n\nReviewed this new base/head independently: complete three-file patch, all 323 new test lines, fresh Issue134 snapshot/empty discussion and new preparation. Traced current Activation, Installation, Host, diagnostic filtering and Cordis boundaries. Also inspected the integrated Shortcut capture, SVG geometry ownership and Layout capability callers now present on main. Canonical patch bytes, parent, clean checkout and identities passed fresh before/after checks.\n\nHard documented standards: no violations found. ADR0004 reverse cleanup and aggregation remain intact. The terminal diagnostic catch retains the entire original cleanup tree plus the actual inspection failure without flattening or losing external references, satisfying ADR0029. ADR0028's disabled ordinary Sink performs no diagnostic-only member reads; cleanup still rejects, and required Fault Reporter behavior is unchanged.\n\nCached Promise/outcome, terminal status, dependency cleanup and parent/child de-duplication retain their existing flow. Public tests cover falsey/native inspection failures, malformed collections, both disposal routes, disabled/enabled Sink, child observation, sparse/inherited members and cycles. New main's callers continue using the same owned-resource boundary.\n\nJudgment-only Fowler smells: no concrete finding. Ponytail: correct, safe and lean for bounded application Runtime lifecycles; no extra policy, accessor ban, cap, retry, dependency or success substitute.\n\nIndependent `/Users/zhou/.bun/bin/bun test packages/runtime-cordis/tests packages/diagnostics/tests packages/plugin-interaction/tests packages/plugin-renderer/tests packages/layout-api/tests packages/plugin-layout/tests tests/layout-providers.test.ts`: **782 tests, 5591 assertions**, exit 0. This is a fresh invocation at this identity. Coordinator current-head compiled controls 4/4 and affected exit-0 receipts were inspected separately, not counted as reviewer execution.\n\nRisk: **medium**, under deployed public-source rules. Cleanup rejection/observation affects Runtime consumers; the full review and fresh checks support focused human review. Rollback: revert the complete `8aed64e` delivery or mapped publication to this base, preserving already integrated fixes, and create fresh Hosts. Code rollback cannot reverse completed cleanup effects or application Commands already executed.\n\nNot independently run: strict TypeScript, product builds, browsers, affected/full checks, compiled-four controls or remote CI/publication. Worktree access has stopped; later bases/heads need fresh review.\n\n**Verdict: passed. Looks good. Ship.** This is not merge approval.\n",
+      "risk": {
+        "level": "medium",
+        "rationale": "Complete Issue134 changes public Runtime terminal cleanup error aggregation and diagnostic inspection behavior across Host consumers. Public packages/runtime-cordis/src imposes the deployed medium floor, and lifecycle/error behavior warrants focused human review. Main's integrated Shortcut/Renderer/Layout changes were considered; passing tests or identical relative patch bytes do not make this low risk.",
+        "evidence": "New fixed base bafb2173212b0ab926f9f6c4ffaa00bf510863c8 to head 8aed64e0d6fb496a568115e1fa389e65ec5bf172, tree 75dc7474a1355f9957bdc9d976ac686c34641c06 and patch 3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b were independently verified against the new packet. Current complete Runtime source/test and integrated Shortcut/SVG/Layout callers were re-read. Fresh independent public suites passed 782 tests and 5591 assertions. The coordinator's new compiled-four controls and affected exit0 receipt were read as separate evidence, not reviewer execution. Source/clean tree/parent/canonical bytes/task were verified before and after; worktree access then stopped.",
+        "rollback": "Revert the complete Issue134 commit 8aed64e0d6fb496a568115e1fa389e65ec5bf172 or its full mapped published delivery, restoring bafb2173212b0ab926f9f6c4ffaa00bf510863c8 while preserving its already integrated Shortcut/SVG/Layout fixes. Create fresh Host/Installation instances because disposal promises and outcomes are cached. No schema migration is introduced. Code rollback cannot reverse completed resource-cleanup effects or application Commands already executed; those require existing application recovery."
+      }
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "8aed64e0d6fb496a568115e1fa389e65ec5bf172",
+      "tree": "75dc7474a1355f9957bdc9d976ac686c34641c06",
+      "patch": "3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b",
+      "report": "verdict: passed\n\nbase: bafb2173212b0ab926f9f6c4ffaa00bf510863c8\nhead: 8aed64e0d6fb496a568115e1fa389e65ec5bf172\ntree: 75dc7474a1355f9957bdc9d976ac686c34641c06\nbinary patch SHA256: 3892550546e1ce446f9847dbd0d9c8deb88eced0739335a106cc9f4b71b2b60b\ntaskDigest: d7374f622f52c6df987eaa1d5296514b8f4d382a6977b0969ff1098548d7327c\n\n重新读取提供的 [Issue134](https://github.com/ZWkang/nodebraid/issues/134) 全文/空评论快照、独立新prepared request/plan，审查完整三文件及323行测试和实际Host→Installation→Activation→清理聚合/诊断/Fault Reporter链。新main的#127 Shortcut、#133 SVG Geometry、#129 Layout Capability源码/产物与调用者已核对；依据当前main规范/CONTEXT及ADR0004/0028/0029。补丁字节相同未替代本轮完整树审查。\n\n未发现缺漏、scope creep或错误实现。对照 “retain every original resource failure by reference”，catch仅包住诊断选择；固定消息的并列AggregateError保留完整原清理树及实际发生的inspection原值，falsey异常不丢失。无Sink在遍历前停用普通诊断选择，仍reject原错误，必需Fault不被禁用。原native indexed reads、逆序清理、disposed状态、缓存Promise/outcome及父子去重保持；没有遍历重试、flatten、fallback或公共API/依赖变化。\n\n本人新进程运行覆盖Runtime/Diagnostics/Command/KernelPlugin、Shortcut values/lifecycle、Layout capabilities/PluginLayout、Renderer API/PluginRenderer/SVG及layout-providers的定向组合：547 pass、0 fail、3692 assertions，31文件，exit0。旧六场景程序SOURCE逐字节重放为新调用6/6通过：两条dispose route的第二次native read失败保留双方、无Sink零读取且required Fault可见、Sink故障走Reporter不替换cleanup拒绝。diff-check通过；最终HEAD/tree/patch/clean核对后已停读工作树。完整精确命令/程序与原始输出在spec-tests.log，不沿用旧计数。\n\n原typed public4及其他记录只读核验，未重复执行。未本人运行build/typecheck/affected/browser/full、远端CI/发布/媒体/merge/main验收，未联网刷新讨论。本报告仅绑定新比较范围bafb→8aed，不认证后续base/head；Spec通过不是人工批准或整项完成。\n\nrisk: {\"level\": \"medium\", \"rationale\": \"公共Runtime cleanup rejection及诊断观察边界改变，命中packages/*/src的medium下限；新main兼容检查通过仍需重点人工审阅聚合阶段、无Sink/Fault边界及父子去重，不能因小补丁或绿测判low。\", \"evidence\": \"完整三文件/323行公共测试、Host/Installation/Activation/diagnostic链及新main127 Shortcut、133 SVG Geometry、129 Layout Capability调用者重审；当前新身份独立547tests/3692assertions通过，六场景SOURCE逐字节新执行6/6通过。采用basebafb的canonical pr-risk blob596298db784c4f3424968cd05a3aca4a6471b1b3。\", \"rollback\": \"正常回退8aed64e0d6fb496a568115e1fa389e65ec5bf172完整三文件或未来实际published映射，保留basebafb已集成的其它修复；无schema/依赖/数据迁移，但会恢复原inspection替换cleanup与无Sink遍历缺陷。代码回退不能复原已释放资源或撤销应用已执行Command/cleanup副作用，需按既有生命周期重新创建Host/Installation。\"}\n",
+      "risk": {
+        "level": "medium",
+        "rationale": "公共Runtime cleanup rejection及诊断观察边界改变，命中packages/*/src的medium下限；新main兼容检查通过仍需重点人工审阅聚合阶段、无Sink/Fault边界及父子去重，不能因小补丁或绿测判low。",
+        "evidence": "完整三文件/323行公共测试、Host/Installation/Activation/diagnostic链及新main127 Shortcut、133 SVG Geometry、129 Layout Capability调用者重审；当前新身份独立547tests/3692assertions通过，六场景SOURCE逐字节新执行6/6通过。采用basebafb的canonical pr-risk blob596298db784c4f3424968cd05a3aca4a6471b1b3。",
+        "rollback": "正常回退8aed64e0d6fb496a568115e1fa389e65ec5bf172完整三文件或未来实际published映射，保留basebafb已集成的其它修复；无schema/依赖/数据迁移，但会恢复原inspection替换cleanup与无Sink遍历缺陷。代码回退不能复原已释放资源或撤销应用已执行Command/cleanup副作用，需按既有生命周期重新创建Host/Installation。"
+      }
+    }
+  },
+  "decisions": []
+}

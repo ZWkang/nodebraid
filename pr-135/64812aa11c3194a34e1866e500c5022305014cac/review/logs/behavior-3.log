@@ -1,0 +1,22 @@
+
+packages/runtime-cordis/tests/diagnostic-inspection.test.ts:
+49 |   const host = createPluginHost();
+50 |   const installation = host.install(definePlugin({ setup(context) { context.own(() => { throw original; }); } }));
+51 |   try {
+52 |     await installation.whenActive();
+53 |     const failure = await installation.dispose().catch((error: unknown) => error);
+54 |     expect(reads).toBe(0);
+                       ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/runtime-cordis/tests/diagnostic-inspection.test.ts:54:19)
+(fail) disabled ordinary diagnostics does not inspect cleanup error members [55.29ms]
+
+ 0 pass
+ 1 filtered out
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [181.00ms]

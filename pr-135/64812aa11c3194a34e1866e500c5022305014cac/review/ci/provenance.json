@@ -1,0 +1,28 @@
+{
+  "sourceHead": "64812aa11c3194a34e1866e500c5022305014cac",
+  "sourceTree": "4800054aa64c34564818f5a5533b4e6698a35e32",
+  "localReviewedHead": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+  "localFormalTests": 1608,
+  "localFormalAssertions": 9578,
+  "localFormalCommand": "bun run check",
+  "checksRun": 40632139722,
+  "checksJob": 122630732192,
+  "checksActualCheckout": "2b783c2ed16f06d70de935c1d32988d6819b2cb1",
+  "checksActualTree": "4800054aa64c34564818f5a5533b4e6698a35e32",
+  "checksOrderedParents": [
+    "e282d6291c98deac2fd65879c94b6bf2881ede6b",
+    "64812aa11c3194a34e1866e500c5022305014cac"
+  ],
+  "checksLinuxTests": 1608,
+  "checksLinuxAssertions": 9572,
+  "previewJob": 122630732344,
+  "previewCheckout": "64812aa11c3194a34e1866e500c5022305014cac",
+  "publisherRun": 40632581834,
+  "publisherJob": 122632158654,
+  "publisherTrustedMain": "e282d6291c98deac2fd65879c94b6bf2881ede6b",
+  "publisherEligibilitySourceRun": 40632139722,
+  "previewEvidenceCommit": "614d24b47ac4d187f938c8e66f2e6f50ff4a3abf",
+  "nativeScenes": 5,
+  "previewFiles": 55,
+  "limits": "CI checks used the GitHub test merge with same tree, not the local review SHA or actual integration. PR135 remains unmerged. Preview used source648. Local and Linux assertion counts remain distinct. Native scene success is not diagnostic Fault UI proof."
+}

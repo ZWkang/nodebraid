@@ -1,0 +1,30 @@
+[
+  {
+    "label": "strict-typecheck-and-emit",
+    "argv": [
+      "bun",
+      "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/node_modules/typescript/bin/tsc",
+      "-p",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/5297ba1b-e4d6-414f-9a95-d7cb19392296/public-controls/tsconfig.json"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+    "exitCode": 0,
+    "startedAt": "2026-10-28T04:08:59.662699+00:00",
+    "endedAt": "2026-10-28T04:08:59.995234+00:00",
+    "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+    "sourceSHA256": "a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b"
+  },
+  {
+    "label": "compiled",
+    "argv": [
+      "bun",
+      "/Users/zhou/.codex/local-workflows/nodebraid/runs/5297ba1b-e4d6-414f-9a95-d7cb19392296/public-controls/compiled/runtime-disposal-error-inspection.js"
+    ],
+    "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+    "exitCode": 0,
+    "startedAt": "2026-10-28T04:09:00.019401+00:00",
+    "endedAt": "2026-10-28T04:09:00.054511+00:00",
+    "head": "37d7131df1b2ffff2c37fb83ac4bc3877795e377",
+    "sourceSHA256": "a064d97c4edf1e017bf76d1ac64061e06e43eae6b75ed732907750b8afcb295b"
+  }
+]

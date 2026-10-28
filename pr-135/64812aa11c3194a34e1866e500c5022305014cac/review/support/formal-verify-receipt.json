@@ -1,0 +1,17 @@
+{
+  "command": [
+    "bun",
+    "/Users/zhou/.codex/worktrees/issue-6-dagre-layout/cflow/scripts/local-agent.ts",
+    "verify",
+    "/Users/zhou/.codex/local-workflows/nodebraid/runs/5297ba1b-e4d6-414f-9a95-d7cb19392296",
+    "/Users/zhou/.codex/local-workflows/nodebraid/runs/5297ba1b-e4d6-414f-9a95-d7cb19392296/reviews.json",
+    "/Users/zhou/.codex/local-workflows/nodebraid/runs/5297ba1b-e4d6-414f-9a95-d7cb19392296/decisions.json"
+  ],
+  "cwd": "/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow",
+  "exitCode": 0,
+  "startedAt": "2026-10-28T04:16:38.500788+00:00",
+  "endedAt": "2026-10-28T04:21:38.920029+00:00",
+  "durationSeconds": 300.41971462500806,
+  "scriptCommit": "e282d6291c98deac2fd65879c94b6bf2881ede6b",
+  "scriptBlob": "ff11d98b51ba12f0742bdd7750f941268a4d7522"
+}
