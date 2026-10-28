@@ -19,7 +19,178 @@ import type {
 import type { SessionSnapshot } from '@nodebraid/session-api';
 import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
-import { deleteSelectionCommand, interactionPlugin, interactionShortcutService, moveNodesCommand } from '../src';
+import {
+  defineInteractionShortcut,
+  deleteSelectionCommand,
+  interactionPlugin,
+  interactionShortcutService,
+  moveNodesCommand,
+} from '../src';
+
+test('Shortcut Binding preserves the Command accepted from a caller getter', async () => {
+  const renderer = new LifecycleRenderer();
+  const firstCommand = defineCommand<void, void>('test.shortcut.capture.first');
+  const laterCommand = defineCommand<void, void>('test.shortcut.capture.later');
+  const observed = Promise.withResolvers<void>();
+  const calls: string[] = [];
+  let commandReads = 0;
+  let shortcutReads = 0;
+  const host = createPluginHost();
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => renderer)),
+    host.install(interactionPlugin),
+    host.install(
+      definePlugin({
+        requires: { commands: commandService, shortcuts: interactionShortcutService },
+        setup(context) {
+          const first = context.services.commands.register(firstCommand, () => {
+            calls.push('first');
+            observed.resolve();
+          });
+          const later = context.services.commands.register(laterCommand, () => {
+            calls.push('later');
+            observed.resolve();
+          });
+          context.own(() => first.dispose());
+          context.own(() => later.dispose());
+          let invalidCommandReads = 0;
+          let invalidShortcutReads = 0;
+          expect(() =>
+            context.services.shortcuts.register({
+              get command(): typeof firstCommand {
+                invalidCommandReads += 1;
+                return invalidCommandReads === 1 ? (null as never) : firstCommand;
+              },
+              get shortcut(): never {
+                invalidShortcutReads += 1;
+                throw new Error('Later Shortcut must not mask the first invalid Command.');
+              },
+            }),
+          ).toThrow(expect.objectContaining({ code: 'INVALID_SHORTCUT' }));
+          expect(invalidCommandReads).toBe(1);
+          expect(invalidShortcutReads).toBe(0);
+          const binding = {
+            get shortcut() {
+              expect(this).toBe(binding);
+              shortcutReads += 1;
+              if (shortcutReads > 1) throw new Error('Later Shortcut must not replace the captured value.');
+              return {
+                code: 'KeyP',
+                modifierAlternatives: [{ alt: false, control: false, meta: false, shift: false }],
+              };
+            },
+            get command(): typeof firstCommand {
+              expect(this).toBe(binding);
+              commandReads += 1;
+              return commandReads < 3 ? firstCommand : laterCommand;
+            },
+          };
+          const registration = context.services.shortcuts.register(binding);
+          context.own(() => registration.dispose());
+        },
+      }),
+    ),
+  ];
+  try {
+    await Promise.all(installations.map((installation) => installation.whenActive()));
+    expect(
+      renderer.emit({
+        type: 'key.down',
+        key: 'p',
+        code: 'KeyP',
+        repeat: false,
+        modifiers: { alt: false, control: false, meta: false, shift: false },
+      }),
+    ).toEqual({ defaultAction: 'prevent' });
+    await observed.promise;
+    expect(calls).toEqual(['first']);
+    expect(commandReads).toBe(1);
+    expect(shortcutReads).toBe(1);
+  } finally {
+    await host.dispose();
+  }
+});
+
+test('captured modifier values retain distinct Shortcut matching and reservations', async () => {
+  const renderer = new LifecycleRenderer();
+  const firstCommand = defineCommand<void, void>('test.shortcut.modifier.first');
+  const oppositeCommand = defineCommand<void, void>('test.shortcut.modifier.opposite');
+  const observed = Promise.withResolvers<void>();
+  const calls: string[] = [];
+  let reads = 0;
+  const captured = defineInteractionShortcut({
+    code: 'KeyP',
+    modifierAlternatives: [
+      {
+        get alt() {
+          reads += 1;
+          return reads === 1 ? false : true;
+        },
+        control: false,
+        meta: false,
+        shift: false,
+      },
+    ],
+  });
+  const host = createPluginHost();
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => renderer)),
+    host.install(interactionPlugin),
+    host.install(
+      definePlugin({
+        requires: { commands: commandService, shortcuts: interactionShortcutService },
+        setup(context) {
+          const first = context.services.commands.register(firstCommand, () => {
+            calls.push('first');
+          });
+          const opposite = context.services.commands.register(oppositeCommand, () => {
+            calls.push('opposite');
+            observed.resolve();
+          });
+          context.own(() => first.dispose());
+          context.own(() => opposite.dispose());
+          const firstBinding = context.services.shortcuts.register({ shortcut: captured, command: firstCommand });
+          const oppositeBinding = context.services.shortcuts.register({
+            shortcut: {
+              code: 'KeyP',
+              modifierAlternatives: [{ alt: true, control: false, meta: false, shift: false }],
+            },
+            command: oppositeCommand,
+          });
+          context.own(() => firstBinding.dispose());
+          context.own(() => oppositeBinding.dispose());
+        },
+      }),
+    ),
+  ];
+  try {
+    await Promise.all(installations.map((installation) => installation.whenActive()));
+    for (const alt of [false, true]) {
+      expect(
+        renderer.emit({
+          type: 'key.down',
+          key: 'p',
+          code: 'KeyP',
+          repeat: false,
+          modifiers: { alt, control: false, meta: false, shift: false },
+        }),
+      ).toEqual({ defaultAction: 'prevent' });
+    }
+    await observed.promise;
+    expect(calls).toEqual(['first', 'opposite']);
+    expect(reads).toBe(1);
+  } finally {
+    await host.dispose();
+  }
+});
 
 test('Shortcut disposal aborts and awaits execution, retains reservation, and reactivates fresh', async () => {
   const renderer = new LifecycleRenderer();
