@@ -119,24 +119,37 @@ export function createShortcutRuntime(options: {
     entry.executions.add(running);
     void options.commands.execute(entry.binding.command, undefined, { signal: controller.signal }).then(
       () => finish(),
-      (error) => {
-        const expectedDisposalAbort =
-          entry.disposePromise !== undefined && controller.signal.aborted && error === controller.signal.reason;
-        if (!expectedDisposalAbort) {
-          if (error instanceof CommandError && error.code === 'COMMAND_NOT_FOUND') {
-            options.diagnostics.emit({
-              name: interactionDiagnosticEvents.inputRejected,
-              level: 'info',
-              attributes: { inputType: 'key.down', reason: 'capability-unavailable' },
-            });
-          } else {
-            options.diagnostics.reportFault(error, {
-              name: interactionDiagnosticEvents.commandFault,
-              attributes: { commandId: entry.binding.command.id },
-            });
+      (error: unknown) => {
+        try {
+          const expectedDisposalAbort =
+            entry.disposePromise !== undefined && controller.signal.aborted && error === controller.signal.reason;
+          if (!expectedDisposalAbort) {
+            let unavailable = false;
+            let rejection = error;
+            try {
+              unavailable = error instanceof CommandError && error.code === 'COMMAND_NOT_FOUND';
+            } catch (inspectionFailure) {
+              rejection = new AggregateError(
+                [error, inspectionFailure],
+                'Shortcut Command rejection inspection failed.',
+              );
+            }
+            if (unavailable) {
+              options.diagnostics.emit({
+                name: interactionDiagnosticEvents.inputRejected,
+                level: 'info',
+                attributes: { inputType: 'key.down', reason: 'capability-unavailable' },
+              });
+            } else {
+              options.diagnostics.reportFault(rejection, {
+                name: interactionDiagnosticEvents.commandFault,
+                attributes: { commandId: entry.binding.command.id },
+              });
+            }
           }
+        } finally {
+          finish();
         }
-        finish();
       },
     );
 
