@@ -36,7 +36,7 @@
     "dev": "bun run build:dependencies && vite --host 127.0.0.1",
     "test": "bun run build && bun run test:browser:self",
     "test:browser": "bun run build && bun run test:browser:self",
-    "test:browser:self": "bun run ./browser-tests/basic-svg.browser.ts && bun run ./browser-tests/clipboard.browser.ts && bun run ./browser-tests/document.browser.ts",
+    "test:browser:self": "bun run ./browser-tests/basic-svg.browser.ts && bun run ./browser-tests/clipboard.browser.ts && bun run ./browser-tests/document.browser.ts && bun run ./browser-tests/node-authoring.browser.ts",
     "typecheck": "bun run build:dependencies && bun run typecheck:self",
     "typecheck:self": "tsgo --noEmit -p tsconfig.json"
   }

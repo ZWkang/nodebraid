@@ -525,7 +525,7 @@ packages/
 └── core/               @nodebraid/core，公共收口
 ```
 
-`preset-basic` 已在完整 Runtime 组合形成稳定重复证据后进入实现。它接受显式 Renderer Factory，通过 Child Installation 组合 Kernel、Command、Session、Renderer、Interaction 与 History，等待全部 child active，并保持 Host、Diagnostics、Provider 与 sibling Plugin 由应用显式拥有。真实 SVG canonical example 与 Chromium 测试验证完整可视链路，但 preset package 本身不依赖 SVG 或 DOM。
+`preset-basic` 已在完整 Runtime 组合形成稳定重复证据后进入实现。它接受显式 Renderer Factory，通过 Child Installation 组合 Kernel、Port、Command、Node Editing、Session、Renderer、Interaction 与 History，等待全部 child active，并保持 Host、Diagnostics、Provider 与 sibling Plugin 由应用显式拥有。真实 SVG canonical example 与 Chromium 测试验证完整可视链路，但 preset package 本身不依赖 SVG 或 DOM。
 
 ## 9. 实施阶段
 

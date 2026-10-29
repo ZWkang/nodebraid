@@ -163,6 +163,14 @@ h1 {
   color: #59657b;
 }
 
+.basic-svg-page {
+  padding: 24px 0;
+}
+
+.basic-svg-page h1 {
+  font-size: 2.5rem;
+}
+
 .example-workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 280px;
@@ -186,6 +194,80 @@ h1 {
   border-radius: 14px;
   background: color-mix(in oklch, var(--card), transparent 4%);
   box-shadow: 0 12px 32px rgb(34 54 93 / 8%);
+}
+
+.node-creation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.node-creation label,
+.node-data-editor label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.node-creation select,
+.node-data-editor input {
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 9px;
+  border: 1px solid var(--input);
+  border-radius: 8px;
+  color: var(--foreground);
+  background: var(--background);
+}
+
+.node-creation p,
+.node-editor-hint {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+}
+
+.node-creation p {
+  flex-basis: 100%;
+}
+
+.node-data-editor form,
+.node-draft-switch {
+  display: grid;
+  gap: 12px;
+}
+
+.node-data-editor [role='alert'] {
+  font-size: 0.8rem;
+  color: var(--destructive);
+}
+
+.node-draft-switch {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+
+.node-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+[data-node-placement='true'] .canvas-target {
+  cursor: crosshair;
+}
+
+.example-node-label {
+  fill: #14213d;
+  stroke: none;
+  font-size: 14px;
+  font-weight: 600;
+  pointer-events: none;
 }
 
 .toolbar-separator {
@@ -335,6 +417,7 @@ h1 {
 
 .nodebraid-renderer-svg__connection-anchor,
 .nodebraid-renderer-svg__port {
+  r: 5px;
   fill: #3156d3;
   stroke: #fff;
   stroke-width: 2;
@@ -370,6 +453,10 @@ h1 {
   .nodebraid-renderer-svg__node {
     fill: #18213a;
     stroke: #8aa4ff;
+  }
+
+  .example-node-label {
+    fill: #eef2ff;
   }
 
   .nodebraid-renderer-svg__node[data-nodebraid-selected='true'] {

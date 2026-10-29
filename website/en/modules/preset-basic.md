@@ -5,7 +5,7 @@ description: Basic Canvas Composition with an explicit Renderer, complete readin
 
 # `@nodebraid/preset-basic`
 
-`@nodebraid/preset-basic` is NodeBraid's official backend-neutral Basic Canvas Composition. It concentrates the stable repeated assembly of Kernel, Command, Session, Renderer, Interaction, and History into one ordinary Plugin while leaving the Plugin Host, Diagnostics, Renderer Provider, and extension choices under application ownership.
+`@nodebraid/preset-basic` is NodeBraid's official backend-neutral Basic Canvas Composition. It concentrates the stable repeated assembly of Kernel, Port, Command, Node Editing, Session, Renderer, Interaction, and History into one ordinary Plugin while leaving the Plugin Host, Diagnostics, Renderer Provider, and extension choices under application ownership.
 
 ::: warning Package is not publicly released
 This name identifies the current source module boundary; it does not mean the package can be installed from npm. Follow the [Quick Start](/en/guide/quick-start) to verify it from source.
@@ -13,7 +13,7 @@ This name identifies the current source module boundary; it does not mean the pa
 
 ## The problem it solves
 
-Applications no longer repeat the installation, waiting, and disposal code for six standard Feature Plugins or maintain a dependency-safe cleanup order themselves. The Composition Installation becomes active only after every Child Installation is active, and a required child failure rolls back the complete tree.
+Applications no longer repeat the installation, waiting, and disposal code for eight standard Feature Plugins or maintain a dependency-safe cleanup order themselves. The Composition Installation becomes active only after every Child Installation is active, and a required child failure rolls back the complete tree.
 
 ## Public entry points
 
@@ -43,7 +43,7 @@ SVG is only the Provider selected explicitly by this application example; it is 
 
 ## Readiness, failure, and disposal
 
-The Composition creates children in Kernel, Command, Session, Renderer, Interaction, and History order, then waits for all of them to become active. Parent active is an initial readiness point, not an atomic Child Service publication barrier or a permanent health signal.
+The Composition creates children in Kernel, Port, Command, Node Editing, Session, Renderer, Interaction, and History order, then waits for all of them to become active. Parent active is an initial readiness point, not an atomic Child Service publication barrier or a permanent health signal.
 
 Renderer Factory, Interaction config, and other child setup failures preserve their original identity. Existing standard Providers, a second preset, or a second Renderer in one Host continue to fail through the current Service reservation rules; the preset never skips or replaces them. Disposal runs in reverse order and awaits asynchronous Renderer cleanup. Multiple cleanup failures remain visible through AggregateError.
 
@@ -68,3 +68,5 @@ Applications consume the basic capabilities through static Required Service Bind
 - Lifecycle tests cover readiness, failure identity, rollback, conflicts, isolation, and asynchronous cleanup.
 - A real SVG and Chromium tracer covers projection, Selection, Box Selection, Move, Undo/Redo, Wheel input, and disposal.
 - Declaration isolation, package-name import, pack preview, and repository gates verify the publication boundary.
+
+Basic Composition also installs `nodeEditingPlugin`, providing headless Create Node / Update Node Data Commands for placement and application editing.

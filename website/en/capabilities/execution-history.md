@@ -28,10 +28,11 @@ If a change remains local to one piece of code and does not need its own action 
 
 ## What it provides
 
-| Role             | Package                                                   | What it delivers                                                                                                  |
-| ---------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Action execution | [`@nodebraid/plugin-command`](/en/modules/plugin-command) | Command definition, Activation-scoped registration and execution, cooperative cancellation, and in-flight cleanup |
-| Document History | [`@nodebraid/plugin-history`](/en/modules/plugin-history) | Commit recording, Undo/Redo Commands, stable History Snapshots, and single-flight Replay                          |
+| Role             | Package                                                             | What it delivers                                                                                                  |
+| ---------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Action execution | [`@nodebraid/plugin-command`](/en/modules/plugin-command)           | Command definition, Activation-scoped registration and execution, cooperative cancellation, and in-flight cleanup |
+| Node Editing     | [`@nodebraid/plugin-node-editing`](/en/modules/plugin-node-editing) | Atomic Node creation and source-guarded data updates                                                              |
+| Document History | [`@nodebraid/plugin-history`](/en/modules/plugin-history)           | Commit recording, Undo/Redo Commands, stable History Snapshots, and single-flight Replay                          |
 
 A typical flow looks like this:
 
@@ -61,7 +62,7 @@ An application's Feature Plugin obtains the Runtime Services it needs through `r
 
 - [`@nodebraid/plugin-command`](/en/modules/plugin-command): define and host any strongly typed action;
 - [`@nodebraid/plugin-history`](/en/modules/plugin-history): provide Document Undo/Redo for Kernel Commits;
-- `@nodebraid/core`: re-exports the public seams of both packages, while internal packages still depend directly on the capability they own.
+- `@nodebraid/core`: re-exports the public seams of these packages, while internal packages still depend directly on the capability they own.
 
 The NodeBraid packages have not been publicly released. Follow the source-based [Quick Start](/en/guide/quick-start) until the initial npm release is available.
 

@@ -26,3 +26,11 @@ export { interactionShortcutService } from './shortcut-service';
 export { defineInteractionShortcut } from './shortcut-value';
 export { InteractionError, type InteractionErrorCode } from './interaction-error';
 export { moveNodesCommand } from './move-nodes-command';
+export { nodePlacementService } from './node-placement';
+export type {
+  NodeMaterializationInput,
+  NodeMaterializer,
+  NodePlacement,
+  NodePlacementResult,
+  NodePlacementService,
+} from './node-placement';

@@ -31,7 +31,7 @@ NodeBraid 处于早期实现阶段，但已经形成一条可运行的 headless 
 ## 当前缺口
 
 ::: warning 尚无产品级编辑器外壳
-当前分支已经交付 Basic Canvas Composition、Duplicate/Delete Selection、显式 Clipboard Copy/Paste、Port Capability、Port-aware/Node-level Edge Connection、SVG Renderer 闭环、React Adapter 与开发者参考 Examples Application，但仍没有 Vue 或其他 framework adapter，也没有产品级编辑器外壳。当前不包含自动/云端 Persistence、跨版本 Clipboard 格式、Edge/Port 框选、lasso、snapping、pinch/touch 工具、文本编辑、产品节点 UI 或可扩展 Tool Registry。
+当前分支已经交付 Basic Canvas Composition、Duplicate/Delete Selection、显式 Clipboard Copy/Paste、Port Capability、Port-aware/Node-level Edge Connection、SVG Renderer 闭环、React Adapter 与开发者参考 Examples Application，但仍没有 Vue 或其他 framework adapter，也没有产品级编辑器外壳。当前不包含自动/云端 Persistence、跨版本 Clipboard 格式、Edge/Port 框选、lasso、snapping、pinch/touch 工具、任意 HTML/React 组件节点与画布内文本编辑 或可扩展 Tool Registry。
 :::
 
 完整 Document 的版本化序列化与 Example 手动文件导出/导入已提供；当前没有自动/云端 Persistence、Collaboration 或远程同步能力。目标架构中出现某个名称，不代表它已经成为公共 package。
@@ -49,3 +49,5 @@ NodeBraid 处于早期实现阶段，但已经形成一条可运行的 headless 
 每项能力以当前 public exports、package tests、declaration isolation 与真实 Runtime composition 为证据。仓库总检查覆盖 lint、typecheck、format、Bun tests、真实浏览器 tests、build、Quick Start 与文档生产构建。
 
 站点内容不把 README 计数、链接存在或设计文档当成运行时证明；发现冲突时，以当前实现与测试为准，并单独保留设计意图。
+
+通用节点创建、严格起点 data 编辑与单次放置已提供。SVG 自定义内容沿用矩形交互边界，示例拥有应用/取消属性表单。见 [Node Editing](/modules/plugin-node-editing)。

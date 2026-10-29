@@ -22,7 +22,7 @@ It provides generic rectangular Nodes, straight Edges, and a stable DOM seam. It
 - Your application will define product visuals and editing behavior through CSS and higher-level Interaction;
 - You want to use a named Factory directly or connect it to the Runtime through [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer).
 
-If the product needs custom Node DOM, arbitrary Port shapes/positions, complex Edges, component mounting, or complete editor interaction, this package is not a substitute for those capabilities.
+If the product needs HTML/React component Nodes, arbitrary Port shapes/positions, complex Edges, component mounting, or complete editor interaction, this package is not a substitute for those capabilities.
 
 ## What it provides
 
@@ -53,6 +53,8 @@ import {
   type SvgDomEventPolicy,
   type SvgInputPolicies,
   type SvgRendererConfig,
+  type SvgNodeContentContext,
+  type SvgNodeContentFactory,
   type SvgRendererErrorCode,
 } from '@nodebraid/renderer-svg';
 
@@ -107,19 +109,20 @@ These attributes are stable seams for CSS, tests, and light DOM integration, not
 
 An available Target can host only one SVG Renderer Instance at a time. The Factory synchronously validates config, Target type, connection state, dimensions, coordinate transforms, and occupancy. The Target remains reserved from creation until asynchronous cleanup finishes so two instances cannot interleave ownership of one projection.
 
-| Code                 | Applicable failure                                                       |
-| -------------------- | ------------------------------------------------------------------------ |
-| `INVALID_CONFIG`     | Unknown config keys, an invalid tolerance, or invalid input policies     |
-| `INVALID_TARGET`     | `target` is not a valid `SVGSVGElement`                                  |
-| `TARGET_OCCUPIED`    | Another active or still-cleaning-up Instance owns the Target             |
-| `TARGET_UNAVAILABLE` | The Target is disconnected, has no usable size, or has no invertible CTM |
+| Code                   | Applicable failure                                                       |
+| ---------------------- | ------------------------------------------------------------------------ |
+| `INVALID_CONFIG`       | Unknown config keys, an invalid tolerance, or invalid input policies     |
+| `INVALID_NODE_CONTENT` | Invalid, mounted or already-owned SVG content                            |
+| `INVALID_TARGET`       | `target` is not a valid `SVGSVGElement`                                  |
+| `TARGET_OCCUPIED`      | Another active or still-cleaning-up Instance owns the Target             |
+| `TARGET_UNAVAILABLE`   | The Target is disconnected, has no usable size, or has no invertible CTM |
 
 Document revision, Session, Input subscriber, Pointer, and disposed-state failures continue to use `RendererError` from `@nodebraid/renderer-api`. The Provider does not swallow failures. Structural validation occurs before projection changes, and a failure that cannot be rolled back safely explicitly requires the next `reset` to rebuild the Baseline.
 
 ## Limitations and non-goals
 
-- Renders only explicitly sized rectangular Nodes and straight Edges between valid endpoints;
-- Nodes without Ports use node-level Connection Anchors; Ports use canonical boundary Geometry, while self-loops, curves, markers, labels, rich text, animation, and product-specific Node appearance remain unsupported;
+- Requires explicit Node Size, uses rectangular interaction bounds, and renders straight Edges between valid endpoints;
+- Nodes without Ports use node-level Connection Anchors; Ports use canonical boundary Geometry, while self-loops, curved Edges, Edge markers/labels, component lifecycles and animation remain unsupported;
 - No default theme, theme Registry, component slots, or framework adapter;
 - Does not interpret Interaction behavior and provides no Commands, drag state machine, Selection writes, or persistence; it only displays an accepted semantic Projection;
 - Does not create the SVG Target or take ownership of the caller's existing Target children;
@@ -128,3 +131,13 @@ Document revision, Session, Input subscriber, Pointer, and disposed-state failur
 ## Verification evidence
 
 Type tests lock down the named synchronous Factory, Config, and error entry points. Bun tests cover config and value semantics. Real-Chromium tests cover SVG and Interaction projection, DOM identity, continuous Commits, Session, Hit Testing, screen-to-SVG coordinate conversion, ResizeObserver, native input policies, Pointer Capture, lost capture, Focus, Runtime Plugin composition, Target reservation, rollback, and disposal. Declaration-artifact checks also ensure that public entry points do not leak implementation details.
+
+## Custom Node content
+
+`SvgRendererConfig.createNodeContent` synchronously constructs fresh, unattached SVG content from `nodeId`, `type`, `size`, opaque `data` and the target's `document`. The application interprets its own data and uses Node-local coordinates. The Provider owns the returned subtree and stable outer Node, positioning, Selection, rectangular hit bounds and Ports. There is no component or event-resource lifecycle.
+
+Without the callback the original rectangle DOM is retained. A reset reconstructs content; ordinary commits rebuild it only for new Nodes or type/size/data changes. Dragging, position, Selection and Viewport changes preserve content. Circle visuals still have rectangular hits. No automatic clipping is introduced.
+
+All candidate content is prepared before live DOM mutation, and child replacement participates in rollback. Invalid output and original callback failures are exposed. This Renderer atomicity cannot undo a Kernel Commit already consumed by Runtime; application validation belongs before data submission.
+
+Every reset also reconstructs content when Runtime independently registers or disposes a Port Contribution at the same Document revision. This keeps the existing Renderer protocol: an incremental Port geometry change is distinct from a Port-only Runtime reset.

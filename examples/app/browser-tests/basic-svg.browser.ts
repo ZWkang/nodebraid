@@ -25,6 +25,7 @@ const server = await createProductionAppServer(applicationRoot);
 
 try {
   await runAgentBrowser(['open', `${server.url.origin}/basic-svg?lang=en`]);
+  await runAgentBrowser(['set', 'viewport', '1280', '960']);
   const result = await evaluateBrowserScenario(`
     new Promise((resolve, reject) => {
       const deadline = Date.now() + 5000;
@@ -380,9 +381,10 @@ try {
   assert.deepEqual(
     await evaluateBrowserScenario(`(() => {
       const node = document.querySelector('[data-nodebraid-node-id="example-discover"]');
-      return { x: node?.getAttribute('x'), y: node?.getAttribute('y') };
+      const matrix = node.transform.baseVal.getItem(0).matrix;
+      return { x: matrix.e, y: matrix.f };
     })()`),
-    { x: '140', y: '140' },
+    { x: 140, y: 140 },
   );
 
   await evaluateBrowserScenario(`new Promise((resolve) => {
@@ -528,7 +530,7 @@ async function readLayoutState(): Promise<
   return evaluateBrowserScenario(`({
     positions: Object.fromEntries(Array.from(document.querySelectorAll('[data-nodebraid-node-id]'), (node) => [
       node.getAttribute('data-nodebraid-node-id'),
-      { x: Number(node.getAttribute('x')), y: Number(node.getAttribute('y')) },
+      { x: node.transform.baseVal.getItem(0).matrix.e, y: node.transform.baseVal.getItem(0).matrix.f },
     ])),
     transform: document.querySelector('[data-nodebraid-renderer-svg-root]')?.getAttribute('transform') ?? null,
     edgeIds: Array.from(document.querySelectorAll('[data-nodebraid-edge-id]'), (edge) =>

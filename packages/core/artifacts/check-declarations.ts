@@ -21,6 +21,7 @@ const pluginDuplicateSelectionDist = fileURLToPath(new URL('../../plugin-duplica
 const pluginHistoryDist = fileURLToPath(new URL('../../plugin-history/dist/', import.meta.url));
 const pluginInteractionDist = fileURLToPath(new URL('../../plugin-interaction/dist/', import.meta.url));
 const pluginKernelDist = fileURLToPath(new URL('../../plugin-kernel/dist/', import.meta.url));
+const pluginNodeEditingDist = fileURLToPath(new URL('../../plugin-node-editing/dist/', import.meta.url));
 const pluginPortDist = fileURLToPath(new URL('../../plugin-port/dist/', import.meta.url));
 const pluginRendererDist = fileURLToPath(new URL('../../plugin-renderer/dist/', import.meta.url));
 const pluginSessionDist = fileURLToPath(new URL('../../plugin-session/dist/', import.meta.url));
@@ -45,6 +46,7 @@ const declarationFiles = await Promise.all([
   collectDeclarations(pluginHistoryDist),
   collectDeclarations(pluginInteractionDist),
   collectDeclarations(pluginKernelDist),
+  collectDeclarations(pluginNodeEditingDist),
   collectDeclarations(pluginPortDist),
   collectDeclarations(pluginRendererDist),
   collectDeclarations(pluginSessionDist),
@@ -94,6 +96,9 @@ const documentText = corePackage.serializeCanvasDocument(kernel.read().snapshot,
 assert.deepEqual(corePackage.deserializeCanvasDocument(documentText, documentCodec), { nodes: [], edges: [] });
 assert.equal(corePackage.establishHistoryBaselineCommand.id, 'history.establish-baseline');
 assert.equal(corePackage.diagnosticEvents.sinkFault, 'nodebraid.diagnostics.sink.fault');
+assert.ok(corePackage.nodeEditingPlugin);
+assert.equal(corePackage.createNodeCommand.id, 'node.create');
+assert.equal(corePackage.updateNodeDataCommand.id, 'node.data.update');
 assert.ok(corePackage.kernelPlugin);
 assert.ok(corePackage.kernelService);
 assert.ok(corePackage.portPlugin);

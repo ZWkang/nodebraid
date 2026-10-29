@@ -43,7 +43,7 @@ symlink、hash 不符或身份不一致直接报错。只复制明确声明的�
 可见 Canvas 变更和场景维护使用项目
 [verify-nodebraid](../../.agents/skills/verify-nodebraid/SKILL.md) 及其
 [feature map](../../.agents/skills/verify-nodebraid/features/README.md)。当前场景为 Viewport、
-Selection/Duplicate/History、Port Connection、系统 Clipboard 和 Document 文件往返。场景选择来自
+Selection/Duplicate/History、Port Connection、系统 Clipboard、Document 文件往返和 Node 创建/编辑。场景选择来自
 [`preview-scenarios.ts`](../../scripts/preview-scenarios.ts)，`--all` 执行全部场景。
 
 采集器为每个场景建立独立 session，固定偶数尺寸页面并开始录制后检查真实页面 ready 状态和初始

@@ -37,6 +37,11 @@ try {
     flatten: true,
   })) as Readonly<{ sessionId: string }>;
   const page = attachment.sessionId;
+  await client.send(
+    'Emulation.setDeviceMetricsOverride',
+    { width: 1280, height: 960, deviceScaleFactor: 1, mobile: false },
+    page,
+  );
   await client.send('Page.bringToFront', {}, page);
   await evaluate(
     client,
@@ -140,10 +145,11 @@ try {
       page,
       `(() => {
         const node = document.querySelector('[data-nodebraid-node-id="example-clipboard-node-1"]');
-        return { x: node?.getAttribute('x'), y: node?.getAttribute('y') };
+        const matrix = node.transform.baseVal.getItem(0).matrix;
+        return { x: matrix.e, y: matrix.f };
       })()`,
     ),
-    { x: '104', y: '124' },
+    { x: 104, y: 124 },
   );
 
   await clickControl(client, page, 'Undo');

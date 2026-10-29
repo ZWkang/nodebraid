@@ -33,7 +33,7 @@ When the Renderer owns Focus and no Active Gesture exists, either logical `key` 
 
 ## Dependencies and write direction
 
-The Plugin statically requires Renderer, Session, Command, Kernel, and Port Services. It provides only the Shortcut contribution Service and does not expose Active Gesture state.
+The Plugin statically requires Renderer, Session, Command, Kernel, and Port Services. It provides the Shortcut contribution Service and Node Placement Service and does not expose Active Gesture state.
 
 ```text
 RendererService ─▶ Input / Hit / Capture / Projection
@@ -50,3 +50,9 @@ One Activation owns one Gesture Pointer. Additional Pointers and Wheel during a 
 ## Non-goals and verification
 
 The current version has no self-loop, business validation, capacity/type rules, Edge/Port box selection, lasso, Backspace deletion, Clipboard, confirmation UI, soft delete, snapping, pinch/touch tool, HTML overlay, text editing, collaboration presence, product UI, or generic Tool Registry. Successful behavior is verified through the complete Runtime + SVG seam in real Chromium.
+
+## One-shot Node Placement
+
+`nodePlacementService.begin(materializeNode)` starts one request. Its handle offers `cancel()` and a `result` Promise resolving to `{type: 'created', nodeId, commit}` or `{type: 'cancelled'}`; original failures reject. The synchronous application materializer receives `{worldPoint}` and returns a complete Node. Install Node Editing for the public Create Node Command; Basic Composition already includes it.
+
+Interaction routes placement and ordinary gestures together. A primary click begins and ends on blank Canvas below the existing drag threshold, creates once and selects the new Node. Entity clicks and drags do not place or also select/drag. Esc cancels. Idle placement retains pan/zoom, while a candidate click cannot commit across a Viewport change. The Example uses the point as the Node top-left and provides cursor/prompt feedback.

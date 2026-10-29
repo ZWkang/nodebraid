@@ -41,3 +41,9 @@ Viewport 保持当前值；Selection 继续按已有 ID 协调，不从文件恢
 Example 的应用 Data Codec 仅接受 `null` 或 `{ label: string, tags: string[] }`，Clipboard 使用同一业务约束。
 框架的 [Document](/modules/document) 契约允许应用提供其他 codec。文件不包含 Runtime revision 或 Session/History，
 页面不会自动保存；取消文件选择不会改变画布，同一文件可以再次导入。
+
+## 创建与编辑通用节点
+
+选择节点类型后在空白 Canvas 点击一次，完成放置并选中新节点；Esc 可取消。属性面板保留应用草稿：应用一次提交 data 并形成一次可撤销变化，取消不改 Document。切换编辑对象前提示应用或放弃未提交草稿。
+
+草稿绑定精确源 Node。拖动同一个节点也会使草稿过期，面板保留输入并提供显式重新载入；其他节点的变化不影响提交。节点类型、数据 schema 与表单属于示例应用，不属于 Kernel。已有文件导出/导入保留新节点及应用数据。

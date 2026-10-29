@@ -28,10 +28,11 @@ Execution & History 能力族把“发起一个行为”和“记录已经提交
 
 ## 提供的能力
 
-| 角色             | Package                                                | 交付内容                                                                  |
-| ---------------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
-| 行为执行         | [`@nodebraid/plugin-command`](/modules/plugin-command) | Command 定义、Activation-scoped 注册与执行、协作式取消、in-flight cleanup |
-| Document History | [`@nodebraid/plugin-history`](/modules/plugin-history) | Commit 记录、Undo/Redo Command、稳定 History Snapshot、单飞 Replay        |
+| 角色             | Package                                                          | 交付内容                                                                  |
+| ---------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| 行为执行         | [`@nodebraid/plugin-command`](/modules/plugin-command)           | Command 定义、Activation-scoped 注册与执行、协作式取消、in-flight cleanup |
+| Node Editing     | [`@nodebraid/plugin-node-editing`](/modules/plugin-node-editing) | 原子创建 Node 与精确源值保护的 data 更新                                  |
+| Document History | [`@nodebraid/plugin-history`](/modules/plugin-history)           | Commit 记录、Undo/Redo Command、稳定 History Snapshot、单飞 Replay        |
 
 典型链路如下：
 
@@ -61,7 +62,7 @@ History 记录的是 Change Set，不是 Command。没有 Command metadata 的 C
 
 - [`@nodebraid/plugin-command`](/modules/plugin-command)：定义和托管任意强类型行为；
 - [`@nodebraid/plugin-history`](/modules/plugin-history)：为 Kernel Commit 提供 Document Undo/Redo；
-- `@nodebraid/core`：重导出两者的公共 seam，但内部 package 仍直接依赖所属能力。
+- `@nodebraid/core`：重导出这些模块的公共 seam，但内部 package 仍直接依赖所属能力。
 
 当前 package 尚未公开发布；请按 [Quick Start](/guide/quick-start) 从源码验证，首次 npm 发布前不要使用尚未生效的 package 名安装。
 

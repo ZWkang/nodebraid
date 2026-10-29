@@ -1,6 +1,7 @@
 import { NodeBraidError, type DiagnosticAttributes } from '@nodebraid/diagnostics';
 
-export type SvgRendererErrorCode = 'INVALID_CONFIG' | 'INVALID_TARGET' | 'TARGET_OCCUPIED' | 'TARGET_UNAVAILABLE';
+export type SvgRendererErrorCode =
+  'INVALID_CONFIG' | 'INVALID_TARGET' | 'TARGET_OCCUPIED' | 'TARGET_UNAVAILABLE' | 'INVALID_NODE_CONTENT';
 
 export class SvgRendererError extends NodeBraidError<'renderer.svg', SvgRendererErrorCode> {
   override readonly name = 'SvgRendererError';

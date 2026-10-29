@@ -12,7 +12,7 @@ NodeBraid keeps the Plugin Host as an empty substrate. Applications can install 
 The Basic Canvas Composition fixes this member set:
 
 ```text
-Kernel → Command → Session → Renderer → Interaction → History
+Kernel → Port → Command → Node Editing → Session → Renderer → Interaction → History
 ```
 
 It accepts an application-selected Renderer Factory and forwards Installation config unchanged to that Provider. The Composition has no SVG, DOM, or concrete-backend dependency. The real SVG example takes a separate explicit dependency on `@nodebraid/renderer-svg`.
@@ -21,7 +21,7 @@ It accepts an application-selected Renderer Factory and forwards Installation co
 
 The Composition is an ordinary Plugin. Its parent setup creates every Child Installation and waits for every child to become active, so `composition.whenActive()` is the readiness point for the complete basic Runtime.
 
-Child Services still publish individually through the Plugin Graph; they are not hidden atomically until the parent becomes active. Disposal runs in reverse order: History, Interaction, Renderer, Session, Command, and Kernel. Asynchronous Renderer cleanup is awaited completely, and failures retain the existing AggregateError semantics.
+Child Services still publish individually through the Plugin Graph; they are not hidden atomically until the parent becomes active. Disposal runs in reverse order: History, Interaction, Renderer, Session, Node Editing, Command, Port, and Kernel. Asynchronous Renderer cleanup is awaited completely, and failures retain the existing AggregateError semantics.
 
 ## Decisions the application still owns
 
@@ -35,6 +35,6 @@ The Composition provides no aggregate Service, dynamic `getService()`, internal 
 
 ## Real verification
 
-Package tests use the real Plugin Host and all six real Feature Plugins to verify readiness, Command/History behavior, conflicts, rollback, Host isolation, and asynchronous cleanup. The complete success path uses the real SVG Provider in Chromium to verify projection, Selection, Box Selection, a Move Commit, Undo/Redo, Wheel Zoom, Host disposal, and Target reservation release.
+Package tests use the real Plugin Host and all eight real Feature Plugins to verify readiness, Command/History behavior, conflicts, rollback, Host isolation, and asynchronous cleanup. The complete success path uses the real SVG Provider in Chromium to verify projection, Selection, Box Selection, a Move Commit, Undo/Redo, Wheel Zoom, Host disposal, and Target reservation release.
 
 Continue with [`@nodebraid/preset-basic`](/en/modules/preset-basic), or use the [Quick Start](/en/guide/quick-start) for the headless and real-SVG example layers.

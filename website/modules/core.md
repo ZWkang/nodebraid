@@ -38,7 +38,7 @@ description: NodeBraid 当前已交付公共能力的统一 facade。
 - `@nodebraid/interaction-api` 的后端中立 Interaction Projection 值；
 - `@nodebraid/port-api` 的 Port 定义/Snapshot 值与 `@nodebraid/plugin-port` Runtime；
 - `@nodebraid/runtime-cordis` 的 NodeBraid-owned Plugin Host API；
-- Kernel、Port、Command、Session、Renderer、Interaction、Duplicate Selection、Clipboard 与 History Runtime Plugin；
+- Kernel、Port、Command、Node Editing、Session、Renderer、Interaction、Duplicate Selection、Clipboard 与 History Runtime Plugin；
 - `@nodebraid/preset-basic` 的后端中立 Basic Canvas Composition；
 - 通用 Layout API 与 Layout Runtime Plugin。
 

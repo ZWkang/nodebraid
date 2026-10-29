@@ -41,3 +41,9 @@ The current Viewport remains; Selection follows existing ID reconciliation inste
 The Example application Data Codec accepts only `null` or `{ label: string, tags: string[] }`; Clipboard uses the same business-data constraint.
 The framework [Document](/en/modules/document) contract accepts other application codecs. Files omit Runtime revision and Session/History.
 The page does not save automatically. Cancelling file selection leaves the Canvas unchanged, and the same file can be imported again.
+
+## Create and edit generic Nodes
+
+Select a Node type, then click blank Canvas once to place and select it. Escape cancels placement. The property editor keeps an application draft: Apply submits one data update and one undoable change; Cancel leaves the Document alone. Switching editing targets asks to apply or discard a dirty draft.
+
+Drafts bind an exact source Node. Moving that same Node also makes the draft stale; the editor preserves the input and offers explicit reload. Changes to other Nodes are compatible. Type/data schemas and form controls belong to this application, not Kernel. Existing download/import preserves the new Nodes and application data.

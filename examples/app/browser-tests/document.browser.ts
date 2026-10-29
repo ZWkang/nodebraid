@@ -60,6 +60,7 @@ const fixture = {
 
 try {
   await browser(['open', `${server.url.origin}/basic-svg?lang=en`]);
+  await browser(['set', 'viewport', '1280', '960']);
   await waitForMetrics({ nodes: '3', edges: '1', history: 'Undo / —' });
   assert.equal(await evaluate(`document.querySelector('[aria-label="Document file"]')?.type`), 'file');
   await attachPage();
@@ -361,7 +362,7 @@ async function readState() {
 
 async function readNodePositions() {
   return evaluate(
-    `Object.fromEntries(Array.from(document.querySelectorAll('[data-nodebraid-node-id]'), node => [node.getAttribute('data-nodebraid-node-id'), { x: Number(node.getAttribute('x')), y: Number(node.getAttribute('y')) }]))`,
+    `Object.fromEntries(Array.from(document.querySelectorAll('[data-nodebraid-node-id]'), node => [node.getAttribute('data-nodebraid-node-id'), { x: node.transform.baseVal.getItem(0).matrix.e, y: node.transform.baseVal.getItem(0).matrix.f }]))`,
   );
 }
 

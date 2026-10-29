@@ -85,6 +85,7 @@ revision=1 nodes=1
 │   ├── layout-elk/     # @nodebraid/layout-elk 官方 Provider
 │   ├── plugin-command/ # @nodebraid/plugin-command Runtime Service 适配器
 │   ├── plugin-clipboard/ # 显式 Clipboard Copy/Paste Behavior
+│   ├── plugin-node-editing/ # @nodebraid/plugin-node-editing Node creation / data updates
 │   ├── plugin-history/ # @nodebraid/plugin-history History Runtime Plugin
 │   ├── plugin-interaction/ # @nodebraid/plugin-interaction Interaction Runtime
 │   ├── plugin-duplicate-selection/ # 独立 Duplicate Selection Behavior
@@ -226,7 +227,7 @@ History Activation；重新激活时从新的空 Baseline 开始。
 
 `@nodebraid/preset-basic` 暴露
 `createBasicCanvasPlugin(rendererFactory, options?)`。它是后端无关的普通
-Plugin，通过 Child Installation 拥有 Kernel、Command、Session、Renderer、
+Plugin，通过 Child Installation 拥有 Kernel、Port、Command、Node Editing、Session、Renderer、
 Interaction 与 History。Composition 会等待每个 child 激活，并按依赖安全的逆序释放。
 
 应用仍负责创建 Plugin Host、配置 Diagnostics、选择具体 Renderer Factory，并将
@@ -438,3 +439,17 @@ bun run --filter '@nodebraid/core' test
 ## 许可证
 
 [MIT](./LICENSE)
+
+## 节点创建与编辑
+
+`@nodebraid/plugin-node-editing` 提供 `createNodeCommand` 与 `updateNodeDataCommand`，
+由 core 重导出并纳入 Basic Composition。应用拥有节点类型与不透明 data；SVG
+`createNodeContent` 提供同步自定义内容，Geometry 与矩形命中仍由 Provider 负责。
+示例提供单次放置、应用/取消编辑、明确的过期草稿恢复及已有文件往返。移动正在编辑的
+Node 也会使草稿过期，无关 Node 的变化不影响提交。
+
+```sh
+bun run --filter '@nodebraid/plugin-node-editing' build:dependencies
+bun run --filter '@nodebraid/plugin-node-editing' build:test-dependencies
+bun run --filter '@nodebraid/plugin-node-editing' test
+```

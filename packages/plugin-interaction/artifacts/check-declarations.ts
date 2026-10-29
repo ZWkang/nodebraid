@@ -19,6 +19,9 @@ assert.match(indexDeclaration, /ConnectionMaterializer/);
 assert.match(indexDeclaration, /interactionShortcutService/);
 assert.match(indexDeclaration, /InteractionShortcutService/);
 assert.match(indexDeclaration, /defineInteractionShortcut/);
+assert.match(indexDeclaration, /nodePlacementService/);
+assert.match(indexDeclaration, /NodePlacementService/);
+assert.match(indexDeclaration, /NodePlacementResult/);
 for (const declaration of await collectDeclarations(dist)) {
   assert.doesNotMatch(declaration.contents, forbiddenImport, declaration.path);
   assert.doesNotMatch(declaration.contents, forbiddenPlatformType, declaration.path);
@@ -31,3 +34,4 @@ assert.equal(typeof packageExports.interactionDiagnosticEvents, 'object');
 assert.equal(typeof packageExports.interactionShortcutService, 'object');
 assert.equal(typeof packageExports.moveNodesCommand, 'object');
 assert.equal(typeof packageExports.createEdgeCommand, 'object');
+assert.equal(typeof packageExports.nodePlacementService, 'object');
