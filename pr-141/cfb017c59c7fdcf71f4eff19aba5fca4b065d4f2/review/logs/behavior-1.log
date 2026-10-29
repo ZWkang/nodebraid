@@ -1,0 +1,25 @@
+bun test v1.4.2 (744846f84)
+
+packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:
+194 |     });
+195 |     expect(rejected).toBe(true);
+196 |     expect(containsError(failure, original)).toBe(true);
+197 |     const failures = events.filter((event) => event.name === runtimeDiagnosticEvents.installationDisposeFailed);
+198 |     expect(failures).toHaveLength(1);
+199 |     expect(failures[0]?.error).toBe(failure);
+                                     ^
+error: expect(received).toBe(expected)
+
+Expected: error: NaN
+NaN
+
+Received: serializes to the same string
+
+      at <anonymous> (/Users/zhou/.codex/worktrees/runtime-binding-descriptors/cflow/packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:199:32)
+(fail) terminal cleanup diagnostics retain an unchanged AggregateError containing NaN [30.24ms]
+
+ 0 pass
+ 8 filtered out
+ 1 fail
+ 4 expect() calls
+Ran 1 test across 1 file. [107.00ms]

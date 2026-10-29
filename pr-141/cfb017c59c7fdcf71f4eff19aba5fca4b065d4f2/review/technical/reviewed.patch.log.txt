@@ -1,0 +1,159 @@
+diff --git a/packages/runtime-cordis/src/host-diagnostics.ts b/packages/runtime-cordis/src/host-diagnostics.ts
+index 0c02c69..77d80c6 100644
+--- a/packages/runtime-cordis/src/host-diagnostics.ts
++++ b/packages/runtime-cordis/src/host-diagnostics.ts
+@@ -246,7 +246,7 @@ export class HostDiagnostics {
+       if (nestedErrors.length === 0) return Object.freeze({ found: false });
+       if (
+         nestedErrors.length === length &&
+-        nestedErrors.every((nestedError, index) => nestedError === members[index])
++        nestedErrors.every((nestedError, index) => Object.is(nestedError, members[index]))
+       ) {
+         return Object.freeze({ found: true, error });
+       }
+diff --git a/packages/runtime-cordis/tests/diagnostic-cleanup.test.ts b/packages/runtime-cordis/tests/diagnostic-cleanup.test.ts
+index 60b3055..1123576 100644
+--- a/packages/runtime-cordis/tests/diagnostic-cleanup.test.ts
++++ b/packages/runtime-cordis/tests/diagnostic-cleanup.test.ts
+@@ -170,6 +170,141 @@ test.each(['resolve', 'reject'] as const)(
+   },
+ );
+ 
++test('terminal cleanup diagnostics retain an unchanged AggregateError containing NaN', async () => {
++  const original = new AggregateError([Number.NaN], 'original cleanup');
++  const events: DiagnosticEvent[] = [];
++  const host = createPluginHost({ diagnostics: { sink: (event) => events.push(event) } });
++  const installation = host.install(
++    definePlugin({
++      setup(context) {
++        context.own(() => {
++          throw original;
++        });
++      },
++    }),
++  );
++  try {
++    await installation.whenActive();
++    const disposal = installation.dispose();
++    let rejected = false;
++    let failure: unknown;
++    await disposal.catch((error: unknown) => {
++      rejected = true;
++      failure = error;
++    });
++    expect(rejected).toBe(true);
++    expect(containsError(failure, original)).toBe(true);
++    const failures = events.filter((event) => event.name === runtimeDiagnosticEvents.installationDisposeFailed);
++    expect(failures).toHaveLength(1);
++    expect(failures[0]?.error).toBe(failure);
++    expect(containsError(failures[0]?.error, original)).toBe(true);
++    expect(original.errors[0]).toBeNaN();
++    expect(Object.isFrozen(original.errors)).toBe(false);
++    expect(installation.getSnapshot()).toEqual({ status: 'disposed' });
++  } finally {
++    await host.dispose();
++  }
++});
++
++test('Host cleanup diagnostics retain unchanged NaN, signed zero and ordinary members', async () => {
++  const leaf = new Error('ordinary member');
++  const original = new AggregateError([Number.NaN, -0, Infinity, -Infinity, undefined, leaf], 'mixed cleanup');
++  const members = original.errors;
++  const events: DiagnosticEvent[] = [];
++  const cleanup: string[] = [];
++  const host = createPluginHost({ diagnostics: { sink: (event) => events.push(event) } });
++  const installation = host.install(
++    definePlugin({
++      setup(context) {
++        context.own(() => {
++          cleanup.push('early');
++        });
++        context.own(() => {
++          cleanup.push('failure');
++          throw original;
++        });
++        context.own(() => {
++          cleanup.push('late');
++        });
++      },
++    }),
++  );
++  let failure: unknown;
++  try {
++    await installation.whenActive();
++    const disposal = host.dispose();
++    expect(host.dispose()).toBe(disposal);
++    let rejected = false;
++    await disposal.catch((error: unknown) => {
++      rejected = true;
++      failure = error;
++    });
++    expect(rejected).toBe(true);
++    const installationFailure = await installation.dispose().catch((error: unknown) => error);
++    const failures = events.filter((event) => event.name === runtimeDiagnosticEvents.installationDisposeFailed);
++    expect(failures).toHaveLength(1);
++    expect(failures[0]?.error).toBe(installationFailure);
++    expect(containsError(failures[0]?.error, original)).toBe(true);
++    expect(containsError(failure, original)).toBe(true);
++    expect(await host.dispose().catch((error: unknown) => error)).toBe(failure);
++    expect(cleanup).toEqual(['late', 'failure', 'early']);
++    expect(installation.getSnapshot()).toEqual({ status: 'disposed' });
++    expect(original.errors).toBe(members);
++    expect(original.errors[0]).toBeNaN();
++    expect(original.errors[1]).toBe(-0);
++    expect(original.errors[2]).toBe(Infinity);
++    expect(original.errors[3]).toBe(-Infinity);
++    expect(original.errors[4]).toBeUndefined();
++    expect(original.errors[5]).toBe(leaf);
++    expect(Object.isFrozen(members)).toBe(false);
++  } finally {
++    await host.dispose().catch((error: unknown) => {
++      expect(error).toBe(failure);
++    });
++  }
++});
++
++test('cleanup diagnostic filtering retains an unchanged NaN aggregate beside an already diagnosed error', async () => {
++  const diagnosed = new Error('already diagnosed');
++  const retained = new AggregateError([Number.NaN, -0], 'retained cleanup stage');
++  const original = new AggregateError([diagnosed, retained], 'application cleanup');
++  const events: DiagnosticEvent[] = [];
++  const host = createPluginHost({ diagnostics: { sink: (event) => events.push(event) } });
++  const installation = host.install(
++    definePlugin({
++      setup(context) {
++        context.diagnostics.emit({ name: 'test.already-diagnosed', level: 'error', error: diagnosed });
++        context.own(() => {
++          throw original;
++        });
++      },
++    }),
++  );
++  try {
++    await installation.whenActive();
++    let rejected = false;
++    let failure: unknown;
++    await installation.dispose().catch((error: unknown) => {
++      rejected = true;
++      failure = error;
++    });
++    expect(rejected).toBe(true);
++    expect(containsError(failure, original)).toBe(true);
++    expect(containsError(failure, diagnosed)).toBe(true);
++    expect(containsError(failure, retained)).toBe(true);
++    const failures = events.filter((event) => event.name === runtimeDiagnosticEvents.installationDisposeFailed);
++    expect(failures).toHaveLength(1);
++    expect(containsError(failures[0]?.error, diagnosed)).toBe(false);
++    expect(containsError(failures[0]?.error, original)).toBe(false);
++    expect(containsError(failures[0]?.error, retained)).toBe(true);
++    expect(original.errors).toEqual([diagnosed, retained]);
++    expect(retained.errors[0]).toBeNaN();
++    expect(retained.errors[1]).toBe(-0);
++  } finally {
++    await host.dispose();
++  }
++});
++
+ function containsError(error: unknown, expected: unknown): boolean {
+   if (error === expected) return true;
+   return error instanceof AggregateError && error.errors.some((nested: unknown) => containsError(nested, expected));

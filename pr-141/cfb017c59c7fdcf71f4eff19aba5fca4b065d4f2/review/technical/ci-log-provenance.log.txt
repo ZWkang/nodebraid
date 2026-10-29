@@ -1,0 +1,82 @@
+{
+  "sourceRun": 40868717185,
+  "sourceHead": "cfb017c59c7fdcf71f4eff19aba5fca4b065d4f2",
+  "checksJob": 123429966360,
+  "checksCheckout": "86c04af68840d096ed142cf6522ecb141494c774",
+  "checksCheckoutKind": "GitHub PR test merge, not an actual main integration",
+  "tree": "4591a2f466a7435ca4e4cd27aa948f695b929b02",
+  "orderedTestMergeParents": [
+    "447d7ae999959888b2dd3aefeaef1fa1784dcb7d",
+    "cfb017c59c7fdcf71f4eff19aba5fca4b065d4f2"
+  ],
+  "linuxRootBunSuite": {
+    "tests": 1698,
+    "assertions": 10848,
+    "failed": 0
+  },
+  "localFormalRootBunSuite": {
+    "head": "f5df3997555bf3470eababb626c0b87c453720c1",
+    "tests": 1698,
+    "assertions": 10854,
+    "failed": 0
+  },
+  "countsAreSeparateExecutionsNotAdded": true,
+  "previewJob": 123429966638,
+  "previewDirectCheckout": "cfb017c59c7fdcf71f4eff19aba5fca4b065d4f2",
+  "deployJob": 123432084762,
+  "deployConclusion": "skipped normally for PR",
+  "trustedPublisherRun": 40869349612,
+  "trustedPublisherJob": 123432110276,
+  "trustedPublisherCheckout": "447d7ae999959888b2dd3aefeaef1fa1784dcb7d",
+  "actualEligibility": {
+    "status": "eligible",
+    "runId": 40868717185,
+    "head": "cfb017c59c7fdcf71f4eff19aba5fca4b065d4f2",
+    "pr": 141
+  },
+  "previewEvidenceCommit": "87f6b43f1a3d039c1a304558132de80aa0b671be",
+  "completePublisherCollection": {
+    "runs": 139,
+    "pages": [
+      100,
+      39
+    ],
+    "uniqueIDs": true
+  },
+  "rawLogs": {
+    "checks": {
+      "file": "source-ci-checks-job.log",
+      "bytes": 284442,
+      "sha256": "70d72324d6f63ff3f534a765bccc7539ad8fb270d42a2b8d0b3c61590fef8f5f",
+      "checkoutCommits": [
+        "86c04af68840d096ed142cf6522ecb141494c774"
+      ],
+      "bunSummaries": [
+        [
+          "1698",
+          "0",
+          "10848"
+        ]
+      ]
+    },
+    "preview": {
+      "file": "source-ci-preview-job.log",
+      "bytes": 90324,
+      "sha256": "4465e4e6fa03b24bf33dadc953e13dc080e97d1da4b56810eb115a288e5b54c6",
+      "checkoutCommits": [
+        "cfb017c59c7fdcf71f4eff19aba5fca4b065d4f2"
+      ],
+      "bunSummaries": []
+    },
+    "publisher": {
+      "file": "trusted-publisher-job.log",
+      "bytes": 19609,
+      "sha256": "73590fa7646fcc6a1da8eac7f02723e0d0d6247c5016a02a3ccd61049cb9d753",
+      "checkoutCommits": [
+        "447d7ae999959888b2dd3aefeaef1fa1784dcb7d"
+      ],
+      "bunSummaries": []
+    }
+  },
+  "mainIntegrationAcceptanceCertified": false
+}

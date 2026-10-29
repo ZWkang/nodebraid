@@ -1,0 +1,23 @@
+{
+  "sourceCommit": "cfb017c59c7fdcf71f4eff19aba5fca4b065d4f2",
+  "localReviewCommit": "f5df3997555bf3470eababb626c0b87c453720c1",
+  "tree": "4591a2f466a7435ca4e4cd27aa948f695b929b02",
+  "orderedParents": [
+    "447d7ae999959888b2dd3aefeaef1fa1784dcb7d"
+  ],
+  "reviewBase": "447d7ae999959888b2dd3aefeaef1fa1784dcb7d",
+  "baseTree": "695b2bee19659da75ff175e5e4b14c230285d7da",
+  "baseAncestorVerified": true,
+  "changedPaths": [
+    "packages/runtime-cordis/src/host-diagnostics.ts",
+    "packages/runtime-cordis/tests/diagnostic-cleanup.test.ts"
+  ],
+  "completeLeaves": 946,
+  "fullGitByteReadback": true,
+  "fullApiTreeReadback": true,
+  "apiChangedBlobBodyReadbackCertified": false,
+  "apiBlobTextParserFailureRetainedSeparately": true,
+  "localTestsExecutedAtRemoteSHA": false,
+  "originalCompleteFileProofSHA256": "d5d4287b95efe007bcd04b38712dea393d9e31fea301d43c28614f3cbf905d93",
+  "byteVerificationMethod": "Saved actual API commit/tree metadata and one real Git fetch; git cat-file reads both actual publishedCommit:path and reviewedCommit:path for every946 leaf, preserving symlink target bytes; exact bytes/size/SHA1 Git blob/SHA256 checked. No new local tests were run at the GitData SHA."
+}

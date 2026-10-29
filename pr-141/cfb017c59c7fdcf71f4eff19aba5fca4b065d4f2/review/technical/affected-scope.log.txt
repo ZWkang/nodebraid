@@ -1,0 +1,61 @@
+{
+  "head": "f5df3997555bf3470eababb626c0b87c453720c1",
+  "selectedPackages": [
+    "@nodebraid/adapter-react",
+    "@nodebraid/core",
+    "@nodebraid/examples",
+    "@nodebraid/plugin-clipboard",
+    "@nodebraid/plugin-command",
+    "@nodebraid/plugin-duplicate-selection",
+    "@nodebraid/plugin-history",
+    "@nodebraid/plugin-interaction",
+    "@nodebraid/plugin-kernel",
+    "@nodebraid/plugin-layout",
+    "@nodebraid/plugin-node-editing",
+    "@nodebraid/plugin-port",
+    "@nodebraid/plugin-renderer",
+    "@nodebraid/plugin-session",
+    "@nodebraid/preset-basic",
+    "@nodebraid/renderer-svg",
+    "@nodebraid/runtime-cordis"
+  ],
+  "selectedPackageCount": 17,
+  "scopeNamesAreNotExtraPassedTestCounts": true,
+  "plan": {
+    "mode": "affected",
+    "files": [
+      "packages/runtime-cordis/src/host-diagnostics.ts",
+      "packages/runtime-cordis/tests/diagnostic-cleanup.test.ts"
+    ],
+    "packages": [
+      "@nodebraid/adapter-react",
+      "@nodebraid/core",
+      "@nodebraid/examples",
+      "@nodebraid/plugin-clipboard",
+      "@nodebraid/plugin-command",
+      "@nodebraid/plugin-duplicate-selection",
+      "@nodebraid/plugin-history",
+      "@nodebraid/plugin-interaction",
+      "@nodebraid/plugin-kernel",
+      "@nodebraid/plugin-layout",
+      "@nodebraid/plugin-node-editing",
+      "@nodebraid/plugin-port",
+      "@nodebraid/plugin-renderer",
+      "@nodebraid/plugin-session",
+      "@nodebraid/preset-basic",
+      "@nodebraid/renderer-svg",
+      "@nodebraid/runtime-cordis"
+    ],
+    "tests": [
+      "tests/kernel-commit-preparation.test.ts",
+      "tests/layout-providers.test.ts"
+    ],
+    "browser": [
+      "@nodebraid/adapter-react",
+      "@nodebraid/examples",
+      "@nodebraid/renderer-svg"
+    ],
+    "docs": true,
+    "shared": []
+  }
+}

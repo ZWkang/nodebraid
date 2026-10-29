@@ -1,0 +1,424 @@
+{
+  "rows": [
+    {
+      "route": "installation",
+      "sinkEnabled": false,
+      "kind": "nan-member",
+      "checks": {
+        "operationReallyRejected": true,
+        "originalAggregateRetainedInRejection": true,
+        "originalLeafRetainedInRejection": true,
+        "diagnosticRetainsOriginalAggregate": true,
+        "diagnosticLeafRetained": true,
+        "cleanupReverseOrder": true,
+        "terminalDisposed": true,
+        "samePendingPromise": true,
+        "sameSettledPromise": true,
+        "cachedRejectionIdentity": true,
+        "hostOutcome": true,
+        "noFault": true
+      },
+      "failedChecks": [],
+      "passed": true,
+      "events": [],
+      "cleanup": [
+        "late",
+        "failing",
+        "early"
+      ],
+      "disposed": "disposed",
+      "faultCount": 0,
+      "publicRendererOrBrowserUsed": false
+    },
+    {
+      "route": "installation",
+      "sinkEnabled": false,
+      "kind": "error-member-control",
+      "checks": {
+        "operationReallyRejected": true,
+        "originalAggregateRetainedInRejection": true,
+        "originalLeafRetainedInRejection": true,
+        "diagnosticRetainsOriginalAggregate": true,
+        "diagnosticLeafRetained": true,
+        "cleanupReverseOrder": true,
+        "terminalDisposed": true,
+        "samePendingPromise": true,
+        "sameSettledPromise": true,
+        "cachedRejectionIdentity": true,
+        "hostOutcome": true,
+        "noFault": true
+      },
+      "failedChecks": [],
+      "passed": true,
+      "events": [],
+      "cleanup": [
+        "late",
+        "failing",
+        "early"
+      ],
+      "disposed": "disposed",
+      "faultCount": 0,
+      "publicRendererOrBrowserUsed": false
+    },
+    {
+      "route": "installation",
+      "sinkEnabled": true,
+      "kind": "nan-member",
+      "checks": {
+        "operationReallyRejected": true,
+        "originalAggregateRetainedInRejection": true,
+        "originalLeafRetainedInRejection": true,
+        "diagnosticRetainsOriginalAggregate": true,
+        "diagnosticLeafRetained": true,
+        "cleanupReverseOrder": true,
+        "terminalDisposed": true,
+        "samePendingPromise": true,
+        "sameSettledPromise": true,
+        "cachedRejectionIdentity": true,
+        "hostOutcome": true,
+        "noFault": true
+      },
+      "failedChecks": [],
+      "passed": true,
+      "events": [
+        {
+          "name": "nodebraid.runtime.host.created",
+          "level": "info",
+          "sequence": 1
+        },
+        {
+          "name": "nodebraid.runtime.installation.status.changed",
+          "level": "debug",
+          "sequence": 2
+        },
+        {
+          "name": "nodebraid.runtime.activation.started",
+          "level": "debug",
+          "sequence": 3
+        },
+        {
+          "name": "nodebraid.runtime.installation.status.changed",
+          "level": "debug",
+          "sequence": 4
+        },
+        {
+          "name": "nodebraid.runtime.activation.ended",
+          "level": "debug",
+          "sequence": 5
+        },
+        {
+          "name": "nodebraid.runtime.installation.status.changed",
+          "level": "debug",
+          "sequence": 6
+        },
+        {
+          "name": "nodebraid.runtime.installation.dispose.failed",
+          "level": "error",
+          "sequence": 7
+        },
+        {
+          "name": "nodebraid.runtime.host.disposing",
+          "level": "debug",
+          "sequence": 8
+        },
+        {
+          "name": "nodebraid.runtime.host.disposed",
+          "level": "info",
+          "sequence": 9
+        }
+      ],
+      "cleanup": [
+        "late",
+        "failing",
+        "early"
+      ],
+      "disposed": "disposed",
+      "faultCount": 0,
+      "publicRendererOrBrowserUsed": false
+    },
+    {
+      "route": "installation",
+      "sinkEnabled": true,
+      "kind": "error-member-control",
+      "checks": {
+        "operationReallyRejected": true,
+        "originalAggregateRetainedInRejection": true,
+        "originalLeafRetainedInRejection": true,
+        "diagnosticRetainsOriginalAggregate": true,
+        "diagnosticLeafRetained": true,
+        "cleanupReverseOrder": true,
+        "terminalDisposed": true,
+        "samePendingPromise": true,
+        "sameSettledPromise": true,
+        "cachedRejectionIdentity": true,
+        "hostOutcome": true,
+        "noFault": true
+      },
+      "failedChecks": [],
+      "passed": true,
+      "events": [
+        {
+          "name": "nodebraid.runtime.host.created",
+          "level": "info",
+          "sequence": 1
+        },
+        {
+          "name": "nodebraid.runtime.installation.status.changed",
+          "level": "debug",
+          "sequence": 2
+        },
+        {
+          "name": "nodebraid.runtime.activation.started",
+          "level": "debug",
+          "sequence": 3
+        },
+        {
+          "name": "nodebraid.runtime.installation.status.changed",
+          "level": "debug",
+          "sequence": 4
+        },
+        {
+          "name": "nodebraid.runtime.activation.ended",
+          "level": "debug",
+          "sequence": 5
+        },
+        {
+          "name": "nodebraid.runtime.installation.status.changed",
+          "level": "debug",
+          "sequence": 6
+        },
+        {
+          "name": "nodebraid.runtime.installation.dispose.failed",
+          "level": "error",
+          "sequence": 7
+        },
+        {
+          "name": "nodebraid.runtime.host.disposing",
+          "level": "debug",
+          "sequence": 8
+        },
+        {
+          "name": "nodebraid.runtime.host.disposed",
+          "level": "info",
+          "sequence": 9
+        }
+      ],
+      "cleanup": [
+        "late",
+        "failing",
+        "early"
+      ],
+      "disposed": "disposed",
+      "faultCount": 0,
+      "publicRendererOrBrowserUsed": false
+    },
+    {
+      "route": "host",
+      "sinkEnabled": false,
+      "kind": "nan-member",
+      "checks": {
+        "operationReallyRejected": true,
+        "originalAggregateRetainedInRejection": true,
+        "originalLeafRetainedInRejection": true,
+        "diagnosticRetainsOriginalAggregate": true,
+        "diagnosticLeafRetained": true,
+        "cleanupReverseOrder": true,
+        "terminalDisposed": true,
+        "samePendingPromise": true,
+        "sameSettledPromise": true,
+        "cachedRejectionIdentity": true,
+        "hostOutcome": true,
+        "noFault": true
+      },
+      "failedChecks": [],
+      "passed": true,
+      "events": [],
+      "cleanup": [
+        "late",
+        "failing",
+        "early"
+      ],
+      "disposed": "disposed",
+      "faultCount": 0,
+      "publicRendererOrBrowserUsed": false
+    },
+    {
+      "route": "host",
+      "sinkEnabled": false,
+      "kind": "error-member-control",
+      "checks": {
+        "operationReallyRejected": true,
+        "originalAggregateRetainedInRejection": true,
+        "originalLeafRetainedInRejection": true,
+        "diagnosticRetainsOriginalAggregate": true,
+        "diagnosticLeafRetained": true,
+        "cleanupReverseOrder": true,
+        "terminalDisposed": true,
+        "samePendingPromise": true,
+        "sameSettledPromise": true,
+        "cachedRejectionIdentity": true,
+        "hostOutcome": true,
+        "noFault": true
+      },
+      "failedChecks": [],
+      "passed": true,
+      "events": [],
+      "cleanup": [
+        "late",
+        "failing",
+        "early"
+      ],
+      "disposed": "disposed",
+      "faultCount": 0,
+      "publicRendererOrBrowserUsed": false
+    },
+    {
+      "route": "host",
+      "sinkEnabled": true,
+      "kind": "nan-member",
+      "checks": {
+        "operationReallyRejected": true,
+        "originalAggregateRetainedInRejection": true,
+        "originalLeafRetainedInRejection": true,
+        "diagnosticRetainsOriginalAggregate": true,
+        "diagnosticLeafRetained": true,
+        "cleanupReverseOrder": true,
+        "terminalDisposed": true,
+        "samePendingPromise": true,
+        "sameSettledPromise": true,
+        "cachedRejectionIdentity": true,
+        "hostOutcome": true,
+        "noFault": true
+      },
+      "failedChecks": [],
+      "passed": true,
+      "events": [
+        {
+          "name": "nodebraid.runtime.host.created",
+          "level": "info",
+          "sequence": 1
+        },
+        {
+          "name": "nodebraid.runtime.installation.status.changed",
+          "level": "debug",
+          "sequence": 2
+        },
+        {
+          "name": "nodebraid.runtime.activation.started",
+          "level": "debug",
+          "sequence": 3
+        },
+        {
+          "name": "nodebraid.runtime.installation.status.changed",
+          "level": "debug",
+          "sequence": 4
+        },
+        {
+          "name": "nodebraid.runtime.host.disposing",
+          "level": "debug",
+          "sequence": 5
+        },
+        {
+          "name": "nodebraid.runtime.activation.ended",
+          "level": "debug",
+          "sequence": 6
+        },
+        {
+          "name": "nodebraid.runtime.installation.status.changed",
+          "level": "debug",
+          "sequence": 7
+        },
+        {
+          "name": "nodebraid.runtime.installation.dispose.failed",
+          "level": "error",
+          "sequence": 8
+        }
+      ],
+      "cleanup": [
+        "late",
+        "failing",
+        "early"
+      ],
+      "disposed": "disposed",
+      "faultCount": 0,
+      "publicRendererOrBrowserUsed": false
+    },
+    {
+      "route": "host",
+      "sinkEnabled": true,
+      "kind": "error-member-control",
+      "checks": {
+        "operationReallyRejected": true,
+        "originalAggregateRetainedInRejection": true,
+        "originalLeafRetainedInRejection": true,
+        "diagnosticRetainsOriginalAggregate": true,
+        "diagnosticLeafRetained": true,
+        "cleanupReverseOrder": true,
+        "terminalDisposed": true,
+        "samePendingPromise": true,
+        "sameSettledPromise": true,
+        "cachedRejectionIdentity": true,
+        "hostOutcome": true,
+        "noFault": true
+      },
+      "failedChecks": [],
+      "passed": true,
+      "events": [
+        {
+          "name": "nodebraid.runtime.host.created",
+          "level": "info",
+          "sequence": 1
+        },
+        {
+          "name": "nodebraid.runtime.installation.status.changed",
+          "level": "debug",
+          "sequence": 2
+        },
+        {
+          "name": "nodebraid.runtime.activation.started",
+          "level": "debug",
+          "sequence": 3
+        },
+        {
+          "name": "nodebraid.runtime.installation.status.changed",
+          "level": "debug",
+          "sequence": 4
+        },
+        {
+          "name": "nodebraid.runtime.host.disposing",
+          "level": "debug",
+          "sequence": 5
+        },
+        {
+          "name": "nodebraid.runtime.activation.ended",
+          "level": "debug",
+          "sequence": 6
+        },
+        {
+          "name": "nodebraid.runtime.installation.status.changed",
+          "level": "debug",
+          "sequence": 7
+        },
+        {
+          "name": "nodebraid.runtime.installation.dispose.failed",
+          "level": "error",
+          "sequence": 8
+        }
+      ],
+      "cleanup": [
+        "late",
+        "failing",
+        "early"
+      ],
+      "disposed": "disposed",
+      "faultCount": 0,
+      "publicRendererOrBrowserUsed": false
+    }
+  ],
+  "uncaughtCount": 0,
+  "unhandledCount": 0,
+  "processListenersRemoved": true,
+  "derivedForPublicPresentation": true,
+  "originalObservationSHA256": "e16f6cb8dd516d261db720ecdd3a94dfaddd88f1c4ada6e3ce9680e202771b69",
+  "modulePathQualification": "Actual package-name resolution was independently checked against the corresponding public production dist modules; private absolute machine paths are omitted."
+}

@@ -1,0 +1,20 @@
+{
+  "testSHA256": "83dbd208fe68f3159f8d789a5e0353c04029236df1234afa8e924a7af6338413",
+  "red": {
+    "exitCode": 1,
+    "productionUnmodifiedFromBase": true,
+    "tests": 1,
+    "passed": 0,
+    "failed": 1,
+    "expectCalls": 4
+  },
+  "green": {
+    "exitCode": 0,
+    "sameTestBytes": true,
+    "tests": 1,
+    "passed": 1,
+    "failed": 0,
+    "expectCalls": 8
+  },
+  "laterCompatibilityCases": "Two additional public cases; related Runtime/Diagnostics suite319tests/2374assertions. Dirty source patch matches the reviewed commit; not formal or remote execution."
+}

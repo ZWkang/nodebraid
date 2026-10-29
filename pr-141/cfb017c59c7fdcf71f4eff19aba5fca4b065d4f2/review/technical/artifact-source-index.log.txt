@@ -1,0 +1,140 @@
+{
+  "source": "Current head technical attachment index",
+  "files": [
+    {
+      "path": "technical/public-program.ts.log.txt",
+      "role": "Verbatim byte-identical baseline and repair TypeScript entry",
+      "derivedForPresentation": false,
+      "bytes": 6228,
+      "sha256": "6650d16ccf78006be316e10435d51cdd8754a41e5248aad92da5e2e02b11a91b"
+    },
+    {
+      "path": "technical/public-program.js.log.txt",
+      "role": "Verbatim emitted JavaScript shared by the baseline and repair executions",
+      "derivedForPresentation": false,
+      "bytes": 6518,
+      "sha256": "402a700298541901af319a5789a414642e3473b526fbd9d138190a1d97add360"
+    },
+    {
+      "path": "technical/public-program.js.map.log.txt",
+      "role": "Verbatim emitted source-map bytes shared by both executions",
+      "derivedForPresentation": false,
+      "bytes": 6663,
+      "sha256": "662eec14c03cb71a5f1aa176206197e1fb3073168831db76297b015b2172bb5e"
+    },
+    {
+      "path": "technical/primary-red-green-test-snapshot.ts.log.txt",
+      "role": "Verbatim primary tracer snapshot before the later compatibility additions",
+      "derivedForPresentation": false,
+      "bytes": 7978,
+      "sha256": "83dbd208fe68f3159f8d789a5e0353c04029236df1234afa8e924a7af6338413"
+    },
+    {
+      "path": "technical/reviewed.patch.log.txt",
+      "role": "Verbatim complete binary patch reviewed and verified",
+      "derivedForPresentation": false,
+      "bytes": 6644,
+      "sha256": "953ff2e94631ef139d4a4d0c99f435a498681385d41be888daaa881b10d8176a"
+    },
+    {
+      "path": "technical/public-baseline-observations.log.txt",
+      "role": "Derived observation presentation; all original rows/counts retained",
+      "derivedForPresentation": true,
+      "bytes": 11843,
+      "sha256": "113474effc43831ca4a665914aa81c5ae6c3e39760d51d83febebbe94f02bbda"
+    },
+    {
+      "path": "technical/public-repair-observations.log.txt",
+      "role": "Derived observation presentation; all original rows/counts retained",
+      "derivedForPresentation": true,
+      "bytes": 11735,
+      "sha256": "b5e27b8d276bfbc72d4a0f598d73b1cf1db8ee0ddb243cb3f570c76a9cf23232"
+    },
+    {
+      "path": "technical/public-execution-provenance.log.txt",
+      "role": "Derived public execution provenance",
+      "derivedForPresentation": true,
+      "bytes": 2374,
+      "sha256": "bd072fe3c044475667ffcc56b00a48a56cbfb4ca976f0137e9313069eb1ab3c3"
+    },
+    {
+      "path": "technical/primary-tdd-provenance.log.txt",
+      "role": "Derived primary TDD receipt view",
+      "derivedForPresentation": true,
+      "bytes": 569,
+      "sha256": "166043d4416cb6ed8ed3c54306592d04d0d291df0bd110aff34fe3a525124516"
+    },
+    {
+      "path": "technical/affected-scope.log.txt",
+      "role": "Original selected affected scope metadata",
+      "derivedForPresentation": false,
+      "bytes": 1789,
+      "sha256": "3f9ef78657310f5a2a1adc40a8f0185e09791d96b2e4251aa3971aa98a5a008b"
+    },
+    {
+      "path": "technical/affected-receipt.log.txt",
+      "role": "Derived affected receipt excluding personal cwd",
+      "derivedForPresentation": true,
+      "bytes": 882,
+      "sha256": "ab1fb79b9beb3699a8eaf783ae545a54283204a106d6797697a627828d0b208f"
+    },
+    {
+      "path": "technical/source-publication-readback-summary.log.txt",
+      "role": "Derived complete source publication readback summary",
+      "derivedForPresentation": true,
+      "bytes": 1205,
+      "sha256": "d67323f52d316818a07aafde61e33119bdd0f2caa159e1069056125788614799"
+    },
+    {
+      "path": "technical/source-ci-checks.log",
+      "role": "Original complete decoded CI job log, UTF-8/BOM retained",
+      "derivedForPresentation": false,
+      "bytes": 284442,
+      "sha256": "70d72324d6f63ff3f534a765bccc7539ad8fb270d42a2b8d0b3c61590fef8f5f"
+    },
+    {
+      "path": "technical/source-ci-preview.log",
+      "role": "Original complete decoded CI job log, UTF-8/BOM retained",
+      "derivedForPresentation": false,
+      "bytes": 90324,
+      "sha256": "4465e4e6fa03b24bf33dadc953e13dc080e97d1da4b56810eb115a288e5b54c6"
+    },
+    {
+      "path": "technical/trusted-publisher.log",
+      "role": "Original complete decoded CI job log, UTF-8/BOM retained",
+      "derivedForPresentation": false,
+      "bytes": 19609,
+      "sha256": "73590fa7646fcc6a1da8eac7f02723e0d0d6247c5016a02a3ccd61049cb9d753"
+    },
+    {
+      "path": "technical/ci-log-provenance.log.txt",
+      "role": "Derived exact CI identities and observed counters",
+      "derivedForPresentation": true,
+      "bytes": 2412,
+      "sha256": "75a3f16c40ed3e152e748bda73125e0a43570631ed6d8c5b288aeb9fbc3a9cec"
+    },
+    {
+      "path": "technical/preview-content-readback.log.txt",
+      "role": "Original complete69-file preview byte/size/hash/Gitblob/header readback",
+      "derivedForPresentation": false,
+      "bytes": 26785,
+      "sha256": "f56b734c1474b9c2e3a18405bc4689b6c7f6abeefc8ce772f8a763f2838ecf40"
+    },
+    {
+      "path": "technical/behavior-log-provenance.log.txt",
+      "role": "Original declared behavior log construction and portable command explanation",
+      "derivedForPresentation": false,
+      "bytes": 1482,
+      "sha256": "fc2ccce6e051b5f8dfacded503e093fc69f78d28c03464bc46a140b6eaedefcf"
+    },
+    {
+      "path": "technical/scope-and-record-limits.md",
+      "role": "Derived complete execution and collection scope notes",
+      "derivedForPresentation": true,
+      "bytes": 5624,
+      "sha256": "b8a65e50f0a3b6aca3d0a4fd9237b74941aa9e6958d69b3298ce067a60c32992"
+    }
+  ],
+  "indexExcludesItself": true,
+  "fullOriginalLocalRecordsRetained": true
+}

@@ -1,0 +1,49 @@
+{
+  "sourceEntrySHA256": "6650d16ccf78006be316e10435d51cdd8754a41e5248aad92da5e2e02b11a91b",
+  "sameEntryAndEmittedJSAndMapBytes": true,
+  "baseline": {
+    "sourceMain": "447d7ae999959888b2dd3aefeaef1fa1784dcb7d",
+    "tree": "695b2bee19659da75ff175e5e4b14c230285d7da",
+    "strictCompilerExit": 0,
+    "nativeBunExit": 1,
+    "controls": 8,
+    "passed": 6,
+    "failed": 2,
+    "originalReceiptsSHA256": "cb4a7d69d0e184c77e538c0c4186fcce1f61558ba5c0e90cc058ea38143cbe15"
+  },
+  "repair": {
+    "reviewedIdentity": {
+      "taskDigest": "7c9a53662dd59837e99720bc5f8264877b8e415bf308657953f3931c02296376",
+      "head": "f5df3997555bf3470eababb626c0b87c453720c1",
+      "tree": "4591a2f466a7435ca4e4cd27aa948f695b929b02",
+      "patch": "953ff2e94631ef139d4a4d0c99f435a498681385d41be888daaa881b10d8176a",
+      "changedFiles": [
+        "packages/runtime-cordis/src/host-diagnostics.ts",
+        "packages/runtime-cordis/tests/diagnostic-cleanup.test.ts"
+      ]
+    },
+    "strictCompilerExit": 0,
+    "nativeBunExit": 0,
+    "controls": 8,
+    "passed": 8,
+    "modules": [
+      {
+        "path": "packages/runtime-cordis/dist/index.js",
+        "bytes": 311,
+        "sha256": "c51e03769fd58eee903f81f5556ad3ac653917eab47c6dd6226d5e8c1972d5f4"
+      },
+      {
+        "path": "packages/diagnostics/dist/index.js",
+        "bytes": 430,
+        "sha256": "438fb75caf4a4ff7e7e73dd3b13a9c188a47448b0892e8b3f7fa3158f6886ac9"
+      }
+    ],
+    "hostDiagnosticsArtifactSHA256": "0016692fe5073b956bd36bd203bb9323d6281cd4563df5c44d613a3251d07d05",
+    "originalReceiptsSHA256": "f724d9fbf7991aeb9541cd12794eb9eb13bcf84f507a3130c556857472417d1a",
+    "actualBuildPrerequisite": "Current-head affected check; no extra root build",
+    "publicArtifactsBeforeAfterUnchanged": 653,
+    "postFormalArtifactsStillIdentical": true
+  },
+  "portableReplay": "Extract retained program bytes and select BASELINE_PROGRAM_DIR or REPAIR_PROGRAM_DIR; compile with the retained strict TypeScript settings and run bun \"$PROGRAM_DIR/compiled/runtime-nan-diagnostic.js\". Original expanded argv and machine paths remain in private local execution records. Portable rendering did not execute another check.",
+  "scope": "Native Bun public Host/Owned Resource/Installation/Host diagnostics; no browser or Renderer. Sink-off cases prove ordinary diagnostics disabled, not a diagnostic payload."
+}

@@ -1,0 +1,102 @@
+import assert from 'node:assert/strict';
+import { writeFileSync } from 'node:fs';
+import { createPluginHost, definePlugin, runtimeDiagnosticEvents } from '@nodebraid/runtime-cordis';
+import type { DiagnosticEvent, DiagnosticFault } from '@nodebraid/diagnostics';
+
+type Outcome = { readonly ok: true } | { readonly ok: false; readonly error: unknown };
+const capture = (promise: Promise<void>): Promise<Outcome> => promise.then(
+  () => ({ ok: true as const }), (error: unknown) => ({ ok: false as const, error }),
+);
+function containsReference(root: unknown, target: unknown, seen = new Set<object>()): boolean {
+  if (Object.is(root, target)) return true;
+  if ((typeof root !== 'object' || root === null) && typeof root !== 'function') return false;
+  if (seen.has(root)) return false;
+  seen.add(root);
+  const descriptor = Object.getOwnPropertyDescriptor(root, 'errors');
+  if (!descriptor || !('value' in descriptor) || !Array.isArray(descriptor.value)) return false;
+  const members: unknown[] = descriptor.value;
+  return members.some(member => containsReference(member, target, seen));
+}
+const output = process.env.NODEBRAID_NAN_DIAGNOSTIC_RESULTS;
+assert.ok(output);
+const rows: Record<string, unknown>[] = [];
+const uncaught: unknown[] = [];
+const unhandled: unknown[] = [];
+const onUncaught = (error: unknown) => { uncaught.push(error); };
+const onUnhandled = (error: unknown) => { unhandled.push(error); };
+process.on('uncaughtException', onUncaught);
+process.on('unhandledRejection', onUnhandled);
+try {
+  for (const route of ['installation', 'host'] as const) {
+    for (const sinkEnabled of [false, true]) {
+      for (const kind of ['nan-member', 'error-member-control'] as const) {
+        const leaf: unknown = kind === 'nan-member' ? Number.NaN : new Error('ordinary member control');
+        const original = new AggregateError([leaf], 'application owned-resource aggregate');
+        const events: DiagnosticEvent[] = [];
+        const faults: DiagnosticFault[] = [];
+        const cleanup: string[] = [];
+        const host = createPluginHost({ diagnostics: {
+          ...(sinkEnabled ? { sink(event: DiagnosticEvent) { events.push(event); } } : {}),
+          faultReporter(fault: DiagnosticFault) { faults.push(fault); },
+        } });
+        const installation = host.install(definePlugin({
+          name: 'public-nan-diagnostic-identity',
+          setup(context) {
+            context.own(() => { cleanup.push('early'); });
+            context.own(() => { cleanup.push('failing'); throw original; });
+            context.own(() => { cleanup.push('late'); });
+          },
+        }));
+        try {
+          await installation.whenActive();
+          const operation = route === 'installation' ? installation.dispose() : host.dispose();
+          const pendingSame = (route === 'installation' ? installation.dispose() : host.dispose()) === operation;
+          const result = await capture(operation);
+          const repeatedOperation = route === 'installation' ? installation.dispose() : host.dispose();
+          const repeated = await capture(repeatedOperation);
+          const hostAfter = await capture(host.dispose());
+          const failures = events.filter(event => event.name === runtimeDiagnosticEvents.installationDisposeFailed);
+          const diagnosticRetainsOriginalAggregate = sinkEnabled
+            ? failures.length === 1 && containsReference(failures[0]?.error, original)
+            : events.length === 0;
+          const checks = {
+            operationReallyRejected: !result.ok,
+            originalAggregateRetainedInRejection: !result.ok && containsReference(result.error, original),
+            originalLeafRetainedInRejection: !result.ok && containsReference(result.error, leaf),
+            diagnosticRetainsOriginalAggregate,
+            diagnosticLeafRetained: sinkEnabled ? containsReference(failures[0]?.error, leaf) : true,
+            cleanupReverseOrder: cleanup.join(',') === 'late,failing,early',
+            terminalDisposed: installation.getSnapshot().status === 'disposed',
+            samePendingPromise: pendingSame,
+            sameSettledPromise: repeatedOperation === operation,
+            cachedRejectionIdentity: !result.ok && !repeated.ok && Object.is(result.error, repeated.error),
+            hostOutcome: route === 'installation' ? hostAfter.ok
+              : !result.ok && !hostAfter.ok && Object.is(result.error, hostAfter.error),
+            noFault: faults.length === 0,
+          };
+          const failedChecks = Object.entries(checks).filter(([, passed]) => !passed).map(([name]) => name);
+          const row = { route, sinkEnabled, kind, checks, failedChecks, passed: failedChecks.length === 0,
+            events: events.map(event => ({ name: event.name, level: event.level, sequence: event.sequence })),
+            cleanup, disposed: installation.getSnapshot().status,
+            faultCount: faults.length, publicRendererOrBrowserUsed: false };
+          rows.push(row);
+          writeFileSync(output, JSON.stringify({ rows, uncaughtCount: uncaught.length, unhandledCount: unhandled.length,
+            modulePaths: { runtime: import.meta.resolve('@nodebraid/runtime-cordis'), diagnostics: import.meta.resolve('@nodebraid/diagnostics') } }, null, 2) + '\n');
+          console.log(JSON.stringify(row));
+        } finally {
+          await Promise.allSettled([installation.dispose(), host.dispose()]);
+        }
+      }
+    }
+  }
+} finally {
+  process.removeListener('uncaughtException', onUncaught);
+  process.removeListener('unhandledRejection', onUnhandled);
+  writeFileSync(output, JSON.stringify({ rows, uncaughtCount: uncaught.length, unhandledCount: unhandled.length,
+    processListenersRemoved: !process.listeners('uncaughtException').includes(onUncaught) && !process.listeners('unhandledRejection').includes(onUnhandled),
+    modulePaths: { runtime: import.meta.resolve('@nodebraid/runtime-cordis'), diagnostics: import.meta.resolve('@nodebraid/diagnostics') } }, null, 2) + '\n');
+}
+assert.equal(rows.length, 8);
+assert.equal(uncaught.length, 0);
+assert.equal(unhandled.length, 0);
+assert.ok(rows.every(row => row.passed), 'Cleanup diagnostics must retain the original undiagnosed resource AggregateError object.');

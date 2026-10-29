@@ -1,0 +1,467 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "447d7ae999959888b2dd3aefeaef1fa1784dcb7d",
+    "expectedParent": "447d7ae999959888b2dd3aefeaef1fa1784dcb7d",
+    "head": "cfb017c59c7fdcf71f4eff19aba5fca4b065d4f2",
+    "tree": "4591a2f466a7435ca4e4cd27aa948f695b929b02",
+    "patch": "953ff2e94631ef139d4a4d0c99f435a498681385d41be888daaa881b10d8176a",
+    "localHead": "f5df3997555bf3470eababb626c0b87c453720c1"
+  },
+  "task": {
+    "run": "d0a84499-2252-4ce2-bb46-8ac90da845ab",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 140
+    },
+    "request": "## Confirmed public behavior\n\nAt main `447d7ae999959888b2dd3aefeaef1fa1784dcb7d`, an Owned Resource throwing a native `AggregateError([NaN])` keeps its original object in the Installation/Host disposal rejection, but loses that object from the raw cleanup Diagnostic Event when a Sink is enabled. No error member has previously been diagnosed or removed in this case.\n\nThe first strict TypeScript compilation exited0. The emitted JavaScript ran once with native Bun and the actual public package imports: 8 controls, 6 passed and 2 failed, final assertion exit1. Both failures were the enabled-Sink NaN-member cases (Installation and Host routes). Error-member controls and disabled-Sink cases passed. All eight preserved rejection members, reverse cleanup, disposed state and cached disposal results. No product build/full check/browser/CI was executed for this probe.\n\n```ts\nimport { createPluginHost, definePlugin, runtimeDiagnosticEvents } from '@nodebraid/runtime-cordis';\nconst original = new AggregateError([NaN], 'application cleanup');\nconst events: import('@nodebraid/diagnostics').DiagnosticEvent[] = [];\nconst host = createPluginHost({ diagnostics: { sink(event) { events.push(event); } } });\nconst installation = host.install(definePlugin({ setup(context) {\n  context.own(() => { throw original; });\n} }));\nawait installation.whenActive();\nconst failure = await installation.dispose().then(\n  () => { throw new Error('Expected cleanup rejection'); },\n  error => error,\n);\nconst observed = events.find(event => event.name === runtimeDiagnosticEvents.installationDisposeFailed);\nconsole.log(observed?.error === failure); // false; no member was filtered\nawait host.dispose();\n```\n\nThe complete assertion program locates the original AggregateError by reference through framework-owned aggregate wrappers. Source SHA256 `6650d16ccf78006be316e10435d51cdd8754a41e5248aad92da5e2e02b11a91b`. Its original red source, emitted JS/map, raw logs, observations and compiler/runtime receipts are retained. The actual653-file main build prerequisites matched before and after this investigation; these are existing build bytes, not a new check result.\n\n## Existing contract and cause\n\n- [ADR0028](https://github.com/ZWkang/nodebraid/blob/447d7ae999959888b2dd3aefeaef1fa1784dcb7d/docs/adr/0028-separate-diagnostics-from-error-propagation.md) separates diagnostics from failure propagation and defines raw optional errors.\n- [ADR0029](https://github.com/ZWkang/nodebraid/blob/447d7ae999959888b2dd3aefeaef1fa1784dcb7d/docs/adr/0029-preserve-domain-and-external-error-identity.md) preserves original external failure object identity in diagnostic observation.\n- The current public DiagnosticEvent.error type is unknown. The finite-number restriction belongs to safe attributes/details, not opaque raw errors or AggregateError members.\n- Existing public cleanup tests preserve the original aggregate object when diagnostic filtering removes nothing. The Runtime filter compares retained members with `===`; NaN is not equal to itself, so it rebuilds an otherwise unchanged aggregate and each affected ancestor.\n\nThis is an observation-identity defect. The actual disposal rejection remains correct. Existing removal of already-diagnosed members is still intentional and must not be disabled.\n\n## Acceptance\n\n1. With an enabled Sink and no members removed, cleanup diagnostics retain the original application AggregateError object containing NaN, through both Installation and Host disposal. Preserve the original rejection and aggregation stages.\n2. Preserve intentional diagnostic de-duplication when members were already diagnosed, sparse/inherited members, original numeric values including signed zero, ordinary references, cycles and supported native read/error behavior. Keep caller arrays/errors unchanged.\n3. Preserve disabled ordinary diagnostics, exactly one cleanup observation, reverse cleanup, terminal state, cached disposal Promise/outcome, configured Sink and Fault Reporter behavior. No new error-value restrictions, API, dependency, cap, retry, fallback or flattening policy.\n4. Add a public lifecycle red-green regression before the minimal implementation; run related and affected consumers, independent Standards + ponytail-review and Spec with current-head risk, then canonical formal full verification. Re-run the unchanged public assertion program against the actual newly built repair.\n5. Verify actual source publication tree/append parent, current-head complete CI/feedback and immutable full report/media publication/readback. Deliver one PR to main with Refs, retain this Issue open for actual-main whole-task acceptance, and use the existing independent review/merge/closure gates.\n\n## Deduplication\n\nComplete all-state collections contained139 unique Issue/PR records (100+39) and71 PRs. Related Issues13/31/69/80/134/136 and deliveries14/32/70/81/135/138 were read with complete discussions, review threads/replies and file lists.\n\n- #13/#14 concerns safe diagnostic values, not raw unknown errors.\n- #31/#32 concerns the separate JSON error-description output.\n- #69/#70 removed caller-owned collection hooks; #134/#135 retained cleanup and native inspection failures. Their completed fixes remain valid. The new case has ordinary native arrays and no inspection exception.\n- #80/#81 captures Host/event fields; #136/#138 fixes Shortcut rejection classification. Neither covers this NaN comparison in Runtime aggregate filtering.\n- No current open delivery covers this bounded input; #137 remains a separate feature owned by its existing worktree.\n\n\n## Complete current source discussion\n\nNo comments were present in the complete current readback. Canonical source: https://github.com/ZWkang/nodebraid/issues/140",
+    "plan": [
+      {
+        "id": "retain-unchanged-cleanup-diagnostic-identity",
+        "blockedBy": [],
+        "acceptance": "At the existing public Host/PluginContext.own/Installation Sink seam, retain a genuine NaN aggregate identity regression red before the minimal shared fix; preserve legitimate de-duplication, numeric values, lifecycle and errors."
+      },
+      {
+        "id": "verify-current-public-and-affected-consumers",
+        "blockedBy": [
+          "retain-unchanged-cleanup-diagnostic-identity"
+        ],
+        "acceptance": "Commit only the defect source/test paths; run current-head check:affected and the unchanged original strict typed eight-case public program on actual repair package artifacts. Preserve original red evidence and exact artifact provenance."
+      },
+      {
+        "id": "independent-axes-and-formal-engineering-check",
+        "blockedBy": [
+          "verify-current-public-and-affected-consumers"
+        ],
+        "acceptance": "Standards plus ponytail-review and independent Spec review bind exact head/tree/full binary patch/actual changedFiles and complete risk. After both pass, run canonical agents:run verify for a new real full bun run check; retain actual attempts and logs."
+      },
+      {
+        "id": "publish-current-head-complete-evidence",
+        "blockedBy": [
+          "independent-axes-and-formal-engineering-check"
+        ],
+        "acceptance": "Normally append the original Issue branch and one main PR using Refs140. Verify actual complete remote tree/ordered parents/base inheritance, current CI/full feedback and actual immutable full report plus all mapped preview scenes readback before technical ready."
+      },
+      {
+        "id": "required-human-review-and-authorized-merge",
+        "blockedBy": [
+          "publish-current-head-complete-evidence"
+        ],
+        "acceptance": "Apply actual current main risk policy (source floor medium), required focused human review and authorized immediate expected-head merge with actual merge/tree/parents readback. No standing-grant waiver, self approval, bypass or future-head queue."
+      },
+      {
+        "id": "actual-main-whole-issue-acceptance-and-authorized-close",
+        "blockedBy": [
+          "required-human-review-and-authorized-merge"
+        ],
+        "acceptance": "After actual merge, fresh main whole-Issue functional/ticket acceptance and actual main CI/necessary Deploy must pass. Only separately authorized summary and completed close, both readback/archive, can complete closure."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "f5df3997555bf3470eababb626c0b87c453720c1",
+      "tree": "4591a2f466a7435ca4e4cd27aa948f695b929b02",
+      "patch": "953ff2e94631ef139d4a4d0c99f435a498681385d41be888daaa881b10d8176a",
+      "base": "447d7ae999959888b2dd3aefeaef1fa1784dcb7d",
+      "expectedParent": "447d7ae999959888b2dd3aefeaef1fa1784dcb7d",
+      "changedFiles": [
+        "packages/runtime-cordis/src/host-diagnostics.ts",
+        "packages/runtime-cordis/tests/diagnostic-cleanup.test.ts"
+      ],
+      "verdict": "passed",
+      "report": "# Standards + ponytail-review\n\nWhat this change does: 在 Runtime 清理诊断树的既有“成员未变”判定中使用 Object.is，使原样保留的 NaN 不再触发重建 AggregateError。原始 disposal rejection、真正的诊断去重和生命周期流程保持原义。\n\n**Verdict: passed。发现0项；没有必须修复项或有具体反例的 Fowler smell。**\n\n## 固定身份与范围\n\n- Base / expectedParent：`447d7ae999959888b2dd3aefeaef1fa1784dcb7d`（分别保存）。\n- Head：`f5df3997555bf3470eababb626c0b87c453720c1`；tree：`4591a2f466a7435ca4e4cd27aa948f695b929b02`。\n- 完整 binary patch SHA256：`953ff2e94631ef139d4a4d0c99f435a498681385d41be888daaa881b10d8176a`。\n- 实际 changedFiles：`packages/runtime-cordis/src/host-diagnostics.ts`、`packages/runtime-cordis/tests/diagnostic-cleanup.test.ts`，无 rename。\n\n已完整读取两路径及 PluginActivation→Installation→Host 清理、cleanup-errors、HostDiagnostics 选择/发射、raw DiagnosticEvent 与安全 attributes 的调用链；也读取完整既有 cleanup/inspection 测试、Runtime 契约和 README。判断依据为当前 AGENTS/CONTEXT、ponytail full/review、pr-risk、[Issue140](https://github.com/ZWkang/nodebraid/issues/140)、ADR0004/0028/0029及 Boundary Discipline、Fix Root Causes、Test Behavior、Type System、Idempotence、Prove It Works。\n\n## 独立判断\n\n- 首个错误决定确在共享判定：NaN 经递归原样返回，却因 === 不自等而导致不必要的重建。单行 Object.is 修在负责这个保证的边界；未改发射点、caller rejection、集合遍历、异常传播或包装层次。\n- 真正已诊断的引用仍由 WeakSet 过滤；长度/成员比较仍决定何时重建必要的父聚合。没有通过无条件返回原错误来取消去重，也没有把 unknown raw error 错套有限数值 attributes/details 的约束。\n- 新增公开回归观察真实 Host/Installation 的返回结果与 Sink 事件：无过滤 NaN 原聚合身份、Host 混合 NaN/-0/Infinity/-Infinity/undefined/Error、真实已诊断成员过滤后保留未变的 NaN 子聚合。逆序清理、缓存 outcome、disposed 状态、caller 数组/值未改与旧稀疏/继承/循环/原生读取失败回归均保留。\n- 以进程内 Host 的现有错误树为负载边界，本改动没有新增遍历、集合或共享状态；每个既有比较仅换用标准库同值比较。未声称资源极限、任意调度或性能提升，也没有新增抽象、依赖、cap、retry、fallback、flattening 或错误值禁令。\n\n## 本次实际证据与归属\n\n实读 `tdd/primary-red/receipt.json`、`combined.log` 和对应 green：完全相同 test bytes SHA `83dbd208fe68f3159f8d789a5e0353c04029236df1234afa8e924a7af6338413` 在生产未改时1 fail/4 assertions，最小修复后1 pass/8 assertions。随后 dirty 阶段 related Runtime＋Diagnostics 319/2374、严格 typecheck0 的完整 patch 与本 head 相同；这不是正式 full。\n\n当前 `affected-receipt.json` 绑定本 head/tree/patch，实际 exit0/stable，范围为17个受影响 package、两项根组合测试、React/Examples/SVG browser 和 docs；原 stdout/stderr hash 已逐字节核对。该检查构建本次 Runtime/Diagnostics 所需产物及所选消费者，不推断所有无关产物都重新构建。\n\n`public-controls/receipts.json` 和原始 observations 记录同字节八控制程序 SHA `6650d16ccf78006be316e10435d51cdd8754a41e5248aad92da5e2e02b11a91b` 在本 head 新 strict compile0、原生 Bun0、8/8。两项原 Sink-on NaN 红条件现在保留原聚合引用；其余 rejection/cleanup/cache 检查、uncaught0、unhandled0及 listener 移除均成立。Sink-off 的空事件仅证明普通诊断禁用，不拿不存在的载荷宣称身份已验。核对653份观察到的公共产物 byte/hash 与执行前一致，Runtime 的实际 JS 已含本次 Object.is；未复用旧 main 的6/8红结果为新 green。\n\n上述测试/编译/affected 均由执行器实际运行；本独立 reviewer 新执行测试、编译、build、browser、Git/GitHub均为 **0**。原红、后续 green、旧失败和原计划报告保持原身份。\n\n## 风险与门禁\n\n**Risk: medium / quick-human。** 公开 Runtime src 改变清理诊断的错误对象身份选择，路径最低 medium；单行改动和绿检查不能降为 low。依据为上述完整两路径、调用链和本次固定身份的公开红绿/去重/affected 证据。回滚可用正常后续提交撤销该单行实现与对应回归；无持久化数据迁移或不可逆写入，但会重新引入 NaN 清理诊断身份缺陷，调用者拒绝语义不变。\n\nNot checked: 正式 full 尚待双轴通过后的 canonical verify；远端 source/CI、当前 head 全文报告与动态六场景媒体发布回读、所需人工审阅/merge及实际 main 整项验收未由本轴认证。后续门禁是待执行交付阶段，不是本次代码缺陷。\n",
+      "risk": {
+        "level": "medium",
+        "rationale": "Public Runtime implementation changes which original error objects appear in cleanup diagnostic observation. Public packages/*/src has a medium floor; a one-line change and successful checks do not establish low risk.",
+        "evidence": "Complete current patch953ff2e94631ef139d4a4d0c99f435a498681385d41be888daaa881b10d8176a at headf5df3997555bf3470eababb626c0b87c453720c1/tree4591a2f466a7435ca4e4cd27aa948f695b929b02 vs independently saved447d7ae. Actual changed paths are host-diagnostics.ts and diagnostic-cleanup.test.ts; reviewed complete cleanup/diagnostic call chain, same-test-byte primary red/green, legitimate diagnosed-member filtering, current affected exit0/stable and unchanged-public-program8of8. Reviewer product/Git/GitHub execution0; evidence paths are tdd/, affected-receipt.json and public-controls/.",
+        "rollback": "Use a normal subsequent commit reverting the single production comparison change and its regression additions, retaining original evidence. No persistent data migration or irreversible write; rollback reintroduces the NaN cleanup-diagnostic aggregate identity defect without changing the caller disposal rejection contract."
+      },
+      "findings": [],
+      "reviewer": "independent-standards-plus-ponytail-review",
+      "reviewerExecution": {
+        "tests": 0,
+        "compiler": 0,
+        "build": 0,
+        "browser": 0,
+        "git": 0,
+        "github": 0
+      },
+      "coordinatorEvidenceReviewed": {
+        "primaryTdd": {
+          "red": "tdd/primary-red/",
+          "green": "tdd/primary-green/",
+          "sameTestSHA256": "83dbd208fe68f3159f8d789a5e0353c04029236df1234afa8e924a7af6338413"
+        },
+        "related": {
+          "tests": 319,
+          "assertions": 2374,
+          "workingTreeDirty": true,
+          "binaryPatchSHA256": "953ff2e94631ef139d4a4d0c99f435a498681385d41be888daaa881b10d8176a"
+        },
+        "affected": {
+          "receipt": "affected-receipt.json",
+          "head": "f5df3997555bf3470eababb626c0b87c453720c1",
+          "exitCode": 0,
+          "stable": true,
+          "stdoutSHA256": "0e7ead0ba54bb616982c21412b558f03b1b6d4930b2c14ffb297161700481ba2",
+          "stderrSHA256": "3c9c7033651c12a09f3f3294162d3fa9592a43fdbee00f2ed1b63fc93ab9b43b"
+        },
+        "publicProgram": {
+          "sourceSHA256": "6650d16ccf78006be316e10435d51cdd8754a41e5248aad92da5e2e02b11a91b",
+          "compilerExit": 0,
+          "compiledExit": 0,
+          "controls": 8,
+          "passed": 8,
+          "noBrowserOrRenderer": true,
+          "artifactsObservedAndMatched": 653
+        }
+      },
+      "subsequentDeliveryStepsNotCertified": [
+        "formal full verification",
+        "actual source publication and current CI",
+        "current-head complete report and all dynamic mapped media readback",
+        "required human review/merge and actual-main whole-Issue acceptance"
+      ]
+    },
+    "spec": {
+      "head": "f5df3997555bf3470eababb626c0b87c453720c1",
+      "tree": "4591a2f466a7435ca4e4cd27aa948f695b929b02",
+      "patch": "953ff2e94631ef139d4a4d0c99f435a498681385d41be888daaa881b10d8176a",
+      "base": "447d7ae999959888b2dd3aefeaef1fa1784dcb7d",
+      "expectedParent": "447d7ae999959888b2dd3aefeaef1fa1784dcb7d",
+      "changedFiles": [
+        "packages/runtime-cordis/src/host-diagnostics.ts",
+        "packages/runtime-cordis/tests/diagnostic-cleanup.test.ts"
+      ],
+      "taskDigest": "7c9a53662dd59837e99720bc5f8264877b8e415bf308657953f3931c02296376",
+      "report": "## Spec — passed\n\n审查身份：base/expectedParent `447d7ae999959888b2dd3aefeaef1fa1784dcb7d`；head `f5df3997555bf3470eababb626c0b87c453720c1`；tree `4591a2f466a7435ca4e4cd27aa948f695b929b02`；完整binary patch SHA256 `953ff2e94631ef139d4a4d0c99f435a498681385d41be888daaa881b10d8176a`。真实变更仅 `packages/runtime-cordis/src/host-diagnostics.ts`、`packages/runtime-cordis/tests/diagnostic-cleanup.test.ts`，无rename。\n\n已独立阅读[Issue140](https://github.com/ZWkang/nodebraid/issues/140)完整正文及0评论、完整补丁、两份变更文件和Host/Activation/Installation→未诊断错误选择→Sink调用链，对照ADR0004/0028/0029及公开DiagnosticEvent.error契约。未发现缺项、错误实现或范围扩张。\n\n- 验收1：唯一生产改动将此边界的未变化成员比较改为Object.is；原样保留的NaN不再触发无必要聚合重构。原resource AggregateError及聚合阶段保留，调用者rejection的数据流不变；修复没有把未知错误限制为JSON-safe值。\n- 验收2/3：已诊断引用的筛除、实际过滤后的父聚合重建、稀疏/继承索引、循环和读取异常路径均保留。新增公共Host混合NaN/-0/±Infinity/undefined/Error控制检查原数组与值、逆序清理、终态和缓存；真实已诊断过滤控制要求移除已诊断Error同时保留未变化NaN子聚合，可挡住“总返回原aggregate”的错误简化。没有新增API、依赖、读取次数、重试、cap或fallback政策。\n- 验收4的本阶段证据已实读：`tdd/primary-red`与`primary-green`使用同一测试字节SHA83dbd208…，生产未改时实际0pass/1fail，最小修复后1pass；原失败保留。dirty阶段Runtime＋Diagnostics319/2374及typecheck0绑定同patch，未称为commit formal执行。当前head的`affected-receipt.json`为0/stable，原stdout/stderr哈希相符。公共程序SHA6650d16c…与原红逐byte相同，`public-controls`新strict emit0、原生Bun0、8/8；旧main原Bun1/6/8不改。新观察的诊断原聚合、拒绝原值、清理、终态、缓存与Host结果全部通过，Fault/uncaught/unhandled均0，listener移除；四项Sink-off只证明无普通事件，不伪称诊断载荷身份。653公共产物前后hash相同，模块解析及实际Object.is产物已核对。\n\n风险 **medium / quick-human**。公开框架诊断身份及清理观察行为改变，适用public src最低medium；一行改动或绿检查不支持low。依据是完整当前源码链、上述真实红绿/affected/公共程序及其局限。回滚应正常追加回退本两路径补丁；无持久数据迁移，但原NaN诊断身份缺陷会恢复，需要重新验证。\n\n本轴自行执行编译/测试/build/browser/Git/GitHub均0；结论来自独立阅读与本次真实证据核对。有限八控制不证明任意调度、资源极限或whole Runtime；非native浏览器证据。后续正式full、远端当前head CI/报告媒体发布及main验收尚待工作流执行，本review不认证交付已完成。\n\nSpec发现 **0项**；无最高严重问题。\n",
+      "verdict": "passed",
+      "risk": {
+        "level": "medium",
+        "rationale": "公开Runtime框架源码改变清理诊断中原错误身份和未变化聚合保留行为；packages/*/src适用最低medium，一行补丁和绿检查不能证明low。未改变公共API、依赖或审查/发布政策。",
+        "evidence": "完整f5df3997/tree4591a2f4/patch953ff2e9两路径及Host/Activation/Installation/Diagnostics调用链独立阅读；同测试字节primary真red→green，dirty同patch相关319/2374与typecheck0，当前head affected0/stable、原字节公共8新strict0/Bun0/8of8以及653产物/模块归属已核对。Spec自身执行0，未借旧head结果。",
+        "rollback": "正常追加回退Issue140两路径补丁，保留其他已集成main功能；无数据迁移或不可逆操作，但会重新引入NaN聚合诊断身份缺陷，须重新验证。"
+      },
+      "reviewAxis": "spec",
+      "findings": [],
+      "phase": "pre-formal-implementation-review",
+      "reviewerExecution": {
+        "compiler": 0,
+        "tests": 0,
+        "build": 0,
+        "browser": 0,
+        "git": 0,
+        "github": 0,
+        "subagents": 0
+      },
+      "observedCoordinatorExecution": {
+        "primaryRed": {
+          "tests": 1,
+          "passed": 0,
+          "exitCode": 1,
+          "testSHA256": "83dbd208fe68f3159f8d789a5e0353c04029236df1234afa8e924a7af6338413"
+        },
+        "primaryGreen": {
+          "tests": 1,
+          "passed": 1,
+          "exitCode": 0,
+          "sameTestBytes": true
+        },
+        "dirtyRelated": {
+          "tests": 319,
+          "assertions": 2374,
+          "exitCode": 0,
+          "patch": "953ff2e94631ef139d4a4d0c99f435a498681385d41be888daaa881b10d8176a",
+          "notCommitFormalProof": true
+        },
+        "dirtyTypecheckExit": 0,
+        "currentHeadAffectedExit": 0,
+        "currentHeadAffectedStable": true,
+        "publicControls": {
+          "sourceSHA256": "6650d16ccf78006be316e10435d51cdd8754a41e5248aad92da5e2e02b11a91b",
+          "compilerExit": 0,
+          "compiledExit": 0,
+          "controls": 8,
+          "passed": 8,
+          "originalRedRetained": true,
+          "notReviewerExecuted": true
+        },
+        "publicArtifacts": 653
+      },
+      "originalPlanAndContractRecordsUnchanged": true,
+      "sourceReadHashes": {
+        "packages/runtime-cordis/src/host-diagnostics.ts": "4c72403f3feb0735bc6977a90c5077ed4dc536a8ad08771e8373be767e16dd7a",
+        "packages/runtime-cordis/tests/diagnostic-cleanup.test.ts": "5216c56bee90db4780265e57f5a9d24e3bd6863d8af678fbcf0ad2215cc27882",
+        "packages/runtime-cordis/src/plugin-activation.ts": "34273762756a23e3f936cdf015e3c54936d0052789b57c7ec2bc2760e5af2f95",
+        "packages/runtime-cordis/src/plugin-installation.ts": "0f8953bcf99a7c599d14dc6d213d4e68d77ab732ee5c75079034604a93cd03a5",
+        "packages/runtime-cordis/src/cordis-plugin-host.ts": "9f8b46a82b43169beaf8f31c52e795da4ea405a0a1f3f787b84f8f7027302b5f",
+        "packages/runtime-cordis/src/cleanup-errors.ts": "79378ed42d0c5bc294f2204bd279fdc67428f96c95e6535eb9dcaf0d3c0bc41a",
+        "packages/runtime-cordis/src/plugin-contracts.ts": "45b5a0107dffa8b4b31633860963462f7325f244dcacad7321a2ef50591c4881",
+        "packages/diagnostics/src/diagnostic-event.ts": "23a4dc3adcd4ea596a139f53427b840431a20b512953f243f8560f8cc63aecb5"
+      },
+      "evidenceSources": [
+        "tdd/primary-red/receipt.json",
+        "tdd/primary-red/stderr.log",
+        "tdd/primary-green/receipt.json",
+        "tdd/primary-green/stderr.log",
+        "related-receipts.json",
+        "related-runtime-diagnostics.stderr.log",
+        "affected-receipt.json",
+        "affected.stdout.log",
+        "affected.stderr.log",
+        "public-controls/receipts.json",
+        "public-controls/observations.json",
+        "public-controls/compiled-provenance.json",
+        "public-controls/post-probe-integrity.json"
+      ],
+      "formalFullOrPublicationNotCertifiedYet": true,
+      "at": "2026-10-29T11:27:23.141837+00:00"
+    }
+  },
+  "changedFiles": [
+    "packages/runtime-cordis/src/host-diagnostics.ts",
+    "packages/runtime-cordis/tests/diagnostic-cleanup.test.ts"
+  ],
+  "risk": {
+    "level": "medium",
+    "route": "quick-human",
+    "reasons": [
+      "standards: medium — Public Runtime implementation changes which original error objects appear in cleanup diagnostic observation. Public packages/*/src has a medium floor; a one-line change and successful checks do not establish low risk.",
+      "spec: medium — 公开Runtime框架源码改变清理诊断中原错误身份和未变化聚合保留行为；packages/*/src适用最低medium，一行补丁和绿检查不能证明low。未改变公共API、依赖或审查/发布政策。",
+      "packages/runtime-cordis/src/host-diagnostics.ts: minimum medium risk."
+    ]
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "primary-baseline-red",
+      "acceptance": "Production still matched main447. The single public lifecycle regression failed at the original diagnostic/rejection identity assertion: 0pass/1fail, four assertions. The later same-byte green is separate.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-cleanup.test.ts --test-name-pattern 'terminal cleanup diagnostics retain an unchanged AggregateError containing NaN'",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "primary-minimal-green",
+      "acceptance": "The exact same test-file bytes passed after changing only the production same-value comparison: one test/eight assertions. Additional compatibility cases were added afterwards.",
+      "command": "bun test packages/runtime-cordis/tests/diagnostic-cleanup.test.ts --test-name-pattern 'terminal cleanup diagnostics retain an unchanged AggregateError containing NaN'",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "runtime-typecheck-dirty",
+      "acceptance": "Strict Runtime package typecheck passed before commit. This dirty source had the same complete binary patch as the reviewed commit; it is not the later formal engineering check.",
+      "command": "bun run --filter '@nodebraid/runtime-cordis' typecheck",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "related-runtime-diagnostics-dirty",
+      "acceptance": "Runtime and Diagnostics suite passed319tests/2374assertions, including three new lifecycle cases. This is dirty-stage evidence with the complete patch matching the later commit; overlapping suite results are not added together.",
+      "command": "bun test packages/runtime-cordis/tests packages/diagnostics/tests",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "compiled-public-baseline-red",
+      "acceptance": "Original strict compile0 preceded this actual native Bun assertion exit1 on main447: eight controls/six passed/two enabled-Sink NaN identity failures. Caller rejection/lifecycle checks remained correct. BASELINE_PROGRAM_DIR selects the retained baseline program directory for portable replay.",
+      "command": "bun \"$BASELINE_PROGRAM_DIR/compiled/runtime-nan-diagnostic.js\"",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "current-head-affected",
+      "acceptance": "Actual reviewed local head f5df399 passed the selected17-package affected check, root combinations, browser suites and docs with clean/stable head/tree. This is distinct from the formal full engineering check.",
+      "command": "bun run check:affected --base 447d7ae999959888b2dd3aefeaef1fa1784dcb7d",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "compiled-public-repair-green",
+      "acceptance": "Byte-identical original entry SHA6650d16c was newly strict-compiled0 and natively executed0 against actual current-head affected-built Runtime/Diagnostics artifacts: all eight controls passed. Four Sink-off cases establish no ordinary events; actual identity payload checks apply to Sink-on cases. REPAIR_PROGRAM_DIR selects the retained repair directory for portable replay.",
+      "command": "bun \"$REPAIR_PROGRAM_DIR/compiled/runtime-nan-diagnostic.js\"",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "9c6e2091918a922378095cd5a02a7c1f689229c98bd0b2892180b7e9bc38c741"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "3b1ebfe4c458f6b5c6ad253218c50d6afbf2f4e0cea5bc252b1e3817e5f8ab50"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "65d60698cf1a35e667223fdb1a42d4f7309129edd987ab26f18553aa1fd01465"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "bf27efb74e9dd51727bf6fde1a4303f34d182e6cf9fb4007819e1687eb65ed3a"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "44b4f37db406ba4515a933278130b0d970ddf125bbba14f4473f6d2b6296b708"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "4ccc43cc65f37e2c1f1e7ee2b0099cc17f1444a1069df67e7222f30f4a0966b5"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "5a5a4974ea71924740e4cc2e5d2b88028d770dbccda257591f0a336c818df10c"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "f726391e8907a59e18cbbbbd0ccd93d3a4281140ad2569675d5e9508b2fea782"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "3f980c48fcb14a605bc1f42116b08fa194b2e111c0dc9a905a5756fc93d255bf"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "9d390837ca2d6a900412e1aff7ee352d58de8a059bb8ee215059ab75020b55bc"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "5afaa634642d74c0f8cd255d80b2d9e88ea3a0b224462e026ea2adcda718b8f9"
+    },
+    {
+      "path": "technical/public-program.ts.log.txt",
+      "kind": "log",
+      "sha256": "6650d16ccf78006be316e10435d51cdd8754a41e5248aad92da5e2e02b11a91b"
+    },
+    {
+      "path": "technical/public-program.js.log.txt",
+      "kind": "log",
+      "sha256": "402a700298541901af319a5789a414642e3473b526fbd9d138190a1d97add360"
+    },
+    {
+      "path": "technical/public-program.js.map.log.txt",
+      "kind": "log",
+      "sha256": "662eec14c03cb71a5f1aa176206197e1fb3073168831db76297b015b2172bb5e"
+    },
+    {
+      "path": "technical/primary-red-green-test-snapshot.ts.log.txt",
+      "kind": "log",
+      "sha256": "83dbd208fe68f3159f8d789a5e0353c04029236df1234afa8e924a7af6338413"
+    },
+    {
+      "path": "technical/reviewed.patch.log.txt",
+      "kind": "log",
+      "sha256": "953ff2e94631ef139d4a4d0c99f435a498681385d41be888daaa881b10d8176a"
+    },
+    {
+      "path": "technical/public-baseline-observations.log.txt",
+      "kind": "log",
+      "sha256": "113474effc43831ca4a665914aa81c5ae6c3e39760d51d83febebbe94f02bbda"
+    },
+    {
+      "path": "technical/public-repair-observations.log.txt",
+      "kind": "log",
+      "sha256": "b5e27b8d276bfbc72d4a0f598d73b1cf1db8ee0ddb243cb3f570c76a9cf23232"
+    },
+    {
+      "path": "technical/public-execution-provenance.log.txt",
+      "kind": "log",
+      "sha256": "bd072fe3c044475667ffcc56b00a48a56cbfb4ca976f0137e9313069eb1ab3c3"
+    },
+    {
+      "path": "technical/primary-tdd-provenance.log.txt",
+      "kind": "log",
+      "sha256": "166043d4416cb6ed8ed3c54306592d04d0d291df0bd110aff34fe3a525124516"
+    },
+    {
+      "path": "technical/affected-scope.log.txt",
+      "kind": "log",
+      "sha256": "3f9ef78657310f5a2a1adc40a8f0185e09791d96b2e4251aa3971aa98a5a008b"
+    },
+    {
+      "path": "technical/affected-receipt.log.txt",
+      "kind": "log",
+      "sha256": "ab1fb79b9beb3699a8eaf783ae545a54283204a106d6797697a627828d0b208f"
+    },
+    {
+      "path": "technical/source-publication-readback-summary.log.txt",
+      "kind": "log",
+      "sha256": "d67323f52d316818a07aafde61e33119bdd0f2caa159e1069056125788614799"
+    },
+    {
+      "path": "technical/source-ci-checks.log",
+      "kind": "log",
+      "sha256": "70d72324d6f63ff3f534a765bccc7539ad8fb270d42a2b8d0b3c61590fef8f5f"
+    },
+    {
+      "path": "technical/source-ci-preview.log",
+      "kind": "log",
+      "sha256": "4465e4e6fa03b24bf33dadc953e13dc080e97d1da4b56810eb115a288e5b54c6"
+    },
+    {
+      "path": "technical/trusted-publisher.log",
+      "kind": "log",
+      "sha256": "73590fa7646fcc6a1da8eac7f02723e0d0d6247c5016a02a3ccd61049cb9d753"
+    },
+    {
+      "path": "technical/ci-log-provenance.log.txt",
+      "kind": "log",
+      "sha256": "75a3f16c40ed3e152e748bda73125e0a43570631ed6d8c5b288aeb9fbc3a9cec"
+    },
+    {
+      "path": "technical/preview-content-readback.log.txt",
+      "kind": "log",
+      "sha256": "f56b734c1474b9c2e3a18405bc4689b6c7f6abeefc8ce772f8a763f2838ecf40"
+    },
+    {
+      "path": "technical/behavior-log-provenance.log.txt",
+      "kind": "log",
+      "sha256": "fc2ccce6e051b5f8dfacded503e093fc69f78d28c03464bc46a140b6eaedefcf"
+    },
+    {
+      "path": "technical/scope-and-record-limits.md",
+      "kind": "report",
+      "sha256": "b8a65e50f0a3b6aca3d0a4fd9237b74941aa9e6958d69b3298ce067a60c32992"
+    },
+    {
+      "path": "technical/artifact-source-index.log.txt",
+      "kind": "log",
+      "sha256": "a83dc5c4a811bd0ae87ca6dea5a1ca8781481321fa245db244f25e56a3bcf1be"
+    }
+  ]
+}

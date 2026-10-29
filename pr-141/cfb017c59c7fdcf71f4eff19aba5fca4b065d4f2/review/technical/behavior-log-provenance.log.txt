@@ -1,0 +1,33 @@
+{
+  "combinedLogConstruction": "Original stdout bytes followed by original stderr bytes; this is a reading bundle, not an interleaving/timing claim. Separate originals remain unchanged.",
+  "portableExternalProgramCommands": "PROGRAM_DIR variables express the recorded absolute external-program location portably; original resolved argv/cwd and compiler receipts remain in the original private execution records. No command was rerun for rendering.",
+  "sourceEntrySHA256": "6650d16ccf78006be316e10435d51cdd8754a41e5248aad92da5e2e02b11a91b",
+  "newExecutionPerformedByThisCollectorPreparation": false,
+  "files": [
+    {
+      "path": "behavior-logs/current-head-affected.log",
+      "bytes": 110713,
+      "sha256": "3f980c48fcb14a605bc1f42116b08fa194b2e111c0dc9a905a5756fc93d255bf"
+    },
+    {
+      "path": "behavior-logs/public-baseline-red.log",
+      "bytes": 8360,
+      "sha256": "f726391e8907a59e18cbbbbd0ccd93d3a4281140ad2569675d5e9508b2fea782"
+    },
+    {
+      "path": "behavior-logs/public-repair-green.log",
+      "bytes": 7370,
+      "sha256": "9d390837ca2d6a900412e1aff7ee352d58de8a059bb8ee215059ab75020b55bc"
+    },
+    {
+      "path": "behavior-logs/related-dirty.log",
+      "bytes": 29923,
+      "sha256": "5a5a4974ea71924740e4cc2e5d2b88028d770dbccda257591f0a336c818df10c"
+    },
+    {
+      "path": "behavior-logs/runtime-typecheck-dirty.log",
+      "bytes": 490,
+      "sha256": "4ccc43cc65f37e2c1f1e7ee2b0099cc17f1444a1069df67e7222f30f4a0966b5"
+    }
+  ]
+}

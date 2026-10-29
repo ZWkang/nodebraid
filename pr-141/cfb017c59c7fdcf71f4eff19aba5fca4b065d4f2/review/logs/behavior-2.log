@@ -1,0 +1,10 @@
+bun test v1.4.2 (744846f84)
+
+packages/runtime-cordis/tests/diagnostic-cleanup.test.ts:
+(pass) terminal cleanup diagnostics retain an unchanged AggregateError containing NaN [29.34ms]
+
+ 1 pass
+ 8 filtered out
+ 0 fail
+ 8 expect() calls
+Ran 1 test across 1 file. [124.00ms]

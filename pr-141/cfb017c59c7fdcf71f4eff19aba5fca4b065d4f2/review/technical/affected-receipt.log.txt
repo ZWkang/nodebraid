@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "bun",
+    "run",
+    "check:affected",
+    "--base",
+    "447d7ae999959888b2dd3aefeaef1fa1784dcb7d"
+  ],
+  "identity": {
+    "taskDigest": "7c9a53662dd59837e99720bc5f8264877b8e415bf308657953f3931c02296376",
+    "head": "f5df3997555bf3470eababb626c0b87c453720c1",
+    "tree": "4591a2f466a7435ca4e4cd27aa948f695b929b02",
+    "patch": "953ff2e94631ef139d4a4d0c99f435a498681385d41be888daaa881b10d8176a",
+    "changedFiles": [
+      "packages/runtime-cordis/src/host-diagnostics.ts",
+      "packages/runtime-cordis/tests/diagnostic-cleanup.test.ts"
+    ]
+  },
+  "startedAt": "2026-10-29T11:17:55.939397+00:00",
+  "endedAt": "2026-10-29T11:22:43.294000+00:00",
+  "exitCode": 0,
+  "stable": true,
+  "stdoutSHA256": "0e7ead0ba54bb616982c21412b558f03b1b6d4930b2c14ffb297161700481ba2",
+  "stderrSHA256": "3c9c7033651c12a09f3f3294162d3fa9592a43fdbee00f2ed1b63fc93ab9b43b"
+}

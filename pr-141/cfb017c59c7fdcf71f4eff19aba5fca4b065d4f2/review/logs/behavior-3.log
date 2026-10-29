@@ -1,0 +1,6 @@
+@nodebraid/runtime-cordis typecheck: $ bun run ../../scripts/build-workspaces.ts --dependencies @nodebraid/runtime-cordis
+@nodebraid/runtime-cordis typecheck: [build] @nodebraid/diagnostics
+@nodebraid/runtime-cordis typecheck: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/runtime-cordis typecheck: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/runtime-cordis typecheck: $ tsgo --noEmit -p tsconfig.json
+@nodebraid/runtime-cordis typecheck: Exited with code 0
