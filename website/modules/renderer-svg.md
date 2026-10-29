@@ -22,7 +22,7 @@ description: 将 NodeBraid Canvas 语义投影到现有 SVG Target 的参考级 
 - 你愿意由应用通过 CSS 和上层 Interaction 定义产品视觉与编辑行为；
 - 你要直接使用具名 Factory，或通过 [`@nodebraid/plugin-renderer`](/modules/plugin-renderer) 接入 Runtime。
 
-如果产品需要自定义 Node DOM、任意 Port shape/position、复杂 Edge、组件挂载或完整编辑器交互，本 package 不是这些能力的替代品。
+如果产品需要HTML/React 组件节点、任意 Port shape/position、复杂 Edge、组件挂载或完整编辑器交互，本 package 不是这些能力的替代品。
 
 ## 提供的能力
 
@@ -53,6 +53,8 @@ import {
   type SvgDomEventPolicy,
   type SvgInputPolicies,
   type SvgRendererConfig,
+  type SvgNodeContentContext,
+  type SvgNodeContentFactory,
   type SvgRendererErrorCode,
 } from '@nodebraid/renderer-svg';
 
@@ -112,19 +114,20 @@ Provider 写入 geometry、稳定 class 与 `data-nodebraid-*` 属性，但不�
 
 一个可用 Target 同时只允许一份 SVG Renderer Instance。Factory 会同步校验 config、Target 类型、连接状态、尺寸、坐标变换与占用状态；Target 从创建开始到异步 cleanup 完成前都保持 reservation，避免两个实例交错拥有同一 projection。
 
-| Code                 | 适用失败                                             |
-| -------------------- | ---------------------------------------------------- |
-| `INVALID_CONFIG`     | 未知 config key、无效 tolerance 或 input policy      |
-| `INVALID_TARGET`     | `target` 不是有效 `SVGSVGElement`                    |
-| `TARGET_OCCUPIED`    | Target 已被另一份活跃或仍在 cleanup 的 Instance 占用 |
-| `TARGET_UNAVAILABLE` | Target 未连接、无可用尺寸或 screen-to-SVG 变换不可逆 |
+| Code                   | 适用失败                                             |
+| ---------------------- | ---------------------------------------------------- |
+| `INVALID_CONFIG`       | 未知 config key、无效 tolerance 或 input policy      |
+| `INVALID_NODE_CONTENT` | 非法、已挂载或重复拥有的 SVG 内容                    |
+| `INVALID_TARGET`       | `target` 不是有效 `SVGSVGElement`                    |
+| `TARGET_OCCUPIED`      | Target 已被另一份活跃或仍在 cleanup 的 Instance 占用 |
+| `TARGET_UNAVAILABLE`   | Target 未连接、无可用尺寸或 screen-to-SVG 变换不可逆 |
 
 Document revision、Session、Input subscriber、Pointer 与 disposed-state 失败继续使用 `@nodebraid/renderer-api` 的 `RendererError`。Provider 不吞掉异常；结构验证发生在投影变更之前，无法安全回滚时会显式要求下一次 `reset` 重建 Baseline。
 
 ## 限制与非目标
 
-- 仅渲染显式 `Size` 的矩形 Node 与有效端点之间的直线 Edge；
-- 无 Port Node 使用 node-level Connection Anchor；Port 使用规范边界 Geometry，但不支持自环、曲线、marker、label、富文本、动画或业务 Node 外观；
+- 要求 Node 显式 `Size` 并使用矩形交互边界，Edge 为有效端点之间的直线；
+- 无 Port Node 使用 node-level Connection Anchor；Port 使用规范边界 Geometry，但不支持自环、曲线 Edge、Edge marker/label、组件生命周期或动画；
 - 不提供默认主题、theme registry、组件插槽或 framework adapter；
 - 不解释 Interaction 行为，也不提供 Command、拖拽状态机、Selection 写入或持久化；它只显示已接受的语义 Projection；
 - 不创建 SVG Target，也不接管调用方已有的 Target 子节点；
@@ -133,3 +136,13 @@ Document revision、Session、Input subscriber、Pointer 与 disposed-state 失�
 ## 验证依据
 
 类型测试锁定具名同步 Factory、Config 与错误入口；Bun 测试覆盖 config 和值语义；真实 Chromium 测试覆盖 SVG/Interaction projection、DOM identity、连续 Commit、Session、Hit Test、screen-to-SVG 坐标转换、ResizeObserver、原生输入 policy、Pointer Capture、lost capture、Focus、Runtime Plugin 组合、Target reservation、回滚与释放。声明产物检查同时保证公共入口不泄漏内部实现。
+
+## 自定义 Node 内容
+
+`SvgRendererConfig.createNodeContent` 根据 `nodeId`、`type`、`size`、不透明 `data` 和 Target 所属 `document` 同步构造新、未挂载的 SVG 内容。应用解释自己的数据并使用 Node 局部坐标；Provider 拥有返回子树与稳定外层、位置、Selection、矩形命中和 Port。此入口不提供组件或事件资源生命周期。
+
+不配置时保留原矩形 DOM。reset 重建内容；普通提交只在新增或 type/size/data 变化时重建。拖动、位置、Selection 与 Viewport 改变保留内容。圆形外观仍使用矩形命中，不自动裁剪。
+
+所有候选内容先构造再修改 live DOM，子树替换也参与回滚。非法输出和原始构造失败显式暴露。Renderer 原子性不能撤销 Runtime 已收到的 Kernel Commit；应用的数据校验应发生在提交前。
+
+独立注册或释放 Port Contribution 时，Runtime 会在同一 Document revision 发送 reset，该路径同样重建全部内容。普通增量中的 Port 几何变化与这种 Port-only reset 不同；现有 Renderer 协议保持不变。

@@ -58,6 +58,16 @@ const server = Bun.serve({
 
 try {
   await runAgentBrowser(['open', server.url.href]);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgNodeContentCases()', [
+    'projection-lifecycle',
+    'construction-deep-rollback',
+    'ownership',
+    'owner-realms',
+    'rollback-failure',
+    'config-and-legacy',
+    'runtime-port-reset',
+  ]);
+  console.info('SVG custom Node content: public projection, update, rollback, ownership and legacy cases passed.');
   const declaredGeometry = await evaluateBrowserScenario('globalThis.__nodebraidRendererSvgDeclaredGeometryTracer()');
   assert.deepEqual(declaredGeometry, { x: '80', y: '90', baselineUnchanged: true });
 

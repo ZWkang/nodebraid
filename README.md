@@ -193,6 +193,7 @@ This does not add a model API, another scheduler, or changes to branch protectio
 │   ├── layout-elk/     # @nodebraid/layout-elk official Provider
 │   ├── plugin-command/ # @nodebraid/plugin-command Runtime Service adapter
 │   ├── plugin-clipboard/ # Explicit Clipboard Copy/Paste Behavior
+│   ├── plugin-node-editing/ # @nodebraid/plugin-node-editing Node creation / data updates
 │   ├── plugin-history/ # @nodebraid/plugin-history History Runtime Plugin
 │   ├── plugin-interaction/ # @nodebraid/plugin-interaction Interaction Runtime
 │   ├── plugin-duplicate-selection/ # Independent Duplicate Selection Behavior
@@ -367,7 +368,7 @@ current History Activation; reactivation starts from a fresh empty Baseline.
 ## Basic Canvas Composition
 
 `@nodebraid/preset-basic` exposes `createBasicCanvasPlugin(rendererFactory,
-options?)`, a backend-neutral ordinary Plugin that owns Kernel, Port, Command,
+options?)`, a backend-neutral ordinary Plugin that owns Kernel, Port, Command, Node Editing,
 Session, Renderer, Interaction, and History through Child Installations. The
 Composition waits for every child to become active and releases them in reverse
 dependency-safe order.
@@ -623,3 +624,19 @@ The Document package follows the same workspace entries: `bun run --filter '@nod
 ## License
 
 [MIT](./LICENSE)
+
+## Node creation and editing
+
+`@nodebraid/plugin-node-editing` supplies `createNodeCommand` and
+`updateNodeDataCommand`, also exported by core and installed by Basic Composition.
+Applications own Node types and opaque data. SVG `createNodeContent` supplies
+synchronous custom content while Geometry and rectangular hits remain Provider-owned.
+The Example offers one-shot placement and Apply/Cancel data editing, with explicit
+stale-draft recovery and the existing file round trip. Moving the edited Node also
+makes its draft stale; unrelated Node changes do not.
+
+```sh
+bun run --filter '@nodebraid/plugin-node-editing' build:dependencies
+bun run --filter '@nodebraid/plugin-node-editing' build:test-dependencies
+bun run --filter '@nodebraid/plugin-node-editing' test
+```

@@ -26,6 +26,7 @@ import {
 import { describeError, redoCommand, undoCommand, type Viewport } from '@nodebraid/core';
 
 import { Badge } from '@/components/ui/badge';
+import { NodeCreation, NodeDataEditor } from '@/components/node-authoring';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -51,6 +52,7 @@ function BasicSvgExample() {
   const { lang } = Route.useSearch();
   const [generation, setGeneration] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string>();
+  const [placing, setPlacing] = useState(false);
   const reportFailure = (error: unknown) => {
     setErrorMessage(describeExampleError(error));
     queueMicrotask(() => {
@@ -72,7 +74,7 @@ function BasicSvgExample() {
   const copy = translations[lang];
 
   return (
-    <main className="basic-svg-page" data-example-status={status}>
+    <main className="basic-svg-page" data-example-status={status} data-node-placement={placing}>
       <section className="example-introduction">
         <p className="eyebrow">Interactive Example</p>
         <h1>{copy.title}</h1>
@@ -81,23 +83,27 @@ function BasicSvgExample() {
       <div className="example-workspace">
         <section className="canvas-column">
           {ready ? (
-            <CanvasToolbar
-              copy={copy}
-              runtime={ready.runtime}
-              target={ready.target}
-              onResetExample={() => {
-                setErrorMessage(undefined);
-                setGeneration((value) => value + 1);
-              }}
-              onError={reportFailure}
-              onFileError={(error) => setErrorMessage(error === undefined ? undefined : describeExampleError(error))}
-            />
+            <>
+              <NodeCreation key={generation} runtime={ready.runtime} lang={lang} onPlacementChange={setPlacing} />
+              <CanvasToolbar
+                copy={copy}
+                runtime={ready.runtime}
+                target={ready.target}
+                onResetExample={() => {
+                  setErrorMessage(undefined);
+                  setGeneration((value) => value + 1);
+                }}
+                onError={reportFailure}
+                onFileError={(error) => setErrorMessage(error === undefined ? undefined : describeExampleError(error))}
+              />
+            </>
           ) : null}
           <section className="canvas-frame" aria-label={copy.canvasLabel}>
             <svg ref={mount.ref} className="canvas-target" width="960" height="640" tabIndex={0} />
           </section>
         </section>
         <aside className="example-sidebar">
+          {ready ? <NodeDataEditor key={generation} runtime={ready.runtime} lang={lang} /> : null}
           {ready ? (
             <RuntimeStatus copy={copy} runtime={ready.runtime} />
           ) : (
@@ -436,7 +442,7 @@ const translations: Readonly<Record<Language, Copy>> = {
   en: {
     title: 'Basic SVG Canvas',
     description:
-      'Select, box-select, copy/paste, duplicate, delete, drag, pan, zoom, and connect one node anchor to another.',
+      'Create and customize nodes, edit their data, and combine selection, clipboard, layout, connections, and file saving.',
     canvasLabel: 'Interactive canvas',
     toolbar: 'Canvas controls',
     undo: 'Undo',
@@ -468,6 +474,8 @@ const translations: Readonly<Record<Language, Copy>> = {
     instructions: 'Try the interaction loop',
     instructionsDescription: 'Every stable graph change becomes a Kernel Commit.',
     steps: [
+      'Choose Card or Note, then click empty canvas to place one node. Esc cancels placement.',
+      'Edit the selected node in Node properties. Apply once, or cancel the draft without changing the canvas.',
       'Click a node to select it.',
       'Drag across empty canvas space to box-select intersecting nodes.',
       'Press Ctrl/Cmd+C and Ctrl/Cmd+V while the canvas is focused to copy and paste the Selection.',
@@ -483,7 +491,7 @@ const translations: Readonly<Record<Language, Copy>> = {
   },
   zh: {
     title: '基础 SVG 画布',
-    description: '选择、框选、剪贴板复制/粘贴、Duplicate、删除、拖动、平移、缩放，并从一个连接锚点拖到另一个锚点。',
+    description: '创建与自定义节点、编辑节点数据，并组合选择、剪贴板、布局、连接与文件保存能力。',
     canvasLabel: '交互画布',
     toolbar: '画布控制',
     undo: '撤销',
@@ -515,6 +523,8 @@ const translations: Readonly<Record<Language, Copy>> = {
     instructions: '体验完整交互闭环',
     instructionsDescription: '每次稳定图变化都会成为一个 Kernel Commit。',
     steps: [
+      '选择卡片或便笺，然后点击画布空白处放置一个节点；按 Esc 取消放置。',
+      '在节点属性中编辑，应用后提交一次修改，或取消草稿。',
       '点击 Node 完成选择。',
       '从画布空白处拖动，框选相交的 Node。',
       '画布获得焦点后按 Ctrl/Cmd+C 与 Ctrl/Cmd+V，复制并粘贴当前 Selection。',

@@ -106,6 +106,8 @@ Agent 在原 PR 上追加修复并验证，需求变化返回讨论；按 pr-ris
 - `bun run --filter '@nodebraid/plugin-clipboard' build:test-dependencies`：在生产依赖之外生成 Clipboard 联合公共 seam 测试所需的 Duplicate Selection 与 History Plugin workspace 声明。
 - `bun run --filter '@nodebraid/renderer-svg' build:dependencies`：生成 SVG Renderer Provider 生产构建所需的 Renderer API 及其传递 workspace 声明。
 - `bun run --filter '@nodebraid/renderer-svg' build:test-dependencies`：生成 Renderer Plugin、Interaction、History 与 Renderer 公共 seam 浏览器场景所需的全部 workspace 声明。
+- `bun run --filter '@nodebraid/plugin-node-editing' build:dependencies`：生成 Node Editing 所需的 Kernel、Command 与 Plugin Host workspace 声明。
+- `bun run --filter '@nodebraid/plugin-node-editing' build:test-dependencies`：另准备公共 Command/History 组合测试所需的 History workspace 声明。
 - `bun run --filter '@nodebraid/plugin-history' build:dependencies`：生成 History Runtime Plugin 构建与类型检查所需的 Command 与 Kernel Plugin workspace 声明。
 - `bun run --filter '@nodebraid/preset-basic' build:dependencies`：生成 Basic Canvas Composition 所需的 Interaction、History 及其传递 workspace 声明。
 - `bun run --filter '@nodebraid/adapter-react' build:dependencies`：生成 React Adapter 构建与类型检查所需的 Kernel、Session 与 History Plugin workspace 声明。

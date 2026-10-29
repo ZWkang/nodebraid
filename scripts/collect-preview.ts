@@ -347,6 +347,91 @@ async function collectScene(
         assert.equal(await observe('document.querySelectorAll("[data-nodebraid-connection-preview]").length'), 0);
         assert.equal(await observe('document.querySelectorAll("[data-nodebraid-edge-id=example-edge-1]").length'), 1);
       });
+    } else if (scene.id === 'node-authoring') {
+      const createdId = 'example-node-1';
+      const label = () =>
+        observe<string | null>(
+          `document.querySelector('[data-nodebraid-node-id="${createdId}"] [data-example-node-label]')?.textContent ?? null`,
+        );
+      const placeAt = async (x: number, y: number) => {
+        await run(['scrollintoview', '[aria-label="Place node"]']);
+        await control('Place node');
+        await run(['wait', '[data-example-placement="waiting"]']);
+        await run(['scrollintoview', '.canvas-target']);
+        const point = await observe<{ x: number; y: number }>(`(() => {
+          const bounds = document.querySelector('.canvas-target').getBoundingClientRect();
+          return {x: bounds.left + ${x}, y: bounds.top + ${y}};
+        })()`);
+        await sendPage('Input.dispatchMouseEvent', { type: 'mouseMoved', ...point, buttons: 0 });
+        await sendPage('Input.dispatchMouseEvent', {
+          type: 'mousePressed',
+          ...point,
+          button: 'left',
+          buttons: 1,
+          clickCount: 1,
+        });
+        await sendPage('Input.dispatchMouseEvent', {
+          type: 'mouseReleased',
+          ...point,
+          button: 'left',
+          buttons: 0,
+          clickCount: 1,
+        });
+      };
+      await step('Select a generic type and place one custom SVG Node using a native click', async () => {
+        await run(['select', '[aria-label="Node type"]', 'step']);
+        await placeAt(300, 400);
+        await metrics({ nodes: '4', revision: '2', selection: createdId });
+        assert.equal(await label(), 'Card');
+        assert.equal(
+          await observe(`document.querySelector('[data-example-placement]').getAttribute('data-example-placement')`),
+          'idle',
+        );
+        await capture('created');
+      });
+      await step('Apply application data once, then Undo and Redo that edit', async () => {
+        await run(['fill', '[aria-label="Node label"]', 'Custom card']);
+        await run(['fill', '[aria-label="Tags (JSON array)"]', '["saved","中文"]']);
+        assert.equal(await label(), 'Card');
+        await metrics({ revision: '2' });
+        await control('Apply changes');
+        await metrics({ revision: '3' });
+        assert.equal(await label(), 'Custom card');
+        await control('Undo');
+        await metrics({ revision: '4' });
+        assert.equal(await label(), 'Card');
+        await control('Redo');
+        await metrics({ revision: '5' });
+        assert.equal(await label(), 'Custom card');
+        await capture('edited');
+      });
+      await step('Create a second visual type and restore both types and edited data from a real file', async () => {
+        await run(['select', '[aria-label="Node type"]', 'note']);
+        await placeAt(520, 400);
+        await metrics({ nodes: '5', revision: '6', selection: 'example-node-2' });
+        assert.equal(
+          await observe(`document.querySelectorAll('[data-nodebraid-node-id="example-node-2"] ellipse').length`),
+          1,
+        );
+        assert.ok(client, 'Expected the owned browser connection.');
+        const savedPath = join(directory, 'nodes.json');
+        await downloadBrowserFile(client, run, '[aria-label="Export document"]', savedPath, browserContextId);
+        const saved = JSON.parse(readFileSync(savedPath, 'utf8'));
+        assert.deepEqual(JSON.parse(saved.nodes.find((node: { id: string }) => node.id === createdId).data), {
+          label: 'Custom card',
+          tags: ['saved', '中文'],
+        });
+        remember('nodes.json', 'snapshot');
+        await run(['reload']);
+        await run(['wait', '[data-example-status="ready"]']);
+        await run(['upload', '[aria-label="Document file"]', savedPath]);
+        await metrics({ nodes: '5', edges: '1', history: '— / —' });
+        assert.equal(await label(), 'Custom card');
+        const restoredPath = join(directory, 'restored-nodes.json');
+        await downloadBrowserFile(client, run, '[aria-label="Export document"]', restoredPath, browserContextId);
+        assert.deepEqual(JSON.parse(readFileSync(restoredPath, 'utf8')), saved);
+        remember('restored-nodes.json', 'snapshot');
+      });
     } else if (scene.id === 'document-files') {
       const documentPath = join(directory, 'document.json');
       await step('Edit and download a real complete Document file', async () => {

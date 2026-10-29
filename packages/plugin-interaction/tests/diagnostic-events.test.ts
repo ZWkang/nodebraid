@@ -8,6 +8,7 @@ test('publishes the stable Interaction diagnostic event catalog', () => {
     inputRejected: 'nodebraid.plugin.interaction.input.rejected',
     gestureCancelled: 'nodebraid.plugin.interaction.gesture.cancelled',
     connectionMaterializerFault: 'nodebraid.plugin.interaction.connection-materializer.fault',
+    nodePlacementFault: 'nodebraid.plugin.interaction.node-placement.fault',
     commandFault: 'nodebraid.plugin.interaction.command.fault',
   });
 });

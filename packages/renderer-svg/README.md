@@ -50,6 +50,62 @@ runtime theme. A minimal application stylesheet can start with:
 }
 ```
 
+## Application-owned Node content
+
+The optional static `createNodeContent` callback constructs SVG content from the
+application's Node type and opaque data. It receives a frozen
+`SvgNodeContentContext` containing `nodeId`, `type`, frozen `size`, the original
+`data` reference and the Target's `document`. The application owns type dispatch
+and data validation; the Provider does not define a Node schema or registry.
+The callback is captured when the Renderer is created. Changing its configuration
+object or closed-over application state does not itself trigger reconstruction.
+
+```ts
+const renderer = createSvgRenderer({
+  target,
+  createNodeContent({ document, data, size }) {
+    if (typeof data !== 'string') throw new TypeError('This application expects string Node data.');
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', String(size.width / 2));
+    text.setAttribute('y', String(size.height / 2));
+    text.setAttribute('text-anchor', 'middle');
+    text.textContent = data;
+    return text;
+  },
+});
+```
+
+Each invocation returns a fresh, detached `SVGElement` root in Node-local
+coordinates. After return, the Provider owns that subtree. Content construction
+is synchronous and must not mutate other DOM or retain resources requiring
+cleanup; this interface does not manage event subscriptions, asynchronous
+components, HTML/React components or per-Node lifecycle hooks. Application data
+continues to follow the Kernel's immutable-value contract.
+
+Configured Nodes use a stable outer `<g>` with the existing Node class, identity
+and Selection attributes, plus `transform="translate(x y)"`. The Provider owns
+that outer element, positioning, Port/Anchor geometry and Viewport transformations.
+An ordinary Commit reconstructs content only for added Nodes or changed type,
+size values or data identity. Position, Selection, Viewport, incremental Port geometry
+and drag previews retain content identity. Every `reset` reconstructs all content,
+including Runtime resets at the same Document revision after independent Port
+Contribution registration or disposal. Internal
+content elements may be replaced when content changes. Without the callback,
+the existing `<rect>` DOM and geometry attributes remain unchanged.
+
+Visual content does not change the declared rectangular Node bounds used for
+Hit Test, Box Selection and Port placement. A circle's rectangle corners remain
+selectable. The Provider does not add clipping or correct overflowing content.
+
+All candidate content is prepared before changing live DOM. Constructor errors
+retain their original identity; invalid, attached or reused roots fail with
+`SvgRendererError` code `INVALID_NODE_CONTENT`. Content replacement participates
+in the existing DOM rollback journal, including restoration of the original
+subtree objects. No construction failure silently switches to a plain rectangle.
+This atomicity protects accepted Renderer state, not a Kernel Commit that has
+already happened; Runtime synchronization failures retain their existing explicit
+fault and recovery behavior.
+
 ## Development
 
 Run package scripts from the monorepo root:
