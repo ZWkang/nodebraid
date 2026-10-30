@@ -246,7 +246,7 @@ export class HostDiagnostics {
       if (nestedErrors.length === 0) return Object.freeze({ found: false });
       if (
         nestedErrors.length === length &&
-        nestedErrors.every((nestedError, index) => nestedError === members[index])
+        nestedErrors.every((nestedError, index) => Object.is(nestedError, members[index]))
       ) {
         return Object.freeze({ found: true, error });
       }
