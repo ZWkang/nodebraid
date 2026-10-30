@@ -1,12 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useKernelView, useSessionSnapshot } from '@nodebraid/adapter-react';
-import { describeError, updateNodeDataCommand, type NodePlacement } from '@nodebraid/core';
+import { describeError, type NodePlacement } from '@nodebraid/core';
 
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import type { ExampleNodeType, ExampleRuntime } from '../example-runtime/create-example-runtime';
-import { createNodeDraft, isNodeDraftDirty, materializeNodeDraft, type NodeDraft } from '../example-runtime/node-draft';
+import {
+  applyNodeDraft,
+  createNodeDraft,
+  projectNodeEditor,
+  reconcileNodeDraft,
+  type NodeDraft,
+} from '../example-runtime/node-draft';
 
 type Language = 'en' | 'zh';
 
@@ -88,26 +94,14 @@ export function NodeDataEditor({ runtime, lang }: { readonly runtime: ExampleRun
   const copy = translations[lang];
   const view = useKernelView(runtime.kernel);
   const { selection } = useSessionSnapshot(runtime.session);
-  const selected =
-    selection.nodeIds.length === 1 && selection.edgeIds.length === 0
-      ? view.query.getNode(selection.nodeIds[0]!)
-      : undefined;
   const [draft, setDraft] = useState<NodeDraft>();
   const [failure, setFailure] = useState<string>();
   const [applying, setApplying] = useState(false);
+  const { selected, current, dirty, switching, stale, afterApplyNodeId } = projectNodeEditor(view, selection, draft);
 
   useEffect(() => {
-    setDraft((current) => {
-      if (current && isNodeDraftDirty(current)) return current;
-      if (current?.expectedNode === selected) return current;
-      return selected ? createNodeDraft(selected) : undefined;
-    });
+    setDraft((current) => reconcileNodeDraft(current, selected));
   }, [selected]);
-
-  const dirty = draft !== undefined && isNodeDraftDirty(draft);
-  const switching = dirty && draft.expectedNode.id !== selected?.id;
-  const current = draft ? view.query.getNode(draft.expectedNode.id) : undefined;
-  const stale = dirty && current !== draft.expectedNode;
 
   const loadSelected = () => {
     setDraft(selected ? createNodeDraft(selected) : undefined);
@@ -118,13 +112,7 @@ export function NodeDataEditor({ runtime, lang }: { readonly runtime: ExampleRun
     setApplying(true);
     setFailure(undefined);
     try {
-      await runtime.commands.execute(updateNodeDataCommand, {
-        expectedNode: draft.expectedNode,
-        data: materializeNodeDraft(draft),
-      });
-      const nextId = switching ? selected?.id : draft.expectedNode.id;
-      const next = nextId ? runtime.kernel.read().query.getNode(nextId) : undefined;
-      setDraft(next ? createNodeDraft(next) : undefined);
+      setDraft(await applyNodeDraft(runtime, draft, afterApplyNodeId));
     } catch (error) {
       setFailure(errorMessage(error));
     } finally {
