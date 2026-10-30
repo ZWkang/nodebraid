@@ -33,6 +33,7 @@ import { createSvgRenderer } from '@nodebraid/renderer-svg';
 
 import { createNavigatorClipboardTransport, exampleCanvasFragmentTextCodec } from './clipboard-adapters';
 import { createExampleNodeContent } from './node-content';
+import { exampleZoomRange } from './viewport';
 
 export type ExampleNodeType = 'step' | 'note';
 
@@ -94,8 +95,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
   let placement: NodePlacementService | undefined;
   const basicCanvasPlugin = createBasicCanvasPlugin(createSvgRenderer, {
     interaction: {
-      minZoom: 0.25,
-      maxZoom: 4,
+      ...exampleZoomRange,
       wheelZoomSensitivity: Math.log(2) / 100,
       connection: {
         materializeEdge({ source, target: edgeTarget }) {

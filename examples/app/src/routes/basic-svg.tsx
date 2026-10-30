@@ -23,7 +23,7 @@ import {
   useSessionSnapshot,
   type RuntimeMountFailureReporter,
 } from '@nodebraid/adapter-react';
-import { describeError, redoCommand, undoCommand, type Viewport } from '@nodebraid/core';
+import { describeError, redoCommand, undoCommand } from '@nodebraid/core';
 
 import { Badge } from '@/components/ui/badge';
 import { NodeCreation, NodeDataEditor } from '@/components/node-authoring';
@@ -38,6 +38,7 @@ import {
 } from '@/example-runtime/create-example-runtime';
 import { downloadExampleDocument, restoreExampleDocument } from '@/example-runtime/document-adapters';
 import { useClipboardFailure } from '@/example-runtime/use-clipboard-failure';
+import { fitViewport, zoomViewportAtCenter } from '@/example-runtime/viewport';
 
 type Language = 'en' | 'zh';
 
@@ -361,37 +362,14 @@ function Metric({
 function zoomAtCenter(runtime: ExampleRuntime, target: SVGSVGElement, factor: number) {
   const current = runtime.session.getSnapshot().viewport;
   const bounds = target.getBoundingClientRect();
-  const anchor = { x: bounds.width / 2, y: bounds.height / 2 };
-  const zoom = clamp(current.zoom * factor, 0.25, 4);
-  const worldX = (anchor.x - current.x) / current.zoom;
-  const worldY = (anchor.y - current.y) / current.zoom;
-  runtime.session.setViewport({ x: anchor.x - worldX * zoom, y: anchor.y - worldY * zoom, zoom });
+  runtime.session.setViewport(zoomViewportAtCenter(current, bounds, factor));
 }
 
 function fitView(runtime: ExampleRuntime, target: SVGSVGElement) {
   const nodes = runtime.kernel.read().snapshot.nodes;
-  if (nodes.length === 0) return;
-  const minX = Math.min(...nodes.map((node) => node.position.x));
-  const minY = Math.min(...nodes.map((node) => node.position.y));
-  const maxX = Math.max(...nodes.map((node) => node.position.x + (node.size?.width ?? 0)));
-  const maxY = Math.max(...nodes.map((node) => node.position.y + (node.size?.height ?? 0)));
   const bounds = target.getBoundingClientRect();
-  const padding = 48;
-  const zoom = clamp(
-    Math.min((bounds.width - padding * 2) / (maxX - minX), (bounds.height - padding * 2) / (maxY - minY)),
-    0.25,
-    4,
-  );
-  const viewport: Viewport = {
-    x: (bounds.width - (maxX - minX) * zoom) / 2 - minX * zoom,
-    y: (bounds.height - (maxY - minY) * zoom) / 2 - minY * zoom,
-    zoom,
-  };
-  runtime.session.setViewport(viewport);
-}
-
-function clamp(value: number, minimum: number, maximum: number): number {
-  return Math.min(maximum, Math.max(minimum, value));
+  const viewport = fitViewport(nodes, bounds);
+  if (viewport) runtime.session.setViewport(viewport);
 }
 
 function describeExampleError(error: unknown): string {
