@@ -1,0 +1,150 @@
+"""Run paired, serial A/B observations with the byte-identical public harness."""
+
+import argparse
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import platform
+import random
+import subprocess
+import time
+
+
+HERE = Path(__file__).resolve().parent
+DEFAULT_BASE = Path('<BASELINE_RUN>')
+DEFAULT_OPTIMIZED = HERE.parent / 'performance-optimized'
+
+
+def write_json(path, value):
+    path.write_text(json.dumps(value, indent=2) + '\n')
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def artifacts(root):
+    files = []
+    for package in ('kernel', 'diagnostics'):
+        directory = root / 'node_modules' / '@nodebraid' / package
+        if not (directory / 'dist' / 'index.js').is_file():
+            raise ValueError(f'Missing built public package: {directory}')
+        files.append(directory / 'package.json')
+        files.extend(sorted((directory / 'dist').rglob('*')))
+    return {str(path.relative_to(root)): digest(path) for path in files if path.is_file()}
+
+
+def schedule():
+    cases = [dict(topology='sparse', size=size, operation=operation, retained=0)
+             for size in (1000, 10000, 50000)
+             for operation in ('move-one', 'move-1pct', 'rewire-one', 'net-zero')]
+    result = []
+    for repetition in range(1, 4):
+        indexed = list(enumerate(cases))
+        random.Random(137 + repetition).shuffle(indexed)
+        for case_index, case in indexed:
+            order = ['base', 'optimized'] if (case_index + repetition) % 2 else ['optimized', 'base']
+            case_id = f"sparse-{case['size']}-{case['operation']}-retain0"
+            result.append(dict(caseId=case_id, case=case, repetition=repetition, order=order))
+    assert sum(pair['order'][0] == 'base' for pair in result) == 18
+    return cases, result
+
+
+def validate(result, case):
+    assert result['runtime'].startswith('bun-')
+    assert result['topology'] == case['topology']
+    assert result['nodes'] == case['size'] and result['edges'] == case['size'] * 2
+    assert result['operation'] == case['operation'] and result['retainedCount'] == case['retained']
+    assert result['warmupCount'] == 20 and result['sampleCount'] == 30
+    assert result['checks'] == 50 and len(result['timingsMs']) == 30
+    assert result['finalRevision'] == (1 if case['operation'] == 'net-zero' else 51)
+    assert result['changedEntitiesPerCommit'] == (0 if case['operation'] == 'net-zero' else
+                                                case['size'] // 100 if case['operation'] == 'move-1pct' else 1)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--base', type=Path, default=DEFAULT_BASE)
+    parser.add_argument('--optimized', type=Path, default=DEFAULT_OPTIMIZED)
+    parser.add_argument('--out', type=Path, required=True, help='New observation directory; existing data is not overwritten.')
+    parser.add_argument('--base-revision', required=True)
+    parser.add_argument('--optimized-revision', required=True, help='Commit SHA, or explicit worktree tree/patch identity.')
+    parser.add_argument('--plan-only', action='store_true', help='Print schedule; do not start Bun or write outputs.')
+    args = parser.parse_args()
+    cases, pairs = schedule()
+    plan = dict(schemaVersion=1, cases=cases, repetitions=3, warmupCount=20, sampleCount=30,
+                seed=137, pairs=pairs, pairedProcesses=72,
+                balancing='18 AB and 18 BA pairs; each case alternates order across its three repetitions',
+                gc='Natural; no forced collection', execution='Serial fresh Bun processes; no profiler',
+                scope='12 sparse cases; the separate unchanged full matrix has 20 cases')
+    if args.plan_only:
+        print(json.dumps(plan, indent=2))
+        return
+
+    roots = dict(base=args.base.resolve(), optimized=args.optimized.resolve())
+    expected = (HERE / 'reference' / 'benchmark.mjs').read_bytes()
+    for variant, root in roots.items():
+        if (root / 'benchmark.mjs').read_bytes() != expected:
+            raise ValueError(f'{variant} harness differs from the historical reference: {root}')
+    before = {variant: artifacts(root) for variant, root in roots.items()}
+    if roots['base'] == roots['optimized'] or before['base'] == before['optimized']:
+        raise ValueError('Base and optimized must be distinct preserved builds with an actual artifact change.')
+    out = args.out.resolve()
+    out.mkdir(parents=True, exist_ok=False)
+    (out / 'results').mkdir()
+    (out / 'logs').mkdir()
+    write_json(out / 'plan.json', plan)
+    environment = dict(startedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                       platform=platform.platform(), machine=platform.machine(), cpuCount=os.cpu_count(),
+                       python=platform.python_version(), bun=subprocess.check_output(['bun', '--version'], text=True).strip(),
+                       baseRoot=str(roots['base']), optimizedRoot=str(roots['optimized']),
+                       baseRevision=args.base_revision, optimizedRevision=args.optimized_revision,
+                       harnessSha256=hashlib.sha256(expected).hexdigest(),
+                       runnerSha256=digest(Path(__file__)), loadBefore=os.getloadavg())
+    write_json(out / 'environment.json', environment)
+    write_json(out / 'artifacts-before.json', before)
+    receipts = []
+    for pair_index, pair in enumerate(pairs, 1):
+        case = pair['case']
+        for variant in pair['order']:
+            label = f"{pair['caseId']}-r{pair['repetition']}-{variant}"
+            output = out / 'results' / (label + '.json')
+            command = ['bun', '--no-install', str(roots[variant] / 'benchmark.mjs'), case['topology'],
+                       str(case['size']), case['operation'], '20', '30', str(case['retained']), str(output)]
+            receipt = dict(label=label, pairIndex=pair_index, caseId=pair['caseId'], repetition=pair['repetition'],
+                           variant=variant, order=pair['order'], command=command, cwd=str(roots[variant]),
+                           result=str(output.relative_to(out)), log=f'logs/{label}.log',
+                           startedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                           loadBefore=os.getloadavg(), status='running')
+            receipts.append(receipt)
+            write_json(out / 'receipts.json', receipts)
+            tick = time.monotonic()
+            with (out / receipt['log']).open('w') as log:
+                process = subprocess.run(command, cwd=roots[variant], stdout=log, stderr=subprocess.STDOUT)
+            receipt.update(exitCode=process.returncode, elapsedSeconds=time.monotonic() - tick,
+                           completedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                           loadAfter=os.getloadavg(), status='process-completed')
+            write_json(out / 'receipts.json', receipts)
+            if process.returncode:
+                raise SystemExit(f"Failed {label}; retained log: {out / receipt['log']}")
+            result = json.loads(output.read_text())
+            validate(result, case)
+            receipt.update(status='validated', resultSha256=digest(output), medianMs=result['statistics']['medianMs'])
+            write_json(out / 'receipts.json', receipts)
+            print(f"{pair_index}/36 {label}: median={receipt['medianMs']:.6f} ms", flush=True)
+    after = {variant: artifacts(root) for variant, root in roots.items()}
+    write_json(out / 'artifacts-after.json', after)
+    if before != after:
+        raise ValueError('Package artifacts changed during comparison; do not interpret it as a stable revision comparison.')
+    for root in roots.values():
+        if (root / 'benchmark.mjs').read_bytes() != expected:
+            raise ValueError('Harness changed during comparison.')
+    write_json(out / 'completion.json', dict(completedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                                           runs=len(receipts), artifactsUnchanged=True, loadAfter=os.getloadavg()))
+    print('PAIRED COMPARISON COMPLETE', flush=True)
+
+
+if __name__ == '__main__':
+    main()

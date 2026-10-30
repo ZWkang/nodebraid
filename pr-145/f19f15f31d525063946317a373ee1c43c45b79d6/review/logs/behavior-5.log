@@ -1,0 +1,422 @@
+$ bun run scripts/check-affected.ts
+{
+  "mode": "affected",
+  "files": [
+    "packages/kernel/src/canvas-kernel.ts",
+    "packages/kernel/src/canvas-view.ts",
+    "packages/kernel/src/entity-collection.ts",
+    "packages/kernel/tests/snapshot-reuse.test.ts",
+    "packages/kernel/tests/transaction-index.test.ts"
+  ],
+  "packages": [
+    "@nodebraid/adapter-react",
+    "@nodebraid/canvas-fragment",
+    "@nodebraid/core",
+    "@nodebraid/document",
+    "@nodebraid/examples",
+    "@nodebraid/interaction-api",
+    "@nodebraid/kernel",
+    "@nodebraid/layout-api",
+    "@nodebraid/layout-dagre",
+    "@nodebraid/layout-elk",
+    "@nodebraid/plugin-clipboard",
+    "@nodebraid/plugin-duplicate-selection",
+    "@nodebraid/plugin-history",
+    "@nodebraid/plugin-interaction",
+    "@nodebraid/plugin-kernel",
+    "@nodebraid/plugin-layout",
+    "@nodebraid/plugin-node-editing",
+    "@nodebraid/plugin-port",
+    "@nodebraid/plugin-renderer",
+    "@nodebraid/plugin-session",
+    "@nodebraid/port-api",
+    "@nodebraid/preset-basic",
+    "@nodebraid/renderer-api",
+    "@nodebraid/renderer-svg",
+    "@nodebraid/session-api"
+  ],
+  "tests": [
+    "tests/kernel-commit-preparation.test.ts",
+    "tests/layout-providers.test.ts"
+  ],
+  "browser": [
+    "@nodebraid/adapter-react",
+    "@nodebraid/examples",
+    "@nodebraid/renderer-svg"
+  ],
+  "docs": true,
+  "shared": []
+}
+
+[check:affected] .: <BUN_HOME>/bin/bun x --no-install prettier --check --ignore-unknown packages/kernel/src/canvas-kernel.ts packages/kernel/src/canvas-view.ts packages/kernel/src/entity-collection.ts packages/kernel/tests/snapshot-reuse.test.ts packages/kernel/tests/transaction-index.test.ts
+Checking formatting...
+All matched files use Prettier code style!
+
+[check:affected] .: <BUN_HOME>/bin/bun x --no-install oxlint packages/kernel/src/canvas-kernel.ts packages/kernel/src/canvas-view.ts packages/kernel/src/entity-collection.ts packages/kernel/tests/snapshot-reuse.test.ts packages/kernel/tests/transaction-index.test.ts
+[build] @nodebraid/diagnostics
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/kernel
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/runtime-cordis
+$ tsgo -p tsconfig.build.json
+[build] @nodebraid/plugin-command
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-kernel
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-history
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/session-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-session
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/adapter-react
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/canvas-fragment
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/port-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/interaction-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-api
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-node-editing
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-port
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-api
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-renderer
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-interaction
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-clipboard
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-duplicate-selection
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/plugin-layout
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/preset-basic
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/document
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/core
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/layout-dagre
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/renderer-svg
+$ tsgo -p tsconfig.build.json && bun run test:artifacts
+$ bun run ./artifacts/check-declarations.ts
+[build] @nodebraid/examples
+$ vite build
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 2198 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                              0.62 kB │ gzip:   0.34 kB
+dist/assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2    7.42 kB
+dist/assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2      8.00 kB
+dist/assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2       15.08 kB
+dist/assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2      16.51 kB
+dist/assets/geist-latin-wght-normal-BgDaEnEv.woff2          29.40 kB
+dist/assets/index-DIFxrLM3.css                              39.39 kB │ gzip:   8.38 kB
+dist/assets/routes-DFPxz3Hq.js                               0.56 kB │ gzip:   0.41 kB
+dist/assets/rolldown-runtime-CbXtAM7H.js                     0.58 kB │ gzip:   0.36 kB
+dist/assets/preload-helper-nlOK6TZ5.js                      35.01 kB │ gzip:  12.63 kB
+dist/assets/basic-svg-CSmCy5yZ.js                          265.91 kB │ gzip:  79.84 kB
+dist/assets/index-BiF2uRpN.js                              348.54 kB │ gzip: 113.55 kB
+
+✓ built in 659ms
+[build] @nodebraid/layout-elk
+$ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+
+[check:affected] packages/adapter-react: <BUN_HOME>/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/adapter-react: <BUN_HOME>/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/server-rendering.test.tsx:
+(pass) fails explicitly when a Snapshot Hook is server-rendered without a hydration contract [1.39ms]
+
+tests/index.test.ts:
+(pass) exports the React Adapter hooks through its public entrypoint [0.01ms]
+
+tests/types.test.ts:
+(pass) keeps the React Adapter interface narrow and type-safe
+
+ 3 pass
+ 0 fail
+ 5 expect() calls
+Ran 3 tests across 3 files. [18.00ms]
+
+[check:affected] packages/canvas-fragment: <BUN_HOME>/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/canvas-fragment: <BUN_HOME>/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) captures the selected-node induced subgraph and explicit Selection in canonical order [0.96ms]
+(pass) materializes nested Nodes and port-qualified Edges with fresh IDs and one world offset [0.63ms]
+(pass) accepts one decoded Fragment shell and rejects edges outside its Node set [0.26ms]
+
+tests/array-input.test.ts:
+(pass) rejects an empty normalized Node collection for length %s [0.05ms]
+(pass) rejects an empty normalized Node collection for length %s [0.01ms]
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length 0
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length %s
+(pass) rejects an empty normalized Node collection for length %s
+(pass) returns the same Node collection that passed Fragment validation [0.11ms]
+(pass) rejects malformed Fragment elements even when the array defines map [0.03ms]
+(pass) materializes the actual mapping elements even when the array defines map [0.05ms]
+(pass) validates every element within a Proxy array length [0.03ms]
+(pass) accepts frozen array data without invoking method, iterator or constructor hooks [0.08ms]
+(pass) rejects a missing Fragment nodes element [0.02ms]
+(pass) rejects a missing Fragment edges element
+(pass) rejects a missing Fragment selectionNodes element [0.01ms]
+(pass) rejects a missing Fragment selectionEdges element [0.01ms]
+(pass) rejects a missing nodes materialization element [0.03ms]
+(pass) rejects a missing edges materialization element [0.03ms]
+(pass) preserves an array element read failure [0.03ms]
+
+ 23 pass
+ 0 fail
+ 43 expect() calls
+Ran 23 tests across 2 files. [8.00ms]
+
+[check:affected] packages/core: <BUN_HOME>/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/core: <BUN_HOME>/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) @nodebraid/core > publishes Port values and Runtime contribution seams [0.03ms]
+(pass) @nodebraid/core > publishes Canvas Fragment and Clipboard through the public facade
+(pass) @nodebraid/core > publishes Duplicate Selection through the public facade
+(pass) @nodebraid/core > publishes the shared Diagnostics seam [0.57ms]
+(pass) @nodebraid/core > publishes the typed Plugin Host seam [3.39ms]
+(pass) @nodebraid/core > publishes the reversible Kernel seam [0.80ms]
+(pass) @nodebraid/core > publishes the Kernel Runtime Plugin seam [1.26ms]
+(pass) @nodebraid/core > publishes the Session Runtime Plugin seam [0.85ms]
+(pass) @nodebraid/core > publishes the backend-neutral Renderer and Runtime integration seams [0.05ms]
+(pass) @nodebraid/core > publishes backend-neutral Interaction values and Runtime behavior [0.02ms]
+(pass) @nodebraid/core > composes asynchronous Command preparation with a synchronous Kernel Transaction [1.13ms]
+(pass) @nodebraid/core > publishes the History Runtime Plugin seam [0.01ms]
+
+tests/preset-basic.test.ts:
+(pass) Core facade exports Basic Canvas Composition without a concrete Renderer [0.01ms]
+
+tests/layout.test.ts:
+(pass) the Core facade exports generic Layout seams without concrete Providers [0.01ms]
+
+tests/document-roundtrip.test.ts:
+(pass) the public facade restores a file and records only subsequent editing [3.24ms]
+
+ 15 pass
+ 0 fail
+ 44 expect() calls
+Ran 15 tests across 4 files. [28.00ms]
+
+[check:affected] packages/document: <BUN_HOME>/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/document: <BUN_HOME>/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) round-trips a complete Document and opaque application data without persisting runtime state [1.25ms]
+(pass) supports an empty Document and uses no codec calls when there are no entities [0.05ms]
+(pass) rejects wrong envelope type before interpreting any application data [0.14ms]
+(pass) rejects unknown version before interpreting any application data [0.02ms]
+(pass) rejects wrong data format before interpreting any application data [0.02ms]
+(pass) rejects non-object envelope before interpreting any application data
+(pass) rejects unknown envelope field before interpreting any application data
+(pass) rejects missing array before interpreting any application data
+(pass) rejects non-array nodes before interpreting any application data [0.06ms]
+(pass) rejects invalid node type before interpreting any application data [0.05ms]
+(pass) rejects empty node ID before interpreting any application data [0.04ms]
+(pass) rejects string position before interpreting any application data [0.05ms]
+(pass) rejects unknown node field before interpreting any application data
+(pass) rejects malformed size before interpreting any application data
+(pass) rejects invalid parent ID before interpreting any application data
+(pass) rejects malformed edge before interpreting any application data [0.03ms]
+(pass) rejects invalid port ID before interpreting any application data [0.01ms]
+(pass) rejects non-text data on later edge before interpreting any application data [0.01ms]
+(pass) rejects duplicate Node ID through the Kernel complete-graph contract [0.27ms]
+(pass) rejects duplicate Edge ID through the Kernel complete-graph contract [0.06ms]
+(pass) rejects missing parent through the Kernel complete-graph contract [0.07ms]
+(pass) rejects self parent cycle through the Kernel complete-graph contract [0.04ms]
+(pass) rejects missing endpoint through the Kernel complete-graph contract [0.03ms]
+(pass) rejects negative size through the Kernel complete-graph contract [0.03ms]
+(pass) rejects malformed JSON and non-finite JSON geometry [0.54ms]
+(pass) preserves original application codec exceptions and rejects non-text encoding [0.23ms]
+(pass) rejects invalid codec configuration [0.02ms]
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+(pass) rejects invalid codec configuration
+
+tests/types.test.ts:
+(pass) keeps decoded Document structure readonly and business data opaque
+
+tests/capture.test.ts:
+(pass) captures getters once and preserves the graph even when application encoding changes its source [0.26ms]
+(pass) normalizes valid graph ordering and ignores caller array iteration hooks [0.14ms]
+(pass) rejects sparse arrays and malformed owned export fields instead of losing information [0.61ms]
+(pass) calls the original codec methods with their receiver when their bind property is overridden [0.11ms]
+(pass) captures typed class getters and extra application fields without requiring own enumerable storage [0.26ms]
+(pass) still rejects a genuinely missing required source field [0.04ms]
+(pass) Document preserves a first entity getter failure before allocating a virtual array [0.06ms]
+(pass) Document preserves first malformed nodes failure at length 1 [0.09ms]
+(pass) Document preserves first throwing nodes failure at length 1 [0.02ms]
+(pass) Document preserves first malformed nodes failure at length 4294967296 [0.01ms]
+(pass) Document preserves first throwing nodes failure at length 4294967296
+(pass) Document preserves first malformed nodes failure at length Infinity
+(pass) Document preserves first throwing nodes failure at length Infinity
+(pass) Document preserves original nodes length failure undefined [0.04ms]
+(pass) Document preserves original nodes length failure null
+(pass) Document preserves original nodes length failure false
+(pass) Document preserves original nodes length failure 0
+(pass) Document preserves original nodes length failure ""
+(pass) Document preserves original nodes length failure Symbol(Document read)
+(pass) Document preserves original nodes length failure 357 |       },
+358 |     );
+359 |   }
+360 | 
+361 |   for (const boundary of ['length', 'index'] as const) {
+362 |     test.each([undefined, null, false, 0, '', Symbol('Document read'), new Error('Document read')])(
+                                                                                 ^
+error: Document read
+      at <WORKSPACE>/packages/document/tests/capture.test.ts:362:76
+
+(pass) Document preserves original nodes index failure undefined
+(pass) Document preserves original nodes index failure null
+(pass) Document preserves original nodes index failure false
+(pass) Document preserves original nodes index failure 0
+(pass) Document preserves original nodes index failure ""
+(pass) Document preserves original nodes index failure Symbol(Document read)
+(pass) Document preserves original nodes index failure 357 |       },
+358 |     );
+359 |   }
+360 | 
+361 |   for (const boundary of ['length', 'index'] as const) {
+362 |     test.each([undefined, null, false, 0, '', Symbol('Document read'), new Error('Document read')])(
+                                                                                 ^
+error: Document read
+      at <WORKSPACE>/packages/document/tests/capture.test.ts:362:76
+
+(pass) Document retains native empty lengths and failures for nodes [0.39ms]
+(pass) Document captures fractional native length and first indexed values without caller hooks for nodes [0.15ms]
+(pass) Document preserves first malformed edges failure at length 1 [0.01ms]
+(pass) Document preserves first throwing edges failure at length 1
+(pass) Document preserves first malformed edges failure at length 4294967296
+(pass) Document preserves first throwing edges failure at length 4294967296
+(pass) Document preserves first malformed edges failure at length Infinity
+(pass) Document preserves first throwing edges failure at length Infinity
+(pass) Document preserves original edges length failure undefined
+(pass) Document preserves original edges length failure null
+(pass) Document preserves original edges length failure false
+(pass) Document preserves original edges length failure 0
+(pass) Document preserves original edges length failure ""
+(pass) Document preserves original edges length failure Symbol(Document read)
+(pass) Document preserves original edges length failure 357 |       },
+358 |     );
+359 |   }
+360 | 
+361 |   for (const boundary of ['length', 'index'] as const) {
+362 |     test.each([undefined, null, false, 0, '', Symbol('Document read'), new Error('Document read')])(
+                                                                                 ^
+error: Document read
+      at <WORKSPACE>/packages/document/tests/capture.test.ts:362:76
+
+(pass) Document preserves original edges index failure undefined
+(pass) Document preserves original edges index failure null
+(pass) Document preserves original edges index failure false
+(pass) Document preserves original edges index failure 0
+(pass) Document preserves original edges index failure ""
+(pass) Document preserves original edges index failure Symbol(Document read)
+(pass) Document preserves original edges index failure 357 |       },
+358 |     );
+359 |   }
+360 | 
+361 |   for (const boundary of ['length', 'index'] as const) {
+362 |     test.each([undefined, null, false, 0, '', Symbol('Document read'), new Error('Document read')])(
+                                                                                 ^
+error: Document read
+      at <WORKSPACE>/packages/document/tests/capture.test.ts:362:76
+
+(pass) Document retains native empty lengths and failures for edges [0.09ms]
+(pass) Document captures fractional native length and first indexed values without caller hooks for edges [0.06ms]
+
+ 83 pass
+ 0 fail
+ 347 expect() calls
+Ran 83 tests across 3 files. [12.00ms]
+
+[check:affected] examples/app: <BUN_HOME>/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/interaction-api: <BUN_HOME>/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+
+[check:affected] packages/interaction-api: <BUN_HOME>/bin/bun run test:self
+$ bun test ./tests
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) describes backend-neutral Interaction Projection values [0.10ms]
+(pass) creates immutable direction-independent World Rect values including zero area [0.10ms]
+
+ 2 pass
+ 0 fail
+ 7 expect() calls
+Ran 2 tests across 1 file. [4.00ms]
+
+[check:affected] packages/kernel: <BUN_HOME>/bin/bun run typecheck:self
+$ tsgo --noEmit -p tsconfig.json
+tests/snapshot-reuse.test.ts(36,47): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type 'CanvasNode | undefined' is not assignable to parameter of type 'CanvasNode'.
+      Type 'undefined' is not assignable to type 'CanvasNode'.
+tests/snapshot-reuse.test.ts(37,47): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type 'CanvasEdge | undefined' is not assignable to parameter of type 'CanvasEdge'.
+      Type 'undefined' is not assignable to type 'CanvasEdge'.
+tests/snapshot-reuse.test.ts(57,47): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type 'CanvasEdge | undefined' is not assignable to parameter of type 'CanvasEdge'.
+      Type 'undefined' is not assignable to type 'CanvasEdge'.
+tests/snapshot-reuse.test.ts(83,49): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type 'CanvasNode | undefined' is not assignable to parameter of type 'CanvasNode'.
+      Type 'undefined' is not assignable to type 'CanvasNode'.
+tests/snapshot-reuse.test.ts(84,49): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type 'CanvasEdge | undefined' is not assignable to parameter of type 'CanvasEdge'.
+      Type 'undefined' is not assignable to type 'CanvasEdge'.
+error: script "typecheck:self" exited with code 1
+error: script "check:affected" exited with code 1

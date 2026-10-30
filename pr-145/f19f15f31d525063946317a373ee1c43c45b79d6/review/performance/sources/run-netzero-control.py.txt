@@ -1,0 +1,28 @@
+from pathlib import Path
+import json,subprocess,datetime,resource
+root=Path(__file__).resolve().parent
+out=root/'performance-netzero-control'
+out.mkdir()
+variants={'base':Path('<BASELINE_RUN>'),'optimized':root/'performance-optimized'}
+rows=[]
+for repeat in range(1,7):
+    order=['base','optimized'] if repeat%2 else ['optimized','base']
+    for variant in order:
+        label=f'r{repeat}-{variant}'
+        result=out/(label+'.json')
+        cmd=['bun','--no-install',str(variants[variant]/'benchmark.mjs'),'sparse','50000','net-zero','20','30','0',str(result)]
+        before=resource.getrusage(resource.RUSAGE_CHILDREN)
+        started=datetime.datetime.now(datetime.timezone.utc).isoformat()
+        with (out/(label+'.log')).open('w') as log:p=subprocess.run(cmd,stdout=log,stderr=subprocess.STDOUT)
+        after=resource.getrusage(resource.RUSAGE_CHILDREN)
+        row={'repeat':repeat,'variant':variant,'order':order,'command':cmd,'startedAt':started,'exitCode':p.returncode,'processUserCpuSeconds':after.ru_utime-before.ru_utime,'processSystemCpuSeconds':after.ru_stime-before.ru_stime,'processMajorFaults':after.ru_majflt-before.ru_majflt,'processMinorFaults':after.ru_minflt-before.ru_minflt}
+        rows.append(row)
+        (out/'receipts.json').write_text(json.dumps(rows,indent=2)+'\n')
+        if p.returncode:raise SystemExit(p.returncode)
+        data=json.loads(result.read_text())
+        assert data['finalRevision']==1 and data['checks']==50
+        row['statistics']=data['statistics']
+        (out/'receipts.json').write_text(json.dumps(rows,indent=2)+'\n')
+        print(label,json.dumps(row['statistics']),flush=True)
+print('NET ZERO CONTROL COMPLETE')
+

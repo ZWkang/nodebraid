@@ -1,0 +1,542 @@
+[
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "net-zero",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "nested",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 20
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "move-1pct",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "move-1pct",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "hub",
+      "size": 50000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "hub",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "net-zero",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "net-zero",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "hub",
+      "size": 10000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 20
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "move-1pct",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "nested",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "hub",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    1,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "nested",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "hub",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "move-1pct",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "net-zero",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 20
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "net-zero",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "hub",
+      "size": 10000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "net-zero",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "nested",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "move-1pct",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "hub",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 20
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "move-1pct",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "hub",
+      "size": 50000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    2,
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "move-1pct",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "move-1pct",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "net-zero",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 20
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "hub",
+      "size": 10000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "nested",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "hub",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "hub",
+      "size": 50000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "hub",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 20
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "net-zero",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "rewire-one",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "move-1pct",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "nested",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "move-one",
+      "retained": 0
+    }
+  ],
+  [
+    3,
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "net-zero",
+      "retained": 0
+    }
+  ]
+]

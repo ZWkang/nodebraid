@@ -1,0 +1,1538 @@
+[
+  {
+    "profile": "hub-50000-rewire-one-r1.cpuprofile",
+    "result": "hub-50000-rewire-one-r1.json",
+    "selectedTransactionSamples": 2139,
+    "totalProcessSamples": 3033,
+    "selectedSamplesAlsoUnderMeasuredTransactStack": 2135,
+    "categorySamples": {
+      "map-copy": 26,
+      "draft-index": 466,
+      "graph-validation": 464,
+      "snapshot-and-view-excluding-index": 1173,
+      "unattributed-or-boundary-sample": 4,
+      "entity-write": 3,
+      "other-transaction": 3
+    },
+    "categorySamplePercent": {
+      "map-copy": 1.2155212716222534,
+      "draft-index": 21.785881252921925,
+      "graph-validation": 21.69237961664329,
+      "snapshot-and-view-excluding-index": 54.83870967741935,
+      "unattributed-or-boundary-sample": 0.18700327255726976,
+      "entity-write": 0.1402524544179523,
+      "other-transaction": 0.1402524544179523
+    },
+    "topSelfFrames": [
+      {
+        "function": "freeze",
+        "url": "",
+        "line": 0,
+        "samples": 1023
+      },
+      {
+        "function": "compareIds",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/ordering.js",
+        "line": 1,
+        "samples": 260
+      },
+      {
+        "function": "append",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 97,
+        "samples": 255
+      },
+      {
+        "function": "validateGraph",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 3,
+        "samples": 246
+      },
+      {
+        "function": "findParentCycles",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 68,
+        "samples": 174
+      },
+      {
+        "function": "sort",
+        "url": "",
+        "line": 0,
+        "samples": 45
+      },
+      {
+        "function": "sortBuckets",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 104,
+        "samples": 35
+      },
+      {
+        "function": "performIteration",
+        "url": "",
+        "line": 1,
+        "samples": 29
+      },
+      {
+        "function": "Map",
+        "url": "",
+        "line": 0,
+        "samples": 26
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-view.js",
+        "line": 6,
+        "samples": 13
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 106,
+        "samples": 8
+      },
+      {
+        "function": "createCanvasView",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-view.js",
+        "line": 3,
+        "samples": 6
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 4,
+        "samples": 6
+      },
+      {
+        "function": "GraphIndex",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 8,
+        "samples": 2
+      },
+      {
+        "function": "transact",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-kernel.js",
+        "line": 17,
+        "samples": 2
+      },
+      {
+        "function": "add",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "set",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "freezeEdgeEndpoint",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/entity-values.js",
+        "line": 118,
+        "samples": 1
+      },
+      {
+        "function": "runIteration",
+        "url": "file://<RUN>/performance-optimized/benchmark.mjs",
+        "line": 155,
+        "samples": 1
+      },
+      {
+        "function": "some",
+        "url": "",
+        "line": 1,
+        "samples": 1
+      }
+    ],
+    "topStacks": [
+      {
+        "stack": "freeze <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 1022
+      },
+      {
+        "stack": "append <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 255
+      },
+      {
+        "stack": "validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 246
+      },
+      {
+        "stack": "findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 174
+      },
+      {
+        "stack": "compareIds <-  <- sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 113
+      },
+      {
+        "stack": "compareIds <-  <- sort <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 81
+      },
+      {
+        "stack": "compareIds <-  <- sort <- sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload",
+        "samples": 38
+      },
+      {
+        "stack": "sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 35
+      },
+      {
+        "stack": "sort <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 33
+      },
+      {
+        "stack": "compareIds <- sort <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 28
+      },
+      {
+        "stack": "Map <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 26
+      },
+      {
+        "stack": "performIteration <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 18
+      },
+      {
+        "stack": " <- sort <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 13
+      },
+      {
+        "stack": "performIteration <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 11
+      },
+      {
+        "stack": "sort <- sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 9
+      }
+    ],
+    "method": "Filter cumulative Chrome sample timestamps to recorded measured transact windows. Mutually exclusive categories from complete ancestry; percent is sampling attribution, not exact stage timing.",
+    "alignment": {
+      "transactionCount": 60,
+      "transactionDurationMs": 2712.09125,
+      "profileRangeCoveredTransactionDurationMs": 2711.87525,
+      "profileRangeUncoveredHeadTransactionDurationMs": 0.0,
+      "profileRangeUncoveredTailTransactionDurationMs": 0.216,
+      "profileRangeCoveredTransactionCount": 60,
+      "profileRangeFullyCoveredTransactionCount": 59,
+      "profileRangePartiallyCoveredTransactionCount": 1,
+      "profileRangeUncoveredTransactionCount": 0,
+      "firstTransactionOffsetFromProfileStartMs": 1134.12025,
+      "lastTransactionOffsetBeforeProfileEndMs": -0.216,
+      "measuredTransactStackFraction": 0.9981299672744273,
+      "sampledTimelineEndMinusProfileEndUs": -1112.5,
+      "interpretation": "Actual intersection with the declared profile range, without tolerance. Uncovered time is unobserved, not zero cost. Sampling gaps and native/GC attribution remain unresolved."
+    }
+  },
+  {
+    "profile": "hub-50000-rewire-one-r2.cpuprofile",
+    "result": "hub-50000-rewire-one-r2.json",
+    "selectedTransactionSamples": 2161,
+    "totalProcessSamples": 3199,
+    "selectedSamplesAlsoUnderMeasuredTransactStack": 2158,
+    "categorySamples": {
+      "draft-index": 481,
+      "graph-validation": 464,
+      "snapshot-and-view-excluding-index": 1184,
+      "map-copy": 26,
+      "unattributed-or-boundary-sample": 3,
+      "entity-write": 1,
+      "other-transaction": 2
+    },
+    "categorySamplePercent": {
+      "draft-index": 22.258213789912077,
+      "graph-validation": 21.47154095326238,
+      "snapshot-and-view-excluding-index": 54.789449329014346,
+      "map-copy": 1.203146691346599,
+      "unattributed-or-boundary-sample": 0.13882461823229986,
+      "entity-write": 0.04627487274409996,
+      "other-transaction": 0.09254974548819991
+    },
+    "topSelfFrames": [
+      {
+        "function": "freeze",
+        "url": "",
+        "line": 0,
+        "samples": 1045
+      },
+      {
+        "function": "append",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 97,
+        "samples": 275
+      },
+      {
+        "function": "compareIds",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/ordering.js",
+        "line": 1,
+        "samples": 261
+      },
+      {
+        "function": "validateGraph",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 3,
+        "samples": 254
+      },
+      {
+        "function": "findParentCycles",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 68,
+        "samples": 167
+      },
+      {
+        "function": "sortBuckets",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 104,
+        "samples": 29
+      },
+      {
+        "function": "performIteration",
+        "url": "",
+        "line": 1,
+        "samples": 29
+      },
+      {
+        "function": "sort",
+        "url": "",
+        "line": 0,
+        "samples": 29
+      },
+      {
+        "function": "Map",
+        "url": "",
+        "line": 0,
+        "samples": 26
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-view.js",
+        "line": 6,
+        "samples": 18
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 4,
+        "samples": 10
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 106,
+        "samples": 6
+      },
+      {
+        "function": "createCanvasView",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-view.js",
+        "line": 3,
+        "samples": 3
+      },
+      {
+        "function": "getEdge",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 71,
+        "samples": 2
+      },
+      {
+        "function": "get",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "set",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "has",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "GraphIndex",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 8,
+        "samples": 1
+      },
+      {
+        "function": "getIncoming",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 47,
+        "samples": 1
+      },
+      {
+        "function": "onReplace",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-kernel.js",
+        "line": 52,
+        "samples": 1
+      }
+    ],
+    "topStacks": [
+      {
+        "stack": "freeze <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 1044
+      },
+      {
+        "stack": "append <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 275
+      },
+      {
+        "stack": "validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 254
+      },
+      {
+        "stack": "findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 167
+      },
+      {
+        "stack": "compareIds <-  <- sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 114
+      },
+      {
+        "stack": "compareIds <-  <- sort <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 78
+      },
+      {
+        "stack": "compareIds <-  <- sort <- sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload",
+        "samples": 40
+      },
+      {
+        "stack": "sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 29
+      },
+      {
+        "stack": "compareIds <- sort <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 29
+      },
+      {
+        "stack": "Map <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 26
+      },
+      {
+        "stack": "performIteration <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 23
+      },
+      {
+        "stack": " <- sort <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 18
+      },
+      {
+        "stack": "sort <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 18
+      },
+      {
+        "stack": " <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 10
+      },
+      {
+        "stack": "performIteration <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 6
+      }
+    ],
+    "method": "Filter cumulative Chrome sample timestamps to recorded measured transact windows. Mutually exclusive categories from complete ancestry; percent is sampling attribution, not exact stage timing.",
+    "alignment": {
+      "transactionCount": 60,
+      "transactionDurationMs": 2738.981,
+      "profileRangeCoveredTransactionDurationMs": 2738.517,
+      "profileRangeUncoveredHeadTransactionDurationMs": 0.0,
+      "profileRangeUncoveredTailTransactionDurationMs": 0.464,
+      "profileRangeCoveredTransactionCount": 60,
+      "profileRangeFullyCoveredTransactionCount": 59,
+      "profileRangePartiallyCoveredTransactionCount": 1,
+      "profileRangeUncoveredTransactionCount": 0,
+      "firstTransactionOffsetFromProfileStartMs": 1357.76375,
+      "lastTransactionOffsetBeforeProfileEndMs": -0.464,
+      "measuredTransactStackFraction": 0.998611753817677,
+      "sampledTimelineEndMinusProfileEndUs": -1206,
+      "interpretation": "Actual intersection with the declared profile range, without tolerance. Uncovered time is unobserved, not zero cost. Sampling gaps and native/GC attribution remain unresolved."
+    }
+  },
+  {
+    "profile": "sparse-50000-move-one-r1.cpuprofile",
+    "result": "sparse-50000-move-one-r1.json",
+    "selectedTransactionSamples": 1979,
+    "totalProcessSamples": 3026,
+    "selectedSamplesAlsoUnderMeasuredTransactStack": 1976,
+    "categorySamples": {
+      "map-copy": 34,
+      "draft-index": 682,
+      "graph-validation": 684,
+      "snapshot-and-view-excluding-index": 574,
+      "unattributed-or-boundary-sample": 3,
+      "entity-write": 1,
+      "other-transaction": 1
+    },
+    "categorySamplePercent": {
+      "map-copy": 1.7180394138453765,
+      "draft-index": 34.46184941889843,
+      "graph-validation": 34.562910560889335,
+      "snapshot-and-view-excluding-index": 29.00454775138959,
+      "unattributed-or-boundary-sample": 0.15159171298635674,
+      "entity-write": 0.050530570995452245,
+      "other-transaction": 0.050530570995452245
+    },
+    "topSelfFrames": [
+      {
+        "function": "freeze",
+        "url": "",
+        "line": 0,
+        "samples": 517
+      },
+      {
+        "function": "append",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 97,
+        "samples": 391
+      },
+      {
+        "function": "compareIds",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/ordering.js",
+        "line": 1,
+        "samples": 341
+      },
+      {
+        "function": "validateGraph",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 3,
+        "samples": 331
+      },
+      {
+        "function": "findParentCycles",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 68,
+        "samples": 296
+      },
+      {
+        "function": "Map",
+        "url": "",
+        "line": 0,
+        "samples": 35
+      },
+      {
+        "function": "performIteration",
+        "url": "",
+        "line": 1,
+        "samples": 22
+      },
+      {
+        "function": "sort",
+        "url": "",
+        "line": 0,
+        "samples": 13
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 4,
+        "samples": 7
+      },
+      {
+        "function": "GraphIndex",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 8,
+        "samples": 6
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-view.js",
+        "line": 5,
+        "samples": 5
+      },
+      {
+        "function": "sortBuckets",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 104,
+        "samples": 3
+      },
+      {
+        "function": "has",
+        "url": "",
+        "line": 0,
+        "samples": 2
+      },
+      {
+        "function": "createCanvasView",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-view.js",
+        "line": 3,
+        "samples": 2
+      },
+      {
+        "function": "isFinite",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "set",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "runIteration",
+        "url": "file://<RUN>/performance-optimized/benchmark.mjs",
+        "line": 155,
+        "samples": 1
+      },
+      {
+        "function": "freezeCanvasNode",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/entity-values.js",
+        "line": 2,
+        "samples": 1
+      },
+      {
+        "function": "add",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "assertOutcome",
+        "url": "file://<RUN>/performance-optimized/benchmark.mjs",
+        "line": 92,
+        "samples": 1
+      }
+    ],
+    "topStacks": [
+      {
+        "stack": "freeze <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 517
+      },
+      {
+        "stack": "append <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 391
+      },
+      {
+        "stack": "validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 331
+      },
+      {
+        "stack": "findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 296
+      },
+      {
+        "stack": "compareIds <-  <- sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 273
+      },
+      {
+        "stack": "compareIds <- sort <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 35
+      },
+      {
+        "stack": "Map <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 34
+      },
+      {
+        "stack": "compareIds <-  <- sort <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 32
+      },
+      {
+        "stack": "performIteration <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 12
+      },
+      {
+        "stack": "performIteration <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 10
+      },
+      {
+        "stack": " <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 7
+      },
+      {
+        "stack": "GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 6
+      },
+      {
+        "stack": "sort <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 6
+      },
+      {
+        "stack": "sort <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 6
+      },
+      {
+        "stack": " <- sort <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 5
+      }
+    ],
+    "method": "Filter cumulative Chrome sample timestamps to recorded measured transact windows. Mutually exclusive categories from complete ancestry; percent is sampling attribution, not exact stage timing.",
+    "alignment": {
+      "transactionCount": 60,
+      "transactionDurationMs": 2611.1435,
+      "profileRangeCoveredTransactionDurationMs": 2611.1435,
+      "profileRangeUncoveredHeadTransactionDurationMs": 0.0,
+      "profileRangeUncoveredTailTransactionDurationMs": 0.0,
+      "profileRangeCoveredTransactionCount": 60,
+      "profileRangeFullyCoveredTransactionCount": 60,
+      "profileRangePartiallyCoveredTransactionCount": 0,
+      "profileRangeUncoveredTransactionCount": 0,
+      "firstTransactionOffsetFromProfileStartMs": 1588.701,
+      "lastTransactionOffsetBeforeProfileEndMs": 3.73375,
+      "measuredTransactStackFraction": 0.9984840828701365,
+      "sampledTimelineEndMinusProfileEndUs": -1113.75,
+      "interpretation": "Actual intersection with the declared profile range, without tolerance. Uncovered time is unobserved, not zero cost. Sampling gaps and native/GC attribution remain unresolved."
+    }
+  },
+  {
+    "profile": "sparse-50000-move-one-r2.cpuprofile",
+    "result": "sparse-50000-move-one-r2.json",
+    "selectedTransactionSamples": 1679,
+    "totalProcessSamples": 2666,
+    "selectedSamplesAlsoUnderMeasuredTransactStack": 1676,
+    "categorySamples": {
+      "draft-index": 596,
+      "graph-validation": 559,
+      "snapshot-and-view-excluding-index": 498,
+      "map-copy": 19,
+      "other-transaction": 4,
+      "unattributed-or-boundary-sample": 3
+    },
+    "categorySamplePercent": {
+      "draft-index": 35.497319833234066,
+      "graph-validation": 33.29362715902323,
+      "snapshot-and-view-excluding-index": 29.6605122096486,
+      "map-copy": 1.1316259678379987,
+      "other-transaction": 0.23823704586063132,
+      "unattributed-or-boundary-sample": 0.1786777843954735
+    },
+    "topSelfFrames": [
+      {
+        "function": "freeze",
+        "url": "",
+        "line": 0,
+        "samples": 451
+      },
+      {
+        "function": "append",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 97,
+        "samples": 329
+      },
+      {
+        "function": "compareIds",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/ordering.js",
+        "line": 1,
+        "samples": 310
+      },
+      {
+        "function": "validateGraph",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 3,
+        "samples": 298
+      },
+      {
+        "function": "findParentCycles",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 68,
+        "samples": 210
+      },
+      {
+        "function": "performIteration",
+        "url": "",
+        "line": 1,
+        "samples": 19
+      },
+      {
+        "function": "Map",
+        "url": "",
+        "line": 0,
+        "samples": 19
+      },
+      {
+        "function": "sort",
+        "url": "",
+        "line": 0,
+        "samples": 11
+      },
+      {
+        "function": "sortBuckets",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 104,
+        "samples": 6
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 4,
+        "samples": 5
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-view.js",
+        "line": 5,
+        "samples": 4
+      },
+      {
+        "function": "set",
+        "url": "",
+        "line": 0,
+        "samples": 3
+      },
+      {
+        "function": "GraphIndex",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 8,
+        "samples": 3
+      },
+      {
+        "function": "createCanvasView",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-view.js",
+        "line": 3,
+        "samples": 3
+      },
+      {
+        "function": "incrementRevision",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/revision.js",
+        "line": 2,
+        "samples": 2
+      },
+      {
+        "function": "has",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "callback",
+        "url": "file://<RUN>/performance-optimized/benchmark.mjs",
+        "line": 78,
+        "samples": 1
+      },
+      {
+        "function": "cloneObject",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "assertOutcome",
+        "url": "file://<RUN>/performance-optimized/benchmark.mjs",
+        "line": 92,
+        "samples": 1
+      },
+      {
+        "function": "copyDataProperties",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      }
+    ],
+    "topStacks": [
+      {
+        "stack": "freeze <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 451
+      },
+      {
+        "stack": "append <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 329
+      },
+      {
+        "stack": "validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 298
+      },
+      {
+        "stack": "compareIds <-  <- sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 253
+      },
+      {
+        "stack": "findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 210
+      },
+      {
+        "stack": "compareIds <-  <- sort <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 30
+      },
+      {
+        "stack": "compareIds <- sort <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 27
+      },
+      {
+        "stack": "Map <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 19
+      },
+      {
+        "stack": "sort <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 10
+      },
+      {
+        "stack": "performIteration <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 10
+      },
+      {
+        "stack": "performIteration <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 9
+      },
+      {
+        "stack": "sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 6
+      },
+      {
+        "stack": " <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 5
+      },
+      {
+        "stack": " <- sort <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 4
+      },
+      {
+        "stack": "set <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 3
+      }
+    ],
+    "method": "Filter cumulative Chrome sample timestamps to recorded measured transact windows. Mutually exclusive categories from complete ancestry; percent is sampling attribution, not exact stage timing.",
+    "alignment": {
+      "transactionCount": 60,
+      "transactionDurationMs": 2151.089,
+      "profileRangeCoveredTransactionDurationMs": 2151.089,
+      "profileRangeUncoveredHeadTransactionDurationMs": 0.0,
+      "profileRangeUncoveredTailTransactionDurationMs": 0.0,
+      "profileRangeCoveredTransactionCount": 60,
+      "profileRangeFullyCoveredTransactionCount": 60,
+      "profileRangePartiallyCoveredTransactionCount": 0,
+      "profileRangeUncoveredTransactionCount": 0,
+      "firstTransactionOffsetFromProfileStartMs": 1297.22325,
+      "lastTransactionOffsetBeforeProfileEndMs": 0.43125,
+      "measuredTransactStackFraction": 0.9982132221560452,
+      "sampledTimelineEndMinusProfileEndUs": -1006.25,
+      "interpretation": "Actual intersection with the declared profile range, without tolerance. Uncovered time is unobserved, not zero cost. Sampling gaps and native/GC attribution remain unresolved."
+    }
+  },
+  {
+    "profile": "sparse-50000-move-one-r3.cpuprofile",
+    "result": "sparse-50000-move-one-r3.json",
+    "selectedTransactionSamples": 1757,
+    "totalProcessSamples": 2418,
+    "selectedSamplesAlsoUnderMeasuredTransactStack": 1755,
+    "categorySamples": {
+      "draft-index": 591,
+      "graph-validation": 586,
+      "snapshot-and-view-excluding-index": 542,
+      "map-copy": 33,
+      "entity-write": 1,
+      "other-transaction": 2,
+      "unattributed-or-boundary-sample": 2
+    },
+    "categorySamplePercent": {
+      "draft-index": 33.63688104723961,
+      "graph-validation": 33.35230506545248,
+      "snapshot-and-view-excluding-index": 30.84803642572567,
+      "map-copy": 1.8782014797951052,
+      "entity-write": 0.056915196357427436,
+      "other-transaction": 0.11383039271485487,
+      "unattributed-or-boundary-sample": 0.11383039271485487
+    },
+    "topSelfFrames": [
+      {
+        "function": "freeze",
+        "url": "",
+        "line": 0,
+        "samples": 499
+      },
+      {
+        "function": "append",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 97,
+        "samples": 344
+      },
+      {
+        "function": "validateGraph",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 3,
+        "samples": 302
+      },
+      {
+        "function": "compareIds",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/ordering.js",
+        "line": 1,
+        "samples": 263
+      },
+      {
+        "function": "findParentCycles",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 68,
+        "samples": 240
+      },
+      {
+        "function": "Map",
+        "url": "",
+        "line": 0,
+        "samples": 33
+      },
+      {
+        "function": "performIteration",
+        "url": "",
+        "line": 1,
+        "samples": 29
+      },
+      {
+        "function": "sort",
+        "url": "",
+        "line": 0,
+        "samples": 11
+      },
+      {
+        "function": "sortBuckets",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 104,
+        "samples": 11
+      },
+      {
+        "function": "createCanvasView",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-view.js",
+        "line": 3,
+        "samples": 6
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-view.js",
+        "line": 5,
+        "samples": 6
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 4,
+        "samples": 4
+      },
+      {
+        "function": "GraphIndex",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 8,
+        "samples": 2
+      },
+      {
+        "function": "get",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "has",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "assertTransactionOpen",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-kernel.js",
+        "line": 29,
+        "samples": 1
+      },
+      {
+        "function": "incrementRevision",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/revision.js",
+        "line": 2,
+        "samples": 1
+      },
+      {
+        "function": "transact",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/canvas-kernel.js",
+        "line": 17,
+        "samples": 1
+      },
+      {
+        "function": "strict",
+        "url": "node:assert",
+        "line": 538,
+        "samples": 1
+      },
+      {
+        "function": "assertOutcome",
+        "url": "file://<RUN>/performance-optimized/benchmark.mjs",
+        "line": 92,
+        "samples": 1
+      }
+    ],
+    "topStacks": [
+      {
+        "stack": "freeze <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 499
+      },
+      {
+        "stack": "append <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 344
+      },
+      {
+        "stack": "validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 302
+      },
+      {
+        "stack": "findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 240
+      },
+      {
+        "stack": "compareIds <-  <- sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 229
+      },
+      {
+        "stack": "Map <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 33
+      },
+      {
+        "stack": "compareIds <- sort <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 23
+      },
+      {
+        "stack": "performIteration <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 18
+      },
+      {
+        "stack": "performIteration <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 11
+      },
+      {
+        "stack": "compareIds <-  <- sort <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 11
+      },
+      {
+        "stack": "sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 11
+      },
+      {
+        "stack": "sort <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 8
+      },
+      {
+        "stack": "createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 6
+      },
+      {
+        "stack": " <- sort <- createCanvasView <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 6
+      },
+      {
+        "stack": " <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 4
+      }
+    ],
+    "method": "Filter cumulative Chrome sample timestamps to recorded measured transact windows. Mutually exclusive categories from complete ancestry; percent is sampling attribution, not exact stage timing.",
+    "alignment": {
+      "transactionCount": 60,
+      "transactionDurationMs": 2483.319,
+      "profileRangeCoveredTransactionDurationMs": 2482.7945,
+      "profileRangeUncoveredHeadTransactionDurationMs": 0.0,
+      "profileRangeUncoveredTailTransactionDurationMs": 0.5245,
+      "profileRangeCoveredTransactionCount": 60,
+      "profileRangeFullyCoveredTransactionCount": 59,
+      "profileRangePartiallyCoveredTransactionCount": 1,
+      "profileRangeUncoveredTransactionCount": 0,
+      "firstTransactionOffsetFromProfileStartMs": 841.46825,
+      "lastTransactionOffsetBeforeProfileEndMs": -0.5245,
+      "measuredTransactStackFraction": 0.9988616960728515,
+      "sampledTimelineEndMinusProfileEndUs": -894.5,
+      "interpretation": "Actual intersection with the declared profile range, without tolerance. Uncovered time is unobserved, not zero cost. Sampling gaps and native/GC attribution remain unresolved."
+    }
+  },
+  {
+    "profile": "sparse-50000-net-zero-r1.cpuprofile",
+    "result": "sparse-50000-net-zero-r1.json",
+    "selectedTransactionSamples": 968,
+    "totalProcessSamples": 1449,
+    "selectedSamplesAlsoUnderMeasuredTransactStack": 966,
+    "categorySamples": {
+      "draft-index": 485,
+      "graph-validation": 463,
+      "map-copy": 16,
+      "other-transaction": 2,
+      "unattributed-or-boundary-sample": 2
+    },
+    "categorySamplePercent": {
+      "draft-index": 50.103305785123965,
+      "graph-validation": 47.83057851239669,
+      "map-copy": 1.6528925619834711,
+      "other-transaction": 0.2066115702479339,
+      "unattributed-or-boundary-sample": 0.2066115702479339
+    },
+    "topSelfFrames": [
+      {
+        "function": "append",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 97,
+        "samples": 257
+      },
+      {
+        "function": "validateGraph",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 3,
+        "samples": 251
+      },
+      {
+        "function": "compareIds",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/ordering.js",
+        "line": 1,
+        "samples": 235
+      },
+      {
+        "function": "findParentCycles",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 68,
+        "samples": 167
+      },
+      {
+        "function": "Map",
+        "url": "",
+        "line": 0,
+        "samples": 16
+      },
+      {
+        "function": "performIteration",
+        "url": "",
+        "line": 1,
+        "samples": 15
+      },
+      {
+        "function": "sortBuckets",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 104,
+        "samples": 7
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 4,
+        "samples": 6
+      },
+      {
+        "function": "sort",
+        "url": "",
+        "line": 0,
+        "samples": 5
+      },
+      {
+        "function": "createCanvasQuery",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 60,
+        "samples": 2
+      },
+      {
+        "function": "get",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "has",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "set",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "add",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "GraphIndex",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 8,
+        "samples": 1
+      },
+      {
+        "function": "prepareOperation",
+        "url": "file://<RUN>/performance-optimized/benchmark.mjs",
+        "line": 64,
+        "samples": 1
+      },
+      {
+        "function": "writeFileSync",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      }
+    ],
+    "topStacks": [
+      {
+        "stack": "append <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 257
+      },
+      {
+        "stack": "validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 251
+      },
+      {
+        "stack": "compareIds <-  <- sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 212
+      },
+      {
+        "stack": "findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 167
+      },
+      {
+        "stack": "compareIds <- sort <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 23
+      },
+      {
+        "stack": "Map <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 16
+      },
+      {
+        "stack": "performIteration <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 15
+      },
+      {
+        "stack": "sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 7
+      },
+      {
+        "stack": " <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 6
+      },
+      {
+        "stack": "sort <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 4
+      },
+      {
+        "stack": "createCanvasQuery <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 2
+      },
+      {
+        "stack": "get <- append <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 1
+      },
+      {
+        "stack": "sort <- sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 1
+      },
+      {
+        "stack": "has <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 1
+      },
+      {
+        "stack": "set <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 1
+      }
+    ],
+    "method": "Filter cumulative Chrome sample timestamps to recorded measured transact windows. Mutually exclusive categories from complete ancestry; percent is sampling attribution, not exact stage timing.",
+    "alignment": {
+      "transactionCount": 60,
+      "transactionDurationMs": 1231.871,
+      "profileRangeCoveredTransactionDurationMs": 1231.871,
+      "profileRangeUncoveredHeadTransactionDurationMs": 0.0,
+      "profileRangeUncoveredTailTransactionDurationMs": 0.0,
+      "profileRangeCoveredTransactionCount": 60,
+      "profileRangeFullyCoveredTransactionCount": 60,
+      "profileRangePartiallyCoveredTransactionCount": 0,
+      "profileRangeUncoveredTransactionCount": 0,
+      "firstTransactionOffsetFromProfileStartMs": 615.36375,
+      "lastTransactionOffsetBeforeProfileEndMs": 0.29175,
+      "measuredTransactStackFraction": 0.9979338842975206,
+      "sampledTimelineEndMinusProfileEndUs": -536.75,
+      "interpretation": "Actual intersection with the declared profile range, without tolerance. Uncovered time is unobserved, not zero cost. Sampling gaps and native/GC attribution remain unresolved."
+    }
+  },
+  {
+    "profile": "sparse-50000-net-zero-r2.cpuprofile",
+    "result": "sparse-50000-net-zero-r2.json",
+    "selectedTransactionSamples": 1088,
+    "totalProcessSamples": 1613,
+    "selectedSamplesAlsoUnderMeasuredTransactStack": 1086,
+    "categorySamples": {
+      "draft-index": 533,
+      "graph-validation": 528,
+      "map-copy": 24,
+      "unattributed-or-boundary-sample": 2,
+      "entity-write": 1
+    },
+    "categorySamplePercent": {
+      "draft-index": 48.9889705882353,
+      "graph-validation": 48.529411764705884,
+      "map-copy": 2.2058823529411766,
+      "unattributed-or-boundary-sample": 0.18382352941176472,
+      "entity-write": 0.09191176470588236
+    },
+    "topSelfFrames": [
+      {
+        "function": "append",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 97,
+        "samples": 287
+      },
+      {
+        "function": "validateGraph",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 3,
+        "samples": 284
+      },
+      {
+        "function": "compareIds",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/ordering.js",
+        "line": 1,
+        "samples": 245
+      },
+      {
+        "function": "findParentCycles",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-validation.js",
+        "line": 68,
+        "samples": 198
+      },
+      {
+        "function": "Map",
+        "url": "",
+        "line": 0,
+        "samples": 24
+      },
+      {
+        "function": "sortBuckets",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 104,
+        "samples": 13
+      },
+      {
+        "function": "performIteration",
+        "url": "",
+        "line": 1,
+        "samples": 11
+      },
+      {
+        "function": "sort",
+        "url": "",
+        "line": 0,
+        "samples": 7
+      },
+      {
+        "function": "GraphIndex",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 8,
+        "samples": 6
+      },
+      {
+        "function": "",
+        "url": "file://<RUN>/performance-optimized/node_modules/@nodebraid/kernel/dist/graph-index.js",
+        "line": 4,
+        "samples": 6
+      },
+      {
+        "function": "set",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "get",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "has",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "add",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "(unknown)",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "copyDataProperties",
+        "url": "",
+        "line": 0,
+        "samples": 1
+      },
+      {
+        "function": "assertOutcome",
+        "url": "file://<RUN>/performance-optimized/benchmark.mjs",
+        "line": 92,
+        "samples": 1
+      }
+    ],
+    "topStacks": [
+      {
+        "stack": "append <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 287
+      },
+      {
+        "stack": "validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 284
+      },
+      {
+        "stack": "compareIds <-  <- sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 221
+      },
+      {
+        "stack": "findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 198
+      },
+      {
+        "stack": "compareIds <- sort <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module)",
+        "samples": 24
+      },
+      {
+        "stack": "Map <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 24
+      },
+      {
+        "stack": "sortBuckets <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 13
+      },
+      {
+        "stack": "performIteration <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 11
+      },
+      {
+        "stack": "sort <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 7
+      },
+      {
+        "stack": "GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 6
+      },
+      {
+        "stack": " <- GraphIndex <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 6
+      },
+      {
+        "stack": "set <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 1
+      },
+      {
+        "stack": "get <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 1
+      },
+      {
+        "stack": "has <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 1
+      },
+      {
+        "stack": "add <- findParentCycles <- validateGraph <- transact <- runIteration <- runMeasuredWorkload <- (module) <- (root)",
+        "samples": 1
+      }
+    ],
+    "method": "Filter cumulative Chrome sample timestamps to recorded measured transact windows. Mutually exclusive categories from complete ancestry; percent is sampling attribution, not exact stage timing.",
+    "alignment": {
+      "transactionCount": 60,
+      "transactionDurationMs": 1411.067,
+      "profileRangeCoveredTransactionDurationMs": 1411.067,
+      "profileRangeUncoveredHeadTransactionDurationMs": 0.0,
+      "profileRangeUncoveredTailTransactionDurationMs": 0.0,
+      "profileRangeCoveredTransactionCount": 60,
+      "profileRangeFullyCoveredTransactionCount": 60,
+      "profileRangePartiallyCoveredTransactionCount": 0,
+      "profileRangeUncoveredTransactionCount": 0,
+      "firstTransactionOffsetFromProfileStartMs": 666.0975,
+      "lastTransactionOffsetBeforeProfileEndMs": 0.00425,
+      "measuredTransactStackFraction": 0.9981617647058824,
+      "sampledTimelineEndMinusProfileEndUs": -591.75,
+      "interpretation": "Actual intersection with the declared profile range, without tolerance. Uncovered time is unobserved, not zero cost. Sampling gaps and native/GC attribution remain unresolved."
+    }
+  }
+]

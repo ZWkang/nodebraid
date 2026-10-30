@@ -1,0 +1,201 @@
+import assert from 'node:assert/strict';
+import { writeFileSync } from 'node:fs';
+import { createCanvasKernel, nodeId, edgeId } from '@nodebraid/kernel';
+
+const [topology, sizeText, operation, warmupText, samplesText, retainText, outputPath] = process.argv.slice(2);
+const size = Number(sizeText);
+const warmupCount = Number(warmupText);
+const sampleCount = Number(samplesText);
+const retainedCount = Number(retainText);
+assert(['sparse', 'hub', 'nested'].includes(topology));
+assert(['move-one', 'move-1pct', 'rewire-one', 'net-zero'].includes(operation));
+for (const value of [size, warmupCount, sampleCount, retainedCount]) assert(Number.isSafeInteger(value) && value >= 0);
+assert(size >= 100 && sampleCount > 0 && outputPath);
+const ids = Array.from({ length: size }, (_, index) => nodeId('n' + String(index).padStart(6, '0')));
+const edgeIds = Array.from({ length: size * 2 }, (_, index) => edgeId('e' + String(index).padStart(7, '0')));
+const kernel = createCanvasKernel();
+const setupStart = performance.now();
+let setup = kernel.transact((transaction) => {
+  for (let index = 0; index < size; index++) {
+    transaction.nodes.add({
+      id: ids[index], type: 'benchmark-node',
+      position: { x: (index % 100) * 100, y: Math.floor(index / 100) * 50 },
+      size: { width: 80, height: 32 }, data: null,
+      ...(topology === 'nested' && index > 0 ? { parentId: ids[index - 1] } : {}),
+    });
+  }
+  for (let index = 0; index < size; index++) {
+    transaction.edges.add({
+      id: edgeIds[index * 2], type: 'benchmark-edge',
+      source: { nodeId: topology === 'hub' ? ids[0] : ids[index] },
+      target: { nodeId: topology === 'hub' ? ids[1 + (index % (size - 1))] : ids[(index + 1) % size] },
+      data: null,
+    });
+    transaction.edges.add({
+      id: edgeIds[index * 2 + 1], type: 'benchmark-edge',
+      source: { nodeId: ids[index] }, target: { nodeId: ids[(index + 97) % size] }, data: null,
+    });
+  }
+});
+const setupMs = performance.now() - setupStart;
+assert(setup && setup.changeSet.changes.length === size * 3);
+assert.equal(kernel.read().snapshot.nodes.length, size);
+assert.equal(kernel.read().snapshot.edges.length, size * 2);
+assert.equal(kernel.read().snapshot.revision, 1);
+if (topology === 'nested') {
+  assert.equal(kernel.read().query.getChildren(ids[0])[0]?.id, ids[1]);
+  assert.equal(kernel.read().query.getChildren(ids[size - 1]).length, 0);
+}
+setup = null;
+const targetIds = operation === 'move-1pct'
+  ? Array.from({ length: Math.ceil(size / 100) }, (_, index) => ids[index * 100])
+  : [ids[Math.floor(size / 2)]];
+const heldViews = [];
+const timings = [];
+const transactionWindows = [];
+const phaseWindows = [];
+let checks = 0;
+
+// This wrapper is a sampling-profile boundary around only the public transaction.
+function runTransaction(callback) {
+  return kernel.transact(callback);
+}
+
+function prepareOperation() {
+  const before = kernel.read();
+  const oldNodes = targetIds.map((id) => before.query.getNode(id));
+  for (const node of oldNodes) assert(node);
+  const replacements = oldNodes.map((node) => ({ ...node, position: { x: node.position.x + 1, y: node.position.y } }));
+  const oldEdge = before.query.getEdge(edgeIds[0]);
+  assert(oldEdge);
+  const replacementEdge = {
+    ...oldEdge,
+    target: { nodeId: oldEdge.target.nodeId === ids[1] ? ids[2] : ids[1] },
+  };
+  const oldValues = oldNodes.map((node) => ({ id: node.id, x: node.position.x, y: node.position.y }));
+  let callback;
+  if (operation === 'move-one' || operation === 'move-1pct') {
+    callback = (transaction) => {
+      for (const node of replacements) transaction.nodes.replace(node.id, node);
+    };
+  } else if (operation === 'rewire-one') {
+    callback = (transaction) => transaction.edges.replace(oldEdge.id, replacementEdge);
+  } else {
+    callback = (transaction) => {
+      transaction.nodes.replace(oldNodes[0].id, replacements[0]);
+      transaction.nodes.replace(oldNodes[0].id, oldNodes[0]);
+    };
+  }
+  return { before, oldNodes, replacements, oldEdge, replacementEdge, oldValues, callback };
+}
+
+function assertOutcome(prepared, commit) {
+  const { before, oldNodes, replacements, oldEdge, replacementEdge, oldValues } = prepared;
+  const after = kernel.read();
+  assert.equal(before.snapshot.nodes.length, size);
+  assert.equal(before.snapshot.edges.length, size * 2);
+  assert.equal(after.snapshot.nodes.length, size);
+  assert.equal(after.snapshot.edges.length, size * 2);
+  if (operation === 'net-zero') {
+    assert.equal(commit, null);
+    assert.equal(after, before);
+  } else {
+    assert(commit);
+    assert.equal(commit.before, before);
+    assert.equal(commit.after, after);
+    assert.equal(after.snapshot.revision, before.snapshot.revision + 1);
+    assert.equal(commit.changeSet.beforeRevision, before.snapshot.revision);
+    assert.equal(commit.changeSet.revision, after.snapshot.revision);
+    assert.equal(commit.changeSet.changes.length, operation === 'move-1pct' ? targetIds.length : 1);
+    if (operation === 'rewire-one') {
+      assert.equal(commit.changeSet.changes[0].id, oldEdge.id);
+      assert.equal(commit.changeSet.changes[0].before, oldEdge);
+      const currentEdge = after.query.getEdge(oldEdge.id);
+      assert(currentEdge);
+      assert.equal(after.snapshot.edges[0], currentEdge);
+      assert.equal(commit.changeSet.changes[0].after, currentEdge);
+      assert.equal(currentEdge.target.nodeId, replacementEdge.target.nodeId);
+      assert(!after.query.getIncomingEdges(oldEdge.target.nodeId).some((edge) => edge.id === oldEdge.id));
+      assert(after.query.getIncomingEdges(replacementEdge.target.nodeId).some((edge) => edge === currentEdge));
+      assert(before.query.getIncomingEdges(oldEdge.target.nodeId).some((edge) => edge === oldEdge));
+      assert.equal(before.query.getEdge(oldEdge.id), oldEdge);
+    } else {
+      for (let index = 0; index < oldNodes.length; index++) {
+        const currentNode = after.query.getNode(oldNodes[index].id);
+        assert(currentNode);
+        assert.equal(after.snapshot.nodes[Number(currentNode.id.slice(1))], currentNode);
+        assert.equal(currentNode.position.x, replacements[index].position.x);
+        assert.equal(currentNode.position.y, oldValues[index].y);
+        const change = commit.changeSet.changes[index];
+        assert.equal(change.id, oldNodes[index].id);
+        assert.equal(change.before, oldNodes[index]);
+        assert.equal(change.after, currentNode);
+        if (currentNode.parentId) {
+          assert(after.query.getChildren(currentNode.parentId).some((node) => node === currentNode));
+        }
+      }
+    }
+  }
+  for (let index = 0; index < oldNodes.length; index++) {
+    assert.equal(before.query.getNode(oldNodes[index].id), oldNodes[index]);
+    assert.equal(oldNodes[index].position.x, oldValues[index].x);
+    assert.equal(oldNodes[index].position.y, oldValues[index].y);
+  }
+  if (retainedCount > 0) {
+    heldViews.push({ view: before, revision: before.snapshot.revision, id: oldValues[0].id, x: oldValues[0].x });
+    if (heldViews.length > retainedCount) heldViews.shift();
+    for (const saved of heldViews) {
+      assert.equal(saved.view.snapshot.revision, saved.revision);
+      assert.equal(saved.view.query.getNode(saved.id).position.x, saved.x);
+    }
+  }
+  checks++;
+}
+
+function runIteration(record) {
+  const prepared = prepareOperation();
+  const start = performance.now();
+  const commit = runTransaction(prepared.callback);
+  const end = performance.now();
+  if (record) {
+    timings.push(end - start);
+    transactionWindows.push({ startMs: start, endMs: end });
+  }
+  assertOutcome(prepared, commit);
+}
+
+function runWarmup() {
+  for (let index = 0; index < warmupCount; index++) runIteration(false);
+}
+function runMeasuredWorkload() {
+  for (let index = 0; index < sampleCount; index++) runIteration(true);
+}
+// No forced GC: the measured sequence includes natural GC pressure.
+// setup does not stay alive as a retained full Change Set.
+runWarmup();
+const memoryBefore = process.memoryUsage();
+const measuredStart = performance.now();
+runMeasuredWorkload();
+const measuredEnd = performance.now();
+assert.equal(kernel.read().snapshot.revision, operation === 'net-zero' ? 1 : 1 + warmupCount + sampleCount);
+const memoryAfter = process.memoryUsage();
+phaseWindows.push({ name: 'measured', startMs: measuredStart, endMs: measuredEnd });
+const sorted = [...timings].sort((a, b) => a - b);
+const median = sorted.length % 2 ? sorted[(sorted.length - 1) / 2] : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
+const result = {
+  schemaVersion: 1, runtime: 'bun-' + Bun.version,
+  topology, nodes: size, edges: size * 2, operation,
+  warmupCount, sampleCount, retainedCount,
+  changedEntitiesPerCommit: operation === 'net-zero' ? 0 : operation === 'move-1pct' ? targetIds.length : 1,
+  setupMs, checks, finalRevision: kernel.read().snapshot.revision,
+  timingsMs: timings,
+  statistics: {
+    minMs: sorted[0], medianMs: median, p95Ms: sorted[Math.ceil(sorted.length * 0.95) - 1],
+    maxMs: sorted.at(-1), meanMs: timings.reduce((a, b) => a + b, 0) / timings.length,
+  },
+  memoryBefore, memoryAfter, phaseWindows, timeOriginMs: performance.timeOrigin, transactionWindows,
+  timingScope: 'Public kernel.transact only, including writer, validation and commit; preparation and assertions excluded.',
+};
+writeFileSync(outputPath, JSON.stringify(result, null, 2) + '\n');
+console.log(JSON.stringify({ topology, size, operation, retainedCount, ...result.statistics, checks }));
+

@@ -1,0 +1,107 @@
+[
+  {
+    "path": "logs/full-check.log",
+    "originalSha256": "c9e90ab85c9f52b948e4ce2862f012b639f7323993dedef0e8ee36a9ad5d456c",
+    "publishedSha256": "f3a755b96c11f9dbcf0c482a9b107eb6a02e7c6af3a7f5417f26bd4e8fe7124c",
+    "replacedPrefixes": [
+      "<WORKSPACE>"
+    ]
+  },
+  {
+    "path": "reviews/standards.md",
+    "originalSha256": "83112fa24d332c4914f46c9720ebd3c9a82610351347dea15cbd567a77ff1197",
+    "publishedSha256": "83112fa24d332c4914f46c9720ebd3c9a82610351347dea15cbd567a77ff1197",
+    "replacedPrefixes": []
+  },
+  {
+    "path": "reviews/spec.md",
+    "originalSha256": "896f94024ffaa3db22f89d855ae096d5da92ef7c4aebc0e1e0effa43c4f4ac7a",
+    "publishedSha256": "896f94024ffaa3db22f89d855ae096d5da92ef7c4aebc0e1e0effa43c4f4ac7a",
+    "replacedPrefixes": []
+  },
+  {
+    "path": "logs/behavior-1.log",
+    "originalSha256": "69bfa648d46db5999feb4d3deb784b3f004f7c249dc6ea85dab7c81a973178c0",
+    "publishedSha256": "b649775b41ac9e7bd35e1eebde2647e567c4d7589dd8c02660a270928d2ba99f",
+    "replacedPrefixes": [
+      "<WORKSPACE>"
+    ]
+  },
+  {
+    "path": "logs/behavior-2.log",
+    "originalSha256": "4153d2f728bf76394529f434e51aa46d9e1b6e494b91d5f8351b23ae0a9c4d63",
+    "publishedSha256": "4153d2f728bf76394529f434e51aa46d9e1b6e494b91d5f8351b23ae0a9c4d63",
+    "replacedPrefixes": []
+  },
+  {
+    "path": "logs/behavior-3.log",
+    "originalSha256": "eff340fdd8c445be9e52e59a6ecd5ff7df04f21885bc1c55dcdf13e5fc6e7023",
+    "publishedSha256": "975ab64dba12dfc6e174ec6752f37d901c5083ee38f2e3275a7f0187d5b3558e",
+    "replacedPrefixes": [
+      "<WORKSPACE>"
+    ]
+  },
+  {
+    "path": "logs/behavior-4.log",
+    "originalSha256": "6a8c18cf8ae2b5234fc22ca8600c59df4b87f6a765f88caeab68f9df91a1ce09",
+    "publishedSha256": "6a8c18cf8ae2b5234fc22ca8600c59df4b87f6a765f88caeab68f9df91a1ce09",
+    "replacedPrefixes": []
+  },
+  {
+    "path": "logs/behavior-5.log",
+    "originalSha256": "f2bbf60e5b1cd74258c1a7a479a64daae346a08b7815f424644b21bf4f377898",
+    "publishedSha256": "ef10b403e49509e18deeec22c59a8b4e7714af4994b695f9d5948d0d759a35b9",
+    "replacedPrefixes": [
+      "<WORKSPACE>",
+      "<BUN_HOME>"
+    ]
+  },
+  {
+    "path": "logs/behavior-6.log",
+    "originalSha256": "fd99cb89c5998d99efb6ef2f78c6a68ad4a8c77a49c6e4b040984e20463ec632",
+    "publishedSha256": "065bea10c7c815fefa7fbd4479aac01cc6dcd1e0d5f33dc3e8ef87fb238125ee",
+    "replacedPrefixes": [
+      "<WORKSPACE>",
+      "<BUN_HOME>"
+    ]
+  },
+  {
+    "path": "logs/behavior-7.log",
+    "originalSha256": "cab276dd8c4cf988e081d2b0e03a67da18048f6504ae1710a3d5d410f70a800c",
+    "publishedSha256": "cab276dd8c4cf988e081d2b0e03a67da18048f6504ae1710a3d5d410f70a800c",
+    "replacedPrefixes": []
+  },
+  {
+    "path": "logs/behavior-8.log",
+    "originalSha256": "8f01eba373dcd0efb50399f0ccd9dc900e1bf88b89c4c690da5e2ee59918966e",
+    "publishedSha256": "8bf0f457c3bb86d9054c6b0ae4a906e46c0da1ac327a70d4bdb62c7b6e40d11d",
+    "replacedPrefixes": [
+      "<RUN>"
+    ]
+  },
+  {
+    "path": "logs/behavior-9.log",
+    "originalSha256": "48c15d00e6c9b4985fb49935986c568d8d0cea1b6ca10a02bdeaac8b744f26db",
+    "publishedSha256": "2cbba9962b1c066934801de3d4e9afe965ae6c232a547478cb2809837cbbc2a7",
+    "replacedPrefixes": [
+      "<BASELINE_RUN>",
+      "<RUN>"
+    ]
+  },
+  {
+    "path": "logs/behavior-10.log",
+    "originalSha256": "7fb8d62fdcbd923614ad3ce1dbaed111e717e76b311a3fe269ae754a200bc165",
+    "publishedSha256": "68a3270648b8fb5e3d75c5376692a8a06a91dcbd27c2638db1829cddf30044bd",
+    "replacedPrefixes": [
+      "<BASELINE_RUN>",
+      "<RUN>"
+    ]
+  },
+  {
+    "path": "report.md",
+    "originalSha256": "1e3728da138e35131a2f3c7bc73bca108a0bda895f65c040557b6ff89f247d8c",
+    "publishedSha256": "c96218739969fe6b98cb67433ef4ddf93cdc0695684f0aff24e741cca21bf8c3",
+    "replacedPrefixes": [],
+    "generatedAppendix": "Performance and publication evidence links appended."
+  }
+]

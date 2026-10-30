@@ -1,0 +1,142 @@
+[
+  {
+    "command": [
+      "bun",
+      "--cpu-prof",
+      "--cpu-prof-name=sparse-50000-move-one-r1.cpuprofile",
+      "--cpu-prof-dir=<RUN>/performance-optimized/profiles",
+      "--cpu-prof-interval=1000",
+      "--no-install",
+      "<RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "60",
+      "0",
+      "<RUN>/performance-optimized/profiles/sparse-50000-move-one-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:42:10.948879+00:00",
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "bun",
+      "--cpu-prof",
+      "--cpu-prof-name=sparse-50000-move-one-r2.cpuprofile",
+      "--cpu-prof-dir=<RUN>/performance-optimized/profiles",
+      "--cpu-prof-interval=1000",
+      "--no-install",
+      "<RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "60",
+      "0",
+      "<RUN>/performance-optimized/profiles/sparse-50000-move-one-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:42:15.257026+00:00",
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "bun",
+      "--cpu-prof",
+      "--cpu-prof-name=sparse-50000-move-one-r3.cpuprofile",
+      "--cpu-prof-dir=<RUN>/performance-optimized/profiles",
+      "--cpu-prof-interval=1000",
+      "--no-install",
+      "<RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "60",
+      "0",
+      "<RUN>/performance-optimized/profiles/sparse-50000-move-one-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:42:18.751132+00:00",
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "bun",
+      "--cpu-prof",
+      "--cpu-prof-name=sparse-50000-net-zero-r1.cpuprofile",
+      "--cpu-prof-dir=<RUN>/performance-optimized/profiles",
+      "--cpu-prof-interval=1000",
+      "--no-install",
+      "<RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "60",
+      "0",
+      "<RUN>/performance-optimized/profiles/sparse-50000-net-zero-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:42:22.118082+00:00",
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "bun",
+      "--cpu-prof",
+      "--cpu-prof-name=sparse-50000-net-zero-r2.cpuprofile",
+      "--cpu-prof-dir=<RUN>/performance-optimized/profiles",
+      "--cpu-prof-interval=1000",
+      "--no-install",
+      "<RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "60",
+      "0",
+      "<RUN>/performance-optimized/profiles/sparse-50000-net-zero-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:42:23.999999+00:00",
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "bun",
+      "--cpu-prof",
+      "--cpu-prof-name=hub-50000-rewire-one-r1.cpuprofile",
+      "--cpu-prof-dir=<RUN>/performance-optimized/profiles",
+      "--cpu-prof-interval=1000",
+      "--no-install",
+      "<RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "50000",
+      "rewire-one",
+      "20",
+      "60",
+      "0",
+      "<RUN>/performance-optimized/profiles/hub-50000-rewire-one-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:42:26.116518+00:00",
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "bun",
+      "--cpu-prof",
+      "--cpu-prof-name=hub-50000-rewire-one-r2.cpuprofile",
+      "--cpu-prof-dir=<RUN>/performance-optimized/profiles",
+      "--cpu-prof-interval=1000",
+      "--no-install",
+      "<RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "50000",
+      "rewire-one",
+      "20",
+      "60",
+      "0",
+      "<RUN>/performance-optimized/profiles/hub-50000-rewire-one-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:42:30.011579+00:00",
+    "exitCode": 0
+  }
+]

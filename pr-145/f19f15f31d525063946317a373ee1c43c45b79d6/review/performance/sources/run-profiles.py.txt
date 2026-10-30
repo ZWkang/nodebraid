@@ -1,0 +1,108 @@
+from pathlib import Path
+import bisect, collections, datetime, json, subprocess, sys
+
+root=Path(__file__).resolve().parent
+directory=root/'profiles'
+directory.mkdir(exist_ok=True)
+cases=[('sparse','move-one',3),('sparse','net-zero',2),('hub','rewire-one',2)]
+receipts=[]
+summaries=[]
+
+def analyze(profile_path,result_path):
+    profile=json.loads(profile_path.read_text())
+    result=json.loads(result_path.read_text())
+    assert set(('nodes','samples','timeDeltas','startTime','endTime')) <= profile.keys()
+    assert len(profile['samples']) == len(profile['timeDeltas'])
+    nodes={node['id']:node for node in profile['nodes']}
+    parents={}
+    for node in nodes.values():
+        for child in node.get('children',[]): parents[child]=node['id']
+    def stack(node_id):
+        chain=[]
+        while node_id in nodes:
+            chain.append(nodes[node_id]['callFrame'])
+            if node_id not in parents: break
+            node_id=parents[node_id]
+        return chain
+    stacks={node_id:stack(node_id) for node_id in nodes}
+    windows=[((result['timeOriginMs']+w['startMs'])*1000,(result['timeOriginMs']+w['endMs'])*1000) for w in result['transactionWindows']]
+    starts=[w[0] for w in windows]
+    counts=collections.Counter()
+    functions=collections.Counter()
+    stack_counts=collections.Counter()
+    cursor=profile['startTime']
+    matched_stack=0
+    total_profile_samples=len(profile['samples'])
+    for node_id,delta in zip(profile['samples'],profile['timeDeltas']):
+        cursor+=delta
+        index=bisect.bisect_right(starts,cursor)-1
+        if index<0 or cursor>windows[index][1]: continue
+        frames=stacks[node_id]
+        names=[f['functionName'] for f in frames]
+        in_transaction='transact' in names
+        in_measured='runMeasuredWorkload' in names
+        if in_transaction and in_measured: matched_stack+=1
+        if any(name in ('(garbage collector)','GC','Garbage Collector') for name in names):
+            category='gc'
+        elif not in_transaction:
+            category='unattributed-or-boundary-sample'
+        elif 'GraphIndex' in names:
+            category='committed-index' if 'createCanvasView' in names else 'draft-index'
+        elif 'validateGraph' in names:
+            category='graph-validation'
+        elif 'createCanvasView' in names:
+            category='snapshot-and-view-excluding-index'
+        elif names[0]=='Map' and len(names)>1 and names[1]=='transact':
+            category='map-copy'
+        elif 'collectEntityChanges' in names:
+            category='change-set'
+        elif any(f['url'].endswith('/entity-values.js') or f['url'].endswith('/entity-collection.js') for f in frames):
+            category='entity-write'
+        else:
+            category='other-transaction'
+        counts[category]+=1
+        frame=frames[0]
+        functions[(frame['functionName'],frame['url'],frame['lineNumber']+1)]+=1
+        stack_counts[' <- '.join(names[:8])]+=1
+    total=sum(counts.values())
+    assert total>0 and matched_stack>0
+    return {
+        'profile':profile_path.name, 'result':result_path.name,
+        'selectedTransactionSamples':total,'totalProcessSamples':total_profile_samples,
+        'selectedSamplesAlsoUnderMeasuredTransactStack':matched_stack,
+        'categorySamples':dict(counts),
+        'categorySamplePercent':{key:100*value/total for key,value in counts.items()},
+        'topSelfFrames':[{'function':key[0],'url':key[1],'line':key[2],'samples':value} for key,value in functions.most_common(20)],
+        'topStacks':[{'stack':key,'samples':value} for key,value in stack_counts.most_common(15)],
+        'method':'Filter cumulative Chrome sample timestamps to recorded measured transact windows. Mutually exclusive categories from complete ancestry; percent is sampling attribution, not exact stage timing.',
+    }
+
+if '--analyze-only' in sys.argv:
+    for profile in sorted(directory.glob('*.cpuprofile')):
+        value=analyze(profile,profile.with_suffix('.json'))
+        summaries.append(value)
+        (directory/(profile.stem+'-analysis.v2.json')).write_text(json.dumps(value,indent=2)+'\n')
+    (root/'profile-summary.v2.json').write_text(json.dumps(summaries,indent=2)+'\n')
+    print('REANALYZED',len(summaries),'profiles; sample fractions only')
+    raise SystemExit(0)
+
+for topology,operation,repetitions in cases:
+    for repetition in range(1,repetitions+1):
+        label=f'{topology}-50000-{operation}-r{repetition}'
+        profile=directory/(label+'.cpuprofile')
+        output=directory/(label+'.json')
+        cmd=['bun','--cpu-prof',f'--cpu-prof-name={profile.name}',f'--cpu-prof-dir={directory}',
+             '--cpu-prof-interval=1000','--no-install',str(root/'benchmark.mjs'),topology,'50000',operation,'20','60','0',str(output)]
+        started=datetime.datetime.now(datetime.timezone.utc).isoformat()
+        with (directory/(label+'.log')).open('w') as log:
+            process=subprocess.run(cmd,cwd=root,stdout=log,stderr=subprocess.STDOUT)
+        receipts.append({'command':cmd,'startedAt':started,'exitCode':process.returncode})
+        (root/'profile-receipts.json').write_text(json.dumps(receipts,indent=2)+'\n')
+        if process.returncode: raise SystemExit(process.returncode)
+        value=analyze(profile,output)
+        summaries.append(value)
+        (directory/(label+'-analysis.json')).write_text(json.dumps(value,indent=2)+'\n')
+        (root/'profile-summary.json').write_text(json.dumps(summaries,indent=2)+'\n')
+        print(label,json.dumps(value['categorySamplePercent']),flush=True)
+print('PROFILES COMPLETE',flush=True)
+

@@ -1,0 +1,1673 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "843c9484a7d32e957dceba6658b31a5662560329",
+    "expectedParent": "843c9484a7d32e957dceba6658b31a5662560329",
+    "head": "f19f15f31d525063946317a373ee1c43c45b79d6",
+    "tree": "2e6095cd9265a816d6e25dd8c13fe65e2d48794d",
+    "patch": "6f97fc0624d3bed2dae9a9712720886885ed7b9eab8950f75892a4d56796431b",
+    "localHead": "ece568a07a2f56ae25d6daa63d9f16d88108a5af"
+  },
+  "task": {
+    "run": "issue-142-kernel-reuse-20261030",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 142
+    },
+    "request": "Implement Issue #142: reuse closed Draft indexes and only untouched collection Snapshot arrays without changing public contracts; rerun the unchanged recorded baseline and compare actual results.",
+    "plan": [
+      {
+        "id": "kernel-reuse",
+        "blockedBy": [],
+        "acceptance": "Public-seam regression tests and both internal reuse changes preserve all existing Kernel contracts."
+      },
+      {
+        "id": "affected-validation",
+        "blockedBy": [
+          "kernel-reuse"
+        ],
+        "acceptance": "Targeted package and affected consumers pass at the final code revision."
+      },
+      {
+        "id": "performance-comparison",
+        "blockedBy": [
+          "affected-validation"
+        ],
+        "acceptance": "Same 20-case baseline and representative profiles run on built artifacts; raw samples and comparable base/optimized evidence retained."
+      },
+      {
+        "id": "independent-reviews",
+        "blockedBy": [
+          "performance-comparison"
+        ],
+        "acceptance": "Standards with ponytail-review and Spec pass at the same head/tree/patch, each with risk and rollback."
+      },
+      {
+        "id": "formal-verification",
+        "blockedBy": [
+          "independent-reviews"
+        ],
+        "acceptance": "agents:run verify executes full check successfully on the final clean revision."
+      },
+      {
+        "id": "publication",
+        "blockedBy": [
+          "formal-verification"
+        ],
+        "acceptance": "One PR to main; matching source tree, report publication/readback and current-head CI/discussions accounted for."
+      },
+      {
+        "id": "main-acceptance",
+        "blockedBy": [
+          "publication"
+        ],
+        "acceptance": "After separately authorized merge, verify actual main integration and remaining whole-task acceptance; Issue closure requires independent authorization."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "ece568a07a2f56ae25d6daa63d9f16d88108a5af",
+      "tree": "2e6095cd9265a816d6e25dd8c13fe65e2d48794d",
+      "patch": "6f97fc0624d3bed2dae9a9712720886885ed7b9eab8950f75892a4d56796431b",
+      "verdict": "passed",
+      "report": "# Standards / ponytail-review\n\n\u53d8\u66f4\u4f5c\u7528\uff1a\u6210\u529f\u63d0\u4ea4\u590d\u7528\u5df2\u7ecf\u5c01\u95ed\u7684 Draft \u5173\u7cfb\u7d22\u5f15\uff0c\u5e76\u590d\u7528\u6ca1\u6709\u5199\u5165\u7684\u96c6\u5408\u5feb\u7167\u3002Writer \u5728\u8bfb\u53d6\u5916\u90e8\u5b57\u6bb5\u5b8c\u6210\u540e\uff0c\u4ee5\u5f53\u65f6\u7684 Draft \u5b9e\u4f53\u66f4\u65b0\u7d22\u5f15\uff0c\u4fdd\u7559\u540c\u4e00\u4e8b\u52a1 getter \u91cd\u5165\u7684\u5408\u6cd5\u884c\u4e3a\u3002\n\n\u56fa\u5b9a\u8eab\u4efd\uff1abase 843c9484a7d32e957dceba6658b31a5662560329\uff1bhead ece568a07a2f56ae25d6daa63d9f16d88108a5af\uff1btree 2e6095cd9265a816d6e25dd8c13fe65e2d48794d\uff1bbinary patch SHA-256 6f97fc0624d3bed2dae9a9712720886885ed7b9eab8950f75892a4d56796431b\u3002\n\n**\u53d1\u73b0\uff1a0 \u9879\u3002** \u672a\u53d1\u73b0\u8fdd\u53cd\u5df2\u8bb0\u5f55\u6807\u51c6\u7684\u6539\u52a8\uff0c\u4e5f\u6ca1\u6709\u9700\u4fee\u6b63\u7684 baseline smell\u3002\u5224\u65ad\u4f9d\u636e\u5305\u62ec AGENTS\u3001CONTRIBUTING\u3001CONTEXT\u3001ADR-0009/0010/0011/0012/0029\uff0c\u4ee5\u53ca\u8fb9\u754c\u3001\u6240\u6709\u6743\u3001\u884c\u4e3a\u6d4b\u8bd5\u3001\u8bfb\u53d6\u8d1f\u62c5\u548c\u6027\u80fd\u8bc1\u636e\u539f\u5219\u3002\n\n\u8ffd\u8e2a\u4e86\u5168\u90e8 createCanvasView/createEntityWriter \u8c03\u7528\u3001GraphIndex \u66f4\u65b0/\u67e5\u8be2\u3001\u5b9e\u4f53\u6355\u83b7\u3001Change Set \u56de\u653e\u4e0e\u63d0\u4ea4\u51c6\u5907\u3002\u65b0\u53c2\u6570\u4ec5\u5728\u5185\u90e8\u7ec4\u88c5\u4f7f\u7528\uff1b\u516c\u5171\u5bfc\u51fa\u3001\u5b8c\u6574\u6821\u9a8c\u548c\u9519\u8bef\u4f20\u64ad\u4fdd\u6301\u3002Writer \u5173\u95ed\u540e\u624d\u4ea4\u4ed8\u7d22\u5f15\uff0c\u65b0\u4e8b\u52a1\u4ecd\u53d6\u5f97\u72ec\u7acb\u7d22\u5f15\uff1b\u590d\u7528\u6761\u4ef6\u4f7f\u7528 touched ID \u800c\u975e\u51c0 Change Set\uff0c\u907f\u514d\u503c\u76f8\u7b49\u66ff\u6362\u9020\u6210 Snapshot/Query \u5f15\u7528\u5206\u88c2\u3002writeCaptured \u6c47\u603b\u5b9e\u9645\u5171\u4eab\u7684\u5199\u5165\u8bb0\u8d26\uff0c\u6ca1\u6709\u5f15\u5165\u914d\u7f6e\u5c42\u3001\u9759\u9ed8\u56de\u9000\u6216\u91cd\u5165\u7981\u4ee4\u3002\n\n\u72ec\u7acb\u9a8c\u8bc1\uff1a\u5728\u8be5 head \u6267\u884c bun test packages/kernel/tests\uff0c295 pass\u30010 fail\u30011,809 assertions\u3002\u5df2\u8bfb\u5f00\u53d1\u68c0\u67e5\u7684\u539f\u59cb\u5931\u8d25\u4e0e\u4fee\u6b63\u540e affected-2 \u6210\u529f\u56de\u6267\u3002\u72ec\u7acb\u6838\u5bf9 72 \u4e2a\u914d\u5bf9\u8fdb\u7a0b\u7684\u9000\u51fa\u7801\u3001\u539f\u59cb\u7ed3\u679c\u54c8\u5e0c\u3001\u4e2d\u4f4d\u6570\u3001\u6bcf\u6b21 50 \u9879\u64cd\u4f5c\u68c0\u67e5\u53ca\u524d\u540e\u4ea7\u7269\u54c8\u5e0c\uff1b\u4e24\u7248\u672c harness \u5b57\u8282\u4e00\u81f4\u3002\n\n\u6027\u80fd\u7ed3\u8bba\u9650\u5b9a\u4e8e\u5b9e\u6d4b\uff1a\u4e3b\u8981\u63d0\u4ea4\u8def\u5f84\u53d7\u76ca\uff1b50k \u51c0\u96f6\u4e3b\u5bf9\u7167\u6162 8\u201313%\uff0c\u516d\u5bf9\u8865\u6d4b\u6709\u5feb\u6709\u6162\uff0c\u4e0d\u80fd\u5ba3\u79f0\u6240\u6709\u8def\u5f84\u63d0\u5347\u6216\u7a33\u5b9a\u65e0\u56de\u9000\u3002\u8be5\u9650\u5236\u662f\u98ce\u9669\u4f9d\u636e\uff0c\u672a\u628a profile \u6837\u672c\u767e\u5206\u6bd4\u89e3\u91ca\u4e3a\u7cbe\u786e\u9636\u6bb5\u8017\u65f6\u3002\n\n**\u98ce\u9669\uff1amedium\uff1b\u8def\u7531\uff1aquick-human\u3002** \u6743\u5a01\u56fe\u7d22\u5f15\u548c\u4e0d\u53ef\u53d8\u5feb\u7167\u7684\u6240\u6709\u6743\u53d1\u751f\u5185\u90e8\u53d8\u5316\uff0cpackages/*/src \u8def\u5f84\u6700\u4f4e\u4e3a medium\uff1b\u76f8\u5173\u91cd\u5165\u3001\u5f02\u5e38\u3001\u5386\u53f2 View\u3001\u51bb\u7ed3\u53ca\u56de\u653e\u6709\u516c\u5171\u6d4b\u8bd5\u8bc1\u636e\u3002\u9700\u8981\u91cd\u70b9\u4eba\u5de5\u5ba1\u9605\u8fd9\u4e9b\u8fb9\u754c\u4e0e\u51c0\u96f6\u6027\u80fd\u89c2\u6d4b\u3002\n\n**\u56de\u6eda\uff1a**\u56de\u6eda ece568a \u53ef\u6062\u590d\u539f\u6784\u5efa\u4e0e\u8bb0\u8d26\u8def\u5f84\uff1b\u65e0\u6301\u4e45\u683c\u5f0f\u53d8\u66f4\u3001\u6570\u636e\u8fc1\u79fb\u6216\u4e0d\u53ef\u9006\u526f\u4f5c\u7528\u3002\n\n**\u672a\u68c0\u67e5\uff1a**\u672c\u8f74\u6ca1\u6709\u91cd\u8dd1\u5168\u91cf\u5de5\u7a0b\u68c0\u67e5\u3001\u6d4f\u89c8\u5668\u6216\u6027\u80fd\u8d1f\u8f7d\uff1b\u6b63\u5f0f verify\u3001\u53d1\u5e03\u3001CI\u3001\u4eba\u5de5\u5408\u5e76\u4e0e\u5b9e\u9645 main \u9a8c\u6536\u4ecd\u7531\u4ea4\u4ed8\u6d41\u7a0b\u72ec\u7acb\u5b8c\u6210\u3002\n\nVerdict: passed\u3002Standards 0 \u9879\u53d1\u73b0\u3002\n",
+      "risk": {
+        "level": "medium",
+        "rationale": "Changes authoritative Kernel index ownership and immutable Snapshot reuse; public framework source has a medium path floor. Same-Transaction getter reentry and historical View isolation require focused human review.",
+        "evidence": "Pinned ece568a / tree 2e6095cd / patch 6f97fc06. Independently ran 295 Kernel tests with 1809 assertions; reviewed affected-2 success and original failure records. Verified 72 paired-result hashes/medians and unchanged build manifests; net-zero regression signal and mixed focused results remain explicit.",
+        "rollback": "Revert ece568a07a2f56ae25d6daa63d9f16d88108a5af to restore previous index/View construction and writer bookkeeping; no persistence schema or data migration is involved."
+      }
+    },
+    "spec": {
+      "head": "ece568a07a2f56ae25d6daa63d9f16d88108a5af",
+      "tree": "2e6095cd9265a816d6e25dd8c13fe65e2d48794d",
+      "patch": "6f97fc0624d3bed2dae9a9712720886885ed7b9eab8950f75892a4d56796431b",
+      "verdict": "passed",
+      "report": "# Spec review\n\n**Verdict: passed. Findings: 0.**\n\nReviewed head: ece568a07a2f56ae25d6daa63d9f16d88108a5af; tree: 2e6095cd9265a816d6e25dd8c13fe65e2d48794d; binary patch: 6f97fc0624d3bed2dae9a9712720886885ed7b9eab8950f75892a4d56796431b.\n\n\u5bf9\u7167 [Issue #142](https://github.com/ZWkang/nodebraid/issues/142) \u4e0e[\u5df2\u63a5\u53d7\u8303\u56f4](https://github.com/ZWkang/nodebraid/issues/142#issuecomment-6517283433)\uff0c\u672a\u53d1\u73b0\u9057\u6f0f\u3001\u8d8a\u754c\u5b9e\u73b0\u6216\u8fdd\u53cd\u89c4\u683c\u7684\u884c\u4e3a\u3002\n\n- Scope 1\u20132\uff1a\u63d0\u4ea4\u540e\u7684 Query \u4f7f\u7528\u672c\u6b21\u5df2\u5c01\u95ed Draft \u7684\u7d22\u5f15\uff1b\u540e\u7eed\u4e8b\u52a1\u4ecd\u521b\u5efa\u72ec\u7acb\u7d22\u5f15\u3002Snapshot \u6570\u7ec4\u4ec5\u5728\u5bf9\u5e94 touched-ID \u96c6\u5408\u4e3a\u7a7a\u65f6\u590d\u7528\uff0c\u503c\u76f8\u7b49 replace \u4e0d\u4f1a\u9519\u8bef\u590d\u7528\u65e7\u5b9e\u4f53\u5f15\u7528\u3002\n- Scope 3\u20134\uff1a\u516c\u5f00 exports\u3001Map \u590d\u5236\u3001\u6700\u7ec8\u56fe\u6821\u9a8c\u53ca\u9519\u8bef\u4f20\u64ad\u8def\u5f84\u672a\u53d8\u3002\u65b0\u7684 committed Query \u6ca1\u6709\u590d\u7528\u5df2\u5173\u95ed\u7684 Transaction Query\uff1b\u53d1\u5e03\u4ecd\u5728 metadata \u8bfb\u53d6\u6210\u529f\u4e4b\u540e\uff0c\u51c0\u96f6\u4ecd\u4fdd\u7559\u539f View\u3002\n- getter \u91cd\u5165\u8bb0\u8d26\u4fee\u590d\u7b26\u5408\u89c4\u683c\u4e2d\u7684\u73b0\u6709\u91cd\u5165\u8bed\u4e49\u8981\u6c42\u3002\u5b57\u6bb5\u6355\u83b7\u540e\u8bfb\u53d6\u5f53\u524d Draft \u5b9e\u4f53\uff0c\u6d88\u9664\u65e7\u5173\u7cfb\u6b8b\u7559\uff1b\u6ca1\u6709\u65b0\u589e\u91cd\u5165\u7981\u4ee4\u6216\u5931\u8d25\u964d\u7ea7\u3002\u65b0\u589e\u516c\u5171\u6d4b\u8bd5\u8986\u76d6 Node/Edge \u91cd\u5165\u3001\u539f\u59cb\u5f02\u5e38\u3001\u56de\u6eda\u3001\u5386\u53f2\u7d22\u5f15\u548c\u53cc\u5411 replay\u3002\n\n\u72ec\u7acb\u8fd0\u884c\u4e09\u4e2a\u76f8\u5173\u6d4b\u8bd5\u6587\u4ef6\uff1a26 passed\u30010 failed\u3001296 assertions\uff1b\u65e5\u5fd7\u4e3a reviews/spec-check.log\u3002\u53e6\u6838\u5bf9 Kernel 295 tests \u4e0e affected-2 \u6210\u529f\u56de\u6267\u3002\u539f\u6027\u80fd harness \u4e0e\u5b8c\u6574\u77e9\u9635\u6267\u884c\u5668\u5b57\u8282\u4e00\u81f4\uff1b60 \u6b21\u4f18\u5316\u7248\u8fd0\u884c\u7684 1,800 \u4e2a\u6b63\u5f0f\u6837\u672c\u300172 \u6b21\u914d\u5bf9\u8fd0\u884c\u7684 2,160 \u4e2a\u6837\u672c\u53ca\u6784\u5efa\u4ea7\u7269\u524d\u540e\u54c8\u5e0c\u5747\u6709\u6548\u3002\n\n\u6027\u80fd\u8bc1\u636e\u652f\u6301\u63d0\u4ea4\u8def\u5f84\u6539\u5584\uff0c\u4e0d\u652f\u6301\u6240\u6709\u8def\u5f84\u6539\u5584\uff1a50k \u51c0\u96f6\u4e3b\u5bf9\u7167\u6162 8\u201313%\uff0c\u8ffd\u52a0\u516d\u5bf9\u7ed3\u679c\u6709\u5feb\u6709\u6162\uff0c\u539f\u56e0\u672a\u5b9a\u4f4d\uff1b\u5fc5\u987b\u4fdd\u7559\u6b64\u9650\u5236\u3002\u91c7\u6837\u6bd4\u4f8b\u4e0d\u80fd\u5f53\u4f5c\u7cbe\u786e\u9636\u6bb5\u65f6\u95f4\u3002\n\n**Risk: medium / quick-human.** \u53d8\u66f4\u5f71\u54cd\u516c\u5171 Kernel \u7684\u7d22\u5f15\u6240\u6709\u6743\u548c\u8de8 revision \u5f15\u7528\u590d\u7528\uff0cpackages/*/src \u8def\u5f84\u6700\u4f4e\u4e3a medium\u3002\u91cd\u70b9\u4eba\u5de5\u5ba1\u9605\u91cd\u5165\u8bb0\u8d26\u3001\u672a\u89e6\u78b0\u5224\u5b9a\u4e0e\u5386\u53f2 View \u9694\u79bb\u3002\n\n**Rollback:** revert ece568a\uff0c\u6062\u590d\u6bcf\u6b21\u63d0\u4ea4\u91cd\u5efa\u7d22\u5f15\u548c Snapshot \u6570\u7ec4\uff1b\u540c\u65f6\u64a4\u56de\u6b64\u6b21\u91cd\u5165\u7d22\u5f15\u4fee\u590d\u3002\u6ca1\u6709\u6570\u636e\u683c\u5f0f\u8fc1\u79fb\u6216\u4e0d\u53ef\u9006\u64cd\u4f5c\u3002\n\n\u672c\u5ba1\u67e5\u672a\u6267\u884c\u6b63\u5f0f\u5168\u4ed3 verify\u3001\u8fdc\u7aef\u53d1\u5e03\u6216\u4e3b\u7ebf\u9a8c\u6536\uff1b\u8fd9\u4e9b\u4ecd\u662f\u540e\u7eed\u4ea4\u4ed8\u6761\u4ef6\u3002\u672a\u8bfb\u53d6 Standards \u7ed3\u8bba\u3002\n",
+      "risk": {
+        "level": "medium",
+        "rationale": "Public Kernel index ownership and cross-revision array reuse change internal behavior; public implementation paths have a medium floor. Same-Transaction getter reentry is an ownership-sensitive prerequisite.",
+        "evidence": "Pinned five-file patch; independent 26 tests / 296 assertions passed; existing Kernel 295 tests and affected-2 receipts checked. Same-byte harness, 60 optimized runs / 1800 formal samples and 72 paired runs / 2160 samples with stable artifact hashes verified. Net-zero regression signal remains visible and unexplained.",
+        "rollback": "Revert ece568a07a2f56ae25d6daa63d9f16d88108a5af to restore rebuilding committed indexes and Snapshot arrays, also reverting the same-Transaction reentry bookkeeping repair. No stored data migration or irreversible effects."
+      }
+    }
+  },
+  "changedFiles": [
+    "packages/kernel/src/canvas-kernel.ts",
+    "packages/kernel/src/canvas-view.ts",
+    "packages/kernel/src/entity-collection.ts",
+    "packages/kernel/tests/snapshot-reuse.test.ts",
+    "packages/kernel/tests/transaction-index.test.ts"
+  ],
+  "risk": {
+    "level": "medium",
+    "route": "quick-human",
+    "reasons": [
+      "standards: medium \u2014 Changes authoritative Kernel index ownership and immutable Snapshot reuse; public framework source has a medium path floor. Same-Transaction getter reentry and historical View isolation require focused human review.",
+      "spec: medium \u2014 Public Kernel index ownership and cross-revision array reuse change internal behavior; public implementation paths have a medium floor. Same-Transaction getter reentry is an ownership-sensitive prerequisite.",
+      "packages/kernel/src/canvas-kernel.ts: minimum medium risk.",
+      "packages/kernel/src/canvas-view.ts: minimum medium risk.",
+      "packages/kernel/src/entity-collection.ts: minimum medium risk."
+    ]
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "reentrant-draft-red",
+      "acceptance": "Before the bookkeeping repair, a same-Transaction getter replacement leaves a ghost parent relationship; the public assertion fails for that behavior.",
+      "command": "bun test packages/kernel/tests/transaction-index.test.ts (initial single regression, before repair)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "reentrant-draft-green",
+      "acceptance": "The same initial regression passes after indexing the actual Draft entity following field capture.",
+      "command": "bun test packages/kernel/tests/transaction-index.test.ts (initial single regression, after repair)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "untouched-snapshot-red",
+      "acceptance": "Before collection reuse, a Node-only update does not retain the untouched frozen Edge array.",
+      "command": "bun test packages/kernel/tests/snapshot-reuse.test.ts (initial reuse regression, before optimization)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "untouched-snapshot-green",
+      "acceptance": "The same untouched Edge collection regression passes after optimization.",
+      "command": "bun test packages/kernel/tests/snapshot-reuse.test.ts (initial reuse regression, after optimization)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "initial-affected-type-error",
+      "acceptance": "Initial affected validation stopped on five non-null type mismatches in the new test expectations; corrected without weakening runtime assertions.",
+      "command": "bun run check:affected (first attempt)",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "affected-consumers",
+      "acceptance": "Affected workspace type checks and tests, React/SVG/Examples browser suites and docs checks passed after the test typing correction.",
+      "command": "bun run check:affected (second attempt)",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "public-reentry-probe",
+      "acceptance": "The unchanged 18-case public package reproduction passes on the optimized build, including preserved committed results and corrected Draft indexes.",
+      "command": "bun --no-install performance-optimized/reentrant-index.mjs plan-probes/reentrant-index-optimized-results.json",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "optimized-full-baseline",
+      "acceptance": "The byte-identical 20-case harness completes 60 optimized processes and 1800 measured Transactions with all correctness checks passing; receipts retain every command and exit code.",
+      "command": "python3 performance-optimized/run-baseline.py",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "paired-performance",
+      "acceptance": "72 serial contemporaneous base/optimized processes complete with identical harness/settings and stable artifacts. Positive commit-path results and net-zero regressions are retained.",
+      "command": "python3 performance-tools/run-comparison.py --base-revision 843c9484a7d32e957dceba6658b31a5662560329 --optimized-revision ece568a07a2f56ae25d6daa63d9f16d88108a5af --out performance-paired",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "net-zero-control",
+      "acceptance": "All six planned additional net-zero pairs complete. Mixed latency results are reported without deleting outliers or claiming a stable benefit.",
+      "command": "python3 run-netzero-control.py",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "log": "logs/behavior-10.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "f3a755b96c11f9dbcf0c482a9b107eb6a02e7c6af3a7f5417f26bd4e8fe7124c"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "83112fa24d332c4914f46c9720ebd3c9a82610351347dea15cbd567a77ff1197"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "896f94024ffaa3db22f89d855ae096d5da92ef7c4aebc0e1e0effa43c4f4ac7a"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "b649775b41ac9e7bd35e1eebde2647e567c4d7589dd8c02660a270928d2ba99f"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "4153d2f728bf76394529f434e51aa46d9e1b6e494b91d5f8351b23ae0a9c4d63"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "975ab64dba12dfc6e174ec6752f37d901c5083ee38f2e3275a7f0187d5b3558e"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "6a8c18cf8ae2b5234fc22ca8600c59df4b87f6a765f88caeab68f9df91a1ce09"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "ef10b403e49509e18deeec22c59a8b4e7714af4994b695f9d5948d0d759a35b9"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "065bea10c7c815fefa7fbd4479aac01cc6dcd1e0d5f33dc3e8ef87fb238125ee"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "cab276dd8c4cf988e081d2b0e03a67da18048f6504ae1710a3d5d410f70a800c"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "8bf0f457c3bb86d9054c6b0ae4a906e46c0da1ac327a70d4bdb62c7b6e40d11d"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "2cbba9962b1c066934801de3d4e9afe965ae6c232a547478cb2809837cbbc2a7"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "68a3270648b8fb5e3d75c5376692a8a06a91dcbd27c2638db1829cddf30044bd"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "c96218739969fe6b98cb67433ef4ddf93cdc0695684f0aff24e741cca21bf8c3"
+    },
+    {
+      "path": "performance/README.md",
+      "kind": "report",
+      "sha256": "54726bf3c795cd512f3538f3f08a7dac264d4c127bc3c6e2f872e5cc23bab232"
+    },
+    {
+      "path": "performance/identity/optimized-source.json",
+      "kind": "report",
+      "sha256": "c744b1d059e25d0a8489ab03eb5cc44a7d00540785e7460634a43772de5f75da"
+    },
+    {
+      "path": "performance/identity/source-and-artifact-identity.json",
+      "kind": "report",
+      "sha256": "8676c6be81421dd1bb062b3680c9bcdd65309622dd2acb96f049a1188fcaf148"
+    },
+    {
+      "path": "performance/matrices/base/artifact-manifest.json",
+      "kind": "report",
+      "sha256": "c9c61fde9ad094fce5b8d6aec89bbf20b7676402be0f617934c592f49e9425cf"
+    },
+    {
+      "path": "performance/matrices/base/baseline-receipts.json",
+      "kind": "report",
+      "sha256": "41ad5ea78bcc4442b52b9deaaa2795577cffbe2af845d3ee63d1a2fb6c849ea4"
+    },
+    {
+      "path": "performance/matrices/base/baseline-summary.json",
+      "kind": "report",
+      "sha256": "6d07759d57345904e9a72ad3dff5ef2401f4b314d198491c2ff908fc66098d00"
+    },
+    {
+      "path": "performance/matrices/base/harness-sha256.txt",
+      "kind": "log",
+      "sha256": "7a6ab97052957130f7449200644e7524cf4efd0a75039a5133b05264e13cea60"
+    },
+    {
+      "path": "performance/matrices/base/matrix-plan.json",
+      "kind": "report",
+      "sha256": "ac87e0ed02f9254c0bd0c6df79e8dde5c2324035340aa480c6bd696c640efb10"
+    },
+    {
+      "path": "performance/matrices/base/results/hub-10000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "d8fd8243e9edf2a202e575645d0802ce09bad9a9caec9a1a95a208b6bf52199a"
+    },
+    {
+      "path": "performance/matrices/base/results/hub-10000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "1b6dad1949e522c8e9bb45e7110bb0e2a86f714f21d7fb9e45b7800aa10c3264"
+    },
+    {
+      "path": "performance/matrices/base/results/hub-10000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "225a9e13ff70f4efa27600ab5371b96f3d5eba5ef8ed2e50528369f7250ae3e5"
+    },
+    {
+      "path": "performance/matrices/base/results/hub-10000-rewire-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "92c93abbb7ee3114452d5d686696d8a5869a62ed30cf3f4517af41648a19a33e"
+    },
+    {
+      "path": "performance/matrices/base/results/hub-10000-rewire-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "b7a06cb697e93596b3566eebc1739331055b0c3ff3829a0e47ff9204735ad899"
+    },
+    {
+      "path": "performance/matrices/base/results/hub-10000-rewire-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "b2acbe136fe508b6003dcfcd66a4e111dc583070de5b33a7f13dc22dc5c57caa"
+    },
+    {
+      "path": "performance/matrices/base/results/hub-50000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "770384d3b395b0c0216fbdcb4d990a8660544a31b589a907c58e0bdcc7eedd8b"
+    },
+    {
+      "path": "performance/matrices/base/results/hub-50000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "9267db46c44db4ef45c88b0412bdf2d5cdbfd8d1667d19003a17a2eafee15adc"
+    },
+    {
+      "path": "performance/matrices/base/results/hub-50000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "14b0c9fa6a466fc5fdd6c2dc609ac0c5e73399c1a3ee5f9887df53ab9b84eaf2"
+    },
+    {
+      "path": "performance/matrices/base/results/hub-50000-rewire-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "442135ac8c0415b30f94530f5551f4ffb2dde836f624ec81abe029000b4830a9"
+    },
+    {
+      "path": "performance/matrices/base/results/hub-50000-rewire-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "1004cb737069a9ef5e9f6de7c9ea216cb8b016d11ed962c15172551025324af3"
+    },
+    {
+      "path": "performance/matrices/base/results/hub-50000-rewire-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "b74a45b2ed311a0b06032bd2178c649bc842eaf5833cecde3b40b93ed937e718"
+    },
+    {
+      "path": "performance/matrices/base/results/nested-10000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "fb9d4fadd322c9d3ccff74e5d62269e9c88cb658b7116414787ddf6ddf1d3f8f"
+    },
+    {
+      "path": "performance/matrices/base/results/nested-10000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "6d41d9a09f2c9a28bd1819f5451b10495e067e3477e992daa6d2beb346fb1926"
+    },
+    {
+      "path": "performance/matrices/base/results/nested-10000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "0e1489469ba8aeef70708ebed81e1c550baa13e8c122fdf68a783302ba0a691d"
+    },
+    {
+      "path": "performance/matrices/base/results/nested-50000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "38b75df273b88267ec3d6b35853d6c73b763fcc841b979b457b7ff189d640b70"
+    },
+    {
+      "path": "performance/matrices/base/results/nested-50000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "4d930a1682f465d84028647e48f72c6fc524e5aaa8439a5b659556034e264b50"
+    },
+    {
+      "path": "performance/matrices/base/results/nested-50000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "e1243a5d5bcbba77cf9acfde1bc5362ca01ff0872ff85a197de12e9c967343f2"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-1000-move-1pct-retain0-r1.json",
+      "kind": "report",
+      "sha256": "8c4ac72410a30e2025eab460a3f573aaedb8ab45345f213051334fc4909a8a9d"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-1000-move-1pct-retain0-r2.json",
+      "kind": "report",
+      "sha256": "31fca8dfc31c8d59abd8ac5ce809fa102955bb9446c820129fc0281b54253093"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-1000-move-1pct-retain0-r3.json",
+      "kind": "report",
+      "sha256": "d051decbdef6bdbdc3af611ddde908a9d819ba750365e54d2403376bc9f99216"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-1000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "7ec60175b194b7c90410890913aa595f820d23b6d3da6b7c446569ee475355d8"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-1000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "9bf9add15981d9b885922c1b493368c3db01a25f1113362b337bd9bba079d4a0"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-1000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "083e1b9709c8c1788cb5189e6026a0c111bcc6268b35b6581917d97847ee4665"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-1000-net-zero-retain0-r1.json",
+      "kind": "report",
+      "sha256": "30ea63a0dcf2103b147315541f502dbce7c1cbfc8718f0489147ab65d6aa286f"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-1000-net-zero-retain0-r2.json",
+      "kind": "report",
+      "sha256": "3fbe85db5ab44f4a3f714fe57a91af2a5e24124e813b09d69d80ad40419d87e1"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-1000-net-zero-retain0-r3.json",
+      "kind": "report",
+      "sha256": "d0f1232af8cc882efa73a9631efb7782515912cabbbdc1ca2e17993036199465"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-1000-rewire-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "3a28a18dc0f79320e41d60acf013d96a9c20fb596faa04180cd26c20fe64085f"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-1000-rewire-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "7a98b978fbba17672390a2d446a6b21cff3f89be12b915d2a14a09930f87cf21"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-1000-rewire-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "957af378322233924184e338dbb4cc9389f9fa185a6440d602afaa53a93cceb6"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-move-1pct-retain0-r1.json",
+      "kind": "report",
+      "sha256": "df0f32ff5856e6f1a9993a71822ffc97e536561c77b25025f8f67e21c3bdf98b"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-move-1pct-retain0-r2.json",
+      "kind": "report",
+      "sha256": "c989cd2641b1162bbc7cb87b6e9bae10ddf32eaf3c4240f57987081ac1e04ef4"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-move-1pct-retain0-r3.json",
+      "kind": "report",
+      "sha256": "7388d5b8df6f62bc5e5140ff55aa1a810dad3daef4fc00b8b6ae6be95804aa7d"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "6665cb0e55a0fbd1f8fb4a237912b1ffc69989c1dc1b9bd359da25446baaed38"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "260048f8d84784e01d164de8b7270b5f67749112d4e479b4877c102252705bbd"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "e3a2ea24eb5f796fc008d437afe45d6ca25f22abbc1b0b35d6be7a5d960515f9"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-move-one-retain20-r1.json",
+      "kind": "report",
+      "sha256": "20a1a66f7aaf93309235a87be8f84650bd7672b7908b8941c02745d2c83ffaca"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-move-one-retain20-r2.json",
+      "kind": "report",
+      "sha256": "9efed43937af495ec0adba3f916c071fc90efd15135612f973b22c7069ae5b32"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-move-one-retain20-r3.json",
+      "kind": "report",
+      "sha256": "4defe9c25ee9b29b2637a0258273aa87908b82ecd8f8dd9303c25f66c8017528"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-net-zero-retain0-r1.json",
+      "kind": "report",
+      "sha256": "22a4103c021c83c4903283fc4099dd0e231657151df77adbd295984b07d0905f"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-net-zero-retain0-r2.json",
+      "kind": "report",
+      "sha256": "48e92deabb51dd950743a711bc6a1cedd642dce6a89c44ab13e23035d45487a8"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-net-zero-retain0-r3.json",
+      "kind": "report",
+      "sha256": "5ea18140e1662d9d4bdc10ef680efc4f8846d5f042ff9f2a64bcbd3544ff264a"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-rewire-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "10cc4b6466d7b357baa99fec603e32f8a8479984e2b9d5b81d0c2fb23193e8a0"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-rewire-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "eda55003c357836330dc8d119555eabf138b522f4c13fae08989a86312683118"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-10000-rewire-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "1abca42261d606923ac78b45155a378f3f65bc9459174717f7270d5b6015bcfe"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-move-1pct-retain0-r1.json",
+      "kind": "report",
+      "sha256": "d1aab1144cc0976ff4394ff642d659997073c3b89cb08eb70db258b1b4fb1fb4"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-move-1pct-retain0-r2.json",
+      "kind": "report",
+      "sha256": "9069ae08a16f6611146f8f95a7ee7e72d13cf159f8da1626031dc0b6dc150412"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-move-1pct-retain0-r3.json",
+      "kind": "report",
+      "sha256": "2c9aef3f38fcb5cc7054c6f45bf68ed88e62fbd5ee9e6a618fa9a6343acc2bf7"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "990a5926c0fb950298d356d973e0c32457e61134d5b1f08b166b8a0590784ec3"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "7ccf93c0e38051c57dec724f2663ea3b5e5e01f18c333503a5934430f431b7d5"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "4929786ac4cf46ad5509d65652c2bde823583c5fccd64d1d51033b97c0040f3a"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-move-one-retain20-r1.json",
+      "kind": "report",
+      "sha256": "00814ab716685554137168c08332b7ff4f05d910cca307aa95e537888ebcb805"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-move-one-retain20-r2.json",
+      "kind": "report",
+      "sha256": "5b0e3b5fc67146e31232a897e284b65b08a1dffc85696c683f6791a70a29d419"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-move-one-retain20-r3.json",
+      "kind": "report",
+      "sha256": "8e8cc2482441354c7f008a856fa952f5c474151a88d8f48cb7bac24a0c0292a0"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-net-zero-retain0-r1.json",
+      "kind": "report",
+      "sha256": "04a439f541b967ed6e6555707f6f99b451123283a52d524d6d39b070333f6172"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-net-zero-retain0-r2.json",
+      "kind": "report",
+      "sha256": "d887bfe44ca5c3a0d8904850a952cbbcef86c62d4b74cb986890826a0cbd4ca2"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-net-zero-retain0-r3.json",
+      "kind": "report",
+      "sha256": "7499fbe9b322ab78e5ba4e8d3eeaff554f722be24e4230613bbf9122612df048"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-rewire-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "e34ac1321093fdf246f23c659b06cb76f5394e6ddbeb3b748c5937bae855b54b"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-rewire-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "1534a6be4f75dd6706acec812b8fb6b1b1377c3e46665d56f312df3c03827e45"
+    },
+    {
+      "path": "performance/matrices/base/results/sparse-50000-rewire-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "af7f0f2207487cb7c080061e13e7cdc62e1e2c1c87cf8674ab782ed4bbe19111"
+    },
+    {
+      "path": "performance/matrices/base/schedule.json",
+      "kind": "report",
+      "sha256": "a457f97326b5e08d12914967b1c57ad5d86412570476549fdf9d26bdead38ec8"
+    },
+    {
+      "path": "performance/matrices/optimized/artifact-manifest.json",
+      "kind": "report",
+      "sha256": "0f3f9c881b682e938e60dc8123fad09b81466751c296f2be9245cc0eca70ac77"
+    },
+    {
+      "path": "performance/matrices/optimized/baseline-receipts.json",
+      "kind": "report",
+      "sha256": "8bf0f457c3bb86d9054c6b0ae4a906e46c0da1ac327a70d4bdb62c7b6e40d11d"
+    },
+    {
+      "path": "performance/matrices/optimized/baseline-summary.json",
+      "kind": "report",
+      "sha256": "d4c732309e2227cde754e5631f53b1a48377dd2c77fe6f8279d855cc1097b120"
+    },
+    {
+      "path": "performance/matrices/optimized/harness-sha256.txt",
+      "kind": "log",
+      "sha256": "7a6ab97052957130f7449200644e7524cf4efd0a75039a5133b05264e13cea60"
+    },
+    {
+      "path": "performance/matrices/optimized/matrix-plan.json",
+      "kind": "report",
+      "sha256": "ac87e0ed02f9254c0bd0c6df79e8dde5c2324035340aa480c6bd696c640efb10"
+    },
+    {
+      "path": "performance/matrices/optimized/results/hub-10000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "7b27bdc8a2ce673df27ed67a91f5b5f7f972f76831967dbc5138564ffd7f3864"
+    },
+    {
+      "path": "performance/matrices/optimized/results/hub-10000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "70a9f9425e4a87adb950acef3f443da3b362ef231adb0b78320f06a5965f6c74"
+    },
+    {
+      "path": "performance/matrices/optimized/results/hub-10000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "344f11ded40fcf2acf1cbba5b8e51f88bfc71fc6798f950c6969e831486e2255"
+    },
+    {
+      "path": "performance/matrices/optimized/results/hub-10000-rewire-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "c1bed766fec1971cc25b403764be9052400aacceee5dc871d5245ef634cc2349"
+    },
+    {
+      "path": "performance/matrices/optimized/results/hub-10000-rewire-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "b324aeac59b162ea5a375b715e0e1740194c0151e292be8e8b613a1595c1f6fd"
+    },
+    {
+      "path": "performance/matrices/optimized/results/hub-10000-rewire-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "403de23601705fdef257828d09ea9284b3550c51a921ab3323b1b8aa999a777f"
+    },
+    {
+      "path": "performance/matrices/optimized/results/hub-50000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "b73255fb1603326c507073b3ed909569f11c132ad7cdbe4d0c88941455f50ee7"
+    },
+    {
+      "path": "performance/matrices/optimized/results/hub-50000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "bece1fc7506263f0ae363a5dcee9703a3c6b4df21f68a2b9da2399dc3955f1af"
+    },
+    {
+      "path": "performance/matrices/optimized/results/hub-50000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "ccfccbdf0cd6af1412749bea648684559c4db88724fed44dac8501ec3ea8296c"
+    },
+    {
+      "path": "performance/matrices/optimized/results/hub-50000-rewire-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "ebcfe57b9bfcfb5f2aa098c9658b6a4507fd0475edc06ec9891b7e7b2a39873c"
+    },
+    {
+      "path": "performance/matrices/optimized/results/hub-50000-rewire-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "99f0ce60dc9caf75b10050fe8c1e4704dc8896e5f57d1713ee487aa8f8656351"
+    },
+    {
+      "path": "performance/matrices/optimized/results/hub-50000-rewire-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "c013ff7fafc5b7b737d407aa9e70f492266496e164977152226a29017717d1be"
+    },
+    {
+      "path": "performance/matrices/optimized/results/nested-10000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "ce3857bd5bc0aea9b3299d3d344502615a7373d7191a0901e48db3785edde7af"
+    },
+    {
+      "path": "performance/matrices/optimized/results/nested-10000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "80fbf5d02468987780455641c6ae8b6a3384dc2bc9de996ab009fcd6e03843ff"
+    },
+    {
+      "path": "performance/matrices/optimized/results/nested-10000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "1905a85fc1e80f417f0eaae779b7c55d0da2e18e3e02da655bfdebf767c2486a"
+    },
+    {
+      "path": "performance/matrices/optimized/results/nested-50000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "f2e38d98a41befd8d0161f0f63d7229bbc28b95ae939067c67325a6001a7cdaa"
+    },
+    {
+      "path": "performance/matrices/optimized/results/nested-50000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "6f0e5493fe742ac925251c58518d92b2371a96696e36e4ad54ada980983f079f"
+    },
+    {
+      "path": "performance/matrices/optimized/results/nested-50000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "5dd318615c839a143676949a9ffd0f15ae0ed2406142f5735b665332c0eae0d7"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-1000-move-1pct-retain0-r1.json",
+      "kind": "report",
+      "sha256": "dc3b20e323b0cb816d7b0509f6c8d2ce633b37f75395efd53ade7a8d3610e3ef"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-1000-move-1pct-retain0-r2.json",
+      "kind": "report",
+      "sha256": "9ce34bc451b214674d930e0d7e6a891e95318d79a5acb0234f347720b92a37a2"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-1000-move-1pct-retain0-r3.json",
+      "kind": "report",
+      "sha256": "69b603091266530c40efe97f8aa091e1b9558a39b32e409c9acb664ed6446d8e"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-1000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "80325fd5892e0d1d021f9a724124a6c8b4e1ad4fbdcccaa0cad93d4e87212cb9"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-1000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "825bd15788471ed5532051e57719f02a675dba7cef505e3f92d53a1a996b9b8d"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-1000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "73f8aaa299f8289d622a8f1e52ca99fbfcc6702d1baa3476df1ad099149bb99c"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-1000-net-zero-retain0-r1.json",
+      "kind": "report",
+      "sha256": "3b45c36664f4d676df34742debe726b093531fc723fdff0e97510a2f5cff8fe3"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-1000-net-zero-retain0-r2.json",
+      "kind": "report",
+      "sha256": "afc07aa52b12f0da3173041daa682f65ea40f2d634040fb333254ecb9b339ca7"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-1000-net-zero-retain0-r3.json",
+      "kind": "report",
+      "sha256": "65ee86296d44254dd44f78d76aa50ec2b0d9a2d8ec28275a44f9574524fcc9e8"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-1000-rewire-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "11c4fba5eb28c27fbde6bd52aec492e6ac3fd015e1fad9cbe8591c354152e890"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-1000-rewire-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "6a705455b64574096b363e6349a9fc25702311f79fb7e85a26ad5057dd45d033"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-1000-rewire-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "f983b62b8a7c40f9b6e30ac890ee1a7b4fc359cbcb3c178f5b1b966858d1303b"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-move-1pct-retain0-r1.json",
+      "kind": "report",
+      "sha256": "8cff4f24bce58eead79d4018913997948dd07fae8c8b8bb38b588f5e76d32fe2"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-move-1pct-retain0-r2.json",
+      "kind": "report",
+      "sha256": "f6bd5647d371fbbe13566e2d554b30bd129e4ef591bd6077e1b00586f9f408b0"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-move-1pct-retain0-r3.json",
+      "kind": "report",
+      "sha256": "6a3d3e51cb44e83d4b53add362cd54c02d0d1c7eca1e98bab74b91823f9e4c26"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "b17d4e6fa924d6d37a58d2c38fdbdac2f54eaf8cb99ccfb55614412962fec77a"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "6abdfbf5f2a369a5c74439fac507c6c3405f3dc83d1fbc0eb750a04b7ab5a2f1"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "2a79006ebd7eec5b2b502468ecac3d4d77b11f4064453501dcff84fce18b47c0"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-move-one-retain20-r1.json",
+      "kind": "report",
+      "sha256": "ad6441353d1635b21a84dce4fdbc218f8ca885553f2ec284d3c7d99eacc91558"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-move-one-retain20-r2.json",
+      "kind": "report",
+      "sha256": "683bfa2971730f18640cdf3996b842dc7778911ba6ab22c6c20e9126fe08f411"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-move-one-retain20-r3.json",
+      "kind": "report",
+      "sha256": "09d19b8f12bf32c647aaea2cf1b91bc25da867239ac6285a1d27005ee3628e95"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-net-zero-retain0-r1.json",
+      "kind": "report",
+      "sha256": "10659a5934722593c3bf5c393a944fe8d22a09d9fedf822226289c3cfed85058"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-net-zero-retain0-r2.json",
+      "kind": "report",
+      "sha256": "c6b18427e597be1454386501505add7e9774e862633fa1c8aec36a1f50c3ba39"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-net-zero-retain0-r3.json",
+      "kind": "report",
+      "sha256": "8fc933c015feab471591731d87ee04d86036f89e88549b3bc39f2cfd9e52090d"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-rewire-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "d949e3836ef6452ff9b249415757673f6b2cb2b33e4e7dfa4ae37f2fccce2937"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-rewire-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "705136cac945a8cb3545b740a4014c8c6b5b984bffe5066e01e3de41a79c7b5e"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-10000-rewire-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "396f7a693d973ea08012ad1cafe7afa5255f27053e47693acb540f701bd8e718"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-move-1pct-retain0-r1.json",
+      "kind": "report",
+      "sha256": "64386d234604ee79c136db7639350578d893681e4928790a42baf5d06d8bbf96"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-move-1pct-retain0-r2.json",
+      "kind": "report",
+      "sha256": "5a780ede13f66a8e31b51300b14893f0cb559386f78c04b873687597712890be"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-move-1pct-retain0-r3.json",
+      "kind": "report",
+      "sha256": "b57006f7ef5a1855ea7f005d23ffd51598d89cc0d7e2f478d48c0d8b1b5e437e"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-move-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "51f1fdb11da6fb1461ffdcf8a78a41071baf2fe15a9c3445c790e46327618d5a"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-move-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "a9ef31cd8ea28f3c971b978eeb01fd598bd7c813c56369b3eb7853d52e5c5d34"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-move-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "8720d4fe1ea1eff4d6e26d2f78f5ccef46f64f765924a53f95234160b601e148"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-move-one-retain20-r1.json",
+      "kind": "report",
+      "sha256": "313070d491b00f74eff1144ca7b17d509a579d600a8b35a0080cdb144a12108b"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-move-one-retain20-r2.json",
+      "kind": "report",
+      "sha256": "188f86aff0dfef2c43c7b13df008279311051f529e535075be27661832f40aca"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-move-one-retain20-r3.json",
+      "kind": "report",
+      "sha256": "0b344e3374052c9871d60699680e01c8d60a02fa0cf5398b85ae4e18eef2e988"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-net-zero-retain0-r1.json",
+      "kind": "report",
+      "sha256": "6d4a063be43087c404d855499bdf02836e798db063aead3081b643b23db5193a"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-net-zero-retain0-r2.json",
+      "kind": "report",
+      "sha256": "eb536e4cb314f29e523e0cdb5e3fb9a84e7e872fbd02b4710029989f9d828bfe"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-net-zero-retain0-r3.json",
+      "kind": "report",
+      "sha256": "4247231fe5e802cf94b229253ddb3057d86f82411796efad028deb8f1ee80467"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-rewire-one-retain0-r1.json",
+      "kind": "report",
+      "sha256": "4a17d90495907bcfdf8a8d1a2116fcdad4806df6c5227fe549ce0707939cc311"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-rewire-one-retain0-r2.json",
+      "kind": "report",
+      "sha256": "2516faa243b7e6e7f672e22977236dbfe9f37aa47018fc8847a28b317bb94e50"
+    },
+    {
+      "path": "performance/matrices/optimized/results/sparse-50000-rewire-one-retain0-r3.json",
+      "kind": "report",
+      "sha256": "f4e5a7ac4240e7b84534df5f7878a6dc3ea81b11c076b5ad09980cbbc2a0fae9"
+    },
+    {
+      "path": "performance/matrices/optimized/schedule.json",
+      "kind": "report",
+      "sha256": "a457f97326b5e08d12914967b1c57ad5d86412570476549fdf9d26bdead38ec8"
+    },
+    {
+      "path": "performance/netzero-control/r1-base.json",
+      "kind": "report",
+      "sha256": "c3816f52a359987e418e6772f644ee2a4ec1c755da59daff1d8df3c83317af70"
+    },
+    {
+      "path": "performance/netzero-control/r1-optimized.json",
+      "kind": "report",
+      "sha256": "b64f5e92c43c4ad22b1bb043d8ee1de3f1b79aa7be18663d247d75048a754fb1"
+    },
+    {
+      "path": "performance/netzero-control/r2-base.json",
+      "kind": "report",
+      "sha256": "f790958eb5a699d26c6666dea219c5153bdf4e05bb1933e1a1c4274a7ac7ae49"
+    },
+    {
+      "path": "performance/netzero-control/r2-optimized.json",
+      "kind": "report",
+      "sha256": "42099b1d99f7416706f4479a6813dd628a74c3e3a821bf42fbb91660ccd97da5"
+    },
+    {
+      "path": "performance/netzero-control/r3-base.json",
+      "kind": "report",
+      "sha256": "974474eec6efdeb871bfc8835a523f90c6cb62a6ce309cde174e9890bd36e5c1"
+    },
+    {
+      "path": "performance/netzero-control/r3-optimized.json",
+      "kind": "report",
+      "sha256": "b27fc582bd2831975aa663356f1c59cdb772a447eea08405748f6c0e0a5155f5"
+    },
+    {
+      "path": "performance/netzero-control/r4-base.json",
+      "kind": "report",
+      "sha256": "610e344ea2a563401e1624935d6f33976ac947aac02882dcdee57773b80c9439"
+    },
+    {
+      "path": "performance/netzero-control/r4-optimized.json",
+      "kind": "report",
+      "sha256": "e078fe26b7b3055a4a74f4313166d53c6c4d359d3fafe006c4f6a35216f8e41c"
+    },
+    {
+      "path": "performance/netzero-control/r5-base.json",
+      "kind": "report",
+      "sha256": "f9cfe2a5ca0145ec1c023e5e4ab80ce64fd1f2e4e9d746945bc70591c98cd255"
+    },
+    {
+      "path": "performance/netzero-control/r5-optimized.json",
+      "kind": "report",
+      "sha256": "020d81c3dd8fa83e68749fecfe5fa8b5e603ac6bb9964668cee1fcf8d5867270"
+    },
+    {
+      "path": "performance/netzero-control/r6-base.json",
+      "kind": "report",
+      "sha256": "15d4862d5e220ea26fd96c7d89e88e6bf2e5b1b7b38daee1613df62e4c71727c"
+    },
+    {
+      "path": "performance/netzero-control/r6-optimized.json",
+      "kind": "report",
+      "sha256": "3b9dae4756add8d50f03c947929156b85cae0433dea1bc5043f8389997284f2d"
+    },
+    {
+      "path": "performance/netzero-control/receipts.json",
+      "kind": "report",
+      "sha256": "68a3270648b8fb5e3d75c5376692a8a06a91dcbd27c2638db1829cddf30044bd"
+    },
+    {
+      "path": "performance/paired/artifacts-after.json",
+      "kind": "report",
+      "sha256": "5a2cf4da2bb50de573b3da87b57415b9a150494fde118528792746dafaf68f01"
+    },
+    {
+      "path": "performance/paired/artifacts-before.json",
+      "kind": "report",
+      "sha256": "5a2cf4da2bb50de573b3da87b57415b9a150494fde118528792746dafaf68f01"
+    },
+    {
+      "path": "performance/paired/completion.json",
+      "kind": "report",
+      "sha256": "3fecf5c0ebb4078bba524adcb0f756859397c81af5d789f5f65ead5a7e631657"
+    },
+    {
+      "path": "performance/paired/environment.json",
+      "kind": "report",
+      "sha256": "259559b9a9be22fc59be3ec978a5c81f3db3e57e1192af1a05f7143ac9c4a85e"
+    },
+    {
+      "path": "performance/paired/plan.json",
+      "kind": "report",
+      "sha256": "bc421f1631dc9cb4810670effb893b2ff022e9c9be3f289f27e372d11c6b061d"
+    },
+    {
+      "path": "performance/paired/receipts.json",
+      "kind": "report",
+      "sha256": "2cbba9962b1c066934801de3d4e9afe965ae6c232a547478cb2809837cbbc2a7"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-move-1pct-retain0-r1-base.json",
+      "kind": "report",
+      "sha256": "41aa66218bc6ad4986f000fc26a8dafb1275089138b0107c0e1576fda2eb195a"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-move-1pct-retain0-r1-optimized.json",
+      "kind": "report",
+      "sha256": "0d322bde25df72452c23e08d7a9c36e9e97f9b8fa9760d91dc3ad1604abecc0c"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-move-1pct-retain0-r2-base.json",
+      "kind": "report",
+      "sha256": "8ba895db2bd75b26c258d2fc0060fcf0f251970d48c2a114978e3442b4bf72ed"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-move-1pct-retain0-r2-optimized.json",
+      "kind": "report",
+      "sha256": "c297d2db4d3fd976f32c11be48c3141012f68892ea93fef06b7ec8da23cfc942"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-move-1pct-retain0-r3-base.json",
+      "kind": "report",
+      "sha256": "7782541dadd60caf8da83d6925173b13d1da7c7797f8b8683d635caddc928a90"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-move-1pct-retain0-r3-optimized.json",
+      "kind": "report",
+      "sha256": "c537e40d5bc79f014e5edac28f6dee33f4b94b1af56df2f8f20f9bc9eb5e38d1"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-move-one-retain0-r1-base.json",
+      "kind": "report",
+      "sha256": "d840b17103a0badad32b1eda7e0a4a2e737914ab9491e6847a85711165e9681b"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-move-one-retain0-r1-optimized.json",
+      "kind": "report",
+      "sha256": "c7bdf45ab71b16a5c7e04d0bfc4e08bd4e75cbcf9b405b3fc7cdc16ee0a8f094"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-move-one-retain0-r2-base.json",
+      "kind": "report",
+      "sha256": "5452758e28e2c2f823febe06e5064efaefdf355f8f58f76cda9d1fadd04ad603"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-move-one-retain0-r2-optimized.json",
+      "kind": "report",
+      "sha256": "f7d0baae52ff357d5ae06f08f900d423eb65cb32eb81ce7bffb17443c4735089"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-move-one-retain0-r3-base.json",
+      "kind": "report",
+      "sha256": "5cb26c29149964a80270edaef4b4e581b893b61f3bd6739b2feb9b659bfc929b"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-move-one-retain0-r3-optimized.json",
+      "kind": "report",
+      "sha256": "f55693adb3c01dc9ee2e96113ebcd74386183380547e12a3862b056016a61f71"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-net-zero-retain0-r1-base.json",
+      "kind": "report",
+      "sha256": "8407a359927ae368ea402fb4f9585ce01c342461f6b7bd27fc2960f627a86825"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-net-zero-retain0-r1-optimized.json",
+      "kind": "report",
+      "sha256": "781aacd20628806ddb21fe0e0b8649d952ca0dec042cb0f28c54039db54e33f7"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-net-zero-retain0-r2-base.json",
+      "kind": "report",
+      "sha256": "6d97cb3f8ed9d7fe9df3dfc658a656e943de768aad707a427aedb18badd6619d"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-net-zero-retain0-r2-optimized.json",
+      "kind": "report",
+      "sha256": "c442f285fba5224eda1ea71d47596a91d2dff22d27a7c018c75b9bdf36caba83"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-net-zero-retain0-r3-base.json",
+      "kind": "report",
+      "sha256": "d87cd80dd10dd797d283a7ac383744fb96bcb5d70d937ff9a43ab5a0b4a847a0"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-net-zero-retain0-r3-optimized.json",
+      "kind": "report",
+      "sha256": "0d86d84bf20d7c1e379d799558adc7d05d45e7d13344f4ec98babfc0e8e194f3"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-rewire-one-retain0-r1-base.json",
+      "kind": "report",
+      "sha256": "483afedf0cf1ca87edab42b031bc3ecaa12e6f280bce362b41b81389c8243fc7"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-rewire-one-retain0-r1-optimized.json",
+      "kind": "report",
+      "sha256": "f3144801f71a49d488c2fede902f9d326f625dbc2a9441d79d699a9f5a555f7a"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-rewire-one-retain0-r2-base.json",
+      "kind": "report",
+      "sha256": "dedb4e552123e8f558774d872b4f693bb997a225edb9f6523c2e375ce5be7fbc"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-rewire-one-retain0-r2-optimized.json",
+      "kind": "report",
+      "sha256": "5855ac59529f1b6a59190ea16cd729030999d529e093997835278498043cff65"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-rewire-one-retain0-r3-base.json",
+      "kind": "report",
+      "sha256": "43bc41207b32593b3243c75c1405c0b6326d287532395760083a909b4409a22b"
+    },
+    {
+      "path": "performance/paired/results/sparse-1000-rewire-one-retain0-r3-optimized.json",
+      "kind": "report",
+      "sha256": "04bf0ed29d8e1b3535351e9863c178c6813d9ed078ea31baa7744df08af7585c"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-move-1pct-retain0-r1-base.json",
+      "kind": "report",
+      "sha256": "17e6c611014ea50ba358900e751c0ed5ec9176d55e437849b13717be68cf1887"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-move-1pct-retain0-r1-optimized.json",
+      "kind": "report",
+      "sha256": "88fd4ac49d6d13d6b8acf5f4f16358505d8fae1b4d9a554d2a322f7ac4e77a20"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-move-1pct-retain0-r2-base.json",
+      "kind": "report",
+      "sha256": "20b21148b6524d0ebd039cb936eae2b6f1aa5c1b6e19f5c41af7376dbfd31d68"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-move-1pct-retain0-r2-optimized.json",
+      "kind": "report",
+      "sha256": "381797720be68fec36a45232aebf1ea03dcea75b0a99efd981c7418c9a069231"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-move-1pct-retain0-r3-base.json",
+      "kind": "report",
+      "sha256": "9fd6bb998ec70f84feb12657581172d1b3dcd40d31e8a216d4296aa9f24c7078"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-move-1pct-retain0-r3-optimized.json",
+      "kind": "report",
+      "sha256": "cc73c7c48fc4ba4925f7be7849494a294060ccba0da8eb8ec36988a15e4e4f07"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-move-one-retain0-r1-base.json",
+      "kind": "report",
+      "sha256": "2d061b4e9218d0b971118911b45c1d36cacf4b0c915db103846c8787e345c35c"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-move-one-retain0-r1-optimized.json",
+      "kind": "report",
+      "sha256": "9f1bc46c8d7ef64e417792074084f98439ccc3502e1dd659b7774bb48e1fbf44"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-move-one-retain0-r2-base.json",
+      "kind": "report",
+      "sha256": "37998e7ff8057e33ad47ea0d23284e93ec50ea0db330d56ad95463730cacce90"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-move-one-retain0-r2-optimized.json",
+      "kind": "report",
+      "sha256": "f38128abb2b4da98205507cd31ac5060702d1843baabf2773253a60e29b63cbe"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-move-one-retain0-r3-base.json",
+      "kind": "report",
+      "sha256": "ace7798f32ec44e97a438b7589a0205a2334c17b6f18193e2f122a81c2c3b7df"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-move-one-retain0-r3-optimized.json",
+      "kind": "report",
+      "sha256": "24e404fa6a868125aa780a0456eb6395bf345c53683c11fe7a6895105f2a4dd5"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-net-zero-retain0-r1-base.json",
+      "kind": "report",
+      "sha256": "1d1103f09c0fda9d581561d287840a51ac630b0a05a9b42a62f37b58b7115471"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-net-zero-retain0-r1-optimized.json",
+      "kind": "report",
+      "sha256": "71f62afad9f5c5e37b2b1e9bafbd77b909234814ab3fae0fbf34271a9e625e45"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-net-zero-retain0-r2-base.json",
+      "kind": "report",
+      "sha256": "b620493b08062db7fb24d244b79f3a17123d5ada6b2cbbbe68e0205aef81b4ce"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-net-zero-retain0-r2-optimized.json",
+      "kind": "report",
+      "sha256": "24ef81680b81cd607eaf730bc4344eddf4dcf28ae7cbdbc35fcda403f5d0f065"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-net-zero-retain0-r3-base.json",
+      "kind": "report",
+      "sha256": "179b1778e1505a234a9237df82241b9b7b2cadc5c773c682ce5f3f6554d39e0c"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-net-zero-retain0-r3-optimized.json",
+      "kind": "report",
+      "sha256": "bd2f8e8c011c9511c8e2bf17ceb434fed8c6f190d00e8ea4d940521fccabbcee"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-rewire-one-retain0-r1-base.json",
+      "kind": "report",
+      "sha256": "d5aecad47b03f0ffa56b7af2ea354aa7250383574c05bb41510267165494768d"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-rewire-one-retain0-r1-optimized.json",
+      "kind": "report",
+      "sha256": "2992f1557c2f52e130aa209ec904df8791a292452c5f0205162a278ebae4cddb"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-rewire-one-retain0-r2-base.json",
+      "kind": "report",
+      "sha256": "c69f8894166b9d39398a19489b1768d56a1708743c87b716e3bae9617adf2281"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-rewire-one-retain0-r2-optimized.json",
+      "kind": "report",
+      "sha256": "80b0162b39e2be1164b2aead702bb0788307aa9e395dd5d7d738ee80bc449b60"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-rewire-one-retain0-r3-base.json",
+      "kind": "report",
+      "sha256": "ce406b563cd6246980ef2b60c42056e29267ba6e2354c53bc1aa760c7804d4a2"
+    },
+    {
+      "path": "performance/paired/results/sparse-10000-rewire-one-retain0-r3-optimized.json",
+      "kind": "report",
+      "sha256": "a98c240930127e6f041773bcbc61b4a8331a6010f742e3a6cfade98703c4b0c6"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-move-1pct-retain0-r1-base.json",
+      "kind": "report",
+      "sha256": "169f309b89216830e68252bedf8bf0fa1c3c1022823844eee5612f3f2e60a598"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-move-1pct-retain0-r1-optimized.json",
+      "kind": "report",
+      "sha256": "c4622d06733b93e7575ce4bb8eb22581277546eceedc35cf605ba76656598401"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-move-1pct-retain0-r2-base.json",
+      "kind": "report",
+      "sha256": "b7ca1bd769761a60c6dd332b06ae0612c8cc86c8589600ac6ce3d0b1bacad4e5"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-move-1pct-retain0-r2-optimized.json",
+      "kind": "report",
+      "sha256": "d7107abbd1c3c7bc86c4f4ac43fa9e6a792aec088bb1e3335e2c30c8f1e584a0"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-move-1pct-retain0-r3-base.json",
+      "kind": "report",
+      "sha256": "8e02502b37433796116154c4b134b3596968f668d04e2c858159609197e0fce5"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-move-1pct-retain0-r3-optimized.json",
+      "kind": "report",
+      "sha256": "2e6c72e8be7e3fa23690ad0692a9621b050cfabe639f01be5eca275233660c19"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-move-one-retain0-r1-base.json",
+      "kind": "report",
+      "sha256": "066ed1d0879cf14dba37e67f500173a5faf4f97652db77a32a1bebe5f14df779"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-move-one-retain0-r1-optimized.json",
+      "kind": "report",
+      "sha256": "76764e97c9de12702faa5db749e5cbfb373333a7972e95a1ad02859da59180d7"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-move-one-retain0-r2-base.json",
+      "kind": "report",
+      "sha256": "3cf226cb2badab4267d3a2028b25a3669e8b420fe6b4b2d968d0e48e985ade4c"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-move-one-retain0-r2-optimized.json",
+      "kind": "report",
+      "sha256": "98fef51e014cdf00ebf28d316141f029bb11734b98b18d3e594fdb4b0b4b914a"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-move-one-retain0-r3-base.json",
+      "kind": "report",
+      "sha256": "3fe29397c88ed5e39fd38fa6695f3498074b9f8437baedd302c7323bd4beec99"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-move-one-retain0-r3-optimized.json",
+      "kind": "report",
+      "sha256": "39c4046b2062eb4de0708fb75bc3f1320de46e1741e9f6659fd8ef146f1f34df"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-net-zero-retain0-r1-base.json",
+      "kind": "report",
+      "sha256": "08f72a09f1633aa95e1dcf7d05973db519ad82e62b4fa9555dfa28dec27315df"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-net-zero-retain0-r1-optimized.json",
+      "kind": "report",
+      "sha256": "0c1749dae7c0042bfc13a1bfb33f521f71b2ebbb78e016445e07813c8fed80f2"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-net-zero-retain0-r2-base.json",
+      "kind": "report",
+      "sha256": "522cbc1b6b805ed17d37e46e227a36b071ce3357c0e8e320216a7a99dbbf1461"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-net-zero-retain0-r2-optimized.json",
+      "kind": "report",
+      "sha256": "c0a4bd10d7211e65ffa22030098d232e47c8c786bece502c3a2dc9cf62c8d51e"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-net-zero-retain0-r3-base.json",
+      "kind": "report",
+      "sha256": "1b48ccfb7e4e9ae5d7615b20e79f852a59f05b46a2c5e5a8c75c507a9d3c7413"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-net-zero-retain0-r3-optimized.json",
+      "kind": "report",
+      "sha256": "0e7d84d5c465920d6389640577fbfdb1d6ec40e3317c1f90c19219a53fdd1b36"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-rewire-one-retain0-r1-base.json",
+      "kind": "report",
+      "sha256": "4b5cd5517c1d25756fd155fde6bd9159cfea770a2753e3c483bb731bd667fb59"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-rewire-one-retain0-r1-optimized.json",
+      "kind": "report",
+      "sha256": "98f8f488a7de484e86910cc617eaff0b11d6f4e5399f8b4ba298065defc73aa8"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-rewire-one-retain0-r2-base.json",
+      "kind": "report",
+      "sha256": "eadb03df780eeb2b28aa94668de1342deebe1ea9d4a888c2624779d87f15a857"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-rewire-one-retain0-r2-optimized.json",
+      "kind": "report",
+      "sha256": "6a9067f88713d410869bec550721d790eeaddfaef2cfc4d3c436354b210d7567"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-rewire-one-retain0-r3-base.json",
+      "kind": "report",
+      "sha256": "0c7c336b99175d99fb43b08009267ae8bcef16ba156cce83faae2174a4ebe994"
+    },
+    {
+      "path": "performance/paired/results/sparse-50000-rewire-one-retain0-r3-optimized.json",
+      "kind": "report",
+      "sha256": "c24ba3d5b6dd370a64475111038219ee4cd674099943325c86a51d7fb0e089fa"
+    },
+    {
+      "path": "performance/profiles/alignment-validation.json",
+      "kind": "report",
+      "sha256": "5c8fc24675320d9b6ca942a7fd2cdcab64cce292a974f45895e864df1c3015b3"
+    },
+    {
+      "path": "performance/profiles/base/hub-50000-rewire-one-r1.cpuprofile.json",
+      "kind": "report",
+      "sha256": "cf5a878f06cd25a3e9b2909e456c16aa4fbf431d650e62dc9a3d8734e1e3e703"
+    },
+    {
+      "path": "performance/profiles/base/hub-50000-rewire-one-r1.json",
+      "kind": "report",
+      "sha256": "15730a33be61892594583a12217d0cbe1db876240bf72acb28fe0b8f7c93d85d"
+    },
+    {
+      "path": "performance/profiles/base/hub-50000-rewire-one-r2.cpuprofile.json",
+      "kind": "report",
+      "sha256": "c826e3e241f66e2696edc9d63e29afd243151c8ac11ba4e76c225ad648321a38"
+    },
+    {
+      "path": "performance/profiles/base/hub-50000-rewire-one-r2.json",
+      "kind": "report",
+      "sha256": "0a60fae98a1be0b74089dcad10e394ff84df5cf0c642694b6d9b19f4375e0608"
+    },
+    {
+      "path": "performance/profiles/base/receipts.json",
+      "kind": "report",
+      "sha256": "17957f7740de573a41910d728a1827aee8b2da424f919c59bfd3ba1d05b67869"
+    },
+    {
+      "path": "performance/profiles/base/sparse-50000-move-one-r1.cpuprofile.json",
+      "kind": "report",
+      "sha256": "2a2c58660c52eb972cacf19b64fb21545e7548ee3e34d6077c899c50fe35734d"
+    },
+    {
+      "path": "performance/profiles/base/sparse-50000-move-one-r1.json",
+      "kind": "report",
+      "sha256": "10fca03f24f0149c635dea802343721513f54c2b577ffd4d8c984de0900add9d"
+    },
+    {
+      "path": "performance/profiles/base/sparse-50000-move-one-r2.cpuprofile.json",
+      "kind": "report",
+      "sha256": "c4fb4c32fe336db4675c030b660dc3d1ca0b325b326108ebb29fb4cf5170e137"
+    },
+    {
+      "path": "performance/profiles/base/sparse-50000-move-one-r2.json",
+      "kind": "report",
+      "sha256": "65b6930f2cdbc3231e613565d4e4117e64b5c65fb890ebd0d0c73a737e6f96bd"
+    },
+    {
+      "path": "performance/profiles/base/sparse-50000-move-one-r3.cpuprofile.json",
+      "kind": "report",
+      "sha256": "8919a09c4c5ef2298fc28441cd3db39ca74e963f3ac876fd9994dd93185df32d"
+    },
+    {
+      "path": "performance/profiles/base/sparse-50000-move-one-r3.json",
+      "kind": "report",
+      "sha256": "c555a03ae0785d1c27e5f3e506d07072aca2d571fa345777b73a2bc8e0ea91c9"
+    },
+    {
+      "path": "performance/profiles/base/sparse-50000-net-zero-r1.cpuprofile.json",
+      "kind": "report",
+      "sha256": "61a9f59e683e9be0adada21a6f5e5db3b1aa2b3c10d624a4970a3ad8e6730c18"
+    },
+    {
+      "path": "performance/profiles/base/sparse-50000-net-zero-r1.json",
+      "kind": "report",
+      "sha256": "426307130c3b6b55bb0c5ddd5baff219a5f7d121cc75825bde00d6583d8d1c41"
+    },
+    {
+      "path": "performance/profiles/base/sparse-50000-net-zero-r2.cpuprofile.json",
+      "kind": "report",
+      "sha256": "c0e467261ac9450ae73bcba4ad4cc5a923808834e376ead8355b2fe314f21297"
+    },
+    {
+      "path": "performance/profiles/base/sparse-50000-net-zero-r2.json",
+      "kind": "report",
+      "sha256": "84039bc461f3cb75cda329ac7370b4937a7068a48ad42c4df279b20354166864"
+    },
+    {
+      "path": "performance/profiles/base/summary.v2-overlap.json",
+      "kind": "report",
+      "sha256": "763855a45c9730ccb5de3a7c4f0870331b43a7fe47c2341ff1647a410a5a5f3b"
+    },
+    {
+      "path": "performance/profiles/optimized/hub-50000-rewire-one-r1.cpuprofile.json",
+      "kind": "report",
+      "sha256": "3152b796609c33fe50de15ead02b768361e79d14dca7120ac36f9f5634440221"
+    },
+    {
+      "path": "performance/profiles/optimized/hub-50000-rewire-one-r1.json",
+      "kind": "report",
+      "sha256": "637f19ff3a1c70401bcda0cf716759e90b34d9a4fc783f424c94323ace84acb5"
+    },
+    {
+      "path": "performance/profiles/optimized/hub-50000-rewire-one-r2.cpuprofile.json",
+      "kind": "report",
+      "sha256": "c9e43901d7570df797565ed30d3f394cb9ee44ae726e5fae8c13b4b867c05332"
+    },
+    {
+      "path": "performance/profiles/optimized/hub-50000-rewire-one-r2.json",
+      "kind": "report",
+      "sha256": "8196c6e7153018c7a6261730996283fc604a5190737b2a4e86456c8070b243e3"
+    },
+    {
+      "path": "performance/profiles/optimized/receipts.json",
+      "kind": "report",
+      "sha256": "d32f4134dc70b44afac861a771b220f2973cd52e0601ac9bfa974849502d43b8"
+    },
+    {
+      "path": "performance/profiles/optimized/sparse-50000-move-one-r1.cpuprofile.json",
+      "kind": "report",
+      "sha256": "43d18116fa434b5c5793ab7fd9a3275424e87a63570f65161afca1c5a3b12295"
+    },
+    {
+      "path": "performance/profiles/optimized/sparse-50000-move-one-r1.json",
+      "kind": "report",
+      "sha256": "f1d1044401c476776e99cdbfd9c4555574a13e1fa49c28862d9f37b35ac520c4"
+    },
+    {
+      "path": "performance/profiles/optimized/sparse-50000-move-one-r2.cpuprofile.json",
+      "kind": "report",
+      "sha256": "4f3890a6a5d6bb851238b7d623aa04a1c3c94d3ea3100bdeabf3e9bc98cd04d5"
+    },
+    {
+      "path": "performance/profiles/optimized/sparse-50000-move-one-r2.json",
+      "kind": "report",
+      "sha256": "520e123aa1873529bd65cce5f6329755ce052b93d5cbc653f079c00bd7aab929"
+    },
+    {
+      "path": "performance/profiles/optimized/sparse-50000-move-one-r3.cpuprofile.json",
+      "kind": "report",
+      "sha256": "8103241e7a72cb22dc7293ac1cca5ff057d204bb1c8305daecbf26de42303843"
+    },
+    {
+      "path": "performance/profiles/optimized/sparse-50000-move-one-r3.json",
+      "kind": "report",
+      "sha256": "7ac595b7a4db4db03e3b8094f17b8fff3b780fad13ec1d5ce26b4e58096c2089"
+    },
+    {
+      "path": "performance/profiles/optimized/sparse-50000-net-zero-r1.cpuprofile.json",
+      "kind": "report",
+      "sha256": "2788ab85728de63516c1d2d03c37dc228fc9b64105ca082a716d691aecbf1faa"
+    },
+    {
+      "path": "performance/profiles/optimized/sparse-50000-net-zero-r1.json",
+      "kind": "report",
+      "sha256": "0a301665082bf8730f29e8b776737e27a46b21bdb221f153a9c968f42e9edde9"
+    },
+    {
+      "path": "performance/profiles/optimized/sparse-50000-net-zero-r2.cpuprofile.json",
+      "kind": "report",
+      "sha256": "0fbd0726a040c4fbcd009d9918f8beb4d57bf9365d0e64a19c224d09af0913da"
+    },
+    {
+      "path": "performance/profiles/optimized/sparse-50000-net-zero-r2.json",
+      "kind": "report",
+      "sha256": "8c93e14a1797b9f68bc2d74be9bdd29b272b7583e2b612e166352ff352ed3ce5"
+    },
+    {
+      "path": "performance/profiles/optimized/summary.v2-overlap.json",
+      "kind": "report",
+      "sha256": "3862c4a06f379b19668fc42346ba907a90140a20cf08b87901bf0b63227f0fc0"
+    },
+    {
+      "path": "performance/redaction-manifest.json",
+      "kind": "report",
+      "sha256": "5f93917e5c73ce7d11304bca39faba42c9a420ca9ea2e335f4aa951f89c5feda"
+    },
+    {
+      "path": "performance/reports/REPORT.md",
+      "kind": "report",
+      "sha256": "a4860ea8bbf237cea651e20c5300021fd1d96d65007cef02f40ba757ecf62c7b"
+    },
+    {
+      "path": "performance/reports/comparison.json",
+      "kind": "report",
+      "sha256": "23671f2a56690daf3018bca6d412ccaf1f9ca37a8ddcebacba2fe15bf66d187b"
+    },
+    {
+      "path": "performance/reports/netzero-diagnostic.json",
+      "kind": "report",
+      "sha256": "b0c4ef7ddcfe443b475e2662e88602fa6917eb2b5ce1d1131533b9d09094ab87"
+    },
+    {
+      "path": "performance/reports/netzero-diagnostic.md",
+      "kind": "report",
+      "sha256": "d2db11be97e9531a534b4950176818526450774e6f970180cc65513e87b3c2f3"
+    },
+    {
+      "path": "performance/reports/profile-range-correction.md",
+      "kind": "report",
+      "sha256": "9c9694f0df46299279d406811899e6b1d77c8fb258f37bc41fcbc9cb27566f8e"
+    },
+    {
+      "path": "performance/sources/analyze-netzero.py.txt",
+      "kind": "log",
+      "sha256": "2b74a82973a428aaaab4007e740e30501c36d44614480ebd7466f24a7faef7eb"
+    },
+    {
+      "path": "performance/sources/analyze-profiles-v2.initial.py.txt",
+      "kind": "log",
+      "sha256": "0c90a1500df99bfe478ff386a9dbdca2f68da80ac1705bd84696a0db9476fb35"
+    },
+    {
+      "path": "performance/sources/analyze-profiles-v2.py.txt",
+      "kind": "log",
+      "sha256": "fd060228fd6399c91996b265b92fbb97155db5a9bbf313a37241d9cf84cb6d16"
+    },
+    {
+      "path": "performance/sources/benchmark.mjs.txt",
+      "kind": "log",
+      "sha256": "e41e3d7fc9fe2ebd88dbd333d2e07b31dc18b6ea71a3639c6f78460db5e03d81"
+    },
+    {
+      "path": "performance/sources/report-comparison.py.txt",
+      "kind": "log",
+      "sha256": "e97093da6ef25f72e3b2553f7a6314b91dbbd1bdfcf0b19447c250897131c42f"
+    },
+    {
+      "path": "performance/sources/run-baseline.py.txt",
+      "kind": "log",
+      "sha256": "bc8e80f14c983260e12965ba919bcbc8302240257a925254e5d0135c325d2397"
+    },
+    {
+      "path": "performance/sources/run-comparison.py.txt",
+      "kind": "log",
+      "sha256": "4237991c0eba452c16958a8e34880c946b1ce8082dff26d8fa068a07ceb50751"
+    },
+    {
+      "path": "performance/sources/run-netzero-control.py.txt",
+      "kind": "log",
+      "sha256": "5f218567aafbc745809431acf5f4875f27193749d3993c1c5187128bff6258b8"
+    },
+    {
+      "path": "performance/sources/run-profiles.py.txt",
+      "kind": "log",
+      "sha256": "4d6fc506e892420c1653533e9752c3f417d6b0f13eea22844525a4899bc569fd"
+    },
+    {
+      "path": "publication-notes.md",
+      "kind": "report",
+      "sha256": "c5f119d0eef0c0ac43543f664236507db60b7e7acc307fdd2c8fd946b6b505fb"
+    },
+    {
+      "path": "publication-redactions.json",
+      "kind": "report",
+      "sha256": "a1f1ee0d1e4a954441cbd395fb550c11d6f9b9188b274612bad54657020b1743"
+    },
+    {
+      "path": "publication-source.json",
+      "kind": "report",
+      "sha256": "b9decab306e6c228b6dce1d5fdb3e85d442058bffc39b7b40986bf9c4452d5a5"
+    }
+  ]
+}

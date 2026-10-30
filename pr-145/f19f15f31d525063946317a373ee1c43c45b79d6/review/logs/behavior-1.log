@@ -1,0 +1,38 @@
+bun test v1.4.2 (744846f84)
+
+packages/kernel/tests/transaction-index.test.ts:
+30 |       },
+31 |     });
+32 |     const accepted = transaction.query.getNode(childId)!;
+33 |     expect(accepted.data).toBe('outer');
+34 |     expect(transaction.query.getChildren(firstParent)).toEqual([accepted]);
+35 |     expect(transaction.query.getChildren(secondParent)).toEqual([]);
+                                                             ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   {
++     "data": "inner",
++     "id": "child",
++     "parentId": "b",
++     "position": {
++       "x": 0,
++       "y": 0,
++     },
++     "type": "child",
++   },
++ ]
+
+- Expected  - 1
++ Received  + 12
+
+      at <anonymous> (<WORKSPACE>/packages/kernel/tests/transaction-index.test.ts:35:57)
+      at transact (<WORKSPACE>/packages/kernel/src/canvas-kernel.ts:88:28)
+      at <anonymous> (<WORKSPACE>/packages/kernel/tests/transaction-index.test.ts:23:25)
+(fail) keeps Draft and committed parent indexes aligned after a getter replaces the same Node [28.70ms]
+
+ 0 pass
+ 1 fail
+ 3 expect() calls
+Ran 1 test across 1 file. [94.00ms]

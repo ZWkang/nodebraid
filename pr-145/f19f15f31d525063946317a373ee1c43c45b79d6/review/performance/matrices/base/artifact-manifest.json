@@ -1,0 +1,614 @@
+[
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/canvas-kernel.d.ts",
+    "source": "packages/kernel/dist/canvas-kernel.d.ts",
+    "bytes": 248,
+    "sha256": "6064977ef1f44c0f4cc25b6337cc2bf3d7acd60bd0ff61f1f29b68c87001b145"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/canvas-kernel.d.ts.map",
+    "source": "packages/kernel/dist/canvas-kernel.d.ts.map",
+    "bytes": 214,
+    "sha256": "891b71a414742786d064787632a93b4584c2aa54cd01f2c46eb6bdcdea1c7e06"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/canvas-kernel.js",
+    "source": "packages/kernel/dist/canvas-kernel.js",
+    "bytes": 6290,
+    "sha256": "fd13c936945367545dc24052d38fc37274f152dc30f0542cbb0233b683515dcd"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/canvas-kernel.js.map",
+    "source": "packages/kernel/dist/canvas-kernel.js.map",
+    "bytes": 4799,
+    "sha256": "3dcc712d315a9f07ba8f47384f607cd19fd110f1acfea617941eaca99913312a"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/canvas-view.d.ts",
+    "source": "packages/kernel/dist/canvas-view.d.ts",
+    "bytes": 317,
+    "sha256": "5ee9825f84cb9e656d0364159ce59ffa6c0f9a0c545682dcc60f87b65f1ebf19"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/canvas-view.d.ts.map",
+    "source": "packages/kernel/dist/canvas-view.d.ts.map",
+    "bytes": 386,
+    "sha256": "a33add9c7eef5f7e3057a41599307a2cf31c135a9568d985245912aba5a5411d"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/canvas-view.js",
+    "source": "packages/kernel/dist/canvas-view.js",
+    "bytes": 791,
+    "sha256": "960e167cefefee3f4c9e1801fded3193197c9a7616da9d9ba52ac35934bbfb7f"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/canvas-view.js.map",
+    "source": "packages/kernel/dist/canvas-view.js.map",
+    "bytes": 954,
+    "sha256": "a097b136b3376731f3582b2025eb6d8965aba5b318498b310576e7452f9c8c00"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/change-set.d.ts",
+    "source": "packages/kernel/dist/change-set.d.ts",
+    "bytes": 479,
+    "sha256": "956c9f7eaa85b322425f5f995941be538533d8d14525f767b1276b40e65b7c0c"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/change-set.d.ts.map",
+    "source": "packages/kernel/dist/change-set.d.ts.map",
+    "bytes": 517,
+    "sha256": "79183ce1a358878f3b9f8325c543bb81b06b6f117a160193039cc9d560b05230"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/change-set.js",
+    "source": "packages/kernel/dist/change-set.js",
+    "bytes": 6663,
+    "sha256": "419047f2f3a7e2dc832ac602e6531adb1d6a793aaaf57bd658309b3f492d0487"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/change-set.js.map",
+    "source": "packages/kernel/dist/change-set.js.map",
+    "bytes": 5963,
+    "sha256": "53844109474059ecc67cabae7f719f99c1ab1ad09be9255ccb59ea6d255d0e1c"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/contracts.d.ts",
+    "source": "packages/kernel/dist/contracts.d.ts",
+    "bytes": 4667,
+    "sha256": "5ec84922c1420111b3c08be9a2827b6d4fa8ef3aee8da536d49f1d1ee5a67369"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/contracts.d.ts.map",
+    "source": "packages/kernel/dist/contracts.d.ts.map",
+    "bytes": 4125,
+    "sha256": "c6396b88c0e2c8a69f0ca55dd8b0903ec2b54e596ec240eb1c9257fe07294694"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/contracts.js",
+    "source": "packages/kernel/dist/contracts.js",
+    "bytes": 48,
+    "sha256": "427a6852d1b4fbc59c12b396120836e73895fb11bee3ec3841f58f9c9f32499d"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/contracts.js.map",
+    "source": "packages/kernel/dist/contracts.js.map",
+    "bytes": 110,
+    "sha256": "4fcc757fb487479db32d5b2e7264542757309c43b177791ecfe6dd761150de26"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/entity-collection.d.ts",
+    "source": "packages/kernel/dist/entity-collection.d.ts",
+    "bytes": 1111,
+    "sha256": "17cc7425cf267bc6a3adf80d58065bc7ae624d7068961cffb600e8b24e620cf7"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/entity-collection.d.ts.map",
+    "source": "packages/kernel/dist/entity-collection.d.ts.map",
+    "bytes": 1354,
+    "sha256": "0d8cd8f08eaab79a35ba0f2dbd3eec1935b6412683678ef8d99ed6d345c81f33"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/entity-collection.js",
+    "source": "packages/kernel/dist/entity-collection.js",
+    "bytes": 2354,
+    "sha256": "2572d6977b5e79ed9dcdb7b19ee464b646b7b6be51ea278a433a43db1562a058"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/entity-collection.js.map",
+    "source": "packages/kernel/dist/entity-collection.js.map",
+    "bytes": 2866,
+    "sha256": "98ba43d64399143192b657984ed9cbf0927f69cf09fe44de16731967ed1ce375"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/entity-values.d.ts",
+    "source": "packages/kernel/dist/entity-values.d.ts",
+    "bytes": 792,
+    "sha256": "374bfa618c0385271b5ae5c35b00b312abdc5ad29f5162716205d1194247c7a0"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/entity-values.d.ts.map",
+    "source": "packages/kernel/dist/entity-values.d.ts.map",
+    "bytes": 799,
+    "sha256": "990c27aea5434e81ecc50ab265310f4e2e76d91eb0d69c4165e732d5832db95d"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/entity-values.js",
+    "source": "packages/kernel/dist/entity-values.js",
+    "bytes": 5396,
+    "sha256": "c1ab71e1bc2331c60ef3b066402b13a8c6a6ce7fb45bb11af7eb93da82436414"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/entity-values.js.map",
+    "source": "packages/kernel/dist/entity-values.js.map",
+    "bytes": 5926,
+    "sha256": "546716f98e7d481ae614e49fd693b197bf28a18ec64b70b0d15ec42719ef9893"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/graph-index.d.ts",
+    "source": "packages/kernel/dist/graph-index.d.ts",
+    "bytes": 1087,
+    "sha256": "3c04a0da1477c330c093bad3b26fa49eb1ccdfab431c67a4b2ef337b9dd0cab8"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/graph-index.d.ts.map",
+    "source": "packages/kernel/dist/graph-index.d.ts.map",
+    "bytes": 1089,
+    "sha256": "6aadc1132a9af6283290b5e7d18d47d6e6246f488cb0e21c4af3735b85bbe06b"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/graph-index.js",
+    "source": "packages/kernel/dist/graph-index.js",
+    "bytes": 5299,
+    "sha256": "2998fb7225d22a4d23a66e5a425aa867f846f770485e001aa0c3cb32097e95ef"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/graph-index.js.map",
+    "source": "packages/kernel/dist/graph-index.js.map",
+    "bytes": 6139,
+    "sha256": "8bc9adc15907560047c2388d8c213f858970fff68e4f1aa2917b7650b7511c9d"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/graph-validation.d.ts",
+    "source": "packages/kernel/dist/graph-validation.d.ts",
+    "bytes": 480,
+    "sha256": "b5cf0d07b020bf8b9bb9aad950350eadbf4636bae6bfe0a55ade6c8269ea10d3"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/graph-validation.d.ts.map",
+    "source": "packages/kernel/dist/graph-validation.d.ts.map",
+    "bytes": 508,
+    "sha256": "005a1c2fc46b8560192cfa4e6264030bb992765ad550bb20024032a842698f5a"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/graph-validation.js",
+    "source": "packages/kernel/dist/graph-validation.js",
+    "bytes": 5218,
+    "sha256": "3c7f4d52f331d1ace58c526993901fa1f49b4d87f6e87102403e5970d164fa8f"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/graph-validation.js.map",
+    "source": "packages/kernel/dist/graph-validation.js.map",
+    "bytes": 5486,
+    "sha256": "bea7dbea3a66fd943efdc1d275c5a1ce15be1d77c1ce018cd16fe0d080cb957d"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/identifiers.d.ts",
+    "source": "packages/kernel/dist/identifiers.d.ts",
+    "bytes": 480,
+    "sha256": "9a087c164d71906ec9c7aae985e8ba2d713007f847f2fa4114d2fa142ccd5495"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/identifiers.d.ts.map",
+    "source": "packages/kernel/dist/identifiers.d.ts.map",
+    "bytes": 510,
+    "sha256": "82b64aa945c751578df5e7a545546186c7d811ba6b86826dc87912e6d78fd783"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/identifiers.js",
+    "source": "packages/kernel/dist/identifiers.js",
+    "bytes": 945,
+    "sha256": "78b24bcbfd1b45dfd25b57bd866810308ec5ca712c2337ab08ff6bc811cd3692"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/identifiers.js.map",
+    "source": "packages/kernel/dist/identifiers.js.map",
+    "bytes": 1104,
+    "sha256": "e90921d8cf70d0436650118204b706e6f9a4c8a14250b058ab6ef9849ad98cdb"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/index.d.ts",
+    "source": "packages/kernel/dist/index.d.ts",
+    "bytes": 265,
+    "sha256": "9fa395b91ae26921cfd4da65f7ea28586560eeb146b7d320c775deba1f869bfa"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/index.d.ts.map",
+    "source": "packages/kernel/dist/index.d.ts.map",
+    "bytes": 309,
+    "sha256": "19d5a8ff46e1523166de9b605b5333620ce4fac833e1945fc19cb605b31ac773"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/index.js",
+    "source": "packages/kernel/dist/index.js",
+    "bytes": 181,
+    "sha256": "c9ff8d863bd1c07313f11443fbf1c8773ff320d6edb4d5b0d18e35cd1b429f92"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/index.js.map",
+    "source": "packages/kernel/dist/index.js.map",
+    "bytes": 241,
+    "sha256": "fadc2a800c48f048e7d7026012b48ad7594caf2014ef2668c8fb956852ff3ddd"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/kernel-error.d.ts",
+    "source": "packages/kernel/dist/kernel-error.d.ts",
+    "bytes": 766,
+    "sha256": "2c777b63e715e2f945c6cf5791a3fd84fb8429c381725b17427db6e11bc82836"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/kernel-error.d.ts.map",
+    "source": "packages/kernel/dist/kernel-error.d.ts.map",
+    "bytes": 579,
+    "sha256": "0030faa5e60511af3022806a4d66d3f3d5bc583d335b923ef0f18e027a4f0464"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/kernel-error.js",
+    "source": "packages/kernel/dist/kernel-error.js",
+    "bytes": 416,
+    "sha256": "415c580efa7ec3a0acae9ae22565c7a285cca2443d7eb03a20a4b161b9016279"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/kernel-error.js.map",
+    "source": "packages/kernel/dist/kernel-error.js.map",
+    "bytes": 407,
+    "sha256": "bd05bf51264cf92df833c09dd423bb643f84a61fea3a162c1a70b6d5807e22fb"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/ordering.d.ts",
+    "source": "packages/kernel/dist/ordering.d.ts",
+    "bytes": 111,
+    "sha256": "6dac8d8db80f15c319c4b614e033db04517acd366526a2e21d2a495de100ed72"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/ordering.d.ts.map",
+    "source": "packages/kernel/dist/ordering.d.ts.map",
+    "bytes": 182,
+    "sha256": "08cb9481ae98b8848af3f30c0670a759b8fa5d3b06122dbd6261b76f6f3dd77b"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/ordering.js",
+    "source": "packages/kernel/dist/ordering.js",
+    "bytes": 133,
+    "sha256": "2d70d4ef9d83b1dffd7bbcd847c2de7f776338aba7527132b70291d0e2c9f6a5"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/ordering.js.map",
+    "source": "packages/kernel/dist/ordering.js.map",
+    "bytes": 284,
+    "sha256": "14bcab40f6f0b579a04ff79f920ca398c554898b001740949b243e0fba47b88e"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/revision.d.ts",
+    "source": "packages/kernel/dist/revision.d.ts",
+    "bytes": 209,
+    "sha256": "69137b58efbf6cea61ef77c665e306df846d6a73785c6bd864aad84b9aaaaa5c"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/revision.d.ts.map",
+    "source": "packages/kernel/dist/revision.d.ts.map",
+    "bytes": 187,
+    "sha256": "feff1922d600a417db7f5ceaf0ab1ce39a301d8eecb870063f6c385d93422127"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/revision.js",
+    "source": "packages/kernel/dist/revision.js",
+    "bytes": 250,
+    "sha256": "664b36b72e9a4be8fbad7f52fab8cf4dad2a98f60d3819dd09257fed356c389d"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/dist/revision.js.map",
+    "source": "packages/kernel/dist/revision.js.map",
+    "bytes": 257,
+    "sha256": "dc81e132bba4e06a53c393d6ecee6a6bb5c5df24fb9a397b7aa4f047b14f0c2d"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/package.json",
+    "source": "packages/kernel/package.json",
+    "bytes": 1654,
+    "sha256": "8ccb07461e28feaa19b12d3877fca4511f317206f0e6dbb164ec15e65223b0d1"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/src/canvas-kernel.ts",
+    "source": "packages/kernel/src/canvas-kernel.ts",
+    "bytes": 6251,
+    "sha256": "d2405303bb2a932ea9fd732cf53477f3c5055e116f9e9b25a088ea6b3d07be61"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/src/canvas-view.ts",
+    "source": "packages/kernel/src/canvas-view.ts",
+    "bytes": 978,
+    "sha256": "7d939f8ebf0333bec40d07cb959fd2d537a3dcaef962ea0dc98bad22882d4903"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/src/change-set.ts",
+    "source": "packages/kernel/src/change-set.ts",
+    "bytes": 6787,
+    "sha256": "f4bbf0a7e5f123ea3bd45999100fa215d9f2f73ea42256925149fee022506b4c"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/src/contracts.ts",
+    "source": "packages/kernel/src/contracts.ts",
+    "bytes": 4533,
+    "sha256": "6ed4ddb479c46be49f5c3b5d320dea39d5a9adba1752616ba311c302bff471ac"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/src/entity-collection.ts",
+    "source": "packages/kernel/src/entity-collection.ts",
+    "bytes": 3224,
+    "sha256": "9755b56b7d6f7a781b5de6a71344fc134fd22e169604cf827caa42afd1a6bda0"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/src/entity-values.ts",
+    "source": "packages/kernel/src/entity-values.ts",
+    "bytes": 5369,
+    "sha256": "834a324eaa8be6cf967de8b403761b9163fcb54cf385bddabfb42ec804c89670"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/src/graph-index.ts",
+    "source": "packages/kernel/src/graph-index.ts",
+    "bytes": 5754,
+    "sha256": "3c81914b76bb113c7fae979f88666cf6f851a450602d9d075a9c9db7d679a931"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/src/graph-validation.ts",
+    "source": "packages/kernel/src/graph-validation.ts",
+    "bytes": 5061,
+    "sha256": "2cd7350a2f7d45c875baa8b8098f87c554719d32513abe30b7dfcc21c0ac4e4e"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/src/identifiers.ts",
+    "source": "packages/kernel/src/identifiers.ts",
+    "bytes": 1334,
+    "sha256": "6683eafbf8c08fffcc9403ee3a6677e03958af84d36085cd9a1c54ea862d4c21"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/src/index.ts",
+    "source": "packages/kernel/src/index.ts",
+    "bytes": 230,
+    "sha256": "f2d61b3f405aeff63c776918ec0f88addb90ba6a1c1884d733b94e590c99e246"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/src/kernel-error.ts",
+    "source": "packages/kernel/src/kernel-error.ts",
+    "bytes": 837,
+    "sha256": "a0f5363faaaea753ca00ba608d07e7dcac7035b783745bc6a5a606186068144f"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/src/ordering.ts",
+    "source": "packages/kernel/src/ordering.ts",
+    "bytes": 119,
+    "sha256": "b229838dd1f2d7abf7f958e89c1338cd9dba0d47be553763dafffecd965503b5"
+  },
+  {
+    "file": "node_modules/@nodebraid/kernel/src/revision.ts",
+    "source": "packages/kernel/src/revision.ts",
+    "bytes": 235,
+    "sha256": "ec15b2e5a6c6b18668e55947a932dffae7cf6da29a9886f1efe6fe7f255562a7"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostic-event.d.ts",
+    "source": "packages/diagnostics/dist/diagnostic-event.d.ts",
+    "bytes": 1564,
+    "sha256": "ffae77c4015b79fdf9f6623c63362730e4b6d683db26c18775bcc039ec163cd8"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostic-event.d.ts.map",
+    "source": "packages/diagnostics/dist/diagnostic-event.d.ts.map",
+    "bytes": 1590,
+    "sha256": "b0ec308fee1c88dfcea2515968cf1c78991edf378b28e65cf12c153d208c8ccd"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostic-event.js",
+    "source": "packages/diagnostics/dist/diagnostic-event.js",
+    "bytes": 321,
+    "sha256": "727206dd3b1a3baff643a137ee883ab45b99719449d72c826036f4e5936b2e12"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostic-event.js.map",
+    "source": "packages/diagnostics/dist/diagnostic-event.js.map",
+    "bytes": 440,
+    "sha256": "08277e3ed83d271ab64cf10ea8c3e795aa21ea2eeb16d3c0b367a018eb8b151e"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostic-events.d.ts",
+    "source": "packages/diagnostics/dist/diagnostic-events.d.ts",
+    "bytes": 224,
+    "sha256": "66f8dee196cf81f4fd748037b52113df7a3fa66b030c2c625d261bf9ff6fdff9"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostic-events.d.ts.map",
+    "source": "packages/diagnostics/dist/diagnostic-events.d.ts.map",
+    "bytes": 162,
+    "sha256": "acf945102e57e148a3673946a1e181f1bf416d3f4196836609592840689a41df"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostic-events.js",
+    "source": "packages/diagnostics/dist/diagnostic-events.js",
+    "bytes": 220,
+    "sha256": "aba2e730f3455fd9439b52de31507b77ae0aaf407f6833d1eeee258278258102"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostic-events.js.map",
+    "source": "packages/diagnostics/dist/diagnostic-events.js.map",
+    "bytes": 241,
+    "sha256": "f457846e6dc7d53489f07ed072405c14cdd879832dcb9580b71809985b7999d3"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostic-value.d.ts",
+    "source": "packages/diagnostics/dist/diagnostic-value.d.ts",
+    "bytes": 935,
+    "sha256": "20e4df164a334410dbd45561876c5a7ed2c70827d3ed5ea6986d19ceb2e03028"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostic-value.d.ts.map",
+    "source": "packages/diagnostics/dist/diagnostic-value.d.ts.map",
+    "bytes": 774,
+    "sha256": "d9c5ce0080e8459285d69863922cc821a7436efa5ba33e434af193f1e99fd996"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostic-value.js",
+    "source": "packages/diagnostics/dist/diagnostic-value.js",
+    "bytes": 4653,
+    "sha256": "46be83634ce76f71d9aa2dca631b9480192e84e60ffdce298bb0af42e89f1730"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostic-value.js.map",
+    "source": "packages/diagnostics/dist/diagnostic-value.js.map",
+    "bytes": 3986,
+    "sha256": "470d673e5dbfb596cb69a3e713dd4162d1e87a7d87dcf034c6f448d6d9902532"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostics-error.d.ts",
+    "source": "packages/diagnostics/dist/diagnostics-error.d.ts",
+    "bytes": 620,
+    "sha256": "1255640c44aedc8c1323427bd3967c6d4f0ae7b1e3c8a18585c9eb4738306a67"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostics-error.d.ts.map",
+    "source": "packages/diagnostics/dist/diagnostics-error.d.ts.map",
+    "bytes": 540,
+    "sha256": "f392518a92eb2f62398268a17d49a5640ee8e3dab7f4ec8b785ae24354a2e936"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostics-error.js",
+    "source": "packages/diagnostics/dist/diagnostics-error.js",
+    "bytes": 328,
+    "sha256": "9abb5e8e1f16d4021e1169c705300725554f1b30ddefe11c786de3d0b8a8069a"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/diagnostics-error.js.map",
+    "source": "packages/diagnostics/dist/diagnostics-error.js.map",
+    "bytes": 408,
+    "sha256": "2a56b4af556d52bee91bca36bfd91a9deb24d927ab688587e24c5d6da2a47ecb"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/error-description.d.ts",
+    "source": "packages/diagnostics/dist/error-description.d.ts",
+    "bytes": 1288,
+    "sha256": "ca81b40c9469cf30495e82e0eb43a3fa14d3d5e065f0edc20d2b1296e1829b1b"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/error-description.d.ts.map",
+    "source": "packages/diagnostics/dist/error-description.d.ts.map",
+    "bytes": 1141,
+    "sha256": "c3ca18aebe4faccd8b4a3690711334367e786d8f2c53783c4468aad587a8ea32"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/error-description.js",
+    "source": "packages/diagnostics/dist/error-description.js",
+    "bytes": 3054,
+    "sha256": "07f542c517c5158b8a8b074917c02915aa1b57b4a2ae6d9bc3da9d4c8c3b1247"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/error-description.js.map",
+    "source": "packages/diagnostics/dist/error-description.js.map",
+    "bytes": 3417,
+    "sha256": "d39d9b1646bf1bb70554bb92872150e10f0797dbe9fed9c1e804ecf9d1f586e9"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/index.d.ts",
+    "source": "packages/diagnostics/dist/index.d.ts",
+    "bytes": 967,
+    "sha256": "ba01066a935e96938ce939a29f7f8463bf6e41310c9abcd92cff70eea15e318c"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/index.d.ts.map",
+    "source": "packages/diagnostics/dist/index.d.ts.map",
+    "bytes": 740,
+    "sha256": "6892dcc5d5bc03ede26b1f065f3a98620df884ef01c9cdf169e24d39322ea4c2"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/index.js",
+    "source": "packages/diagnostics/dist/index.js",
+    "bytes": 430,
+    "sha256": "438fb75caf4a4ff7e7e73dd3b13a9c188a47448b0892e8b3f7fa3158f6886ac9"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/index.js.map",
+    "source": "packages/diagnostics/dist/index.js.map",
+    "bytes": 396,
+    "sha256": "5c9a17cd676b3d54b6279a3ad95fe88f20c7f8ba5a20b564489fcd967ef30168"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/nodebraid-error.d.ts",
+    "source": "packages/diagnostics/dist/nodebraid-error.d.ts",
+    "bytes": 639,
+    "sha256": "7ac807932077b979fd97397b5729850f3a81a15a1cd5f091307c96364ce61d2a"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/nodebraid-error.d.ts.map",
+    "source": "packages/diagnostics/dist/nodebraid-error.d.ts.map",
+    "bytes": 669,
+    "sha256": "2ac59bbe564026c76d9808dd8e9c58de475524e09ad11a3a3db6f3a8b8d10d34"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/nodebraid-error.js",
+    "source": "packages/diagnostics/dist/nodebraid-error.js",
+    "bytes": 594,
+    "sha256": "47c5504542e64842dd1497fa70e848d14985f1b49f2a7121d6ee83a84305105b"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/dist/nodebraid-error.js.map",
+    "source": "packages/diagnostics/dist/nodebraid-error.js.map",
+    "bytes": 693,
+    "sha256": "9a304c4c87cca401060c62047cc2928e230f985577cc977d2fbb66d1ed67fa40"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/package.json",
+    "source": "packages/diagnostics/package.json",
+    "bytes": 1476,
+    "sha256": "386e7f603f3965a0eb04e5a654f7f4eb81db15129b047cde8fd2cf8fcbb34ccc"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/src/diagnostic-event.ts",
+    "source": "packages/diagnostics/src/diagnostic-event.ts",
+    "bytes": 1652,
+    "sha256": "23a4dc3adcd4ea596a139f53427b840431a20b512953f243f8560f8cc63aecb5"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/src/diagnostic-events.ts",
+    "source": "packages/diagnostics/src/diagnostic-events.ts",
+    "bytes": 171,
+    "sha256": "4dbbf392380da57f1ea605d75fec64c4c4c911441af82855e96178b58a352f05"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/src/diagnostic-value.ts",
+    "source": "packages/diagnostics/src/diagnostic-value.ts",
+    "bytes": 4964,
+    "sha256": "bdea69ed3cfd4cb962d9d70c8f048be54e2c3e1f04717eb154e0a6dd699514e8"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/src/diagnostics-error.ts",
+    "source": "packages/diagnostics/src/diagnostics-error.ts",
+    "bytes": 680,
+    "sha256": "4c1e4cb8fe9e67ceb5c42585832a2d9da241b0017f17b9cc0908fe1501922059"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/src/error-description.ts",
+    "source": "packages/diagnostics/src/error-description.ts",
+    "bytes": 4035,
+    "sha256": "9f8480a00bf277390fbf7dace3250983e18490594657fc8f16fb84968c1684b5"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/src/index.ts",
+    "source": "packages/diagnostics/src/index.ts",
+    "bytes": 978,
+    "sha256": "c3efc2c4f80d63f7394365bb59f150d26e8114e40ee1d21bea379e670415e659"
+  },
+  {
+    "file": "node_modules/@nodebraid/diagnostics/src/nodebraid-error.ts",
+    "source": "packages/diagnostics/src/nodebraid-error.ts",
+    "bytes": 889,
+    "sha256": "be66079ea9a62f6aa25ccc9233de91d2eb7b408af88d15a53684361d599f7e61"
+  }
+]

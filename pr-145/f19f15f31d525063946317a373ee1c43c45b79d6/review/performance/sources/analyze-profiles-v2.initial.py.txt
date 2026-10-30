@@ -1,0 +1,116 @@
+"""Apply the preserved v2 sample-only CPU classification; never run a benchmark."""
+
+import argparse
+import bisect
+import collections
+import json
+from pathlib import Path
+
+def analyze(profile_path,result_path):
+    profile=json.loads(profile_path.read_text())
+    result=json.loads(result_path.read_text())
+    assert set(('nodes','samples','timeDeltas','startTime','endTime')) <= profile.keys()
+    assert len(profile['samples']) == len(profile['timeDeltas'])
+    nodes={node['id']:node for node in profile['nodes']}
+    parents={}
+    for node in nodes.values():
+        for child in node.get('children',[]): parents[child]=node['id']
+    def stack(node_id):
+        chain=[]
+        while node_id in nodes:
+            chain.append(nodes[node_id]['callFrame'])
+            if node_id not in parents: break
+            node_id=parents[node_id]
+        return chain
+    stacks={node_id:stack(node_id) for node_id in nodes}
+    windows=[((result['timeOriginMs']+w['startMs'])*1000,(result['timeOriginMs']+w['endMs'])*1000) for w in result['transactionWindows']]
+    starts=[w[0] for w in windows]
+    counts=collections.Counter()
+    functions=collections.Counter()
+    stack_counts=collections.Counter()
+    cursor=profile['startTime']
+    matched_stack=0
+    total_profile_samples=len(profile['samples'])
+    for node_id,delta in zip(profile['samples'],profile['timeDeltas']):
+        cursor+=delta
+        index=bisect.bisect_right(starts,cursor)-1
+        if index<0 or cursor>windows[index][1]: continue
+        frames=stacks[node_id]
+        names=[f['functionName'] for f in frames]
+        in_transaction='transact' in names
+        in_measured='runMeasuredWorkload' in names
+        if in_transaction and in_measured: matched_stack+=1
+        if any(name in ('(garbage collector)','GC','Garbage Collector') for name in names):
+            category='gc'
+        elif not in_transaction:
+            category='unattributed-or-boundary-sample'
+        elif 'GraphIndex' in names:
+            category='committed-index' if 'createCanvasView' in names else 'draft-index'
+        elif 'validateGraph' in names:
+            category='graph-validation'
+        elif 'createCanvasView' in names:
+            category='snapshot-and-view-excluding-index'
+        elif names[0]=='Map' and len(names)>1 and names[1]=='transact':
+            category='map-copy'
+        elif 'collectEntityChanges' in names:
+            category='change-set'
+        elif any(f['url'].endswith('/entity-values.js') or f['url'].endswith('/entity-collection.js') for f in frames):
+            category='entity-write'
+        else:
+            category='other-transaction'
+        counts[category]+=1
+        frame=frames[0]
+        functions[(frame['functionName'],frame['url'],frame['lineNumber']+1)]+=1
+        stack_counts[' <- '.join(names[:8])]+=1
+    total=sum(counts.values())
+    assert total>0 and matched_stack>0
+    return {
+        'profile':profile_path.name, 'result':result_path.name,
+        'selectedTransactionSamples':total,'totalProcessSamples':total_profile_samples,
+        'selectedSamplesAlsoUnderMeasuredTransactStack':matched_stack,
+        'categorySamples':dict(counts),
+        'categorySamplePercent':{key:100*value/total for key,value in counts.items()},
+        'topSelfFrames':[{'function':key[0],'url':key[1],'line':key[2],'samples':value} for key,value in functions.most_common(20)],
+        'topStacks':[{'stack':key,'samples':value} for key,value in stack_counts.most_common(15)],
+        'method':'Filter cumulative Chrome sample timestamps to recorded measured transact windows. Mutually exclusive categories from complete ancestry; percent is sampling attribution, not exact stage timing.',
+    }
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--profiles', type=Path, required=True)
+    parser.add_argument('--out', type=Path, required=True, help='New JSON summary file.')
+    args = parser.parse_args()
+    profiles = sorted(args.profiles.glob('*.cpuprofile'))
+    if not profiles:
+        raise ValueError(f'No CPU profiles in {args.profiles}')
+    if args.out.exists():
+        raise FileExistsError(args.out)
+    values = []
+    for path in profiles:
+        result_path = path.with_suffix('.json')
+        value = analyze(path, result_path)
+        profile = json.loads(path.read_text())
+        result = json.loads(result_path.read_text())
+        windows = [((result['timeOriginMs'] + w['startMs']) * 1000,
+                    (result['timeOriginMs'] + w['endMs']) * 1000)
+                   for w in result['transactionWindows']]
+        assert len(windows) == result['sampleCount']
+        assert all(start <= end for start, end in windows)
+        assert all(windows[i][1] <= windows[i + 1][0] for i in range(len(windows) - 1))
+        assert profile['startTime'] <= windows[0][0] <= windows[-1][1] <= profile['endTime']
+        assert all(delta >= 0 for delta in profile['timeDeltas'])
+        value['alignment'] = dict(
+            transactionCount=len(windows),
+            transactionDurationMs=sum(end-start for start,end in windows)/1000,
+            firstTransactionOffsetFromProfileStartMs=(windows[0][0]-profile['startTime'])/1000,
+            lastTransactionOffsetBeforeProfileEndMs=(profile['endTime']-windows[-1][1])/1000,
+            measuredTransactStackFraction=value['selectedSamplesAlsoUnderMeasuredTransactStack']/value['selectedTransactionSamples'],
+            sampledTimelineEndMinusProfileEndUs=profile['startTime']+sum(profile['timeDeltas'])-profile['endTime'])
+        values.append(value)
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    args.out.write_text(json.dumps(values, indent=2) + '\n')
+    print(f'Analyzed {len(values)} profiles; sample attribution only: {args.out}')
+
+
+if __name__ == '__main__':
+    main()

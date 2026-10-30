@@ -1,0 +1,562 @@
+[
+  {
+    "topology": "sparse",
+    "size": 1000,
+    "operation": "move-one",
+    "retained": 0,
+    "caseId": "sparse-1000-move-one-retain0",
+    "pooledMedianMs": 0.7544170000000001,
+    "pooledP95Ms": 1.5437909999999988,
+    "pooledMaxMs": 2.4552500000000066,
+    "runMedianMinMs": 0.6946455,
+    "runMedianMaxMs": 0.7772709999999989,
+    "runMediansMs": [
+      0.7592710000000018,
+      0.6946455,
+      0.7772709999999989
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      50249728,
+      50085888,
+      50298880
+    ],
+    "rssAfter": [
+      58933248,
+      58474496,
+      59064320
+    ]
+  },
+  {
+    "topology": "sparse",
+    "size": 1000,
+    "operation": "move-1pct",
+    "retained": 0,
+    "caseId": "sparse-1000-move-1pct-retain0",
+    "pooledMedianMs": 0.8045624999999994,
+    "pooledP95Ms": 3.627749999999992,
+    "pooledMaxMs": 4.369374999999991,
+    "runMedianMinMs": 0.7110210000000023,
+    "runMedianMaxMs": 1.0567710000000012,
+    "runMediansMs": [
+      0.7405420000000014,
+      0.7110210000000023,
+      1.0567710000000012
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      50429952,
+      49856512,
+      49643520
+    ],
+    "rssAfter": [
+      57966592,
+      58212352,
+      56950784
+    ]
+  },
+  {
+    "topology": "sparse",
+    "size": 1000,
+    "operation": "rewire-one",
+    "retained": 0,
+    "caseId": "sparse-1000-rewire-one-retain0",
+    "pooledMedianMs": 0.7245000000000026,
+    "pooledP95Ms": 1.2660419999999988,
+    "pooledMaxMs": 2.738666000000002,
+    "runMedianMinMs": 0.7139169999999986,
+    "runMedianMaxMs": 0.7422914999999968,
+    "runMediansMs": [
+      0.7422914999999968,
+      0.7139169999999986,
+      0.7231459999999963
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      50036736,
+      49856512,
+      50167808
+    ],
+    "rssAfter": [
+      58589184,
+      58441728,
+      58540032
+    ]
+  },
+  {
+    "topology": "sparse",
+    "size": 1000,
+    "operation": "net-zero",
+    "retained": 0,
+    "caseId": "sparse-1000-net-zero-retain0",
+    "pooledMedianMs": 0.3336869999999994,
+    "pooledP95Ms": 1.4653749999999945,
+    "pooledMaxMs": 3.554249999999996,
+    "runMedianMinMs": 0.30129199999999656,
+    "runMedianMaxMs": 0.9036454999999961,
+    "runMediansMs": [
+      0.30129199999999656,
+      0.3271045000000008,
+      0.9036454999999961
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      46514176,
+      46415872,
+      45809664
+    ],
+    "rssAfter": [
+      51281920,
+      51347456,
+      50003968
+    ]
+  },
+  {
+    "topology": "sparse",
+    "size": 10000,
+    "operation": "move-one",
+    "retained": 0,
+    "caseId": "sparse-10000-move-one-retain0",
+    "pooledMedianMs": 10.04906250000002,
+    "pooledP95Ms": 12.713292000000024,
+    "pooledMaxMs": 16.02962500000001,
+    "runMedianMinMs": 9.697833000000003,
+    "runMedianMaxMs": 10.212437500000021,
+    "runMediansMs": [
+      9.697833000000003,
+      10.199208499999997,
+      10.212437500000021
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      177733632,
+      183304192,
+      190922752
+    ],
+    "rssAfter": [
+      228392960,
+      211566592,
+      246611968
+    ]
+  },
+  {
+    "topology": "sparse",
+    "size": 10000,
+    "operation": "move-1pct",
+    "retained": 0,
+    "caseId": "sparse-10000-move-1pct-retain0",
+    "pooledMedianMs": 9.888208499999962,
+    "pooledP95Ms": 12.770083,
+    "pooledMaxMs": 13.447125000000028,
+    "runMedianMinMs": 9.636083499999984,
+    "runMedianMaxMs": 10.233000000000004,
+    "runMediansMs": [
+      9.636083499999984,
+      10.233000000000004,
+      9.739875499999982
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      209895424,
+      180731904,
+      186941440
+    ],
+    "rssAfter": [
+      242089984,
+      210108416,
+      207142912
+    ]
+  },
+  {
+    "topology": "sparse",
+    "size": 10000,
+    "operation": "rewire-one",
+    "retained": 0,
+    "caseId": "sparse-10000-rewire-one-retain0",
+    "pooledMedianMs": 9.711041999999964,
+    "pooledP95Ms": 12.282334000000048,
+    "pooledMaxMs": 14.931457999999964,
+    "runMedianMinMs": 9.548500499999989,
+    "runMedianMaxMs": 9.773458500000004,
+    "runMediansMs": [
+      9.579979500000007,
+      9.773458500000004,
+      9.548500499999989
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      194494464,
+      173735936,
+      174309376
+    ],
+    "rssAfter": [
+      210010112,
+      206077952,
+      258097152
+    ]
+  },
+  {
+    "topology": "sparse",
+    "size": 10000,
+    "operation": "net-zero",
+    "retained": 0,
+    "caseId": "sparse-10000-net-zero-retain0",
+    "pooledMedianMs": 3.2387919999999895,
+    "pooledP95Ms": 5.381999999999991,
+    "pooledMaxMs": 33.72566699999999,
+    "runMedianMinMs": 2.9948334999999986,
+    "runMedianMaxMs": 3.5292294999999854,
+    "runMediansMs": [
+      3.158854000000005,
+      2.9948334999999986,
+      3.5292294999999854
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      160153600,
+      159432704,
+      157810688
+    ],
+    "rssAfter": [
+      217137152,
+      213843968,
+      211681280
+    ]
+  },
+  {
+    "topology": "sparse",
+    "size": 50000,
+    "operation": "move-one",
+    "retained": 0,
+    "caseId": "sparse-50000-move-one-retain0",
+    "pooledMedianMs": 68.38706250000018,
+    "pooledP95Ms": 100.55570800000032,
+    "pooledMaxMs": 166.7943750000004,
+    "runMedianMinMs": 63.786437500000375,
+    "runMedianMaxMs": 91.40818749999971,
+    "runMediansMs": [
+      63.786437500000375,
+      65.83635450000008,
+      91.40818749999971
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      548454400,
+      543014912,
+      456278016
+    ],
+    "rssAfter": [
+      703594496,
+      623673344,
+      529006592
+    ]
+  },
+  {
+    "topology": "sparse",
+    "size": 50000,
+    "operation": "move-1pct",
+    "retained": 0,
+    "caseId": "sparse-50000-move-1pct-retain0",
+    "pooledMedianMs": 66.48745900000006,
+    "pooledP95Ms": 91.16637499999979,
+    "pooledMaxMs": 188.70679199999995,
+    "runMedianMinMs": 64.01322950000008,
+    "runMedianMaxMs": 68.17335449999996,
+    "runMediansMs": [
+      64.01322950000008,
+      68.17335449999996,
+      67.80435450000004
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      544505856,
+      544817152,
+      630112256
+    ],
+    "rssAfter": [
+      650477568,
+      620347392,
+      719765504
+    ]
+  },
+  {
+    "topology": "sparse",
+    "size": 50000,
+    "operation": "rewire-one",
+    "retained": 0,
+    "caseId": "sparse-50000-rewire-one-retain0",
+    "pooledMedianMs": 64.18102099999987,
+    "pooledP95Ms": 79.1824160000001,
+    "pooledMaxMs": 95.29816699999992,
+    "runMedianMinMs": 62.021999999999935,
+    "runMedianMaxMs": 67.46318749999978,
+    "runMediansMs": [
+      64.900354,
+      62.021999999999935,
+      67.46318749999978
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      543834112,
+      531775488,
+      560594944
+    ],
+    "rssAfter": [
+      697729024,
+      630374400,
+      746946560
+    ]
+  },
+  {
+    "topology": "sparse",
+    "size": 50000,
+    "operation": "net-zero",
+    "retained": 0,
+    "caseId": "sparse-50000-net-zero-retain0",
+    "pooledMedianMs": 22.037791499999912,
+    "pooledP95Ms": 31.702749999999924,
+    "pooledMaxMs": 49.41250000000002,
+    "runMedianMinMs": 20.624187499999948,
+    "runMedianMaxMs": 22.77237500000001,
+    "runMediansMs": [
+      22.77237500000001,
+      20.624187499999948,
+      22.13733350000001
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      493223936,
+      486801408,
+      450084864
+    ],
+    "rssAfter": [
+      693403648,
+      688095232,
+      555237376
+    ]
+  },
+  {
+    "topology": "hub",
+    "size": 10000,
+    "operation": "move-one",
+    "retained": 0,
+    "caseId": "hub-10000-move-one-retain0",
+    "pooledMedianMs": 9.763229500000023,
+    "pooledP95Ms": 11.814707999999996,
+    "pooledMaxMs": 14.198791999999969,
+    "runMedianMinMs": 9.637812499999967,
+    "runMedianMaxMs": 9.906833500000005,
+    "runMediansMs": [
+      9.667770499999989,
+      9.637812499999967,
+      9.906833500000005
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      188383232,
+      194936832,
+      176488448
+    ],
+    "rssAfter": [
+      257490944,
+      209223680,
+      219283456
+    ]
+  },
+  {
+    "topology": "hub",
+    "size": 10000,
+    "operation": "rewire-one",
+    "retained": 0,
+    "caseId": "hub-10000-rewire-one-retain0",
+    "pooledMedianMs": 10.407687500000009,
+    "pooledP95Ms": 12.970709,
+    "pooledMaxMs": 16.140916000000004,
+    "runMedianMinMs": 9.458625000000012,
+    "runMedianMaxMs": 10.976895499999983,
+    "runMediansMs": [
+      9.458625000000012,
+      10.39137550000001,
+      10.976895499999983
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      179699712,
+      188661760,
+      214138880
+    ],
+    "rssAfter": [
+      214286336,
+      248365056,
+      241745920
+    ]
+  },
+  {
+    "topology": "nested",
+    "size": 10000,
+    "operation": "move-one",
+    "retained": 0,
+    "caseId": "nested-10000-move-one-retain0",
+    "pooledMedianMs": 10.57385450000001,
+    "pooledP95Ms": 12.787540999999976,
+    "pooledMaxMs": 15.65341699999999,
+    "runMedianMinMs": 10.395062499999995,
+    "runMedianMaxMs": 10.794062499999995,
+    "runMediansMs": [
+      10.395062499999995,
+      10.794062499999995,
+      10.626833500000004
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      180731904,
+      196313088,
+      192888832
+    ],
+    "rssAfter": [
+      234946560,
+      225771520,
+      239403008
+    ]
+  },
+  {
+    "topology": "sparse",
+    "size": 10000,
+    "operation": "move-one",
+    "retained": 20,
+    "caseId": "sparse-10000-move-one-retain20",
+    "pooledMedianMs": 10.338187500000004,
+    "pooledP95Ms": 13.446000000000026,
+    "pooledMaxMs": 17.262166999999977,
+    "runMedianMinMs": 10.203020500000008,
+    "runMedianMaxMs": 10.534375000000011,
+    "runMediansMs": [
+      10.486354000000006,
+      10.203020500000008,
+      10.534375000000011
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      294862848,
+      296894464,
+      313884672
+    ],
+    "rssAfter": [
+      682737664,
+      688340992,
+      654589952
+    ]
+  },
+  {
+    "topology": "hub",
+    "size": 50000,
+    "operation": "move-one",
+    "retained": 0,
+    "caseId": "hub-50000-move-one-retain0",
+    "pooledMedianMs": 66.70627099999979,
+    "pooledP95Ms": 83.83770800000002,
+    "pooledMaxMs": 95.77141700000038,
+    "runMedianMinMs": 65.27122949999989,
+    "runMedianMaxMs": 67.78343799999993,
+    "runMediansMs": [
+      67.0207499999998,
+      65.27122949999989,
+      67.78343799999993
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      541605888,
+      543326208,
+      545030144
+    ],
+    "rssAfter": [
+      713408512,
+      699924480,
+      677789696
+    ]
+  },
+  {
+    "topology": "hub",
+    "size": 50000,
+    "operation": "rewire-one",
+    "retained": 0,
+    "caseId": "hub-50000-rewire-one-retain0",
+    "pooledMedianMs": 65.30237450000004,
+    "pooledP95Ms": 81.38541599999962,
+    "pooledMaxMs": 100.09120800000005,
+    "runMedianMinMs": 62.30335400000013,
+    "runMedianMaxMs": 67.29641650000008,
+    "runMediansMs": [
+      62.30335400000013,
+      66.284625,
+      67.29641650000008
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      543227904,
+      549076992,
+      545996800
+    ],
+    "rssAfter": [
+      641974272,
+      609943552,
+      691699712
+    ]
+  },
+  {
+    "topology": "nested",
+    "size": 50000,
+    "operation": "move-one",
+    "retained": 0,
+    "caseId": "nested-50000-move-one-retain0",
+    "pooledMedianMs": 77.72145849999993,
+    "pooledP95Ms": 124.20916699999998,
+    "pooledMaxMs": 185.4580420000002,
+    "runMedianMinMs": 72.52556299999992,
+    "runMedianMaxMs": 98.66164600000002,
+    "runMediansMs": [
+      72.52556299999992,
+      72.6211045,
+      98.66164600000002
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      627933184,
+      642514944,
+      305807360
+    ],
+    "rssAfter": [
+      753270784,
+      667615232,
+      640548864
+    ]
+  },
+  {
+    "topology": "sparse",
+    "size": 50000,
+    "operation": "move-one",
+    "retained": 20,
+    "caseId": "sparse-50000-move-one-retain20",
+    "pooledMedianMs": 67.84616699999992,
+    "pooledP95Ms": 93.09483300000011,
+    "pooledMaxMs": 109.86429199999998,
+    "runMedianMinMs": 66.43420800000013,
+    "runMedianMaxMs": 78.53677049999988,
+    "runMediansMs": [
+      66.43420800000013,
+      68.32070850000002,
+      78.53677049999988
+    ],
+    "sampleCount": 90,
+    "rssBefore": [
+      1146060800,
+      1214627840,
+      1156792320
+    ],
+    "rssAfter": [
+      1876590592,
+      1993883648,
+      1867268096
+    ]
+  }
+]
