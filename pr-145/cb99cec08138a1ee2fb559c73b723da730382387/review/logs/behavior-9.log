@@ -1,0 +1,3098 @@
+[
+  {
+    "label": "sparse-10000-move-1pct-retain0-r1-optimized",
+    "pairIndex": 1,
+    "caseId": "sparse-10000-move-1pct-retain0",
+    "repetition": 1,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-move-1pct-retain0-r1-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-10000-move-1pct-retain0-r1-optimized.json",
+    "log": "logs/sparse-10000-move-1pct-retain0-r1-optimized.log",
+    "startedAt": "2026-10-30T07:40:02.421455+00:00",
+    "loadBefore": [
+      9.04541015625,
+      10.8203125,
+      10.431640625
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.391501457997947,
+    "completedAt": "2026-10-30T07:40:02.813100+00:00",
+    "loadAfter": [
+      9.04541015625,
+      10.8203125,
+      10.431640625
+    ],
+    "resultSha256": "88fd4ac49d6d13d6b8acf5f4f16358505d8fae1b4d9a554d2a322f7ac4e77a20",
+    "medianMs": 5.017812499999991
+  },
+  {
+    "label": "sparse-10000-move-1pct-retain0-r1-base",
+    "pairIndex": 1,
+    "caseId": "sparse-10000-move-1pct-retain0",
+    "repetition": 1,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-move-1pct-retain0-r1-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-10000-move-1pct-retain0-r1-base.json",
+    "log": "logs/sparse-10000-move-1pct-retain0-r1-base.log",
+    "startedAt": "2026-10-30T07:40:02.814709+00:00",
+    "loadBefore": [
+      9.04541015625,
+      10.8203125,
+      10.431640625
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.6110822909977287,
+    "completedAt": "2026-10-30T07:40:03.425930+00:00",
+    "loadAfter": [
+      9.04541015625,
+      10.8203125,
+      10.431640625
+    ],
+    "resultSha256": "17e6c611014ea50ba358900e751c0ed5ec9176d55e437849b13717be68cf1887",
+    "medianMs": 10.231791500000014
+  },
+  {
+    "label": "sparse-50000-move-1pct-retain0-r1-optimized",
+    "pairIndex": 2,
+    "caseId": "sparse-50000-move-1pct-retain0",
+    "repetition": 1,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-move-1pct-retain0-r1-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-50000-move-1pct-retain0-r1-optimized.json",
+    "log": "logs/sparse-50000-move-1pct-retain0-r1-optimized.log",
+    "startedAt": "2026-10-30T07:40:03.426518+00:00",
+    "loadBefore": [
+      9.04541015625,
+      10.8203125,
+      10.431640625
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 1.8205620410008123,
+    "completedAt": "2026-10-30T07:40:05.247209+00:00",
+    "loadAfter": [
+      9.04541015625,
+      10.8203125,
+      10.431640625
+    ],
+    "resultSha256": "c4622d06733b93e7575ce4bb8eb22581277546eceedc35cf605ba76656598401",
+    "medianMs": 31.472145499999897
+  },
+  {
+    "label": "sparse-50000-move-1pct-retain0-r1-base",
+    "pairIndex": 2,
+    "caseId": "sparse-50000-move-1pct-retain0",
+    "repetition": 1,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-move-1pct-retain0-r1-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-50000-move-1pct-retain0-r1-base.json",
+    "log": "logs/sparse-50000-move-1pct-retain0-r1-base.log",
+    "startedAt": "2026-10-30T07:40:05.247957+00:00",
+    "loadBefore": [
+      9.04541015625,
+      10.8203125,
+      10.431640625
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 3.9240448329946958,
+    "completedAt": "2026-10-30T07:40:09.172209+00:00",
+    "loadAfter": [
+      9.20166015625,
+      10.8232421875,
+      10.4345703125
+    ],
+    "resultSha256": "169f309b89216830e68252bedf8bf0fa1c3c1022823844eee5612f3f2e60a598",
+    "medianMs": 73.7225830000001
+  },
+  {
+    "label": "sparse-1000-move-one-retain0-r1-base",
+    "pairIndex": 3,
+    "caseId": "sparse-1000-move-one-retain0",
+    "repetition": 1,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-move-one-retain0-r1-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-1000-move-one-retain0-r1-base.json",
+    "log": "logs/sparse-1000-move-one-retain0-r1-base.log",
+    "startedAt": "2026-10-30T07:40:09.173216+00:00",
+    "loadBefore": [
+      9.20166015625,
+      10.8232421875,
+      10.4345703125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.06508241700066719,
+    "completedAt": "2026-10-30T07:40:09.238523+00:00",
+    "loadAfter": [
+      9.20166015625,
+      10.8232421875,
+      10.4345703125
+    ],
+    "resultSha256": "d840b17103a0badad32b1eda7e0a4a2e737914ab9491e6847a85711165e9681b",
+    "medianMs": 0.7548959999999987
+  },
+  {
+    "label": "sparse-1000-move-one-retain0-r1-optimized",
+    "pairIndex": 3,
+    "caseId": "sparse-1000-move-one-retain0",
+    "repetition": 1,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-move-one-retain0-r1-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-1000-move-one-retain0-r1-optimized.json",
+    "log": "logs/sparse-1000-move-one-retain0-r1-optimized.log",
+    "startedAt": "2026-10-30T07:40:09.239391+00:00",
+    "loadBefore": [
+      9.20166015625,
+      10.8232421875,
+      10.4345703125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04771604199777357,
+    "completedAt": "2026-10-30T07:40:09.287334+00:00",
+    "loadAfter": [
+      9.20166015625,
+      10.8232421875,
+      10.4345703125
+    ],
+    "resultSha256": "c7bdf45ab71b16a5c7e04d0bfc4e08bd4e75cbcf9b405b3fc7cdc16ee0a8f094",
+    "medianMs": 0.40208350000000337
+  },
+  {
+    "label": "sparse-50000-rewire-one-retain0-r1-base",
+    "pairIndex": 4,
+    "caseId": "sparse-50000-rewire-one-retain0",
+    "repetition": 1,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-rewire-one-retain0-r1-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-50000-rewire-one-retain0-r1-base.json",
+    "log": "logs/sparse-50000-rewire-one-retain0-r1-base.log",
+    "startedAt": "2026-10-30T07:40:09.288353+00:00",
+    "loadBefore": [
+      9.20166015625,
+      10.8232421875,
+      10.4345703125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 4.024779375002254,
+    "completedAt": "2026-10-30T07:40:13.313380+00:00",
+    "loadAfter": [
+      9.34521484375,
+      10.826171875,
+      10.4375
+    ],
+    "resultSha256": "4b5cd5517c1d25756fd155fde6bd9159cfea770a2753e3c483bb731bd667fb59",
+    "medianMs": 71.8711874999999
+  },
+  {
+    "label": "sparse-50000-rewire-one-retain0-r1-optimized",
+    "pairIndex": 4,
+    "caseId": "sparse-50000-rewire-one-retain0",
+    "repetition": 1,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-rewire-one-retain0-r1-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-50000-rewire-one-retain0-r1-optimized.json",
+    "log": "logs/sparse-50000-rewire-one-retain0-r1-optimized.log",
+    "startedAt": "2026-10-30T07:40:13.314382+00:00",
+    "loadBefore": [
+      9.34521484375,
+      10.826171875,
+      10.4375
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 2.6227252499957103,
+    "completedAt": "2026-10-30T07:40:15.937376+00:00",
+    "loadAfter": [
+      9.0771484375,
+      10.74560546875,
+      10.4111328125
+    ],
+    "resultSha256": "98f8f488a7de484e86910cc617eaff0b11d6f4e5399f8b4ba298065defc73aa8",
+    "medianMs": 44.72708350000016
+  },
+  {
+    "label": "sparse-1000-move-1pct-retain0-r1-optimized",
+    "pairIndex": 5,
+    "caseId": "sparse-1000-move-1pct-retain0",
+    "repetition": 1,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-move-1pct-retain0-r1-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-1000-move-1pct-retain0-r1-optimized.json",
+    "log": "logs/sparse-1000-move-1pct-retain0-r1-optimized.log",
+    "startedAt": "2026-10-30T07:40:15.938443+00:00",
+    "loadBefore": [
+      9.0771484375,
+      10.74560546875,
+      10.4111328125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.047637249997933395,
+    "completedAt": "2026-10-30T07:40:15.986373+00:00",
+    "loadAfter": [
+      9.0771484375,
+      10.74560546875,
+      10.4111328125
+    ],
+    "resultSha256": "0d322bde25df72452c23e08d7a9c36e9e97f9b8fa9760d91dc3ad1604abecc0c",
+    "medianMs": 0.3972294999999999
+  },
+  {
+    "label": "sparse-1000-move-1pct-retain0-r1-base",
+    "pairIndex": 5,
+    "caseId": "sparse-1000-move-1pct-retain0",
+    "repetition": 1,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-move-1pct-retain0-r1-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-1000-move-1pct-retain0-r1-base.json",
+    "log": "logs/sparse-1000-move-1pct-retain0-r1-base.log",
+    "startedAt": "2026-10-30T07:40:15.987267+00:00",
+    "loadBefore": [
+      9.0771484375,
+      10.74560546875,
+      10.4111328125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.06256283300172072,
+    "completedAt": "2026-10-30T07:40:16.050117+00:00",
+    "loadAfter": [
+      9.0771484375,
+      10.74560546875,
+      10.4111328125
+    ],
+    "resultSha256": "41aa66218bc6ad4986f000fc26a8dafb1275089138b0107c0e1576fda2eb195a",
+    "medianMs": 0.721104000000004
+  },
+  {
+    "label": "sparse-1000-rewire-one-retain0-r1-base",
+    "pairIndex": 6,
+    "caseId": "sparse-1000-rewire-one-retain0",
+    "repetition": 1,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-rewire-one-retain0-r1-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-1000-rewire-one-retain0-r1-base.json",
+    "log": "logs/sparse-1000-rewire-one-retain0-r1-base.log",
+    "startedAt": "2026-10-30T07:40:16.051267+00:00",
+    "loadBefore": [
+      9.0771484375,
+      10.74560546875,
+      10.4111328125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.06210179098707158,
+    "completedAt": "2026-10-30T07:40:16.113751+00:00",
+    "loadAfter": [
+      9.0771484375,
+      10.74560546875,
+      10.4111328125
+    ],
+    "resultSha256": "483afedf0cf1ca87edab42b031bc3ecaa12e6f280bce362b41b81389c8243fc7",
+    "medianMs": 0.685437499999999
+  },
+  {
+    "label": "sparse-1000-rewire-one-retain0-r1-optimized",
+    "pairIndex": 6,
+    "caseId": "sparse-1000-rewire-one-retain0",
+    "repetition": 1,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-rewire-one-retain0-r1-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-1000-rewire-one-retain0-r1-optimized.json",
+    "log": "logs/sparse-1000-rewire-one-retain0-r1-optimized.log",
+    "startedAt": "2026-10-30T07:40:16.114709+00:00",
+    "loadBefore": [
+      9.0771484375,
+      10.74560546875,
+      10.4111328125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.052989542004070245,
+    "completedAt": "2026-10-30T07:40:16.167968+00:00",
+    "loadAfter": [
+      9.0771484375,
+      10.74560546875,
+      10.4111328125
+    ],
+    "resultSha256": "f3144801f71a49d488c2fede902f9d326f625dbc2a9441d79d699a9f5a555f7a",
+    "medianMs": 0.5194584999999989
+  },
+  {
+    "label": "sparse-50000-move-one-retain0-r1-base",
+    "pairIndex": 7,
+    "caseId": "sparse-50000-move-one-retain0",
+    "repetition": 1,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-move-one-retain0-r1-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-50000-move-one-retain0-r1-base.json",
+    "log": "logs/sparse-50000-move-one-retain0-r1-base.log",
+    "startedAt": "2026-10-30T07:40:16.168954+00:00",
+    "loadBefore": [
+      9.0771484375,
+      10.74560546875,
+      10.4111328125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 3.606176957997377,
+    "completedAt": "2026-10-30T07:40:19.775423+00:00",
+    "loadAfter": [
+      9.0771484375,
+      10.74560546875,
+      10.4111328125
+    ],
+    "resultSha256": "066ed1d0879cf14dba37e67f500173a5faf4f97652db77a32a1bebe5f14df779",
+    "medianMs": 67.22812499999986
+  },
+  {
+    "label": "sparse-50000-move-one-retain0-r1-optimized",
+    "pairIndex": 7,
+    "caseId": "sparse-50000-move-one-retain0",
+    "repetition": 1,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-move-one-retain0-r1-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-50000-move-one-retain0-r1-optimized.json",
+    "log": "logs/sparse-50000-move-one-retain0-r1-optimized.log",
+    "startedAt": "2026-10-30T07:40:19.776501+00:00",
+    "loadBefore": [
+      9.0771484375,
+      10.74560546875,
+      10.4111328125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 1.9835484999930486,
+    "completedAt": "2026-10-30T07:40:21.760359+00:00",
+    "loadAfter": [
+      9.07080078125,
+      10.71630859375,
+      10.40283203125
+    ],
+    "resultSha256": "76764e97c9de12702faa5db749e5cbfb373333a7972e95a1ad02859da59180d7",
+    "medianMs": 36.54356250000001
+  },
+  {
+    "label": "sparse-50000-net-zero-retain0-r1-optimized",
+    "pairIndex": 8,
+    "caseId": "sparse-50000-net-zero-retain0",
+    "repetition": 1,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r1-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-50000-net-zero-retain0-r1-optimized.json",
+    "log": "logs/sparse-50000-net-zero-retain0-r1-optimized.log",
+    "startedAt": "2026-10-30T07:40:21.761371+00:00",
+    "loadBefore": [
+      9.07080078125,
+      10.71630859375,
+      10.40283203125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 1.4565371250064345,
+    "completedAt": "2026-10-30T07:40:23.218243+00:00",
+    "loadAfter": [
+      9.07080078125,
+      10.71630859375,
+      10.40283203125
+    ],
+    "resultSha256": "0c1749dae7c0042bfc13a1bfb33f521f71b2ebbb78e016445e07813c8fed80f2",
+    "medianMs": 22.766812500000015
+  },
+  {
+    "label": "sparse-50000-net-zero-retain0-r1-base",
+    "pairIndex": 8,
+    "caseId": "sparse-50000-net-zero-retain0",
+    "repetition": 1,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r1-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-50000-net-zero-retain0-r1-base.json",
+    "log": "logs/sparse-50000-net-zero-retain0-r1-base.log",
+    "startedAt": "2026-10-30T07:40:23.219477+00:00",
+    "loadBefore": [
+      9.07080078125,
+      10.71630859375,
+      10.40283203125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 1.3260338749969378,
+    "completedAt": "2026-10-30T07:40:24.546026+00:00",
+    "loadAfter": [
+      9.07080078125,
+      10.71630859375,
+      10.40283203125
+    ],
+    "resultSha256": "08f72a09f1633aa95e1dcf7d05973db519ad82e62b4fa9555dfa28dec27315df",
+    "medianMs": 20.056354499999884
+  },
+  {
+    "label": "sparse-10000-move-one-retain0-r1-base",
+    "pairIndex": 9,
+    "caseId": "sparse-10000-move-one-retain0",
+    "repetition": 1,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-move-one-retain0-r1-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-10000-move-one-retain0-r1-base.json",
+    "log": "logs/sparse-10000-move-one-retain0-r1-base.log",
+    "startedAt": "2026-10-30T07:40:24.547061+00:00",
+    "loadBefore": [
+      9.07080078125,
+      10.71630859375,
+      10.40283203125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.6163177499984158,
+    "completedAt": "2026-10-30T07:40:25.163710+00:00",
+    "loadAfter": [
+      9.07080078125,
+      10.71630859375,
+      10.40283203125
+    ],
+    "resultSha256": "2d061b4e9218d0b971118911b45c1d36cacf4b0c915db103846c8787e345c35c",
+    "medianMs": 11.249499499999985
+  },
+  {
+    "label": "sparse-10000-move-one-retain0-r1-optimized",
+    "pairIndex": 9,
+    "caseId": "sparse-10000-move-one-retain0",
+    "repetition": 1,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-move-one-retain0-r1-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-10000-move-one-retain0-r1-optimized.json",
+    "log": "logs/sparse-10000-move-one-retain0-r1-optimized.log",
+    "startedAt": "2026-10-30T07:40:25.164886+00:00",
+    "loadBefore": [
+      9.07080078125,
+      10.71630859375,
+      10.40283203125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.4316776670020772,
+    "completedAt": "2026-10-30T07:40:25.596996+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "9f1bc46c8d7ef64e417792074084f98439ccc3502e1dd659b7774bb48e1fbf44",
+    "medianMs": 6.684562499999998
+  },
+  {
+    "label": "sparse-10000-net-zero-retain0-r1-optimized",
+    "pairIndex": 10,
+    "caseId": "sparse-10000-net-zero-retain0",
+    "repetition": 1,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-net-zero-retain0-r1-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-10000-net-zero-retain0-r1-optimized.json",
+    "log": "logs/sparse-10000-net-zero-retain0-r1-optimized.log",
+    "startedAt": "2026-10-30T07:40:25.598501+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.24503158300649375,
+    "completedAt": "2026-10-30T07:40:25.843917+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "71f62afad9f5c5e37b2b1e9bafbd77b909234814ab3fae0fbf34271a9e625e45",
+    "medianMs": 3.3254790000000014
+  },
+  {
+    "label": "sparse-10000-net-zero-retain0-r1-base",
+    "pairIndex": 10,
+    "caseId": "sparse-10000-net-zero-retain0",
+    "repetition": 1,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-net-zero-retain0-r1-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-10000-net-zero-retain0-r1-base.json",
+    "log": "logs/sparse-10000-net-zero-retain0-r1-base.log",
+    "startedAt": "2026-10-30T07:40:25.845164+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.26483616599580273,
+    "completedAt": "2026-10-30T07:40:26.110412+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "1d1103f09c0fda9d581561d287840a51ac630b0a05a9b42a62f37b58b7115471",
+    "medianMs": 3.842832999999999
+  },
+  {
+    "label": "sparse-10000-rewire-one-retain0-r1-base",
+    "pairIndex": 11,
+    "caseId": "sparse-10000-rewire-one-retain0",
+    "repetition": 1,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-rewire-one-retain0-r1-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-10000-rewire-one-retain0-r1-base.json",
+    "log": "logs/sparse-10000-rewire-one-retain0-r1-base.log",
+    "startedAt": "2026-10-30T07:40:26.111772+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.6054306669975631,
+    "completedAt": "2026-10-30T07:40:26.717697+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "d5aecad47b03f0ffa56b7af2ea354aa7250383574c05bb41510267165494768d",
+    "medianMs": 10.617249999999984
+  },
+  {
+    "label": "sparse-10000-rewire-one-retain0-r1-optimized",
+    "pairIndex": 11,
+    "caseId": "sparse-10000-rewire-one-retain0",
+    "repetition": 1,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-rewire-one-retain0-r1-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-10000-rewire-one-retain0-r1-optimized.json",
+    "log": "logs/sparse-10000-rewire-one-retain0-r1-optimized.log",
+    "startedAt": "2026-10-30T07:40:26.719066+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.49534979098825715,
+    "completedAt": "2026-10-30T07:40:27.215252+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "2992f1557c2f52e130aa209ec904df8791a292452c5f0205162a278ebae4cddb",
+    "medianMs": 7.9359794999999735
+  },
+  {
+    "label": "sparse-1000-net-zero-retain0-r1-optimized",
+    "pairIndex": 12,
+    "caseId": "sparse-1000-net-zero-retain0",
+    "repetition": 1,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-net-zero-retain0-r1-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-1000-net-zero-retain0-r1-optimized.json",
+    "log": "logs/sparse-1000-net-zero-retain0-r1-optimized.log",
+    "startedAt": "2026-10-30T07:40:27.216529+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.041838874996756203,
+    "completedAt": "2026-10-30T07:40:27.258912+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "781aacd20628806ddb21fe0e0b8649d952ca0dec042cb0f28c54039db54e33f7",
+    "medianMs": 0.3044375000000006
+  },
+  {
+    "label": "sparse-1000-net-zero-retain0-r1-base",
+    "pairIndex": 12,
+    "caseId": "sparse-1000-net-zero-retain0",
+    "repetition": 1,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-net-zero-retain0-r1-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-1000-net-zero-retain0-r1-base.json",
+    "log": "logs/sparse-1000-net-zero-retain0-r1-base.log",
+    "startedAt": "2026-10-30T07:40:27.260134+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04292041700682603,
+    "completedAt": "2026-10-30T07:40:27.303664+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "8407a359927ae368ea402fb4f9585ce01c342461f6b7bd27fc2960f627a86825",
+    "medianMs": 0.29204200000000036
+  },
+  {
+    "label": "sparse-1000-move-1pct-retain0-r2-base",
+    "pairIndex": 13,
+    "caseId": "sparse-1000-move-1pct-retain0",
+    "repetition": 2,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-move-1pct-retain0-r2-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-1000-move-1pct-retain0-r2-base.json",
+    "log": "logs/sparse-1000-move-1pct-retain0-r2-base.log",
+    "startedAt": "2026-10-30T07:40:27.304979+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.06372466700850055,
+    "completedAt": "2026-10-30T07:40:27.369147+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "8ba895db2bd75b26c258d2fc0060fcf0f251970d48c2a114978e3442b4bf72ed",
+    "medianMs": 0.7345624999999956
+  },
+  {
+    "label": "sparse-1000-move-1pct-retain0-r2-optimized",
+    "pairIndex": 13,
+    "caseId": "sparse-1000-move-1pct-retain0",
+    "repetition": 2,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-move-1pct-retain0-r2-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-1000-move-1pct-retain0-r2-optimized.json",
+    "log": "logs/sparse-1000-move-1pct-retain0-r2-optimized.log",
+    "startedAt": "2026-10-30T07:40:27.370512+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.045993125007953495,
+    "completedAt": "2026-10-30T07:40:27.416978+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "c297d2db4d3fd976f32c11be48c3141012f68892ea93fef06b7ec8da23cfc942",
+    "medianMs": 0.4027500000000046
+  },
+  {
+    "label": "sparse-10000-net-zero-retain0-r2-base",
+    "pairIndex": 14,
+    "caseId": "sparse-10000-net-zero-retain0",
+    "repetition": 2,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-net-zero-retain0-r2-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-10000-net-zero-retain0-r2-base.json",
+    "log": "logs/sparse-10000-net-zero-retain0-r2-base.log",
+    "startedAt": "2026-10-30T07:40:27.418234+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.46071329100232106,
+    "completedAt": "2026-10-30T07:40:27.879414+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "b620493b08062db7fb24d244b79f3a17123d5ada6b2cbbbe68e0205aef81b4ce",
+    "medianMs": 3.7272079999999903
+  },
+  {
+    "label": "sparse-10000-net-zero-retain0-r2-optimized",
+    "pairIndex": 14,
+    "caseId": "sparse-10000-net-zero-retain0",
+    "repetition": 2,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-net-zero-retain0-r2-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-10000-net-zero-retain0-r2-optimized.json",
+    "log": "logs/sparse-10000-net-zero-retain0-r2-optimized.log",
+    "startedAt": "2026-10-30T07:40:27.881448+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.24638849998882506,
+    "completedAt": "2026-10-30T07:40:28.128436+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "24ef81680b81cd607eaf730bc4344eddf4dcf28ae7cbdbc35fcda403f5d0f065",
+    "medianMs": 3.3905835000000053
+  },
+  {
+    "label": "sparse-1000-net-zero-retain0-r2-base",
+    "pairIndex": 15,
+    "caseId": "sparse-1000-net-zero-retain0",
+    "repetition": 2,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-net-zero-retain0-r2-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-1000-net-zero-retain0-r2-base.json",
+    "log": "logs/sparse-1000-net-zero-retain0-r2-base.log",
+    "startedAt": "2026-10-30T07:40:28.130191+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04148787500162143,
+    "completedAt": "2026-10-30T07:40:28.172328+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "6d97cb3f8ed9d7fe9df3dfc658a656e943de768aad707a427aedb18badd6619d",
+    "medianMs": 0.30393800000000226
+  },
+  {
+    "label": "sparse-1000-net-zero-retain0-r2-optimized",
+    "pairIndex": 15,
+    "caseId": "sparse-1000-net-zero-retain0",
+    "repetition": 2,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-net-zero-retain0-r2-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-1000-net-zero-retain0-r2-optimized.json",
+    "log": "logs/sparse-1000-net-zero-retain0-r2-optimized.log",
+    "startedAt": "2026-10-30T07:40:28.173799+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04162883399112616,
+    "completedAt": "2026-10-30T07:40:28.216073+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "c442f285fba5224eda1ea71d47596a91d2dff22d27a7c018c75b9bdf36caba83",
+    "medianMs": 0.3072290000000013
+  },
+  {
+    "label": "sparse-10000-rewire-one-retain0-r2-optimized",
+    "pairIndex": 16,
+    "caseId": "sparse-10000-rewire-one-retain0",
+    "repetition": 2,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-rewire-one-retain0-r2-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-10000-rewire-one-retain0-r2-optimized.json",
+    "log": "logs/sparse-10000-rewire-one-retain0-r2-optimized.log",
+    "startedAt": "2026-10-30T07:40:28.217528+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.44297166699834634,
+    "completedAt": "2026-10-30T07:40:28.661041+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "80b0162b39e2be1164b2aead702bb0788307aa9e395dd5d7d738ee80bc449b60",
+    "medianMs": 6.9504374999999925
+  },
+  {
+    "label": "sparse-10000-rewire-one-retain0-r2-base",
+    "pairIndex": 16,
+    "caseId": "sparse-10000-rewire-one-retain0",
+    "repetition": 2,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-rewire-one-retain0-r2-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-10000-rewire-one-retain0-r2-base.json",
+    "log": "logs/sparse-10000-rewire-one-retain0-r2-base.log",
+    "startedAt": "2026-10-30T07:40:28.662557+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.668746834009653,
+    "completedAt": "2026-10-30T07:40:29.331986+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "c69f8894166b9d39398a19489b1768d56a1708743c87b716e3bae9617adf2281",
+    "medianMs": 11.214395499999995
+  },
+  {
+    "label": "sparse-10000-move-1pct-retain0-r2-base",
+    "pairIndex": 17,
+    "caseId": "sparse-10000-move-1pct-retain0",
+    "repetition": 2,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-move-1pct-retain0-r2-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-10000-move-1pct-retain0-r2-base.json",
+    "log": "logs/sparse-10000-move-1pct-retain0-r2-base.log",
+    "startedAt": "2026-10-30T07:40:29.333532+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.6981805410032393,
+    "completedAt": "2026-10-30T07:40:30.032397+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "20b21148b6524d0ebd039cb936eae2b6f1aa5c1b6e19f5c41af7376dbfd31d68",
+    "medianMs": 11.992520999999982
+  },
+  {
+    "label": "sparse-10000-move-1pct-retain0-r2-optimized",
+    "pairIndex": 17,
+    "caseId": "sparse-10000-move-1pct-retain0",
+    "repetition": 2,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-move-1pct-retain0-r2-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-10000-move-1pct-retain0-r2-optimized.json",
+    "log": "logs/sparse-10000-move-1pct-retain0-r2-optimized.log",
+    "startedAt": "2026-10-30T07:40:30.033938+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.35646370801259764,
+    "completedAt": "2026-10-30T07:40:30.390982+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "381797720be68fec36a45232aebf1ea03dcea75b0a99efd981c7418c9a069231",
+    "medianMs": 5.4327495
+  },
+  {
+    "label": "sparse-1000-rewire-one-retain0-r2-optimized",
+    "pairIndex": 18,
+    "caseId": "sparse-1000-rewire-one-retain0",
+    "repetition": 2,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-rewire-one-retain0-r2-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-1000-rewire-one-retain0-r2-optimized.json",
+    "log": "logs/sparse-1000-rewire-one-retain0-r2-optimized.log",
+    "startedAt": "2026-10-30T07:40:30.392548+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05533645799732767,
+    "completedAt": "2026-10-30T07:40:30.448460+00:00",
+    "loadAfter": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "resultSha256": "5855ac59529f1b6a59190ea16cd729030999d529e093997835278498043cff65",
+    "medianMs": 0.5489789999999957
+  },
+  {
+    "label": "sparse-1000-rewire-one-retain0-r2-base",
+    "pairIndex": 18,
+    "caseId": "sparse-1000-rewire-one-retain0",
+    "repetition": 2,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-rewire-one-retain0-r2-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-1000-rewire-one-retain0-r2-base.json",
+    "log": "logs/sparse-1000-rewire-one-retain0-r2-base.log",
+    "startedAt": "2026-10-30T07:40:30.450197+00:00",
+    "loadBefore": [
+      8.82470703125,
+      10.6376953125,
+      10.376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.06884162499045487,
+    "completedAt": "2026-10-30T07:40:30.519938+00:00",
+    "loadAfter": [
+      8.51806640625,
+      10.5439453125,
+      10.34521484375
+    ],
+    "resultSha256": "dedb4e552123e8f558774d872b4f693bb997a225edb9f6523c2e375ce5be7fbc",
+    "medianMs": 0.7801249999999982
+  },
+  {
+    "label": "sparse-50000-rewire-one-retain0-r2-optimized",
+    "pairIndex": 19,
+    "caseId": "sparse-50000-rewire-one-retain0",
+    "repetition": 2,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-rewire-one-retain0-r2-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-50000-rewire-one-retain0-r2-optimized.json",
+    "log": "logs/sparse-50000-rewire-one-retain0-r2-optimized.log",
+    "startedAt": "2026-10-30T07:40:30.521956+00:00",
+    "loadBefore": [
+      8.51806640625,
+      10.5439453125,
+      10.34521484375
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 2.768982249996043,
+    "completedAt": "2026-10-30T07:40:33.291775+00:00",
+    "loadAfter": [
+      8.51806640625,
+      10.5439453125,
+      10.34521484375
+    ],
+    "resultSha256": "6a9067f88713d410869bec550721d790eeaddfaef2cfc4d3c436354b210d7567",
+    "medianMs": 47.61460450000004
+  },
+  {
+    "label": "sparse-50000-rewire-one-retain0-r2-base",
+    "pairIndex": 19,
+    "caseId": "sparse-50000-rewire-one-retain0",
+    "repetition": 2,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-rewire-one-retain0-r2-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-50000-rewire-one-retain0-r2-base.json",
+    "log": "logs/sparse-50000-rewire-one-retain0-r2-base.log",
+    "startedAt": "2026-10-30T07:40:33.293511+00:00",
+    "loadBefore": [
+      8.51806640625,
+      10.5439453125,
+      10.34521484375
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 3.531325875010225,
+    "completedAt": "2026-10-30T07:40:36.825477+00:00",
+    "loadAfter": [
+      8.4765625,
+      10.50146484375,
+      10.3310546875
+    ],
+    "resultSha256": "eadb03df780eeb2b28aa94668de1342deebe1ea9d4a888c2624779d87f15a857",
+    "medianMs": 65.09622850000005
+  },
+  {
+    "label": "sparse-50000-net-zero-retain0-r2-base",
+    "pairIndex": 20,
+    "caseId": "sparse-50000-net-zero-retain0",
+    "repetition": 2,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r2-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-50000-net-zero-retain0-r2-base.json",
+    "log": "logs/sparse-50000-net-zero-retain0-r2-base.log",
+    "startedAt": "2026-10-30T07:40:36.827385+00:00",
+    "loadBefore": [
+      8.4765625,
+      10.50146484375,
+      10.3310546875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 1.2656414170050994,
+    "completedAt": "2026-10-30T07:40:38.093883+00:00",
+    "loadAfter": [
+      8.4765625,
+      10.50146484375,
+      10.3310546875
+    ],
+    "resultSha256": "522cbc1b6b805ed17d37e46e227a36b071ce3357c0e8e320216a7a99dbbf1461",
+    "medianMs": 19.573916999999994
+  },
+  {
+    "label": "sparse-50000-net-zero-retain0-r2-optimized",
+    "pairIndex": 20,
+    "caseId": "sparse-50000-net-zero-retain0",
+    "repetition": 2,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r2-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-50000-net-zero-retain0-r2-optimized.json",
+    "log": "logs/sparse-50000-net-zero-retain0-r2-optimized.log",
+    "startedAt": "2026-10-30T07:40:38.095624+00:00",
+    "loadBefore": [
+      8.4765625,
+      10.50146484375,
+      10.3310546875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 1.3195578750019195,
+    "completedAt": "2026-10-30T07:40:39.416023+00:00",
+    "loadAfter": [
+      8.4765625,
+      10.50146484375,
+      10.3310546875
+    ],
+    "resultSha256": "c0a4bd10d7211e65ffa22030098d232e47c8c786bece502c3a2dc9cf62c8d51e",
+    "medianMs": 21.18752099999989
+  },
+  {
+    "label": "sparse-10000-move-one-retain0-r2-optimized",
+    "pairIndex": 21,
+    "caseId": "sparse-10000-move-one-retain0",
+    "repetition": 2,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-move-one-retain0-r2-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-10000-move-one-retain0-r2-optimized.json",
+    "log": "logs/sparse-10000-move-one-retain0-r2-optimized.log",
+    "startedAt": "2026-10-30T07:40:39.417729+00:00",
+    "loadBefore": [
+      8.4765625,
+      10.50146484375,
+      10.3310546875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.303346041997429,
+    "completedAt": "2026-10-30T07:40:39.721832+00:00",
+    "loadAfter": [
+      8.4765625,
+      10.50146484375,
+      10.3310546875
+    ],
+    "resultSha256": "f38128abb2b4da98205507cd31ac5060702d1843baabf2773253a60e29b63cbe",
+    "medianMs": 4.680250000000015
+  },
+  {
+    "label": "sparse-10000-move-one-retain0-r2-base",
+    "pairIndex": 21,
+    "caseId": "sparse-10000-move-one-retain0",
+    "repetition": 2,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-move-one-retain0-r2-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-10000-move-one-retain0-r2-base.json",
+    "log": "logs/sparse-10000-move-one-retain0-r2-base.log",
+    "startedAt": "2026-10-30T07:40:39.723625+00:00",
+    "loadBefore": [
+      8.4765625,
+      10.50146484375,
+      10.3310546875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.574624834000133,
+    "completedAt": "2026-10-30T07:40:40.298924+00:00",
+    "loadAfter": [
+      8.4765625,
+      10.50146484375,
+      10.3310546875
+    ],
+    "resultSha256": "37998e7ff8057e33ad47ea0d23284e93ec50ea0db330d56ad95463730cacce90",
+    "medianMs": 10.087167000000022
+  },
+  {
+    "label": "sparse-50000-move-one-retain0-r2-optimized",
+    "pairIndex": 22,
+    "caseId": "sparse-50000-move-one-retain0",
+    "repetition": 2,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-move-one-retain0-r2-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-50000-move-one-retain0-r2-optimized.json",
+    "log": "logs/sparse-50000-move-one-retain0-r2-optimized.log",
+    "startedAt": "2026-10-30T07:40:40.300670+00:00",
+    "loadBefore": [
+      8.4765625,
+      10.50146484375,
+      10.3310546875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 1.7521388750028564,
+    "completedAt": "2026-10-30T07:40:42.053474+00:00",
+    "loadAfter": [
+      8.27783203125,
+      10.42626953125,
+      10.3056640625
+    ],
+    "resultSha256": "98fef51e014cdf00ebf28d316141f029bb11734b98b18d3e594fdb4b0b4b914a",
+    "medianMs": 29.842354499999942
+  },
+  {
+    "label": "sparse-50000-move-one-retain0-r2-base",
+    "pairIndex": 22,
+    "caseId": "sparse-50000-move-one-retain0",
+    "repetition": 2,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-move-one-retain0-r2-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-50000-move-one-retain0-r2-base.json",
+    "log": "logs/sparse-50000-move-one-retain0-r2-base.log",
+    "startedAt": "2026-10-30T07:40:42.055332+00:00",
+    "loadBefore": [
+      8.27783203125,
+      10.42626953125,
+      10.3056640625
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 3.5498802090005483,
+    "completedAt": "2026-10-30T07:40:45.606022+00:00",
+    "loadAfter": [
+      7.93505859375,
+      10.3193359375,
+      10.2685546875
+    ],
+    "resultSha256": "3cf226cb2badab4267d3a2028b25a3669e8b420fe6b4b2d968d0e48e985ade4c",
+    "medianMs": 65.14604150000014
+  },
+  {
+    "label": "sparse-50000-move-1pct-retain0-r2-base",
+    "pairIndex": 23,
+    "caseId": "sparse-50000-move-1pct-retain0",
+    "repetition": 2,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-move-1pct-retain0-r2-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-50000-move-1pct-retain0-r2-base.json",
+    "log": "logs/sparse-50000-move-1pct-retain0-r2-base.log",
+    "startedAt": "2026-10-30T07:40:45.607836+00:00",
+    "loadBefore": [
+      7.93505859375,
+      10.3193359375,
+      10.2685546875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 3.859226625005249,
+    "completedAt": "2026-10-30T07:40:49.467769+00:00",
+    "loadAfter": [
+      7.93505859375,
+      10.3193359375,
+      10.2685546875
+    ],
+    "resultSha256": "b7ca1bd769761a60c6dd332b06ae0612c8cc86c8589600ac6ce3d0b1bacad4e5",
+    "medianMs": 72.53733299999999
+  },
+  {
+    "label": "sparse-50000-move-1pct-retain0-r2-optimized",
+    "pairIndex": 23,
+    "caseId": "sparse-50000-move-1pct-retain0",
+    "repetition": 2,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-move-1pct-retain0-r2-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-50000-move-1pct-retain0-r2-optimized.json",
+    "log": "logs/sparse-50000-move-1pct-retain0-r2-optimized.log",
+    "startedAt": "2026-10-30T07:40:49.469792+00:00",
+    "loadBefore": [
+      7.93505859375,
+      10.3193359375,
+      10.2685546875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 2.1424185420037247,
+    "completedAt": "2026-10-30T07:40:51.613736+00:00",
+    "loadAfter": [
+      8.02001953125,
+      10.29736328125,
+      10.2607421875
+    ],
+    "resultSha256": "d7107abbd1c3c7bc86c4f4ac43fa9e6a792aec088bb1e3335e2c30c8f1e584a0",
+    "medianMs": 35.667625499999986
+  },
+  {
+    "label": "sparse-1000-move-one-retain0-r2-optimized",
+    "pairIndex": 24,
+    "caseId": "sparse-1000-move-one-retain0",
+    "repetition": 2,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-move-one-retain0-r2-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-1000-move-one-retain0-r2-optimized.json",
+    "log": "logs/sparse-1000-move-one-retain0-r2-optimized.log",
+    "startedAt": "2026-10-30T07:40:51.617625+00:00",
+    "loadBefore": [
+      8.02001953125,
+      10.29736328125,
+      10.2607421875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.06493720899743494,
+    "completedAt": "2026-10-30T07:40:51.690700+00:00",
+    "loadAfter": [
+      8.02001953125,
+      10.29736328125,
+      10.2607421875
+    ],
+    "resultSha256": "f7d0baae52ff357d5ae06f08f900d423eb65cb32eb81ce7bffb17443c4735089",
+    "medianMs": 0.4239789999999992
+  },
+  {
+    "label": "sparse-1000-move-one-retain0-r2-base",
+    "pairIndex": 24,
+    "caseId": "sparse-1000-move-one-retain0",
+    "repetition": 2,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-move-one-retain0-r2-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-1000-move-one-retain0-r2-base.json",
+    "log": "logs/sparse-1000-move-one-retain0-r2-base.log",
+    "startedAt": "2026-10-30T07:40:51.692979+00:00",
+    "loadBefore": [
+      8.02001953125,
+      10.29736328125,
+      10.2607421875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.07415216701338068,
+    "completedAt": "2026-10-30T07:40:51.767955+00:00",
+    "loadAfter": [
+      8.02001953125,
+      10.29736328125,
+      10.2607421875
+    ],
+    "resultSha256": "5452758e28e2c2f823febe06e5064efaefdf355f8f58f76cda9d1fadd04ad603",
+    "medianMs": 0.7324584999999999
+  },
+  {
+    "label": "sparse-50000-move-1pct-retain0-r3-optimized",
+    "pairIndex": 25,
+    "caseId": "sparse-50000-move-1pct-retain0",
+    "repetition": 3,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-move-1pct-retain0-r3-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-50000-move-1pct-retain0-r3-optimized.json",
+    "log": "logs/sparse-50000-move-1pct-retain0-r3-optimized.log",
+    "startedAt": "2026-10-30T07:40:51.769990+00:00",
+    "loadBefore": [
+      8.02001953125,
+      10.29736328125,
+      10.2607421875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 2.168672458996298,
+    "completedAt": "2026-10-30T07:40:53.939572+00:00",
+    "loadAfter": [
+      8.02001953125,
+      10.29736328125,
+      10.2607421875
+    ],
+    "resultSha256": "2e6c72e8be7e3fa23690ad0692a9621b050cfabe639f01be5eca275233660c19",
+    "medianMs": 35.09556250000003
+  },
+  {
+    "label": "sparse-50000-move-1pct-retain0-r3-base",
+    "pairIndex": 25,
+    "caseId": "sparse-50000-move-1pct-retain0",
+    "repetition": 3,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-move-1pct-retain0-r3-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-50000-move-1pct-retain0-r3-base.json",
+    "log": "logs/sparse-50000-move-1pct-retain0-r3-base.log",
+    "startedAt": "2026-10-30T07:40:53.943934+00:00",
+    "loadBefore": [
+      8.02001953125,
+      10.29736328125,
+      10.2607421875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 4.160275832997286,
+    "completedAt": "2026-10-30T07:40:58.105260+00:00",
+    "loadAfter": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "resultSha256": "8e02502b37433796116154c4b134b3596968f668d04e2c858159609197e0fce5",
+    "medianMs": 65.66710400000011
+  },
+  {
+    "label": "sparse-1000-net-zero-retain0-r3-optimized",
+    "pairIndex": 26,
+    "caseId": "sparse-1000-net-zero-retain0",
+    "repetition": 3,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-net-zero-retain0-r3-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-1000-net-zero-retain0-r3-optimized.json",
+    "log": "logs/sparse-1000-net-zero-retain0-r3-optimized.log",
+    "startedAt": "2026-10-30T07:40:58.107626+00:00",
+    "loadBefore": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.043101709001348354,
+    "completedAt": "2026-10-30T07:40:58.151763+00:00",
+    "loadAfter": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "resultSha256": "0d86d84bf20d7c1e379d799558adc7d05d45e7d13344f4ec98babfc0e8e194f3",
+    "medianMs": 0.30489550000000065
+  },
+  {
+    "label": "sparse-1000-net-zero-retain0-r3-base",
+    "pairIndex": 26,
+    "caseId": "sparse-1000-net-zero-retain0",
+    "repetition": 3,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-net-zero-retain0-r3-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-1000-net-zero-retain0-r3-base.json",
+    "log": "logs/sparse-1000-net-zero-retain0-r3-base.log",
+    "startedAt": "2026-10-30T07:40:58.154497+00:00",
+    "loadBefore": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.044406750006601214,
+    "completedAt": "2026-10-30T07:40:58.199846+00:00",
+    "loadAfter": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "resultSha256": "d87cd80dd10dd797d283a7ac383744fb96bcb5d70d937ff9a43ab5a0b4a847a0",
+    "medianMs": 0.3260419999999993
+  },
+  {
+    "label": "sparse-1000-rewire-one-retain0-r3-base",
+    "pairIndex": 27,
+    "caseId": "sparse-1000-rewire-one-retain0",
+    "repetition": 3,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-rewire-one-retain0-r3-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-1000-rewire-one-retain0-r3-base.json",
+    "log": "logs/sparse-1000-rewire-one-retain0-r3-base.log",
+    "startedAt": "2026-10-30T07:40:58.202242+00:00",
+    "loadBefore": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.06990954199864063,
+    "completedAt": "2026-10-30T07:40:58.273523+00:00",
+    "loadAfter": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "resultSha256": "43bc41207b32593b3243c75c1405c0b6326d287532395760083a909b4409a22b",
+    "medianMs": 0.8314785000000029
+  },
+  {
+    "label": "sparse-1000-rewire-one-retain0-r3-optimized",
+    "pairIndex": 27,
+    "caseId": "sparse-1000-rewire-one-retain0",
+    "repetition": 3,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-rewire-one-retain0-r3-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-1000-rewire-one-retain0-r3-optimized.json",
+    "log": "logs/sparse-1000-rewire-one-retain0-r3-optimized.log",
+    "startedAt": "2026-10-30T07:40:58.275660+00:00",
+    "loadBefore": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05342999999993481,
+    "completedAt": "2026-10-30T07:40:58.330152+00:00",
+    "loadAfter": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "resultSha256": "04bf0ed29d8e1b3535351e9863c178c6813d9ed078ea31baa7744df08af7585c",
+    "medianMs": 0.5120834999999992
+  },
+  {
+    "label": "sparse-10000-net-zero-retain0-r3-optimized",
+    "pairIndex": 28,
+    "caseId": "sparse-10000-net-zero-retain0",
+    "repetition": 3,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-net-zero-retain0-r3-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-10000-net-zero-retain0-r3-optimized.json",
+    "log": "logs/sparse-10000-net-zero-retain0-r3-optimized.log",
+    "startedAt": "2026-10-30T07:40:58.333094+00:00",
+    "loadBefore": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.23118608300865162,
+    "completedAt": "2026-10-30T07:40:58.565286+00:00",
+    "loadAfter": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "resultSha256": "bd2f8e8c011c9511c8e2bf17ceb434fed8c6f190d00e8ea4d940521fccabbcee",
+    "medianMs": 3.301354500000002
+  },
+  {
+    "label": "sparse-10000-net-zero-retain0-r3-base",
+    "pairIndex": 28,
+    "caseId": "sparse-10000-net-zero-retain0",
+    "repetition": 3,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-net-zero-retain0-r3-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-10000-net-zero-retain0-r3-base.json",
+    "log": "logs/sparse-10000-net-zero-retain0-r3-base.log",
+    "startedAt": "2026-10-30T07:40:58.567597+00:00",
+    "loadBefore": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.2943183330062311,
+    "completedAt": "2026-10-30T07:40:58.862892+00:00",
+    "loadAfter": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "resultSha256": "179b1778e1505a234a9237df82241b9b7b2cadc5c773c682ce5f3f6554d39e0c",
+    "medianMs": 3.86304149999998
+  },
+  {
+    "label": "sparse-50000-net-zero-retain0-r3-optimized",
+    "pairIndex": 29,
+    "caseId": "sparse-50000-net-zero-retain0",
+    "repetition": 3,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r3-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-50000-net-zero-retain0-r3-optimized.json",
+    "log": "logs/sparse-50000-net-zero-retain0-r3-optimized.log",
+    "startedAt": "2026-10-30T07:40:58.865337+00:00",
+    "loadBefore": [
+      7.69775390625,
+      10.1923828125,
+      10.2236328125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 1.877748832994257,
+    "completedAt": "2026-10-30T07:41:00.744391+00:00",
+    "loadAfter": [
+      7.5615234375,
+      10.12255859375,
+      10.19873046875
+    ],
+    "resultSha256": "0e7d84d5c465920d6389640577fbfdb1d6ec40e3317c1f90c19219a53fdd1b36",
+    "medianMs": 25.39939599999991
+  },
+  {
+    "label": "sparse-50000-net-zero-retain0-r3-base",
+    "pairIndex": 29,
+    "caseId": "sparse-50000-net-zero-retain0",
+    "repetition": 3,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r3-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-50000-net-zero-retain0-r3-base.json",
+    "log": "logs/sparse-50000-net-zero-retain0-r3-base.log",
+    "startedAt": "2026-10-30T07:41:00.746621+00:00",
+    "loadBefore": [
+      7.5615234375,
+      10.12255859375,
+      10.19873046875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 1.3937110410042806,
+    "completedAt": "2026-10-30T07:41:02.141200+00:00",
+    "loadAfter": [
+      7.5615234375,
+      10.12255859375,
+      10.19873046875
+    ],
+    "resultSha256": "1b48ccfb7e4e9ae5d7615b20e79f852a59f05b46a2c5e5a8c75c507a9d3c7413",
+    "medianMs": 23.31758350000007
+  },
+  {
+    "label": "sparse-10000-rewire-one-retain0-r3-base",
+    "pairIndex": 30,
+    "caseId": "sparse-10000-rewire-one-retain0",
+    "repetition": 3,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-rewire-one-retain0-r3-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-10000-rewire-one-retain0-r3-base.json",
+    "log": "logs/sparse-10000-rewire-one-retain0-r3-base.log",
+    "startedAt": "2026-10-30T07:41:02.143526+00:00",
+    "loadBefore": [
+      7.5615234375,
+      10.12255859375,
+      10.19873046875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.6601675420097308,
+    "completedAt": "2026-10-30T07:41:02.804761+00:00",
+    "loadAfter": [
+      7.5615234375,
+      10.12255859375,
+      10.19873046875
+    ],
+    "resultSha256": "ce406b563cd6246980ef2b60c42056e29267ba6e2354c53bc1aa760c7804d4a2",
+    "medianMs": 12.02445800000001
+  },
+  {
+    "label": "sparse-10000-rewire-one-retain0-r3-optimized",
+    "pairIndex": 30,
+    "caseId": "sparse-10000-rewire-one-retain0",
+    "repetition": 3,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-rewire-one-retain0-r3-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-10000-rewire-one-retain0-r3-optimized.json",
+    "log": "logs/sparse-10000-rewire-one-retain0-r3-optimized.log",
+    "startedAt": "2026-10-30T07:41:02.807085+00:00",
+    "loadBefore": [
+      7.5615234375,
+      10.12255859375,
+      10.19873046875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5365020419994835,
+    "completedAt": "2026-10-30T07:41:03.344859+00:00",
+    "loadAfter": [
+      7.5615234375,
+      10.12255859375,
+      10.19873046875
+    ],
+    "resultSha256": "a98c240930127e6f041773bcbc61b4a8331a6010f742e3a6cfade98703c4b0c6",
+    "medianMs": 9.10918700000002
+  },
+  {
+    "label": "sparse-10000-move-1pct-retain0-r3-optimized",
+    "pairIndex": 31,
+    "caseId": "sparse-10000-move-1pct-retain0",
+    "repetition": 3,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-move-1pct-retain0-r3-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-10000-move-1pct-retain0-r3-optimized.json",
+    "log": "logs/sparse-10000-move-1pct-retain0-r3-optimized.log",
+    "startedAt": "2026-10-30T07:41:03.347395+00:00",
+    "loadBefore": [
+      7.5615234375,
+      10.12255859375,
+      10.19873046875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.8525231249950593,
+    "completedAt": "2026-10-30T07:41:04.201057+00:00",
+    "loadAfter": [
+      7.5615234375,
+      10.12255859375,
+      10.19873046875
+    ],
+    "resultSha256": "cc73c7c48fc4ba4925f7be7849494a294060ccba0da8eb8ec36988a15e4e4f07",
+    "medianMs": 10.797603999999978
+  },
+  {
+    "label": "sparse-10000-move-1pct-retain0-r3-base",
+    "pairIndex": 31,
+    "caseId": "sparse-10000-move-1pct-retain0",
+    "repetition": 3,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-move-1pct-retain0-r3-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-10000-move-1pct-retain0-r3-base.json",
+    "log": "logs/sparse-10000-move-1pct-retain0-r3-base.log",
+    "startedAt": "2026-10-30T07:41:04.203882+00:00",
+    "loadBefore": [
+      7.5615234375,
+      10.12255859375,
+      10.19873046875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.724590249999892,
+    "completedAt": "2026-10-30T07:41:04.929774+00:00",
+    "loadAfter": [
+      7.5615234375,
+      10.12255859375,
+      10.19873046875
+    ],
+    "resultSha256": "9fd6bb998ec70f84feb12657581172d1b3dcd40d31e8a216d4296aa9f24c7078",
+    "medianMs": 11.878332999999998
+  },
+  {
+    "label": "sparse-50000-move-one-retain0-r3-base",
+    "pairIndex": 32,
+    "caseId": "sparse-50000-move-one-retain0",
+    "repetition": 3,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-move-one-retain0-r3-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-50000-move-one-retain0-r3-base.json",
+    "log": "logs/sparse-50000-move-one-retain0-r3-base.log",
+    "startedAt": "2026-10-30T07:41:04.932496+00:00",
+    "loadBefore": [
+      7.5615234375,
+      10.12255859375,
+      10.19873046875
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 4.005462208006065,
+    "completedAt": "2026-10-30T07:41:08.939265+00:00",
+    "loadAfter": [
+      7.19580078125,
+      10.00390625,
+      10.15625
+    ],
+    "resultSha256": "3fe29397c88ed5e39fd38fa6695f3498074b9f8437baedd302c7323bd4beec99",
+    "medianMs": 65.80433349999998
+  },
+  {
+    "label": "sparse-50000-move-one-retain0-r3-optimized",
+    "pairIndex": 32,
+    "caseId": "sparse-50000-move-one-retain0",
+    "repetition": 3,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-move-one-retain0-r3-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-50000-move-one-retain0-r3-optimized.json",
+    "log": "logs/sparse-50000-move-one-retain0-r3-optimized.log",
+    "startedAt": "2026-10-30T07:41:08.942417+00:00",
+    "loadBefore": [
+      7.19580078125,
+      10.00390625,
+      10.15625
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 2.30781641700014,
+    "completedAt": "2026-10-30T07:41:11.251262+00:00",
+    "loadAfter": [
+      7.1796875,
+      9.95361328125,
+      10.1376953125
+    ],
+    "resultSha256": "39c4046b2062eb4de0708fb75bc3f1320de46e1741e9f6659fd8ef146f1f34df",
+    "medianMs": 37.57408350000003
+  },
+  {
+    "label": "sparse-50000-rewire-one-retain0-r3-base",
+    "pairIndex": 33,
+    "caseId": "sparse-50000-rewire-one-retain0",
+    "repetition": 3,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-rewire-one-retain0-r3-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-50000-rewire-one-retain0-r3-base.json",
+    "log": "logs/sparse-50000-rewire-one-retain0-r3-base.log",
+    "startedAt": "2026-10-30T07:41:11.254174+00:00",
+    "loadBefore": [
+      7.1796875,
+      9.95361328125,
+      10.1376953125
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 4.54692791699199,
+    "completedAt": "2026-10-30T07:41:15.802360+00:00",
+    "loadAfter": [
+      6.9248046875,
+      9.8544921875,
+      10.1015625
+    ],
+    "resultSha256": "0c7c336b99175d99fb43b08009267ae8bcef16ba156cce83faae2174a4ebe994",
+    "medianMs": 83.75647900000013
+  },
+  {
+    "label": "sparse-50000-rewire-one-retain0-r3-optimized",
+    "pairIndex": 33,
+    "caseId": "sparse-50000-rewire-one-retain0",
+    "repetition": 3,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-50000-rewire-one-retain0-r3-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-50000-rewire-one-retain0-r3-optimized.json",
+    "log": "logs/sparse-50000-rewire-one-retain0-r3-optimized.log",
+    "startedAt": "2026-10-30T07:41:15.806105+00:00",
+    "loadBefore": [
+      6.9248046875,
+      9.8544921875,
+      10.1015625
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 3.427029250000487,
+    "completedAt": "2026-10-30T07:41:19.234781+00:00",
+    "loadAfter": [
+      6.9248046875,
+      9.8544921875,
+      10.1015625
+    ],
+    "resultSha256": "c24ba3d5b6dd370a64475111038219ee4cd674099943325c86a51d7fb0e089fa",
+    "medianMs": 55.6116669999999
+  },
+  {
+    "label": "sparse-10000-move-one-retain0-r3-base",
+    "pairIndex": 34,
+    "caseId": "sparse-10000-move-one-retain0",
+    "repetition": 3,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-move-one-retain0-r3-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-10000-move-one-retain0-r3-base.json",
+    "log": "logs/sparse-10000-move-one-retain0-r3-base.log",
+    "startedAt": "2026-10-30T07:41:19.237805+00:00",
+    "loadBefore": [
+      6.9248046875,
+      9.8544921875,
+      10.1015625
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.8158803339902079,
+    "completedAt": "2026-10-30T07:41:20.055491+00:00",
+    "loadAfter": [
+      6.9248046875,
+      9.8544921875,
+      10.1015625
+    ],
+    "resultSha256": "ace7798f32ec44e97a438b7589a0205a2334c17b6f18193e2f122a81c2c3b7df",
+    "medianMs": 14.50470850000005
+  },
+  {
+    "label": "sparse-10000-move-one-retain0-r3-optimized",
+    "pairIndex": 34,
+    "caseId": "sparse-10000-move-one-retain0",
+    "repetition": 3,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-10000-move-one-retain0-r3-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-10000-move-one-retain0-r3-optimized.json",
+    "log": "logs/sparse-10000-move-one-retain0-r3-optimized.log",
+    "startedAt": "2026-10-30T07:41:20.058135+00:00",
+    "loadBefore": [
+      6.9248046875,
+      9.8544921875,
+      10.1015625
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.40729666700644884,
+    "completedAt": "2026-10-30T07:41:20.466927+00:00",
+    "loadAfter": [
+      6.9248046875,
+      9.8544921875,
+      10.1015625
+    ],
+    "resultSha256": "24e404fa6a868125aa780a0456eb6395bf345c53683c11fe7a6895105f2a4dd5",
+    "medianMs": 6.169812500000006
+  },
+  {
+    "label": "sparse-1000-move-one-retain0-r3-base",
+    "pairIndex": 35,
+    "caseId": "sparse-1000-move-one-retain0",
+    "repetition": 3,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-move-one-retain0-r3-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-1000-move-one-retain0-r3-base.json",
+    "log": "logs/sparse-1000-move-one-retain0-r3-base.log",
+    "startedAt": "2026-10-30T07:41:20.469778+00:00",
+    "loadBefore": [
+      6.9248046875,
+      9.8544921875,
+      10.1015625
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.07177658299042378,
+    "completedAt": "2026-10-30T07:41:20.542915+00:00",
+    "loadAfter": [
+      7.1708984375,
+      9.8564453125,
+      10.1005859375
+    ],
+    "resultSha256": "5cb26c29149964a80270edaef4b4e581b893b61f3bd6739b2feb9b659bfc929b",
+    "medianMs": 0.7626460000000002
+  },
+  {
+    "label": "sparse-1000-move-one-retain0-r3-optimized",
+    "pairIndex": 35,
+    "caseId": "sparse-1000-move-one-retain0",
+    "repetition": 3,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-move-one-retain0-r3-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-1000-move-one-retain0-r3-optimized.json",
+    "log": "logs/sparse-1000-move-one-retain0-r3-optimized.log",
+    "startedAt": "2026-10-30T07:41:20.545888+00:00",
+    "loadBefore": [
+      7.1708984375,
+      9.8564453125,
+      10.1005859375
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05525725000188686,
+    "completedAt": "2026-10-30T07:41:20.602661+00:00",
+    "loadAfter": [
+      7.1708984375,
+      9.8564453125,
+      10.1005859375
+    ],
+    "resultSha256": "f55693adb3c01dc9ee2e96113ebcd74386183380547e12a3862b056016a61f71",
+    "medianMs": 0.4962090000000039
+  },
+  {
+    "label": "sparse-1000-move-1pct-retain0-r3-optimized",
+    "pairIndex": 36,
+    "caseId": "sparse-1000-move-1pct-retain0",
+    "repetition": 3,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-move-1pct-retain0-r3-optimized.json"
+    ],
+    "cwd": "<PRIOR_RUN>/performance-optimized",
+    "result": "results/sparse-1000-move-1pct-retain0-r3-optimized.json",
+    "log": "logs/sparse-1000-move-1pct-retain0-r3-optimized.log",
+    "startedAt": "2026-10-30T07:41:20.605815+00:00",
+    "loadBefore": [
+      7.1708984375,
+      9.8564453125,
+      10.1005859375
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05615620799653698,
+    "completedAt": "2026-10-30T07:41:20.663078+00:00",
+    "loadAfter": [
+      7.1708984375,
+      9.8564453125,
+      10.1005859375
+    ],
+    "resultSha256": "c537e40d5bc79f014e5edac28f6dee33f4b94b1af56df2f8f20f9bc9eb5e38d1",
+    "medianMs": 0.4147704999999995
+  },
+  {
+    "label": "sparse-1000-move-1pct-retain0-r3-base",
+    "pairIndex": 36,
+    "caseId": "sparse-1000-move-1pct-retain0",
+    "repetition": 3,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-paired/results/sparse-1000-move-1pct-retain0-r3-base.json"
+    ],
+    "cwd": "<BASELINE_RUN>",
+    "result": "results/sparse-1000-move-1pct-retain0-r3-base.json",
+    "log": "logs/sparse-1000-move-1pct-retain0-r3-base.log",
+    "startedAt": "2026-10-30T07:41:20.665736+00:00",
+    "loadBefore": [
+      7.1708984375,
+      9.8564453125,
+      10.1005859375
+    ],
+    "status": "validated",
+    "exitCode": 0,
+    "elapsedSeconds": 0.325247834000038,
+    "completedAt": "2026-10-30T07:41:20.992132+00:00",
+    "loadAfter": [
+      7.1708984375,
+      9.8564453125,
+      10.1005859375
+    ],
+    "resultSha256": "7782541dadd60caf8da83d6925173b13d1da7c7797f8b8683d635caddc928a90",
+    "medianMs": 3.408854499999997
+  }
+]

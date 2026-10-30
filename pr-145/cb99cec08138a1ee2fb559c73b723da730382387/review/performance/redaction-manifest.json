@@ -1,0 +1,2904 @@
+{
+  "schemaVersion": 1,
+  "transformation": "Only the three named logical-prefix replacements; no numeric data or unfavorable observations removed.",
+  "logicalPrefixes": [
+    "<BASELINE_RUN>",
+    "<RUN>",
+    "<WORKSPACE>"
+  ],
+  "exclusions": "No source checkout, node_modules binaries, chat/authorization state, process inventory or non-allowlisted run files.",
+  "scope": "Payload files. This manifest is hashed by artifacts.json; artifacts.json is the external integration index and does not hash itself.",
+  "files": [
+    {
+      "path": "reports/REPORT.md",
+      "source": "<RUN>/performance-report/REPORT.md",
+      "originalSha256": "a4860ea8bbf237cea651e20c5300021fd1d96d65007cef02f40ba757ecf62c7b",
+      "publicSha256": "a4860ea8bbf237cea651e20c5300021fd1d96d65007cef02f40ba757ecf62c7b",
+      "originalBytes": 10635,
+      "publicBytes": 10635,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "reports/comparison.json",
+      "source": "<RUN>/performance-report/comparison.json",
+      "originalSha256": "0407d1e2dce26a021d0a2342f14d914322ebe78f72eb2201fe0fbf6b12c70d77",
+      "publicSha256": "23671f2a56690daf3018bca6d412ccaf1f9ca37a8ddcebacba2fe15bf66d187b",
+      "originalBytes": 166073,
+      "publicBytes": 153281,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 82
+        },
+        {
+          "prefix": "<RUN>",
+          "occurrences": 82
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "reports/netzero-diagnostic.md",
+      "source": "<RUN>/performance-report/netzero-diagnostic.md",
+      "originalSha256": "d2db11be97e9531a534b4950176818526450774e6f970180cc65513e87b3c2f3",
+      "publicSha256": "d2db11be97e9531a534b4950176818526450774e6f970180cc65513e87b3c2f3",
+      "originalBytes": 4038,
+      "publicBytes": 4038,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "reports/netzero-diagnostic.json",
+      "source": "<RUN>/performance-report/netzero-diagnostic.json",
+      "originalSha256": "d6d86b6b2f2664ab09de8af9c5d6572df596e56350c8c7825049eb808c7f6cf8",
+      "publicSha256": "b0c4ef7ddcfe443b475e2662e88602fa6917eb2b5ce1d1131533b9d09094ab87",
+      "originalBytes": 62349,
+      "publicBytes": 57741,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 12
+        },
+        {
+          "prefix": "<RUN>",
+          "occurrences": 48
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "reports/profile-range-correction.md",
+      "source": "<RUN>/performance-report/profile-range-correction.md",
+      "originalSha256": "9c9694f0df46299279d406811899e6b1d77c8fb258f37bc41fcbc9cb27566f8e",
+      "publicSha256": "9c9694f0df46299279d406811899e6b1d77c8fb258f37bc41fcbc9cb27566f8e",
+      "originalBytes": 2029,
+      "publicBytes": 2029,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/baseline-summary.json",
+      "source": "<BASELINE_RUN>/baseline-summary.json",
+      "originalSha256": "6d07759d57345904e9a72ad3dff5ef2401f4b314d198491c2ff908fc66098d00",
+      "publicSha256": "6d07759d57345904e9a72ad3dff5ef2401f4b314d198491c2ff908fc66098d00",
+      "originalBytes": 12481,
+      "publicBytes": 12481,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/baseline-receipts.json",
+      "source": "<BASELINE_RUN>/baseline-receipts.json",
+      "originalSha256": "b7c60853a275a779665fe822222abea92d7db8f56dec5f4ecf06ae9b0e2119eb",
+      "publicSha256": "41ad5ea78bcc4442b52b9deaaa2795577cffbe2af845d3ee63d1a2fb6c849ea4",
+      "originalBytes": 34906,
+      "publicBytes": 25306,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 120
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/matrix-plan.json",
+      "source": "<BASELINE_RUN>/matrix-plan.json",
+      "originalSha256": "ac87e0ed02f9254c0bd0c6df79e8dde5c2324035340aa480c6bd696c640efb10",
+      "publicSha256": "ac87e0ed02f9254c0bd0c6df79e8dde5c2324035340aa480c6bd696c640efb10",
+      "originalBytes": 2472,
+      "publicBytes": 2472,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/schedule.json",
+      "source": "<BASELINE_RUN>/schedule.json",
+      "originalSha256": "a457f97326b5e08d12914967b1c57ad5d86412570476549fdf9d26bdead38ec8",
+      "publicSha256": "a457f97326b5e08d12914967b1c57ad5d86412570476549fdf9d26bdead38ec8",
+      "originalBytes": 7680,
+      "publicBytes": 7680,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/artifact-manifest.json",
+      "source": "<BASELINE_RUN>/artifact-manifest.json",
+      "originalSha256": "c9c61fde9ad094fce5b8d6aec89bbf20b7676402be0f617934c592f49e9425cf",
+      "publicSha256": "c9c61fde9ad094fce5b8d6aec89bbf20b7676402be0f617934c592f49e9425cf",
+      "originalBytes": 24238,
+      "publicBytes": 24238,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/harness-sha256.txt",
+      "source": "<BASELINE_RUN>/harness-sha256.txt",
+      "originalSha256": "7a6ab97052957130f7449200644e7524cf4efd0a75039a5133b05264e13cea60",
+      "publicSha256": "7a6ab97052957130f7449200644e7524cf4efd0a75039a5133b05264e13cea60",
+      "originalBytes": 80,
+      "publicBytes": 80,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/hub-10000-move-one-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/hub-10000-move-one-retain0-r1.json",
+      "originalSha256": "d8fd8243e9edf2a202e575645d0802ce09bad9a9caec9a1a95a208b6bf52199a",
+      "publicSha256": "d8fd8243e9edf2a202e575645d0802ce09bad9a9caec9a1a95a208b6bf52199a",
+      "originalBytes": 3814,
+      "publicBytes": 3814,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/hub-10000-move-one-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/hub-10000-move-one-retain0-r2.json",
+      "originalSha256": "1b6dad1949e522c8e9bb45e7110bb0e2a86f714f21d7fb9e45b7800aa10c3264",
+      "publicSha256": "1b6dad1949e522c8e9bb45e7110bb0e2a86f714f21d7fb9e45b7800aa10c3264",
+      "originalBytes": 3829,
+      "publicBytes": 3829,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/hub-10000-move-one-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/hub-10000-move-one-retain0-r3.json",
+      "originalSha256": "225a9e13ff70f4efa27600ab5371b96f3d5eba5ef8ed2e50528369f7250ae3e5",
+      "publicSha256": "225a9e13ff70f4efa27600ab5371b96f3d5eba5ef8ed2e50528369f7250ae3e5",
+      "originalBytes": 3847,
+      "publicBytes": 3847,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/hub-10000-rewire-one-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/hub-10000-rewire-one-retain0-r1.json",
+      "originalSha256": "92c93abbb7ee3114452d5d686696d8a5869a62ed30cf3f4517af41648a19a33e",
+      "publicSha256": "92c93abbb7ee3114452d5d686696d8a5869a62ed30cf3f4517af41648a19a33e",
+      "originalBytes": 3819,
+      "publicBytes": 3819,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/hub-10000-rewire-one-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/hub-10000-rewire-one-retain0-r2.json",
+      "originalSha256": "b7a06cb697e93596b3566eebc1739331055b0c3ff3829a0e47ff9204735ad899",
+      "publicSha256": "b7a06cb697e93596b3566eebc1739331055b0c3ff3829a0e47ff9204735ad899",
+      "originalBytes": 3817,
+      "publicBytes": 3817,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/hub-10000-rewire-one-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/hub-10000-rewire-one-retain0-r3.json",
+      "originalSha256": "b2acbe136fe508b6003dcfcd66a4e111dc583070de5b33a7f13dc22dc5c57caa",
+      "publicSha256": "b2acbe136fe508b6003dcfcd66a4e111dc583070de5b33a7f13dc22dc5c57caa",
+      "originalBytes": 3835,
+      "publicBytes": 3835,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/hub-50000-move-one-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/hub-50000-move-one-retain0-r1.json",
+      "originalSha256": "770384d3b395b0c0216fbdcb4d990a8660544a31b589a907c58e0bdcc7eedd8b",
+      "publicSha256": "770384d3b395b0c0216fbdcb4d990a8660544a31b589a907c58e0bdcc7eedd8b",
+      "originalBytes": 3877,
+      "publicBytes": 3877,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/hub-50000-move-one-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/hub-50000-move-one-retain0-r2.json",
+      "originalSha256": "9267db46c44db4ef45c88b0412bdf2d5cdbfd8d1667d19003a17a2eafee15adc",
+      "publicSha256": "9267db46c44db4ef45c88b0412bdf2d5cdbfd8d1667d19003a17a2eafee15adc",
+      "originalBytes": 3859,
+      "publicBytes": 3859,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/hub-50000-move-one-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/hub-50000-move-one-retain0-r3.json",
+      "originalSha256": "14b0c9fa6a466fc5fdd6c2dc609ac0c5e73399c1a3ee5f9887df53ab9b84eaf2",
+      "publicSha256": "14b0c9fa6a466fc5fdd6c2dc609ac0c5e73399c1a3ee5f9887df53ab9b84eaf2",
+      "originalBytes": 3892,
+      "publicBytes": 3892,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/hub-50000-rewire-one-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/hub-50000-rewire-one-retain0-r1.json",
+      "originalSha256": "442135ac8c0415b30f94530f5551f4ffb2dde836f624ec81abe029000b4830a9",
+      "publicSha256": "442135ac8c0415b30f94530f5551f4ffb2dde836f624ec81abe029000b4830a9",
+      "originalBytes": 3883,
+      "publicBytes": 3883,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/hub-50000-rewire-one-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/hub-50000-rewire-one-retain0-r2.json",
+      "originalSha256": "1004cb737069a9ef5e9f6de7c9ea216cb8b016d11ed962c15172551025324af3",
+      "publicSha256": "1004cb737069a9ef5e9f6de7c9ea216cb8b016d11ed962c15172551025324af3",
+      "originalBytes": 3860,
+      "publicBytes": 3860,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/hub-50000-rewire-one-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/hub-50000-rewire-one-retain0-r3.json",
+      "originalSha256": "b74a45b2ed311a0b06032bd2178c649bc842eaf5833cecde3b40b93ed937e718",
+      "publicSha256": "b74a45b2ed311a0b06032bd2178c649bc842eaf5833cecde3b40b93ed937e718",
+      "originalBytes": 3890,
+      "publicBytes": 3890,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/nested-10000-move-one-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/nested-10000-move-one-retain0-r1.json",
+      "originalSha256": "fb9d4fadd322c9d3ccff74e5d62269e9c88cb658b7116414787ddf6ddf1d3f8f",
+      "publicSha256": "fb9d4fadd322c9d3ccff74e5d62269e9c88cb658b7116414787ddf6ddf1d3f8f",
+      "originalBytes": 3841,
+      "publicBytes": 3841,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/nested-10000-move-one-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/nested-10000-move-one-retain0-r2.json",
+      "originalSha256": "6d41d9a09f2c9a28bd1819f5451b10495e067e3477e992daa6d2beb346fb1926",
+      "publicSha256": "6d41d9a09f2c9a28bd1819f5451b10495e067e3477e992daa6d2beb346fb1926",
+      "originalBytes": 3854,
+      "publicBytes": 3854,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/nested-10000-move-one-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/nested-10000-move-one-retain0-r3.json",
+      "originalSha256": "0e1489469ba8aeef70708ebed81e1c550baa13e8c122fdf68a783302ba0a691d",
+      "publicSha256": "0e1489469ba8aeef70708ebed81e1c550baa13e8c122fdf68a783302ba0a691d",
+      "originalBytes": 3845,
+      "publicBytes": 3845,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/nested-50000-move-one-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/nested-50000-move-one-retain0-r1.json",
+      "originalSha256": "38b75df273b88267ec3d6b35853d6c73b763fcc841b979b457b7ff189d640b70",
+      "publicSha256": "38b75df273b88267ec3d6b35853d6c73b763fcc841b979b457b7ff189d640b70",
+      "originalBytes": 3854,
+      "publicBytes": 3854,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/nested-50000-move-one-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/nested-50000-move-one-retain0-r2.json",
+      "originalSha256": "4d930a1682f465d84028647e48f72c6fc524e5aaa8439a5b659556034e264b50",
+      "publicSha256": "4d930a1682f465d84028647e48f72c6fc524e5aaa8439a5b659556034e264b50",
+      "originalBytes": 3865,
+      "publicBytes": 3865,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/nested-50000-move-one-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/nested-50000-move-one-retain0-r3.json",
+      "originalSha256": "e1243a5d5bcbba77cf9acfde1bc5362ca01ff0872ff85a197de12e9c967343f2",
+      "publicSha256": "e1243a5d5bcbba77cf9acfde1bc5362ca01ff0872ff85a197de12e9c967343f2",
+      "originalBytes": 3902,
+      "publicBytes": 3902,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-1000-move-1pct-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-1000-move-1pct-retain0-r1.json",
+      "originalSha256": "8c4ac72410a30e2025eab460a3f573aaedb8ab45345f213051334fc4909a8a9d",
+      "publicSha256": "8c4ac72410a30e2025eab460a3f573aaedb8ab45345f213051334fc4909a8a9d",
+      "originalBytes": 3788,
+      "publicBytes": 3788,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-1000-move-1pct-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-1000-move-1pct-retain0-r2.json",
+      "originalSha256": "31fca8dfc31c8d59abd8ac5ce809fa102955bb9446c820129fc0281b54253093",
+      "publicSha256": "31fca8dfc31c8d59abd8ac5ce809fa102955bb9446c820129fc0281b54253093",
+      "originalBytes": 3794,
+      "publicBytes": 3794,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-1000-move-1pct-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-1000-move-1pct-retain0-r3.json",
+      "originalSha256": "d051decbdef6bdbdc3af611ddde908a9d819ba750365e54d2403376bc9f99216",
+      "publicSha256": "d051decbdef6bdbdc3af611ddde908a9d819ba750365e54d2403376bc9f99216",
+      "originalBytes": 3768,
+      "publicBytes": 3768,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-1000-move-one-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-1000-move-one-retain0-r1.json",
+      "originalSha256": "7ec60175b194b7c90410890913aa595f820d23b6d3da6b7c446569ee475355d8",
+      "publicSha256": "7ec60175b194b7c90410890913aa595f820d23b6d3da6b7c446569ee475355d8",
+      "originalBytes": 3796,
+      "publicBytes": 3796,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-1000-move-one-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-1000-move-one-retain0-r2.json",
+      "originalSha256": "9bf9add15981d9b885922c1b493368c3db01a25f1113362b337bd9bba079d4a0",
+      "publicSha256": "9bf9add15981d9b885922c1b493368c3db01a25f1113362b337bd9bba079d4a0",
+      "originalBytes": 3777,
+      "publicBytes": 3777,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-1000-move-one-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-1000-move-one-retain0-r3.json",
+      "originalSha256": "083e1b9709c8c1788cb5189e6026a0c111bcc6268b35b6581917d97847ee4665",
+      "publicSha256": "083e1b9709c8c1788cb5189e6026a0c111bcc6268b35b6581917d97847ee4665",
+      "originalBytes": 3789,
+      "publicBytes": 3789,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-1000-net-zero-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-1000-net-zero-retain0-r1.json",
+      "originalSha256": "30ea63a0dcf2103b147315541f502dbce7c1cbfc8718f0489147ab65d6aa286f",
+      "publicSha256": "30ea63a0dcf2103b147315541f502dbce7c1cbfc8718f0489147ab65d6aa286f",
+      "originalBytes": 3788,
+      "publicBytes": 3788,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-1000-net-zero-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-1000-net-zero-retain0-r2.json",
+      "originalSha256": "3fbe85db5ab44f4a3f714fe57a91af2a5e24124e813b09d69d80ad40419d87e1",
+      "publicSha256": "3fbe85db5ab44f4a3f714fe57a91af2a5e24124e813b09d69d80ad40419d87e1",
+      "originalBytes": 3766,
+      "publicBytes": 3766,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-1000-net-zero-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-1000-net-zero-retain0-r3.json",
+      "originalSha256": "d0f1232af8cc882efa73a9631efb7782515912cabbbdc1ca2e17993036199465",
+      "publicSha256": "d0f1232af8cc882efa73a9631efb7782515912cabbbdc1ca2e17993036199465",
+      "originalBytes": 3823,
+      "publicBytes": 3823,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-1000-rewire-one-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-1000-rewire-one-retain0-r1.json",
+      "originalSha256": "3a28a18dc0f79320e41d60acf013d96a9c20fb596faa04180cd26c20fe64085f",
+      "publicSha256": "3a28a18dc0f79320e41d60acf013d96a9c20fb596faa04180cd26c20fe64085f",
+      "originalBytes": 3779,
+      "publicBytes": 3779,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-1000-rewire-one-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-1000-rewire-one-retain0-r2.json",
+      "originalSha256": "7a98b978fbba17672390a2d446a6b21cff3f89be12b915d2a14a09930f87cf21",
+      "publicSha256": "7a98b978fbba17672390a2d446a6b21cff3f89be12b915d2a14a09930f87cf21",
+      "originalBytes": 3792,
+      "publicBytes": 3792,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-1000-rewire-one-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-1000-rewire-one-retain0-r3.json",
+      "originalSha256": "957af378322233924184e338dbb4cc9389f9fa185a6440d602afaa53a93cceb6",
+      "publicSha256": "957af378322233924184e338dbb4cc9389f9fa185a6440d602afaa53a93cceb6",
+      "originalBytes": 3787,
+      "publicBytes": 3787,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-move-1pct-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-move-1pct-retain0-r1.json",
+      "originalSha256": "df0f32ff5856e6f1a9993a71822ffc97e536561c77b25025f8f67e21c3bdf98b",
+      "publicSha256": "df0f32ff5856e6f1a9993a71822ffc97e536561c77b25025f8f67e21c3bdf98b",
+      "originalBytes": 3842,
+      "publicBytes": 3842,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-move-1pct-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-move-1pct-retain0-r2.json",
+      "originalSha256": "c989cd2641b1162bbc7cb87b6e9bae10ddf32eaf3c4240f57987081ac1e04ef4",
+      "publicSha256": "c989cd2641b1162bbc7cb87b6e9bae10ddf32eaf3c4240f57987081ac1e04ef4",
+      "originalBytes": 3839,
+      "publicBytes": 3839,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-move-1pct-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-move-1pct-retain0-r3.json",
+      "originalSha256": "7388d5b8df6f62bc5e5140ff55aa1a810dad3daef4fc00b8b6ae6be95804aa7d",
+      "publicSha256": "7388d5b8df6f62bc5e5140ff55aa1a810dad3daef4fc00b8b6ae6be95804aa7d",
+      "originalBytes": 3803,
+      "publicBytes": 3803,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-move-one-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-move-one-retain0-r1.json",
+      "originalSha256": "6665cb0e55a0fbd1f8fb4a237912b1ffc69989c1dc1b9bd359da25446baaed38",
+      "publicSha256": "6665cb0e55a0fbd1f8fb4a237912b1ffc69989c1dc1b9bd359da25446baaed38",
+      "originalBytes": 3820,
+      "publicBytes": 3820,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-move-one-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-move-one-retain0-r2.json",
+      "originalSha256": "260048f8d84784e01d164de8b7270b5f67749112d4e479b4877c102252705bbd",
+      "publicSha256": "260048f8d84784e01d164de8b7270b5f67749112d4e479b4877c102252705bbd",
+      "originalBytes": 3841,
+      "publicBytes": 3841,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-move-one-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-move-one-retain0-r3.json",
+      "originalSha256": "e3a2ea24eb5f796fc008d437afe45d6ca25f22abbc1b0b35d6be7a5d960515f9",
+      "publicSha256": "e3a2ea24eb5f796fc008d437afe45d6ca25f22abbc1b0b35d6be7a5d960515f9",
+      "originalBytes": 3824,
+      "publicBytes": 3824,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-move-one-retain20-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-move-one-retain20-r1.json",
+      "originalSha256": "20a1a66f7aaf93309235a87be8f84650bd7672b7908b8941c02745d2c83ffaca",
+      "publicSha256": "20a1a66f7aaf93309235a87be8f84650bd7672b7908b8941c02745d2c83ffaca",
+      "originalBytes": 3836,
+      "publicBytes": 3836,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-move-one-retain20-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-move-one-retain20-r2.json",
+      "originalSha256": "9efed43937af495ec0adba3f916c071fc90efd15135612f973b22c7069ae5b32",
+      "publicSha256": "9efed43937af495ec0adba3f916c071fc90efd15135612f973b22c7069ae5b32",
+      "originalBytes": 3831,
+      "publicBytes": 3831,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-move-one-retain20-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-move-one-retain20-r3.json",
+      "originalSha256": "4defe9c25ee9b29b2637a0258273aa87908b82ecd8f8dd9303c25f66c8017528",
+      "publicSha256": "4defe9c25ee9b29b2637a0258273aa87908b82ecd8f8dd9303c25f66c8017528",
+      "originalBytes": 3854,
+      "publicBytes": 3854,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-net-zero-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-net-zero-retain0-r1.json",
+      "originalSha256": "22a4103c021c83c4903283fc4099dd0e231657151df77adbd295984b07d0905f",
+      "publicSha256": "22a4103c021c83c4903283fc4099dd0e231657151df77adbd295984b07d0905f",
+      "originalBytes": 3839,
+      "publicBytes": 3839,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-net-zero-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-net-zero-retain0-r2.json",
+      "originalSha256": "48e92deabb51dd950743a711bc6a1cedd642dce6a89c44ab13e23035d45487a8",
+      "publicSha256": "48e92deabb51dd950743a711bc6a1cedd642dce6a89c44ab13e23035d45487a8",
+      "originalBytes": 3825,
+      "publicBytes": 3825,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-net-zero-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-net-zero-retain0-r3.json",
+      "originalSha256": "5ea18140e1662d9d4bdc10ef680efc4f8846d5f042ff9f2a64bcbd3544ff264a",
+      "publicSha256": "5ea18140e1662d9d4bdc10ef680efc4f8846d5f042ff9f2a64bcbd3544ff264a",
+      "originalBytes": 3819,
+      "publicBytes": 3819,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-rewire-one-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-rewire-one-retain0-r1.json",
+      "originalSha256": "10cc4b6466d7b357baa99fec603e32f8a8479984e2b9d5b81d0c2fb23193e8a0",
+      "publicSha256": "10cc4b6466d7b357baa99fec603e32f8a8479984e2b9d5b81d0c2fb23193e8a0",
+      "originalBytes": 3850,
+      "publicBytes": 3850,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-rewire-one-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-rewire-one-retain0-r2.json",
+      "originalSha256": "eda55003c357836330dc8d119555eabf138b522f4c13fae08989a86312683118",
+      "publicSha256": "eda55003c357836330dc8d119555eabf138b522f4c13fae08989a86312683118",
+      "originalBytes": 3843,
+      "publicBytes": 3843,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-10000-rewire-one-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-10000-rewire-one-retain0-r3.json",
+      "originalSha256": "1abca42261d606923ac78b45155a378f3f65bc9459174717f7270d5b6015bcfe",
+      "publicSha256": "1abca42261d606923ac78b45155a378f3f65bc9459174717f7270d5b6015bcfe",
+      "originalBytes": 3799,
+      "publicBytes": 3799,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-move-1pct-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-move-1pct-retain0-r1.json",
+      "originalSha256": "d1aab1144cc0976ff4394ff642d659997073c3b89cb08eb70db258b1b4fb1fb4",
+      "publicSha256": "d1aab1144cc0976ff4394ff642d659997073c3b89cb08eb70db258b1b4fb1fb4",
+      "originalBytes": 3887,
+      "publicBytes": 3887,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-move-1pct-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-move-1pct-retain0-r2.json",
+      "originalSha256": "9069ae08a16f6611146f8f95a7ee7e72d13cf159f8da1626031dc0b6dc150412",
+      "publicSha256": "9069ae08a16f6611146f8f95a7ee7e72d13cf159f8da1626031dc0b6dc150412",
+      "originalBytes": 3887,
+      "publicBytes": 3887,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-move-1pct-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-move-1pct-retain0-r3.json",
+      "originalSha256": "2c9aef3f38fcb5cc7054c6f45bf68ed88e62fbd5ee9e6a618fa9a6343acc2bf7",
+      "publicSha256": "2c9aef3f38fcb5cc7054c6f45bf68ed88e62fbd5ee9e6a618fa9a6343acc2bf7",
+      "originalBytes": 3888,
+      "publicBytes": 3888,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-move-one-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-move-one-retain0-r1.json",
+      "originalSha256": "990a5926c0fb950298d356d973e0c32457e61134d5b1f08b166b8a0590784ec3",
+      "publicSha256": "990a5926c0fb950298d356d973e0c32457e61134d5b1f08b166b8a0590784ec3",
+      "originalBytes": 3862,
+      "publicBytes": 3862,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-move-one-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-move-one-retain0-r2.json",
+      "originalSha256": "7ccf93c0e38051c57dec724f2663ea3b5e5e01f18c333503a5934430f431b7d5",
+      "publicSha256": "7ccf93c0e38051c57dec724f2663ea3b5e5e01f18c333503a5934430f431b7d5",
+      "originalBytes": 3889,
+      "publicBytes": 3889,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-move-one-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-move-one-retain0-r3.json",
+      "originalSha256": "4929786ac4cf46ad5509d65652c2bde823583c5fccd64d1d51033b97c0040f3a",
+      "publicSha256": "4929786ac4cf46ad5509d65652c2bde823583c5fccd64d1d51033b97c0040f3a",
+      "originalBytes": 3876,
+      "publicBytes": 3876,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-move-one-retain20-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-move-one-retain20-r1.json",
+      "originalSha256": "00814ab716685554137168c08332b7ff4f05d910cca307aa95e537888ebcb805",
+      "publicSha256": "00814ab716685554137168c08332b7ff4f05d910cca307aa95e537888ebcb805",
+      "originalBytes": 3873,
+      "publicBytes": 3873,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-move-one-retain20-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-move-one-retain20-r2.json",
+      "originalSha256": "5b0e3b5fc67146e31232a897e284b65b08a1dffc85696c683f6791a70a29d419",
+      "publicSha256": "5b0e3b5fc67146e31232a897e284b65b08a1dffc85696c683f6791a70a29d419",
+      "originalBytes": 3904,
+      "publicBytes": 3904,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-move-one-retain20-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-move-one-retain20-r3.json",
+      "originalSha256": "8e8cc2482441354c7f008a856fa952f5c474151a88d8f48cb7bac24a0c0292a0",
+      "publicSha256": "8e8cc2482441354c7f008a856fa952f5c474151a88d8f48cb7bac24a0c0292a0",
+      "originalBytes": 3899,
+      "publicBytes": 3899,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-net-zero-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-net-zero-retain0-r1.json",
+      "originalSha256": "04a439f541b967ed6e6555707f6f99b451123283a52d524d6d39b070333f6172",
+      "publicSha256": "04a439f541b967ed6e6555707f6f99b451123283a52d524d6d39b070333f6172",
+      "originalBytes": 3906,
+      "publicBytes": 3906,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-net-zero-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-net-zero-retain0-r2.json",
+      "originalSha256": "d887bfe44ca5c3a0d8904850a952cbbcef86c62d4b74cb986890826a0cbd4ca2",
+      "publicSha256": "d887bfe44ca5c3a0d8904850a952cbbcef86c62d4b74cb986890826a0cbd4ca2",
+      "originalBytes": 3874,
+      "publicBytes": 3874,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-net-zero-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-net-zero-retain0-r3.json",
+      "originalSha256": "7499fbe9b322ab78e5ba4e8d3eeaff554f722be24e4230613bbf9122612df048",
+      "publicSha256": "7499fbe9b322ab78e5ba4e8d3eeaff554f722be24e4230613bbf9122612df048",
+      "originalBytes": 3891,
+      "publicBytes": 3891,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-rewire-one-retain0-r1.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-rewire-one-retain0-r1.json",
+      "originalSha256": "e34ac1321093fdf246f23c659b06cb76f5394e6ddbeb3b748c5937bae855b54b",
+      "publicSha256": "e34ac1321093fdf246f23c659b06cb76f5394e6ddbeb3b748c5937bae855b54b",
+      "originalBytes": 3868,
+      "publicBytes": 3868,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-rewire-one-retain0-r2.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-rewire-one-retain0-r2.json",
+      "originalSha256": "1534a6be4f75dd6706acec812b8fb6b1b1377c3e46665d56f312df3c03827e45",
+      "publicSha256": "1534a6be4f75dd6706acec812b8fb6b1b1377c3e46665d56f312df3c03827e45",
+      "originalBytes": 3912,
+      "publicBytes": 3912,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/base/results/sparse-50000-rewire-one-retain0-r3.json",
+      "source": "<BASELINE_RUN>/baseline/sparse-50000-rewire-one-retain0-r3.json",
+      "originalSha256": "af7f0f2207487cb7c080061e13e7cdc62e1e2c1c87cf8674ab782ed4bbe19111",
+      "publicSha256": "af7f0f2207487cb7c080061e13e7cdc62e1e2c1c87cf8674ab782ed4bbe19111",
+      "originalBytes": 3900,
+      "publicBytes": 3900,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/baseline-summary.json",
+      "source": "<RUN>/performance-optimized/baseline-summary.json",
+      "originalSha256": "d4c732309e2227cde754e5631f53b1a48377dd2c77fe6f8279d855cc1097b120",
+      "publicSha256": "d4c732309e2227cde754e5631f53b1a48377dd2c77fe6f8279d855cc1097b120",
+      "originalBytes": 12476,
+      "publicBytes": 12476,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/baseline-receipts.json",
+      "source": "<RUN>/performance-optimized/baseline-receipts.json",
+      "originalSha256": "8f01eba373dcd0efb50399f0ccd9dc900e1bf88b89c4c690da5e2ee59918966e",
+      "publicSha256": "8bf0f457c3bb86d9054c6b0ae4a906e46c0da1ac327a70d4bdb62c7b6e40d11d",
+      "originalBytes": 35997,
+      "publicBytes": 26877,
+      "replacedPrefixes": [
+        {
+          "prefix": "<RUN>",
+          "occurrences": 120
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/matrix-plan.json",
+      "source": "<RUN>/performance-optimized/matrix-plan.json",
+      "originalSha256": "ac87e0ed02f9254c0bd0c6df79e8dde5c2324035340aa480c6bd696c640efb10",
+      "publicSha256": "ac87e0ed02f9254c0bd0c6df79e8dde5c2324035340aa480c6bd696c640efb10",
+      "originalBytes": 2472,
+      "publicBytes": 2472,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/schedule.json",
+      "source": "<RUN>/performance-optimized/schedule.json",
+      "originalSha256": "a457f97326b5e08d12914967b1c57ad5d86412570476549fdf9d26bdead38ec8",
+      "publicSha256": "a457f97326b5e08d12914967b1c57ad5d86412570476549fdf9d26bdead38ec8",
+      "originalBytes": 7680,
+      "publicBytes": 7680,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/artifact-manifest.json",
+      "source": "<RUN>/performance-optimized/artifact-manifest.json",
+      "originalSha256": "0f3f9c881b682e938e60dc8123fad09b81466751c296f2be9245cc0eca70ac77",
+      "publicSha256": "0f3f9c881b682e938e60dc8123fad09b81466751c296f2be9245cc0eca70ac77",
+      "originalBytes": 22363,
+      "publicBytes": 22363,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/harness-sha256.txt",
+      "source": "<RUN>/performance-optimized/harness-sha256.txt",
+      "originalSha256": "7a6ab97052957130f7449200644e7524cf4efd0a75039a5133b05264e13cea60",
+      "publicSha256": "7a6ab97052957130f7449200644e7524cf4efd0a75039a5133b05264e13cea60",
+      "originalBytes": 80,
+      "publicBytes": 80,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/hub-10000-move-one-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/hub-10000-move-one-retain0-r1.json",
+      "originalSha256": "7b27bdc8a2ce673df27ed67a91f5b5f7f972f76831967dbc5138564ffd7f3864",
+      "publicSha256": "7b27bdc8a2ce673df27ed67a91f5b5f7f972f76831967dbc5138564ffd7f3864",
+      "originalBytes": 3823,
+      "publicBytes": 3823,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/hub-10000-move-one-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/hub-10000-move-one-retain0-r2.json",
+      "originalSha256": "70a9f9425e4a87adb950acef3f443da3b362ef231adb0b78320f06a5965f6c74",
+      "publicSha256": "70a9f9425e4a87adb950acef3f443da3b362ef231adb0b78320f06a5965f6c74",
+      "originalBytes": 3830,
+      "publicBytes": 3830,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/hub-10000-move-one-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/hub-10000-move-one-retain0-r3.json",
+      "originalSha256": "344f11ded40fcf2acf1cbba5b8e51f88bfc71fc6798f950c6969e831486e2255",
+      "publicSha256": "344f11ded40fcf2acf1cbba5b8e51f88bfc71fc6798f950c6969e831486e2255",
+      "originalBytes": 3819,
+      "publicBytes": 3819,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/hub-10000-rewire-one-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/hub-10000-rewire-one-retain0-r1.json",
+      "originalSha256": "c1bed766fec1971cc25b403764be9052400aacceee5dc871d5245ef634cc2349",
+      "publicSha256": "c1bed766fec1971cc25b403764be9052400aacceee5dc871d5245ef634cc2349",
+      "originalBytes": 3825,
+      "publicBytes": 3825,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/hub-10000-rewire-one-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/hub-10000-rewire-one-retain0-r2.json",
+      "originalSha256": "b324aeac59b162ea5a375b715e0e1740194c0151e292be8e8b613a1595c1f6fd",
+      "publicSha256": "b324aeac59b162ea5a375b715e0e1740194c0151e292be8e8b613a1595c1f6fd",
+      "originalBytes": 3819,
+      "publicBytes": 3819,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/hub-10000-rewire-one-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/hub-10000-rewire-one-retain0-r3.json",
+      "originalSha256": "403de23601705fdef257828d09ea9284b3550c51a921ab3323b1b8aa999a777f",
+      "publicSha256": "403de23601705fdef257828d09ea9284b3550c51a921ab3323b1b8aa999a777f",
+      "originalBytes": 3834,
+      "publicBytes": 3834,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/hub-50000-move-one-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/hub-50000-move-one-retain0-r1.json",
+      "originalSha256": "b73255fb1603326c507073b3ed909569f11c132ad7cdbe4d0c88941455f50ee7",
+      "publicSha256": "b73255fb1603326c507073b3ed909569f11c132ad7cdbe4d0c88941455f50ee7",
+      "originalBytes": 3897,
+      "publicBytes": 3897,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/hub-50000-move-one-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/hub-50000-move-one-retain0-r2.json",
+      "originalSha256": "bece1fc7506263f0ae363a5dcee9703a3c6b4df21f68a2b9da2399dc3955f1af",
+      "publicSha256": "bece1fc7506263f0ae363a5dcee9703a3c6b4df21f68a2b9da2399dc3955f1af",
+      "originalBytes": 3907,
+      "publicBytes": 3907,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/hub-50000-move-one-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/hub-50000-move-one-retain0-r3.json",
+      "originalSha256": "ccfccbdf0cd6af1412749bea648684559c4db88724fed44dac8501ec3ea8296c",
+      "publicSha256": "ccfccbdf0cd6af1412749bea648684559c4db88724fed44dac8501ec3ea8296c",
+      "originalBytes": 3872,
+      "publicBytes": 3872,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/hub-50000-rewire-one-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/hub-50000-rewire-one-retain0-r1.json",
+      "originalSha256": "ebcfe57b9bfcfb5f2aa098c9658b6a4507fd0475edc06ec9891b7e7b2a39873c",
+      "publicSha256": "ebcfe57b9bfcfb5f2aa098c9658b6a4507fd0475edc06ec9891b7e7b2a39873c",
+      "originalBytes": 3903,
+      "publicBytes": 3903,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/hub-50000-rewire-one-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/hub-50000-rewire-one-retain0-r2.json",
+      "originalSha256": "99f0ce60dc9caf75b10050fe8c1e4704dc8896e5f57d1713ee487aa8f8656351",
+      "publicSha256": "99f0ce60dc9caf75b10050fe8c1e4704dc8896e5f57d1713ee487aa8f8656351",
+      "originalBytes": 3890,
+      "publicBytes": 3890,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/hub-50000-rewire-one-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/hub-50000-rewire-one-retain0-r3.json",
+      "originalSha256": "c013ff7fafc5b7b737d407aa9e70f492266496e164977152226a29017717d1be",
+      "publicSha256": "c013ff7fafc5b7b737d407aa9e70f492266496e164977152226a29017717d1be",
+      "originalBytes": 3906,
+      "publicBytes": 3906,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/nested-10000-move-one-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/nested-10000-move-one-retain0-r1.json",
+      "originalSha256": "ce3857bd5bc0aea9b3299d3d344502615a7373d7191a0901e48db3785edde7af",
+      "publicSha256": "ce3857bd5bc0aea9b3299d3d344502615a7373d7191a0901e48db3785edde7af",
+      "originalBytes": 3820,
+      "publicBytes": 3820,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/nested-10000-move-one-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/nested-10000-move-one-retain0-r2.json",
+      "originalSha256": "80fbf5d02468987780455641c6ae8b6a3384dc2bc9de996ab009fcd6e03843ff",
+      "publicSha256": "80fbf5d02468987780455641c6ae8b6a3384dc2bc9de996ab009fcd6e03843ff",
+      "originalBytes": 3821,
+      "publicBytes": 3821,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/nested-10000-move-one-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/nested-10000-move-one-retain0-r3.json",
+      "originalSha256": "1905a85fc1e80f417f0eaae779b7c55d0da2e18e3e02da655bfdebf767c2486a",
+      "publicSha256": "1905a85fc1e80f417f0eaae779b7c55d0da2e18e3e02da655bfdebf767c2486a",
+      "originalBytes": 3811,
+      "publicBytes": 3811,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/nested-50000-move-one-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/nested-50000-move-one-retain0-r1.json",
+      "originalSha256": "f2e38d98a41befd8d0161f0f63d7229bbc28b95ae939067c67325a6001a7cdaa",
+      "publicSha256": "f2e38d98a41befd8d0161f0f63d7229bbc28b95ae939067c67325a6001a7cdaa",
+      "originalBytes": 3885,
+      "publicBytes": 3885,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/nested-50000-move-one-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/nested-50000-move-one-retain0-r2.json",
+      "originalSha256": "6f0e5493fe742ac925251c58518d92b2371a96696e36e4ad54ada980983f079f",
+      "publicSha256": "6f0e5493fe742ac925251c58518d92b2371a96696e36e4ad54ada980983f079f",
+      "originalBytes": 3873,
+      "publicBytes": 3873,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/nested-50000-move-one-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/nested-50000-move-one-retain0-r3.json",
+      "originalSha256": "5dd318615c839a143676949a9ffd0f15ae0ed2406142f5735b665332c0eae0d7",
+      "publicSha256": "5dd318615c839a143676949a9ffd0f15ae0ed2406142f5735b665332c0eae0d7",
+      "originalBytes": 3888,
+      "publicBytes": 3888,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-1000-move-1pct-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-1000-move-1pct-retain0-r1.json",
+      "originalSha256": "dc3b20e323b0cb816d7b0509f6c8d2ce633b37f75395efd53ade7a8d3610e3ef",
+      "publicSha256": "dc3b20e323b0cb816d7b0509f6c8d2ce633b37f75395efd53ade7a8d3610e3ef",
+      "originalBytes": 3783,
+      "publicBytes": 3783,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-1000-move-1pct-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-1000-move-1pct-retain0-r2.json",
+      "originalSha256": "9ce34bc451b214674d930e0d7e6a891e95318d79a5acb0234f347720b92a37a2",
+      "publicSha256": "9ce34bc451b214674d930e0d7e6a891e95318d79a5acb0234f347720b92a37a2",
+      "originalBytes": 3798,
+      "publicBytes": 3798,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-1000-move-1pct-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-1000-move-1pct-retain0-r3.json",
+      "originalSha256": "69b603091266530c40efe97f8aa091e1b9558a39b32e409c9acb664ed6446d8e",
+      "publicSha256": "69b603091266530c40efe97f8aa091e1b9558a39b32e409c9acb664ed6446d8e",
+      "originalBytes": 3799,
+      "publicBytes": 3799,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-1000-move-one-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-1000-move-one-retain0-r1.json",
+      "originalSha256": "80325fd5892e0d1d021f9a724124a6c8b4e1ad4fbdcccaa0cad93d4e87212cb9",
+      "publicSha256": "80325fd5892e0d1d021f9a724124a6c8b4e1ad4fbdcccaa0cad93d4e87212cb9",
+      "originalBytes": 3782,
+      "publicBytes": 3782,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-1000-move-one-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-1000-move-one-retain0-r2.json",
+      "originalSha256": "825bd15788471ed5532051e57719f02a675dba7cef505e3f92d53a1a996b9b8d",
+      "publicSha256": "825bd15788471ed5532051e57719f02a675dba7cef505e3f92d53a1a996b9b8d",
+      "originalBytes": 3792,
+      "publicBytes": 3792,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-1000-move-one-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-1000-move-one-retain0-r3.json",
+      "originalSha256": "73f8aaa299f8289d622a8f1e52ca99fbfcc6702d1baa3476df1ad099149bb99c",
+      "publicSha256": "73f8aaa299f8289d622a8f1e52ca99fbfcc6702d1baa3476df1ad099149bb99c",
+      "originalBytes": 3781,
+      "publicBytes": 3781,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-1000-net-zero-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-1000-net-zero-retain0-r1.json",
+      "originalSha256": "3b45c36664f4d676df34742debe726b093531fc723fdff0e97510a2f5cff8fe3",
+      "publicSha256": "3b45c36664f4d676df34742debe726b093531fc723fdff0e97510a2f5cff8fe3",
+      "originalBytes": 3778,
+      "publicBytes": 3778,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-1000-net-zero-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-1000-net-zero-retain0-r2.json",
+      "originalSha256": "afc07aa52b12f0da3173041daa682f65ea40f2d634040fb333254ecb9b339ca7",
+      "publicSha256": "afc07aa52b12f0da3173041daa682f65ea40f2d634040fb333254ecb9b339ca7",
+      "originalBytes": 3795,
+      "publicBytes": 3795,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-1000-net-zero-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-1000-net-zero-retain0-r3.json",
+      "originalSha256": "65ee86296d44254dd44f78d76aa50ec2b0d9a2d8ec28275a44f9574524fcc9e8",
+      "publicSha256": "65ee86296d44254dd44f78d76aa50ec2b0d9a2d8ec28275a44f9574524fcc9e8",
+      "originalBytes": 3797,
+      "publicBytes": 3797,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-1000-rewire-one-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-1000-rewire-one-retain0-r1.json",
+      "originalSha256": "11c4fba5eb28c27fbde6bd52aec492e6ac3fd015e1fad9cbe8591c354152e890",
+      "publicSha256": "11c4fba5eb28c27fbde6bd52aec492e6ac3fd015e1fad9cbe8591c354152e890",
+      "originalBytes": 3794,
+      "publicBytes": 3794,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-1000-rewire-one-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-1000-rewire-one-retain0-r2.json",
+      "originalSha256": "6a705455b64574096b363e6349a9fc25702311f79fb7e85a26ad5057dd45d033",
+      "publicSha256": "6a705455b64574096b363e6349a9fc25702311f79fb7e85a26ad5057dd45d033",
+      "originalBytes": 3779,
+      "publicBytes": 3779,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-1000-rewire-one-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-1000-rewire-one-retain0-r3.json",
+      "originalSha256": "f983b62b8a7c40f9b6e30ac890ee1a7b4fc359cbcb3c178f5b1b966858d1303b",
+      "publicSha256": "f983b62b8a7c40f9b6e30ac890ee1a7b4fc359cbcb3c178f5b1b966858d1303b",
+      "originalBytes": 3786,
+      "publicBytes": 3786,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-move-1pct-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-move-1pct-retain0-r1.json",
+      "originalSha256": "8cff4f24bce58eead79d4018913997948dd07fae8c8b8bb38b588f5e76d32fe2",
+      "publicSha256": "8cff4f24bce58eead79d4018913997948dd07fae8c8b8bb38b588f5e76d32fe2",
+      "originalBytes": 3816,
+      "publicBytes": 3816,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-move-1pct-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-move-1pct-retain0-r2.json",
+      "originalSha256": "f6bd5647d371fbbe13566e2d554b30bd129e4ef591bd6077e1b00586f9f408b0",
+      "publicSha256": "f6bd5647d371fbbe13566e2d554b30bd129e4ef591bd6077e1b00586f9f408b0",
+      "originalBytes": 3841,
+      "publicBytes": 3841,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-move-1pct-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-move-1pct-retain0-r3.json",
+      "originalSha256": "6a3d3e51cb44e83d4b53add362cd54c02d0d1c7eca1e98bab74b91823f9e4c26",
+      "publicSha256": "6a3d3e51cb44e83d4b53add362cd54c02d0d1c7eca1e98bab74b91823f9e4c26",
+      "originalBytes": 3822,
+      "publicBytes": 3822,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-move-one-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-move-one-retain0-r1.json",
+      "originalSha256": "b17d4e6fa924d6d37a58d2c38fdbdac2f54eaf8cb99ccfb55614412962fec77a",
+      "publicSha256": "b17d4e6fa924d6d37a58d2c38fdbdac2f54eaf8cb99ccfb55614412962fec77a",
+      "originalBytes": 3810,
+      "publicBytes": 3810,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-move-one-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-move-one-retain0-r2.json",
+      "originalSha256": "6abdfbf5f2a369a5c74439fac507c6c3405f3dc83d1fbc0eb750a04b7ab5a2f1",
+      "publicSha256": "6abdfbf5f2a369a5c74439fac507c6c3405f3dc83d1fbc0eb750a04b7ab5a2f1",
+      "originalBytes": 3797,
+      "publicBytes": 3797,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-move-one-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-move-one-retain0-r3.json",
+      "originalSha256": "2a79006ebd7eec5b2b502468ecac3d4d77b11f4064453501dcff84fce18b47c0",
+      "publicSha256": "2a79006ebd7eec5b2b502468ecac3d4d77b11f4064453501dcff84fce18b47c0",
+      "originalBytes": 3818,
+      "publicBytes": 3818,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-move-one-retain20-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-move-one-retain20-r1.json",
+      "originalSha256": "ad6441353d1635b21a84dce4fdbc218f8ca885553f2ec284d3c7d99eacc91558",
+      "publicSha256": "ad6441353d1635b21a84dce4fdbc218f8ca885553f2ec284d3c7d99eacc91558",
+      "originalBytes": 3816,
+      "publicBytes": 3816,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-move-one-retain20-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-move-one-retain20-r2.json",
+      "originalSha256": "683bfa2971730f18640cdf3996b842dc7778911ba6ab22c6c20e9126fe08f411",
+      "publicSha256": "683bfa2971730f18640cdf3996b842dc7778911ba6ab22c6c20e9126fe08f411",
+      "originalBytes": 3826,
+      "publicBytes": 3826,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-move-one-retain20-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-move-one-retain20-r3.json",
+      "originalSha256": "09d19b8f12bf32c647aaea2cf1b91bc25da867239ac6285a1d27005ee3628e95",
+      "publicSha256": "09d19b8f12bf32c647aaea2cf1b91bc25da867239ac6285a1d27005ee3628e95",
+      "originalBytes": 3831,
+      "publicBytes": 3831,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-net-zero-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-net-zero-retain0-r1.json",
+      "originalSha256": "10659a5934722593c3bf5c393a944fe8d22a09d9fedf822226289c3cfed85058",
+      "publicSha256": "10659a5934722593c3bf5c393a944fe8d22a09d9fedf822226289c3cfed85058",
+      "originalBytes": 3832,
+      "publicBytes": 3832,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-net-zero-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-net-zero-retain0-r2.json",
+      "originalSha256": "c6b18427e597be1454386501505add7e9774e862633fa1c8aec36a1f50c3ba39",
+      "publicSha256": "c6b18427e597be1454386501505add7e9774e862633fa1c8aec36a1f50c3ba39",
+      "originalBytes": 3831,
+      "publicBytes": 3831,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-net-zero-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-net-zero-retain0-r3.json",
+      "originalSha256": "8fc933c015feab471591731d87ee04d86036f89e88549b3bc39f2cfd9e52090d",
+      "publicSha256": "8fc933c015feab471591731d87ee04d86036f89e88549b3bc39f2cfd9e52090d",
+      "originalBytes": 3832,
+      "publicBytes": 3832,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-rewire-one-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-rewire-one-retain0-r1.json",
+      "originalSha256": "d949e3836ef6452ff9b249415757673f6b2cb2b33e4e7dfa4ae37f2fccce2937",
+      "publicSha256": "d949e3836ef6452ff9b249415757673f6b2cb2b33e4e7dfa4ae37f2fccce2937",
+      "originalBytes": 3808,
+      "publicBytes": 3808,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-rewire-one-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-rewire-one-retain0-r2.json",
+      "originalSha256": "705136cac945a8cb3545b740a4014c8c6b5b984bffe5066e01e3de41a79c7b5e",
+      "publicSha256": "705136cac945a8cb3545b740a4014c8c6b5b984bffe5066e01e3de41a79c7b5e",
+      "originalBytes": 3832,
+      "publicBytes": 3832,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-10000-rewire-one-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-10000-rewire-one-retain0-r3.json",
+      "originalSha256": "396f7a693d973ea08012ad1cafe7afa5255f27053e47693acb540f701bd8e718",
+      "publicSha256": "396f7a693d973ea08012ad1cafe7afa5255f27053e47693acb540f701bd8e718",
+      "originalBytes": 3795,
+      "publicBytes": 3795,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-move-1pct-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-move-1pct-retain0-r1.json",
+      "originalSha256": "64386d234604ee79c136db7639350578d893681e4928790a42baf5d06d8bbf96",
+      "publicSha256": "64386d234604ee79c136db7639350578d893681e4928790a42baf5d06d8bbf96",
+      "originalBytes": 3892,
+      "publicBytes": 3892,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-move-1pct-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-move-1pct-retain0-r2.json",
+      "originalSha256": "5a780ede13f66a8e31b51300b14893f0cb559386f78c04b873687597712890be",
+      "publicSha256": "5a780ede13f66a8e31b51300b14893f0cb559386f78c04b873687597712890be",
+      "originalBytes": 3877,
+      "publicBytes": 3877,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-move-1pct-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-move-1pct-retain0-r3.json",
+      "originalSha256": "b57006f7ef5a1855ea7f005d23ffd51598d89cc0d7e2f478d48c0d8b1b5e437e",
+      "publicSha256": "b57006f7ef5a1855ea7f005d23ffd51598d89cc0d7e2f478d48c0d8b1b5e437e",
+      "originalBytes": 3903,
+      "publicBytes": 3903,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-move-one-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-move-one-retain0-r1.json",
+      "originalSha256": "51f1fdb11da6fb1461ffdcf8a78a41071baf2fe15a9c3445c790e46327618d5a",
+      "publicSha256": "51f1fdb11da6fb1461ffdcf8a78a41071baf2fe15a9c3445c790e46327618d5a",
+      "originalBytes": 3894,
+      "publicBytes": 3894,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-move-one-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-move-one-retain0-r2.json",
+      "originalSha256": "a9ef31cd8ea28f3c971b978eeb01fd598bd7c813c56369b3eb7853d52e5c5d34",
+      "publicSha256": "a9ef31cd8ea28f3c971b978eeb01fd598bd7c813c56369b3eb7853d52e5c5d34",
+      "originalBytes": 3893,
+      "publicBytes": 3893,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-move-one-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-move-one-retain0-r3.json",
+      "originalSha256": "8720d4fe1ea1eff4d6e26d2f78f5ccef46f64f765924a53f95234160b601e148",
+      "publicSha256": "8720d4fe1ea1eff4d6e26d2f78f5ccef46f64f765924a53f95234160b601e148",
+      "originalBytes": 3883,
+      "publicBytes": 3883,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-move-one-retain20-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-move-one-retain20-r1.json",
+      "originalSha256": "313070d491b00f74eff1144ca7b17d509a579d600a8b35a0080cdb144a12108b",
+      "publicSha256": "313070d491b00f74eff1144ca7b17d509a579d600a8b35a0080cdb144a12108b",
+      "originalBytes": 3892,
+      "publicBytes": 3892,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-move-one-retain20-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-move-one-retain20-r2.json",
+      "originalSha256": "188f86aff0dfef2c43c7b13df008279311051f529e535075be27661832f40aca",
+      "publicSha256": "188f86aff0dfef2c43c7b13df008279311051f529e535075be27661832f40aca",
+      "originalBytes": 3887,
+      "publicBytes": 3887,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-move-one-retain20-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-move-one-retain20-r3.json",
+      "originalSha256": "0b344e3374052c9871d60699680e01c8d60a02fa0cf5398b85ae4e18eef2e988",
+      "publicSha256": "0b344e3374052c9871d60699680e01c8d60a02fa0cf5398b85ae4e18eef2e988",
+      "originalBytes": 3899,
+      "publicBytes": 3899,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-net-zero-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-net-zero-retain0-r1.json",
+      "originalSha256": "6d4a063be43087c404d855499bdf02836e798db063aead3081b643b23db5193a",
+      "publicSha256": "6d4a063be43087c404d855499bdf02836e798db063aead3081b643b23db5193a",
+      "originalBytes": 3889,
+      "publicBytes": 3889,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-net-zero-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-net-zero-retain0-r2.json",
+      "originalSha256": "eb536e4cb314f29e523e0cdb5e3fb9a84e7e872fbd02b4710029989f9d828bfe",
+      "publicSha256": "eb536e4cb314f29e523e0cdb5e3fb9a84e7e872fbd02b4710029989f9d828bfe",
+      "originalBytes": 3889,
+      "publicBytes": 3889,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-net-zero-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-net-zero-retain0-r3.json",
+      "originalSha256": "4247231fe5e802cf94b229253ddb3057d86f82411796efad028deb8f1ee80467",
+      "publicSha256": "4247231fe5e802cf94b229253ddb3057d86f82411796efad028deb8f1ee80467",
+      "originalBytes": 3891,
+      "publicBytes": 3891,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-rewire-one-retain0-r1.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-rewire-one-retain0-r1.json",
+      "originalSha256": "4a17d90495907bcfdf8a8d1a2116fcdad4806df6c5227fe549ce0707939cc311",
+      "publicSha256": "4a17d90495907bcfdf8a8d1a2116fcdad4806df6c5227fe549ce0707939cc311",
+      "originalBytes": 3900,
+      "publicBytes": 3900,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-rewire-one-retain0-r2.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-rewire-one-retain0-r2.json",
+      "originalSha256": "2516faa243b7e6e7f672e22977236dbfe9f37aa47018fc8847a28b317bb94e50",
+      "publicSha256": "2516faa243b7e6e7f672e22977236dbfe9f37aa47018fc8847a28b317bb94e50",
+      "originalBytes": 3900,
+      "publicBytes": 3900,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "matrices/optimized/results/sparse-50000-rewire-one-retain0-r3.json",
+      "source": "<RUN>/performance-optimized/baseline/sparse-50000-rewire-one-retain0-r3.json",
+      "originalSha256": "f4e5a7ac4240e7b84534df5f7878a6dc3ea81b11c076b5ad09980cbbc2a0fae9",
+      "publicSha256": "f4e5a7ac4240e7b84534df5f7878a6dc3ea81b11c076b5ad09980cbbc2a0fae9",
+      "originalBytes": 3884,
+      "publicBytes": 3884,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/plan.json",
+      "source": "<RUN>/performance-paired/plan.json",
+      "originalSha256": "bc421f1631dc9cb4810670effb893b2ff022e9c9be3f289f27e372d11c6b061d",
+      "publicSha256": "bc421f1631dc9cb4810670effb893b2ff022e9c9be3f289f27e372d11c6b061d",
+      "originalBytes": 11871,
+      "publicBytes": 11871,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/receipts.json",
+      "source": "<RUN>/performance-paired/receipts.json",
+      "originalSha256": "48c15d00e6c9b4985fb49935986c568d8d0cea1b6ca10a02bdeaac8b744f26db",
+      "publicSha256": "2cbba9962b1c066934801de3d4e9afe965ae6c232a547478cb2809837cbbc2a7",
+      "originalBytes": 101196,
+      "publicBytes": 84492,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 72
+        },
+        {
+          "prefix": "<RUN>",
+          "occurrences": 144
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/environment.json",
+      "source": "<RUN>/performance-paired/environment.json",
+      "originalSha256": "fb31b137c13a345a8717fb043fa2884655ad69e06860b93ea4cf9f4fba0878f1",
+      "publicSha256": "259559b9a9be22fc59be3ec978a5c81f3db3e57e1192af1a05f7143ac9c4a85e",
+      "originalBytes": 795,
+      "publicBytes": 639,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 1
+        },
+        {
+          "prefix": "<RUN>",
+          "occurrences": 1
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/artifacts-before.json",
+      "source": "<RUN>/performance-paired/artifacts-before.json",
+      "originalSha256": "5a2cf4da2bb50de573b3da87b57415b9a150494fde118528792746dafaf68f01",
+      "publicSha256": "5a2cf4da2bb50de573b3da87b57415b9a150494fde118528792746dafaf68f01",
+      "originalBytes": 21662,
+      "publicBytes": 21662,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/artifacts-after.json",
+      "source": "<RUN>/performance-paired/artifacts-after.json",
+      "originalSha256": "5a2cf4da2bb50de573b3da87b57415b9a150494fde118528792746dafaf68f01",
+      "publicSha256": "5a2cf4da2bb50de573b3da87b57415b9a150494fde118528792746dafaf68f01",
+      "originalBytes": 21662,
+      "publicBytes": 21662,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/completion.json",
+      "source": "<RUN>/performance-paired/completion.json",
+      "originalSha256": "3fecf5c0ebb4078bba524adcb0f756859397c81af5d789f5f65ead5a7e631657",
+      "publicSha256": "3fecf5c0ebb4078bba524adcb0f756859397c81af5d789f5f65ead5a7e631657",
+      "originalBytes": 176,
+      "publicBytes": 176,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-move-1pct-retain0-r1-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-move-1pct-retain0-r1-base.json",
+      "originalSha256": "41aa66218bc6ad4986f000fc26a8dafb1275089138b0107c0e1576fda2eb195a",
+      "publicSha256": "41aa66218bc6ad4986f000fc26a8dafb1275089138b0107c0e1576fda2eb195a",
+      "originalBytes": 3768,
+      "publicBytes": 3768,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-move-1pct-retain0-r1-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-move-1pct-retain0-r1-optimized.json",
+      "originalSha256": "0d322bde25df72452c23e08d7a9c36e9e97f9b8fa9760d91dc3ad1604abecc0c",
+      "publicSha256": "0d322bde25df72452c23e08d7a9c36e9e97f9b8fa9760d91dc3ad1604abecc0c",
+      "originalBytes": 3813,
+      "publicBytes": 3813,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-move-1pct-retain0-r2-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-move-1pct-retain0-r2-base.json",
+      "originalSha256": "8ba895db2bd75b26c258d2fc0060fcf0f251970d48c2a114978e3442b4bf72ed",
+      "publicSha256": "8ba895db2bd75b26c258d2fc0060fcf0f251970d48c2a114978e3442b4bf72ed",
+      "originalBytes": 3765,
+      "publicBytes": 3765,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-move-1pct-retain0-r2-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-move-1pct-retain0-r2-optimized.json",
+      "originalSha256": "c297d2db4d3fd976f32c11be48c3141012f68892ea93fef06b7ec8da23cfc942",
+      "publicSha256": "c297d2db4d3fd976f32c11be48c3141012f68892ea93fef06b7ec8da23cfc942",
+      "originalBytes": 3786,
+      "publicBytes": 3786,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-move-1pct-retain0-r3-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-move-1pct-retain0-r3-base.json",
+      "originalSha256": "7782541dadd60caf8da83d6925173b13d1da7c7797f8b8683d635caddc928a90",
+      "publicSha256": "7782541dadd60caf8da83d6925173b13d1da7c7797f8b8683d635caddc928a90",
+      "originalBytes": 3826,
+      "publicBytes": 3826,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-move-1pct-retain0-r3-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-move-1pct-retain0-r3-optimized.json",
+      "originalSha256": "c537e40d5bc79f014e5edac28f6dee33f4b94b1af56df2f8f20f9bc9eb5e38d1",
+      "publicSha256": "c537e40d5bc79f014e5edac28f6dee33f4b94b1af56df2f8f20f9bc9eb5e38d1",
+      "originalBytes": 3795,
+      "publicBytes": 3795,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-move-one-retain0-r1-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-move-one-retain0-r1-base.json",
+      "originalSha256": "d840b17103a0badad32b1eda7e0a4a2e737914ab9491e6847a85711165e9681b",
+      "publicSha256": "d840b17103a0badad32b1eda7e0a4a2e737914ab9491e6847a85711165e9681b",
+      "originalBytes": 3786,
+      "publicBytes": 3786,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-move-one-retain0-r1-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-move-one-retain0-r1-optimized.json",
+      "originalSha256": "c7bdf45ab71b16a5c7e04d0bfc4e08bd4e75cbcf9b405b3fc7cdc16ee0a8f094",
+      "publicSha256": "c7bdf45ab71b16a5c7e04d0bfc4e08bd4e75cbcf9b405b3fc7cdc16ee0a8f094",
+      "originalBytes": 3808,
+      "publicBytes": 3808,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-move-one-retain0-r2-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-move-one-retain0-r2-base.json",
+      "originalSha256": "5452758e28e2c2f823febe06e5064efaefdf355f8f58f76cda9d1fadd04ad603",
+      "publicSha256": "5452758e28e2c2f823febe06e5064efaefdf355f8f58f76cda9d1fadd04ad603",
+      "originalBytes": 3787,
+      "publicBytes": 3787,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-move-one-retain0-r2-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-move-one-retain0-r2-optimized.json",
+      "originalSha256": "f7d0baae52ff357d5ae06f08f900d423eb65cb32eb81ce7bffb17443c4735089",
+      "publicSha256": "f7d0baae52ff357d5ae06f08f900d423eb65cb32eb81ce7bffb17443c4735089",
+      "originalBytes": 3806,
+      "publicBytes": 3806,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-move-one-retain0-r3-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-move-one-retain0-r3-base.json",
+      "originalSha256": "5cb26c29149964a80270edaef4b4e581b893b61f3bd6739b2feb9b659bfc929b",
+      "publicSha256": "5cb26c29149964a80270edaef4b4e581b893b61f3bd6739b2feb9b659bfc929b",
+      "originalBytes": 3797,
+      "publicBytes": 3797,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-move-one-retain0-r3-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-move-one-retain0-r3-optimized.json",
+      "originalSha256": "f55693adb3c01dc9ee2e96113ebcd74386183380547e12a3862b056016a61f71",
+      "publicSha256": "f55693adb3c01dc9ee2e96113ebcd74386183380547e12a3862b056016a61f71",
+      "originalBytes": 3794,
+      "publicBytes": 3794,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-net-zero-retain0-r1-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-net-zero-retain0-r1-base.json",
+      "originalSha256": "8407a359927ae368ea402fb4f9585ce01c342461f6b7bd27fc2960f627a86825",
+      "publicSha256": "8407a359927ae368ea402fb4f9585ce01c342461f6b7bd27fc2960f627a86825",
+      "originalBytes": 3799,
+      "publicBytes": 3799,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-net-zero-retain0-r1-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-net-zero-retain0-r1-optimized.json",
+      "originalSha256": "781aacd20628806ddb21fe0e0b8649d952ca0dec042cb0f28c54039db54e33f7",
+      "publicSha256": "781aacd20628806ddb21fe0e0b8649d952ca0dec042cb0f28c54039db54e33f7",
+      "originalBytes": 3813,
+      "publicBytes": 3813,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-net-zero-retain0-r2-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-net-zero-retain0-r2-base.json",
+      "originalSha256": "6d97cb3f8ed9d7fe9df3dfc658a656e943de768aad707a427aedb18badd6619d",
+      "publicSha256": "6d97cb3f8ed9d7fe9df3dfc658a656e943de768aad707a427aedb18badd6619d",
+      "originalBytes": 3803,
+      "publicBytes": 3803,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-net-zero-retain0-r2-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-net-zero-retain0-r2-optimized.json",
+      "originalSha256": "c442f285fba5224eda1ea71d47596a91d2dff22d27a7c018c75b9bdf36caba83",
+      "publicSha256": "c442f285fba5224eda1ea71d47596a91d2dff22d27a7c018c75b9bdf36caba83",
+      "originalBytes": 3810,
+      "publicBytes": 3810,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-net-zero-retain0-r3-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-net-zero-retain0-r3-base.json",
+      "originalSha256": "d87cd80dd10dd797d283a7ac383744fb96bcb5d70d937ff9a43ab5a0b4a847a0",
+      "publicSha256": "d87cd80dd10dd797d283a7ac383744fb96bcb5d70d937ff9a43ab5a0b4a847a0",
+      "originalBytes": 3797,
+      "publicBytes": 3797,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-net-zero-retain0-r3-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-net-zero-retain0-r3-optimized.json",
+      "originalSha256": "0d86d84bf20d7c1e379d799558adc7d05d45e7d13344f4ec98babfc0e8e194f3",
+      "publicSha256": "0d86d84bf20d7c1e379d799558adc7d05d45e7d13344f4ec98babfc0e8e194f3",
+      "originalBytes": 3793,
+      "publicBytes": 3793,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-rewire-one-retain0-r1-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-rewire-one-retain0-r1-base.json",
+      "originalSha256": "483afedf0cf1ca87edab42b031bc3ecaa12e6f280bce362b41b81389c8243fc7",
+      "publicSha256": "483afedf0cf1ca87edab42b031bc3ecaa12e6f280bce362b41b81389c8243fc7",
+      "originalBytes": 3775,
+      "publicBytes": 3775,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-rewire-one-retain0-r1-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-rewire-one-retain0-r1-optimized.json",
+      "originalSha256": "f3144801f71a49d488c2fede902f9d326f625dbc2a9441d79d699a9f5a555f7a",
+      "publicSha256": "f3144801f71a49d488c2fede902f9d326f625dbc2a9441d79d699a9f5a555f7a",
+      "originalBytes": 3772,
+      "publicBytes": 3772,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-rewire-one-retain0-r2-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-rewire-one-retain0-r2-base.json",
+      "originalSha256": "dedb4e552123e8f558774d872b4f693bb997a225edb9f6523c2e375ce5be7fbc",
+      "publicSha256": "dedb4e552123e8f558774d872b4f693bb997a225edb9f6523c2e375ce5be7fbc",
+      "originalBytes": 3775,
+      "publicBytes": 3775,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-rewire-one-retain0-r2-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-rewire-one-retain0-r2-optimized.json",
+      "originalSha256": "5855ac59529f1b6a59190ea16cd729030999d529e093997835278498043cff65",
+      "publicSha256": "5855ac59529f1b6a59190ea16cd729030999d529e093997835278498043cff65",
+      "originalBytes": 3793,
+      "publicBytes": 3793,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-rewire-one-retain0-r3-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-rewire-one-retain0-r3-base.json",
+      "originalSha256": "43bc41207b32593b3243c75c1405c0b6326d287532395760083a909b4409a22b",
+      "publicSha256": "43bc41207b32593b3243c75c1405c0b6326d287532395760083a909b4409a22b",
+      "originalBytes": 3774,
+      "publicBytes": 3774,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-1000-rewire-one-retain0-r3-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-1000-rewire-one-retain0-r3-optimized.json",
+      "originalSha256": "04bf0ed29d8e1b3535351e9863c178c6813d9ed078ea31baa7744df08af7585c",
+      "publicSha256": "04bf0ed29d8e1b3535351e9863c178c6813d9ed078ea31baa7744df08af7585c",
+      "originalBytes": 3788,
+      "publicBytes": 3788,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-move-1pct-retain0-r1-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-move-1pct-retain0-r1-base.json",
+      "originalSha256": "17e6c611014ea50ba358900e751c0ed5ec9176d55e437849b13717be68cf1887",
+      "publicSha256": "17e6c611014ea50ba358900e751c0ed5ec9176d55e437849b13717be68cf1887",
+      "originalBytes": 3815,
+      "publicBytes": 3815,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-move-1pct-retain0-r1-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-move-1pct-retain0-r1-optimized.json",
+      "originalSha256": "88fd4ac49d6d13d6b8acf5f4f16358505d8fae1b4d9a554d2a322f7ac4e77a20",
+      "publicSha256": "88fd4ac49d6d13d6b8acf5f4f16358505d8fae1b4d9a554d2a322f7ac4e77a20",
+      "originalBytes": 3816,
+      "publicBytes": 3816,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-move-1pct-retain0-r2-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-move-1pct-retain0-r2-base.json",
+      "originalSha256": "20b21148b6524d0ebd039cb936eae2b6f1aa5c1b6e19f5c41af7376dbfd31d68",
+      "publicSha256": "20b21148b6524d0ebd039cb936eae2b6f1aa5c1b6e19f5c41af7376dbfd31d68",
+      "originalBytes": 3833,
+      "publicBytes": 3833,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-move-1pct-retain0-r2-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-move-1pct-retain0-r2-optimized.json",
+      "originalSha256": "381797720be68fec36a45232aebf1ea03dcea75b0a99efd981c7418c9a069231",
+      "publicSha256": "381797720be68fec36a45232aebf1ea03dcea75b0a99efd981c7418c9a069231",
+      "originalBytes": 3818,
+      "publicBytes": 3818,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-move-1pct-retain0-r3-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-move-1pct-retain0-r3-base.json",
+      "originalSha256": "9fd6bb998ec70f84feb12657581172d1b3dcd40d31e8a216d4296aa9f24c7078",
+      "publicSha256": "9fd6bb998ec70f84feb12657581172d1b3dcd40d31e8a216d4296aa9f24c7078",
+      "originalBytes": 3840,
+      "publicBytes": 3840,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-move-1pct-retain0-r3-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-move-1pct-retain0-r3-optimized.json",
+      "originalSha256": "cc73c7c48fc4ba4925f7be7849494a294060ccba0da8eb8ec36988a15e4e4f07",
+      "publicSha256": "cc73c7c48fc4ba4925f7be7849494a294060ccba0da8eb8ec36988a15e4e4f07",
+      "originalBytes": 3836,
+      "publicBytes": 3836,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-move-one-retain0-r1-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-move-one-retain0-r1-base.json",
+      "originalSha256": "2d061b4e9218d0b971118911b45c1d36cacf4b0c915db103846c8787e345c35c",
+      "publicSha256": "2d061b4e9218d0b971118911b45c1d36cacf4b0c915db103846c8787e345c35c",
+      "originalBytes": 3841,
+      "publicBytes": 3841,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-move-one-retain0-r1-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-move-one-retain0-r1-optimized.json",
+      "originalSha256": "9f1bc46c8d7ef64e417792074084f98439ccc3502e1dd659b7774bb48e1fbf44",
+      "publicSha256": "9f1bc46c8d7ef64e417792074084f98439ccc3502e1dd659b7774bb48e1fbf44",
+      "originalBytes": 3822,
+      "publicBytes": 3822,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-move-one-retain0-r2-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-move-one-retain0-r2-base.json",
+      "originalSha256": "37998e7ff8057e33ad47ea0d23284e93ec50ea0db330d56ad95463730cacce90",
+      "publicSha256": "37998e7ff8057e33ad47ea0d23284e93ec50ea0db330d56ad95463730cacce90",
+      "originalBytes": 3837,
+      "publicBytes": 3837,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-move-one-retain0-r2-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-move-one-retain0-r2-optimized.json",
+      "originalSha256": "f38128abb2b4da98205507cd31ac5060702d1843baabf2773253a60e29b63cbe",
+      "publicSha256": "f38128abb2b4da98205507cd31ac5060702d1843baabf2773253a60e29b63cbe",
+      "originalBytes": 3829,
+      "publicBytes": 3829,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-move-one-retain0-r3-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-move-one-retain0-r3-base.json",
+      "originalSha256": "ace7798f32ec44e97a438b7589a0205a2334c17b6f18193e2f122a81c2c3b7df",
+      "publicSha256": "ace7798f32ec44e97a438b7589a0205a2334c17b6f18193e2f122a81c2c3b7df",
+      "originalBytes": 3843,
+      "publicBytes": 3843,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-move-one-retain0-r3-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-move-one-retain0-r3-optimized.json",
+      "originalSha256": "24e404fa6a868125aa780a0456eb6395bf345c53683c11fe7a6895105f2a4dd5",
+      "publicSha256": "24e404fa6a868125aa780a0456eb6395bf345c53683c11fe7a6895105f2a4dd5",
+      "originalBytes": 3810,
+      "publicBytes": 3810,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-net-zero-retain0-r1-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-net-zero-retain0-r1-base.json",
+      "originalSha256": "1d1103f09c0fda9d581561d287840a51ac630b0a05a9b42a62f37b58b7115471",
+      "publicSha256": "1d1103f09c0fda9d581561d287840a51ac630b0a05a9b42a62f37b58b7115471",
+      "originalBytes": 3816,
+      "publicBytes": 3816,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-net-zero-retain0-r1-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-net-zero-retain0-r1-optimized.json",
+      "originalSha256": "71f62afad9f5c5e37b2b1e9bafbd77b909234814ab3fae0fbf34271a9e625e45",
+      "publicSha256": "71f62afad9f5c5e37b2b1e9bafbd77b909234814ab3fae0fbf34271a9e625e45",
+      "originalBytes": 3842,
+      "publicBytes": 3842,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-net-zero-retain0-r2-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-net-zero-retain0-r2-base.json",
+      "originalSha256": "b620493b08062db7fb24d244b79f3a17123d5ada6b2cbbbe68e0205aef81b4ce",
+      "publicSha256": "b620493b08062db7fb24d244b79f3a17123d5ada6b2cbbbe68e0205aef81b4ce",
+      "originalBytes": 3844,
+      "publicBytes": 3844,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-net-zero-retain0-r2-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-net-zero-retain0-r2-optimized.json",
+      "originalSha256": "24ef81680b81cd607eaf730bc4344eddf4dcf28ae7cbdbc35fcda403f5d0f065",
+      "publicSha256": "24ef81680b81cd607eaf730bc4344eddf4dcf28ae7cbdbc35fcda403f5d0f065",
+      "originalBytes": 3825,
+      "publicBytes": 3825,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-net-zero-retain0-r3-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-net-zero-retain0-r3-base.json",
+      "originalSha256": "179b1778e1505a234a9237df82241b9b7b2cadc5c773c682ce5f3f6554d39e0c",
+      "publicSha256": "179b1778e1505a234a9237df82241b9b7b2cadc5c773c682ce5f3f6554d39e0c",
+      "originalBytes": 3827,
+      "publicBytes": 3827,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-net-zero-retain0-r3-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-net-zero-retain0-r3-optimized.json",
+      "originalSha256": "bd2f8e8c011c9511c8e2bf17ceb434fed8c6f190d00e8ea4d940521fccabbcee",
+      "publicSha256": "bd2f8e8c011c9511c8e2bf17ceb434fed8c6f190d00e8ea4d940521fccabbcee",
+      "originalBytes": 3842,
+      "publicBytes": 3842,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-rewire-one-retain0-r1-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-rewire-one-retain0-r1-base.json",
+      "originalSha256": "d5aecad47b03f0ffa56b7af2ea354aa7250383574c05bb41510267165494768d",
+      "publicSha256": "d5aecad47b03f0ffa56b7af2ea354aa7250383574c05bb41510267165494768d",
+      "originalBytes": 3818,
+      "publicBytes": 3818,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-rewire-one-retain0-r1-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-rewire-one-retain0-r1-optimized.json",
+      "originalSha256": "2992f1557c2f52e130aa209ec904df8791a292452c5f0205162a278ebae4cddb",
+      "publicSha256": "2992f1557c2f52e130aa209ec904df8791a292452c5f0205162a278ebae4cddb",
+      "originalBytes": 3829,
+      "publicBytes": 3829,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-rewire-one-retain0-r2-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-rewire-one-retain0-r2-base.json",
+      "originalSha256": "c69f8894166b9d39398a19489b1768d56a1708743c87b716e3bae9617adf2281",
+      "publicSha256": "c69f8894166b9d39398a19489b1768d56a1708743c87b716e3bae9617adf2281",
+      "originalBytes": 3828,
+      "publicBytes": 3828,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-rewire-one-retain0-r2-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-rewire-one-retain0-r2-optimized.json",
+      "originalSha256": "80b0162b39e2be1164b2aead702bb0788307aa9e395dd5d7d738ee80bc449b60",
+      "publicSha256": "80b0162b39e2be1164b2aead702bb0788307aa9e395dd5d7d738ee80bc449b60",
+      "originalBytes": 3823,
+      "publicBytes": 3823,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-rewire-one-retain0-r3-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-rewire-one-retain0-r3-base.json",
+      "originalSha256": "ce406b563cd6246980ef2b60c42056e29267ba6e2354c53bc1aa760c7804d4a2",
+      "publicSha256": "ce406b563cd6246980ef2b60c42056e29267ba6e2354c53bc1aa760c7804d4a2",
+      "originalBytes": 3842,
+      "publicBytes": 3842,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-10000-rewire-one-retain0-r3-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-10000-rewire-one-retain0-r3-optimized.json",
+      "originalSha256": "a98c240930127e6f041773bcbc61b4a8331a6010f742e3a6cfade98703c4b0c6",
+      "publicSha256": "a98c240930127e6f041773bcbc61b4a8331a6010f742e3a6cfade98703c4b0c6",
+      "originalBytes": 3829,
+      "publicBytes": 3829,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-move-1pct-retain0-r1-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-move-1pct-retain0-r1-base.json",
+      "originalSha256": "169f309b89216830e68252bedf8bf0fa1c3c1022823844eee5612f3f2e60a598",
+      "publicSha256": "169f309b89216830e68252bedf8bf0fa1c3c1022823844eee5612f3f2e60a598",
+      "originalBytes": 3870,
+      "publicBytes": 3870,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-move-1pct-retain0-r1-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-move-1pct-retain0-r1-optimized.json",
+      "originalSha256": "c4622d06733b93e7575ce4bb8eb22581277546eceedc35cf605ba76656598401",
+      "publicSha256": "c4622d06733b93e7575ce4bb8eb22581277546eceedc35cf605ba76656598401",
+      "originalBytes": 3893,
+      "publicBytes": 3893,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-move-1pct-retain0-r2-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-move-1pct-retain0-r2-base.json",
+      "originalSha256": "b7ca1bd769761a60c6dd332b06ae0612c8cc86c8589600ac6ce3d0b1bacad4e5",
+      "publicSha256": "b7ca1bd769761a60c6dd332b06ae0612c8cc86c8589600ac6ce3d0b1bacad4e5",
+      "originalBytes": 3886,
+      "publicBytes": 3886,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-move-1pct-retain0-r2-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-move-1pct-retain0-r2-optimized.json",
+      "originalSha256": "d7107abbd1c3c7bc86c4f4ac43fa9e6a792aec088bb1e3335e2c30c8f1e584a0",
+      "publicSha256": "d7107abbd1c3c7bc86c4f4ac43fa9e6a792aec088bb1e3335e2c30c8f1e584a0",
+      "originalBytes": 3901,
+      "publicBytes": 3901,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-move-1pct-retain0-r3-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-move-1pct-retain0-r3-base.json",
+      "originalSha256": "8e02502b37433796116154c4b134b3596968f668d04e2c858159609197e0fce5",
+      "publicSha256": "8e02502b37433796116154c4b134b3596968f668d04e2c858159609197e0fce5",
+      "originalBytes": 3903,
+      "publicBytes": 3903,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-move-1pct-retain0-r3-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-move-1pct-retain0-r3-optimized.json",
+      "originalSha256": "2e6c72e8be7e3fa23690ad0692a9621b050cfabe639f01be5eca275233660c19",
+      "publicSha256": "2e6c72e8be7e3fa23690ad0692a9621b050cfabe639f01be5eca275233660c19",
+      "originalBytes": 3884,
+      "publicBytes": 3884,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-move-one-retain0-r1-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-move-one-retain0-r1-base.json",
+      "originalSha256": "066ed1d0879cf14dba37e67f500173a5faf4f97652db77a32a1bebe5f14df779",
+      "publicSha256": "066ed1d0879cf14dba37e67f500173a5faf4f97652db77a32a1bebe5f14df779",
+      "originalBytes": 3883,
+      "publicBytes": 3883,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-move-one-retain0-r1-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-move-one-retain0-r1-optimized.json",
+      "originalSha256": "76764e97c9de12702faa5db749e5cbfb373333a7972e95a1ad02859da59180d7",
+      "publicSha256": "76764e97c9de12702faa5db749e5cbfb373333a7972e95a1ad02859da59180d7",
+      "originalBytes": 3882,
+      "publicBytes": 3882,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-move-one-retain0-r2-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-move-one-retain0-r2-base.json",
+      "originalSha256": "3cf226cb2badab4267d3a2028b25a3669e8b420fe6b4b2d968d0e48e985ade4c",
+      "publicSha256": "3cf226cb2badab4267d3a2028b25a3669e8b420fe6b4b2d968d0e48e985ade4c",
+      "originalBytes": 3901,
+      "publicBytes": 3901,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-move-one-retain0-r2-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-move-one-retain0-r2-optimized.json",
+      "originalSha256": "98fef51e014cdf00ebf28d316141f029bb11734b98b18d3e594fdb4b0b4b914a",
+      "publicSha256": "98fef51e014cdf00ebf28d316141f029bb11734b98b18d3e594fdb4b0b4b914a",
+      "originalBytes": 3875,
+      "publicBytes": 3875,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-move-one-retain0-r3-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-move-one-retain0-r3-base.json",
+      "originalSha256": "3fe29397c88ed5e39fd38fa6695f3498074b9f8437baedd302c7323bd4beec99",
+      "publicSha256": "3fe29397c88ed5e39fd38fa6695f3498074b9f8437baedd302c7323bd4beec99",
+      "originalBytes": 3887,
+      "publicBytes": 3887,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-move-one-retain0-r3-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-move-one-retain0-r3-optimized.json",
+      "originalSha256": "39c4046b2062eb4de0708fb75bc3f1320de46e1741e9f6659fd8ef146f1f34df",
+      "publicSha256": "39c4046b2062eb4de0708fb75bc3f1320de46e1741e9f6659fd8ef146f1f34df",
+      "originalBytes": 3910,
+      "publicBytes": 3910,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-net-zero-retain0-r1-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r1-base.json",
+      "originalSha256": "08f72a09f1633aa95e1dcf7d05973db519ad82e62b4fa9555dfa28dec27315df",
+      "publicSha256": "08f72a09f1633aa95e1dcf7d05973db519ad82e62b4fa9555dfa28dec27315df",
+      "originalBytes": 3879,
+      "publicBytes": 3879,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-net-zero-retain0-r1-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r1-optimized.json",
+      "originalSha256": "0c1749dae7c0042bfc13a1bfb33f521f71b2ebbb78e016445e07813c8fed80f2",
+      "publicSha256": "0c1749dae7c0042bfc13a1bfb33f521f71b2ebbb78e016445e07813c8fed80f2",
+      "originalBytes": 3890,
+      "publicBytes": 3890,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-net-zero-retain0-r2-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r2-base.json",
+      "originalSha256": "522cbc1b6b805ed17d37e46e227a36b071ce3357c0e8e320216a7a99dbbf1461",
+      "publicSha256": "522cbc1b6b805ed17d37e46e227a36b071ce3357c0e8e320216a7a99dbbf1461",
+      "originalBytes": 3862,
+      "publicBytes": 3862,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-net-zero-retain0-r2-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r2-optimized.json",
+      "originalSha256": "c0a4bd10d7211e65ffa22030098d232e47c8c786bece502c3a2dc9cf62c8d51e",
+      "publicSha256": "c0a4bd10d7211e65ffa22030098d232e47c8c786bece502c3a2dc9cf62c8d51e",
+      "originalBytes": 3882,
+      "publicBytes": 3882,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-net-zero-retain0-r3-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r3-base.json",
+      "originalSha256": "1b48ccfb7e4e9ae5d7615b20e79f852a59f05b46a2c5e5a8c75c507a9d3c7413",
+      "publicSha256": "1b48ccfb7e4e9ae5d7615b20e79f852a59f05b46a2c5e5a8c75c507a9d3c7413",
+      "originalBytes": 3861,
+      "publicBytes": 3861,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-net-zero-retain0-r3-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r3-optimized.json",
+      "originalSha256": "0e7d84d5c465920d6389640577fbfdb1d6ec40e3317c1f90c19219a53fdd1b36",
+      "publicSha256": "0e7d84d5c465920d6389640577fbfdb1d6ec40e3317c1f90c19219a53fdd1b36",
+      "originalBytes": 3910,
+      "publicBytes": 3910,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-rewire-one-retain0-r1-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-rewire-one-retain0-r1-base.json",
+      "originalSha256": "4b5cd5517c1d25756fd155fde6bd9159cfea770a2753e3c483bb731bd667fb59",
+      "publicSha256": "4b5cd5517c1d25756fd155fde6bd9159cfea770a2753e3c483bb731bd667fb59",
+      "originalBytes": 3883,
+      "publicBytes": 3883,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-rewire-one-retain0-r1-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-rewire-one-retain0-r1-optimized.json",
+      "originalSha256": "98f8f488a7de484e86910cc617eaff0b11d6f4e5399f8b4ba298065defc73aa8",
+      "publicSha256": "98f8f488a7de484e86910cc617eaff0b11d6f4e5399f8b4ba298065defc73aa8",
+      "originalBytes": 3902,
+      "publicBytes": 3902,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-rewire-one-retain0-r2-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-rewire-one-retain0-r2-base.json",
+      "originalSha256": "eadb03df780eeb2b28aa94668de1342deebe1ea9d4a888c2624779d87f15a857",
+      "publicSha256": "eadb03df780eeb2b28aa94668de1342deebe1ea9d4a888c2624779d87f15a857",
+      "originalBytes": 3886,
+      "publicBytes": 3886,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-rewire-one-retain0-r2-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-rewire-one-retain0-r2-optimized.json",
+      "originalSha256": "6a9067f88713d410869bec550721d790eeaddfaef2cfc4d3c436354b210d7567",
+      "publicSha256": "6a9067f88713d410869bec550721d790eeaddfaef2cfc4d3c436354b210d7567",
+      "originalBytes": 3908,
+      "publicBytes": 3908,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-rewire-one-retain0-r3-base.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-rewire-one-retain0-r3-base.json",
+      "originalSha256": "0c7c336b99175d99fb43b08009267ae8bcef16ba156cce83faae2174a4ebe994",
+      "publicSha256": "0c7c336b99175d99fb43b08009267ae8bcef16ba156cce83faae2174a4ebe994",
+      "originalBytes": 3895,
+      "publicBytes": 3895,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "paired/results/sparse-50000-rewire-one-retain0-r3-optimized.json",
+      "source": "<RUN>/performance-paired/results/sparse-50000-rewire-one-retain0-r3-optimized.json",
+      "originalSha256": "c24ba3d5b6dd370a64475111038219ee4cd674099943325c86a51d7fb0e089fa",
+      "publicSha256": "c24ba3d5b6dd370a64475111038219ee4cd674099943325c86a51d7fb0e089fa",
+      "originalBytes": 3897,
+      "publicBytes": 3897,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "netzero-control/receipts.json",
+      "source": "<RUN>/performance-netzero-control/receipts.json",
+      "originalSha256": "7fb8d62fdcbd923614ad3ce1dbaed111e717e76b311a3fe269ae754a200bc165",
+      "publicSha256": "68a3270648b8fb5e3d75c5376692a8a06a91dcbd27c2638db1829cddf30044bd",
+      "originalBytes": 11231,
+      "publicBytes": 9383,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 6
+        },
+        {
+          "prefix": "<RUN>",
+          "occurrences": 18
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "netzero-control/r1-base.json",
+      "source": "<RUN>/performance-netzero-control/r1-base.json",
+      "originalSha256": "c3816f52a359987e418e6772f644ee2a4ec1c755da59daff1d8df3c83317af70",
+      "publicSha256": "c3816f52a359987e418e6772f644ee2a4ec1c755da59daff1d8df3c83317af70",
+      "originalBytes": 3880,
+      "publicBytes": 3880,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "netzero-control/r1-optimized.json",
+      "source": "<RUN>/performance-netzero-control/r1-optimized.json",
+      "originalSha256": "b64f5e92c43c4ad22b1bb043d8ee1de3f1b79aa7be18663d247d75048a754fb1",
+      "publicSha256": "b64f5e92c43c4ad22b1bb043d8ee1de3f1b79aa7be18663d247d75048a754fb1",
+      "originalBytes": 3846,
+      "publicBytes": 3846,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "netzero-control/r2-base.json",
+      "source": "<RUN>/performance-netzero-control/r2-base.json",
+      "originalSha256": "f790958eb5a699d26c6666dea219c5153bdf4e05bb1933e1a1c4274a7ac7ae49",
+      "publicSha256": "f790958eb5a699d26c6666dea219c5153bdf4e05bb1933e1a1c4274a7ac7ae49",
+      "originalBytes": 3868,
+      "publicBytes": 3868,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "netzero-control/r2-optimized.json",
+      "source": "<RUN>/performance-netzero-control/r2-optimized.json",
+      "originalSha256": "42099b1d99f7416706f4479a6813dd628a74c3e3a821bf42fbb91660ccd97da5",
+      "publicSha256": "42099b1d99f7416706f4479a6813dd628a74c3e3a821bf42fbb91660ccd97da5",
+      "originalBytes": 3881,
+      "publicBytes": 3881,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "netzero-control/r3-base.json",
+      "source": "<RUN>/performance-netzero-control/r3-base.json",
+      "originalSha256": "974474eec6efdeb871bfc8835a523f90c6cb62a6ce309cde174e9890bd36e5c1",
+      "publicSha256": "974474eec6efdeb871bfc8835a523f90c6cb62a6ce309cde174e9890bd36e5c1",
+      "originalBytes": 3855,
+      "publicBytes": 3855,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "netzero-control/r3-optimized.json",
+      "source": "<RUN>/performance-netzero-control/r3-optimized.json",
+      "originalSha256": "b27fc582bd2831975aa663356f1c59cdb772a447eea08405748f6c0e0a5155f5",
+      "publicSha256": "b27fc582bd2831975aa663356f1c59cdb772a447eea08405748f6c0e0a5155f5",
+      "originalBytes": 3870,
+      "publicBytes": 3870,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "netzero-control/r4-base.json",
+      "source": "<RUN>/performance-netzero-control/r4-base.json",
+      "originalSha256": "610e344ea2a563401e1624935d6f33976ac947aac02882dcdee57773b80c9439",
+      "publicSha256": "610e344ea2a563401e1624935d6f33976ac947aac02882dcdee57773b80c9439",
+      "originalBytes": 3881,
+      "publicBytes": 3881,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "netzero-control/r4-optimized.json",
+      "source": "<RUN>/performance-netzero-control/r4-optimized.json",
+      "originalSha256": "e078fe26b7b3055a4a74f4313166d53c6c4d359d3fafe006c4f6a35216f8e41c",
+      "publicSha256": "e078fe26b7b3055a4a74f4313166d53c6c4d359d3fafe006c4f6a35216f8e41c",
+      "originalBytes": 3844,
+      "publicBytes": 3844,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "netzero-control/r5-base.json",
+      "source": "<RUN>/performance-netzero-control/r5-base.json",
+      "originalSha256": "f9cfe2a5ca0145ec1c023e5e4ab80ce64fd1f2e4e9d746945bc70591c98cd255",
+      "publicSha256": "f9cfe2a5ca0145ec1c023e5e4ab80ce64fd1f2e4e9d746945bc70591c98cd255",
+      "originalBytes": 3873,
+      "publicBytes": 3873,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "netzero-control/r5-optimized.json",
+      "source": "<RUN>/performance-netzero-control/r5-optimized.json",
+      "originalSha256": "020d81c3dd8fa83e68749fecfe5fa8b5e603ac6bb9964668cee1fcf8d5867270",
+      "publicSha256": "020d81c3dd8fa83e68749fecfe5fa8b5e603ac6bb9964668cee1fcf8d5867270",
+      "originalBytes": 3885,
+      "publicBytes": 3885,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "netzero-control/r6-base.json",
+      "source": "<RUN>/performance-netzero-control/r6-base.json",
+      "originalSha256": "15d4862d5e220ea26fd96c7d89e88e6bf2e5b1b7b38daee1613df62e4c71727c",
+      "publicSha256": "15d4862d5e220ea26fd96c7d89e88e6bf2e5b1b7b38daee1613df62e4c71727c",
+      "originalBytes": 3859,
+      "publicBytes": 3859,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "netzero-control/r6-optimized.json",
+      "source": "<RUN>/performance-netzero-control/r6-optimized.json",
+      "originalSha256": "3b9dae4756add8d50f03c947929156b85cae0433dea1bc5043f8389997284f2d",
+      "publicSha256": "3b9dae4756add8d50f03c947929156b85cae0433dea1bc5043f8389997284f2d",
+      "originalBytes": 3875,
+      "publicBytes": 3875,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/base/hub-50000-rewire-one-r1.cpuprofile.json",
+      "source": "<BASELINE_RUN>/profiles/hub-50000-rewire-one-r1.cpuprofile",
+      "originalSha256": "125addda801fc6c7f7ec56d0ce71f796caa630ac91ed046bd9e758e58f56defa",
+      "publicSha256": "cf5a878f06cd25a3e9b2909e456c16aa4fbf431d650e62dc9a3d8734e1e3e703",
+      "originalBytes": 76781,
+      "publicBytes": 68701,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 101
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/base/hub-50000-rewire-one-r1.json",
+      "source": "<BASELINE_RUN>/profiles/hub-50000-rewire-one-r1.json",
+      "originalSha256": "15730a33be61892594583a12217d0cbe1db876240bf72acb28fe0b8f7c93d85d",
+      "publicSha256": "15730a33be61892594583a12217d0cbe1db876240bf72acb28fe0b8f7c93d85d",
+      "originalBytes": 6670,
+      "publicBytes": 6670,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/base/hub-50000-rewire-one-r2.cpuprofile.json",
+      "source": "<BASELINE_RUN>/profiles/hub-50000-rewire-one-r2.cpuprofile",
+      "originalSha256": "9f9b9d2857bbbe974bd411bb8f2ac8eb378b7f01291286e5dd045bd6e4dc0b09",
+      "publicSha256": "c826e3e241f66e2696edc9d63e29afd243151c8ac11ba4e76c225ad648321a38",
+      "originalBytes": 78519,
+      "publicBytes": 70199,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 104
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/base/hub-50000-rewire-one-r2.json",
+      "source": "<BASELINE_RUN>/profiles/hub-50000-rewire-one-r2.json",
+      "originalSha256": "0a60fae98a1be0b74089dcad10e394ff84df5cf0c642694b6d9b19f4375e0608",
+      "publicSha256": "0a60fae98a1be0b74089dcad10e394ff84df5cf0c642694b6d9b19f4375e0608",
+      "originalBytes": 6625,
+      "publicBytes": 6625,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/base/sparse-50000-move-one-r1.cpuprofile.json",
+      "source": "<BASELINE_RUN>/profiles/sparse-50000-move-one-r1.cpuprofile",
+      "originalSha256": "9dc85592a594718485ea5cbfa1de649ce79d87869f681ef0c23677957fdb1582",
+      "publicSha256": "2a2c58660c52eb972cacf19b64fb21545e7548ee3e34d6077c899c50fe35734d",
+      "originalBytes": 74370,
+      "publicBytes": 67410,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 87
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/base/sparse-50000-move-one-r1.json",
+      "source": "<BASELINE_RUN>/profiles/sparse-50000-move-one-r1.json",
+      "originalSha256": "10fca03f24f0149c635dea802343721513f54c2b577ffd4d8c984de0900add9d",
+      "publicSha256": "10fca03f24f0149c635dea802343721513f54c2b577ffd4d8c984de0900add9d",
+      "originalBytes": 6618,
+      "publicBytes": 6618,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/base/sparse-50000-move-one-r2.cpuprofile.json",
+      "source": "<BASELINE_RUN>/profiles/sparse-50000-move-one-r2.cpuprofile",
+      "originalSha256": "e338e72deb06433a6cbadfd991c87c27265c6634e0a5c90b95513c30a2acb6a6",
+      "publicSha256": "c4fb4c32fe336db4675c030b660dc3d1ca0b325b326108ebb29fb4cf5170e137",
+      "originalBytes": 71128,
+      "publicBytes": 64168,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 87
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/base/sparse-50000-move-one-r2.json",
+      "source": "<BASELINE_RUN>/profiles/sparse-50000-move-one-r2.json",
+      "originalSha256": "65b6930f2cdbc3231e613565d4e4117e64b5c65fb890ebd0d0c73a737e6f96bd",
+      "publicSha256": "65b6930f2cdbc3231e613565d4e4117e64b5c65fb890ebd0d0c73a737e6f96bd",
+      "originalBytes": 6684,
+      "publicBytes": 6684,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/base/sparse-50000-move-one-r3.cpuprofile.json",
+      "source": "<BASELINE_RUN>/profiles/sparse-50000-move-one-r3.cpuprofile",
+      "originalSha256": "8b835856a9801483b62608770e281ae8c22c29e25eba5ede15eba91408731ea5",
+      "publicSha256": "8919a09c4c5ef2298fc28441cd3db39ca74e963f3ac876fd9994dd93185df32d",
+      "originalBytes": 69849,
+      "publicBytes": 63289,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 82
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/base/sparse-50000-move-one-r3.json",
+      "source": "<BASELINE_RUN>/profiles/sparse-50000-move-one-r3.json",
+      "originalSha256": "c555a03ae0785d1c27e5f3e506d07072aca2d571fa345777b73a2bc8e0ea91c9",
+      "publicSha256": "c555a03ae0785d1c27e5f3e506d07072aca2d571fa345777b73a2bc8e0ea91c9",
+      "originalBytes": 6633,
+      "publicBytes": 6633,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/base/sparse-50000-net-zero-r1.cpuprofile.json",
+      "source": "<BASELINE_RUN>/profiles/sparse-50000-net-zero-r1.cpuprofile",
+      "originalSha256": "16c067155a93ee45db5c7645a474de124a357a90cd49e54bc559fc94c5d596ee",
+      "publicSha256": "61a9f59e683e9be0adada21a6f5e5db3b1aa2b3c10d624a4970a3ad8e6730c18",
+      "originalBytes": 36227,
+      "publicBytes": 31347,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 61
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/base/sparse-50000-net-zero-r1.json",
+      "source": "<BASELINE_RUN>/profiles/sparse-50000-net-zero-r1.json",
+      "originalSha256": "426307130c3b6b55bb0c5ddd5baff219a5f7d121cc75825bde00d6583d8d1c41",
+      "publicSha256": "426307130c3b6b55bb0c5ddd5baff219a5f7d121cc75825bde00d6583d8d1c41",
+      "originalBytes": 6679,
+      "publicBytes": 6679,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/base/sparse-50000-net-zero-r2.cpuprofile.json",
+      "source": "<BASELINE_RUN>/profiles/sparse-50000-net-zero-r2.cpuprofile",
+      "originalSha256": "19193edfb6d02d664c6cbe4bd435b7b9fd4dda4b442a695065da627ede9c0055",
+      "publicSha256": "c0e467261ac9450ae73bcba4ad4cc5a923808834e376ead8355b2fe314f21297",
+      "originalBytes": 36971,
+      "publicBytes": 32011,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 62
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/base/sparse-50000-net-zero-r2.json",
+      "source": "<BASELINE_RUN>/profiles/sparse-50000-net-zero-r2.json",
+      "originalSha256": "84039bc461f3cb75cda329ac7370b4937a7068a48ad42c4df279b20354166864",
+      "publicSha256": "84039bc461f3cb75cda329ac7370b4937a7068a48ad42c4df279b20354166864",
+      "originalBytes": 6651,
+      "publicBytes": 6651,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/base/receipts.json",
+      "source": "<BASELINE_RUN>/profile-receipts.json",
+      "originalSha256": "16d4cecfd545fb65d4c8c70455aee92fd0073428ffbd323fce40825b1583abd4",
+      "publicSha256": "17957f7740de573a41910d728a1827aee8b2da424f919c59bfd3ba1d05b67869",
+      "originalBytes": 5079,
+      "publicBytes": 3399,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 21
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/base/summary.v2-overlap.json",
+      "source": "<RUN>/performance-tools/base-profile-summary.overlap.json",
+      "originalSha256": "94c8309c1a47c2b291f27c790e1572a80fff5e77fa5af74f92325f4e5779076b",
+      "publicSha256": "763855a45c9730ccb5de3a7c4f0870331b43a7fe47c2341ff1647a410a5a5f3b",
+      "originalBytes": 57845,
+      "publicBytes": 51445,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 80
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/optimized/hub-50000-rewire-one-r1.cpuprofile.json",
+      "source": "<RUN>/performance-optimized/profiles/hub-50000-rewire-one-r1.cpuprofile",
+      "originalSha256": "7f3707520832253be588aaf5f4a7c597ae6ec0d39b912e7cf4ede86ee427a307",
+      "publicSha256": "3152b796609c33fe50de15ead02b768361e79d14dca7120ac36f9f5634440221",
+      "originalBytes": 56346,
+      "publicBytes": 50646,
+      "replacedPrefixes": [
+        {
+          "prefix": "<RUN>",
+          "occurrences": 75
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/optimized/hub-50000-rewire-one-r1.json",
+      "source": "<RUN>/performance-optimized/profiles/hub-50000-rewire-one-r1.json",
+      "originalSha256": "637f19ff3a1c70401bcda0cf716759e90b34d9a4fc783f424c94323ace84acb5",
+      "publicSha256": "637f19ff3a1c70401bcda0cf716759e90b34d9a4fc783f424c94323ace84acb5",
+      "originalBytes": 6668,
+      "publicBytes": 6668,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/optimized/hub-50000-rewire-one-r2.cpuprofile.json",
+      "source": "<RUN>/performance-optimized/profiles/hub-50000-rewire-one-r2.cpuprofile",
+      "originalSha256": "599958a52335bc629dcf919baade9523c10199ba072e519a1f50e536dd2aae6a",
+      "publicSha256": "c9e43901d7570df797565ed30d3f394cb9ee44ae726e5fae8c13b4b867c05332",
+      "originalBytes": 58318,
+      "publicBytes": 52542,
+      "replacedPrefixes": [
+        {
+          "prefix": "<RUN>",
+          "occurrences": 76
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/optimized/hub-50000-rewire-one-r2.json",
+      "source": "<RUN>/performance-optimized/profiles/hub-50000-rewire-one-r2.json",
+      "originalSha256": "8196c6e7153018c7a6261730996283fc604a5190737b2a4e86456c8070b243e3",
+      "publicSha256": "8196c6e7153018c7a6261730996283fc604a5190737b2a4e86456c8070b243e3",
+      "originalBytes": 6676,
+      "publicBytes": 6676,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/optimized/sparse-50000-move-one-r1.cpuprofile.json",
+      "source": "<RUN>/performance-optimized/profiles/sparse-50000-move-one-r1.cpuprofile",
+      "originalSha256": "abfbd01bd580978c0a660702c5b39ac17ed8ac820cfb875e61698a12ba5ab5c5",
+      "publicSha256": "43d18116fa434b5c5793ab7fd9a3275424e87a63570f65161afca1c5a3b12295",
+      "originalBytes": 61741,
+      "publicBytes": 55889,
+      "replacedPrefixes": [
+        {
+          "prefix": "<RUN>",
+          "occurrences": 77
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/optimized/sparse-50000-move-one-r1.json",
+      "source": "<RUN>/performance-optimized/profiles/sparse-50000-move-one-r1.json",
+      "originalSha256": "f1d1044401c476776e99cdbfd9c4555574a13e1fa49c28862d9f37b35ac520c4",
+      "publicSha256": "f1d1044401c476776e99cdbfd9c4555574a13e1fa49c28862d9f37b35ac520c4",
+      "originalBytes": 6633,
+      "publicBytes": 6633,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/optimized/sparse-50000-move-one-r2.cpuprofile.json",
+      "source": "<RUN>/performance-optimized/profiles/sparse-50000-move-one-r2.cpuprofile",
+      "originalSha256": "391d2f8e65eb8a6aff1fce8f23c5328369caa620e8025206be164914d2b15e15",
+      "publicSha256": "4f3890a6a5d6bb851238b7d623aa04a1c3c94d3ea3100bdeabf3e9bc98cd04d5",
+      "originalBytes": 49423,
+      "publicBytes": 44635,
+      "replacedPrefixes": [
+        {
+          "prefix": "<RUN>",
+          "occurrences": 63
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/optimized/sparse-50000-move-one-r2.json",
+      "source": "<RUN>/performance-optimized/profiles/sparse-50000-move-one-r2.json",
+      "originalSha256": "520e123aa1873529bd65cce5f6329755ce052b93d5cbc653f079c00bd7aab929",
+      "publicSha256": "520e123aa1873529bd65cce5f6329755ce052b93d5cbc653f079c00bd7aab929",
+      "originalBytes": 6686,
+      "publicBytes": 6686,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/optimized/sparse-50000-move-one-r3.cpuprofile.json",
+      "source": "<RUN>/performance-optimized/profiles/sparse-50000-move-one-r3.cpuprofile",
+      "originalSha256": "656f7f074b4a2c595b0aefa8b56a77c667fb0cdaef35c7f4e2d30b461593a559",
+      "publicSha256": "8103241e7a72cb22dc7293ac1cca5ff057d204bb1c8305daecbf26de42303843",
+      "originalBytes": 45493,
+      "publicBytes": 40857,
+      "replacedPrefixes": [
+        {
+          "prefix": "<RUN>",
+          "occurrences": 61
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/optimized/sparse-50000-move-one-r3.json",
+      "source": "<RUN>/performance-optimized/profiles/sparse-50000-move-one-r3.json",
+      "originalSha256": "7ac595b7a4db4db03e3b8094f17b8fff3b780fad13ec1d5ce26b4e58096c2089",
+      "publicSha256": "7ac595b7a4db4db03e3b8094f17b8fff3b780fad13ec1d5ce26b4e58096c2089",
+      "originalBytes": 6680,
+      "publicBytes": 6680,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/optimized/sparse-50000-net-zero-r1.cpuprofile.json",
+      "source": "<RUN>/performance-optimized/profiles/sparse-50000-net-zero-r1.cpuprofile",
+      "originalSha256": "13f28d403ee01793bd1c1955193d6f1efcde7fbb414cacccd9e7073212409d8a",
+      "publicSha256": "2788ab85728de63516c1d2d03c37dc228fc9b64105ca082a716d691aecbf1faa",
+      "originalBytes": 34222,
+      "publicBytes": 30270,
+      "replacedPrefixes": [
+        {
+          "prefix": "<RUN>",
+          "occurrences": 52
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/optimized/sparse-50000-net-zero-r1.json",
+      "source": "<RUN>/performance-optimized/profiles/sparse-50000-net-zero-r1.json",
+      "originalSha256": "0a301665082bf8730f29e8b776737e27a46b21bdb221f153a9c968f42e9edde9",
+      "publicSha256": "0a301665082bf8730f29e8b776737e27a46b21bdb221f153a9c968f42e9edde9",
+      "originalBytes": 6654,
+      "publicBytes": 6654,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/optimized/sparse-50000-net-zero-r2.cpuprofile.json",
+      "source": "<RUN>/performance-optimized/profiles/sparse-50000-net-zero-r2.cpuprofile",
+      "originalSha256": "f9bb91917285a8da5ee04ce2506633e8fbb642fd24a490cac7996a78d43c59fb",
+      "publicSha256": "0fbd0726a040c4fbcd009d9918f8beb4d57bf9365d0e64a19c224d09af0913da",
+      "originalBytes": 38266,
+      "publicBytes": 33706,
+      "replacedPrefixes": [
+        {
+          "prefix": "<RUN>",
+          "occurrences": 60
+        }
+      ],
+      "renamedNativeProfile": true
+    },
+    {
+      "path": "profiles/optimized/sparse-50000-net-zero-r2.json",
+      "source": "<RUN>/performance-optimized/profiles/sparse-50000-net-zero-r2.json",
+      "originalSha256": "8c93e14a1797b9f68bc2d74be9bdd29b272b7583e2b612e166352ff352ed3ce5",
+      "publicSha256": "8c93e14a1797b9f68bc2d74be9bdd29b272b7583e2b612e166352ff352ed3ce5",
+      "originalBytes": 6649,
+      "publicBytes": 6649,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/optimized/receipts.json",
+      "source": "<RUN>/performance-optimized/profile-receipts.json",
+      "originalSha256": "9f8079ed75069c5ece7a4ca1b8d80bef75b356bd1d04c9aefef48e987f06acfd",
+      "publicSha256": "d32f4134dc70b44afac861a771b220f2973cd52e0601ac9bfa974849502d43b8",
+      "originalBytes": 5268,
+      "publicBytes": 3672,
+      "replacedPrefixes": [
+        {
+          "prefix": "<RUN>",
+          "occurrences": 21
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/optimized/summary.v2-overlap.json",
+      "source": "<RUN>/performance-tools/optimized-profile-summary.overlap.json",
+      "originalSha256": "6014891570d9c8413a8c2c64556e20de38283ef11d889253ed6a3ba294430e8f",
+      "publicSha256": "3862c4a06f379b19668fc42346ba907a90140a20cf08b87901bf0b63227f0fc0",
+      "originalBytes": 58298,
+      "publicBytes": 52218,
+      "replacedPrefixes": [
+        {
+          "prefix": "<RUN>",
+          "occurrences": 80
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "sources/benchmark.mjs.txt",
+      "source": "<BASELINE_RUN>/benchmark.mjs",
+      "originalSha256": "e41e3d7fc9fe2ebd88dbd333d2e07b31dc18b6ea71a3639c6f78460db5e03d81",
+      "publicSha256": "e41e3d7fc9fe2ebd88dbd333d2e07b31dc18b6ea71a3639c6f78460db5e03d81",
+      "originalBytes": 9475,
+      "publicBytes": 9475,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "sources/run-baseline.py.txt",
+      "source": "<BASELINE_RUN>/run-baseline.py",
+      "originalSha256": "bc8e80f14c983260e12965ba919bcbc8302240257a925254e5d0135c325d2397",
+      "publicSha256": "bc8e80f14c983260e12965ba919bcbc8302240257a925254e5d0135c325d2397",
+      "originalBytes": 3820,
+      "publicBytes": 3820,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "sources/run-profiles.py.txt",
+      "source": "<BASELINE_RUN>/run-profiles.py",
+      "originalSha256": "4d6fc506e892420c1653533e9752c3f417d6b0f13eea22844525a4899bc569fd",
+      "publicSha256": "4d6fc506e892420c1653533e9752c3f417d6b0f13eea22844525a4899bc569fd",
+      "originalBytes": 5585,
+      "publicBytes": 5585,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "sources/run-netzero-control.py.txt",
+      "source": "<RUN>/run-netzero-control.py",
+      "originalSha256": "e60c71fde89224fe4c657cc5080b26fe31f2eb0661c755ceafc4209d925b08a6",
+      "publicSha256": "5f218567aafbc745809431acf5f4875f27193749d3993c1c5187128bff6258b8",
+      "originalBytes": 1762,
+      "publicBytes": 1682,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 1
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "sources/run-comparison.py.txt",
+      "source": "<RUN>/performance-tools/run-comparison.py",
+      "originalSha256": "ca8a07b721aa3bdf5cbef1fe6e43dffff1dae211882cf5ab7c9e11c72e6a0089",
+      "publicSha256": "4237991c0eba452c16958a8e34880c946b1ce8082dff26d8fa068a07ceb50751",
+      "originalBytes": 8267,
+      "publicBytes": 8187,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 1
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "sources/report-comparison.py.txt",
+      "source": "<RUN>/performance-tools/report-comparison.py",
+      "originalSha256": "e97093da6ef25f72e3b2553f7a6314b91dbbd1bdfcf0b19447c250897131c42f",
+      "publicSha256": "e97093da6ef25f72e3b2553f7a6314b91dbbd1bdfcf0b19447c250897131c42f",
+      "originalBytes": 9934,
+      "publicBytes": 9934,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "sources/analyze-netzero.py.txt",
+      "source": "<RUN>/performance-tools/analyze-netzero.py",
+      "originalSha256": "2b74a82973a428aaaab4007e740e30501c36d44614480ebd7466f24a7faef7eb",
+      "publicSha256": "2b74a82973a428aaaab4007e740e30501c36d44614480ebd7466f24a7faef7eb",
+      "originalBytes": 9224,
+      "publicBytes": 9224,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "sources/analyze-profiles-v2.py.txt",
+      "source": "<RUN>/performance-tools/analyze-profiles-v2.py",
+      "originalSha256": "fd060228fd6399c91996b265b92fbb97155db5a9bbf313a37241d9cf84cb6d16",
+      "publicSha256": "fd060228fd6399c91996b265b92fbb97155db5a9bbf313a37241d9cf84cb6d16",
+      "originalBytes": 7107,
+      "publicBytes": 7107,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "sources/analyze-profiles-v2.initial.py.txt",
+      "source": "<RUN>/performance-tools/analyze-profiles-v2.initial.py",
+      "originalSha256": "0c90a1500df99bfe478ff386a9dbdca2f68da80ac1705bd84696a0db9476fb35",
+      "publicSha256": "0c90a1500df99bfe478ff386a9dbdca2f68da80ac1705bd84696a0db9476fb35",
+      "originalBytes": 5828,
+      "publicBytes": 5828,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "identity/optimized-source.json",
+      "source": "<RUN>/performance-optimized/source.json",
+      "originalSha256": "0112d7e690416fd4b9b001c915535f716d6be723b1216ea7d744f58337d41ac5",
+      "publicSha256": "c744b1d059e25d0a8489ab03eb5cc44a7d00540785e7460634a43772de5f75da",
+      "originalBytes": 362,
+      "publicBytes": 282,
+      "replacedPrefixes": [
+        {
+          "prefix": "<BASELINE_RUN>",
+          "occurrences": 1
+        }
+      ],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "profiles/alignment-validation.json",
+      "source": "<RUN>/performance-tools/analysis-correction-validation.json",
+      "originalSha256": "5c8fc24675320d9b6ca942a7fd2cdcab64cce292a974f45895e864df1c3015b3",
+      "publicSha256": "5c8fc24675320d9b6ca942a7fd2cdcab64cce292a974f45895e864df1c3015b3",
+      "originalBytes": 14128,
+      "publicBytes": 14128,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "identity/source-and-artifact-identity.json",
+      "source": "generated:technical-evidence-metadata",
+      "originalSha256": "8676c6be81421dd1bb062b3680c9bcdd65309622dd2acb96f049a1188fcaf148",
+      "publicSha256": "8676c6be81421dd1bb062b3680c9bcdd65309622dd2acb96f049a1188fcaf148",
+      "originalBytes": 1058,
+      "publicBytes": 1058,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false
+    },
+    {
+      "path": "README.md",
+      "source": "generated:technical-evidence-metadata",
+      "originalSha256": "3d527ccbe873ed08d62370f7c4643ef479f85a42a9686bbc2fe6e831614fce6e",
+      "publicSha256": "54726bf3c795cd512f3538f3f08a7dac264d4c127bc3c6e2f872e5cc23bab232",
+      "originalBytes": 5501,
+      "publicBytes": 5760,
+      "replacedPrefixes": [],
+      "renamedNativeProfile": false,
+      "generatedPublicationNote": "Generated README updated with verified local-to-published source identity; measurement inputs unchanged."
+    }
+  ]
+}

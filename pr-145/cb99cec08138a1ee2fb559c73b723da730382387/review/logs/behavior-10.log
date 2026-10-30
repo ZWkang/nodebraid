@@ -1,0 +1,398 @@
+[
+  {
+    "repeat": 1,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-netzero-control/r1-base.json"
+    ],
+    "startedAt": "2026-10-30T07:44:06.030389+00:00",
+    "exitCode": 0,
+    "processUserCpuSeconds": 1.419022,
+    "processSystemCpuSeconds": 0.154477,
+    "processMajorFaults": 1217,
+    "processMinorFaults": 42653,
+    "statistics": {
+      "minMs": 16.870083000000022,
+      "medianMs": 20.333479000000068,
+      "p95Ms": 26.68483399999991,
+      "maxMs": 26.863208000000213,
+      "meanMs": 20.87577076666667
+    }
+  },
+  {
+    "repeat": 1,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-netzero-control/r1-optimized.json"
+    ],
+    "startedAt": "2026-10-30T07:44:07.365838+00:00",
+    "exitCode": 0,
+    "processUserCpuSeconds": 1.4401380000000001,
+    "processSystemCpuSeconds": 0.08733099999999999,
+    "processMajorFaults": 57,
+    "processMinorFaults": 35742,
+    "statistics": {
+      "minMs": 16.200582999999938,
+      "medianMs": 20.246354000000053,
+      "p95Ms": 37.95425,
+      "maxMs": 47.774875000000065,
+      "meanMs": 22.69159303333334
+    }
+  },
+  {
+    "repeat": 2,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-netzero-control/r2-optimized.json"
+    ],
+    "startedAt": "2026-10-30T07:44:08.642553+00:00",
+    "exitCode": 0,
+    "processUserCpuSeconds": 1.5173559999999995,
+    "processSystemCpuSeconds": 0.123669,
+    "processMajorFaults": 49,
+    "processMinorFaults": 36455,
+    "statistics": {
+      "minMs": 16.134415999999987,
+      "medianMs": 23.633875000000103,
+      "p95Ms": 29.657499999999914,
+      "maxMs": 35.749416999999994,
+      "meanMs": 23.778437400000016
+    }
+  },
+  {
+    "repeat": 2,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-netzero-control/r2-base.json"
+    ],
+    "startedAt": "2026-10-30T07:44:09.979449+00:00",
+    "exitCode": 0,
+    "processUserCpuSeconds": 1.4574510000000007,
+    "processSystemCpuSeconds": 0.09001699999999996,
+    "processMajorFaults": 49,
+    "processMinorFaults": 34404,
+    "statistics": {
+      "minMs": 16.297500000000127,
+      "medianMs": 18.495813000000055,
+      "p95Ms": 24.41779100000008,
+      "maxMs": 29.287500000000023,
+      "meanMs": 19.294719433333334
+    }
+  },
+  {
+    "repeat": 3,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-netzero-control/r3-base.json"
+    ],
+    "startedAt": "2026-10-30T07:44:11.230215+00:00",
+    "exitCode": 0,
+    "processUserCpuSeconds": 1.3544869999999998,
+    "processSystemCpuSeconds": 0.10055400000000003,
+    "processMajorFaults": 49,
+    "processMinorFaults": 43948,
+    "statistics": {
+      "minMs": 15.797957999999994,
+      "medianMs": 18.415333000000032,
+      "p95Ms": 27.006291999999917,
+      "maxMs": 28.109375,
+      "meanMs": 19.212863833333337
+    }
+  },
+  {
+    "repeat": 3,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-netzero-control/r3-optimized.json"
+    ],
+    "startedAt": "2026-10-30T07:44:12.414073+00:00",
+    "exitCode": 0,
+    "processUserCpuSeconds": 1.311909,
+    "processSystemCpuSeconds": 0.09682800000000003,
+    "processMajorFaults": 49,
+    "processMinorFaults": 41055,
+    "statistics": {
+      "minMs": 15.586208000000056,
+      "medianMs": 18.85779150000002,
+      "p95Ms": 24.457250000000045,
+      "maxMs": 26.750582999999892,
+      "meanMs": 18.867554100000007
+    }
+  },
+  {
+    "repeat": 4,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-netzero-control/r4-optimized.json"
+    ],
+    "startedAt": "2026-10-30T07:44:13.565259+00:00",
+    "exitCode": 0,
+    "processUserCpuSeconds": 1.3563709999999993,
+    "processSystemCpuSeconds": 0.08313099999999995,
+    "processMajorFaults": 49,
+    "processMinorFaults": 36089,
+    "statistics": {
+      "minMs": 15.851208000000042,
+      "medianMs": 18.157812000000035,
+      "p95Ms": 26.43379200000004,
+      "maxMs": 27.530709,
+      "meanMs": 18.9474222
+    }
+  },
+  {
+    "repeat": 4,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-netzero-control/r4-base.json"
+    ],
+    "startedAt": "2026-10-30T07:44:14.722550+00:00",
+    "exitCode": 0,
+    "processUserCpuSeconds": 1.319643000000001,
+    "processSystemCpuSeconds": 0.09084099999999995,
+    "processMajorFaults": 49,
+    "processMinorFaults": 41952,
+    "statistics": {
+      "minMs": 15.770749999999907,
+      "medianMs": 18.893354500000044,
+      "p95Ms": 25.470459000000005,
+      "maxMs": 25.74766699999998,
+      "meanMs": 19.505862533333342
+    }
+  },
+  {
+    "repeat": 5,
+    "variant": "base",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-netzero-control/r5-base.json"
+    ],
+    "startedAt": "2026-10-30T07:44:15.895971+00:00",
+    "exitCode": 0,
+    "processUserCpuSeconds": 1.4832999999999998,
+    "processSystemCpuSeconds": 0.07486599999999999,
+    "processMajorFaults": 49,
+    "processMinorFaults": 35010,
+    "statistics": {
+      "minMs": 17.245374999999967,
+      "medianMs": 21.719437499999913,
+      "p95Ms": 29.929875000000038,
+      "maxMs": 32.17770799999994,
+      "meanMs": 21.97673049999999
+    }
+  },
+  {
+    "repeat": 5,
+    "variant": "optimized",
+    "order": [
+      "base",
+      "optimized"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-netzero-control/r5-optimized.json"
+    ],
+    "startedAt": "2026-10-30T07:44:17.176431+00:00",
+    "exitCode": 0,
+    "processUserCpuSeconds": 1.4460999999999995,
+    "processSystemCpuSeconds": 0.09190100000000001,
+    "processMajorFaults": 49,
+    "processMinorFaults": 33434,
+    "statistics": {
+      "minMs": 17.566500000000133,
+      "medianMs": 20.426729000000023,
+      "p95Ms": 28.060958000000028,
+      "maxMs": 29.314250000000015,
+      "meanMs": 21.373727766666704
+    }
+  },
+  {
+    "repeat": 6,
+    "variant": "optimized",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-netzero-control/r6-optimized.json"
+    ],
+    "startedAt": "2026-10-30T07:44:18.440339+00:00",
+    "exitCode": 0,
+    "processUserCpuSeconds": 1.590580000000001,
+    "processSystemCpuSeconds": 0.09762400000000016,
+    "processMajorFaults": 49,
+    "processMinorFaults": 36897,
+    "statistics": {
+      "minMs": 17.284625000000005,
+      "medianMs": 21.07237550000002,
+      "p95Ms": 30.44637499999999,
+      "maxMs": 35.868875,
+      "meanMs": 22.626874933333347
+    }
+  },
+  {
+    "repeat": 6,
+    "variant": "base",
+    "order": [
+      "optimized",
+      "base"
+    ],
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-netzero-control/r6-base.json"
+    ],
+    "startedAt": "2026-10-30T07:44:19.842478+00:00",
+    "exitCode": 0,
+    "processUserCpuSeconds": 1.4435439999999975,
+    "processSystemCpuSeconds": 0.10188699999999984,
+    "processMajorFaults": 101,
+    "processMinorFaults": 42907,
+    "statistics": {
+      "minMs": 17.275667,
+      "medianMs": 20.708958499999994,
+      "p95Ms": 27.325249999999983,
+      "maxMs": 30.887207999999987,
+      "meanMs": 21.270040199999997
+    }
+  }
+]

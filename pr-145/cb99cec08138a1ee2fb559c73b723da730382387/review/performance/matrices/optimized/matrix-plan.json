@@ -1,0 +1,130 @@
+{
+  "repetitions": 3,
+  "warmupCount": 20,
+  "sampleCount": 30,
+  "scheduleSeed": 137,
+  "processIsolation": "new Bun process for every case/repetition",
+  "gc": "natural; no forced collection",
+  "cases": [
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "move-one",
+      "retained": 0
+    },
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "move-1pct",
+      "retained": 0
+    },
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "rewire-one",
+      "retained": 0
+    },
+    {
+      "topology": "sparse",
+      "size": 1000,
+      "operation": "net-zero",
+      "retained": 0
+    },
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 0
+    },
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "move-1pct",
+      "retained": 0
+    },
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "rewire-one",
+      "retained": 0
+    },
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "net-zero",
+      "retained": 0
+    },
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 0
+    },
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "move-1pct",
+      "retained": 0
+    },
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "rewire-one",
+      "retained": 0
+    },
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "net-zero",
+      "retained": 0
+    },
+    {
+      "topology": "hub",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 0
+    },
+    {
+      "topology": "hub",
+      "size": 10000,
+      "operation": "rewire-one",
+      "retained": 0
+    },
+    {
+      "topology": "nested",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 0
+    },
+    {
+      "topology": "sparse",
+      "size": 10000,
+      "operation": "move-one",
+      "retained": 20
+    },
+    {
+      "topology": "hub",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 0
+    },
+    {
+      "topology": "hub",
+      "size": 50000,
+      "operation": "rewire-one",
+      "retained": 0
+    },
+    {
+      "topology": "nested",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 0
+    },
+    {
+      "topology": "sparse",
+      "size": 50000,
+      "operation": "move-one",
+      "retained": 20
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+"""Summarize historical and paired observations without treating drift as speedup."""
+
+import argparse
+from collections import defaultdict
+import hashlib
+import json
+import math
+from pathlib import Path
+import statistics
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def aggregate(results):
+    times = sorted(value for result in results for value in result['timingsMs'])
+    medians = [statistics.median(result['timingsMs']) for result in results]
+    return dict(pooledMedianMs=statistics.median(times), pooledP95Ms=times[math.ceil(len(times) * .95) - 1],
+                runMediansMs=medians, runMedianMinMs=min(medians), runMedianMaxMs=max(medians),
+                sampleCount=len(times), runCount=len(results),
+                rssBefore=[result['memoryBefore']['rss'] for result in results],
+                rssAfter=[result['memoryAfter']['rss'] for result in results])
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--historical', type=Path, required=True)
+    parser.add_argument('--paired', type=Path, required=True)
+    parser.add_argument('--out', type=Path, required=True, help='New report directory.')
+    parser.add_argument('--optimized-full', type=Path, help='Optional output from the unchanged 20-case run-baseline.py.')
+    parser.add_argument('--base-profiles', type=Path, help='Optional v2 sample-only profile summary JSON.')
+    parser.add_argument('--optimized-profiles', type=Path, help='Optional v2 sample-only profile summary JSON.')
+    args = parser.parse_args()
+    historical = {row['caseId']: row for row in read(args.historical / 'baseline-summary.json')}
+    receipts = read(args.paired / 'receipts.json')
+    completion = read(args.paired / 'completion.json')
+    plan = read(args.paired / 'plan.json')
+    environment = read(args.paired / 'environment.json')
+    assert completion['artifactsUnchanged'] and completion['runs'] == 72 and len(receipts) == 72
+    grouped = defaultdict(lambda: defaultdict(dict))
+    for receipt in receipts:
+        assert receipt['status'] == 'validated' and receipt['exitCode'] == 0
+        path = args.paired / receipt['result']
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == receipt['resultSha256']
+        result = read(path)
+        assert result['sampleCount'] == 30 and result['warmupCount'] == 20 and result['checks'] == 50
+        variant_runs = grouped[receipt['caseId']][receipt['variant']]
+        assert receipt['repetition'] not in variant_runs
+        variant_runs[receipt['repetition']] = result
+    rows = []
+    for case in plan['cases']:
+        case_id = f"{case['topology']}-{case['size']}-{case['operation']}-retain{case['retained']}"
+        groups = grouped[case_id]
+        assert set(groups) == {'base', 'optimized'}
+        assert set(groups['base']) == set(groups['optimized']) == {1, 2, 3}
+        base = aggregate([groups['base'][rep] for rep in (1, 2, 3)])
+        optimized = aggregate([groups['optimized'][rep] for rep in (1, 2, 3)])
+        paired_reductions = [100 * (1 - statistics.median(groups['optimized'][rep]['timingsMs']) /
+                                    statistics.median(groups['base'][rep]['timingsMs'])) for rep in (1, 2, 3)]
+        old = historical[case_id]
+        rows.append(dict(caseId=case_id, case=case, historical=old, contemporaryBase=base, optimized=optimized,
+                         pairedMedianReductionPercent=statistics.median(paired_reductions),
+                         pairedReductionPercents=paired_reductions,
+                         pooledMedianReductionPercent=100 * (1 - optimized['pooledMedianMs'] / base['pooledMedianMs']),
+                         historicalToContemporaryBaseDeltaPercent=100 * (base['pooledMedianMs'] / old['pooledMedianMs'] - 1)))
+    out = args.out.resolve()
+    out.mkdir(parents=True, exist_ok=False)
+    report = dict(schemaVersion=1, historicalRoot=str(args.historical.resolve()), pairedRoot=str(args.paired.resolve()),
+                  environment=environment, cases=rows,
+                  interpretation='Latency reduction uses only adjacent contemporary A/B pairs. Historical base is context, not the causal comparator.')
+    lines = ['# Kernel 性能比较', '',
+             f"Base：`{environment['baseRevision']}`；optimized：`{environment['optimizedRevision']}`。",
+             f"运行时：`Bun {environment['bun']}`；harness SHA-256：`{environment['harnessSha256']}`。", '',
+             '历史 base 用于展示原始基线；本次 base 与 optimized 使用相同字节的 harness，在同一轮中相邻配对、串行运行。',
+             '12 个 sparse 场景，每场景 3 对独立进程；每进程 20 次 warmup、30 次事务计时。全局 18 对 AB、18 对 BA。',
+             '无强制 GC、无计时阈值。计时只包含公开 kernel.transact；准备与断言在窗口外，但其分配仍可能影响后续自然 GC。', '',
+             '| 节点 / 操作 | 历史 base 中位 ms | 本次 base 中位 ms | optimized 中位 ms | 配对降幅中位 | 3 对降幅范围 |',
+             '| --- | ---: | ---: | ---: | ---: | ---: |']
+    for row in rows:
+        values = row['pairedReductionPercents']
+        case = row['case']
+        lines.append(f"| {case['size']:,} / {case['operation']} | {row['historical']['pooledMedianMs']:.3f} | "
+                     f"{row['contemporaryBase']['pooledMedianMs']:.3f} | {row['optimized']['pooledMedianMs']:.3f} | "
+                     f"{row['pairedMedianReductionPercent']:+.1f}% | {min(values):+.1f}% 至 {max(values):+.1f}% |")
+    lines += ['', '正降幅表示 optimized 耗时减少，负数表示变慢；每对降幅基于两个进程各自 30 次计时的中位数。',
+              '表中 ms 是同一场景 90 次观测的合并中位数；配对降幅的中位数与合并中位数之比不是同一统计量。', '',
+              '## 进程间波动与尾延迟', '',
+              '| 节点 / 操作 | base 3 次中位 ms | optimized 3 次中位 ms | base / optimized 合并 p95 ms | base 相对历史漂移 |',
+              '| --- | --- | --- | ---: | ---: |']
+    for row in rows:
+        base, optimized, case = row['contemporaryBase'], row['optimized'], row['case']
+        lines.append(f"| {case['size']:,} / {case['operation']} | " + ' / '.join(f'{x:.3f}' for x in base['runMediansMs']) +
+                     ' | ' + ' / '.join(f'{x:.3f}' for x in optimized['runMediansMs']) +
+                     f" | {base['pooledP95Ms']:.3f} / {optimized['pooledP95Ms']:.3f} | {row['historicalToContemporaryBaseDeltaPercent']:+.1f}% |")
+    lines += ['', '## 净零对照与解释范围', '',
+              '净零事务保持原 View 与 revision，不进入新的 committed View 构建路径。其变化单独列出，不能据此宣称该路径受益：']
+    for row in rows:
+        if row['case']['operation'] == 'net-zero':
+            lines.append(f"- {row['case']['size']:,} 节点：3 对降幅 " + ', '.join(f'{x:+.1f}%' for x in row['pairedReductionPercents']) + '。')
+    lines += ['', '3 次独立重复仅描述本机观测与波动，不构成跨机器保证或统计显著性结论。',
+              'RSS 是进程前后净值，不能当作总分配量、峰值或 GC 暂停时间；原始 JSON 保留内存读数。',
+              '每次调用都检查真实 Commit／净零结果、图规模、revision、ChangeSet、旧 View 与相关查询。',
+              '配对期间保存并比对两套 package 文件哈希；完整命令、退出码、运行顺序、负载与原始计时保留在 paired 目录。']
+    if args.optimized_full:
+        full = read(args.optimized_full / 'baseline-summary.json')
+        assert len(full) == 20
+        assert {row['caseId'] for row in full} == set(historical)
+        report['optimizedFullMatrix'] = full
+        lines += ['', '## 独立完整矩阵', '',
+                  '另保留 unchanged run-baseline.py 的 20 场景 optimized 观测（含 hub、nested、保留 20 个旧 View）。',
+                  '这组与历史 base 不相邻配对；可验证覆盖范围并展示观测，不把两组差值直接当成优化因果收益。', '',
+                  '| 场景 | 历史 base 中位 ms | optimized 完整矩阵中位 ms | optimized 3 次中位范围 ms |',
+                  '| --- | ---: | ---: | ---: |']
+        for value in full:
+            lines.append(f"| {value['caseId']} | {historical[value['caseId']]['pooledMedianMs']:.3f} | "
+                         f"{value['pooledMedianMs']:.3f} | {value['runMedianMinMs']:.3f} 至 {value['runMedianMaxMs']:.3f} |")
+    for variant, path in [('base', args.base_profiles), ('optimized', args.optimized_profiles)]:
+        if path:
+            profiles = read(path)
+            assert all('categoryWeightedPercent' not in profile for profile in profiles)
+            report[variant + 'ProfilesV2'] = profiles
+            lines += ['', f'## {variant} CPU 采样', '',
+                      '以下百分比仅为事务时间窗内样本占比，不是阶段耗时；按完整祖先链互斥分类。',
+                      'GC、native 执行和采样等待不能由现有样本单独可靠拆分；没有 GC 标记不表示没有 GC。', '',
+                      '| Profile | 事务窗口样本 / measured transact 栈吻合数 | 类别样本占比 |', '| --- | ---: | --- |']
+            for profile in profiles:
+                categories = '; '.join(f'{key} {value:.1f}%' for key, value in profile['categorySamplePercent'].items())
+                lines.append(f"| {profile['profile']} | {profile['selectedTransactionSamples']} / "
+                             f"{profile['selectedSamplesAlsoUnderMeasuredTransactStack']} | {categories} |")
+    (out / 'comparison.json').write_text(json.dumps(report, indent=2) + '\n')
+    (out / 'REPORT.md').write_text('\n'.join(lines) + '\n')
+    print(out / 'REPORT.md')
+
+
+if __name__ == '__main__':
+    main()

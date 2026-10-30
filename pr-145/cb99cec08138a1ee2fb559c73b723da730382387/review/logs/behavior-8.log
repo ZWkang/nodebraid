@@ -1,0 +1,1082 @@
+[
+  {
+    "label": "sparse-50000-net-zero-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-net-zero-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:16.185903+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.4082068749994505
+  },
+  {
+    "label": "nested-50000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "nested",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/nested-50000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:17.594826+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 2.172494041995378
+  },
+  {
+    "label": "sparse-10000-move-one-retain20-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "20",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-move-one-retain20-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:19.768798+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.6523198330105515
+  },
+  {
+    "label": "sparse-1000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-1000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:20.427815+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05255408299854025
+  },
+  {
+    "label": "sparse-1000-move-1pct-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-1000-move-1pct-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:20.480982+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05253487500885967
+  },
+  {
+    "label": "sparse-10000-move-1pct-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-move-1pct-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:20.533988+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.36625195799570065
+  },
+  {
+    "label": "hub-50000-rewire-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/hub-50000-rewire-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:20.900892+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.2912200830032816
+  },
+  {
+    "label": "hub-50000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/hub-50000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:24.204624+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.9638373749912716
+  },
+  {
+    "label": "sparse-10000-net-zero-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-net-zero-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:26.169062+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.2143192910007201
+  },
+  {
+    "label": "sparse-50000-rewire-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-rewire-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:26.383939+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 2.73326174999238
+  },
+  {
+    "label": "sparse-1000-rewire-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-1000-rewire-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:29.117831+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.053766167009598576
+  },
+  {
+    "label": "sparse-1000-net-zero-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-1000-net-zero-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:29.172184+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.03881237500172574
+  },
+  {
+    "label": "sparse-10000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:29.211481+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.3167453330097487
+  },
+  {
+    "label": "hub-10000-rewire-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/hub-10000-rewire-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:29.528763+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.4268961250054417
+  },
+  {
+    "label": "sparse-50000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:29.956312+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.7950680829962948
+  },
+  {
+    "label": "sparse-50000-move-one-retain20-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "20",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-move-one-retain20-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:31.751968+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.8566428329941118
+  },
+  {
+    "label": "sparse-50000-move-1pct-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-move-1pct-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:33.609219+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.742872749993694
+  },
+  {
+    "label": "nested-10000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "nested",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/nested-10000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:35.352925+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.3470218750007916
+  },
+  {
+    "label": "hub-10000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/hub-10000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:35.700516+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.3058682080009021
+  },
+  {
+    "label": "sparse-10000-rewire-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-rewire-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T07:38:36.006991+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.41055287499330007
+  },
+  {
+    "label": "nested-10000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "nested",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/nested-10000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:36.418124+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.35389812500216067
+  },
+  {
+    "label": "hub-50000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/hub-50000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:36.772619+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.88123629099573
+  },
+  {
+    "label": "sparse-10000-rewire-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-rewire-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:38.654477+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.4947600410087034
+  },
+  {
+    "label": "sparse-1000-move-1pct-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-1000-move-1pct-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:39.149887+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04776833399955649
+  },
+  {
+    "label": "sparse-10000-net-zero-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-net-zero-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:39.198369+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.23020504199666902
+  },
+  {
+    "label": "sparse-10000-move-one-retain20-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "20",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-move-one-retain20-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:39.429237+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.340576417002012
+  },
+  {
+    "label": "sparse-50000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:39.770533+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.93326504099241
+  },
+  {
+    "label": "sparse-1000-net-zero-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-1000-net-zero-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:41.704577+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.047491416000411846
+  },
+  {
+    "label": "hub-10000-rewire-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/hub-10000-rewire-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:41.752999+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5066563340078574
+  },
+  {
+    "label": "sparse-50000-net-zero-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-net-zero-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:42.260418+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.462227875003009
+  },
+  {
+    "label": "sparse-1000-rewire-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-1000-rewire-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:43.723333+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05465433299832512
+  },
+  {
+    "label": "nested-50000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "nested",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/nested-50000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:43.778606+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 2.208522749991971
+  },
+  {
+    "label": "sparse-10000-move-1pct-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-move-1pct-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:45.987772+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.34843537501001265
+  },
+  {
+    "label": "sparse-10000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:46.336917+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.38168304099235684
+  },
+  {
+    "label": "hub-10000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/hub-10000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:46.719456+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.3790590830030851
+  },
+  {
+    "label": "sparse-50000-rewire-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-rewire-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:47.099148+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 2.780969000014011
+  },
+  {
+    "label": "sparse-50000-move-one-retain20-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "20",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-move-one-retain20-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:49.880781+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.9192126669950085
+  },
+  {
+    "label": "sparse-50000-move-1pct-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-move-1pct-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:51.801039+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.8677942500071367
+  },
+  {
+    "label": "hub-50000-rewire-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/hub-50000-rewire-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:53.669543+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.101645874994574
+  },
+  {
+    "label": "sparse-1000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-1000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T07:38:56.772088+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04477737499109935
+  },
+  {
+    "label": "sparse-50000-move-1pct-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-move-1pct-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:38:56.817579+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.960151166000287
+  },
+  {
+    "label": "sparse-10000-move-1pct-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-move-1pct-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:38:58.778808+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.3736547500011511
+  },
+  {
+    "label": "sparse-10000-net-zero-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-net-zero-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:38:59.153445+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.238772707991302
+  },
+  {
+    "label": "sparse-10000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:38:59.392927+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.3356404170044698
+  },
+  {
+    "label": "sparse-10000-move-one-retain20-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "20",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-move-one-retain20-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:38:59.729247+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.3816880829981528
+  },
+  {
+    "label": "hub-10000-rewire-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/hub-10000-rewire-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:00.111675+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.4290264169976581
+  },
+  {
+    "label": "sparse-1000-rewire-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-1000-rewire-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:00.541417+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05003379199479241
+  },
+  {
+    "label": "nested-10000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "nested",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/nested-10000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:00.592111+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.3598649580089841
+  },
+  {
+    "label": "sparse-10000-rewire-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-10000-rewire-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:00.952813+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.4372304590069689
+  },
+  {
+    "label": "hub-10000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/hub-10000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:01.391013+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.3597923330089543
+  },
+  {
+    "label": "hub-50000-rewire-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/hub-50000-rewire-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:01.751630+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 2.5351831250009127
+  },
+  {
+    "label": "hub-50000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "hub",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/hub-50000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:04.287591+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.8069732500007376
+  },
+  {
+    "label": "sparse-50000-move-one-retain20-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "20",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-move-one-retain20-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:06.095644+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 2.6889021250099177
+  },
+  {
+    "label": "sparse-50000-net-zero-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-net-zero-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:08.785449+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 2.10702616701019
+  },
+  {
+    "label": "sparse-50000-rewire-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-rewire-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:10.893393+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 2.9829742500005523
+  },
+  {
+    "label": "sparse-1000-move-1pct-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-1000-move-1pct-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:13.877102+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05570879200240597
+  },
+  {
+    "label": "nested-50000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "nested",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/nested-50000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:13.934012+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 2.1151380420051282
+  },
+  {
+    "label": "sparse-50000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-50000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:16.049974+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.7587437920010416
+  },
+  {
+    "label": "sparse-1000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-1000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:17.809615+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04659320799692068
+  },
+  {
+    "label": "sparse-1000-net-zero-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<PRIOR_RUN>/performance-optimized/benchmark.mjs",
+      "sparse",
+      "1000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<PRIOR_RUN>/performance-optimized/baseline/sparse-1000-net-zero-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T07:39:17.857460+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.03972912501194514
+  }
+]

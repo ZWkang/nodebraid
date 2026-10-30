@@ -1,0 +1,131 @@
+"""Read all nine observed 50k net-zero pairs; never execute a benchmark."""
+
+import hashlib
+import json
+import math
+from pathlib import Path
+import statistics
+
+
+HERE = Path(__file__).resolve().parent
+RUN = HERE.parent
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def describe(path, receipt):
+    value = read(path)
+    assert receipt['exitCode'] == 0
+    assert value['topology'] == 'sparse' and value['nodes'] == 50000 and value['edges'] == 100000
+    assert value['operation'] == 'net-zero' and value['retainedCount'] == 0
+    assert value['warmupCount'] == 20 and value['sampleCount'] == 30 and value['checks'] == 50
+    assert value['finalRevision'] == 1 and value['changedEntitiesPerCommit'] == 0
+    assert len(value['timingsMs']) == 30
+    times = value['timingsMs']
+    ordered = sorted(times)
+    return dict(path=str(path), sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+                medianMs=statistics.median(times), meanMs=statistics.mean(times),
+                p95Ms=ordered[math.ceil(len(ordered) * .95) - 1],
+                blockMediansMs=[statistics.median(times[start:start + 10]) for start in (0, 10, 20)],
+                timingsMs=times, setupMs=value['setupMs'], memoryBefore=value['memoryBefore'],
+                memoryAfter=value['memoryAfter'], receipt=receipt)
+
+
+def pair(group, repetition, base, optimized, order):
+    return dict(group=group, repetition=repetition, order=order, base=base, optimized=optimized,
+                medianLatencyChangePercent=100 * (optimized['medianMs'] / base['medianMs'] - 1),
+                blockLatencyChangePercents=[100 * (right / left - 1) for left, right in
+                                           zip(base['blockMediansMs'], optimized['blockMediansMs'])])
+
+
+def summarize(pairs):
+    changes = [value['medianLatencyChangePercent'] for value in pairs]
+    result = dict(pairCount=len(pairs), pairedMedianLatencyChangePercent=statistics.median(changes),
+                  pairedLatencyChangePercentMin=min(changes), pairedLatencyChangePercentMax=max(changes),
+                  optimizedSlowerPairs=sum(change > 0 for change in changes),
+                  optimizedFasterPairs=sum(change < 0 for change in changes),
+                  unchangedPairs=sum(change == 0 for change in changes))
+    for variant in ('base', 'optimized'):
+        times = sorted(time for value in pairs for time in value[variant]['timingsMs'])
+        result[variant] = dict(pooledMedianMs=statistics.median(times),
+                               pooledP95Ms=times[math.ceil(len(times) * .95) - 1], sampleCount=len(times))
+    return result
+
+
+def main():
+    original_root = RUN / 'performance-paired'
+    original_receipts = read(original_root / 'receipts.json')
+    original_receipts = [row for row in original_receipts if row['caseId'] == 'sparse-50000-net-zero-retain0']
+    assert len(original_receipts) == 6
+    original = []
+    for repetition in (1, 2, 3):
+        rows = {row['variant']: row for row in original_receipts if row['repetition'] == repetition}
+        assert set(rows) == {'base', 'optimized'}
+        values = {variant: describe(original_root / row['result'], row) for variant, row in rows.items()}
+        assert all(values[variant]['sha256'] == rows[variant]['resultSha256'] for variant in values)
+        original.append(pair('original-matrix', repetition, values['base'], values['optimized'], rows['base']['order']))
+
+    focused_root = RUN / 'performance-netzero-control'
+    focused_receipts = read(focused_root / 'receipts.json')
+    assert len(focused_receipts) == 12 and all('statistics' in row for row in focused_receipts)
+    focused = []
+    for repetition in range(1, 7):
+        rows = {row['variant']: row for row in focused_receipts if row['repeat'] == repetition}
+        assert set(rows) == {'base', 'optimized'}
+        values = {variant: describe(focused_root / f'r{repetition}-{variant}.json', row) for variant, row in rows.items()}
+        focused.append(pair('focused-control', repetition, values['base'], values['optimized'], rows['base']['order']))
+    assert sum(value['order'][0] == 'base' for value in focused) == 3
+    pairs = original + focused
+    groups = {name: summarize(values) for name, values in [('original', original), ('focused', focused), ('allNineDescriptiveOnly', pairs)]}
+    report = dict(schemaVersion=1, scope='Read-only analysis; no observations removed or rerun.',
+                  positivePercentMeans='Optimized is slower', groups=groups, pairs=pairs,
+                  conclusion='Original 3/3 pairs were slower. Focused six contain both directions and one large slower observation. The original consistent 8–13% pattern was not reproduced in every focused pair; this does not erase the original regression observations or establish no regression.',
+                  cause='Unresolved. Profiles locate remaining cost mainly in draft index and validation, but cannot assign the difference to writeCaptured, GC, JIT or waiting.',
+                  cpuCounterScope='Focused resource counters cover complete child processes, including setup, warmup, assertions and output; they are not transaction-only CPU measurements.')
+    lines = ['# 50k 净零事务复测诊断', '',
+             '原矩阵三对全部保留；聚焦复测六对全部纳入，没有删除最慢值或只取后段样本。',
+             '配置均为 sparse、50,000 Node、100,000 Edge、net-zero、retain0；每个独立 Bun 进程 20 次 warmup、30 次计时。',
+             '聚焦六对 AB／BA 各三对。百分比正数表示 optimized 更慢。', '',
+             '## 各批结果', '',
+             '| 批次 | 对数 | base 合并中位 ms | optimized 合并中位 ms | 每对变化中位 | 每对变化范围 | 更慢 / 更快 |',
+             '| --- | ---: | ---: | ---: | ---: | ---: | ---: |']
+    for name, label in [('original', '原矩阵'), ('focused', '聚焦复测'), ('allNineDescriptiveOnly', '九对合并，仅描述')]:
+        value = groups[name]
+        lines.append(f"| {label} | {value['pairCount']} | {value['base']['pooledMedianMs']:.3f} | "
+                     f"{value['optimized']['pooledMedianMs']:.3f} | {value['pairedMedianLatencyChangePercent']:+.2f}% | "
+                     f"{value['pairedLatencyChangePercentMin']:+.2f}% 至 {value['pairedLatencyChangePercentMax']:+.2f}% | "
+                     f"{value['optimizedSlowerPairs']} / {value['optimizedFasterPairs']} |")
+    lines += ['', '## 每对完整结果', '',
+              '| 批次 / 对 | 顺序 | base 中位 ms | optimized 中位 ms | 耗时变化 | base / optimized p95 ms |',
+              '| --- | --- | ---: | ---: | ---: | ---: |']
+    for value in pairs:
+        base, optimized = value['base'], value['optimized']
+        lines.append(f"| {value['group']} / {value['repetition']} | {' → '.join(value['order'])} | "
+                     f"{base['medianMs']:.3f} | {optimized['medianMs']:.3f} | {value['medianLatencyChangePercent']:+.2f}% | "
+                     f"{base['p95Ms']:.3f} / {optimized['p95Ms']:.3f} |")
+    lines += ['', '## 前、中、后各十次', '',
+              '分段用于观察阶段效应；不取代上表全部 30 次计时的结果。', '',
+              '| 批次 / 对 | base 前 / 中 / 后 ms | optimized 前 / 中 / 后 ms | 对应耗时变化 |',
+              '| --- | --- | --- | --- |']
+    for value in pairs:
+        lines.append(f"| {value['group']} / {value['repetition']} | " +
+                     ' / '.join(f'{x:.3f}' for x in value['base']['blockMediansMs']) + ' | ' +
+                     ' / '.join(f'{x:.3f}' for x in value['optimized']['blockMediansMs']) + ' | ' +
+                     ' / '.join(f'{x:+.2f}%' for x in value['blockLatencyChangePercents']) + ' |')
+    lines += ['', '## 解释与限制', '',
+              '原三对的一致回退是真实观测；聚焦六对有三对更慢、三对更快，未复现“每对均慢 8–13%”的模式。',
+              '聚焦第 2 对慢约 27.78%，并且前、中、后各段都更慢，不能将全部差异简单解释为 warmup 不足，也不能删去该对。',
+              '现有证据不足以断言稳定净零收益、普遍无回退，或将变化归因于某个闭包。原批次与复测批次分开报告。',
+              '样本没有显示 writer 自身占据相应份额，无法将差异直接归给两次调用。JIT、初始化后的堆状态及自然 GC 仍是未定位的可能影响，不是已证明原因。',
+              '净零 profile 的主要样本仍位于 Draft Index 和全图验证；样本占比不是绝对阶段时间，也不能从未出现 GC 标记推出无 GC。',
+              '进程级 CPU／fault 计数覆盖 setup、warmup、断言与输出，不能与单笔事务计时直接等同。RSS 前后值也不是总分配量或 GC 时间。',
+              '所有原始计时、分段数值、进程收据、内存与文件哈希保留在 netzero-diagnostic.json，原数据未改。']
+    (HERE / 'netzero-diagnostic.json').write_text(json.dumps(report, indent=2) + '\n')
+    (HERE / 'netzero-diagnostic.md').write_text('\n'.join(lines) + '\n')
+    print(json.dumps(groups, indent=2))
+
+
+if __name__ == '__main__':
+    main()

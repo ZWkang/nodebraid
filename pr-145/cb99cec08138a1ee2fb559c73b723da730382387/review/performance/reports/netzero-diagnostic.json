@@ -1,0 +1,1911 @@
+{
+  "schemaVersion": 1,
+  "scope": "Read-only analysis; no observations removed or rerun.",
+  "positivePercentMeans": "Optimized is slower",
+  "groups": {
+    "original": {
+      "pairCount": 3,
+      "pairedMedianLatencyChangePercent": 8.928079961629965,
+      "pairedLatencyChangePercentMin": 8.243643824585023,
+      "pairedLatencyChangePercentMax": 13.514210670738525,
+      "optimizedSlowerPairs": 3,
+      "optimizedFasterPairs": 0,
+      "unchangedPairs": 0,
+      "base": {
+        "pooledMedianMs": 20.96660450000013,
+        "pooledP95Ms": 29.58641700000021,
+        "sampleCount": 90
+      },
+      "optimized": {
+        "pooledMedianMs": 22.74000000000001,
+        "pooledP95Ms": 32.76058400000011,
+        "sampleCount": 90
+      }
+    },
+    "focused": {
+      "pairCount": 6,
+      "pairedMedianLatencyChangePercent": 0.6631988359585284,
+      "pairedLatencyChangePercentMin": -5.951850732782072,
+      "pairedLatencyChangePercentMax": 27.779595306245962,
+      "optimizedSlowerPairs": 3,
+      "optimizedFasterPairs": 3,
+      "unchangedPairs": 0,
+      "base": {
+        "pooledMedianMs": 19.747312499999964,
+        "pooledP95Ms": 26.433916000000067,
+        "sampleCount": 180
+      },
+      "optimized": {
+        "pooledMedianMs": 20.139207999999996,
+        "pooledP95Ms": 29.198458000000073,
+        "sampleCount": 180
+      }
+    },
+    "allNineDescriptiveOnly": {
+      "pairCount": 9,
+      "pairedMedianLatencyChangePercent": 2.4026635847420597,
+      "pairedLatencyChangePercentMin": -5.951850732782072,
+      "pairedLatencyChangePercentMax": 27.779595306245962,
+      "optimizedSlowerPairs": 6,
+      "optimizedFasterPairs": 3,
+      "unchangedPairs": 0,
+      "base": {
+        "pooledMedianMs": 20.221228999999994,
+        "pooledP95Ms": 27.591291999999953,
+        "sampleCount": 270
+      },
+      "optimized": {
+        "pooledMedianMs": 20.97591699999998,
+        "pooledP95Ms": 29.764707999999928,
+        "sampleCount": 270
+      }
+    }
+  },
+  "pairs": [
+    {
+      "group": "original-matrix",
+      "repetition": 1,
+      "order": [
+        "optimized",
+        "base"
+      ],
+      "base": {
+        "path": "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r1-base.json",
+        "sha256": "08f72a09f1633aa95e1dcf7d05973db519ad82e62b4fa9555dfa28dec27315df",
+        "medianMs": 20.056354499999884,
+        "meanMs": 22.482440299999986,
+        "p95Ms": 36.325458000000026,
+        "blockMediansMs": [
+          24.29581250000001,
+          18.642395499999964,
+          19.761833499999966
+        ],
+        "timingsMs": [
+          63.473540999999955,
+          36.325458000000026,
+          24.04495799999995,
+          22.87566700000002,
+          25.04058299999997,
+          26.23670900000002,
+          24.54666700000007,
+          21.16641699999991,
+          22.53008299999999,
+          21.635250000000042,
+          18.713791000000015,
+          18.167249999999967,
+          18.71520799999996,
+          21.790750000000003,
+          19.149667000000022,
+          17.06508299999996,
+          17.472125000000005,
+          19.668750000000045,
+          18.27141699999993,
+          18.570999999999913,
+          20.266374999999925,
+          21.109416999999894,
+          17.153834000000188,
+          16.434083999999984,
+          19.67733300000009,
+          25.363791999999876,
+          21.332333000000062,
+          19.846333999999842,
+          19.57312499999989,
+          18.256208000000015
+        ],
+        "setupMs": 182.10704099999998,
+        "memoryBefore": {
+          "rss": 499417088,
+          "heapTotal": 195101696,
+          "heapUsed": 195326684,
+          "external": 7896204,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 707870720,
+          "heapTotal": 242992128,
+          "heapUsed": 99886859,
+          "external": 7965979,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "label": "sparse-50000-net-zero-retain0-r1-base",
+          "pairIndex": 8,
+          "caseId": "sparse-50000-net-zero-retain0",
+          "repetition": 1,
+          "variant": "base",
+          "order": [
+            "optimized",
+            "base"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<BASELINE_RUN>/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r1-base.json"
+          ],
+          "cwd": "<BASELINE_RUN>",
+          "result": "results/sparse-50000-net-zero-retain0-r1-base.json",
+          "log": "logs/sparse-50000-net-zero-retain0-r1-base.log",
+          "startedAt": "2026-10-30T07:40:23.219477+00:00",
+          "loadBefore": [
+            9.07080078125,
+            10.71630859375,
+            10.40283203125
+          ],
+          "status": "validated",
+          "exitCode": 0,
+          "elapsedSeconds": 1.3260338749969378,
+          "completedAt": "2026-10-30T07:40:24.546026+00:00",
+          "loadAfter": [
+            9.07080078125,
+            10.71630859375,
+            10.40283203125
+          ],
+          "resultSha256": "08f72a09f1633aa95e1dcf7d05973db519ad82e62b4fa9555dfa28dec27315df",
+          "medianMs": 20.056354499999884
+        }
+      },
+      "optimized": {
+        "path": "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r1-optimized.json",
+        "sha256": "0c1749dae7c0042bfc13a1bfb33f521f71b2ebbb78e016445e07813c8fed80f2",
+        "medianMs": 22.766812500000015,
+        "meanMs": 23.801368033333347,
+        "p95Ms": 28.295875000000024,
+        "blockMediansMs": [
+          25.442562500000008,
+          24.264437000000044,
+          20.209812499999998
+        ],
+        "timingsMs": [
+          46.36624999999992,
+          28.295875000000024,
+          25.53287499999999,
+          28.061042000000043,
+          25.352250000000026,
+          23.69216700000004,
+          25.973041999999964,
+          22.752250000000004,
+          20.946166000000062,
+          20.975624999999923,
+          23.279749999999922,
+          24.73141700000008,
+          21.751834000000144,
+          22.467709000000013,
+          24.229291000000103,
+          24.299582999999984,
+          25.524708000000146,
+          22.31291699999997,
+          26.32679200000007,
+          25.29362500000002,
+          22.781375000000025,
+          22.045249999999896,
+          19.811916999999994,
+          19.772915999999896,
+          19.167165999999952,
+          21.661707999999862,
+          21.639916000000085,
+          19.719709000000194,
+          18.66820800000005,
+          20.607708000000002
+        ],
+        "setupMs": 205.710417,
+        "memoryBefore": {
+          "rss": 454557696,
+          "heapTotal": 171410432,
+          "heapUsed": 182814700,
+          "external": 7884876,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 587350016,
+          "heapTotal": 208487424,
+          "heapUsed": 274224223,
+          "external": 7911967,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "label": "sparse-50000-net-zero-retain0-r1-optimized",
+          "pairIndex": 8,
+          "caseId": "sparse-50000-net-zero-retain0",
+          "repetition": 1,
+          "variant": "optimized",
+          "order": [
+            "optimized",
+            "base"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<RUN>/performance-optimized/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r1-optimized.json"
+          ],
+          "cwd": "<RUN>/performance-optimized",
+          "result": "results/sparse-50000-net-zero-retain0-r1-optimized.json",
+          "log": "logs/sparse-50000-net-zero-retain0-r1-optimized.log",
+          "startedAt": "2026-10-30T07:40:21.761371+00:00",
+          "loadBefore": [
+            9.07080078125,
+            10.71630859375,
+            10.40283203125
+          ],
+          "status": "validated",
+          "exitCode": 0,
+          "elapsedSeconds": 1.4565371250064345,
+          "completedAt": "2026-10-30T07:40:23.218243+00:00",
+          "loadAfter": [
+            9.07080078125,
+            10.71630859375,
+            10.40283203125
+          ],
+          "resultSha256": "0c1749dae7c0042bfc13a1bfb33f521f71b2ebbb78e016445e07813c8fed80f2",
+          "medianMs": 22.766812500000015
+        }
+      },
+      "medianLatencyChangePercent": 13.514210670738525,
+      "blockLatencyChangePercents": [
+        4.7199491681951145,
+        30.157291212924275,
+        2.2668898612066224
+      ]
+    },
+    {
+      "group": "original-matrix",
+      "repetition": 2,
+      "order": [
+        "base",
+        "optimized"
+      ],
+      "base": {
+        "path": "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r2-base.json",
+        "sha256": "522cbc1b6b805ed17d37e46e227a36b071ce3357c0e8e320216a7a99dbbf1461",
+        "medianMs": 19.573916999999994,
+        "meanMs": 20.252452766666675,
+        "p95Ms": 26.282749999999965,
+        "blockMediansMs": [
+          20.51804149999998,
+          19.30185449999999,
+          19.184812500000135
+        ],
+        "timingsMs": [
+          29.09958299999994,
+          26.282749999999965,
+          20.493165999999974,
+          20.46029199999998,
+          20.576874999999973,
+          19.620542,
+          20.54291699999999,
+          24.058250000000044,
+          18.875833000000057,
+          17.84370899999999,
+          19.52729199999999,
+          23.67183399999999,
+          20.682000000000016,
+          19.076416999999992,
+          21.060499999999934,
+          17.449791000000005,
+          18.528083000000038,
+          22.016166,
+          18.350167000000056,
+          16.63391700000011,
+          19.009249999999838,
+          18.46858300000008,
+          19.056625000000167,
+          20.691375000000107,
+          19.313000000000102,
+          19.40795899999989,
+          21.481708000000026,
+          17.848040999999967,
+          16.546707999999853,
+          20.900250000000142
+        ],
+        "setupMs": 181.724625,
+        "memoryBefore": {
+          "rss": 486686720,
+          "heapTotal": 195085312,
+          "heapUsed": 187422716,
+          "external": 7898700,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 631177216,
+          "heapTotal": 225100800,
+          "heapUsed": 229544146,
+          "external": 7892930,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "label": "sparse-50000-net-zero-retain0-r2-base",
+          "pairIndex": 20,
+          "caseId": "sparse-50000-net-zero-retain0",
+          "repetition": 2,
+          "variant": "base",
+          "order": [
+            "base",
+            "optimized"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<BASELINE_RUN>/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r2-base.json"
+          ],
+          "cwd": "<BASELINE_RUN>",
+          "result": "results/sparse-50000-net-zero-retain0-r2-base.json",
+          "log": "logs/sparse-50000-net-zero-retain0-r2-base.log",
+          "startedAt": "2026-10-30T07:40:36.827385+00:00",
+          "loadBefore": [
+            8.4765625,
+            10.50146484375,
+            10.3310546875
+          ],
+          "status": "validated",
+          "exitCode": 0,
+          "elapsedSeconds": 1.2656414170050994,
+          "completedAt": "2026-10-30T07:40:38.093883+00:00",
+          "loadAfter": [
+            8.4765625,
+            10.50146484375,
+            10.3310546875
+          ],
+          "resultSha256": "522cbc1b6b805ed17d37e46e227a36b071ce3357c0e8e320216a7a99dbbf1461",
+          "medianMs": 19.573916999999994
+        }
+      },
+      "optimized": {
+        "path": "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r2-optimized.json",
+        "sha256": "c0a4bd10d7211e65ffa22030098d232e47c8c786bece502c3a2dc9cf62c8d51e",
+        "medianMs": 21.18752099999989,
+        "meanMs": 22.15090973333332,
+        "p95Ms": 29.764707999999928,
+        "blockMediansMs": [
+          25.252187500000048,
+          20.90433300000001,
+          20.201708000000053
+        ],
+        "timingsMs": [
+          29.764707999999928,
+          28.79570799999999,
+          25.616583000000105,
+          31.01370899999995,
+          26.544624999999996,
+          24.57000000000005,
+          20.422416999999996,
+          24.88779199999999,
+          22.249667000000045,
+          19.55833300000006,
+          20.23945900000001,
+          21.345166999999947,
+          20.09145799999999,
+          21.244749999999954,
+          21.617457999999942,
+          23.059665999999993,
+          19.867292000000134,
+          20.563916000000063,
+          21.555832999999893,
+          19.923958999999968,
+          20.09770800000001,
+          19.514791999999943,
+          22.307624999999916,
+          21.130291999999827,
+          19.467583999999988,
+          20.24587500000007,
+          21.255541999999878,
+          20.84633299999996,
+          16.571500000000015,
+          20.157541000000037
+        ],
+        "setupMs": 186.989292,
+        "memoryBefore": {
+          "rss": 469860352,
+          "heapTotal": 179340288,
+          "heapUsed": 211475416,
+          "external": 7886536,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 574095360,
+          "heapTotal": 210912256,
+          "heapUsed": 274787155,
+          "external": 7909315,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "label": "sparse-50000-net-zero-retain0-r2-optimized",
+          "pairIndex": 20,
+          "caseId": "sparse-50000-net-zero-retain0",
+          "repetition": 2,
+          "variant": "optimized",
+          "order": [
+            "base",
+            "optimized"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<RUN>/performance-optimized/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r2-optimized.json"
+          ],
+          "cwd": "<RUN>/performance-optimized",
+          "result": "results/sparse-50000-net-zero-retain0-r2-optimized.json",
+          "log": "logs/sparse-50000-net-zero-retain0-r2-optimized.log",
+          "startedAt": "2026-10-30T07:40:38.095624+00:00",
+          "loadBefore": [
+            8.4765625,
+            10.50146484375,
+            10.3310546875
+          ],
+          "status": "validated",
+          "exitCode": 0,
+          "elapsedSeconds": 1.3195578750019195,
+          "completedAt": "2026-10-30T07:40:39.416023+00:00",
+          "loadAfter": [
+            8.4765625,
+            10.50146484375,
+            10.3310546875
+          ],
+          "resultSha256": "c0a4bd10d7211e65ffa22030098d232e47c8c786bece502c3a2dc9cf62c8d51e",
+          "medianMs": 21.18752099999989
+        }
+      },
+      "medianLatencyChangePercent": 8.243643824585023,
+      "blockLatencyChangePercents": [
+        23.073089115255318,
+        8.302199666876664,
+        5.300523526096024
+      ]
+    },
+    {
+      "group": "original-matrix",
+      "repetition": 3,
+      "order": [
+        "optimized",
+        "base"
+      ],
+      "base": {
+        "path": "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r3-base.json",
+        "sha256": "1b48ccfb7e4e9ae5d7615b20e79f852a59f05b46a2c5e5a8c75c507a9d3c7413",
+        "medianMs": 23.31758350000007,
+        "meanMs": 24.149193133333334,
+        "p95Ms": 32.37379099999998,
+        "blockMediansMs": [
+          23.08737450000001,
+          23.700479499999915,
+          23.018687500000055
+        ],
+        "timingsMs": [
+          26.724500000000035,
+          32.9670000000001,
+          22.96766600000001,
+          23.20708300000001,
+          20.0073339999999,
+          29.48595899999998,
+          19.914250000000038,
+          19.398458000000005,
+          27.591291999999953,
+          22.30895799999996,
+          17.965374999999995,
+          25.259374999999977,
+          29.455542000000037,
+          21.076499999999896,
+          20.33883299999991,
+          23.34637500000008,
+          23.754874999999856,
+          24.111499999999978,
+          23.646083999999973,
+          24.48108400000001,
+          26.733583999999837,
+          23.288792000000058,
+          22.353958000000148,
+          21.277500000000146,
+          20.440374999999904,
+          29.58641700000021,
+          22.748583000000053,
+          21.03295900000012,
+          32.37379099999998,
+          26.631791999999905
+        ],
+        "setupMs": 202.119041,
+        "memoryBefore": {
+          "rss": 481329152,
+          "heapTotal": 184452096,
+          "heapUsed": 219251404,
+          "external": 7896844,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 622854144,
+          "heapTotal": 227050496,
+          "heapUsed": 189138379,
+          "external": 7896827,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "label": "sparse-50000-net-zero-retain0-r3-base",
+          "pairIndex": 29,
+          "caseId": "sparse-50000-net-zero-retain0",
+          "repetition": 3,
+          "variant": "base",
+          "order": [
+            "optimized",
+            "base"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<BASELINE_RUN>/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r3-base.json"
+          ],
+          "cwd": "<BASELINE_RUN>",
+          "result": "results/sparse-50000-net-zero-retain0-r3-base.json",
+          "log": "logs/sparse-50000-net-zero-retain0-r3-base.log",
+          "startedAt": "2026-10-30T07:41:00.746621+00:00",
+          "loadBefore": [
+            7.5615234375,
+            10.12255859375,
+            10.19873046875
+          ],
+          "status": "validated",
+          "exitCode": 0,
+          "elapsedSeconds": 1.3937110410042806,
+          "completedAt": "2026-10-30T07:41:02.141200+00:00",
+          "loadAfter": [
+            7.5615234375,
+            10.12255859375,
+            10.19873046875
+          ],
+          "resultSha256": "1b48ccfb7e4e9ae5d7615b20e79f852a59f05b46a2c5e5a8c75c507a9d3c7413",
+          "medianMs": 23.31758350000007
+        }
+      },
+      "optimized": {
+        "path": "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r3-optimized.json",
+        "sha256": "0e7d84d5c465920d6389640577fbfdb1d6ec40e3317c1f90c19219a53fdd1b36",
+        "medianMs": 25.39939599999991,
+        "meanMs": 26.38885980000001,
+        "p95Ms": 37.389417000000094,
+        "blockMediansMs": [
+          29.646999999999935,
+          24.98529199999996,
+          23.352916500000106
+        ],
+        "timingsMs": [
+          37.389417000000094,
+          34.925166999999874,
+          43.69287499999996,
+          32.76058400000011,
+          28.921875,
+          28.335375000000113,
+          30.37212499999987,
+          23.52254199999993,
+          25.673125000000027,
+          28.560666999999967,
+          25.530874999999924,
+          25.267916999999898,
+          28.085792000000083,
+          28.866416999999956,
+          20.47179200000005,
+          19.638167000000067,
+          24.70266700000002,
+          19.687916000000087,
+          22.650957999999946,
+          28.584041999999954,
+          22.727750000000015,
+          26.839416999999912,
+          21.755957999999964,
+          30.033541000000014,
+          23.978083000000197,
+          21.809875000000147,
+          24.076291000000083,
+          18.85437500000012,
+          19.058291999999938,
+          24.89191699999992
+        ],
+        "setupMs": 404.112167,
+        "memoryBefore": {
+          "rss": 413581312,
+          "heapTotal": 169608192,
+          "heapUsed": 153538443,
+          "external": 7889963,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 599752704,
+          "heapTotal": 219841536,
+          "heapUsed": 150800175,
+          "external": 7969615,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "label": "sparse-50000-net-zero-retain0-r3-optimized",
+          "pairIndex": 29,
+          "caseId": "sparse-50000-net-zero-retain0",
+          "repetition": 3,
+          "variant": "optimized",
+          "order": [
+            "optimized",
+            "base"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<RUN>/performance-optimized/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-paired/results/sparse-50000-net-zero-retain0-r3-optimized.json"
+          ],
+          "cwd": "<RUN>/performance-optimized",
+          "result": "results/sparse-50000-net-zero-retain0-r3-optimized.json",
+          "log": "logs/sparse-50000-net-zero-retain0-r3-optimized.log",
+          "startedAt": "2026-10-30T07:40:58.865337+00:00",
+          "loadBefore": [
+            7.69775390625,
+            10.1923828125,
+            10.2236328125
+          ],
+          "status": "validated",
+          "exitCode": 0,
+          "elapsedSeconds": 1.877748832994257,
+          "completedAt": "2026-10-30T07:41:00.744391+00:00",
+          "loadAfter": [
+            7.5615234375,
+            10.12255859375,
+            10.19873046875
+          ],
+          "resultSha256": "0e7d84d5c465920d6389640577fbfdb1d6ec40e3317c1f90c19219a53fdd1b36",
+          "medianMs": 25.39939599999991
+        }
+      },
+      "medianLatencyChangePercent": 8.928079961629965,
+      "blockLatencyChangePercents": [
+        28.412176100837815,
+        5.421040110180253,
+        1.4519898234860218
+      ]
+    },
+    {
+      "group": "focused-control",
+      "repetition": 1,
+      "order": [
+        "base",
+        "optimized"
+      ],
+      "base": {
+        "path": "<RUN>/performance-netzero-control/r1-base.json",
+        "sha256": "c3816f52a359987e418e6772f644ee2a4ec1c755da59daff1d8df3c83317af70",
+        "medianMs": 20.333479000000068,
+        "meanMs": 20.87577076666667,
+        "p95Ms": 26.68483399999991,
+        "blockMediansMs": [
+          20.240062499999965,
+          20.47360450000002,
+          20.099604
+        ],
+        "timingsMs": [
+          23.850250000000074,
+          26.433916000000067,
+          19.736249999999927,
+          19.046917000000008,
+          20.72174999999993,
+          21.26858399999992,
+          17.121624999999995,
+          19.758375,
+          17.534208000000035,
+          22.242875000000026,
+          16.870083000000022,
+          18.64379100000008,
+          18.96783300000004,
+          21.632833000000005,
+          20.04762500000004,
+          23.090082999999936,
+          17.64199999999994,
+          26.68483399999991,
+          20.899584000000004,
+          25.35612500000002,
+          20.845833000000084,
+          25.592041999999992,
+          19.5798749999999,
+          17.47266599999989,
+          20.619333000000097,
+          26.863208000000213,
+          17.31012499999997,
+          18.87191699999994,
+          19.084916999999905,
+          22.483666000000085
+        ],
+        "setupMs": 207.21316599999997,
+        "memoryBefore": {
+          "rss": 488980480,
+          "heapTotal": 198640640,
+          "heapUsed": 189550444,
+          "external": 7889820,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 711868416,
+          "heapTotal": 260948992,
+          "heapUsed": 367003068,
+          "external": 1566857,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "repeat": 1,
+          "variant": "base",
+          "order": [
+            "base",
+            "optimized"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<BASELINE_RUN>/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-netzero-control/r1-base.json"
+          ],
+          "startedAt": "2026-10-30T07:44:06.030389+00:00",
+          "exitCode": 0,
+          "processUserCpuSeconds": 1.419022,
+          "processSystemCpuSeconds": 0.154477,
+          "processMajorFaults": 1217,
+          "processMinorFaults": 42653,
+          "statistics": {
+            "minMs": 16.870083000000022,
+            "medianMs": 20.333479000000068,
+            "p95Ms": 26.68483399999991,
+            "maxMs": 26.863208000000213,
+            "meanMs": 20.87577076666667
+          }
+        }
+      },
+      "optimized": {
+        "path": "<RUN>/performance-netzero-control/r1-optimized.json",
+        "sha256": "b64f5e92c43c4ad22b1bb043d8ee1de3f1b79aa7be18663d247d75048a754fb1",
+        "medianMs": 20.246354000000053,
+        "meanMs": 22.69159303333334,
+        "p95Ms": 37.95425,
+        "blockMediansMs": [
+          22.07429149999996,
+          19.73591650000003,
+          19.78352050000001
+        ],
+        "timingsMs": [
+          27.12595799999997,
+          25.59679200000005,
+          21.79783299999997,
+          24.01699999999994,
+          22.350749999999948,
+          21.555166999999983,
+          24.31345799999997,
+          20.074915999999916,
+          17.82512500000007,
+          18.588500000000067,
+          19.03408300000001,
+          22.561500000000024,
+          17.629750000000058,
+          18.896084000000087,
+          20.04920800000002,
+          19.42262500000004,
+          18.256209000000013,
+          23.186458000000016,
+          23.674417000000062,
+          20.26987500000007,
+          16.963416999999936,
+          16.200582999999938,
+          19.34420799999998,
+          19.29554200000007,
+          47.774875000000065,
+          18.8951669999999,
+          20.222833000000037,
+          29.198458000000073,
+          28.67274999999995,
+          37.95425
+        ],
+        "setupMs": 164.596666,
+        "memoryBefore": {
+          "rss": 459735040,
+          "heapTotal": 172721152,
+          "heapUsed": 218165363,
+          "external": 7884899,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 582025216,
+          "heapTotal": 211649536,
+          "heapUsed": 278834646,
+          "external": 7897206,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "repeat": 1,
+          "variant": "optimized",
+          "order": [
+            "base",
+            "optimized"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<RUN>/performance-optimized/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-netzero-control/r1-optimized.json"
+          ],
+          "startedAt": "2026-10-30T07:44:07.365838+00:00",
+          "exitCode": 0,
+          "processUserCpuSeconds": 1.4401380000000001,
+          "processSystemCpuSeconds": 0.08733099999999999,
+          "processMajorFaults": 57,
+          "processMinorFaults": 35742,
+          "statistics": {
+            "minMs": 16.200582999999938,
+            "medianMs": 20.246354000000053,
+            "p95Ms": 37.95425,
+            "maxMs": 47.774875000000065,
+            "meanMs": 22.69159303333334
+          }
+        }
+      },
+      "medianLatencyChangePercent": -0.4284805369509814,
+      "blockLatencyChangePercents": [
+        9.062368260967556,
+        -3.603117369977482,
+        -1.5725857086537176
+      ]
+    },
+    {
+      "group": "focused-control",
+      "repetition": 2,
+      "order": [
+        "optimized",
+        "base"
+      ],
+      "base": {
+        "path": "<RUN>/performance-netzero-control/r2-base.json",
+        "sha256": "f790958eb5a699d26c6666dea219c5153bdf4e05bb1933e1a1c4274a7ac7ae49",
+        "medianMs": 18.495813000000055,
+        "meanMs": 19.294719433333334,
+        "p95Ms": 24.41779100000008,
+        "blockMediansMs": [
+          19.79272900000001,
+          17.786687500000028,
+          18.251771000000076
+        ],
+        "timingsMs": [
+          29.287500000000023,
+          23.080708000000072,
+          23.763207999999963,
+          17.830208999999968,
+          20.48083299999996,
+          19.104625000000055,
+          18.974333,
+          18.820416000000023,
+          24.41779100000008,
+          16.85904199999993,
+          18.451333999999974,
+          16.445791999999983,
+          17.019999999999982,
+          18.081624999999917,
+          17.153291999999965,
+          20.11520900000005,
+          18.07887500000004,
+          16.75966600000004,
+          20.65083299999992,
+          17.494500000000016,
+          17.963250000000016,
+          22.701624999999922,
+          17.491084,
+          18.614291999999978,
+          19.948499999999967,
+          16.800666000000092,
+          17.509166999999934,
+          18.540292000000136,
+          20.105415999999877,
+          16.297500000000127
+        ],
+        "setupMs": 211.215583,
+        "memoryBefore": {
+          "rss": 435961856,
+          "heapTotal": 171230208,
+          "heapUsed": 186963495,
+          "external": 7896183,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 560021504,
+          "heapTotal": 215122944,
+          "heapUsed": 223058410,
+          "external": 7882778,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "repeat": 2,
+          "variant": "base",
+          "order": [
+            "optimized",
+            "base"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<BASELINE_RUN>/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-netzero-control/r2-base.json"
+          ],
+          "startedAt": "2026-10-30T07:44:09.979449+00:00",
+          "exitCode": 0,
+          "processUserCpuSeconds": 1.4574510000000007,
+          "processSystemCpuSeconds": 0.09001699999999996,
+          "processMajorFaults": 49,
+          "processMinorFaults": 34404,
+          "statistics": {
+            "minMs": 16.297500000000127,
+            "medianMs": 18.495813000000055,
+            "p95Ms": 24.41779100000008,
+            "maxMs": 29.287500000000023,
+            "meanMs": 19.294719433333334
+          }
+        }
+      },
+      "optimized": {
+        "path": "<RUN>/performance-netzero-control/r2-optimized.json",
+        "sha256": "42099b1d99f7416706f4479a6813dd628a74c3e3a821bf42fbb91660ccd97da5",
+        "medianMs": 23.633875000000103,
+        "meanMs": 23.778437400000016,
+        "p95Ms": 29.657499999999914,
+        "blockMediansMs": [
+          24.358938000000023,
+          23.201208000000065,
+          23.393687500000055
+        ],
+        "timingsMs": [
+          27.406165999999985,
+          25.33970899999997,
+          27.887292000000002,
+          19.73275000000001,
+          23.378167000000076,
+          20.97620900000004,
+          16.134415999999987,
+          19.652000000000044,
+          27.358166000000097,
+          26.996208999999908,
+          26.86333300000001,
+          35.749416999999994,
+          29.657499999999914,
+          20.345291999999972,
+          20.879541000000017,
+          24.07187500000009,
+          25.716416000000095,
+          20.439499999999953,
+          22.33054100000004,
+          21.57558300000005,
+          24.518375000000106,
+          18.497583000000077,
+          22.184625000000096,
+          23.88958300000013,
+          24.303916000000072,
+          21.095790999999963,
+          22.89779199999998,
+          24.090541999999914,
+          27.35699999999997,
+          22.027832999999873
+        ],
+        "setupMs": 170.25924999999998,
+        "memoryBefore": {
+          "rss": 452952064,
+          "heapTotal": 175473664,
+          "heapUsed": 176347974,
+          "external": 7886694,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 594149376,
+          "heapTotal": 215974912,
+          "heapUsed": 190412705,
+          "external": 7900225,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "repeat": 2,
+          "variant": "optimized",
+          "order": [
+            "optimized",
+            "base"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<RUN>/performance-optimized/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-netzero-control/r2-optimized.json"
+          ],
+          "startedAt": "2026-10-30T07:44:08.642553+00:00",
+          "exitCode": 0,
+          "processUserCpuSeconds": 1.5173559999999995,
+          "processSystemCpuSeconds": 0.123669,
+          "processMajorFaults": 49,
+          "processMinorFaults": 36455,
+          "statistics": {
+            "minMs": 16.134415999999987,
+            "medianMs": 23.633875000000103,
+            "p95Ms": 29.657499999999914,
+            "maxMs": 35.749416999999994,
+            "meanMs": 23.778437400000016
+          }
+        }
+      },
+      "medianLatencyChangePercent": 27.779595306245962,
+      "blockLatencyChangePercents": [
+        23.070133481845858,
+        30.441421428245306,
+        28.1721510750927
+      ]
+    },
+    {
+      "group": "focused-control",
+      "repetition": 3,
+      "order": [
+        "base",
+        "optimized"
+      ],
+      "base": {
+        "path": "<RUN>/performance-netzero-control/r3-base.json",
+        "sha256": "974474eec6efdeb871bfc8835a523f90c6cb62a6ce309cde174e9890bd36e5c1",
+        "medianMs": 18.415333000000032,
+        "meanMs": 19.212863833333337,
+        "p95Ms": 27.006291999999917,
+        "blockMediansMs": [
+          20.459396000000027,
+          17.538250000000005,
+          18.065478999999982
+        ],
+        "timingsMs": [
+          27.006291999999917,
+          28.109375,
+          19.641458000000057,
+          22.516542000000072,
+          20.596875000000068,
+          20.321916999999985,
+          17.539707999999905,
+          17.915917000000036,
+          18.476707999999917,
+          21.148415999999997,
+          16.217083000000002,
+          18.711457999999993,
+          16.582333999999946,
+          18.935957999999914,
+          18.454124999999976,
+          15.797957999999994,
+          16.853207999999995,
+          21.381709,
+          17.836374999999975,
+          17.240125000000035,
+          16.219124999999963,
+          20.61129100000005,
+          16.847917000000052,
+          17.838375000000042,
+          17.378791999999976,
+          21.971917000000076,
+          17.401207999999997,
+          18.292582999999922,
+          18.37654100000009,
+          20.164625000000115
+        ],
+        "setupMs": 180.15579200000002,
+        "memoryBefore": {
+          "rss": 495337472,
+          "heapTotal": 201032704,
+          "heapUsed": 190404104,
+          "external": 7895544,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 716767232,
+          "heapTotal": 257934336,
+          "heapUsed": 365960696,
+          "external": 5837358,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "repeat": 3,
+          "variant": "base",
+          "order": [
+            "base",
+            "optimized"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<BASELINE_RUN>/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-netzero-control/r3-base.json"
+          ],
+          "startedAt": "2026-10-30T07:44:11.230215+00:00",
+          "exitCode": 0,
+          "processUserCpuSeconds": 1.3544869999999998,
+          "processSystemCpuSeconds": 0.10055400000000003,
+          "processMajorFaults": 49,
+          "processMinorFaults": 43948,
+          "statistics": {
+            "minMs": 15.797957999999994,
+            "medianMs": 18.415333000000032,
+            "p95Ms": 27.006291999999917,
+            "maxMs": 28.109375,
+            "meanMs": 19.212863833333337
+          }
+        }
+      },
+      "optimized": {
+        "path": "<RUN>/performance-netzero-control/r3-optimized.json",
+        "sha256": "b27fc582bd2831975aa663356f1c59cdb772a447eea08405748f6c0e0a5155f5",
+        "medianMs": 18.85779150000002,
+        "meanMs": 18.867554100000007,
+        "p95Ms": 24.457250000000045,
+        "blockMediansMs": [
+          20.23364600000008,
+          17.876228999999967,
+          18.346104000000025
+        ],
+        "timingsMs": [
+          24.457250000000045,
+          26.750582999999892,
+          20.25095900000008,
+          20.477041999999983,
+          19.06558300000006,
+          22.883500000000026,
+          15.871332999999936,
+          15.586208000000056,
+          20.173208000000045,
+          20.216333000000077,
+          17.993333000000007,
+          15.709666999999968,
+          16.186457999999902,
+          21.011750000000006,
+          16.410124999999994,
+          18.089124999999967,
+          18.96833300000003,
+          19.91879199999994,
+          15.747749999999996,
+          17.759124999999926,
+          15.806832999999983,
+          18.88824999999997,
+          18.827333000000067,
+          19.207291000000055,
+          17.709791999999993,
+          20.05600000000004,
+          17.526207999999997,
+          16.260125000000016,
+          17.864874999999984,
+          20.353459000000157
+        ],
+        "setupMs": 162.700708,
+        "memoryBefore": {
+          "rss": 474529792,
+          "heapTotal": 191382528,
+          "heapUsed": 168799090,
+          "external": 7889074,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 669368320,
+          "heapTotal": 241992704,
+          "heapUsed": 350970470,
+          "external": 7986342,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "repeat": 3,
+          "variant": "optimized",
+          "order": [
+            "base",
+            "optimized"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<RUN>/performance-optimized/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-netzero-control/r3-optimized.json"
+          ],
+          "startedAt": "2026-10-30T07:44:12.414073+00:00",
+          "exitCode": 0,
+          "processUserCpuSeconds": 1.311909,
+          "processSystemCpuSeconds": 0.09682800000000003,
+          "processMajorFaults": 49,
+          "processMinorFaults": 41055,
+          "statistics": {
+            "minMs": 15.586208000000056,
+            "medianMs": 18.85779150000002,
+            "p95Ms": 24.457250000000045,
+            "maxMs": 26.750582999999892,
+            "meanMs": 18.867554100000007
+          }
+        }
+      },
+      "medianLatencyChangePercent": 2.4026635847420597,
+      "blockLatencyChangePercents": [
+        -1.1034050076549118,
+        1.9270964891021647,
+        1.5533770236595634
+      ]
+    },
+    {
+      "group": "focused-control",
+      "repetition": 4,
+      "order": [
+        "optimized",
+        "base"
+      ],
+      "base": {
+        "path": "<RUN>/performance-netzero-control/r4-base.json",
+        "sha256": "610e344ea2a563401e1624935d6f33976ac947aac02882dcdee57773b80c9439",
+        "medianMs": 18.893354500000044,
+        "meanMs": 19.505862533333342,
+        "p95Ms": 25.470459000000005,
+        "blockMediansMs": [
+          21.541146000000026,
+          17.80595850000003,
+          17.863458000000037
+        ],
+        "timingsMs": [
+          25.470459000000005,
+          25.74766699999998,
+          21.713459000000057,
+          18.824584000000073,
+          17.793541000000005,
+          25.459707999999978,
+          21.368832999999995,
+          20.98833300000001,
+          20.565625000000068,
+          22.470000000000027,
+          19.201041999999916,
+          17.555958000000032,
+          17.46270800000002,
+          22.513958000000002,
+          19.433791999999926,
+          17.827042000000006,
+          16.356333000000063,
+          22.074416999999926,
+          15.783042000000023,
+          17.784875000000056,
+          15.830249999999978,
+          17.430166999999983,
+          18.581750000000056,
+          15.770749999999907,
+          18.962125000000015,
+          18.18775000000005,
+          20.34091699999999,
+          17.539166000000023,
+          17.010833000000048,
+          19.126792000000023
+        ],
+        "setupMs": 177.33391600000002,
+        "memoryBefore": {
+          "rss": 489259008,
+          "heapTotal": 202703872,
+          "heapUsed": 190407944,
+          "external": 7895864,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 683835392,
+          "heapTotal": 250561536,
+          "heapUsed": 353878536,
+          "external": 7977656,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "repeat": 4,
+          "variant": "base",
+          "order": [
+            "optimized",
+            "base"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<BASELINE_RUN>/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-netzero-control/r4-base.json"
+          ],
+          "startedAt": "2026-10-30T07:44:14.722550+00:00",
+          "exitCode": 0,
+          "processUserCpuSeconds": 1.319643000000001,
+          "processSystemCpuSeconds": 0.09084099999999995,
+          "processMajorFaults": 49,
+          "processMinorFaults": 41952,
+          "statistics": {
+            "minMs": 15.770749999999907,
+            "medianMs": 18.893354500000044,
+            "p95Ms": 25.470459000000005,
+            "maxMs": 25.74766699999998,
+            "meanMs": 19.505862533333342
+          }
+        }
+      },
+      "optimized": {
+        "path": "<RUN>/performance-netzero-control/r4-optimized.json",
+        "sha256": "e078fe26b7b3055a4a74f4313166d53c6c4d359d3fafe006c4f6a35216f8e41c",
+        "medianMs": 18.157812000000035,
+        "meanMs": 18.9474222,
+        "p95Ms": 26.43379200000004,
+        "blockMediansMs": [
+          19.743042000000003,
+          17.677416499999993,
+          17.242041500000028
+        ],
+        "timingsMs": [
+          27.530709,
+          24.658957999999984,
+          21.500999999999976,
+          19.664958999999953,
+          19.821125000000052,
+          18.687583000000018,
+          19.32416599999999,
+          26.43379200000004,
+          17.777082999999948,
+          17.37295800000004,
+          19.240084000000024,
+          16.536040999999955,
+          16.583249999999907,
+          20.865750000000048,
+          17.994417,
+          16.43987500000003,
+          19.591916999999967,
+          17.360415999999987,
+          16.856709000000023,
+          19.876125000000002,
+          15.956457999999998,
+          17.582875000000058,
+          18.126582999999982,
+          15.851208000000042,
+          18.18904100000009,
+          16.901207999999997,
+          16.24279200000001,
+          19.323499999999967,
+          16.420791999999892,
+          19.711291999999958
+        ],
+        "setupMs": 162.48558300000002,
+        "memoryBefore": {
+          "rss": 462389248,
+          "heapTotal": 176784384,
+          "heapUsed": 203175795,
+          "external": 7888067,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 587677696,
+          "heapTotal": 201442304,
+          "heapUsed": 235252910,
+          "external": 7893998,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "repeat": 4,
+          "variant": "optimized",
+          "order": [
+            "optimized",
+            "base"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<RUN>/performance-optimized/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-netzero-control/r4-optimized.json"
+          ],
+          "startedAt": "2026-10-30T07:44:13.565259+00:00",
+          "exitCode": 0,
+          "processUserCpuSeconds": 1.3563709999999993,
+          "processSystemCpuSeconds": 0.08313099999999995,
+          "processMajorFaults": 49,
+          "processMinorFaults": 36089,
+          "statistics": {
+            "minMs": 15.851208000000042,
+            "medianMs": 18.157812000000035,
+            "p95Ms": 26.43379200000004,
+            "maxMs": 27.530709,
+            "meanMs": 18.9474222
+          }
+        }
+      },
+      "medianLatencyChangePercent": -3.893128136668411,
+      "blockLatencyChangePercents": [
+        -8.347299628348559,
+        -0.7219044119418649,
+        -3.478702163937175
+      ]
+    },
+    {
+      "group": "focused-control",
+      "repetition": 5,
+      "order": [
+        "base",
+        "optimized"
+      ],
+      "base": {
+        "path": "<RUN>/performance-netzero-control/r5-base.json",
+        "sha256": "f9cfe2a5ca0145ec1c023e5e4ab80ce64fd1f2e4e9d746945bc70591c98cd255",
+        "medianMs": 21.719437499999913,
+        "meanMs": 21.97673049999999,
+        "p95Ms": 29.929875000000038,
+        "blockMediansMs": [
+          22.80945849999995,
+          20.53154150000006,
+          21.237853999999857
+        ],
+        "timingsMs": [
+          32.17770799999994,
+          25.76191700000004,
+          29.929875000000038,
+          22.078666999999996,
+          24.169624999999996,
+          21.662415999999894,
+          20.60566700000004,
+          19.134500000000003,
+          23.5402499999999,
+          17.245374999999967,
+          18.713500000000067,
+          20.21900000000005,
+          23.58520800000008,
+          19.549541999999974,
+          20.84408300000007,
+          23.637249999999995,
+          20.099083000000064,
+          19.28495799999996,
+          23.754249999999956,
+          21.77645899999993,
+          22.789999999999964,
+          21.868999999999915,
+          19.322166000000152,
+          20.511834000000135,
+          18.82899999999995,
+          22.316667000000052,
+          20.6067079999998,
+          22.291957999999795,
+          22.98204099999998,
+          20.013208000000077
+        ],
+        "setupMs": 174.84183299999998,
+        "memoryBefore": {
+          "rss": 437682176,
+          "heapTotal": 171279360,
+          "heapUsed": 186257839,
+          "external": 7895807,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 570327040,
+          "heapTotal": 217809920,
+          "heapUsed": 233582866,
+          "external": 7882178,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "repeat": 5,
+          "variant": "base",
+          "order": [
+            "base",
+            "optimized"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<BASELINE_RUN>/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-netzero-control/r5-base.json"
+          ],
+          "startedAt": "2026-10-30T07:44:15.895971+00:00",
+          "exitCode": 0,
+          "processUserCpuSeconds": 1.4832999999999998,
+          "processSystemCpuSeconds": 0.07486599999999999,
+          "processMajorFaults": 49,
+          "processMinorFaults": 35010,
+          "statistics": {
+            "minMs": 17.245374999999967,
+            "medianMs": 21.719437499999913,
+            "p95Ms": 29.929875000000038,
+            "maxMs": 32.17770799999994,
+            "meanMs": 21.97673049999999
+          }
+        }
+      },
+      "optimized": {
+        "path": "<RUN>/performance-netzero-control/r5-optimized.json",
+        "sha256": "020d81c3dd8fa83e68749fecfe5fa8b5e603ac6bb9964668cee1fcf8d5867270",
+        "medianMs": 20.426729000000023,
+        "meanMs": 21.373727766666704,
+        "p95Ms": 28.060958000000028,
+        "blockMediansMs": [
+          23.029229000000043,
+          19.808312500000056,
+          20.109145500000068
+        ],
+        "timingsMs": [
+          28.060958000000028,
+          29.314250000000015,
+          24.604167000000075,
+          23.821000000000026,
+          20.769457999999986,
+          21.942957999999976,
+          25.932166000000052,
+          22.23745800000006,
+          19.420583999999963,
+          18.624500000000012,
+          19.865625000000023,
+          19.67862500000001,
+          19.559124999999995,
+          19.715167000000065,
+          21.150667,
+          20.632417000000032,
+          19.973208,
+          19.75100000000009,
+          19.003041000000053,
+          20.679750000000126,
+          17.566500000000133,
+          20.221041000000014,
+          19.809000000000196,
+          21.90254200000004,
+          18.705541999999923,
+          19.997250000000122,
+          19.607584000000088,
+          23.839208999999983,
+          21.168457999999873,
+          23.658583000000135
+        ],
+        "setupMs": 171.65112499999998,
+        "memoryBefore": {
+          "rss": 436994048,
+          "heapTotal": 167920640,
+          "heapUsed": 175273346,
+          "external": 7889010,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 544276480,
+          "heapTotal": 206996480,
+          "heapUsed": 211289054,
+          "external": 7898654,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "repeat": 5,
+          "variant": "optimized",
+          "order": [
+            "base",
+            "optimized"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<RUN>/performance-optimized/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-netzero-control/r5-optimized.json"
+          ],
+          "startedAt": "2026-10-30T07:44:17.176431+00:00",
+          "exitCode": 0,
+          "processUserCpuSeconds": 1.4460999999999995,
+          "processSystemCpuSeconds": 0.09190100000000001,
+          "processMajorFaults": 49,
+          "processMinorFaults": 33434,
+          "statistics": {
+            "minMs": 17.566500000000133,
+            "medianMs": 20.426729000000023,
+            "p95Ms": 28.060958000000028,
+            "maxMs": 29.314250000000015,
+            "meanMs": 21.373727766666704
+          }
+        }
+      },
+      "medianLatencyChangePercent": -5.951850732782072,
+      "blockLatencyChangePercents": [
+        0.9635059946736302,
+        -3.522526547750937,
+        -5.314607116141756
+      ]
+    },
+    {
+      "group": "focused-control",
+      "repetition": 6,
+      "order": [
+        "optimized",
+        "base"
+      ],
+      "base": {
+        "path": "<RUN>/performance-netzero-control/r6-base.json",
+        "sha256": "15d4862d5e220ea26fd96c7d89e88e6bf2e5b1b7b38daee1613df62e4c71727c",
+        "medianMs": 20.708958499999994,
+        "meanMs": 21.270040199999997,
+        "p95Ms": 27.325249999999983,
+        "blockMediansMs": [
+          22.48558349999996,
+          19.169208000000083,
+          21.419708000000014
+        ],
+        "timingsMs": [
+          30.887207999999987,
+          27.325249999999983,
+          22.153291999999965,
+          19.19100000000003,
+          22.19591700000001,
+          23.70166699999993,
+          19.910624999999982,
+          21.677999999999997,
+          22.775249999999915,
+          24.564957999999933,
+          17.425624999999968,
+          18.085667000000058,
+          19.704250000000002,
+          20.525333000000046,
+          19.41420800000003,
+          17.275667,
+          20.567000000000007,
+          20.85091699999998,
+          18.920000000000073,
+          18.924208000000135,
+          22.59141599999998,
+          23.267082999999957,
+          19.53604100000007,
+          19.177333999999973,
+          21.9329580000001,
+          22.2612909999998,
+          18.72812500000009,
+          20.90645799999993,
+          20.223457999999937,
+          23.401000000000067
+        ],
+        "setupMs": 184.533083,
+        "memoryBefore": {
+          "rss": 491356160,
+          "heapTotal": 196756480,
+          "heapUsed": 190226296,
+          "external": 7895480,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 700317696,
+          "heapTotal": 246858752,
+          "heapUsed": 371834640,
+          "external": 7994240,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "repeat": 6,
+          "variant": "base",
+          "order": [
+            "optimized",
+            "base"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<BASELINE_RUN>/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-netzero-control/r6-base.json"
+          ],
+          "startedAt": "2026-10-30T07:44:19.842478+00:00",
+          "exitCode": 0,
+          "processUserCpuSeconds": 1.4435439999999975,
+          "processSystemCpuSeconds": 0.10188699999999984,
+          "processMajorFaults": 101,
+          "processMinorFaults": 42907,
+          "statistics": {
+            "minMs": 17.275667,
+            "medianMs": 20.708958499999994,
+            "p95Ms": 27.325249999999983,
+            "maxMs": 30.887207999999987,
+            "meanMs": 21.270040199999997
+          }
+        }
+      },
+      "optimized": {
+        "path": "<RUN>/performance-netzero-control/r6-optimized.json",
+        "sha256": "3b9dae4756add8d50f03c947929156b85cae0433dea1bc5043f8389997284f2d",
+        "medianMs": 21.07237550000002,
+        "meanMs": 22.626874933333347,
+        "p95Ms": 30.44637499999999,
+        "blockMediansMs": [
+          23.55433350000004,
+          19.852354000000105,
+          21.044062499999995
+        ],
+        "timingsMs": [
+          35.868875,
+          30.44637499999999,
+          21.988749999999982,
+          29.42279099999996,
+          24.609665999999947,
+          23.721417000000088,
+          23.079624999999965,
+          18.711874999999964,
+          20.972083999999995,
+          23.387249999999995,
+          20.105207999999948,
+          19.54849999999999,
+          25.42429100000004,
+          21.44037500000013,
+          20.061791000000085,
+          17.758374999999887,
+          20.690209000000095,
+          18.943750000000136,
+          19.642917000000125,
+          17.756374999999935,
+          25.008332999999993,
+          19.091458000000102,
+          27.369791000000077,
+          29.262249999999995,
+          28.843708000000106,
+          20.915457999999944,
+          17.284625000000005,
+          17.62804200000005,
+          21.172667000000047,
+          18.649416999999858
+        ],
+        "setupMs": 194.236708,
+        "memoryBefore": {
+          "rss": 442253312,
+          "heapTotal": 172540928,
+          "heapUsed": 175353610,
+          "external": 7887210,
+          "arrayBuffers": 0
+        },
+        "memoryAfter": {
+          "rss": 601440256,
+          "heapTotal": 224674816,
+          "heapUsed": 191464149,
+          "external": 7961317,
+          "arrayBuffers": 0
+        },
+        "receipt": {
+          "repeat": 6,
+          "variant": "optimized",
+          "order": [
+            "optimized",
+            "base"
+          ],
+          "command": [
+            "bun",
+            "--no-install",
+            "<RUN>/performance-optimized/benchmark.mjs",
+            "sparse",
+            "50000",
+            "net-zero",
+            "20",
+            "30",
+            "0",
+            "<RUN>/performance-netzero-control/r6-optimized.json"
+          ],
+          "startedAt": "2026-10-30T07:44:18.440339+00:00",
+          "exitCode": 0,
+          "processUserCpuSeconds": 1.590580000000001,
+          "processSystemCpuSeconds": 0.09762400000000016,
+          "processMajorFaults": 49,
+          "processMinorFaults": 36897,
+          "statistics": {
+            "minMs": 17.284625000000005,
+            "medianMs": 21.07237550000002,
+            "p95Ms": 30.44637499999999,
+            "maxMs": 35.868875,
+            "meanMs": 22.626874933333347
+          }
+        }
+      },
+      "medianLatencyChangePercent": 1.7548782088680381,
+      "blockLatencyChangePercents": [
+        4.753045434645187,
+        3.5637674754221305,
+        -1.7537377260232412
+      ]
+    }
+  ],
+  "conclusion": "Original 3/3 pairs were slower. Focused six contain both directions and one large slower observation. The original consistent 8\u201313% pattern was not reproduced in every focused pair; this does not erase the original regression observations or establish no regression.",
+  "cause": "Unresolved. Profiles locate remaining cost mainly in draft index and validation, but cannot assign the difference to writeCaptured, GC, JIT or waiting.",
+  "cpuCounterScope": "Focused resource counters cover complete child processes, including setup, warmup, assertions and output; they are not transaction-only CPU measurements."
+}

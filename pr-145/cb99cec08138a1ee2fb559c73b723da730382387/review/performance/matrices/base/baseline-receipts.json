@@ -1,0 +1,1082 @@
+[
+  {
+    "label": "sparse-50000-net-zero-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-50000-net-zero-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:10.164976+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.5315608750097454
+  },
+  {
+    "label": "nested-50000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "nested",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/nested-50000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:11.697302+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.881284458999289
+  },
+  {
+    "label": "sparse-10000-move-one-retain20-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "20",
+      "<BASELINE_RUN>/baseline/sparse-10000-move-one-retain20-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:15.579573+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.6002963750070194
+  },
+  {
+    "label": "sparse-1000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-1000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:16.180397+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.06513358298980165
+  },
+  {
+    "label": "sparse-1000-move-1pct-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-1000-move-1pct-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:16.245975+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.0646626660018228
+  },
+  {
+    "label": "sparse-10000-move-1pct-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-10000-move-1pct-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:16.311081+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.570420166986878
+  },
+  {
+    "label": "hub-50000-rewire-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "hub",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/hub-50000-rewire-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:16.881975+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.525405584005057
+  },
+  {
+    "label": "hub-50000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "hub",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/hub-50000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:20.407881+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.6547706249984913
+  },
+  {
+    "label": "sparse-10000-net-zero-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-10000-net-zero-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:24.063264+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.23771779099479318
+  },
+  {
+    "label": "sparse-50000-rewire-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-50000-rewire-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:24.301639+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.646985457991832
+  },
+  {
+    "label": "sparse-1000-rewire-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-1000-rewire-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:27.949151+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.06514845800120384
+  },
+  {
+    "label": "sparse-1000-net-zero-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-1000-net-zero-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:28.014942+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04122316600114573
+  },
+  {
+    "label": "sparse-10000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-10000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:28.056619+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5518378330016276
+  },
+  {
+    "label": "hub-10000-rewire-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "hub",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/hub-10000-rewire-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:28.609153+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5557707910047611
+  },
+  {
+    "label": "sparse-50000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-50000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:29.165700+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.44118508399697
+  },
+  {
+    "label": "sparse-50000-move-one-retain20-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "20",
+      "<BASELINE_RUN>/baseline/sparse-50000-move-one-retain20-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:32.607587+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.610563624999486
+  },
+  {
+    "label": "sparse-50000-move-1pct-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-50000-move-1pct-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:36.219048+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.4842665000032866
+  },
+  {
+    "label": "nested-10000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "nested",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/nested-10000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:39.703943+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5973379579954781
+  },
+  {
+    "label": "hub-10000-move-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "hub",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/hub-10000-move-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:40.301829+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5600864169973647
+  },
+  {
+    "label": "sparse-10000-rewire-one-retain0-r1",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-10000-rewire-one-retain0-r1.json"
+    ],
+    "startedAt": "2026-10-30T03:57:40.862492+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5496993750130059
+  },
+  {
+    "label": "nested-10000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "nested",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/nested-10000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:41.412767+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.6080091250041733
+  },
+  {
+    "label": "hub-50000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "hub",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/hub-50000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:42.021324+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.6394843330053845
+  },
+  {
+    "label": "sparse-10000-rewire-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-10000-rewire-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:45.661438+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5674082080076914
+  },
+  {
+    "label": "sparse-1000-move-1pct-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-1000-move-1pct-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:46.229467+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.061116833006963134
+  },
+  {
+    "label": "sparse-10000-net-zero-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-10000-net-zero-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:46.291147+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.2189047909923829
+  },
+  {
+    "label": "sparse-10000-move-one-retain20-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "20",
+      "<BASELINE_RUN>/baseline/sparse-10000-move-one-retain20-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:46.510611+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.585892666989821
+  },
+  {
+    "label": "sparse-50000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-50000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:47.097131+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.6571020419942215
+  },
+  {
+    "label": "sparse-1000-net-zero-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-1000-net-zero-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:50.755001+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04537641699425876
+  },
+  {
+    "label": "hub-10000-rewire-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "hub",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/hub-10000-rewire-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:50.801142+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.6047696250025183
+  },
+  {
+    "label": "sparse-50000-net-zero-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-50000-net-zero-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:51.406518+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.2781832500040764
+  },
+  {
+    "label": "sparse-1000-rewire-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-1000-rewire-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:52.685348+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.063134625001112
+  },
+  {
+    "label": "nested-50000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "nested",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/nested-50000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:52.749084+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.91532775000087
+  },
+  {
+    "label": "sparse-10000-move-1pct-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-10000-move-1pct-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:56.665090+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5591012080112705
+  },
+  {
+    "label": "sparse-10000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-10000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:57.224812+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5849254170025233
+  },
+  {
+    "label": "hub-10000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "hub",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/hub-10000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:57.810355+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5670165409974288
+  },
+  {
+    "label": "sparse-50000-rewire-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-50000-rewire-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:57:58.378038+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.496832375007216
+  },
+  {
+    "label": "sparse-50000-move-one-retain20-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "20",
+      "<BASELINE_RUN>/baseline/sparse-50000-move-one-retain20-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:58:01.875538+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.7446228340122616
+  },
+  {
+    "label": "sparse-50000-move-1pct-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-50000-move-1pct-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:58:05.620935+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.855068792006932
+  },
+  {
+    "label": "hub-50000-rewire-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "hub",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/hub-50000-rewire-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:58:09.476831+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.664835249990574
+  },
+  {
+    "label": "sparse-1000-move-one-retain0-r2",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-1000-move-one-retain0-r2.json"
+    ],
+    "startedAt": "2026-10-30T03:58:13.142338+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.06251491600414738
+  },
+  {
+    "label": "sparse-50000-move-1pct-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-50000-move-1pct-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:13.205543+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.6364674590004142
+  },
+  {
+    "label": "sparse-10000-move-1pct-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-10000-move-1pct-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:16.842781+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5667337909981143
+  },
+  {
+    "label": "sparse-10000-net-zero-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-10000-net-zero-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:17.410241+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.2695736659952672
+  },
+  {
+    "label": "sparse-10000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-10000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:17.680610+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5886091249994934
+  },
+  {
+    "label": "sparse-10000-move-one-retain20-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "20",
+      "<BASELINE_RUN>/baseline/sparse-10000-move-one-retain20-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:18.270447+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.6391305419965647
+  },
+  {
+    "label": "hub-10000-rewire-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "hub",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/hub-10000-rewire-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:18.910290+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.6180777919944376
+  },
+  {
+    "label": "sparse-1000-rewire-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-1000-rewire-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:19.529065+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.06246570900839288
+  },
+  {
+    "label": "nested-10000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "nested",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/nested-10000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:19.592230+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.6077998750115512
+  },
+  {
+    "label": "sparse-10000-rewire-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "10000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-10000-rewire-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:20.200756+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.5613853340037167
+  },
+  {
+    "label": "hub-10000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "hub",
+      "10000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/hub-10000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:20.763015+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.587497959000757
+  },
+  {
+    "label": "hub-50000-rewire-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "hub",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/hub-50000-rewire-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:21.351272+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.661747332997038
+  },
+  {
+    "label": "hub-50000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "hub",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/hub-50000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:25.013757+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.6528461669950048
+  },
+  {
+    "label": "sparse-50000-move-one-retain20-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "20",
+      "<BASELINE_RUN>/baseline/sparse-50000-move-one-retain20-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:28.667422+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 3.994420249990071
+  },
+  {
+    "label": "sparse-50000-net-zero-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-50000-net-zero-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:32.662742+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 1.4487721670011524
+  },
+  {
+    "label": "sparse-50000-rewire-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "rewire-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-50000-rewire-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:34.112253+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 4.110380166006507
+  },
+  {
+    "label": "sparse-1000-move-1pct-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-1pct",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-1000-move-1pct-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:38.223846+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.10882391700579319
+  },
+  {
+    "label": "nested-50000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "nested",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/nested-50000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:38.333931+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 8.353832916007377
+  },
+  {
+    "label": "sparse-50000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "50000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-50000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:46.699542+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 5.464782124996418
+  },
+  {
+    "label": "sparse-1000-move-one-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "move-one",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-1000-move-one-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:52.165259+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.07388283300679177
+  },
+  {
+    "label": "sparse-1000-net-zero-retain0-r3",
+    "command": [
+      "bun",
+      "--no-install",
+      "<BASELINE_RUN>/benchmark.mjs",
+      "sparse",
+      "1000",
+      "net-zero",
+      "20",
+      "30",
+      "0",
+      "<BASELINE_RUN>/baseline/sparse-1000-net-zero-retain0-r3.json"
+    ],
+    "startedAt": "2026-10-30T03:58:52.240010+00:00",
+    "exitCode": 0,
+    "elapsedSeconds": 0.12325879200943746
+  }
+]

@@ -1,0 +1,129 @@
+[
+  {
+    "path": "logs/full-check.log",
+    "originalSha256": "d2c259f8ac1cb64170cc4389bcdf5860ff5579528d8519f47019322f242ec847",
+    "publishedSha256": "ec239e49aa80efbcec0984eaab29ebef48362f5f41048a905f21a2737d050b86",
+    "replacedPrefixes": [
+      "<WORKSPACE>"
+    ]
+  },
+  {
+    "path": "reviews/standards.md",
+    "originalSha256": "1dd39cc8c4ceac9c17bdb6b0218f8f32e06924732c203ca72260f31537a2b58e",
+    "publishedSha256": "1dd39cc8c4ceac9c17bdb6b0218f8f32e06924732c203ca72260f31537a2b58e",
+    "replacedPrefixes": []
+  },
+  {
+    "path": "reviews/spec.md",
+    "originalSha256": "fd372d96a39275d9f6983811e2662d387f1d6eef1768bd34356745f248dd3539",
+    "publishedSha256": "fd372d96a39275d9f6983811e2662d387f1d6eef1768bd34356745f248dd3539",
+    "replacedPrefixes": []
+  },
+  {
+    "path": "logs/behavior-1.log",
+    "originalSha256": "69bfa648d46db5999feb4d3deb784b3f004f7c249dc6ea85dab7c81a973178c0",
+    "publishedSha256": "b649775b41ac9e7bd35e1eebde2647e567c4d7589dd8c02660a270928d2ba99f",
+    "replacedPrefixes": [
+      "<WORKSPACE>"
+    ]
+  },
+  {
+    "path": "logs/behavior-2.log",
+    "originalSha256": "4153d2f728bf76394529f434e51aa46d9e1b6e494b91d5f8351b23ae0a9c4d63",
+    "publishedSha256": "4153d2f728bf76394529f434e51aa46d9e1b6e494b91d5f8351b23ae0a9c4d63",
+    "replacedPrefixes": []
+  },
+  {
+    "path": "logs/behavior-3.log",
+    "originalSha256": "eff340fdd8c445be9e52e59a6ecd5ff7df04f21885bc1c55dcdf13e5fc6e7023",
+    "publishedSha256": "975ab64dba12dfc6e174ec6752f37d901c5083ee38f2e3275a7f0187d5b3558e",
+    "replacedPrefixes": [
+      "<WORKSPACE>"
+    ]
+  },
+  {
+    "path": "logs/behavior-4.log",
+    "originalSha256": "6a8c18cf8ae2b5234fc22ca8600c59df4b87f6a765f88caeab68f9df91a1ce09",
+    "publishedSha256": "6a8c18cf8ae2b5234fc22ca8600c59df4b87f6a765f88caeab68f9df91a1ce09",
+    "replacedPrefixes": []
+  },
+  {
+    "path": "logs/behavior-5.log",
+    "originalSha256": "f2bbf60e5b1cd74258c1a7a479a64daae346a08b7815f424644b21bf4f377898",
+    "publishedSha256": "ef10b403e49509e18deeec22c59a8b4e7714af4994b695f9d5948d0d759a35b9",
+    "replacedPrefixes": [
+      "<WORKSPACE>",
+      "<BUN_HOME>"
+    ]
+  },
+  {
+    "path": "logs/behavior-6.log",
+    "originalSha256": "fd99cb89c5998d99efb6ef2f78c6a68ad4a8c77a49c6e4b040984e20463ec632",
+    "publishedSha256": "065bea10c7c815fefa7fbd4479aac01cc6dcd1e0d5f33dc3e8ef87fb238125ee",
+    "replacedPrefixes": [
+      "<WORKSPACE>",
+      "<BUN_HOME>"
+    ]
+  },
+  {
+    "path": "logs/behavior-7.log",
+    "originalSha256": "cab276dd8c4cf988e081d2b0e03a67da18048f6504ae1710a3d5d410f70a800c",
+    "publishedSha256": "cab276dd8c4cf988e081d2b0e03a67da18048f6504ae1710a3d5d410f70a800c",
+    "replacedPrefixes": []
+  },
+  {
+    "path": "logs/behavior-8.log",
+    "originalSha256": "8f01eba373dcd0efb50399f0ccd9dc900e1bf88b89c4c690da5e2ee59918966e",
+    "publishedSha256": "dc0b8e98cbdf68fedf8a1703ba14266ce7f690626e9fd47c7c9c7814973e18bc",
+    "replacedPrefixes": [
+      "<PRIOR_RUN>"
+    ]
+  },
+  {
+    "path": "logs/behavior-9.log",
+    "originalSha256": "48c15d00e6c9b4985fb49935986c568d8d0cea1b6ca10a02bdeaac8b744f26db",
+    "publishedSha256": "cf10d81957cbcfad7af116749e7505ccad48685f8dbb1e1732b00788c52c6b8f",
+    "replacedPrefixes": [
+      "<BASELINE_RUN>",
+      "<PRIOR_RUN>"
+    ]
+  },
+  {
+    "path": "logs/behavior-10.log",
+    "originalSha256": "7fb8d62fdcbd923614ad3ce1dbaed111e717e76b311a3fe269ae754a200bc165",
+    "publishedSha256": "25d49abe6e16c39fb887cd82a6e9333423fd262195aef6ebf8a93163a804b640",
+    "replacedPrefixes": [
+      "<BASELINE_RUN>",
+      "<PRIOR_RUN>"
+    ]
+  },
+  {
+    "path": "logs/behavior-11.log",
+    "originalSha256": "5deeb49508f1c8c1a778e587bb4d7c5fdbbf0998845de0cfe6cd7fbf0394821e",
+    "publishedSha256": "7dd6c6d6ef9c587d885168d4a87b253db5c8a801c3fd682d87a770af0376a7f3",
+    "replacedPrefixes": [
+      "<WORKSPACE>"
+    ]
+  },
+  {
+    "path": "logs/behavior-12.log",
+    "originalSha256": "5032567e0b77330ce7514f0a17d0abb424c4672822a2301cc829db54f22f3054",
+    "publishedSha256": "c158fe39ad389218afaece0c18b66e8e68911808cfb70216356dbc0d193ce693",
+    "replacedPrefixes": [
+      "<WORKSPACE>"
+    ]
+  },
+  {
+    "path": "logs/behavior-13.log",
+    "originalSha256": "7bcb60f7c2c7942e7e1dddcd3f2e9f7afe85828c4bf65eb823d9a08f95e576e2",
+    "publishedSha256": "7bcb60f7c2c7942e7e1dddcd3f2e9f7afe85828c4bf65eb823d9a08f95e576e2",
+    "replacedPrefixes": []
+  },
+  {
+    "path": "report.md",
+    "originalSha256": "d1ce2f725f1c56324a7b4f18163adcd246883e880663c3c569b4dc44a55975eb",
+    "publishedSha256": "1874ded1387ad4cc1b1e34ac34af734c2d2a7559a0c4fe4b21557c300f0c291d",
+    "replacedPrefixes": [],
+    "generatedAppendix": "Performance and delivery identity links appended."
+  }
+]

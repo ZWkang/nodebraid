@@ -1,0 +1,34 @@
+bun test v1.4.2 (744846f84)
+
+packages/kernel/tests/snapshot-reuse.test.ts:
+28 |   const source = before.query.getNode(sourceId)!;
+29 |   const commit = kernel.transact((transaction) => {
+30 |     transaction.nodes.replace(sourceId, { ...source, position: { x: 1, y: 0 } });
+31 |   })!;
+32 | 
+33 |   expect(commit.after.snapshot.edges).toBe(before.snapshot.edges);
+                                           ^
+error: expect(received).toBe(expected)
+
+Expected: [
+  {
+    id: "connection",
+    type: "edge",
+    source: {
+      nodeId: "source",
+    },
+    target: {
+      nodeId: "target",
+    },
+    data: null,
+  }
+]
+Received: serializes to the same string
+
+      at <anonymous> (<WORKSPACE>/packages/kernel/tests/snapshot-reuse.test.ts:33:39)
+(fail) reuses the frozen Edge Snapshot collection when only Nodes are written [23.52ms]
+
+ 0 pass
+ 1 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [82.00ms]

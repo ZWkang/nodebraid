@@ -1,0 +1,19 @@
+{
+  "startedAt": "2026-10-30T07:40:02.386850+00:00",
+  "platform": "macOS-26.4.1-arm64-arm-64bit",
+  "machine": "arm64",
+  "cpuCount": 12,
+  "python": "3.11.7",
+  "bun": "1.4.2",
+  "baseRoot": "<BASELINE_RUN>",
+  "optimizedRoot": "<RUN>/performance-optimized",
+  "baseRevision": "843c9484a7d32e957dceba6658b31a5662560329",
+  "optimizedRevision": "ece568a07a2f56ae25d6daa63d9f16d88108a5af",
+  "harnessSha256": "e41e3d7fc9fe2ebd88dbd333d2e07b31dc18b6ea71a3639c6f78460db5e03d81",
+  "runnerSha256": "ca8a07b721aa3bdf5cbef1fe6e43dffff1dae211882cf5ab7c9e11c72e6a0089",
+  "loadBefore": [
+    9.04541015625,
+    10.8203125,
+    10.431640625
+  ]
+}
