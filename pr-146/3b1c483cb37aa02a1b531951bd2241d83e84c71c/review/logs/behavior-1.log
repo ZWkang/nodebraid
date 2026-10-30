@@ -1,0 +1,39 @@
+bun test v1.4.2 (744846f84)
+
+examples/app/tests/node-draft.test.ts:
+(pass) an unchanged application form preserves the original opaque data, including null [2.55ms]
+(pass) editing a label preserves exact tag values without mutating the source [1.91ms]
+(pass) invalid application tag input fails before a Node Command is called [4.00ms]
+(pass) formatting-only tag changes preserve the original data reference [0.46ms]
+(pass) clean drafts follow selection while unsaved input remains bound to its source [0.07ms]
+(pass) the editor only selects a single Node and keeps an explicit apply-and-switch target [5.16ms]
+(pass) a dirty draft exposes replacement or deletion without treating unrelated edits as stale [0.20ms]
+
+examples/app/tests/example-data-codec.test.ts:
+(pass) Example document data round trips null and the explicit application record [0.58ms]
+(pass) Example data rejects values outside the application schema rather than dropping them [0.92ms]
+(pass) Example data validates and serializes the same captured tags [0.03ms]
+(pass) Clipboard accepts the same business data as the Document file [1.03ms]
+(pass) Clipboard serializes the application data snapshot that passed validation [0.05ms]
+
+examples/app/tests/node-draft-apply.test.ts:
+(pass) applying a draft edits through History and returns a clean draft of the committed Node [22.13ms]
+(pass) apply keeps the captured switch target but reads its current Node after the Command [3.18ms]
+(pass) unchanged and formatting-only drafts do not advance the Document or History [1.58ms]
+(pass) applying a draft after move preserves the Command conflict and current graph [1.93ms]
+(pass) applying a draft after delete preserves the Command conflict and current graph [1.53ms]
+(pass) applying a draft after undo-redo preserves the Command conflict and current graph [1.15ms]
+(pass) form conversion failures preserve their original cause and leave the graph unchanged [1.84ms]
+
+examples/app/tests/viewport.test.ts:
+(pass) center zoom preserves the world point at the middle of the measured Target [0.25ms]
+(pass) center zoom keeps the same anchor when it reaches the application zoom limits [0.02ms]
+(pass) Fit View fits the limiting dimension and centers Node bounds with 48 CSS pixels of padding [0.07ms]
+(pass) Fit View returns no update for an empty Document
+(pass) Fit View treats missing Node size as zero and retains the maximum zoom [0.03ms]
+(pass) Fit View retains the minimum zoom even when the graph is larger than the Target [0.01ms]
+
+ 25 pass
+ 0 fail
+ 100 expect() calls
+Ran 25 tests across 4 files. [144.00ms]

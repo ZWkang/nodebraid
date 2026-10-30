@@ -1,0 +1,136 @@
+# Verification report
+
+Run: issue-144-20261030-example-state · ZWkang/nodebraid · issue #144
+
+## Reviewed and published source
+
+- Review base: `843c9484a7d32e957dceba6658b31a5662560329`
+- Independently prepared append parent: `843c9484a7d32e957dceba6658b31a5662560329`
+- Published head: `3b1c483cb37aa02a1b531951bd2241d83e84c71c`
+- Reviewed local head: `14b2d1027122d783b254b666fa9dbe6edeb0c630`
+- Tree: `4a7641d63a666b6b22280a29655916fd113c3ce2`
+- Complete binary patch SHA-256: `d5c63aef6bf936fb168e14132fc3058c4fbbacf90437507e16f3b8bc3a1d3a05`
+
+The publication record matches the reviewed tree and expected parent. Remote PR freshness is checked separately by the publisher.
+
+## PR risk and merge route
+
+Risk: low. Route: automatic.
+
+- standards: low — 完整变更仅限 examples/app 的私有应用实现与测试；是已理解的行为保持提取，无公共契约、Runtime 生命周期、资源所有权、依赖或工作流策略变更。应用局部影响已有直接验证，路径不触发 medium/high 下限。
+- spec: low — 仅私有 Examples Application 内部行为保持提取与测试，公共契约、Document/Session 权威、Runtime 生命周期和资源所有权均未改变；无高风险路径或数据迁移。
+
+### standards risk: low
+
+Impact and reasoning: 完整变更仅限 examples/app 的私有应用实现与测试；是已理解的行为保持提取，无公共契约、Runtime 生命周期、资源所有权、依赖或工作流策略变更。应用局部影响已有直接验证，路径不触发 medium/high 下限。
+
+Evidence: 绑定 head 14b2d1027122d783b254b666fa9dbe6edeb0c630、tree 4a7641d63a666b6b22280a29655916fd113c3ce2 和 binary patch SHA256 d5c63aef6bf936fb168e14132fc3058c4fbbacf90437507e16f3b8bc3a1d3a05，均已本地核对。审查 node-draft.ts:28-97、node-authoring.tsx:93-120、viewport.ts:3-32 与 basic-svg.tsx:362-373 的真实调用链；日志证实 25 项应用测试通过及 affected 检查完成四个真实 Example browser suite。正式 verify 全量检查仍是后续交付条件。
+
+Rollback: 回退唯一提交 14b2d1027122d783b254b666fa9dbe6edeb0c630 即恢复原组件内逻辑和视口计算；没有数据迁移、持久化格式变化或不可逆副作用。
+
+### spec risk: low
+
+Impact and reasoning: 仅私有 Examples Application 内部行为保持提取与测试，公共契约、Document/Session 权威、Runtime 生命周期和资源所有权均未改变；无高风险路径或数据迁移。
+
+Evidence: 完整 diff 仅 8 个 examples/app 源码/测试文件；Apply 捕获目标及提交后读取、严格冲突、净零与 Undo/Redo 有真实 Host/Kernel/Command/History 测试；25 项应用测试通过，affected 日志包含四套 Example 浏览器验收。已核对 head/tree/patch 与干净工作区。
+
+Rollback: 回退提交 14b2d1027122d783b254b666fa9dbe6edeb0c630 即恢复原组件内逻辑与视口函数；无持久格式变更或不可逆副作用。
+
+Automatic routing is a candidate only. The coordinator still checks current PR status, report publication, pre-merge acceptance and authorization immediately before a head-bound merge.
+
+## Acceptance plan
+
+将 Examples Application 节点草稿决策与 Apply 用例、中心缩放/Fit View 计算抽离为无 React 的应用模块；保持现有 UI、Command/History 与生命周期行为。按 Issue #144 的完整规格及现有公共 seam 验证。
+
+### node-editor
+
+纯草稿投影/选择协调和 Apply 用例完成；组件改为消费这些行为；真实 Kernel/Command/History 验证切换、冲突、错误和净零。
+
+Dependencies: none
+
+### viewport
+
+中心缩放与 Fit View 纯函数及单一应用缩放配置完成，调用方与现有行为保持，定向行为测试通过。
+
+Dependencies: none
+
+### affected-checks
+
+开发 affected 检查与真实 Example 浏览器验收通过。
+
+Dependencies: node-editor, viewport
+
+### review-verify
+
+独立 Standards/ponytail-review 与 Spec/risk 通过，正式 verify 全量 check 通过。
+
+Dependencies: affected-checks
+
+### publish
+
+单 PR 面向 main，当前 head 的 CI 与完整报告/媒体发布回读通过。
+
+Dependencies: review-verify
+
+### main-acceptance
+
+有相应合并授权/路由后，fetch 核对实际 main 集成与整项验收；Issue 关闭独立授权。
+
+Dependencies: publish
+
+## Full engineering check
+
+`bun run check` — exit 0; checked source remained unchanged.
+
+[Original command output](logs/full-check.log)
+
+## Standards review
+
+Verdict: passed. [Original report](reviews/standards.md)
+
+本次变更：将私有 Examples Application 的草稿决策、Apply 用例和视口计算移出 React，统一应用缩放范围。
+
+Standards + ponytail-review：passed，0 项发现。已检查完整 8 文件 diff、调用方、Command/Session 实现、相关 ADR、单元测试与现有浏览器断言。node-draft.ts:28/55/85 分别拥有投影、草稿协调与提交后读取；React 保留 Hooks、局部状态、Effect 和错误展示。Apply 捕获既定目标并保留原始失败，源 Node 身份检查仍由 Transaction 内的既有 Command 负责，符合 ADR-0087、Boundary Discipline。viewport.ts:3/5/13 集中缩放范围与纯计算；DOM 测量和 Session 写入保留在 basic-svg.tsx:362/368，符合 ADR-0018。未新增 controller/store、生命周期管理或无当前用途的抽象，未发现可复现的错误或需修复的 smell。
+
+按单浏览器 Canvas 的现有应用负载评估。已读取 application-tests.log：25 pass、0 fail；affected-check.log：格式、lint、构建、类型与四个 Example browser suite 完成。新增测试通过真实 Host/Kernel/Command/History 验证提交、冲突、净零、Undo/Redo，以固定行为结果验证视口。未重复执行测试；正式全量 check、报告发布与回读尚待协调者完成，本结论不代表交付 ready。
+
+## Spec review
+
+Verdict: passed. [Original report](reviews/spec.md)
+
+独立 Spec review：0 项发现。对照 Issue #144 完整正文与空讨论，检查了全部 8 文件及 Command、React、浏览器调用链。node-draft.ts:28–61 保留单节点投影、脏草稿和严格身份 stale 提示；:85–95 使用调用时传入的目标 ID，并在 Command 完成后读取当前 Kernel，不重新解释 Selection。组件 node-authoring.tsx:110–120 未加入 stale 提前拒绝，错误交给原 UI，Cancel、放弃切换、Reload、继续编辑及 keyed 生命周期保持。viewport.ts:3–31 原样提取中心缩放与 Fit 算法，统一 0.25–4，保留 48 CSS-pixel padding、缺省 size 按零和空图无更新；DOM 测量与 Session 写入仍在路由边界。未发现遗漏、越界或行为错误。已读取 application-tests.log（25 pass）及 affected-check.log（Example 构建、类型检查与四套真实浏览器 suite），覆盖净零、冲突、错误、Undo/Redo、文件往返及 Zoom/Reset/Fit；正式全量 verify、报告发布回读仍待协调者执行，本审查不代表交付完成。
+
+## Behavior evidence
+
+### application-behavior
+
+check — passed; exit 0; expected exit 0.
+
+25 application tests passed: draft projection/selection reconciliation, real Command/History Apply and conflicts, unchanged data, raw failures, center zoom and Fit View.
+
+Command: `bun test examples/app/tests`
+
+[Original command output](logs/behavior-1.log)
+
+### affected
+
+check — passed; exit 0; expected exit 0.
+
+Affected lint/format/build/types and all four existing Example browser suites passed, including node editing, file round-trip, viewport, clipboard and History.
+
+Command: `bun run check:affected`
+
+[Original command output](logs/behavior-2.log)
+
+
+## Feedback dispositions
+
+No feedback dispositions were included in this run.
+
+## Scope and limitations
+
+The two original review reports above retain their scope, evidence and untested areas. Their separate fields do not authenticate reviewer identity or prove independence.
+
+Only explicitly recorded commands and reports are included. Missing behavior evidence, browser coverage or platform checks are not inferred to have passed.
+
+A red result records the supplied behavior explanation and expected nonzero exit. The original output must still be reviewed to distinguish a behavior assertion from a compile, setup or infrastructure failure.
