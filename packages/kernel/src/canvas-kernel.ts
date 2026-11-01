@@ -24,7 +24,7 @@ import { incrementRevision } from './revision';
 export function createCanvasKernel(): CanvasKernel {
   let nodes = new Map<NodeId, CanvasNode>();
   let edges = new Map<EdgeId, CanvasEdge>();
-  let view = createCanvasView(0, nodes, edges);
+  let view = createCanvasView(0, nodes, edges, new GraphIndex(nodes, edges));
   let transactionActive = false;
 
   return Object.freeze({
@@ -121,7 +121,15 @@ export function createCanvasKernel(): CanvasKernel {
             Object.freeze({ revision: before.snapshot.revision }),
           );
         }
-        const after = createCanvasView(revision, draftNodes, draftEdges);
+        // Value-equal writes can still replace entity identity, so only untouched collections are reusable.
+        const after = createCanvasView(
+          revision,
+          draftNodes,
+          draftEdges,
+          draftIndex,
+          touchedNodeIds.size === 0 ? before.snapshot.nodes : undefined,
+          touchedEdgeIds.size === 0 ? before.snapshot.edges : undefined,
+        );
         const origin = metadata?.origin;
         const commandId = metadata?.commandId;
         const changeSet: ChangeSet = Object.freeze({

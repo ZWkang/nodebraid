@@ -23,6 +23,14 @@ export function createEntityWriter<Id extends string, Entity extends Identified<
   options: WriterOptions<Id, Entity>,
 ): EntityWriter<Id, Entity> {
   const label = options.kind === 'node' ? 'Node' : 'Edge';
+  const writeCaptured = (id: Id, entity: Entity): void => {
+    // Capturing caller fields can write again through the same Transaction.
+    const before = options.draft.get(id);
+    options.draft.set(id, entity);
+    if (before === undefined) options.onAdd(entity);
+    else options.onReplace(before, entity);
+    options.touchedIds.add(id);
+  };
   return Object.freeze({
     add(entity: Entity): void {
       options.assertOpen();
@@ -35,9 +43,7 @@ export function createEntityWriter<Id extends string, Entity extends Identified<
         );
       }
       const frozen = options.freeze(entity, id);
-      options.draft.set(id, frozen);
-      options.onAdd(frozen);
-      options.touchedIds.add(id);
+      writeCaptured(id, frozen);
     },
     replace(id: Id, entity: Entity): void {
       options.assertOpen();
@@ -58,9 +64,7 @@ export function createEntityWriter<Id extends string, Entity extends Identified<
         );
       }
       const frozen = options.freeze(entity, actualId);
-      options.draft.set(id, frozen);
-      options.onReplace(before, frozen);
-      options.touchedIds.add(id);
+      writeCaptured(id, frozen);
     },
     remove(id: Id): void {
       options.assertOpen();
