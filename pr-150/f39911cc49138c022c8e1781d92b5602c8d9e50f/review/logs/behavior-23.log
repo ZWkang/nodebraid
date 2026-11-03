@@ -1,0 +1,37 @@
+bun test v1.4.2 (744846f84)
+
+../../../local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/fixed-lost-translation/packages/layout-elk/tests/incremental.test.ts:
+68 |     createLayoutInput(kernel.read(), { mode: 'full', fixedNodeIds: [leftId, rightId] }),
+69 |     { algorithm: 'stress', padding: 0, randomSeed: 1 },
+70 |     { signal: new AbortController().signal },
+71 |   );
+72 |   const moved = translated.positions.find(({ id }) => id === movableId)!.position;
+73 |   expect(moved.x).toBeCloseTo(positions.get(movableId)!.x + offset.x, 6);
+                       ^
+error: expect(received).toBeCloseTo(expected, precision)
+
+Expected: 1150
+Received: 150
+
+Expected precision: 6
+Expected difference: < 0.0000005
+Received difference: 1000
+
+      at <anonymous> (/Users/zhou/.codex/local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/fixed-lost-translation/packages/layout-elk/tests/incremental.test.ts:73:19)
+(fail) ELK Stress keeps Fixed Nodes and their connected layout in absolute world coordinates [183.04ms]
+(pass) ELK Stress incremental layout uses current positions as a deterministic soft constraint [36.72ms]
+(pass) ELK rejects incremental and Fixed Node requests for unproven algorithms [0.47ms]
+
+../../../local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/fixed-lost-translation/packages/layout-elk/tests/index.test.ts:
+(pass) ELK computes deterministic top-left world positions for a full Layout Input [20.66ms]
+(pass) ELK layered full treats seed zero as the fixed default seed [239.13ms]
+(pass) ELK stress full treats seed zero as the fixed default seed [120.92ms]
+(pass) ELK stress incremental treats seed zero as the fixed default seed [38.42ms]
+(pass) ELK rejects non-integer and unsafe seeds [1.07ms]
+(pass) ELK full layout supports the baseline graph shapes [52.59ms]
+(pass) ELK rejects a non-finite Provider configuration before layout [0.46ms]
+
+ 9 pass
+ 1 fail
+ 26 expect() calls
+Ran 10 tests across 2 files. [749.00ms]

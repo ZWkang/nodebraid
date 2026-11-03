@@ -1,0 +1,16 @@
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+(pass) @nodebraid/plugin-node-editing > creates a complete Node and updates only its data with one Undo per commit [9.89ms]
+(pass) @nodebraid/plugin-node-editing > keeps a same-data update net zero and accepts evidence across unrelated commits [2.25ms]
+(pass) @nodebraid/plugin-node-editing > rejects stale evidence after move without changing graph or History [2.25ms]
+(pass) @nodebraid/plugin-node-editing > rejects stale evidence after data without changing graph or History [2.10ms]
+(pass) @nodebraid/plugin-node-editing > rejects stale evidence after recreate without changing graph or History [1.44ms]
+(pass) @nodebraid/plugin-node-editing > rejects stale evidence after undo-redo without changing graph or History [0.92ms]
+(pass) @nodebraid/plugin-node-editing > preserves original Kernel failures, cancellation and command lifecycle [1.41ms]
+(pass) @nodebraid/plugin-node-editing > reads declared inputs once and keeps accessor failures and opaque data identity [1.43ms]
+
+ 8 pass
+ 0 fail
+ 36 expect() calls
+Ran 8 tests across 1 file. [42.00ms]

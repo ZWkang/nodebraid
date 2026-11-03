@@ -1,0 +1,33 @@
+bun test v1.4.2 (744846f84)
+
+../../../local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/incremental-noop/packages/layout-elk/tests/incremental.test.ts:
+(pass) ELK Stress keeps Fixed Nodes and their connected layout in absolute world coordinates [178.32ms]
+123 |     positions.reduce((total, result) => {
+124 |       const source = sourcePositions.get(result.id)!;
+125 |       return total + Math.abs(result.position.x - source.x) + Math.abs(result.position.y - source.y);
+126 |     }, 0);
+127 | 
+128 |   expect(movement(incremental.positions)).toBeGreaterThan(0);
+                                                ^
+error: expect(received).toBeGreaterThan(expected)
+
+Expected: > 0
+Received: 0
+
+      at <anonymous> (/Users/zhou/.codex/local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/incremental-noop/packages/layout-elk/tests/incremental.test.ts:128:43)
+(fail) ELK Stress incremental layout uses current positions as a deterministic soft constraint [66.44ms]
+(pass) ELK rejects incremental and Fixed Node requests for unproven algorithms [0.57ms]
+
+../../../local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/incremental-noop/packages/layout-elk/tests/index.test.ts:
+(pass) ELK computes deterministic top-left world positions for a full Layout Input [29.10ms]
+(pass) ELK layered full treats seed zero as the fixed default seed [282.64ms]
+(pass) ELK stress full treats seed zero as the fixed default seed [139.47ms]
+(pass) ELK stress incremental treats seed zero as the fixed default seed [33.66ms]
+(pass) ELK rejects non-integer and unsafe seeds [0.28ms]
+(pass) ELK full layout supports the baseline graph shapes [31.95ms]
+(pass) ELK rejects a non-finite Provider configuration before layout [0.23ms]
+
+ 9 pass
+ 1 fail
+ 25 expect() calls
+Ran 10 tests across 2 files. [818.00ms]

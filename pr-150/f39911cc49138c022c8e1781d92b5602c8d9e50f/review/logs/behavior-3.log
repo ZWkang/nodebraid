@@ -1,0 +1,2 @@
+Original React suite; suppressed history notifications in build only.
+Original full React suite passed despite disabled notifications.

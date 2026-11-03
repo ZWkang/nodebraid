@@ -1,0 +1,486 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "42ad909b0d8581fe90883bc90eaa872745dab5a2",
+    "expectedParent": "42ad909b0d8581fe90883bc90eaa872745dab5a2",
+    "head": "f39911cc49138c022c8e1781d92b5602c8d9e50f",
+    "tree": "56584f33f75bff9d3000fc464dc97817f4102bcc",
+    "patch": "98c89109f72795cabcc5dc88a6660a2bd4c0b29ecc580de308570693956aaedd",
+    "localHead": "f39911cc49138c022c8e1781d92b5602c8d9e50f"
+  },
+  "task": {
+    "run": "issue-149-test-effectiveness",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 149
+    },
+    "request": "优化测试，检查用例是否真实有效；沿用现有领域契约与公共测试入口，对实证漏检做最小补强，精简自证断言，产品行为不变。",
+    "plan": [
+      {
+        "id": "audit-and-strengthen",
+        "blockedBy": [],
+        "acceptance": "审查核心、交互、浏览器与工具测试，记录实际范围；对有具体故障反例的测试做最小补强，保留有效公共契约。"
+      },
+      {
+        "id": "verify-mutations",
+        "blockedBy": [
+          "audit-and-strengthen"
+        ],
+        "acceptance": "各确认漏检有旧测试通过、优化测试失败、真实行为通过的证据；临时故障不进入 diff；check:affected 通过。"
+      },
+      {
+        "id": "review-and-check",
+        "blockedBy": [
+          "verify-mutations"
+        ],
+        "acceptance": "当前提交 Standards 与 Spec 独立通过，agents:run verify 完整工程检查通过。"
+      },
+      {
+        "id": "publish-pr",
+        "blockedBy": [
+          "review-and-check"
+        ],
+        "acceptance": "面向 main 的单个 PR 关联 #149，发布并回读当前 head 审查验证报告。"
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "verdict": "passed",
+      "head": "f39911cc49138c022c8e1781d92b5602c8d9e50f",
+      "tree": "56584f33f75bff9d3000fc464dc97817f4102bcc",
+      "patch": "98c89109f72795cabcc5dc88a6660a2bd4c0b29ecc580de308570693956aaedd",
+      "report": "变更作用：加强 React 独立 Snapshot 通知、Node 完整字段与 Undo/Redo、ELK 增量计算及世界坐标的行为验证；将 Port 选择迁到公共 Renderer Input seam，保留 core 类型契约。\n\n已审查完整 8 文件 diff、相连生产调用链及 ADR-0012/0023/0027/0082/0083/0087。Node 期望来自原始输入；ELK 用实际位移和世界平移关系验证结果；Port 测试观察 Session 并包含可成功选择的正例。未发现未处理的标准违规、实现耦合或具体代码异味。\n\n历史 finding：原 head 5e6571f 删除私有测试后，capabilities.md:20 仍指向 selection-transition.test.ts，违反 control-nodebraid/SKILL.md:64 的地图维护要求。最终 head 仅追加将该链接改为 delete-selection-input.test.ts，目标已核实存在，问题已修复。\n\n证据：逐项核对 behavior-evidence.json 的原始日志与故障注入脚本。3 类 React 缺通知分别停在对应 DOM 等待点；2 类 Node 字段丢失、Port 点击漏处理、ELK 无操作增量及坐标平移丢失均在行为断言处失败；旧测试及正常实现对照通过。Node、Port、ELK 归档强化测试与交付文件一致。第一轮完整 bun run check 已退出 0；verification.json 的 checks.stable 为 false，因此该收据未通过交付验收。\n\nVerdict: passed；未解决发现 0 项。\n\n绑定复核：HEAD 与 tree 未变化。独立比较 git -c core.abbrev=7 diff --binary 与当前默认 diff，恰有 8 条 index 行由 7 位对象缩写变为 8 位；只规范化这些 index 行后两份 diff 完全相同，源码内容和审查范围没有变化。旧 patch bc5bd9ae…、新 patch 98c89109… 均已重算。旧报告原样保存在 standards-review-attempt1.json；当前报告绑定新摘要，verdict 和 risk 不变。协调方将重新真实执行完整 verify，不能复用首轮收据宣告通过。",
+      "risk": {
+        "level": "high",
+        "rationale": "完整变更仅优化测试并修正能力地图导航，不修改产品、公开契约或执行权限；但 .agents/skills/control-nodebraid/references/capabilities.md 属于 skills 路径，按 pr-risk 的路径最低等级必须判为 high。",
+        "evidence": "已核实完整 base 42ad909b0d8581fe90883bc90eaa872745dab5a2 至 head f39911cc49138c022c8e1781d92b5602c8d9e50f 的 tree 与 binary patch 摘要；7 个测试文件及 1 个技能地图文件。behavior-evidence.json 的 8 类故障原始日志均显示旧绿/新红及正常实现绿；最终增量只修正 Selection 链接，目标真实存在。",
+        "rollback": "回退本次提交即可恢复原测试与能力地图；不涉及生产数据、迁移或不可逆外部副作用。回退会重新引入已确认的测试漏检。"
+      }
+    },
+    "spec": {
+      "verdict": "passed",
+      "head": "f39911cc49138c022c8e1781d92b5602c8d9e50f",
+      "tree": "56584f33f75bff9d3000fc464dc97817f4102bcc",
+      "patch": "98c89109f72795cabcc5dc88a6660a2bd4c0b29ecc580de308570693956aaedd",
+      "report": "未发现 Spec 缺失、错误实现或范围扩大。对照 #149 current.md:19、22–30、42–44 及 ADR-0083、0087、0023、0027，已审完整 diff 与相关生产调用链。React 三种 Snapshot 通知分别触发 DOM 更新；Node 创建、编辑、Undo/Redo 按原始完整输入和 data identity 断言；ELK 证明增量确实移动，并以已知平移关系验证 Fixed Node 连通布局的世界坐标。Port helper 的所属 Node 选择回归迁入真实 Renderer Input→Session 路径，并覆盖单选、加选和取消；core 只移除字面量自证断言，类型注解仍由 typecheck 包含。已逐项核对 8 类故障的旧绿、新红及真实实现绿日志：三个通知缺失、size/parentId 丢失、Port 输入被忽略、增量 no-op、世界平移丢失；失败均落在对应行为观察上。证据中的 Node/Port/ELK 测试快照与交付版本一致。能力地图链接同步属于测试迁移维护，未改生产行为、API、ADR 或权限。结论限于已检查调用链与上述故障；不是全仓穷举证明。首次完整 bun run check 已 exit 0，但 verify 的 stable=false，收据拒绝。独立比较确认旧、新 binary diff 只在 index 哈希缩写由 7 位变为 8 位处不同；head、tree、文件内容均未变化。报告重绑当前 patch；新的完整 verify 尚待执行，不能把首次通过当作有效交付收据。Spec findings: 0。",
+      "risk": {
+        "level": "high",
+        "rationale": "变更的行为影响局限于测试及对应能力地图链接，未修改生产源码或公开契约；但 .agents/skills/control-nodebraid/references/capabilities.md 命中 pr-risk 的 Agent skill 路径最低 high，必须完整人工审阅及按既有权限合并。",
+        "evidence": "审查绑定当前 head/tree/binary patch；完整 8 文件 diff、#149 current.md:19–30、42–44；evidence/react-snapshot-mutations/results.json 及七份对应日志，evidence/node-editing/rerun-verified/、evidence/port-selection/rerun-verified/ 和 mutation-evidence/layout-elk/ 的旧绿/新红/基线绿原始日志。三组保存的测试快照与当前文件一致；git diff --check 通过。另核对 verification.json 和 check-5717f40e-f44e-41ae-8d9a-23b4bd984b3f.log：首次完整检查 exit 0，但 stable=false，收据拒绝。core.abbrev=7 复得旧摘要，默认/8 位复得新摘要；规范化 index 哈希后两份 diff 完全一致。新尝试仍需真实执行。",
+        "rollback": "撤销本提交的测试与能力地图链接改动即可恢复基线；无生产数据迁移或不可逆外部状态。回滚会同时撤销新增行为回归保护。"
+      }
+    }
+  },
+  "changedFiles": [
+    ".agents/skills/control-nodebraid/references/capabilities.md",
+    "packages/adapter-react/browser-tests/runtime-mount.browser.ts",
+    "packages/adapter-react/browser-tests/runtime-mount.entry.tsx",
+    "packages/core/tests/index.test.ts",
+    "packages/layout-elk/tests/incremental.test.ts",
+    "packages/plugin-interaction/tests/delete-selection-input.test.ts",
+    "packages/plugin-interaction/tests/selection-transition.test.ts",
+    "packages/plugin-node-editing/tests/index.test.ts"
+  ],
+  "risk": {
+    "level": "high",
+    "route": "full-human",
+    "reasons": [
+      "standards: high — 完整变更仅优化测试并修正能力地图导航，不修改产品、公开契约或执行权限；但 .agents/skills/control-nodebraid/references/capabilities.md 属于 skills 路径，按 pr-risk 的路径最低等级必须判为 high。",
+      "spec: high — 变更的行为影响局限于测试及对应能力地图链接，未修改生产源码或公开契约；但 .agents/skills/control-nodebraid/references/capabilities.md 命中 pr-risk 的 Agent skill 路径最低 high，必须完整人工审阅及按既有权限合并。",
+      ".agents/skills/control-nodebraid/references/capabilities.md: minimum high risk."
+    ]
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "react-original-kernel",
+      "acceptance": "Snapshot notification isolation: original-kernel; original muted notifications pass incorrectly, improved muted notifications must fail at the corresponding DOM state.",
+      "command": "bun .tmp/test-effectiveness-browser/original-kernel.browser.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "react-original-session",
+      "acceptance": "Snapshot notification isolation: original-session; original muted notifications pass incorrectly, improved muted notifications must fail at the corresponding DOM state.",
+      "command": "bun .tmp/test-effectiveness-browser/original-session.browser.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "react-original-history",
+      "acceptance": "Snapshot notification isolation: original-history; original muted notifications pass incorrectly, improved muted notifications must fail at the corresponding DOM state.",
+      "command": "bun .tmp/test-effectiveness-browser/original-history.browser.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "react-improved-control",
+      "acceptance": "Snapshot notification isolation: improved-control; original muted notifications pass incorrectly, improved muted notifications must fail at the corresponding DOM state.",
+      "command": "bun .tmp/test-effectiveness-browser/improved-control.browser.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "react-improved-kernel",
+      "acceptance": "Snapshot notification isolation: improved-kernel; original muted notifications pass incorrectly, improved muted notifications must fail at the corresponding DOM state.",
+      "command": "bun .tmp/test-effectiveness-browser/improved-kernel.browser.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-5.log"
+    },
+    {
+      "id": "react-improved-session",
+      "acceptance": "Snapshot notification isolation: improved-session; original muted notifications pass incorrectly, improved muted notifications must fail at the corresponding DOM state.",
+      "command": "bun .tmp/test-effectiveness-browser/improved-session.browser.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-6.log"
+    },
+    {
+      "id": "react-improved-history",
+      "acceptance": "Snapshot notification isolation: improved-history; original muted notifications pass incorrectly, improved muted notifications must fail at the corresponding DOM state.",
+      "command": "bun .tmp/test-effectiveness-browser/improved-history.browser.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-7.log"
+    },
+    {
+      "id": "node-editing-baseline",
+      "acceptance": "Complete Node fields and opaque data survive create/edit/history: baseline; original mutant pass demonstrates the gap; strengthened mutant fails at the behavior assertion.",
+      "command": "python3 evidence/node-editing/rerun.py <checkout> (case baseline)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-8.log"
+    },
+    {
+      "id": "node-editing-baseline-strengthened",
+      "acceptance": "Complete Node fields and opaque data survive create/edit/history: baseline-strengthened; original mutant pass demonstrates the gap; strengthened mutant fails at the behavior assertion.",
+      "command": "python3 evidence/node-editing/rerun.py <checkout> (case baseline-strengthened)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-9.log"
+    },
+    {
+      "id": "node-editing-drop-size",
+      "acceptance": "Complete Node fields and opaque data survive create/edit/history: drop-size; original mutant pass demonstrates the gap; strengthened mutant fails at the behavior assertion.",
+      "command": "python3 evidence/node-editing/rerun.py <checkout> (case drop-size)",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-10.log"
+    },
+    {
+      "id": "node-editing-drop-size-strengthened",
+      "acceptance": "Complete Node fields and opaque data survive create/edit/history: drop-size-strengthened; original mutant pass demonstrates the gap; strengthened mutant fails at the behavior assertion.",
+      "command": "python3 evidence/node-editing/rerun.py <checkout> (case drop-size-strengthened)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-11.log"
+    },
+    {
+      "id": "node-editing-drop-parent",
+      "acceptance": "Complete Node fields and opaque data survive create/edit/history: drop-parent; original mutant pass demonstrates the gap; strengthened mutant fails at the behavior assertion.",
+      "command": "python3 evidence/node-editing/rerun.py <checkout> (case drop-parent)",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-12.log"
+    },
+    {
+      "id": "node-editing-drop-parent-strengthened",
+      "acceptance": "Complete Node fields and opaque data survive create/edit/history: drop-parent-strengthened; original mutant pass demonstrates the gap; strengthened mutant fails at the behavior assertion.",
+      "command": "python3 evidence/node-editing/rerun.py <checkout> (case drop-parent-strengthened)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-13.log"
+    },
+    {
+      "id": "port-selection-baseline",
+      "acceptance": "Renderer Input Port clicks update Session Selection: baseline; original mutant pass demonstrates the gap; strengthened mutant fails at the behavior assertion.",
+      "command": "python3 evidence/port-selection/rerun.py <checkout> (case baseline)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-14.log"
+    },
+    {
+      "id": "port-selection-baseline-public-input",
+      "acceptance": "Renderer Input Port clicks update Session Selection: baseline-public-input; original mutant pass demonstrates the gap; strengthened mutant fails at the behavior assertion.",
+      "command": "python3 evidence/port-selection/rerun.py <checkout> (case baseline-public-input)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-15.log"
+    },
+    {
+      "id": "port-selection-ignore-port-click",
+      "acceptance": "Renderer Input Port clicks update Session Selection: ignore-port-click; original mutant pass demonstrates the gap; strengthened mutant fails at the behavior assertion.",
+      "command": "python3 evidence/port-selection/rerun.py <checkout> (case ignore-port-click)",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-16.log"
+    },
+    {
+      "id": "port-selection-ignore-port-click-public-input",
+      "acceptance": "Renderer Input Port clicks update Session Selection: ignore-port-click-public-input; original mutant pass demonstrates the gap; strengthened mutant fails at the behavior assertion.",
+      "command": "python3 evidence/port-selection/rerun.py <checkout> (case ignore-port-click-public-input)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-17.log"
+    },
+    {
+      "id": "elk-baseline-old",
+      "acceptance": "ELK baseline: old tests; original mutant passes; improved mutant fails on actual movement/world translation.",
+      "command": "bun test /Users/zhou/.codex/local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/baseline/packages/layout-elk/tests (old test snapshot)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-18.log"
+    },
+    {
+      "id": "elk-baseline-new",
+      "acceptance": "ELK baseline: new tests; original mutant passes; improved mutant fails on actual movement/world translation.",
+      "command": "bun test /Users/zhou/.codex/local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/baseline/packages/layout-elk/tests (new test snapshot)",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-19.log"
+    },
+    {
+      "id": "elk-incremental-noop-old",
+      "acceptance": "ELK incremental-noop: old tests; original mutant passes; improved mutant fails on actual movement/world translation.",
+      "command": "bun test /Users/zhou/.codex/local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/incremental-noop/packages/layout-elk/tests (old test snapshot)",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-20.log"
+    },
+    {
+      "id": "elk-incremental-noop-new",
+      "acceptance": "ELK incremental-noop: new tests; original mutant passes; improved mutant fails on actual movement/world translation.",
+      "command": "bun test /Users/zhou/.codex/local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/incremental-noop/packages/layout-elk/tests (new test snapshot)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-21.log"
+    },
+    {
+      "id": "elk-fixed-lost-translation-old",
+      "acceptance": "ELK fixed-lost-translation: old tests; original mutant passes; improved mutant fails on actual movement/world translation.",
+      "command": "bun test /Users/zhou/.codex/local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/fixed-lost-translation/packages/layout-elk/tests (old test snapshot)",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-22.log"
+    },
+    {
+      "id": "elk-fixed-lost-translation-new",
+      "acceptance": "ELK fixed-lost-translation: new tests; original mutant passes; improved mutant fails on actual movement/world translation.",
+      "command": "bun test /Users/zhou/.codex/local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/fixed-lost-translation/packages/layout-elk/tests (new test snapshot)",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-23.log"
+    },
+    {
+      "id": "historical-verification-binding-failure",
+      "acceptance": "Historical verification attempt: full check exited 0, but fetching evidence changed automatic Git diff blob abbreviations, so the wrapper rejected stability. Source head/tree were unchanged; current verification retries the full check under the refreshed review digest.",
+      "command": "bun run agents:run verify <run> <reviews> <decisions> (first attempt)",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-24.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "f7c08185b0dfec9894cd42c281c9b6d2771b2ac2ad988e19cfa5be4ff110bfd8"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "abf25198d81931097e167b30753537a094523c5a19cda539b95e00a31e8c79a2"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "c02ae66815f7514d40783f4667dda29371977685c7533558b121998102ec64e9"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "7005f3dc407a2914c7d08fb1b33c7e792a7dede0aa083d491bf26dc098cf0eda"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "beef395bfd94e976afa418473c39de7c5969892d7917ee681f25eeda14b7b626"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "96f4f869dae7fe159a726468889bc295e76e5630128bb7dd3d14b104601cf2a9"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "d05a9e31eecc47a3b498479354ec488c105ec0d3bb1ff76e89b2668ffa090e32"
+    },
+    {
+      "path": "logs/behavior-6.log",
+      "kind": "log",
+      "sha256": "8cc0c719b6a6b9198d449a7477ab0753c63cf1613f20517632cee990c3937fe7"
+    },
+    {
+      "path": "logs/behavior-7.log",
+      "kind": "log",
+      "sha256": "b903919406066bff2b271a4135a79d718e9222e2d7fd48c06b9d84be0738a467"
+    },
+    {
+      "path": "logs/behavior-8.log",
+      "kind": "log",
+      "sha256": "c20094c3da0b12c9a4fd57597b0f878804ddbaf8338d2628363f44fdcb7b1a01"
+    },
+    {
+      "path": "logs/behavior-9.log",
+      "kind": "log",
+      "sha256": "2e2345e3a5fb41fe0ce6a2f138e58190f54cebcda6abc8cab4807005510eca6b"
+    },
+    {
+      "path": "logs/behavior-10.log",
+      "kind": "log",
+      "sha256": "144c36ab2dc60470ff8fd99d89154f7c81b6a25c5068bafa2118bca0fa3aa74f"
+    },
+    {
+      "path": "logs/behavior-11.log",
+      "kind": "log",
+      "sha256": "994c2b64742f3f8aec5d4aef92f09b5f89f6634106a5e733be62ff06865f0815"
+    },
+    {
+      "path": "logs/behavior-12.log",
+      "kind": "log",
+      "sha256": "ed1228c842b9d01e3e58d44bb5e1d464994f04046db3e06fbe3962fe5966c86e"
+    },
+    {
+      "path": "logs/behavior-13.log",
+      "kind": "log",
+      "sha256": "b90193d915635aba6edf5ec9ca7780045c9ad99fa4b96b04c778a1558899cf16"
+    },
+    {
+      "path": "logs/behavior-14.log",
+      "kind": "log",
+      "sha256": "aac7e758eb46ae68f1364fad6c269052b814a0c9dc10479b56d30da72f49dcf5"
+    },
+    {
+      "path": "logs/behavior-15.log",
+      "kind": "log",
+      "sha256": "a7ba8749db7154951fb8ecd9dfee9cee150dcba7c78ae7008b3c942c3d586fa3"
+    },
+    {
+      "path": "logs/behavior-16.log",
+      "kind": "log",
+      "sha256": "d88bfa99cb35ff4aa3e468432ce3414f1f20821e126d2c0429169ca86138769a"
+    },
+    {
+      "path": "logs/behavior-17.log",
+      "kind": "log",
+      "sha256": "d8fb177eaf06759ef5198bc564575084b9b325b32181b4a3cd1ebbcc73bff873"
+    },
+    {
+      "path": "logs/behavior-18.log",
+      "kind": "log",
+      "sha256": "9da0c1d5e9f65c5f87a14cb678ad8e6d122f7f419f5f93875ed2a7ee47aca8a0"
+    },
+    {
+      "path": "logs/behavior-19.log",
+      "kind": "log",
+      "sha256": "02371da29a76d3a84165148ec739fdfee9eb113702bcb31aff5cbe8dfd8cb2cb"
+    },
+    {
+      "path": "logs/behavior-20.log",
+      "kind": "log",
+      "sha256": "b650bf7870ceae441e4cc35e4ce610ba3cf276e2bac478dc441069a8da174add"
+    },
+    {
+      "path": "logs/behavior-21.log",
+      "kind": "log",
+      "sha256": "cac0af825c82300c8e843d35f24083c501d0c32251ad400778e965c3bd9c61c9"
+    },
+    {
+      "path": "logs/behavior-22.log",
+      "kind": "log",
+      "sha256": "5ab9592f8358b1d153297cc3b14d60cf94c0a8496e655befb102baa7e092f255"
+    },
+    {
+      "path": "logs/behavior-23.log",
+      "kind": "log",
+      "sha256": "644a465445efde8f426bb934eb1159fcf702ac498b5e1584d692d3e003614913"
+    },
+    {
+      "path": "logs/behavior-24.log",
+      "kind": "log",
+      "sha256": "8ea14369133827cae1582c7b36ea54056f0ddc80d9d96e7be9f464b423ac1434"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "f37c8cf477733f1087325cc375e8719abce340be67134369cb00c6bb4a667549"
+    }
+  ]
+}

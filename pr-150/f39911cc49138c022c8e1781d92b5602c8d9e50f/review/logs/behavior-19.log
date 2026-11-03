@@ -1,0 +1,20 @@
+bun test v1.4.2 (744846f84)
+
+../../../local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/baseline/packages/layout-elk/tests/incremental.test.ts:
+(pass) ELK Stress keeps Fixed Nodes and their connected layout in absolute world coordinates [178.48ms]
+(pass) ELK Stress incremental layout uses current positions as a deterministic soft constraint [40.41ms]
+(pass) ELK rejects incremental and Fixed Node requests for unproven algorithms [1.22ms]
+
+../../../local-workflows/nodebraid/runs/issue-149-test-effectiveness/mutation-evidence/layout-elk/baseline/packages/layout-elk/tests/index.test.ts:
+(pass) ELK computes deterministic top-left world positions for a full Layout Input [39.32ms]
+(pass) ELK layered full treats seed zero as the fixed default seed [180.03ms]
+(pass) ELK stress full treats seed zero as the fixed default seed [179.75ms]
+(pass) ELK stress incremental treats seed zero as the fixed default seed [49.98ms]
+(pass) ELK rejects non-integer and unsafe seeds [0.61ms]
+(pass) ELK full layout supports the baseline graph shapes [40.45ms]
+(pass) ELK rejects a non-finite Provider configuration before layout [0.26ms]
+
+ 10 pass
+ 0 fail
+ 27 expect() calls
+Ran 10 tests across 2 files. [766.00ms]

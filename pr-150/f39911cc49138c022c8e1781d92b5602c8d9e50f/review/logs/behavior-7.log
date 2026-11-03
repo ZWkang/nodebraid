@@ -1,0 +1,23 @@
+165 |   const [stdout, stderr, exitCode] = await Promise.all([
+166 |     new Response(process.stdout).text(),
+167 |     new Response(process.stderr).text(),
+168 |     process.exited,
+169 |   ]);
+170 |   assert.equal(exitCode, 0, stderr || stdout);
+               ^
+AssertionError: {"success":false,"data":null,"error":"Evaluation error: Error: React Adapter browser scenario timed out.\n    at waitFor (http://127.0.0.1:52448/runtime-mount.js:17676:15)\n    at async runSnapshotScenario (http://127.0.0.1:52448/runtime-mount.js:17639:5)"}
+
+
+1 !== 0
+
+ generatedMessage: false,
+     actual: 1,
+   expected: 0,
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at runAgentBrowser (/Users/zhou/.codex/worktrees/61f7/cflow/.tmp/test-effectiveness-browser/improved-history.browser.ts:170:10)
+      at evaluateBrowserScenario (/Users/zhou/.codex/worktrees/61f7/cflow/.tmp/test-effectiveness-browser/improved-history.browser.ts:175:24)
+
+Bun v1.4.2 (macOS arm64)

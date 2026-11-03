@@ -1,0 +1,13 @@
+$ bun run scripts/local-agent.ts verify "/Users/zhou/.codex/local-workflows/nodebraid/runs/issue-149-test-effectiveness" "/Users/zhou/.codex/local-workflows/nodebraid/runs/issue-149-test-effectiveness/reviews.json" "/Users/zhou/.codex/local-workflows/nodebraid/runs/issue-149-test-effectiveness/decisions.json"
+120 |       reviews,
+121 |       decisions,
+122 |     };
+123 |     save(join(directory, 'verification.json'), verified);
+124 |     if (check.error) throw check.error;
+125 |     if (check.status !== 0 || !stable) throw new Error(`Engineering check failed or changed source; inspect ${log}`);
+                                                       ^
+error: Engineering check failed or changed source; inspect /Users/zhou/.codex/local-workflows/nodebraid/runs/issue-149-test-effectiveness/check-5717f40e-f44e-41ae-8d9a-23b4bd984b3f.log
+      at /Users/zhou/.codex/worktrees/61f7/cflow/scripts/local-agent.ts:125:50
+
+Bun v1.4.2 (macOS arm64)
+error: script "agents:run" exited with code 1

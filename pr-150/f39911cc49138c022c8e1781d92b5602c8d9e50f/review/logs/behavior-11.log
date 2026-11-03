@@ -1,0 +1,46 @@
+bun test v1.4.2 (744846f84)
+
+tests/index.test.ts:
+52 |       const created = await commands.execute(createNodeCommand, { node: input });
+53 |       expect(created.after).toBe(kernel.read());
+54 |       expect(created.changeSet.changes).toHaveLength(1);
+55 |       expect(history.getSnapshot().canUndo).toBe(true);
+56 |       const source = kernel.read().query.getNode(input.id)!;
+57 |       expect(source).toEqual(input);
+                          ^
+error: expect(received).toEqual(expected)
+
+  {
+    "data": {
+      "label": "one",
+    },
+    "id": "one",
+    "parentId": "parent",
+    "position": {
+      "x": 10,
+      "y": 20,
+    },
+-   "size": {
+-     "height": 60,
+-     "width": 140,
+-   },
+    "type": "card",
+  }
+
+- Expected  - 4
++ Received  + 0
+
+      at <anonymous> (/private/var/folders/0g/h82b8dx13812d6pq14b0g8400000gn/T/nodebraid-node-editing-mutation-rxbrpqnk/drop-size/tests/index.test.ts:57:22)
+(fail) @nodebraid/plugin-node-editing > creates a complete Node and updates only its data with one Undo per commit [10.17ms]
+(pass) @nodebraid/plugin-node-editing > keeps a same-data update net zero and accepts evidence across unrelated commits [2.74ms]
+(pass) @nodebraid/plugin-node-editing > rejects stale evidence after move without changing graph or History [5.15ms]
+(pass) @nodebraid/plugin-node-editing > rejects stale evidence after data without changing graph or History [1.15ms]
+(pass) @nodebraid/plugin-node-editing > rejects stale evidence after recreate without changing graph or History [0.92ms]
+(pass) @nodebraid/plugin-node-editing > rejects stale evidence after undo-redo without changing graph or History [1.33ms]
+(pass) @nodebraid/plugin-node-editing > preserves original Kernel failures, cancellation and command lifecycle [1.15ms]
+(pass) @nodebraid/plugin-node-editing > reads declared inputs once and keeps accessor failures and opaque data identity [1.23ms]
+
+ 7 pass
+ 1 fail
+ 31 expect() calls
+Ran 8 tests across 1 file. [46.00ms]
