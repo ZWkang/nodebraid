@@ -173,8 +173,23 @@ test.each(['initial', 'append', 'main-sync'] as const)(
         ],
       };
       json('.tmp/snapshot.json', snapshot);
-      expect(JSON.parse(invoke(cli, 'evaluate', '.tmp/run', '.tmp/snapshot.json').stdout).status).toBe('ready');
+      expect(JSON.parse(invoke(cli, 'evaluate', '.tmp/run', '.tmp/snapshot.json').stdout).status).toBe(
+        'waiting-evidence',
+      );
+      json('.tmp/receipt.json', {
+        head,
+        evidenceCommit: 'e'.repeat(40),
+        url: 'https://github.com/ZWkang/nodebraid/pull/71',
+        body: `pr-71/${head}/review/report.md`,
+      });
+      expect(
+        JSON.parse(invoke(cli, 'evaluate', '.tmp/run', '.tmp/snapshot.json', '.tmp/receipt.json').stdout).status,
+      ).toBe('ready');
       json('.tmp/snapshot.json', { ...snapshot, baseRefOid: mode === 'initial' ? '0'.repeat(40) : parent });
+      expect(
+        JSON.parse(invoke(cli, 'evaluate', '.tmp/run', '.tmp/snapshot.json', '.tmp/receipt.json').stdout).status,
+      ).toBe('ready');
+      json('.tmp/snapshot.json', { ...snapshot, baseRefName: 'release' });
       expect(JSON.parse(invoke(cli, 'evaluate', '.tmp/run', '.tmp/snapshot.json').stdout).status).toBe(
         'waiting-verification',
       );

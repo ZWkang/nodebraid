@@ -23,9 +23,8 @@ scope, test seams and acceptance criteria. Preserve unresolved questions,
 local-only or paused execution, and another active owner's work.
 
 Read the existing PR and local run before drafting steps so resumed work reuses
-its plan and evidence. Historical child Issues and stacked PRs remain traceable;
-check their actual main integration when relevant without creating replacement
-Issues or bulk rewriting those relationships. Title case is not approval.
+its plan and evidence. Historical child Issues and stacked PRs follow
+[legacy recovery](../../../docs/agents/legacy-recovery.md). Title case is not approval.
 
 ### 2. Explore the codebase
 
@@ -86,14 +85,10 @@ Ready for merge review requires evidence for all pre-merge steps and acceptance,
 plus current-head CI, reviews and report publication. Record any post-merge
 prerequisite in the step's acceptance and handoff; those steps stay pending until
 it holds. Ready does not require the PR already merged or those steps completed.
-Closing the spec requires actual main integration, all remaining acceptance and
-an empty local frontier. The frontier selects dependency candidates; the
-coordinator also checks external prerequisites and permission before acting.
-`verify` success alone does not establish these delivery facts.
+The frontier selects dependency candidates; the coordinator also checks external
+prerequisites and permission before acting. `verify` success alone does not
+establish these delivery facts.
 
-Update the same PR with a direct reference to the spec Issue. Use `Refs #N`
-while post-merge acceptance remains; `Fixes #N` is appropriate only when merge
-is the last remaining condition and closure is authorized. Follow the tracker's
-closing-link checks. Close only after actual main integration, completed spec
-acceptance and existing authorization. Local ticket completion does not publish
-a GitHub comment or close an Issue by itself.
+Update the same PR with a direct reference to the spec Issue and close it only
+under the tracker's [closing rule](../../../docs/agents/issue-tracker.md#task-state).
+Local ticket completion does not publish a GitHub comment or close an Issue by itself.

@@ -8,6 +8,7 @@
 ## 入口与产物
 
 ```bash
+bun run agents:preview --base <review-base-sha> --plan [--all]   # 只输出选中场景 JSON
 bun run agents:preview --base <review-base-sha> --out <empty-output-dir> [--all]
 bun run agents:report <run-dir> <output-dir>
 bun run agents:publish-evidence prepare <output-dir> ZWkang/nodebraid <pr-number> <published-head-sha>
@@ -124,14 +125,23 @@ bun run agents:publish-evidence <output-dir> <pr-number> <published-head-sha>
 
 此路径通过 GitHub API 读回 current head/tree、追加证据 commit、更新正文并回读，成功后
 写入本地 `publication-receipt.json`。这些环境变量用于 GitHub 发布，不是模型 API。
-连接器路径保存同等实际回执；任一步失败、权限不足或 head 变化都显式记录，不能用静态链接
-或本地文件代替成功结果。
+任一步失败、权限不足或 head 变化都显式记录，不能用静态链接或本地文件代替成功结果。
+
+### 发布回执
+
+`publication-receipt.json` 为 `{head, evidenceCommit, url, body}`：`head` 是实际发布的源
+head，`evidenceCommit` 是证据分支上新 commit 的完整 SHA，`url` 是 PR 地址，`body` 是更新后
+**回读**得到的完整 PR 正文。连接器路径使用第 6 步的实际回读结果写入同样字段，不手写或从
+plan 复制。`agents:run evaluate` 要求该回执指向当前 PR head，且正文包含
+`pr-<number>/<head>/review/report.md` 报告链接；否则返回 `waiting-evidence`。回执只记录
+发布与回读的事实，不代替审查或完整检查。
 
 ## CI 权限与保存位置
 
 [`Checks`](../../.github/workflows/test.yml) 的 `preview` job checkout 确切 PR head，
-仅有 `contents: read`，不持久化 Git 凭据。它执行 collector，并在失败时也尝试上传
-`pr-evidence` artifact；未产出文件会明确失败。
+仅有 `contents: read`，不持久化 Git 凭据。它先用 `agents:preview --plan` 计算场景；
+没有选中场景时跳过 Chromium 与 ffmpeg 安装，collector 仍产出 `not-applicable` manifest。
+随后执行 collector，并在失败时也尝试上传 `pr-evidence` artifact；未产出文件会明确失败。
 
 [`Publish PR evidence`](../../.github/workflows/pr-evidence.yml) 通过 `workflow_run`
 接收完成的 Checks。具有写权限的 publisher 只从默认分支 `main` checkout 受信任代码，
@@ -160,11 +170,9 @@ workflow run、证据分支与 PR 回读结果前，只能报告本地实现/验
 
 ## 交付判断与边界
 
-每次报告 ready 前，执行者必须确认完整报告已实际发布到当前 PR head，并保存可访问报告
-URL、source head 与 evidence commit；有可见变化时同时核验 preview 或明确未完成原因。
-当前 `agents:run evaluate` 校验代码执行记录、CI 与反馈，**尚未自动校验证据展示回执**。
-因此它返回 `ready` 或 `autoMergeCandidate` 不是报告/媒体已发布或合并前 ticket/验收
-已完成的证明，执行者仍须完成上述发布与回读，以及本地工作流规定的合并前核对。
+每次报告 ready 前，完整报告必须已实际发布到当前 PR head 并保存[发布回执](#发布回执)；
+`agents:run evaluate` 校验该回执。有可见变化时还须核验 preview 或明确未完成原因。
+`evaluate` 不读取本地 ticket 完成记录，合并前 ticket/验收仍由协调者核对。
 
 该实现沿用现有本地 Codex 调度，不增加模型 API、外部模型调用或新调度器；审阅和合并
 按 [pr-risk](../../.agents/skills/pr-risk/SKILL.md) 路由。GitHub 分支保护/合并门禁仍是独立 [Issue #10](https://github.com/ZWkang/nodebraid/issues/10)，

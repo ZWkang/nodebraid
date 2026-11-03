@@ -166,7 +166,27 @@ test('risk routes a verified current head without replacing feedback or CI readi
     localHead: verified.head,
     parent: task.base,
   };
-  const evaluate = (current = snapshot, run = verified) => evaluateVerifiedRun(task, run, publication, current);
+  const receipt = {
+    head: publication.head,
+    evidenceCommit: sha('9'),
+    url: `https://github.com/ZWkang/nodebraid/pull/${snapshot.number}`,
+    body: `[report](https://github.com/ZWkang/nodebraid/blob/pr-evidence/pr-${snapshot.number}/${publication.head}/review/report.md)`,
+  };
+  const evaluate = (current = snapshot, run = verified, ...evidence: [typeof receipt?]) =>
+    evaluateVerifiedRun(task, run, publication, current, evidence.length ? evidence[0] : receipt);
+  for (const evidence of [
+    undefined,
+    { ...receipt, head: sha('f') },
+    { ...receipt, evidenceCommit: 'pending' },
+    { ...receipt, url: 'https://github.com/ZWkang/nodebraid/pull/1' },
+    { ...receipt, body: 'Preview only; no report link.' },
+  ])
+    expect(evaluate(snapshot, verified, evidence)).toMatchObject({
+      status: 'waiting-evidence',
+      risk: { level: 'low' },
+      autoMergeCandidate: false,
+    });
+  expect(evaluate({ ...snapshot, isDraft: true }, verified, undefined).status).not.toBe('waiting-evidence');
   expect(evaluate()).toMatchObject({
     status: 'ready',
     risk: { level: 'low', route: 'automatic' },
@@ -199,10 +219,12 @@ test('risk routes a verified current head without replacing feedback or CI readi
       ],
     },
     { ...snapshot, isDraft: true },
-    { ...snapshot, baseRefOid: sha('f') },
+    { ...snapshot, mergeable: 'CONFLICTING' },
+    { ...snapshot, baseRefName: 'release' },
     { ...snapshot, headRefOid: sha('f') },
   ])
     expect(evaluate(current).autoMergeCandidate).toBe(false);
+  expect(evaluate({ ...snapshot, baseRefOid: sha('f') })).toMatchObject({ status: 'ready', autoMergeCandidate: true });
   expect(evaluate(snapshot, { ...verified, changedFiles: ['AGENTS.md'] })).toMatchObject({
     risk: { level: 'high' },
     autoMergeCandidate: false,

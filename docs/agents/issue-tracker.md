@@ -161,40 +161,19 @@ another closing association. Use `Fixes #N` only when merge is the last remainin
 acceptance condition and closure is already authorized. See GitHub's
 [closing-link behavior](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue).
 
-## Local tickets and execution
+## Local tickets
 
-`to-tickets` writes the plan into the existing `input.json.plan` before
-`agents:run prepare`. After preparation, `prepared-task.json.plan` is the immutable
-plan of record: `[{id, blockedBy, acceptance}]`. Use descriptive local IDs, not
-GitHub Issue numbers. The run lives outside disposable worktrees, normally at
-`$CODEX_HOME/local-workflows/nodebraid/runs/<run-id>/`. Optional `plan.md` explains
-the same plan; it does not maintain another completion list.
-
-Update `completed-steps.json` only from actual execution evidence in that run.
-`agents:run frontier <run-dir> <completed-steps.json>` returns the local tickets
-whose dependencies are complete and rejects unknown steps, cycles and completion
-past an unfinished blocker. Resume the same prepared task for identical input;
-a changed plan/request needs a new run, with earlier evidence retained and
-reassessed instead of silently copying completion IDs.
-
-Before ready for merge review, verify every pre-merge step and acceptance result,
-current-head checks, reviews and report publication. A step that requires main
-integration stays pending with that prerequisite stated in its saved acceptance
-and the handoff. Neither actual main integration nor an empty post-merge frontier
-is a condition for this pre-merge ready state.
+`to-tickets` writes the plan into `input.json.plan` before `agents:run prepare`;
+afterwards `prepared-task.json.plan` is the immutable plan of record. Plan,
+completion evidence and `frontier` follow the
+[command contract](./agentic-workflows.md#prepare-与-frontier); execution order
+follows the [local workflow](../../.agents/workflows/local-agent.md). A ticket
+that needs main integration stays pending with that prerequisite in its saved
+acceptance; it does not block the pre-merge ready state.
 
 Before closing the Issue, check actual main integration, an empty local frontier
-and evidence for all remaining steps and whole-Issue acceptance. Complete review,
-publication or merge steps only after their operations succeed. A frontier is a
-dependency candidate list, not execution permission or proof that external
-prerequisites hold. `verify` and `evaluate` do not read ticket progress; the
-coordinator records these phase-specific checks explicitly.
-
-For new deliveries, `reconcile` receives `specs: []` and one `tasks` entry for
-each canonical GitHub Issue, with `parent: null`. Its `blockers` are complete
-pages of genuine external Issue dependencies (`[[]]` when empty), never local
-ticket IDs. `reconcile.frontier` selects GitHub deliveries; the run's `frontier`
-command selects local steps. See the full contract in the local workflow guide.
+and evidence for all remaining steps and whole-Issue acceptance. Local ticket
+completion does not independently prove delivery or authorize closure.
 
 ## When a skill says "publish to the issue tracker"
 
@@ -206,30 +185,8 @@ Implementation-ticket output goes to the local run as above, not GitHub or
 
 Read the canonical spec Issue and full discussion, then the requested local step
 in its prepared plan and completion evidence. Refresh the Issue's local archive.
-An explicitly referenced historical GitHub ticket or local file remains readable.
-
-## Historical native relationships
-
-Existing parent/child Issues and stacked PRs retain their IDs, discussions,
-relationships and evidence. The legacy `specs` aggregate in `reconcile` is for
-these records; it still verifies native children, acceptance and actual main
-integration. Do not bulk delete, close or recreate old work to fit the new model.
-An existing feature-branch delivery may need recovery on its established PR chain;
-that history does not make stacked PRs the default for new specs. Once a selected
-follow-up is accepted on main, its old PR remains history, not another queue item.
-
-If an existing relationship requires an authorized repair, use numeric database
-IDs, not issue numbers or GraphQL node IDs:
-
-- Resolve an ID: `gh api repos/ZWkang/nodebraid/issues/<number> --jq .id`.
-- Add a child: `gh api --method POST repos/ZWkang/nodebraid/issues/<parent-number>/sub_issues -F sub_issue_id=<child-database-id>`.
-- Add a blocker: `gh api --method POST repos/ZWkang/nodebraid/issues/<child-number>/dependencies/blocked_by -F issue_id=<blocker-database-id>`.
-- List children: `gh api --paginate repos/ZWkang/nodebraid/issues/<parent-number>/sub_issues`.
-- List blockers: `gh api --paginate repos/ZWkang/nodebraid/issues/<child-number>/dependencies/blocked_by`.
-
-Read back relationships after writing them. If an API or permission is
-unavailable, report the failed relationship explicitly rather than silently
-replacing it with a text-only link.
+An explicitly referenced historical GitHub ticket or local file remains readable;
+see [legacy recovery](./legacy-recovery.md) for parent/child Issues and stacked PRs.
 
 ## Wayfinding operations
 
@@ -242,36 +199,13 @@ spec back to that Issue; completing a local step does not close the Issue.
 ## Autonomous delivery
 
 The investigation comment records the base commit, public contract, reproduction
-command, expected/actual results and acceptance criteria. An approved-spec Issue
-contains the spec and its accepted scope. Agent local decomposition, implementation and review
-do not require repeated human approval within that scope.
-
-The local chat heartbeat reads ready issues and new evidence periodically. No
-GitHub label event or API workflow dispatch is required to pass a confirmed task
-to implementation. Unchanged issue fingerprints are not repeatedly investigated.
-Main-change discovery first reproduces and records a defect, then implementation
-reads that original issue and its acceptance criteria.
-
-Keep the source Issue open while its PR is in review or awaiting main integration.
-Link directly to that spec Issue using the closing rule above. Reconcile the actual merge and acceptance
-before reporting resolution.
-
-Delivery titles start with `[local-agent] ` (legacy `[agent] ` is also recognized) and use `feat/issue-N` branches.
-The existing `feat/issue-N-integration` form remains recognized for historical recovery. This opts
-the existing PR into current-head CI/review maintenance. New feedback is
-investigated, verified fixes append to the same branch, and evidence returns
-to the PR. Design changes and disputed reviews remain visible for discussion.
-Review and merge follow the canonical [PR risk policy](../../.agents/skills/pr-risk/SKILL.md).
-Only a verified low-risk candidate may use the immediate merge exemption after
-the coordinator confirms current-head report readback and all pre-merge acceptance.
-Medium/high and unclassified PRs retain human review and merge. Existing explicit
-single-PR authorization remains applicable, but never permits self-approval,
-dismissing reviews, bypassing checks or enabling GitHub auto-merge queues.
-The exemption grants no Issue-closing authority: apply the independent closure
-and automatic-closing-link rules above.
-
-Workflow setup, credentials, event behavior and verification are documented in
-[agentic-workflows.md](./agentic-workflows.md).
+command, expected/actual results and acceptance criteria. Defects sharing a root
+cause with an open Issue extend that Issue instead of opening another one. Within
+an approved scope, Agent decomposition, implementation and review do not require
+repeated human approval. Delivery PRs use `[local-agent] ` titles and
+`feat/issue-N` branches; review and merge follow the
+[PR risk policy](../../.agents/skills/pr-risk/SKILL.md), which grants no
+Issue-closing authority.
 
 ## Discussion workflow
 

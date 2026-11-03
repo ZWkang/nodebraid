@@ -18,11 +18,11 @@ approved spec and actual verification evidence, bound to the review's
 verification coverage and rollback together. Small patches, Markdown extensions,
 green CI or one passing review do not establish low risk.
 
-| Level    | Decision                                                                                                                                                                                                                                                                                                         | Route                                                                                                    |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `low`    | Local, understood impact; no public contract or sensitive boundary change; sufficient concrete verification; straightforward rollback with no destructive effect. Both reviewers must explicitly agree. Ordinary prose corrections or additive regression tests may qualify when they meet all these conditions. | Candidate for immediate merge without human review, after the existing delivery requirements below pass. |
-| `medium` | Behavior, compatible public API, Runtime lifecycle, concurrency or resource ownership changes; or remaining uncertainty that prevents a low classification.                                                                                                                                                      | Focused human review of the affected behavior and boundaries, then human merge.                          |
-| `high`   | Permissions, credentials, destructive state changes, breaking contracts, difficult rollback, or changes to Agent instructions, review, validation, build, dependency or publication policy.                                                                                                                      | Full human review and human merge.                                                                       |
+| Level    | Decision                                                                                                                                                                                                                                                                                                 | Route                                                                                                    |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `low`    | Local, understood impact; no public contract or sensitive boundary change; sufficient concrete verification; straightforward rollback with no destructive effect. Both reviewers must explicitly agree. Ordinary prose corrections or test-only changes may qualify when they meet all these conditions. | Candidate for immediate merge without human review, after the existing delivery requirements below pass. |
+| `medium` | Behavior, compatible public API, Runtime lifecycle, concurrency or resource ownership changes; or remaining uncertainty that prevents a low classification.                                                                                                                                              | Focused human review of the affected behavior and boundaries, then human merge.                          |
+| `high`   | Permissions, credentials, destructive state changes, breaking contracts, difficult rollback, or changes to Agent instructions, review, validation, build, dependency or publication policy.                                                                                                              | Full human review and human merge.                                                                       |
 
 Path floors can only raise risk. Agent instructions, skills/workflows,
 `docs/agents/`, `.github/`, `scripts/`, and dependency/build/validation/publication
@@ -32,6 +32,9 @@ in `packages/*/artifacts/`. Public framework implementation in
 `changedFiles` from the same real Git comparison as the complete reviewed patch;
 renames must account for the old and new paths. A path outside these groups does
 not establish low risk: the reviewers still assess its meaning and effects.
+Test-only changes (`tests/`, `packages/*/tests/`, `browser-tests/`) have no path
+floor, whether they add or modify tests. Both reviewers decide whether such a change is low;
+a test that weakens, removes or skips an assertion is not low.
 Changing this policy or its enforcement is itself `high` and cannot use the
 new exemption to merge itself.
 
@@ -60,17 +63,16 @@ evidence and rollback, and the human attention still required. `evaluate` keeps
 its existing readiness status and adds `risk: {level, route, reasons}` and
 `autoMergeCandidate`. Routes are `automatic` for low, `quick-human` for medium,
 and `full-human` for high or unclassified; `reasons` is a string array.
-`autoMergeCandidate` is true only for a `ready` low-risk result. Candidate status proves neither report publication/readback
-nor pre-merge ticket completion; those remain the coordinator's explicit checks.
+`autoMergeCandidate` is true only for a `ready` low-risk result; `ready` requires the
+current-head report publication receipt. Candidate status does not prove pre-merge
+ticket completion; that remains the coordinator's explicit check.
 
 ## Execute the route
 
 The low-risk route authorizes only a managed PR's immediate merge to `main` after
 all existing requirements pass at the current head. Before writing, refresh the
 complete Issue/PR discussion, current head and target, CI, review states and
-mergeability. Confirm the published report's current-head readback and saved URL,
-source head and evidence commit, and every pre-merge local ticket and acceptance
-result. Keep post-merge acceptance pending with its prerequisite visible.
+mergeability. Confirm every pre-merge local ticket and acceptance result. Keep post-merge acceptance pending with its prerequisite visible.
 
 Any explicit hold, pause, draft, unresolved discussion, active changes request,
 required human approval, failed/pending check, missing evidence or stale identity
