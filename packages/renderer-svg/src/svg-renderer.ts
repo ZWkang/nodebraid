@@ -44,16 +44,24 @@ import {
   renderReset,
   setElementAttribute,
   setSelected,
+  syncConnectionTargets,
 } from './svg-projection';
 import { acceptInteractionProjection, isInteractionCompatibleWithDocument } from './interaction-projection';
 import { SvgRendererError } from './svg-renderer-error';
 import { createNodeContentBuilder } from './node-content';
 import { type AffineMatrix, formatSvgMatrix, readTargetMatrix } from './target-mapping';
+import {
+  createEdgeGeometries,
+  resolveEdgePresentations,
+  type EdgeGeometries,
+  type EdgePresentations,
+} from './edge-geometry';
+import { applyRoutedEdgeElements, prepareRoutedEdgeElements } from './edge-projection';
 
 const targetReservations = new WeakSet<SVGSVGElement>();
 
 export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRenderer {
-  const { target, edgeHitTolerance, connectionAnchorHitTolerance, createNodeContent } = validateConfig(config);
+  const { target, edgeHitTolerance, connectionAnchorHitTolerance, createNodeContent, edges } = validateConfig(config);
   const nodeContent = createNodeContent === undefined ? undefined : createNodeContentBuilder(createNodeContent);
   const inputPolicies = normalizeInputPolicies(config.input);
   readTargetMatrix(target, 'INVALID_TARGET');
@@ -89,6 +97,8 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
   let acceptedInteraction: InteractionProjection | null = null;
   let baselineSnapshot: CanvasSnapshot | undefined;
   let acceptedPorts: PortSnapshot | undefined;
+  let acceptedEdgePresentations: EdgePresentations | undefined;
+  let acceptedEdgeGeometries: EdgeGeometries | undefined;
   let projectionOutOfSync = false;
   let observedResizeError: unknown;
   let disposePromise: Promise<void> | undefined;
@@ -154,7 +164,16 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
     session: SessionSnapshot,
     journal: DomMutationJournal,
     targetMatrix?: AffineMatrix,
-  ): void => {
+    presentations = acceptedEdgePresentations,
+    preparedGeometries?: EdgeGeometries,
+  ): EdgeGeometries | undefined => {
+    const worldChanged = previous !== next && (previous?.type === 'node-drag' || next?.type === 'node-drag');
+    const recompute = presentations !== undefined && preparedGeometries === undefined && worldChanged;
+    const effective = createEffectiveSnapshot(baseline, next);
+    const geometries =
+      preparedGeometries ??
+      (recompute ? createEdgeGeometries(effective, ports, presentations!) : acceptedEdgeGeometries);
+    const edgeElements = recompute ? prepareRoutedEdgeElements(document, geometries!) : undefined;
     applySession(session, journal, targetMatrix);
     if (previous?.type === 'node-drag') {
       applyNodeDragProjection(
@@ -171,6 +190,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         nodesLayer,
         ports,
         journal,
+        presentations !== undefined,
       );
     }
     if (previous?.type === 'connection-preview' && next?.type !== 'connection-preview') {
@@ -179,20 +199,25 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
     if (previous?.type === 'box-selection' && next?.type !== 'box-selection') {
       clearBoxSelection(interactionLayer);
     }
+    if (presentations && (worldChanged || preparedGeometries)) {
+      syncConnectionTargets(effective.nodes, document, interactionLayer, ports, journal);
+    }
     switch (next?.type) {
       case 'node-drag':
-        applyNodeDragProjection(next, baseline, edgesLayer, nodesLayer, ports, journal);
+        applyNodeDragProjection(next, baseline, edgesLayer, nodesLayer, ports, journal, presentations !== undefined);
         break;
       case 'viewport-pan':
         applySession({ selection: session.selection, viewport: next.viewport }, journal, targetMatrix);
         break;
       case 'connection-preview':
-        applyConnectionPreview(next, baseline, ports, interactionLayer, journal);
+        applyConnectionPreview(next, baseline, ports, interactionLayer, journal, edges?.previewPath);
         break;
       case 'box-selection':
         applyBoxSelection(next, interactionLayer, journal);
         break;
     }
+    if (edgeElements) applyRoutedEdgeElements(edgeElements, edgesLayer, journal);
+    return geometries;
   };
 
   const refreshProjectionMapping = (): AffineMatrix => {
@@ -442,9 +467,22 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         const targetMatrix = readTargetMatrix(target, 'TARGET_UNAVAILABLE');
         const nextBaseline = cloneCanvasSnapshot(acceptedUpdate.view.snapshot);
         const nextPorts = acceptPortSnapshot(acceptedUpdate.ports, acceptedUpdate.view.snapshot);
+        const nextPresentations = edges ? resolveEdgePresentations(nextBaseline, edges) : undefined;
+        const nextGeometries = nextPresentations
+          ? createEdgeGeometries(nextBaseline, nextPorts, nextPresentations)
+          : undefined;
         const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
         try {
-          renderReset(acceptedUpdate.view, document, edgesLayer, nodesLayer, interactionLayer, nextPorts, nodeContent);
+          renderReset(
+            acceptedUpdate.view,
+            document,
+            edgesLayer,
+            nodesLayer,
+            interactionLayer,
+            nextPorts,
+            nodeContent,
+            nextGeometries,
+          );
           if (acceptedSession) applySession(acceptedSession, journal, targetMatrix);
         } catch (error) {
           const rollbackErrors = journal.rollback();
@@ -456,6 +494,8 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         }
         baselineSnapshot = nextBaseline;
         acceptedPorts = nextPorts;
+        acceptedEdgePresentations = nextPresentations;
+        acceptedEdgeGeometries = nextGeometries;
         acceptedInteraction = null;
         projectionOutOfSync = false;
         observedResizeError = undefined;
@@ -464,6 +504,8 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         const targetMatrix = readTargetMatrix(target, 'TARGET_UNAVAILABLE');
         const session = acceptedSession;
         const nextPorts = acceptPortSnapshot(acceptedUpdate.ports, acceptedUpdate.commit.after.snapshot);
+        const nextBaseline = cloneCanvasSnapshot(acceptedUpdate.commit.after.snapshot);
+        const nextPresentations = edges ? resolveEdgePresentations(nextBaseline, edges) : undefined;
         const nextInteraction = isInteractionCompatibleWithDocument(
           acceptedInteraction,
           acceptedUpdate.commit.after.snapshot,
@@ -471,6 +513,9 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         )
           ? acceptedInteraction
           : null;
+        const nextGeometries = nextPresentations
+          ? createEdgeGeometries(createEffectiveSnapshot(nextBaseline, nextInteraction), nextPorts, nextPresentations)
+          : undefined;
         try {
           applyCommit(
             acceptedUpdate.commit,
@@ -482,6 +527,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
             interactionLayer,
             nextPorts,
             nodeContent,
+            nextGeometries,
             (journal) => {
               if (session) {
                 applyInteractionProjection(
@@ -492,6 +538,8 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
                   session,
                   journal,
                   targetMatrix,
+                  nextPresentations,
+                  nextGeometries,
                 );
               }
             },
@@ -500,8 +548,10 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
           if (error instanceof ProjectionRollbackError) projectionOutOfSync = true;
           throw error;
         }
-        baselineSnapshot = cloneCanvasSnapshot(acceptedUpdate.commit.after.snapshot);
+        baselineSnapshot = nextBaseline;
         acceptedPorts = nextPorts;
+        acceptedEdgePresentations = nextPresentations;
+        acceptedEdgeGeometries = nextGeometries;
         acceptedInteraction = nextInteraction;
       }
     },
@@ -524,8 +574,9 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
           ? null
           : acceptedInteraction;
       const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
+      let nextGeometries: EdgeGeometries | undefined;
       try {
-        applyInteractionProjection(
+        nextGeometries = applyInteractionProjection(
           acceptedInteraction,
           nextInteraction,
           baselineSnapshot,
@@ -543,6 +594,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
       }
       acceptedSession = accepted;
       acceptedInteraction = nextInteraction;
+      acceptedEdgeGeometries = nextGeometries;
     },
     updateInteraction(projection: InteractionProjection | null): void {
       assertActive();
@@ -560,8 +612,9 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
           ? null
           : acceptInteractionProjection(projection, baselineSnapshot, acceptedPorts, acceptedSession);
       const journal = new DomMutationJournal(edgesLayer, nodesLayer, interactionLayer);
+      let nextGeometries: EdgeGeometries | undefined;
       try {
-        applyInteractionProjection(
+        nextGeometries = applyInteractionProjection(
           acceptedInteraction,
           accepted,
           baselineSnapshot,
@@ -578,6 +631,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         throw error;
       }
       acceptedInteraction = accepted;
+      acceptedEdgeGeometries = nextGeometries;
     },
     subscribeInput(listener: RendererInputListener, decideDisposition?: RendererInputDispositionListener): () => void {
       assertActive();
@@ -620,6 +674,7 @@ export function createSvgRenderer(config: Readonly<SvgRendererConfig>): CanvasRe
         createEffectiveSession(acceptedSession, acceptedInteraction),
         edgeHitTolerance,
         connectionAnchorHitTolerance,
+        acceptedEdgeGeometries,
       );
     },
     capturePointer(pointerId: number): void {

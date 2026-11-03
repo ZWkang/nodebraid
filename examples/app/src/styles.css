@@ -403,8 +403,33 @@ h1 {
 
 .nodebraid-renderer-svg__edge,
 .nodebraid-renderer-svg__connection-preview {
+  color: #7180a0;
   stroke: #7180a0;
   stroke-width: 2;
+}
+
+[data-nodebraid-edge-path] {
+  fill: none;
+}
+
+[data-nodebraid-edge-arrow] {
+  fill: currentColor;
+  stroke: none;
+}
+
+[data-nodebraid-edge-label] {
+  fill: currentColor;
+  stroke: #f8faff;
+  stroke-width: 4;
+  paint-order: stroke;
+  font-size: 12px;
+  text-anchor: middle;
+}
+
+.nodebraid-renderer-svg__edge[data-nodebraid-selected='true'] {
+  color: #2448c6;
+  stroke: #2448c6;
+  stroke-width: 3;
 }
 
 .nodebraid-renderer-svg__box-selection {
@@ -466,7 +491,17 @@ h1 {
 
   .nodebraid-renderer-svg__edge,
   .nodebraid-renderer-svg__connection-preview {
+    color: #8f9bb7;
     stroke: #8f9bb7;
+  }
+
+  [data-nodebraid-edge-label] {
+    stroke: #11182b;
+  }
+
+  .nodebraid-renderer-svg__edge[data-nodebraid-selected='true'] {
+    color: #b7c6ff;
+    stroke: #b7c6ff;
   }
 
   .nodebraid-renderer-svg__box-selection {

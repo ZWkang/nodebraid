@@ -3,14 +3,14 @@
 These six user paths are implemented by `scripts/collect-preview.ts` against the
 production `/basic-svg?lang=en` page. `--all` executes each once in a fresh context.
 
-| Scene | Observable proof |
-| --- | --- |
-| [Node authoring](node-authoring.md) | Native placement, custom SVG content, Apply/Undo/Redo and a real authored-Document file round trip. |
-| [Viewport](viewport.md) | Zoom changes while Document revision stays unchanged; Reset restores 1.00×. |
-| [Selection and History](selection-history.md) | Duplicate adds a selected Node; Undo/Redo restores the documented Node counts. |
-| [Port connection](port-connection.md) | A source-to-target drag shows Connection Preview and commits an Edge. |
-| [Document files](document-files.md) | A downloaded complete graph survives reopening/import, starts fresh History and supports further editing. |
-| [Clipboard](clipboard.md) | Native Copy/Paste crosses the actual clipboard boundary and selects the pasted Node. |
+| Scene                                         | Observable proof                                                                                                                     |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| [Node authoring](node-authoring.md)           | Native placement, custom SVG content, Apply/Undo/Redo and a real authored-Document file round trip.                                  |
+| [Viewport](viewport.md)                       | Zoom changes while Document revision stays unchanged; Reset restores 1.00×.                                                          |
+| [Selection and History](selection-history.md) | Duplicate adds a selected Node; Undo/Redo restores the documented Node counts.                                                       |
+| [Port connection](port-connection.md)         | Orthogonal/Bezier paths, labels and arrows; repeated native connection creates separate parallel paths, each independently selected. |
+| [Document files](document-files.md)           | A downloaded complete graph survives reopening/import, starts fresh History and supports further editing.                            |
+| [Clipboard](clipboard.md)                     | Native Copy/Paste crosses the actual clipboard boundary and selects the pasted Node.                                                 |
 
 This is a verification map of current Examples behavior, not a product roadmap.
 Basic SVG also has a manual Auto layout control (Dagre/full/LR). Its browser suite

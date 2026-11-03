@@ -73,6 +73,7 @@ export function resolveEdgeEndpointPoint(
   endpoint: EdgeEndpoint,
   role: PortRole,
   edgeId: string,
+  boundary = false,
 ): Point {
   const node = nodesById.get(endpoint.nodeId);
   if (!node?.size) {
@@ -83,7 +84,7 @@ export function resolveEdgeEndpointPoint(
   }
   if (endpoint.portId === undefined) {
     return Object.freeze({
-      x: node.position.x + node.size.width / 2,
+      x: node.position.x + (boundary ? (role === 'source' ? node.size.width : 0) : node.size.width / 2),
       y: node.position.y + node.size.height / 2,
     });
   }

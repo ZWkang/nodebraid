@@ -1,4 +1,4 @@
-import type { NodeId, Size } from '@nodebraid/kernel';
+import type { CanvasEdge, NodeId, Size } from '@nodebraid/kernel';
 
 export interface SvgDomEventPolicy {
   readonly preventDefault?: boolean;
@@ -18,6 +18,19 @@ export interface SvgRendererConfig {
   readonly connectionAnchorHitTolerance?: number;
   readonly input?: SvgInputPolicies;
   readonly createNodeContent?: SvgNodeContentFactory;
+  readonly edges?: SvgEdgeConfig;
+}
+
+export type SvgEdgePath = 'orthogonal' | 'bezier';
+
+export interface SvgEdgePresentation {
+  readonly path: SvgEdgePath;
+  readonly label?: string;
+}
+
+export interface SvgEdgeConfig {
+  readonly resolve: (edge: Readonly<CanvasEdge>) => Readonly<SvgEdgePresentation>;
+  readonly previewPath: SvgEdgePath;
 }
 export interface SvgNodeContentContext {
   readonly nodeId: NodeId;

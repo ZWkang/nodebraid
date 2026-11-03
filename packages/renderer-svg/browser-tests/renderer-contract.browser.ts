@@ -58,6 +58,24 @@ const server = Bun.serve({
 
 try {
   await runAgentBrowser(['open', server.url.href]);
+  await assertBrowserScenario('globalThis.__nodebraidRendererSvgEdgePresentationCases()', [
+    'orthogonal-display-and-hit',
+    'bezier-display-and-hit',
+    'orthogonal-parallel-narrow-gap',
+    'accepted-presentation-and-failures',
+    'dom-failure-rolls-back',
+    'orthogonal-parallel-and-reflow',
+    'orthogonal-preview-without-edge',
+    'orthogonal-endpoint-geometry-and-tolerance',
+    'orthogonal-port-endpoints',
+    'orthogonal-remote-degenerate-arrow',
+    'bezier-parallel-and-reflow',
+    'bezier-preview-without-edge',
+    'bezier-endpoint-geometry-and-tolerance',
+    'bezier-port-endpoints',
+    'bezier-remote-degenerate-arrow',
+  ]);
+  console.info('SVG readable Edges: public paths, labels, direction and semantic Hit Test passed.');
   await assertBrowserScenario('globalThis.__nodebraidRendererSvgNodeContentCases()', [
     'projection-lifecycle',
     'construction-deep-rollback',

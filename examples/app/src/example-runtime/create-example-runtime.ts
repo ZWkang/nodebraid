@@ -33,6 +33,7 @@ import { createSvgRenderer } from '@nodebraid/renderer-svg';
 
 import { createNavigatorClipboardTransport, exampleCanvasFragmentTextCodec } from './clipboard-adapters';
 import { createExampleNodeContent } from './node-content';
+import { acceptExampleData } from './example-data-codec';
 import { exampleZoomRange } from './viewport';
 
 export type ExampleNodeType = 'step' | 'note';
@@ -100,7 +101,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       connection: {
         materializeEdge({ source, target: edgeTarget }) {
           const id = freshEdgeId('example-edge', () => nextEdgeSequence++);
-          return { id, type: 'flow', source, target: edgeTarget, data: null };
+          return { id, type: 'flow', source, target: edgeTarget, data: { label: 'Continue', tags: [] } };
         },
       },
     },
@@ -171,6 +172,16 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
     target,
     connectionAnchorHitTolerance: 12,
     createNodeContent: createExampleNodeContent,
+    edges: {
+      previewPath: 'bezier',
+      resolve(edge) {
+        const data = acceptExampleData(edge.data);
+        return {
+          path: edge.type === 'sequence' ? 'orthogonal' : 'bezier',
+          ...(data === null ? {} : { label: data.label }),
+        };
+      },
+    },
   });
   const layout = host.install(createLayoutPlugin({ engine: dagreLayoutEngine, command: exampleLayoutCommand }));
   const duplicateSelection = host.install(duplicateSelectionPlugin);
@@ -222,10 +233,10 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       });
       transaction.edges.add({
         id: initialEdge,
-        type: 'flow',
+        type: 'sequence',
         source: { nodeId: first, portId: 'output' },
         target: { nodeId: second, portId: 'input' },
-        data: null,
+        data: { label: 'Discover → compose', tags: [] },
       });
     });
     if (!commit) throw new Error('Expected the Basic SVG Example initial graph Commit.');

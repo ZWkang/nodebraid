@@ -19,6 +19,9 @@ import type { SessionSnapshot } from '@nodebraid/session-api';
 import { validateCanvasView, validateSessionSnapshot } from './renderer-state';
 import { getNodePortGeometries, resolveConnectionAnchorPoint, resolveEdgeEndpointPoint } from './port-geometry';
 import type { NodeContentBuilder } from './node-content';
+import { createEdgeGeometry, type EdgeGeometries } from './edge-geometry';
+import { appendEdgeVisuals, createRoutedEdgeElement } from './edge-projection';
+import type { SvgEdgePath } from './contracts';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
@@ -31,11 +34,16 @@ export function renderReset(
   interactionLayer: SVGGElement,
   ports: PortSnapshot,
   nodeContent?: NodeContentBuilder,
+  edgeGeometries?: EdgeGeometries,
 ): void {
   validateCanvasView(view);
   const nodes = view.snapshot.nodes.map((node) => createNodeElement(document, node, nodeContent));
   const nodesById = new Map(view.snapshot.nodes.map((node) => [node.id, node]));
-  const edges = view.snapshot.edges.map((edge) => createEdgeElement(document, edge, nodesById, ports));
+  const edges = view.snapshot.edges.map((edge) =>
+    edgeGeometries
+      ? createRoutedEdgeElement(document, edge.id, requireMapValue(edgeGeometries, edge.id))
+      : createEdgeElement(document, edge, nodesById, ports),
+  );
   const targets = view.snapshot.nodes.flatMap((node) => createConnectionTargetElements(document, node, ports));
   edgesLayer.replaceChildren(...edges);
   nodesLayer.replaceChildren(...nodes);
@@ -53,6 +61,7 @@ export function applyCommit(
   interactionLayer: SVGGElement,
   ports: PortSnapshot,
   nodeContent: NodeContentBuilder | undefined,
+  edgeGeometries: EdgeGeometries | undefined,
   completeProjection?: (journal: DomMutationJournal) => void,
 ): void {
   validateCanvasView(commit.before);
@@ -90,7 +99,13 @@ export function applyCommit(
   );
   const validatedEdges = new Map(
     commit.after.snapshot.edges.map(
-      (edge) => [edge.id, createEdgeElement(document, edge, afterNodesById, ports)] as const,
+      (edge) =>
+        [
+          edge.id,
+          edgeGeometries
+            ? createRoutedEdgeElement(document, edge.id, requireMapValue(edgeGeometries, edge.id))
+            : createEdgeElement(document, edge, afterNodesById, ports),
+        ] as const,
     ),
   );
   const changedNodeIds = new Set(
@@ -103,10 +118,11 @@ export function applyCommit(
       else applyEdgeChange(change, validatedEdges, edgesLayer, journal);
     }
     for (const edge of commit.after.snapshot.edges) {
-      if (!changedNodeIds.has(edge.source.nodeId) && !changedNodeIds.has(edge.target.nodeId)) continue;
+      if (!edgeGeometries && !changedNodeIds.has(edge.source.nodeId) && !changedNodeIds.has(edge.target.nodeId))
+        continue;
       const existing = requireEntityElement(edgesLayer, 'data-nodebraid-edge-id', edge.id);
       const validated = requireMapValue(validatedEdges, edge.id);
-      copyGeometryAttributes(validated, existing, ['x1', 'y1', 'x2', 'y2'], journal);
+      copyEdgeProjection(validated, existing, journal);
     }
     nodesLayer.append(
       ...commit.after.snapshot.nodes.map((node) => requireEntityElement(nodesLayer, 'data-nodebraid-node-id', node.id)),
@@ -125,7 +141,8 @@ export function applyCommit(
   }
 }
 
-function syncConnectionTargets(
+/** @internal */
+export function syncConnectionTargets(
   nodes: readonly CanvasNode[],
   document: Document,
   interactionLayer: SVGGElement,
@@ -202,12 +219,35 @@ export function applyConnectionPreview(
   ports: PortSnapshot,
   interactionLayer: SVGGElement,
   journal: DomMutationJournal,
+  path?: SvgEdgePath,
 ): void {
   const source = resolveConnectionAnchorPoint(snapshot, ports, preview.source);
   let endpoint = preview.pointerWorldPoint;
   if (preview.target.type !== 'none') {
     const targetAnchor = preview.target.anchor;
     endpoint = resolveConnectionAnchorPoint(snapshot, ports, targetAnchor);
+  }
+  if (path) {
+    const sourceNode = snapshot.nodes.find((node) => node.id === preview.source.nodeId)!;
+    const previewTarget = preview.target;
+    const targetTop =
+      previewTarget.type === 'none'
+        ? endpoint.y
+        : snapshot.nodes.find((node) => node.id === previewTarget.anchor.nodeId)!.position.y;
+    const geometry = createEdgeGeometry(source, endpoint, { path }, 0, 1, Math.min(sourceNode.position.y, targetTop));
+    const candidate = createSvgElement(interactionLayer.ownerDocument, 'g');
+    appendEdgeVisuals(candidate, geometry);
+    let element = interactionLayer.querySelector<SVGGElement>('[data-nodebraid-connection-preview]');
+    if (!element) {
+      element = candidate;
+      element.setAttribute('class', 'nodebraid-renderer-svg__connection-preview');
+      element.setAttribute('data-nodebraid-connection-preview', '');
+      interactionLayer.append(element);
+    } else {
+      journal.replaceChildren(element, [...candidate.childNodes]);
+    }
+    setElementAttribute(element, 'data-nodebraid-connection-target', preview.target.type, journal);
+    return;
   }
   let element = interactionLayer.querySelector<SVGLineElement>('[data-nodebraid-connection-preview]');
   if (!element) {
@@ -260,6 +300,7 @@ export function applyNodeDragProjection(
   nodesLayer: SVGGElement,
   ports: PortSnapshot,
   suppliedJournal?: DomMutationJournal,
+  skipEdges = false,
 ): void {
   const journal = suppliedJournal ?? new DomMutationJournal(edgesLayer, nodesLayer);
   try {
@@ -275,6 +316,7 @@ export function applyNodeDragProjection(
       updateNodePosition(element, candidate.position, journal);
     }
     for (const edge of baselineSnapshot.edges) {
+      if (skipEdges) break;
       if (!candidates.has(edge.source.nodeId) && !candidates.has(edge.target.nodeId)) continue;
       const existing = requireEntityElement(edgesLayer, 'data-nodebraid-edge-id', edge.id) as SVGLineElement;
       const validated = createEdgeElement(edgesLayer.ownerDocument, edge, effectiveNodes, ports);
@@ -315,11 +357,11 @@ function applyNodeChange(
 
 function applyEdgeChange(
   change: Extract<CanvasCommit['changeSet']['changes'][number], { readonly entity: 'edge' }>,
-  validatedEdges: ReadonlyMap<string, SVGLineElement>,
+  validatedEdges: ReadonlyMap<string, SVGElement>,
   edgesLayer: SVGGElement,
   journal: DomMutationJournal,
 ): void {
-  const existing = findEntityElement<SVGLineElement>(edgesLayer, 'data-nodebraid-edge-id', change.id);
+  const existing = findEntityElement<SVGElement>(edgesLayer, 'data-nodebraid-edge-id', change.id);
   if (change.before === null && change.after !== null) {
     if (existing) throwBaselineEntityConflict('edge', change.id, 'missing', 'present');
     edgesLayer.append(requireMapValue(validatedEdges, change.id));
@@ -332,7 +374,12 @@ function applyEdgeChange(
   }
   if (!existing || change.after === null) throwBaselineEntityConflict('edge', change.id, 'present', 'missing');
   const validated = requireMapValue(validatedEdges, change.id);
-  copyGeometryAttributes(validated, existing, ['x1', 'y1', 'x2', 'y2'], journal);
+  if (validated.localName === 'line') copyEdgeProjection(validated, existing, journal);
+}
+
+function copyEdgeProjection(source: SVGElement, target: SVGElement, journal: DomMutationJournal): void {
+  if (source.localName === 'g') journal.replaceChildren(target, [...source.childNodes]);
+  else copyGeometryAttributes(source, target, ['x1', 'y1', 'x2', 'y2'], journal);
 }
 
 function createNodeElement(

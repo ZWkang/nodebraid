@@ -16,6 +16,8 @@ bun run example:dev
 
 Open the `/basic-svg` URL printed by the development server to exercise Selection, Box Selection, real Clipboard Ctrl/Cmd+C / Ctrl/Cmd+V, Ctrl/Cmd+D Duplicate, Node Drag, Pan, Zoom, Port-aware Edge Connection, manual Auto layout, Undo, Redo, Fit View, and a complete Runtime Reset.
 
+The Example explicitly enables readable SVG connections: the initial Discover→Compose Edge has an orthogonal path, direction arrow and text label; dragging Compose output to Ship input creates a Bezier path. Repeating the connection creates separate lanes that can each be selected. Undo/Redo and Layout preserve endpoints and application labels. Labels use the existing application data and survive Document file round trips; application Edge types determine paths, while Renderer configuration stays outside the file. This demonstrates public-interface composition without an Edge property panel.
+
 The example depends only on the public entry points of `@nodebraid/adapter-react`, `@nodebraid/core`, and the explicitly selected `@nodebraid/renderer-svg` and `@nodebraid/layout-dagre`. The React Adapter owns Runtime mount/remount and stable Snapshot projection; the application continues to own the Runtime Factory, toolbar, and Clipboard state. The application is not deployed separately yet; this page remains the stable description and local entry point.
 
 ## Manual Auto layout
