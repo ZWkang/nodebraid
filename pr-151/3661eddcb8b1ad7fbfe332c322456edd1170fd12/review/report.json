@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "e58cc7ddf826fac894a249a1290d6e1c2942d6b8",
+    "expectedParent": "5e5015ad054cb354b63eeb7833369a7983a125f6",
+    "head": "3661eddcb8b1ad7fbfe332c322456edd1170fd12",
+    "tree": "fc85322ea824a600a57471a8de9d70f3499f761b",
+    "patch": "d4812899455b3d9b88ab5206bbf555a2a93a8fc1ca1a27c2f13b123111c46b4e",
+    "localHead": "3661eddcb8b1ad7fbfe332c322456edd1170fd12"
+  },
+  "task": {
+    "run": "20261103-issue-143-current-head",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 143
+    },
+    "request": "## Problem Statement\n\nSVG Edge 当前只提供无箭头、无标签的直线，难以表达流程方向、连接含义与同端点多条连接。为框架调用方增加显式启用的正交折线和贝塞尔曲线投影，同时保持单一权威 Document 和现有未配置调用方的兼容行为。\n\n## Scope and decisions\n\n- SVG Provider 新增窄的应用投影配置：应用从完整 Edge 值同步提供路径选择与可选纯文本标签。支持正交折线和贝塞尔曲线，箭头表达 source → target。Kernel 不解释 label/path 的业务 schema，不新增全局 Registry 或 Renderer 图写权。\n- 连线预览使用显式配置的路径；预览尚无 Edge，不提前或重复调用 materializeEdge，不创建虚拟 Edge。预览与已提交路径复用几何规则，但应用仍负责预览配置与最终 Edge 投影选择的一致性，最终平行边分道在 Edge ID 已知后确定。\n- 自环继续由现有 Interaction/Create Edge Command 与 SVG Provider 明确拒绝。本次不扩展自环创建或显示。\n- 同一对端点的多条 Edge 自动分道，以确定性规则使每条路径可区分并分别命中。端点身份包含 Node 与可选 Port ID；反向连接保留 source/target 方向。同组增删 Edge 可以重新排布派生路径，不额外修改 Document 或 History。\n- 新路径模式以最近路径/箭头几何决定 Edge 命中，等距时沿用确定性叠放优先级；容差保持 Target-local CSS pixels。Node/Port 优先级保持既有契约。文字标签为显示内容，不增加独立标签 Hit Result 或依赖 DOM/CSS 的命中。\n- 普通 Endpoint 的新路径使用节点边界连接位置；Port-qualified Endpoint 使用既有 Port Geometry，不退回节点中心。正式路径、节点拖动候选路径、箭头、标签定位和命中共享几何来源。\n- 短距离、反向连接和重叠节点继续接受并生成确定性有限几何；不承诺全图自动避障或遮挡消除。缺少 Port、无尺寸节点及其他既有明确错误继续显式失败。\n- 未启用新配置时保留原直线 DOM、端点与命中行为。新模式每条 Edge 仅有一个 data-nodebraid-edge-id；连续提交、派生几何和 Selection 更新保持该实体元素身份，路径种类切换也不丢失身份。箭头和标签拥有独立稳定样式入口。\n- 应用投影函数的原始异常向调用方传播；无效结果在改变已接受状态前失败。Session、Viewport、拖动候选和 hitTest 不重新调用应用投影函数；它们使用已接受的只读表示。\n- 数据更新继续由调用方通过现有 Transaction/Command 组合完成。没有属性面板、业务编辑 UI、新增编辑 Command 或新的持久化 schema。文件与 Clipboard 沿用应用 codec；Provider 配置不自动序列化。\n\n## Domain and architecture\n\n沿用 CONTEXT.md 中的 Edge、Endpoint、Port Geometry、Renderer、Interaction Projection 和 Effective Renderer State。\n\n- Kernel 拥有 Document；Session 拥有 Selection/Viewport。\n- 应用拥有业务数据和 Edge 显示语义的映射。\n- SVG Provider 拥有路径、箭头、标签和命中几何，Interaction 继续拥有行为解释。\n- 更新相关 Renderer ADR 与文档，明确显式新模式对直线投影/命中规则的扩展，保留旧调用方契约。\n- 示例仅用于组合公共接口和验收：保持原初始实体计数，初始 Edge 展示正交路径，现有创建连线操作展示贝塞尔路径；标签来自应用现有可编码 data，不新增编辑控件。\n\n## Acceptance\n\n1. 通过 Renderer 公共 Factory/updateDocument/updateSession/updateInteraction/hitTest 接口，在真实 Chromium 中验证两种路径、箭头方向、纯文本标签及普通/Port Endpoint。\n2. 同端点多条 Edge 可以分别命中；增删、Undo/Redo 后重新分道确定，缩放后命中容差仍以 CSS pixels 计算，等距选择确定。新模式不回退为旧直线。\n3. Node Drag、Viewport Pan、连续 Commit、Port 更新和 Layout 后，显示端点、候选路径与 hitTest 使用同一有效几何；派生更新不新增 Document revision 或 History。\n4. 短距离、反向连接、重叠节点不新增拒绝；自环、缺失 Port、非法配置/结果及应用抛错保留明确失败。失败后已接受 DOM、几何和 Baseline 保持原状；清理和回滚遵循现有错误契约。\n5. 未配置调用方的既有 Renderer/browser suites 保持；显式新模式保持实体 DOM identity、Selection、顺序和唯一标识，标签作为文本而非 HTML 注入。\n6. Examples Application 经真实输入覆盖连线、拖动、布局、Undo/Redo 与文件往返，展示两种路径和标签；没有新增属性面板或产品工作流。\n7. 更新双语 Provider/Example 文档、相关 ADR 和能力/证据地图；定向开发检查、独立 Standards/Spec review、正式 verify 全量检查均通过。\n8. 单一 main PR 关联本 Issue，发布并回读当前 head 的完整报告和真实媒体；合并后另核对实际 main 集成与剩余验收。\n\n## Non-goals\n\n自环扩展、全图自动避障、手动控制点、HTML/React 标签、属性面板、业务规则、协作、新渲染后端与包发布均不在本次范围。\n\n## Delivery\n\n一个面向 main 的 PR，使用 Refs #143 保持合并后验收可见；实施步骤与证据放在本地 run。Issue 关闭遵循独立授权及合并后验收。",
+    "plan": [
+      {
+        "id": "current-head-review",
+        "blockedBy": [],
+        "acceptance": "Review complete current PR head against current main, Issue #143 and connected callers with independent Standards and Spec axes."
+      },
+      {
+        "id": "current-head-verification",
+        "blockedBy": [
+          "current-head-review"
+        ],
+        "acceptance": "Formal verify executes full engineering check on current clean head."
+      },
+      {
+        "id": "current-head-evidence",
+        "blockedBy": [
+          "current-head-verification"
+        ],
+        "acceptance": "Current published head full report and real preview published/read back; CI and discussions checked."
+      },
+      {
+        "id": "main-acceptance",
+        "blockedBy": [
+          "current-head-evidence"
+        ],
+        "acceptance": "After separately authorized merge, actual merge SHA is integrated on fetched main and all Issue acceptance accounted for."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "3661eddcb8b1ad7fbfe332c322456edd1170fd12",
+      "tree": "fc85322ea824a600a57471a8de9d70f3499f761b",
+      "patch": "d4812899455b3d9b88ab5206bbf555a2a93a8fc1ca1a27c2f13b123111c46b4e",
+      "report": "Standards 审查通过，未发现需要修改的问题。\n\n本次独立审阅 `e58cc7d...3661edd` 的完整 29 文件补丁及两条提交，核对 CONTEXT、相关 Renderer ADR、Issue #143 及其确认评论。按项目规范、ponytail-review、边界责任、行为测试和减少阅读负担原则检查，并将 Fowler smell baseline 作为启发式；没有仅凭风格偏好或工具已覆盖事项提出发现。\n\n追踪了配置捕获 → 应用表示 → 共享路径/箭头几何 → keyed DOM、Interaction 和 hitTest，以及 Example codec、声明导出、真实输入测试与媒体采集调用方。应用业务数据留在应用映射内；默认直线分支保持原契约；表示先捕获验证，再与 DOM、Baseline、几何一起接受，失败继续暴露并复用原有回滚机制。预览没有创建虚拟 Edge，Session/拖动不重跑应用 resolver。新测试从公共 Renderer 接口和原生输入观察实际路径、命中、Selection、History、Port、文本与异常恢复。\n\n已专门核对合并 main 后的组合：Renderer/Example 实现未被机械合并改写，`collect-preview.ts` 同时保留 main 的 `--plan` 路径与本次连线验收，不改变执行/发布授权。当前 head/tree/binary-patch 与 run identity 完全一致，工作区干净，`git diff --check` 通过。\n\n风险为 high / full-human：补丁包含验证 skill 地图、`scripts/collect-preview.ts` 和声明校验入口，触发路径最低等级；公共 Renderer 配置与几何命中变更本身也需审阅。回退本功能提交并保留合入的 main 即可恢复旧投影，无持久化格式迁移。\n\n验证边界：本审查未运行浏览器或完整工程检查，也未把旧 head 的检查视为当前结果；当前 head 正式 verify、CI 与报告发布由协调者另行完成。",
+      "verdict": "passed",
+      "risk": {
+        "level": "high",
+        "rationale": "修改验证 skill 地图、preview 采集脚本与声明校验入口，按 pr-risk 触发 high 路径下限；公共 Renderer 配置及几何/命中行为影响框架调用方。",
+        "evidence": "独立审阅完整 29 文件补丁及连接调用链，核对默认兼容、边界捕获、原子回滚、公共行为测试和 main 合并组合；当前 head/tree/patch 已实测匹配，git diff --check 通过。本审查未执行当前 head 浏览器或全量检查。",
+        "rollback": "通过后续提交撤销本次可读 Edge 功能变更，同时保留已经合入的 main 工作流改动；恢复旧 Renderer、Example 和采集行为，不涉及持久化格式或数据迁移。"
+      }
+    },
+    "spec": {
+      "head": "3661eddcb8b1ad7fbfe332c322456edd1170fd12",
+      "tree": "fc85322ea824a600a57471a8de9d70f3499f761b",
+      "patch": "d4812899455b3d9b88ab5206bbf555a2a93a8fc1ca1a27c2f13b123111c46b4e",
+      "report": "Spec review：passed，未发现需求缺失、错误实现或范围扩大。独立核对 #143 正文及批准评论、完整 29 文件 diff、CONTEXT 和 ADR-0031/0048/0050/0053/0054/0059/0062/0082/0086/0089。显式 edges 配置保留默认直线；应用表示先捕获再接受，预览不物化 Edge；正交/贝塞尔、箭头/纯文本标签、含 Port 的确定性分道、最近几何命中与 CSS pixel 容差由同一几何提供。连续 Commit、路径切换、Selection 和拖动保持外层身份；失败保留原状态与原异常，缺失 Port 和自环仍明确拒绝。\n\n公共 Chromium 场景覆盖两种路径、并行重排/重放、小缩放、48 单位窄间距、Port Drag、短/反向/重叠节点、原子回滚及旧模式。Example 保留初始实体数量，以现有操作验证连线、拖动、布局、History、Clipboard 和文件往返；双语文档、ADR、声明检查及证据地图与接口一致，未新增编辑面板、Command 或持久化 schema。核对历史 renderer-red、parallel-gap-red/green、Document 与 docs 原始日志；历史测试并不代替本次 head 验证。\n\n审查绑定 head 3661edd、tree fc85322、patch d481289（均已独立重算）。本次未运行浏览器；当前 head 的正式全量检查、报告/媒体发布回读、CI 与 main 集成仍由交付流程完成。PR 评论、reviews 和 threads 当前为空。",
+      "verdict": "passed",
+      "risk": {
+        "level": "high",
+        "rationale": "公开 SVG 配置、路径和命中行为需要审阅；同时修改 .agents/skills 验证地图、scripts/collect-preview.ts 及 packages/renderer-svg/artifacts/check-declarations.ts，达到 pr-risk 的 high 路径下限。",
+        "evidence": "完整 e58cc7d...3661edd diff、#143 正文和批准评论；公共 Renderer/Example 浏览器验收源码、历史 red-green 与文档日志均已核对。固定 head/tree/binary patch 与 identity.json 独立一致。当前 head 完整验证及发布证据仍待主流程执行。",
+        "rollback": "通过后续 PR 回退本功能变更即可恢复原直线 Provider 和 Example 配置；无持久化格式迁移。回退同时移除新增路径/箭头/标签公开配置及其测试。"
+      }
+    }
+  },
+  "changedFiles": [
+    ".agents/skills/control-nodebraid/references/capabilities.md",
+    ".agents/skills/verify-nodebraid/features/README.md",
+    ".agents/skills/verify-nodebraid/features/port-connection.md",
+    "docs/adr/0089-project-readable-edges-with-shared-svg-geometry.md",
+    "examples/app/browser-tests/basic-svg.browser.ts",
+    "examples/app/browser-tests/document.browser.ts",
+    "examples/app/src/example-runtime/create-example-runtime.ts",
+    "examples/app/src/styles.css",
+    "packages/renderer-svg/README.md",
+    "packages/renderer-svg/artifacts/check-declarations.ts",
+    "packages/renderer-svg/browser-tests/edge-presentation.entry.ts",
+    "packages/renderer-svg/browser-tests/renderer-contract.browser.ts",
+    "packages/renderer-svg/browser-tests/renderer-contract.entry.ts",
+    "packages/renderer-svg/src/contracts.ts",
+    "packages/renderer-svg/src/edge-geometry.ts",
+    "packages/renderer-svg/src/edge-projection.ts",
+    "packages/renderer-svg/src/hit-test.ts",
+    "packages/renderer-svg/src/index.ts",
+    "packages/renderer-svg/src/port-geometry.ts",
+    "packages/renderer-svg/src/svg-config.ts",
+    "packages/renderer-svg/src/svg-projection.ts",
+    "packages/renderer-svg/src/svg-renderer-error.ts",
+    "packages/renderer-svg/src/svg-renderer.ts",
+    "packages/renderer-svg/tests/types.test.ts",
+    "scripts/collect-preview.ts",
+    "website/en/guide/interactive-example.md",
+    "website/en/modules/renderer-svg.md",
+    "website/guide/interactive-example.md",
+    "website/modules/renderer-svg.md"
+  ],
+  "risk": {
+    "level": "high",
+    "route": "full-human",
+    "reasons": [
+      "standards: high — 修改验证 skill 地图、preview 采集脚本与声明校验入口，按 pr-risk 触发 high 路径下限；公共 Renderer 配置及几何/命中行为影响框架调用方。",
+      "spec: high — 公开 SVG 配置、路径和命中行为需要审阅；同时修改 .agents/skills 验证地图、scripts/collect-preview.ts 及 packages/renderer-svg/artifacts/check-declarations.ts，达到 pr-risk 的 high 路径下限。",
+      ".agents/skills/control-nodebraid/references/capabilities.md: minimum high risk.",
+      ".agents/skills/verify-nodebraid/features/README.md: minimum high risk.",
+      ".agents/skills/verify-nodebraid/features/port-connection.md: minimum high risk.",
+      "packages/renderer-svg/artifacts/check-declarations.ts: minimum high risk.",
+      "packages/renderer-svg/src/contracts.ts: minimum medium risk.",
+      "packages/renderer-svg/src/edge-geometry.ts: minimum medium risk.",
+      "packages/renderer-svg/src/edge-projection.ts: minimum medium risk.",
+      "packages/renderer-svg/src/hit-test.ts: minimum medium risk.",
+      "packages/renderer-svg/src/index.ts: minimum medium risk.",
+      "packages/renderer-svg/src/port-geometry.ts: minimum medium risk.",
+      "packages/renderer-svg/src/svg-config.ts: minimum medium risk.",
+      "packages/renderer-svg/src/svg-projection.ts: minimum medium risk.",
+      "packages/renderer-svg/src/svg-renderer-error.ts: minimum medium risk.",
+      "packages/renderer-svg/src/svg-renderer.ts: minimum medium risk.",
+      "scripts/collect-preview.ts: minimum high risk."
+    ]
+  },
+  "decisions": [],
+  "behaviorEvidence": null,
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "30255b77210c772f523252a017122a0885340915dd8ded1466718c3b2db6b1d3"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "31db368b94fb5df6f709d5a111888e50954d0f669e42a3cf7c8776edb5a6432d"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "ed5dfe8251e965f807dda4e7972a682b2f46d442e31966ca1457205f1ab2ae9d"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "ae4cdf8445a4e59981cd056bd8ed71fc40bfe6b097a6df3e0669d884e99d4d4a"
+    }
+  ]
+}
