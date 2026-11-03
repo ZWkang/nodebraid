@@ -2,454 +2,168 @@
 
 [English](./README.md) | 简体中文
 
-NodeBraid 是一个插件化、渲染器无关的流程画布引擎，用于构建 TypeScript
-编辑器，而不必将文档状态、交互、布局和渲染绑定到某个 UI 框架或图形后端。
+**面向 TypeScript 的插件化、渲染器无关的流程画布引擎。**
 
-当前源码已经提供一条可运行的 headless Canvas Runtime、显式的 Basic Canvas
-Composition，以及参考级 SVG Renderer。已实现能力包括原子图事务、Selection 与
-Viewport 状态、类型化 Command、Undo/Redo、Selection、Box Selection、Delete Selection、Duplicate Selection、Clipboard Copy/Paste、多节点拖拽、Pan、Wheel
-Zoom、Port-aware 与节点级连边、Dagre 与 ELK Layout Provider、结构化诊断和 Plugin 生命周期所有权。
+将文档状态、交互、布局和渲染独立组合，用于构建节点编辑器。按需安装画布能力，显式选择
+Renderer Provider，并由应用掌握节点类型、业务数据和产品 UI。
 
-公开 React Adapter 已将应用 Runtime Factory 绑定到 React Target，并投影稳定的 Kernel、
-Session 与 History Snapshot。私有 React Examples Application 通过它把公共 interface
-组合成可单独启动的 Basic SVG 开发者参考应用，包含统一导航、实时 Runtime 状态、框选、
-连边、Viewport 控制、手动 Dagre/full/LR 自动布局与 History 操作。布局保留 Selection、
-Viewport 和原 Port 连接，不自动 Fit View。
+[文档站](https://zwkang.github.io/nodebraid/) ·
+[快速开始](#快速开始) ·
+[能力地图](https://zwkang.github.io/nodebraid/capabilities/) ·
+[架构设计](./ARCHITECTURE.md)
 
-版本化完整 Document 文件与应用 Data Codec 支持手动导出/导入；Examples Application
-通过原子替换恢复图，并从新的 History Baseline 继续编辑。
+> **预发布阶段：** `@nodebraid/*` 尚未发布到 npm，请从源码运行。
+> 当前提供画布引擎和开发者参考应用，尚不包含产品级编辑器外壳、自动／云端持久化或协作能力。
 
-NodeBraid 仍处于预发布阶段，尚未提供产品级编辑器外壳、React 之外的框架适配器、自动/云端持久化或协作。源码 package 使用 `@nodebraid/*` 命名空间，但尚未发布到 npm。
+## 已有能力
 
-## 文档
+| 能力       | 当前实现                                                                                            |
+| ---------- | --------------------------------------------------------------------------------------------------- |
+| 图状态     | Node 与 Edge、原子 Transaction、绑定 revision 的查询，以及可逆 Change Set。                         |
+| 画布交互   | 选择、框选、多节点拖拽、平移、滚轮缩放，以及端口级或节点级连线。                                    |
+| 编辑       | 节点创建与单次放置、数据编辑、删除选中项、生成副本、剪贴板复制粘贴，以及撤销／重做。                |
+| 渲染       | SVG Renderer Provider，支持自定义 SVG 节点内容和标准化输入。                                        |
+| 布局       | Dagre 全量布局；ELK 全量、增量布局与固定节点约束。                                                  |
+| 文档文件   | 版本化完整图序列化，由应用提供数据 codec；示例支持手动导出／导入。                                  |
+| React 集成 | 面向 React 19 客户端渲染的 Runtime 挂载／释放，以及稳定的 Kernel、Session、History Snapshot Hooks。 |
+| 扩展       | 强类型 Command 与 Runtime Service、Plugin 生命周期管理，以及结构化诊断。                            |
 
-中文优先的 Documentation Site 会明确区分当前已实现行为、目标架构和路线图能力：
+布局只排列 Node 并保留 Port 连接，端口几何不参与布局算法。自定义 SVG 内容仍使用矩形命中边界。
+React Snapshot Hooks 不支持 SSR，其他 UI 框架的适配器尚未提供。完整边界见
+[当前状态](https://zwkang.github.io/nodebraid/status)。
 
-- [中文文档站](https://zwkang.github.io/nodebraid/)
-- [当前状态](https://zwkang.github.io/nodebraid/status)
-- [English Documentation](https://zwkang.github.io/nodebraid/en/)
-- [Quick Start](https://zwkang.github.io/nodebraid/guide/quick-start)
-- [Interactive Example](https://zwkang.github.io/nodebraid/guide/interactive-example)
-- [能力地图](https://zwkang.github.io/nodebraid/capabilities/)
-- [模块索引](https://zwkang.github.io/nodebraid/modules/)
-- [架构设计](./ARCHITECTURE.md)
+## 快速开始
 
-推送到 `main` 后，`.github/workflows/docs.yml` 会构建并部署 Documentation Site。
-仓库 Settings → Pages 中的 Source 必须设置为 **GitHub Actions**；项目站点地址为
-`https://zwkang.github.io/nodebraid/`。
-
-## 从源码快速开始
-
-NodeBraid 要求 Node.js 22.13.0 或更高版本，以及 Bun 1.2.19 或更高版本。
+需要 **Node.js ≥ 22.13.0** 和 **Bun ≥ 1.2.19**。以下命令均在仓库根目录执行。
 
 ```bash
 git clone https://github.com/ZWkang/nodebraid.git
 cd nodebraid
 bun install
+bun run example:dev
+```
+
+打开开发服务器输出的地址，进入 `/basic-svg`。Examples Application 会自动构建所需 workspace
+依赖，可体验节点创建与编辑、选择、拖拽、连线、复制粘贴、撤销／重做、手动 Dagre 布局和文档导出／导入。
+
+示例在本地运行，[交互示例指南](https://zwkang.github.io/nodebraid/guide/interactive-example)
+提供操作说明。示例 UI 由应用实现，不属于引擎内置的产品编辑器。
+
+### 运行无界面示例
+
+无需打开浏览器，即可验证 Plugin Host 与一次 Kernel Transaction：
+
+```bash
 bun run docs:quick-start
 ```
 
-该命令会构建公共 `@nodebraid/core` facade 及其 workspace 依赖，然后运行真实的
-Plugin Host 和 Kernel Transaction。成功输出如下：
+该命令构建 `@nodebraid/core` 及其依赖，然后运行
+[与文档站共用的示例](./website/examples/quick-start.ts)。预期输出：
 
 ```text
 revision=1 nodes=1
 ```
 
-完整示例与文档站共用
-[`website/examples/quick-start.ts`](./website/examples/quick-start.ts)。首次 npm
-发布前请继续使用源码 checkout 流程。
+## 模块如何组合
 
-## 技术栈
+- **Kernel 拥有 Document。** Node 与 Edge 通过原子 Transaction 更新；Session 独立管理
+  Selection 和 Viewport，History 记录文档变化。
+- **Plugin 组成 Canvas Runtime。** `createPluginHost()` 创建空 Host；
+  `createBasicCanvasPlugin(rendererFactory, options?)` 显式组合 Kernel、Port、Command、
+  Node Editing、Session、Renderer、Interaction 和 History。
+- **应用选择 Provider，并拥有产品行为。** 显式选择 Renderer Factory，按需安装 Layout、
+  Duplicate Selection 或 Clipboard Plugin，并提供节点数据、codec、剪贴板 transport 和 UI。
 
-- Bun：package 管理、开发、构建、测试和 workspace 脚本。
-- tsgo：TypeScript 类型检查。
-- oxlint：代码检查。
-- Prettier：格式化。
-- agent-browser：真实 Chromium React Adapter 与 Renderer seam 测试。
-- React、TanStack Router、shadcn Base UI、Tailwind CSS 与 Vite：私有 Examples Application。
-
-## 目录结构
-
-```text
-.
-├── packages/
-│   ├── adapter-react/  # @nodebraid/adapter-react React 生命周期适配器
-│   ├── core/           # @nodebraid/core 公共 facade
-│   ├── canvas-fragment/ # 纯内存 Canvas Fragment 值契约
-│   ├── diagnostics/    # @nodebraid/diagnostics 错误与 Diagnostic Event
-│   ├── interaction-api/ # @nodebraid/interaction-api 瞬态 Projection 值
-│   ├── kernel/         # @nodebraid/kernel 图状态与 Transaction
-│   ├── layout-api/     # @nodebraid/layout-api 后端无关契约
-│   ├── layout-dagre/   # @nodebraid/layout-dagre 官方 Provider
-│   ├── layout-elk/     # @nodebraid/layout-elk 官方 Provider
-│   ├── plugin-command/ # @nodebraid/plugin-command Runtime Service 适配器
-│   ├── plugin-clipboard/ # 显式 Clipboard Copy/Paste Behavior
-│   ├── plugin-node-editing/ # @nodebraid/plugin-node-editing Node creation / data updates
-│   ├── plugin-history/ # @nodebraid/plugin-history History Runtime Plugin
-│   ├── plugin-interaction/ # @nodebraid/plugin-interaction Interaction Runtime
-│   ├── plugin-duplicate-selection/ # 独立 Duplicate Selection Behavior
-│   ├── plugin-kernel/  # @nodebraid/plugin-kernel Runtime Service 适配器
-│   ├── plugin-layout/  # @nodebraid/plugin-layout Runtime Command 集成
-│   ├── plugin-renderer/ # @nodebraid/plugin-renderer Renderer Runtime 适配器
-│   ├── plugin-session/ # @nodebraid/plugin-session Runtime Service 适配器
-│   ├── preset-basic/   # @nodebraid/preset-basic Basic Canvas Composition
-│   ├── renderer-api/   # @nodebraid/renderer-api 后端无关契约
-│   ├── renderer-svg/   # @nodebraid/renderer-svg 官方 SVG Provider
-│   ├── session-api/    # @nodebraid/session-api 不可变 Session 值
-│   └── runtime-cordis/ # @nodebraid/runtime-cordis 实现 package
-├── examples/
-│   └── app/            # 私有 @nodebraid/examples React 应用
-├── src/               # 根 TypeScript 源码
-├── tests/             # 根自动化测试
-├── bun.lock           # Bun 锁文件
-├── tsconfig.base.json # 共享 TypeScript 编译选项
-└── tsconfig.json      # 根 TypeScript project
-```
-
-## Plugin Host packages
-
-大多数使用者应从 `@nodebraid/core` 导入 NodeBraid 自有的 Plugin Host API：
+后端无关的公共 API 从 `@nodebraid/core` 导入：
 
 ```ts
-import { createPluginHost, definePlugin, defineService } from '@nodebraid/core';
+import { createPluginHost, createBasicCanvasPlugin } from '@nodebraid/core';
 ```
 
-`@nodebraid/core` 是公共 facade，具体实现委托给 `@nodebraid/runtime-cordis`。
-高级使用者可以直接导入这个窄 package，但 Cordis 类型仍然只存在于其内部。
+`@nodebraid/renderer-svg`、`@nodebraid/layout-dagre`、`@nodebraid/layout-elk` 等具体
+Provider，以及 `@nodebraid/adapter-react`，均从各自 package 导入。Core 不选择或重导出默认
+Renderer、Layout Provider。
 
-首版实现了空 Plugin Host 基座、Runtime Service 依赖、生命周期所有权和 Child
-Installation 组合。它不会隐式安装 Kernel、Session、Renderer 或其他 Canvas
-能力。“Everything is Plugin”适用于这些 Canvas 能力；最小 Host 基座是拥有首次安装和最终释放的边界。
+| 模块入口                                                                                                                                                                                  | 用途                                     |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| [Core](./packages/core/README.md) · [Basic Composition](./packages/preset-basic/README.md)                                                                                                | 公共 API 与可直接组合的基础画布能力。    |
+| [Kernel](./packages/kernel/README.md) · [Document](./packages/document/README.md)                                                                                                         | 图不变量、Transaction 与完整文档文件。   |
+| [Plugin Host](./packages/runtime-cordis/README.md) · [Diagnostics](./packages/diagnostics/README.md)                                                                                      | Service 依赖、生命周期和可观察的错误。   |
+| [Command](./packages/plugin-command/README.md) · [Session](./packages/plugin-session/README.md) · [History](./packages/plugin-history/README.md)                                          | 动作、Selection／Viewport 和撤销／重做。 |
+| [Interaction](./packages/plugin-interaction/README.md) · [Port](./packages/plugin-port/README.md)                                                                                         | 手势、快捷键和节点连接定义。             |
+| [Node Editing](./packages/plugin-node-editing/README.md) · [Duplicate Selection](./packages/plugin-duplicate-selection/README.md) · [Clipboard](./packages/plugin-clipboard/README.md)    | 编辑行为与应用需要提供的输入。           |
+| [Renderer API](./packages/renderer-api/README.md) · [SVG Renderer](./packages/renderer-svg/README.md)                                                                                     | 后端无关的渲染契约与 SVG 实现。          |
+| [Layout API](./packages/layout-api/README.md) · [Layout Plugin](./packages/plugin-layout/README.md) · [Dagre](./packages/layout-dagre/README.md) · [ELK](./packages/layout-elk/README.md) | 布局计算与结果的原子提交。               |
+| [React Adapter](./packages/adapter-react/README.md) · [示例源码](./examples/app/src/)                                                                                                     | React 生命周期集成与完整参考应用。       |
 
-## Diagnostics package
+[模块索引](https://zwkang.github.io/nodebraid/modules/)提供全部 package 的说明，包含独立值契约与 Runtime 适配器。
 
-`@nodebraid/diagnostics` 提供共享 `NodeBraidError`、稳定的 `domain + code`
-身份、不可变 Diagnostic Event 契约、安全错误描述，以及各 package 自有的事件目录。它不依赖 Runtime
-或日志实现。
+## 本地开发
 
-每个 Plugin Host 都可以接收独立的同步 Diagnostic Sink 和 Fault Reporter。Host、
-Installation、Activation、Plugin scope 与单调递增序号让事件无需解析 message
-即可直接检索。Console、文件、Sentry、OpenTelemetry、过滤、批处理和持久化仍由应用 Adapter
-负责。
+仓库使用 Bun、TypeScript／tsgo、oxlint 和 Prettier。真实浏览器测试通过锁定版本的
+`agent-browser` 驱动 Chromium。Examples Application 使用 React、TanStack Router、
+shadcn 与 Base UI、Tailwind CSS 和 Vite。
 
-## Kernel package
-
-`@nodebraid/kernel` 实现了与 Renderer 无关的图核心：Node 与 Edge 状态、同步原子
-Transaction、绑定 revision 的 Canvas View、Canvas Query，以及可逆的 before/after
-Change Set。
-
-大多数使用者也可以从 `@nodebraid/core` 导入同一接口。纯 Kernel 不依赖 Plugin
-Host、Cordis、RxJS、Renderer、DOM 对象或框架适配器。
-
-## Kernel Runtime Plugin
-
-`@nodebraid/plugin-kernel` 通过窄 `KernelService` 为每个 Plugin Activation
-提供一份全新的 Kernel。使用者可以读取绑定 revision 的 View、执行同步 Transaction，并按
-revision 顺序观察成功且产生净变化的 Canvas Commit。Observer 失败不会回滚 Kernel
-状态或阻断后续 Observer；重入 Transaction 会排队，直到当前 revision 已交付给所有 Observer。
-
-该适配器直接依赖 `@nodebraid/kernel` 与 `@nodebraid/runtime-cordis` 中 NodeBraid
-自有的 seam，不会引入推测性的 plugin-api package。具体 Renderer Provider、持久化、初始
-Document 导入和异步 Transaction 仍属于未来 Runtime 工作。
-
-## Session Runtime Plugin
-
-`@nodebraid/plugin-session` 为每个 Plugin Activation 提供一份全新的
-`SessionService`。它在 Document 之外持有不可变 Selection 和 Viewport Snapshot，
-并依赖窄 Kernel Service，使外部 Selection 更新只能接受当前 Canvas View 中存在的实体。
-
-等价更新会保留 Snapshot 身份且不触发通知。Kernel Commit 通过 Session channel
-移除失效 Selection 成员，不会产生另一个 Kernel Change Set 或 History Entry。重入
-Session mutation 使用广度优先 FIFO 交付，使每个订阅者在一轮通知中看到一致的 Snapshot。
-
-## Renderer packages
-
-`@nodebraid/renderer-api` 定义后端无关的 `CanvasRenderer` 协议：reset-or-commit
-Document 更新、独立 Session Snapshot、瞬态 Interaction Projection、标准化
-Pointer/Wheel/Keyboard/Focus 输入、语义化 Hit Result、输入控制和结构化 Renderer
-错误。它不包含 DOM、Canvas Context、原生 Event、Konva、Pixi、Cordis 或框架类型。
-
-`@nodebraid/plugin-renderer` 将一个类型化 Renderer Factory 绑定到 Kernel 和
-Session Service。每个 Activation 拥有一个与 target 绑定的 Renderer Instance，先交付
-Document reset 再交付 Session 状态，保持 Selection 可解析顺序，并通过窄
-`RendererService` 暴露输入、Hit Test、Pointer Capture、Focus 和唯一的 Interaction
-Projection Binding。具体 Renderer Provider 是独立、显式的 package；NodeBraid
-不选择默认 Provider 或 registry。
-
-`@nodebraid/renderer-svg` 是首个参考级官方 Provider。它绑定已有
-`SVGSVGElement`，投影通用矩形 Node 和直线 Edge，并提供稳定的 SVG class 与 data
-attribute，而不解释产品 Node type 或 data。它仍是显式的同级 Provider，不会作为默认实现从
-`@nodebraid/core` 重导出。
-
-## Interaction packages
-
-`@nodebraid/interaction-api` 持有不可变、后端无关的 Node Drag、Viewport Pan、Box Selection 和
-Connection Preview 值。`@nodebraid/plugin-interaction` 消费标准化 Renderer
-Input 与 Hit Result，实现 Selection、Box Selection、多节点拖拽、middle/Space Pan、锚定
-Wheel Zoom，以及可选的纯鼠标节点级连边，并且不暴露状态 Service。
-
-稳定 Selection 与 Viewport 变化通过 Session；最终 Node 移动和 Edge 创建使用类型化
-Command 与一次 Kernel Transaction。应用通过同步 Connection materializer 提供完整
-Edge ID/type/data。Pointer move Preview 保留在唯一 Renderer Projection
-Binding 中。取消、过期证据、Capture 丢失、依赖恢复和清理都显式且可观测。Core 会重导出两个后端无关
-Interaction package，但仍不会重导出具体 SVG Provider。
-
-`@nodebraid/canvas-fragment` 提供 Duplicate 与 Clipboard 共用的纯内存
-selected-Node 子图契约；它保留 opaque `data` 引用，但不是 Serialized Document。
-`@nodebraid/plugin-clipboard` 拥有 `clipboard.copy` / `clipboard.paste`、应用注入的
-abort-aware 文本 transport、应用拥有的 codec 与 fresh-ID mapping、一个 Paste
-Transaction、结果 Selection，以及 Ctrl/Cmd+C / Ctrl/Cmd+V。通用 package 不直接访问
-`navigator.clipboard`，不提供 fallback store，也不声称任意 `unknown` 是 JSON-safe。
-
-## Command Runtime Plugin
-
-`@nodebraid/plugin-command` 为每个 Plugin Activation 提供一份空
-`CommandService`。Feature Plugin 注册强类型 Command token 并拥有返回的
-registration；调用方通过支持同步或异步 handler 的 Promise seam 执行同一 token。
-
-Registration 或 Service 释放时会先从 lookup 中移除 Command，再中止并等待执行中的
-handler。Command package 只依赖 NodeBraid 自有 Plugin Host seam。Feature Plugin
-通过自己的静态 Service Binding 获取 Kernel、Session 或外部能力。
-
-## History Runtime Plugin
-
-`@nodebraid/plugin-history` 将 Baseline 之后每次非 replay Canvas Commit 记录为一个
-History Entry，并暴露强类型 Undo/Redo Command。Replay 通过 Kernel Service
-Transaction 应用已存储 Change Set，产生新的递增 revision，并返回对应 Canvas Commit。
-
-`HistoryService` 只暴露稳定的 `canUndo` / `canRedo` Snapshot 和订阅 seam。
-Replay 为 single-flight；Observer 重入时 Commit 仍按 revision 顺序交付；公共 Snapshot
-要等到 History 追上 Kernel 后才发布。失去 Kernel Service 或 Command Service 会结束当前
-History Activation；重新激活时从新的空 Baseline 开始。
-
-## Basic Canvas Composition
-
-`@nodebraid/preset-basic` 暴露
-`createBasicCanvasPlugin(rendererFactory, options?)`。它是后端无关的普通
-Plugin，通过 Child Installation 拥有 Kernel、Port、Command、Node Editing、Session、Renderer、
-Interaction 与 History。Composition 会等待每个 child 激活，并按依赖安全的逆序释放。
-
-应用仍负责创建 Plugin Host、配置 Diagnostics、选择具体 Renderer Factory，并将
-Layout 或领域能力作为同级 Plugin 安装。Core 会重导出 Composition factory，但不会重导出或选择
-`@nodebraid/renderer-svg` 或其他具体 Provider。
-
-## React Adapter
-
-`@nodebraid/adapter-react` 通过 `useRuntimeMount()` 接受 target-specific async Runtime
-Factory。其 callback ref 拥有 `pending` / `ready` / `failed` 转换、Strict Mode 重放、过期
-Factory 结果、异步 dispose 顺序和显式生命周期 Failure reporting。
-`useKernelView()`、`useSessionSnapshot()` 与 `useHistorySnapshot()` 将既有稳定 Runtime
-Service 接入 `useSyncExternalStore`，不增加写入或 selector。
-
-该 package 不提供 Context、Provider、Renderer JSX、React Node Component、受控 Document、
-产品 UI 或 React/Vue 公共抽象。Basic SVG Example 直接消费这个公开 package，不再保留私有
-mount coordinator 或 Snapshot wrapper。
-
-v0 已验证边界是 React 19 client rendering，且每个 callback ref 同时只绑定一个 live
-Target。Runtime 尚无可重放的 hydration Snapshot contract，因此 Snapshot Hooks 在 SSR 中
-显式失败。
-
-## Layout packages
-
-`@nodebraid/layout-api` 定义不可变 Layout Input、异步 Layout Engine、显式
-capability 和严格 Layout Proposal 校验。`@nodebraid/plugin-layout` 将一个 Engine
-绑定到一个类型化 Command，并通过一次同步 Kernel Transaction 提交有效 Proposal，同时提供取消和过期
-revision 保护。
-
-`@nodebraid/layout-dagre` 与 `@nodebraid/layout-elk` 是显式可选
-Provider，不会由 `@nodebraid/core` 重导出。Dagre 提供确定性的 full layout；ELK
-提供 full layout，并通过 Stress algorithm 支持 incremental 与 Fixed Node 请求。
-
-## 常用命令
-
-安装依赖：
-
-```bash
-bun install
-```
-
-安装 React Adapter 与 SVG Renderer 浏览器测试所需 Chromium：
+执行浏览器检查或仓库全量检查前，先安装 Chromium：
 
 ```bash
 bunx agent-browser install
 ```
 
-启动本地 watch build：
+Linux CI 使用 `bunx agent-browser install --with-deps`。
 
-```bash
-bun run dev
-```
+| 命令                                 | 用途                                                          |
+| ------------------------------------ | ------------------------------------------------------------- |
+| `bun run example:dev`                | 构建依赖并启动交互示例。                                      |
+| `bun run example:check`              | 构建示例、检查类型并执行浏览器验收。                          |
+| `bun run dev`                        | 监听根入口构建，不启动示例应用。                              |
+| `bun run build`                      | 构建根入口与公共 workspace package。                          |
+| `bun run check:affected --plan`      | 查看当前变更对应的检查范围。                                  |
+| `bun run check:affected`             | 执行受影响范围的开发检查，包含工作区变更。                    |
+| `bun run check:affected --base main` | 根据与 `main` 的 merge-base 及工作区变更选择检查。            |
+| `bun run check`                      | 执行完整 lint、格式、构建、类型、单元测试、浏览器与文档检查。 |
+| `bun run docs:dev`                   | 启动本地文档站。                                              |
+| `bun run docs:check`                 | 校验文档、运行 Quick Start 并构建站点。                       |
+| `bun run docs:preview`               | 预览已构建的文档站。                                          |
+| `bun run format`                     | 格式化支持的文件。                                            |
 
-单独启动私有 Examples Application：
-
-```bash
-bun run example:dev
-```
-
-独立构建或验证 Examples Application：
-
-```bash
-bun run example:build
-bun run example:test
-bun run example:check
-```
-
-启动本地文档站：
-
-```bash
-bun run docs:dev
-```
-
-执行文档 Quick Start 并构建生产文档站：
-
-```bash
-bun run docs:check
-```
-
-预览已构建文档站：
-
-```bash
-bun run docs:preview
-```
-
-构建根入口和全部 `@nodebraid/*` workspace package：
-
-```bash
-bun run build
-```
-
-运行仓库全部检查：
-
-```bash
-bun run check
-```
-
-运行单项检查：
-
-```bash
-bun run lint
-bun run typecheck
-bun run format:check
-bun run test
-bun run test:browser
-```
-
-Workspace package 类型检查会先构建 package-name 解析所需的依赖声明，因此相同命令可以在没有
-预存 `dist` 的干净 checkout 中运行。
-
-只构建并验证独立 Diagnostics package：
-
-```bash
-bun run --filter '@nodebraid/diagnostics' build
-```
-
-只构建 `@nodebraid/plugin-kernel` 所需声明：
-
-```bash
-bun run --filter '@nodebraid/plugin-kernel' build:dependencies
-```
-
-只构建 `@nodebraid/plugin-command` 所需声明：
-
-```bash
-bun run --filter '@nodebraid/plugin-command' build:dependencies
-```
-
-构建 Layout package 所需声明：
-
-```bash
-bun run --filter '@nodebraid/layout-api' build:dependencies
-bun run --filter '@nodebraid/plugin-layout' build:dependencies
-bun run --filter '@nodebraid/layout-dagre' build:dependencies
-bun run --filter '@nodebraid/layout-elk' build:dependencies
-```
-
-构建 `@nodebraid/plugin-session` 所需声明：
-
-```bash
-bun run --filter '@nodebraid/plugin-session' build:dependencies
-```
-
-构建 `@nodebraid/plugin-history` 所需声明：
-
-```bash
-bun run --filter '@nodebraid/plugin-history' build:dependencies
-```
-
-构建并验证 React Adapter，包括真实 Chromium public-seam 测试：
-
-```bash
-bun run --filter '@nodebraid/adapter-react' build:dependencies
-bun run --filter '@nodebraid/adapter-react' test:browser
-```
-
-构建 SVG Renderer Provider 所需依赖并运行真实浏览器 seam 测试：
-
-```bash
-bun run --filter '@nodebraid/renderer-svg' build:dependencies
-bun run --filter '@nodebraid/renderer-svg' build:test-dependencies
-bun run --filter '@nodebraid/renderer-svg' test:browser
-```
-
-独立构建 Interaction 值与 Runtime package：
-
-```bash
-bun run --filter '@nodebraid/interaction-api' build:dependencies
-bun run --filter '@nodebraid/plugin-interaction' build:dependencies
-bun run --filter '@nodebraid/canvas-fragment' build:dependencies
-bun run --filter '@nodebraid/plugin-duplicate-selection' build:dependencies
-bun run --filter '@nodebraid/plugin-clipboard' build:dependencies
-bun run --filter '@nodebraid/plugin-clipboard' build:test-dependencies
-```
-
-构建 Basic Canvas Composition 所需依赖：
-
-```bash
-bun run --filter '@nodebraid/preset-basic' build:dependencies
-```
-
-格式化支持的文件：
-
-```bash
-bun run format
-```
-
-## 创建 package
-
-在 `packages/` 下创建 package 目录：
-
-```text
-packages/
-└── my-package/
-    ├── package.json
-    └── src/
-        └── index.ts
-```
-
-每个 workspace package 可以定义自己的构建与发布行为，同时共享根工具链。
-
-从仓库根目录运行单个 workspace package 的脚本：
+从根目录执行单个 package 的普通脚本，会自动准备所需 workspace 依赖。
+`:self` 脚本仅供已完成依赖构建的内部调度使用。
 
 ```bash
 bun run --filter '@nodebraid/core' build
 bun run --filter '@nodebraid/core' test
 ```
 
+受影响范围检查用于开发迭代，不能替代正式交付的全量验证。单项检查、各包命令和贡献要求见
+[AGENTS.md](./AGENTS.md)。
+
+### 目录导航
+
+```text
+packages/       公共 @nodebraid/* packages
+examples/app/   私有 React Examples Application
+website/        双语文档站与共用 Quick Start
+src/            根 TypeScript 入口
+tests/          跨包与工具测试
+scripts/        构建、验证与本地工作流工具
+docs/           架构决策与贡献流程
+```
+
+### 贡献与 Agent 工作流
+
+从 [AGENTS.md](./AGENTS.md)、[领域词汇表](./CONTEXT.md)和相关
+[架构决策](./docs/adr/)开始。每个新需求使用一个 GitHub spec Issue 和一个面向 `main` 的
+PR，实施 ticket 保留在本地 run 中，具体遵循 [Issue tracker 约定](./docs/agents/issue-tracker.md)。
+
+本地 Codex 工作流使用 ChatGPT 登录开展调查、实现、独立 Standards／Spec 审查和 PR 反馈修复；
+GitHub 保存权威 Issue、PR 与 CI。设置和命令见 [Agent 工作流](./docs/agents/agentic-workflows.md)，
+验证遵循[能力验证地图](./.agents/skills/control-nodebraid/references/capabilities.md)、
+[PR 证据流程](./docs/agents/pr-evidence.md)与 [PR 风险规则](./.agents/skills/pr-risk/SKILL.md)。
+
+[Checks workflow](./.github/workflows/test.yml) 在推送到 `main` 或在 `main` 上手动运行时，
+先执行全量检查，再部署同次构建的文档产物。GitHub Pages 的 Source 需设置为 **GitHub Actions**。
+
 ## 许可证
 
 [MIT](./LICENSE)
-
-## 节点创建与编辑
-
-`@nodebraid/plugin-node-editing` 提供 `createNodeCommand` 与 `updateNodeDataCommand`，
-由 core 重导出并纳入 Basic Composition。应用拥有节点类型与不透明 data；SVG
-`createNodeContent` 提供同步自定义内容，Geometry 与矩形命中仍由 Provider 负责。
-示例提供单次放置、应用/取消编辑、明确的过期草稿恢复及已有文件往返。移动正在编辑的
-Node 也会使草稿过期，无关 Node 的变化不影响提交。
-
-```sh
-bun run --filter '@nodebraid/plugin-node-editing' build:dependencies
-bun run --filter '@nodebraid/plugin-node-editing' build:test-dependencies
-bun run --filter '@nodebraid/plugin-node-editing' test
-```
