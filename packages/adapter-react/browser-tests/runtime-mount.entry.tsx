@@ -366,7 +366,9 @@ interface SnapshotSources {
   readonly kernelListeners: Set<() => void>;
   readonly session: SessionService;
   readonly sessionListeners: Set<() => void>;
-  update(): void;
+  updateKernel(): void;
+  updateSession(): void;
+  updateHistory(): void;
 }
 
 function createSnapshotSources(): SnapshotSources {
@@ -414,15 +416,19 @@ function createSnapshotSources(): SnapshotSources {
     kernelListeners,
     session,
     sessionListeners,
-    update() {
+    updateKernel() {
       view = Object.freeze({ snapshot: Object.freeze({ revision: 4 }) }) as CanvasView;
+      for (const listener of kernelListeners) listener();
+    },
+    updateSession() {
       sessionSnapshot = Object.freeze({
         selection: Object.freeze({ nodeIds: Object.freeze([]), edgeIds: Object.freeze([]) }),
         viewport: Object.freeze({ x: 20, y: 30, zoom: 2 }),
       }) as SessionSnapshot;
-      historySnapshot = Object.freeze({ canUndo: true, canRedo: false });
-      for (const listener of kernelListeners) listener();
       for (const listener of sessionListeners) listener();
+    },
+    updateHistory() {
+      historySnapshot = Object.freeze({ canUndo: true, canRedo: false });
       for (const listener of historyListeners) listener();
     },
   };
@@ -448,13 +454,26 @@ async function runSnapshotScenario() {
   await waitFor(() => readSnapshotValue(container) === '0|1|false');
   const initial = readSnapshotValue(container);
   const subscriptionsWhileMounted = readSubscriptionCounts(sources);
-  sources.update();
+  sources.updateKernel();
+  await waitFor(() => readSnapshotValue(container) === '4|1|false');
+  const afterKernelUpdate = readSnapshotValue(container);
+  sources.updateSession();
+  await waitFor(() => readSnapshotValue(container) === '4|2|false');
+  const afterSessionUpdate = readSnapshotValue(container);
+  sources.updateHistory();
   await waitFor(() => readSnapshotValue(container) === '4|2|true');
   const updated = readSnapshotValue(container);
   root.unmount();
   const subscriptionsAfterUnmount = readSubscriptionCounts(sources);
   container.remove();
-  return { initial, updated, subscriptionsWhileMounted, subscriptionsAfterUnmount };
+  return {
+    initial,
+    afterKernelUpdate,
+    afterSessionUpdate,
+    updated,
+    subscriptionsWhileMounted,
+    subscriptionsAfterUnmount,
+  };
 }
 
 function readStatus(container: HTMLElement) {

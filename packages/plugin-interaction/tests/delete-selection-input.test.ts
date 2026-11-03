@@ -115,6 +115,44 @@ test('a live Interaction Shortcut Binding executes its Command and prevents the 
   await host.dispose();
 });
 
+test('Port clicks select and toggle their owning Node through Renderer Input', async () => {
+  const { host, kernel, renderer, session } = await activateInputRuntime();
+  const ownerId = nodeId('port-owner');
+  const otherId = nodeId('other-node');
+  const noModifiers = { alt: false, control: false, meta: false, shift: false };
+  const additive = { ...noModifiers, shift: true };
+  try {
+    kernel.transact((transaction) => {
+      transaction.nodes.add({ id: ownerId, type: 'task', position: { x: 0, y: 0 }, data: null });
+      transaction.nodes.add({ id: otherId, type: 'task', position: { x: 100, y: 0 }, data: null });
+    });
+    const before = kernel.read();
+    renderer.hit = { type: 'node', nodeId: otherId, worldPoint: { x: 100, y: 0 } };
+    renderer.emit(pointerInput('pointer.down', 'primary', 0));
+    renderer.emit(pointerInput('pointer.up', 'primary', 0));
+    expect(session.getSnapshot().selection).toEqual({ nodeIds: [otherId], edgeIds: [] });
+
+    for (const role of ['source', 'target'] as const) {
+      renderer.hit = { type: 'port', nodeId: ownerId, portId: role, role, worldPoint: { x: 0, y: 0 } };
+      session.setSelection({ nodeIds: [otherId], edgeIds: [] });
+      renderer.emit(pointerInput('pointer.down', 'primary', 0));
+      renderer.emit(pointerInput('pointer.up', 'primary', 0));
+      expect(session.getSnapshot().selection).toEqual({ nodeIds: [ownerId], edgeIds: [] });
+
+      session.setSelection({ nodeIds: [otherId], edgeIds: [] });
+      renderer.emit(pointerInput('pointer.down', 'primary', 0, additive));
+      renderer.emit(pointerInput('pointer.up', 'primary', 0, additive));
+      expect(session.getSnapshot().selection).toEqual({ nodeIds: [otherId, ownerId], edgeIds: [] });
+      renderer.emit(pointerInput('pointer.down', 'primary', 0, additive));
+      renderer.emit(pointerInput('pointer.up', 'primary', 0, additive));
+      expect(session.getSnapshot().selection).toEqual({ nodeIds: [otherId], edgeIds: [] });
+    }
+    expect(kernel.read()).toBe(before);
+  } finally {
+    await host.dispose();
+  }
+});
+
 test('logical Delete key removes the current Selection through the public Renderer Input seam', async () => {
   const { host, kernel, renderer, session } = await activateInputRuntime();
 
@@ -344,9 +382,10 @@ function keyInput(
 }
 
 function pointerInput(
-  type: 'pointer.down' | 'pointer.move' | 'pointer.cancel',
+  type: 'pointer.down' | 'pointer.move' | 'pointer.up' | 'pointer.cancel',
   button: 'primary' | 'auxiliary',
   coordinate: number,
+  modifiers = { alt: false, control: false, meta: false, shift: false },
 ): RendererInput {
   return {
     type,
@@ -355,7 +394,7 @@ function pointerInput(
     screenPoint: { x: coordinate, y: coordinate },
     worldPoint: { x: coordinate, y: coordinate },
     button: type === 'pointer.move' || type === 'pointer.cancel' ? null : button,
-    pressedButtons: type === 'pointer.cancel' ? [] : [button],
-    modifiers: { alt: false, control: false, meta: false, shift: false },
+    pressedButtons: type === 'pointer.up' || type === 'pointer.cancel' ? [] : [button],
+    modifiers,
   };
 }

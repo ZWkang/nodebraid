@@ -49,7 +49,7 @@ import {
 describe('@nodebraid/core', () => {
   test('publishes Port values and Runtime contribution seams', () => {
     const definition: PortDefinition = { id: 'output', role: 'source' };
-    expect(definition).toEqual({ id: 'output', role: 'source' });
+    void definition; // The exported value type is checked by typecheck.
     expect(portPlugin).toBeDefined();
     expect(portService).toBeDefined();
     expect(typeof createPortContributionPlugin).toBe('function');
@@ -228,7 +228,7 @@ describe('@nodebraid/core', () => {
       viewport: { x: 20, y: 30, zoom: 1 },
     };
 
-    expect(projection.type).toBe('viewport-pan');
+    void projection; // The exported value type is checked by typecheck.
     expect(interactionPlugin).toBeDefined();
     expect(moveNodesCommand.id).toBe('interaction.nodes.move');
     expect(interactionDiagnosticEvents.inputRejected).toBe('nodebraid.plugin.interaction.input.rejected');
