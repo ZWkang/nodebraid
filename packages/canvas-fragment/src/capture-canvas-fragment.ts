@@ -3,8 +3,8 @@ import type { CanvasEdge, CanvasNode, CanvasView, EdgeId, NodeId } from '@nodebr
 import type { CanvasFragment, CanvasFragmentSelection } from './contracts';
 
 export function captureCanvasFragment(view: CanvasView, selection: CanvasFragmentSelection): CanvasFragment | null {
-  if (selection.nodeIds.length === 0) return null;
   const nodeIds = [...selection.nodeIds].sort(compareIds);
+  if (nodeIds.length === 0) return null;
   const nodeIdSet = new Set(nodeIds);
   const nodes = nodeIds.map((id) => requireNode(view, id));
   const edgesById = new Map<EdgeId, CanvasEdge>();

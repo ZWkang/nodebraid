@@ -96,7 +96,8 @@ comment is not excluded merely because it copies an evidence marker.
    **Group by root cause.** When a new defect shares the root cause of an open or
    recently closed Issue (for example, re-reading a validated input instead of a
    boundary snapshot), extend that Issue's scope and fix every known instance in its
-   PR instead of opening another Issue per call site.
+   PR instead of opening another Issue per call site. Repeated input reads are scanned
+   by `tests/boundary-reads.test.ts`; add a row there for each new public input boundary.
    Run `bun run agents:discovery sync <queue.json>` even when main is unchanged and
    continue its pending seams before treating the run as no work. Finish an entry
    only after its commands pass and any confirmed defect is recorded in GitHub.
