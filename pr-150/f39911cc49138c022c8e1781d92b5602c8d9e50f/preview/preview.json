@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "42ad909b0d8581fe90883bc90eaa872745dab5a2",
+    "head": "f39911cc49138c022c8e1781d92b5602c8d9e50f",
+    "tree": "56584f33f75bff9d3000fc464dc97817f4102bcc",
+    "patch": "bc5bd9aebb4009aaeb97cc941045dc8bf746679778058e9227b483347a9c3b50"
+  },
+  "status": "not-applicable",
+  "limitations": [
+    "These preview scenes cover Canvas behavior, not Layout execution. The Basic SVG browser suite verifies the manual Auto layout control; capture its interaction separately for Layout evidence."
+  ],
+  "scenes": [],
+  "artifacts": [],
+  "reason": "No changed Examples Application or Canvas runtime source selects a visible scene."
+}
