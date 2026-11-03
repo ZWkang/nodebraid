@@ -153,8 +153,7 @@ comment is not excluded merely because it copies an evidence marker.
    with that prerequisite in their acceptance and the handoff. Complete
    review/publication/merge tickets only after their operations succeed. Neither
    `verify` nor `evaluate` reads the completion list, so record those checks
-   explicitly. Record friction for the
-   [workflow retrospective](#workflow-retrospective). Give the user the PR link.
+   explicitly. Give the user the PR link.
    Until current-head checks and feedback pass, report the PR as waiting for CI or
    repair; then follow the [pr-risk route](../skills/pr-risk/SKILL.md#execute-the-route).
    A draft is an explicit opt-out; do not leave a newly managed PR in that state.
@@ -200,23 +199,26 @@ is missing or does not show the full report on the current head, `evaluate` retu
 
 ## Workflow retrospective
 
-When a delivery reaches ready, merge or a blocked state, append friction to the
-run's `retro.json`: `[{phase, category, note, minutes?, rule?}]`. `category` is a
-stable kebab-case name reused across runs (for example `duplicate-rule`,
-`evidence-readback`, `main-sync-rerun`); `rule` names the document section
-involved. Record what cost time, what was unclear or contradictory, and what was
-repeated work, from actual events only. An empty array is valid; do not invent
-friction.
+Retrospectives are user-invoked and run on session transcripts, not on run
+metrics: the Codex chat's `~/.codex/sessions/` rollouts or Cursor's
+`agent-transcripts/`. The scheduled heartbeat never starts one.
 
-When the user asks for a retrospective, run `bun run agents:retro`. It continues
-from the previous retrospective, prints the report and saves it under `retros/`.
-It reports runs per delivery, repeated or failed full checks,
-prepare-to-publication time and signals whose count reaches the threshold
-(default 3). For each signal, search open and closed Issues for its
-`workflow-retro:<key>` marker; comment new evidence on an existing open Issue,
-otherwise publish the generated `workflow: ` proposal with `needs-design`. Never
-apply `ready-for-agent` to it: workflow changes are high risk and start only after
-the user approves a design.
+- `retro` (user says "retro"): finds environment improvements (navigation,
+  automated checks, review standards, AGENTS.md size, tool economy, no-op
+  instructions, information access) and presents them by severity. This repo has
+  no `CODING_STANDARDS.md`; review standards live in `code-review`,
+  `ponytail-review` and the `principle-*` skills.
+- `reflect` (user says "reflect"): three transcript reviewers plus a synthesizer
+  route durable learnings to edits of skills the session used. Without a pstack
+  models file it uses the skill's default models.
+
+Both wait for the user's choice before changing anything. In this repo, approved
+edits go to `.agents/skills/` or `docs/agents/`, never to `.cursor/skills/`. Do not
+edit a skill recorded in `skills-lock.json` in place; put the repository-specific
+rule in the workflow docs or a project skill. Approved changes are high risk under
+`pr-risk` and ship through one `workflow: ` Issue and PR with human merge. File
+Backlog items as `workflow: ` Issues with `needs-design`, after searching for an
+existing one.
 
 ## Rollback
 

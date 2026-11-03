@@ -18,10 +18,9 @@ const requiredFiles = [
   'scripts/collect-preview.ts',
   'scripts/pr-evidence.ts',
   'scripts/verification-report.ts',
-  'scripts/workflow-retro.ts',
   'docs/agents/legacy-recovery.md',
   '.agents/skills/verify-nodebraid/SKILL.md',
-  ...['tdd', 'code-review', 'ponytail', 'ponytail-review', 'pr', 'pr-risk', 'show-me'].map(
+  ...['tdd', 'code-review', 'ponytail', 'ponytail-review', 'pr', 'pr-risk', 'show-me', 'retro', 'reflect'].map(
     (name) => `.agents/skills/${name}/SKILL.md`,
   ),
   ...[

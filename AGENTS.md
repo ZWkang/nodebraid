@@ -31,6 +31,7 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 - [issue-tracker.md](docs/agents/issue-tracker.md)：Issue 约定、标签、`Refs #N`/`Fixes #N` 与关闭规则。
 - [pr-risk](.agents/skills/pr-risk/SKILL.md)：风险分级与合并路由；分级规则及执行权限变更本身属于 high。
 - [PR 证据](docs/agents/pr-evidence.md)：审查报告、界面证据与发布回执。
+- 复盘：用户说 retro 或 reflect 时使用 `retro`（改进环境与工作流）或 `reflect`（把经验落到 skill），本仓库的落地规则见 local-agent.md 的 Workflow retrospective。
 - [legacy-recovery.md](docs/agents/legacy-recovery.md)：旧父子 Issue、叠加 PR 和旧 run，仅在恢复历史工作时读取。
 
 `CONTEXT.md` 是唯一领域词汇表，skill 提到 `GLOSSARY.md` 时读取它。实现阶段应用项目级 `ponytail` 的 full 模式，Standards review 同时使用 `ponytail-review`；不删必要的错误处理、验证或框架 seam。可见 Canvas 变更和浏览器验证维护使用项目级 [verify-nodebraid](.agents/skills/verify-nodebraid/SKILL.md)。
@@ -42,7 +43,6 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 - `bun run agents:scan [base-sha]`：在已 fetch 的干净 main worktree 记录固定 SHA 调查范围。
 - `bun run agents:run <mode> ...`：`archive-issue`、`normalize`、`reconcile`、`prepare`、`frontier`、`inspect`、`verify`、`publication`、`evaluate`；参数与输入契约见 agentic-workflows.md。
 - `bun run agents:discovery init|sync|finish <queue.json> [report.json]`：维护按公共 seam 保存的调查待办。
-- `bun run agents:retro`：汇总上次复盘以来的 run 指标与摩擦记录，打印报告并生成 `workflow:` 改进提案；不写 GitHub。
 - `bun run agents:typecheck`：检查本地工作流命令及其共享状态模块的 TypeScript 类型；包含在完整工程类型检查中。
 - `bun run agents:preview --base <sha> (--out <empty-dir> | --plan) [--all]`：在干净提交上采集 Examples Application 场景、截图、录屏与 manifest，失败证据也保留；`--plan` 只输出选中场景。
 - `bun run agents:report <run-dir> <output-dir>`：生成绑定发布 head 的完整审查/验证报告和声明日志；可追加到同一 preview 目录，只创建新文件。

@@ -8,8 +8,6 @@
     "scripts/github-feedback.ts",
     "scripts/discovery*.ts",
     "scripts/pr-feedback.ts",
-    "scripts/prepare-defect-scan.ts",
-    "scripts/retro.ts",
-    "scripts/workflow-retro.ts"
+    "scripts/prepare-defect-scan.ts"
   ]
 }

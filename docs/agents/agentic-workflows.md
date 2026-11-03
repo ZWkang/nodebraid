@@ -166,19 +166,6 @@ bun run agents:discovery finish /absolute/path/to/discovery.json report.json
 `commands: [{command, exitCode}]`。命令失败、报告缺失或过期不会清掉 pending；成功报告
 保存成不可变 evidence 文件再原子更新队列，相同报告恢复不会重复完成。
 
-### 工作流复盘
-
-```bash
-bun run agents:retro
-```
-
-读取 `$CODEX_HOME/local-workflows/nodebraid/runs/`，自动从上次复盘结束的时间点继续，
-在终端打印报告并保存到同级 `retros/<时间>/`；不写 GitHub。需要时可用 `--since` 指定起点、
-`--threshold` 调整信号阈值（默认 3）。`retro.json` 含 `summary` 与每个信号的
-`proposals: [{key, title, body}]`，正文首行为 `<!-- workflow-retro:<key> -->` 去重标记。`retro.json` 摩擦记录格式错误时直接失败；
-时间来自产物修改时间，只作近似。发布 proposal 的规则见
-[local-agent.md](../../.agents/workflows/local-agent.md#workflow-retrospective)。
-
 ### 证据命令
 
 `agents:preview --base <sha> (--out <empty-dir> | --plan) [--all]`、
