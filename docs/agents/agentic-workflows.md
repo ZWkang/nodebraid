@@ -169,12 +169,13 @@ bun run agents:discovery finish /absolute/path/to/discovery.json report.json
 ### 工作流复盘
 
 ```bash
-bun run agents:retro ~/.codex/local-workflows/nodebraid/runs /absolute/path/to/empty-dir [--since <ISO>] [--threshold <n>]
+bun run agents:retro
 ```
 
-只读取 run 目录，不写 GitHub。输出 `retro.md`（指标与信号）和 `retro.json`
-（`summary` 与每个信号的 `proposals: [{key, title, body}]`，正文首行为
-`<!-- workflow-retro:<key> -->` 去重标记）。`retro.json` 摩擦记录格式错误时直接失败；
+读取 `$CODEX_HOME/local-workflows/nodebraid/runs/`，自动从上次复盘结束的时间点继续，
+在终端打印报告并保存到同级 `retros/<时间>/`；不写 GitHub。需要时可用 `--since` 指定起点、
+`--threshold` 调整信号阈值（默认 3）。`retro.json` 含 `summary` 与每个信号的
+`proposals: [{key, title, body}]`，正文首行为 `<!-- workflow-retro:<key> -->` 去重标记。`retro.json` 摩擦记录格式错误时直接失败；
 时间来自产物修改时间，只作近似。发布 proposal 的规则见
 [local-agent.md](../../.agents/workflows/local-agent.md#workflow-retrospective)。
 

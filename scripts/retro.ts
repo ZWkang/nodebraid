@@ -1,26 +1,40 @@
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
-import { resolve, join } from 'node:path';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
-import { collectRuns, renderProposal, renderRetro, summarizeRetro } from './workflow-retro';
+import { collectRuns, renderProposal, renderRetro, summarizeRetro, type RetroSummary } from './workflow-retro';
 
-const { values, positionals } = parseArgs({
-  allowPositionals: true,
-  options: { since: { type: 'string' }, threshold: { type: 'string' } },
+const { values } = parseArgs({
+  options: { since: { type: 'string' }, threshold: { type: 'string' }, home: { type: 'string' } },
 });
-const [runs, output] = positionals;
-if (!runs || !output)
-  throw new Error('Usage: retro <runs-dir> <empty-output-dir> [--since <ISO date>] [--threshold <n>]');
-const out = resolve(output);
-if (existsSync(out) && readdirSync(out).length)
-  throw new Error('Retro output must be empty; earlier reports are retained.');
-mkdirSync(out, { recursive: true });
+const home = resolve(
+  values.home ?? join(process.env.CODEX_HOME ?? join(homedir(), '.codex'), 'local-workflows/nodebraid'),
+);
+const retros = join(home, 'retros');
+const previous = existsSync(retros)
+  ? readdirSync(retros)
+      .filter((name) => existsSync(join(retros, name, 'retro.json')))
+      .sort()
+      .at(-1)
+  : undefined;
+const since =
+  values.since ??
+  (previous
+    ? (JSON.parse(readFileSync(join(retros, previous, 'retro.json'), 'utf8')) as { summary: RetroSummary }).summary
+        .window.until
+    : undefined);
 
-const summary = summarizeRetro(collectRuns(resolve(runs)), {
-  until: new Date().toISOString(),
-  ...(values.since ? { since: values.since } : {}),
+if (!existsSync(join(home, 'runs'))) throw new Error(`No local workflow runs at ${join(home, 'runs')}.`);
+const until = new Date().toISOString();
+const summary = summarizeRetro(collectRuns(join(home, 'runs')), {
+  until,
+  ...(since ? { since } : {}),
   ...(values.threshold ? { threshold: Number(values.threshold) } : {}),
 });
+const out = join(retros, until.replaceAll(':', '-'));
+mkdirSync(out, { recursive: true });
 const proposals = summary.signals.map((signal) => ({ key: signal.key, ...renderProposal(signal, summary) }));
 writeFileSync(join(out, 'retro.json'), `${JSON.stringify({ summary, proposals }, null, 2)}\n`);
-writeFileSync(join(out, 'retro.md'), renderRetro(summary));
-console.log(JSON.stringify({ runs: summary.runs, signals: proposals.map(({ key, title }) => ({ key, title })) }));
+const report = renderRetro(summary);
+writeFileSync(join(out, 'retro.md'), report);
+console.log(`${report}\nSaved to ${out}`);

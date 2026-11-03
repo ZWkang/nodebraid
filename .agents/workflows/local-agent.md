@@ -208,16 +208,15 @@ involved. Record what cost time, what was unclear or contradictory, and what was
 repeated work, from actual events only. An empty array is valid; do not invent
 friction.
 
-When the user asks for a retrospective, run
-`bun run agents:retro <runs-dir> <empty-output-dir> [--since <ISO date>]`. It reads
-`prepared-task.json`, `verification.json`, `check-*.log`, `publication.json` and
-`retro.json`, and reports runs per delivery, repeated or failed full checks,
+When the user asks for a retrospective, run `bun run agents:retro`. It continues
+from the previous retrospective, prints the report and saves it under `retros/`.
+It reports runs per delivery, repeated or failed full checks,
 prepare-to-publication time and signals whose count reaches the threshold
 (default 3). For each signal, search open and closed Issues for its
 `workflow-retro:<key>` marker; comment new evidence on an existing open Issue,
 otherwise publish the generated `workflow: ` proposal with `needs-design`. Never
 apply `ready-for-agent` to it: workflow changes are high risk and start only after
-the user approves a design. Use the previous retrospective's `until` as `--since`.
+the user approves a design.
 
 ## Rollback
 

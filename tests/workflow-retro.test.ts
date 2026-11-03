@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { collectRuns, renderProposal, retroMarker, summarizeRetro, type RunFacts } from '../scripts/workflow-retro';
@@ -94,19 +94,24 @@ test('the CLI reads real run directories, rejects malformed friction and keeps e
       );
     }
     mkdirSync(join(root, 'runs', 'unprepared'));
-    const result = invoke('runs', 'out');
+    const result = invoke('--home', root);
     expect({ exitCode: result.exitCode, stderr: result.stderr.toString() }).toMatchObject({ exitCode: 0 });
-    const report = JSON.parse(readFileSync(join(root, 'out', 'retro.json'), 'utf8'));
-    expect(report.summary).toMatchObject({ runs: 3, deliveries: 3, metrics: { leadTimeHours: { median: 2 } } });
-    expect(report.proposals.map((item: { key: string }) => item.key)).toEqual(['friction:duplicate-rule']);
-    expect(readFileSync(join(root, 'out', 'retro.md'), 'utf8')).toContain('friction:duplicate-rule');
-    expect(invoke('runs', 'out').stderr.toString()).toContain('must be empty');
+    expect(result.stdout.toString()).toContain('friction:duplicate-rule');
+    const reports = () => readdirSync(join(root, 'retros')).sort();
+    const first = JSON.parse(readFileSync(join(root, 'retros', reports()[0]!, 'retro.json'), 'utf8'));
+    expect(first.summary).toMatchObject({ runs: 3, deliveries: 3, metrics: { leadTimeHours: { median: 2 } } });
+    expect(first.proposals.map((item: { key: string }) => item.key)).toEqual(['friction:duplicate-rule']);
+
+    expect(invoke('--home', root).exitCode).toBe(0);
+    expect(reports()).toHaveLength(2);
+    const second = JSON.parse(readFileSync(join(root, 'retros', reports()[1]!, 'retro.json'), 'utf8'));
+    expect(second.summary).toMatchObject({ window: { since: first.summary.window.until }, runs: 0 });
 
     writeFileSync(
       join(root, 'runs', 'r1', 'retro.json'),
       JSON.stringify([{ phase: 'review', category: 'Bad Name', note: 'x' }]),
     );
-    expect(invoke('runs', 'out2').stderr.toString()).toContain('kebab-case');
+    expect(invoke('--home', root, '--since', '2026-01-01T00:00:00Z').stderr.toString()).toContain('kebab-case');
     expect(() => collectRuns(join(root, 'runs'))).toThrow('kebab-case');
   } finally {
     rmSync(root, { recursive: true });

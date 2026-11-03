@@ -42,7 +42,7 @@ Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执
 - `bun run agents:scan [base-sha]`：在已 fetch 的干净 main worktree 记录固定 SHA 调查范围。
 - `bun run agents:run <mode> ...`：`archive-issue`、`normalize`、`reconcile`、`prepare`、`frontier`、`inspect`、`verify`、`publication`、`evaluate`；参数与输入契约见 agentic-workflows.md。
 - `bun run agents:discovery init|sync|finish <queue.json> [report.json]`：维护按公共 seam 保存的调查待办。
-- `bun run agents:retro <runs-dir> <empty-dir> [--since <ISO>]`：用户要求复盘时汇总 run 指标与 `retro.json` 摩擦记录，生成带去重标记的 `workflow:` 改进提案；只读，不写 GitHub。
+- `bun run agents:retro`：汇总上次复盘以来的 run 指标与摩擦记录，打印报告并生成 `workflow:` 改进提案；不写 GitHub。
 - `bun run agents:typecheck`：检查本地工作流命令及其共享状态模块的 TypeScript 类型；包含在完整工程类型检查中。
 - `bun run agents:preview --base <sha> (--out <empty-dir> | --plan) [--all]`：在干净提交上采集 Examples Application 场景、截图、录屏与 manifest，失败证据也保留；`--plan` 只输出选中场景。
 - `bun run agents:report <run-dir> <output-dir>`：生成绑定发布 head 的完整审查/验证报告和声明日志；可追加到同一 preview 目录，只创建新文件。
