@@ -5,7 +5,7 @@ import { createLayoutInput, type LayoutError } from '@nodebraid/layout-api';
 
 import { elkLayoutEngine } from '../src';
 
-test('ELK Stress keeps multiple Fixed Nodes at their absolute world positions', async () => {
+test('ELK Stress keeps Fixed Nodes and their connected layout in absolute world coordinates', async () => {
   const leftId = nodeId('left');
   const movableId = nodeId('movable');
   const rightId = nodeId('right');
@@ -51,17 +51,27 @@ test('ELK Stress keeps multiple Fixed Nodes at their absolute world positions', 
   );
   const positions = new Map(proposal.positions.map((position) => [position.id, position.position]));
 
-  expect({
-    fixedCapability: elkLayoutEngine.capabilities.fixedNodes,
-    left: positions.get(leftId),
-    right: positions.get(rightId),
-    movableFinite: Object.values(positions.get(movableId) ?? {}).every(Number.isFinite),
-  }).toEqual({
-    fixedCapability: true,
-    left: { x: 100, y: 100 },
-    right: { x: 400, y: 100 },
-    movableFinite: true,
+  expect(positions.get(leftId)).toEqual({ x: 100, y: 100 });
+  expect(positions.get(rightId)).toEqual({ x: 400, y: 100 });
+  expect(Math.abs(positions.get(movableId)!.y - 100)).toBeLessThan(160);
+
+  const offset = { x: 1000, y: -700 };
+  kernel.transact((transaction) => {
+    for (const node of input.nodes) {
+      transaction.nodes.replace(node.id, {
+        ...transaction.query.getNode(node.id)!,
+        position: { x: node.position.x + offset.x, y: node.position.y + offset.y },
+      });
+    }
   });
+  const translated = await elkLayoutEngine.compute(
+    createLayoutInput(kernel.read(), { mode: 'full', fixedNodeIds: [leftId, rightId] }),
+    { algorithm: 'stress', padding: 0, randomSeed: 1 },
+    { signal: new AbortController().signal },
+  );
+  const moved = translated.positions.find(({ id }) => id === movableId)!.position;
+  expect(moved.x).toBeCloseTo(positions.get(movableId)!.x + offset.x, 6);
+  expect(moved.y).toBeCloseTo(positions.get(movableId)!.y + offset.y, 6);
 });
 
 test('ELK Stress incremental layout uses current positions as a deterministic soft constraint', async () => {
@@ -115,15 +125,9 @@ test('ELK Stress incremental layout uses current positions as a deterministic so
       return total + Math.abs(result.position.x - source.x) + Math.abs(result.position.y - source.y);
     }, 0);
 
-  expect({
-    incrementalCapability: elkLayoutEngine.capabilities.incremental,
-    preservesMentalMap: movement(incremental.positions) < movement(full.positions),
-    deterministic: JSON.stringify(incremental) === JSON.stringify(repeated),
-  }).toEqual({
-    incrementalCapability: true,
-    preservesMentalMap: true,
-    deterministic: true,
-  });
+  expect(movement(incremental.positions)).toBeGreaterThan(0);
+  expect(movement(incremental.positions)).toBeLessThan(movement(full.positions));
+  expect(incremental).toEqual(repeated);
 });
 
 test('ELK rejects incremental and Fixed Node requests for unproven algorithms', async () => {
