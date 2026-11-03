@@ -1,4 +1,5 @@
 import { runNodeContentCases } from './node-content.entry';
+import { runEdgePresentationCases } from './edge-presentation.entry';
 import {
   runInteractionGeometryValueCases,
   runInteractionGeometryArrayCases,
@@ -13,8 +14,10 @@ import {
 
 declare global {
   var __nodebraidRendererSvgNodeContentCases: typeof runNodeContentCases;
+  var __nodebraidRendererSvgEdgePresentationCases: typeof runEdgePresentationCases;
 }
 globalThis.__nodebraidRendererSvgNodeContentCases = runNodeContentCases;
+globalThis.__nodebraidRendererSvgEdgePresentationCases = runEdgePresentationCases;
 // Public-seam browser scenarios for the complete SVG Renderer contract.
 import { createCanvasKernel, edgeId, nodeId, type EdgeEndpoint } from '@nodebraid/kernel';
 import type { DiagnosticEvent, DiagnosticFault } from '@nodebraid/diagnostics';

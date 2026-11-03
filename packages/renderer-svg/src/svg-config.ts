@@ -1,4 +1,10 @@
-import type { SvgDomEventPolicy, SvgInputPolicies, SvgRendererConfig, SvgNodeContentFactory } from './contracts';
+import type {
+  SvgDomEventPolicy,
+  SvgInputPolicies,
+  SvgRendererConfig,
+  SvgNodeContentFactory,
+  SvgEdgeConfig,
+} from './contracts';
 import { SvgRendererError } from './svg-renderer-error';
 
 /** @internal */
@@ -14,6 +20,7 @@ interface ValidatedSvgConfig {
   readonly edgeHitTolerance: number;
   readonly connectionAnchorHitTolerance: number;
   readonly createNodeContent: SvgNodeContentFactory | undefined;
+  readonly edges: SvgEdgeConfig | undefined;
 }
 
 /** @internal */
@@ -23,7 +30,7 @@ export function validateConfig(config: Readonly<SvgRendererConfig>): ValidatedSv
   }
   assertKnownConfigKeys(
     config,
-    ['target', 'edgeHitTolerance', 'connectionAnchorHitTolerance', 'input', 'createNodeContent'],
+    ['target', 'edgeHitTolerance', 'connectionAnchorHitTolerance', 'input', 'createNodeContent', 'edges'],
     '',
   );
   const target = (config as Readonly<{ target?: unknown }>).target;
@@ -57,11 +64,29 @@ export function validateConfig(config: Readonly<SvgRendererConfig>): ValidatedSv
       field: 'createNodeContent',
     });
   }
+  const edgeConfig = config.edges;
+  let edges: SvgEdgeConfig | undefined;
+  if (edgeConfig !== undefined) {
+    if (!isRecord(edgeConfig))
+      throw new SvgRendererError('INVALID_CONFIG', 'edges must be an object.', { field: 'edges' });
+    assertKnownConfigKeys(edgeConfig, ['resolve', 'previewPath'], 'edges');
+    const resolve = edgeConfig.resolve;
+    const previewPath = edgeConfig.previewPath;
+    if (typeof resolve !== 'function')
+      throw new SvgRendererError('INVALID_CONFIG', 'edges.resolve must be synchronous.', { field: 'edges.resolve' });
+    if (previewPath !== 'orthogonal' && previewPath !== 'bezier') {
+      throw new SvgRendererError('INVALID_CONFIG', 'edges.previewPath must select a supported path.', {
+        field: 'edges.previewPath',
+      });
+    }
+    edges = Object.freeze({ resolve: resolve as SvgEdgeConfig['resolve'], previewPath });
+  }
   return {
     target: target as SVGSVGElement,
     edgeHitTolerance: edgeHitTolerance ?? 4,
     connectionAnchorHitTolerance: connectionAnchorHitTolerance ?? 8,
     createNodeContent,
+    edges,
   };
 }
 

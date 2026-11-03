@@ -5,6 +5,7 @@ import type { SessionSnapshot } from '@nodebraid/session-api';
 
 import { readTargetMatrix } from './target-mapping';
 import { getNodePortGeometries, resolveEdgeEndpointPoint } from './port-geometry';
+import { distanceToEdge, type EdgeGeometries } from './edge-geometry';
 
 /** @internal */
 export function hitTestProjection(
@@ -15,6 +16,7 @@ export function hitTestProjection(
   sessionSnapshot: SessionSnapshot,
   edgeHitTolerance: number,
   connectionAnchorHitTolerance: number,
+  edgeGeometries?: EdgeGeometries,
 ): HitResult | null {
   validateScreenPoint(point);
   readTargetMatrix(target, 'TARGET_UNAVAILABLE');
@@ -72,6 +74,21 @@ export function hitTestProjection(
     ) {
       return { type: 'node', nodeId: node.id, worldPoint };
     }
+  }
+  if (edgeGeometries) {
+    let nearest: HitResult | undefined;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+    for (let index = documentSnapshot.edges.length - 1; index >= 0; index -= 1) {
+      const edge = documentSnapshot.edges[index]!;
+      const geometry = edgeGeometries.get(edge.id);
+      if (!geometry) throw new Error('Accepted Edge Geometry is missing.');
+      const distance = distanceToEdge(worldPoint, geometry) * viewport.zoom;
+      if (distance <= edgeHitTolerance && distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = { type: 'edge', edgeId: edge.id, worldPoint };
+      }
+    }
+    return nearest ?? { type: 'canvas', worldPoint };
   }
   const nodesById = new Map(documentSnapshot.nodes.map((node) => [node.id, node]));
   for (let index = documentSnapshot.edges.length - 1; index >= 0; index -= 1) {

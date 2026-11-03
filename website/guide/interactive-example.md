@@ -16,6 +16,8 @@ bun run example:dev
 
 打开终端输出的 `/basic-svg` 地址，即可体验 Selection、Box Selection、真实 Clipboard Ctrl/Cmd+C / Ctrl/Cmd+V、Ctrl/Cmd+D Duplicate、Node Drag、Pan、Zoom、Port-aware Edge Connection、手动自动布局、Undo、Redo、Fit View 与完整 Runtime Reset。
 
+示例显式启用 SVG 可读连线：初始 Discover→Compose 是带方向箭头和文本标签的正交路径，从 Compose output 拖向 Ship input 会创建贝塞尔路径。重复连接相同 Port 会分道显示，每条 Edge 可分别选中；Undo/Redo 与布局保持端点和应用标签。标签来自现有应用 data，随 Document 文件往返保存；路径由应用 Edge type 映射，Renderer 配置不进入文件。这是公共接口组合示例，不提供连线属性面板。
+
 示例只依赖 `@nodebraid/adapter-react`、`@nodebraid/core` 和显式选择的 `@nodebraid/renderer-svg`、`@nodebraid/layout-dagre` 公共入口。React Adapter 拥有 Runtime mount/remount 与稳定 Snapshot projection；应用继续拥有 Runtime Factory、Toolbar 和 Clipboard 状态。当前示例暂不独立部署；本页始终提供有效的能力说明和本地启动入口。
 
 ## 手动自动布局

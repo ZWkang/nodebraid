@@ -13,7 +13,7 @@ description: 将 NodeBraid Canvas 语义投影到现有 SVG Target 的参考级 
 
 `@nodebraid/renderer-svg` 是 `@nodebraid/renderer-api` 的首个官方 concrete Provider。它把 Document、Session、Hit Test 与标准化浏览器输入投影到调用方已有的 `SVGSVGElement`，用真实 DOM 验证 Renderer contract，而不让 SVG 类型进入 Kernel、Session 或公共 Renderer API。
 
-它提供通用矩形 Node、直线 Edge 与稳定 DOM seam，但不解释产品 Node type、业务 data 或组件框架。
+它提供通用矩形 Node、默认直线 Edge，以及显式启用的正交/贝塞尔路径、方向箭头和应用文本标签；保留稳定 DOM seam，业务 data 的解释由应用映射函数拥有。
 
 ## 何时使用
 
@@ -22,12 +22,12 @@ description: 将 NodeBraid Canvas 语义投影到现有 SVG Target 的参考级 
 - 你愿意由应用通过 CSS 和上层 Interaction 定义产品视觉与编辑行为；
 - 你要直接使用具名 Factory，或通过 [`@nodebraid/plugin-renderer`](/modules/plugin-renderer) 接入 Runtime。
 
-如果产品需要HTML/React 组件节点、任意 Port shape/position、复杂 Edge、组件挂载或完整编辑器交互，本 package 不是这些能力的替代品。
+如果产品需要 HTML/React 组件节点、任意 Port shape/position、避障路由、交互式标签、组件挂载或完整编辑器交互，本 package 不是这些能力的替代品。
 
 ## 提供的能力
 
 - 同步 `createSvgRenderer(config)` Factory，一次绑定一个现有 `SVGSVGElement`；
-- 通用矩形 Node、直线 Edge、Selection 标记与 Viewport projection；
+- 通用矩形 Node、默认直线或显式正交/贝塞尔 Edge、方向箭头、应用文本标签、Selection 标记与 Viewport projection；
 - Pointer、Wheel、Keyboard、Focus 与 Pointer Capture 的真实 DOM bridge；
 - Node Drag、Viewport Pan、Box Selection marquee 与 Connection Preview Projection，以及 Port 或 node-level source/target Anchor Hit Result；
 - source/target Port 的规范边界 Geometry、稳定 DOM seam 与 port-qualified Edge 端点；
@@ -55,6 +55,9 @@ import {
   type SvgRendererConfig,
   type SvgNodeContentContext,
   type SvgNodeContentFactory,
+  type SvgEdgePath,
+  type SvgEdgePresentation,
+  type SvgEdgeConfig,
   type SvgRendererErrorCode,
 } from '@nodebraid/renderer-svg';
 
@@ -93,6 +96,16 @@ Provider 写入 geometry、稳定 class 与 `data-nodebraid-*` 属性，但不�
   stroke: currentColor;
 }
 
+[data-nodebraid-edge-path] {
+  fill: none;
+}
+
+[data-nodebraid-edge-arrow],
+[data-nodebraid-edge-label] {
+  fill: currentColor;
+  stroke: none;
+}
+
 .nodebraid-renderer-svg__connection-anchor,
 .nodebraid-renderer-svg__port {
   r: 4px;
@@ -114,20 +127,21 @@ Provider 写入 geometry、稳定 class 与 `data-nodebraid-*` 属性，但不�
 
 一个可用 Target 同时只允许一份 SVG Renderer Instance。Factory 会同步校验 config、Target 类型、连接状态、尺寸、坐标变换与占用状态；Target 从创建开始到异步 cleanup 完成前都保持 reservation，避免两个实例交错拥有同一 projection。
 
-| Code                   | 适用失败                                             |
-| ---------------------- | ---------------------------------------------------- |
-| `INVALID_CONFIG`       | 未知 config key、无效 tolerance 或 input policy      |
-| `INVALID_NODE_CONTENT` | 非法、已挂载或重复拥有的 SVG 内容                    |
-| `INVALID_TARGET`       | `target` 不是有效 `SVGSVGElement`                    |
-| `TARGET_OCCUPIED`      | Target 已被另一份活跃或仍在 cleanup 的 Instance 占用 |
-| `TARGET_UNAVAILABLE`   | Target 未连接、无可用尺寸或 screen-to-SVG 变换不可逆 |
+| Code                        | 适用失败                                             |
+| --------------------------- | ---------------------------------------------------- |
+| `INVALID_CONFIG`            | 未知 config key、无效 tolerance 或 input policy      |
+| `INVALID_NODE_CONTENT`      | 非法、已挂载或重复拥有的 SVG 内容                    |
+| `INVALID_EDGE_PRESENTATION` | 应用返回非法路径或非文本标签                         |
+| `INVALID_TARGET`            | `target` 不是有效 `SVGSVGElement`                    |
+| `TARGET_OCCUPIED`           | Target 已被另一份活跃或仍在 cleanup 的 Instance 占用 |
+| `TARGET_UNAVAILABLE`        | Target 未连接、无可用尺寸或 screen-to-SVG 变换不可逆 |
 
 Document revision、Session、Input subscriber、Pointer 与 disposed-state 失败继续使用 `@nodebraid/renderer-api` 的 `RendererError`。Provider 不吞掉异常；结构验证发生在投影变更之前，无法安全回滚时会显式要求下一次 `reset` 重建 Baseline。
 
 ## 限制与非目标
 
-- 要求 Node 显式 `Size` 并使用矩形交互边界，Edge 为有效端点之间的直线；
-- 无 Port Node 使用 node-level Connection Anchor；Port 使用规范边界 Geometry，但不支持自环、曲线 Edge、Edge marker/label、组件生命周期或动画；
+- 要求 Node 显式 `Size` 并使用矩形交互边界；未配置时 Edge 仍为有效端点之间的直线；
+- 无 Port Node 使用 node-level Connection Anchor；Port 使用规范边界 Geometry；自环、全图避障、手动控制点、HTML/React 标签、组件生命周期和动画不在当前范围；
 - 不提供默认主题、theme registry、组件插槽或 framework adapter；
 - 不解释 Interaction 行为，也不提供 Command、拖拽状态机、Selection 写入或持久化；它只显示已接受的语义 Projection；
 - 不创建 SVG Target，也不接管调用方已有的 Target 子节点；
@@ -136,6 +150,35 @@ Document revision、Session、Input subscriber、Pointer 与 disposed-state 失�
 ## 验证依据
 
 类型测试锁定具名同步 Factory、Config 与错误入口；Bun 测试覆盖 config 和值语义；真实 Chromium 测试覆盖 SVG/Interaction projection、DOM identity、连续 Commit、Session、Hit Test、screen-to-SVG 坐标转换、ResizeObserver、原生输入 policy、Pointer Capture、lost capture、Focus、Runtime Plugin 组合、Target reservation、回滚与释放。声明产物检查同时保证公共入口不泄漏内部实现。
+
+## 可读连线
+
+`edges` 显式启用新投影。应用同步提供每条 Edge 的路径与可选纯文本标签，不向 Kernel 增加业务字段：
+
+```ts
+const renderer = createSvgRenderer({
+  target,
+  edges: {
+    previewPath: 'bezier',
+    resolve: (edge) => ({
+      path: edge.type === 'sequence' ? 'orthogonal' : 'bezier',
+      label: edge.type,
+    }),
+  },
+});
+```
+
+`previewPath` 必填：拖线时还没有 Edge，预览不会调用 `resolve` 或提前物化实体。应用负责预览选择与最终 Edge 映射的一致性；最终分道位置在 ID 已知后确定。
+
+Document 更新时捕获并验证应用结果；Session、Viewport、拖动与命中复用已接受的值。标签保留原文本，空串合法，不裁剪或解析 HTML。应用异常保留原身份；非法结果显式失败，DOM/几何接受沿用原子更新与回滚规则。
+
+新模式普通 Endpoint 使用 source 右边界、target 左边界；带 Port 的端点使用真实 Port Geometry。同一无向端点对（包含 Port ID）的平行边按 Edge ID 确定性分道，增删同组 Edge 可使路径重新排布。短距离、反向和节点重叠保持可表示，不保证自动避障或消除遮挡；自环仍拒绝。
+
+每条 Edge 使用一个稳定的 `g[data-nodebraid-edge-id]`，其内为 `path[data-nodebraid-edge-path]`、`path[data-nodebraid-edge-arrow]` 与可选 `text[data-nodebraid-edge-label]`。路径属性值为 `orthogonal` 或 `bezier`；连续提交和路径切换保持外层 identity。新预览是一个 `g[data-nodebraid-connection-preview]`，内含路径与箭头，不含标签。
+
+命中选择容差内最近的路径/箭头，等距时保持逆 ID 优先；Port、Anchor 与 Node 优先级不变。标签是显示内容，不新增文字命中区域。绘制、箭头、标签位置与命中共享已接受的几何，容差仍是 CSS pixels。
+
+省略 `edges` 时保留原 `<line>`、普通端点中心位置与命中顺序。应用继续拥有数据编辑与 codec；Renderer 配置不会自动进入文件，也不要求属性面板或新的编辑 Command。
 
 ## 自定义 Node 内容
 

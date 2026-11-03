@@ -10,6 +10,9 @@ import {
   type SvgRendererErrorCode,
   type SvgNodeContentContext,
   type SvgNodeContentFactory,
+  type SvgEdgeConfig,
+  type SvgEdgePath,
+  type SvgEdgePresentation,
 } from '../src';
 import * as rendererSvgExports from '../src';
 
@@ -39,13 +42,14 @@ test('identifies SVG Provider failures structurally', () => {
     'TARGET_OCCUPIED',
     'TARGET_UNAVAILABLE',
     'INVALID_NODE_CONTENT',
+    'INVALID_EDGE_PRESENTATION',
   ];
   // @ts-expect-error SvgRendererErrorCode is a closed union.
   const unsupportedCode: SvgRendererErrorCode = 'OTHER';
   void unsupportedCode;
 
   const error = new SvgRendererError('INVALID_TARGET', 'Target is invalid.', { field: 'target' });
-  expect(codes).toHaveLength(5);
+  expect(codes).toHaveLength(6);
   expect(error).toBeInstanceOf(NodeBraidError);
   expect(error).toMatchObject({
     domain: 'renderer.svg',
@@ -77,4 +81,32 @@ test('publishes synchronous application-owned SVG Node content without exposing 
   };
   void verifyTypes;
   expect('SvgNodeContentContext' in rendererSvgExports).toBeFalse();
+});
+
+test('publishes synchronous Edge presentation with an explicit independent preview path', () => {
+  const verifyTypes = (target: SVGSVGElement, config: SvgEdgeConfig) => {
+    const path: SvgEdgePath = 'orthogonal';
+    const presentation: SvgEdgePresentation = { path, label: '' };
+    createSvgRenderer({ target, edges: { previewPath: 'bezier', resolve: () => presentation } });
+    // @ts-expect-error A preview has no Edge, so its path must be configured explicitly.
+    const missingPreview: SvgEdgeConfig = { resolve: () => presentation };
+    // @ts-expect-error Presentation resolution must finish synchronously.
+    const asynchronous: SvgEdgeConfig['resolve'] = async () => presentation;
+    // @ts-expect-error Only the supported path forms belong to the new presentation contract.
+    const unsupportedPath: SvgEdgePath = 'straight';
+    // @ts-expect-error Labels are plain text, not elements or application components.
+    const elementLabel: SvgEdgePresentation = { path, label: target };
+    // @ts-expect-error Provider configuration is immutable.
+    config.previewPath = 'orthogonal';
+    const resolve: SvgEdgeConfig['resolve'] = (edge) => {
+      // @ts-expect-error Application data is opaque to the framework.
+      void edge.data.label;
+      // @ts-expect-error The projection callback cannot change the Document Edge.
+      edge.type = 'changed';
+      return presentation;
+    };
+    return [missingPreview, asynchronous, unsupportedPath, elementLabel, resolve];
+  };
+  void verifyTypes;
+  expect('SvgEdgePresentation' in rendererSvgExports).toBeFalse();
 });

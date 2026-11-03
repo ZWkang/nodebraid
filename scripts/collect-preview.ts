@@ -317,7 +317,7 @@ async function collectScene(
         await metrics({ revision: '4', nodes: '4', selection: 'None' });
       });
     } else if (scene.id === 'port-connection') {
-      await step('Drag Compose output Port onto Ship input Port', async () => {
+      const connectPorts = async (previewName: string) => {
         await run(['scrollintoview', '.canvas-target']);
         const source = await center(
           '[data-nodebraid-port-node-id="example-compose"][data-nodebraid-port-id="output"][data-nodebraid-port-role="source"]',
@@ -335,7 +335,13 @@ async function collectScene(
         });
         await sendPage('Input.dispatchMouseEvent', { type: 'mouseMoved', ...target, button: 'left', buttons: 1 });
         assert.equal(await observe('document.querySelectorAll("[data-nodebraid-connection-preview]").length'), 1);
-        await capture('connecting');
+        assert.equal(
+          await observe(
+            `document.querySelector('[data-nodebraid-connection-preview] [data-nodebraid-edge-path]')?.getAttribute('data-nodebraid-edge-path')`,
+          ),
+          'bezier',
+        );
+        await capture(previewName);
         await sendPage('Input.dispatchMouseEvent', {
           type: 'mouseReleased',
           ...target,
@@ -343,9 +349,61 @@ async function collectScene(
           buttons: 0,
           clickCount: 1,
         });
+      };
+      await step('Check the initial orthogonal Edge, direction arrow and application label', async () => {
+        assert.deepEqual(
+          await observe(`(() => {
+          const edge = document.querySelector('[data-nodebraid-edge-id="example-initial-edge"]');
+          return {
+            path: edge.querySelector('[data-nodebraid-edge-path]')?.getAttribute('data-nodebraid-edge-path'),
+            label: edge.querySelector('[data-nodebraid-edge-label]')?.textContent,
+            arrows: edge.querySelectorAll('[data-nodebraid-edge-arrow]').length,
+          };
+        })()`),
+          { path: 'orthogonal', label: 'Discover → compose', arrows: 1 },
+        );
+      });
+      await step('Drag Compose output Port onto Ship input Port to create a Bezier Edge', async () => {
+        await connectPorts('connecting');
         await metrics({ revision: '2', nodes: '3', edges: '2' });
         assert.equal(await observe('document.querySelectorAll("[data-nodebraid-connection-preview]").length'), 0);
         assert.equal(await observe('document.querySelectorAll("[data-nodebraid-edge-id=example-edge-1]").length'), 1);
+      });
+      await step('Repeat the same connection and select each separate parallel path with native input', async () => {
+        await connectPorts('parallel-connecting');
+        await metrics({ revision: '3', nodes: '3', edges: '3' });
+        const paths = await observe<string[]>(`Array.from(document.querySelectorAll(
+          '[data-nodebraid-edge-id="example-edge-1"] [data-nodebraid-edge-path], [data-nodebraid-edge-id="example-edge-2"] [data-nodebraid-edge-path]'), path => path.getAttribute('d'))`);
+        assert.equal(paths.length, 2);
+        assert.equal(new Set(paths).size, 2);
+        for (const id of ['example-edge-1', 'example-edge-2']) {
+          const point = await observe<{ x: number; y: number }>(`(() => {
+            const path = document.querySelector('[data-nodebraid-edge-id="${id}"] [data-nodebraid-edge-path]');
+            if (!(path instanceof SVGPathElement)) throw new Error('Missing readable Edge path.');
+            const local = path.getPointAtLength(path.getTotalLength() / 2);
+            const matrix = path.getScreenCTM();
+            if (!matrix) throw new Error('Missing Edge screen mapping.');
+            const screen = new DOMPoint(local.x, local.y).matrixTransform(matrix);
+            return {x: screen.x, y: screen.y};
+          })()`);
+          await sendPage('Input.dispatchMouseEvent', { type: 'mouseMoved', ...point, buttons: 0 });
+          await sendPage('Input.dispatchMouseEvent', {
+            type: 'mousePressed',
+            ...point,
+            button: 'left',
+            buttons: 1,
+            clickCount: 1,
+          });
+          await sendPage('Input.dispatchMouseEvent', {
+            type: 'mouseReleased',
+            ...point,
+            button: 'left',
+            buttons: 0,
+            clickCount: 1,
+          });
+          await metrics({ revision: '3', selection: id });
+          await capture(`selected-${id}`);
+        }
       });
     } else if (scene.id === 'node-authoring') {
       const createdId = 'example-node-1';

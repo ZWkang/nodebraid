@@ -85,6 +85,12 @@ try {
   await Bun.write(fixturePath, JSON.stringify(fixture));
   await browser(['upload', '[aria-label="Document file"]', fixturePath]);
   await waitForMetrics({ nodes: '5', edges: '4', history: '— / —' });
+  assert.equal(
+    await evaluate(
+      `document.querySelector('[data-nodebraid-edge-id="example-initial-edge"] [data-nodebraid-edge-label]')?.textContent`,
+    ),
+    'Flow',
+  );
   const saved = await download('business-saved');
   assert.deepEqual(saved.document, fixture);
 

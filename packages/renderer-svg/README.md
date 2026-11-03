@@ -30,6 +30,16 @@ runtime theme. A minimal application stylesheet can start with:
   stroke: currentColor;
 }
 
+[data-nodebraid-edge-path] {
+  fill: none;
+}
+
+[data-nodebraid-edge-arrow],
+[data-nodebraid-edge-label] {
+  fill: currentColor;
+  stroke: none;
+}
+
 .nodebraid-renderer-svg__connection-anchor,
 .nodebraid-renderer-svg__port {
   r: 4px;
@@ -49,6 +59,61 @@ runtime theme. A minimal application stylesheet can start with:
   stroke-width: 2;
 }
 ```
+
+## Readable Edge paths
+
+Opt in with `edges` to render orthogonal or cubic Bezier paths with source-to-target
+arrows. Applications synchronously map a complete Edge to a `SvgEdgePresentation`;
+the framework does not interpret the Edge's opaque business data.
+
+```ts
+const renderer = createSvgRenderer({
+  target,
+  edges: {
+    previewPath: 'bezier',
+    resolve: (edge) => ({
+      path: edge.type === 'sequence' ? 'orthogonal' : 'bezier',
+      label: edge.type,
+    }),
+  },
+});
+```
+
+`SvgEdgePath`, `SvgEdgePresentation` and `SvgEdgeConfig` are exported types.
+`previewPath` is required because a Connection Preview has no Edge yet. It does
+not call `resolve` or materialize an Edge; applications align the preview choice
+with the eventual Edge. Committed lane ordering is determined once its ID exists.
+
+The Provider captures and validates resolver results at Document updates, retaining
+plain text exactly, including empty labels. Session, Viewport, drag previews and
+Hit Test reuse accepted values. Invalid results fail with `INVALID_EDGE_PRESENTATION`;
+callback failures retain their original identity. Failed projection updates keep
+the prior accepted DOM and geometry, subject to the existing explicit rollback
+failure contract. No callback failure substitutes a straight line.
+
+New paths connect ordinary Endpoints at source/right and target/left Node boundaries;
+qualified Endpoints retain actual Port Geometry. Parallel Edges sharing an unordered
+Endpoint pair (including Port IDs) are placed in deterministic lanes by Edge ID.
+Adding or removing a sibling may rearrange that group's derived paths. Short,
+reverse and overlapping connections remain valid; self-loops remain rejected.
+This is not global obstacle routing.
+
+Each Edge owns one stable `<g data-nodebraid-edge-id>` with descendant
+`path[data-nodebraid-edge-path="orthogonal|bezier"]`,
+`path[data-nodebraid-edge-arrow]` and optional `text[data-nodebraid-edge-label]`.
+The outer identity survives commits and path-kind changes. New Connection Previews
+use one `g[data-nodebraid-connection-preview]` containing a path and arrow, without
+a label. Selection stays on the entity group. Applications provide the stylesheet.
+
+Hit Test uses the closest path or arrow within the CSS-pixel tolerance; exact ties
+follow the existing reverse-ID order. Node and Port priority is unchanged. Labels
+are decorative plain text and have no independent hit area. Drawing, dragging,
+arrow direction, label placement and hits use the same accepted geometry.
+
+Without `edges`, the existing straight `<line>` DOM, center-based ordinary Endpoints
+and hit order remain unchanged. Presentation is Provider state, not a new Kernel
+schema, editing Command or editor panel. Applications retain data editing and codec
+ownership; Provider configuration is not automatically serialized.
 
 ## Application-owned Node content
 

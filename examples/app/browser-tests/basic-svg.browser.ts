@@ -87,6 +87,18 @@ try {
   });
 
   assert.deepEqual(
+    await evaluateBrowserScenario(`(() => {
+      const edge = document.querySelector('[data-nodebraid-edge-id="example-initial-edge"]');
+      return {
+        path: edge.querySelector('[data-nodebraid-edge-path]')?.getAttribute('data-nodebraid-edge-path'),
+        label: edge.querySelector('[data-nodebraid-edge-label]')?.textContent,
+        arrows: edge.querySelectorAll('[data-nodebraid-edge-arrow]').length,
+      };
+    })()`),
+    { path: 'orthogonal', label: 'Discover → compose', arrows: 1 },
+  );
+
+  assert.deepEqual(
     await evaluateBrowserScenario(`Array.from(document.querySelectorAll('[data-site-navigation] a'), (link) => ({
       label: link.textContent,
       id: link.getAttribute('data-site-navigation-item'),
@@ -166,6 +178,32 @@ try {
   await waitForMetrics({ revision: '5', nodes: '3', edges: '2' });
   assert.deepEqual((await readLayoutState()).positions, afterLayout.positions);
   await assertEdgeAtPorts('example-edge-1', 'example-compose', 'example-ship');
+  assert.equal(
+    await evaluateBrowserScenario(
+      `document.querySelector('[data-nodebraid-edge-id="example-edge-1"] [data-nodebraid-edge-path]')?.getAttribute('data-nodebraid-edge-path')`,
+    ),
+    'bezier',
+  );
+  await dispatchMouseDown(movedSourcePort.x, movedSourcePort.y);
+  await dispatchMouseMove(movedTargetPort.x, movedTargetPort.y);
+  await dispatchMouseUp(movedTargetPort.x, movedTargetPort.y);
+  await waitForMetrics({ revision: '6', edges: '3' });
+  for (const id of ['example-edge-1', 'example-edge-2']) {
+    const point = await readEdgeMidpoint(id);
+    await dispatchMouseDown(point.x, point.y);
+    await dispatchMouseUp(point.x, point.y);
+    await waitForMetrics({ selection: id, revision: '6' });
+    await assertEdgeAtPorts(id, 'example-compose', 'example-ship');
+  }
+  await runAgentBrowser(['scrollintoview', '[aria-label="Undo"]']);
+  await runAgentBrowser(['click', '[aria-label="Undo"]']);
+  await waitForMetrics({ revision: '7', edges: '2', selection: 'None' });
+  await runAgentBrowser(['click', '[aria-label="Redo"]']);
+  await waitForMetrics({ revision: '8', edges: '3' });
+  const parallelPaths = await evaluateBrowserScenario<string[]>(`Array.from(
+    document.querySelectorAll('[data-nodebraid-edge-id="example-edge-1"] [data-nodebraid-edge-path], [data-nodebraid-edge-id="example-edge-2"] [data-nodebraid-edge-path]'),
+    path => path.getAttribute('d'))`);
+  assert.equal(new Set(parallelPaths).size, 2, 'History replay must restore distinct parallel paths.');
   await evaluateBrowserScenario(`new Promise((resolve) => {
     window.scrollTo(0, 0);
     requestAnimationFrame(() => resolve(true));
@@ -549,8 +587,11 @@ async function assertEdgeAtPorts(edgeId: string, sourceNodeId: string, targetNod
         return Number(value);
       });
     };
+    const path = document.querySelector(${JSON.stringify(`[data-nodebraid-edge-id="${edgeId}"] [data-nodebraid-edge-path]`)});
+    if (!(path instanceof SVGPathElement)) throw new Error('Missing readable Edge path.');
+    const start = path.getPointAtLength(0), end = path.getPointAtLength(path.getTotalLength());
     return {
-      edge: read(${JSON.stringify(`[data-nodebraid-edge-id="${edgeId}"]`)}, ['x1', 'y1', 'x2', 'y2']),
+      edge: [start.x, start.y, end.x, end.y],
       ports: [
         ...read(${JSON.stringify(`[data-nodebraid-port-node-id="${sourceNodeId}"][data-nodebraid-port-id="output"]`)}, ['cx', 'cy']),
         ...read(${JSON.stringify(`[data-nodebraid-port-node-id="${targetNodeId}"][data-nodebraid-port-id="input"]`)}, ['cx', 'cy']),
@@ -558,7 +599,24 @@ async function assertEdgeAtPorts(edgeId: string, sourceNodeId: string, targetNod
     };
   })()`);
   assert.ok([...points.edge, ...points.ports].every(Number.isFinite));
-  assert.deepEqual(points.edge, points.ports);
+  points.edge.forEach((coordinate, index) => {
+    assert.ok(
+      Math.abs(coordinate - points.ports[index]!) < 0.01,
+      'Rendered path endpoint must coincide with its Port.',
+    );
+  });
+}
+
+async function readEdgeMidpoint(edgeId: string): Promise<Readonly<{ x: number; y: number }>> {
+  return evaluateBrowserScenario(`(() => {
+    const path = document.querySelector(${JSON.stringify(`[data-nodebraid-edge-id="${edgeId}"] [data-nodebraid-edge-path]`)});
+    if (!(path instanceof SVGPathElement)) throw new Error('Missing readable Edge path.');
+    const point = path.getPointAtLength(path.getTotalLength() / 2);
+    const matrix = path.getScreenCTM();
+    if (!matrix) throw new Error('Missing Edge screen mapping.');
+    const screen = new DOMPoint(point.x, point.y).matrixTransform(matrix);
+    return { x: screen.x, y: screen.y };
+  })()`);
 }
 
 async function readElementCenter(selector: string): Promise<Readonly<{ x: number; y: number }>> {

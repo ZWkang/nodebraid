@@ -13,7 +13,7 @@ This name describes the current source-module boundary; it does not mean the pac
 
 `@nodebraid/renderer-svg` is the first official concrete Provider for `@nodebraid/renderer-api`. It projects Document, Session, Hit Testing, and standardized browser input into an application-owned `SVGSVGElement`, validating the Renderer contract against a real DOM without leaking SVG types into Kernel, Session, or the public Renderer API.
 
-It provides generic rectangular Nodes, straight Edges, and a stable DOM seam. It does not interpret product Node types, business data, or component frameworks.
+It provides generic rectangular Nodes, default straight Edges, and opt-in orthogonal/Bezier paths, direction arrows and application text labels through a stable DOM seam. Application mapping functions own business-data interpretation.
 
 ## When to use it
 
@@ -22,12 +22,12 @@ It provides generic rectangular Nodes, straight Edges, and a stable DOM seam. It
 - Your application will define product visuals and editing behavior through CSS and higher-level Interaction;
 - You want to use a named Factory directly or connect it to the Runtime through [`@nodebraid/plugin-renderer`](/en/modules/plugin-renderer).
 
-If the product needs HTML/React component Nodes, arbitrary Port shapes/positions, complex Edges, component mounting, or complete editor interaction, this package is not a substitute for those capabilities.
+If the product needs HTML/React component Nodes, arbitrary Port shapes/positions, obstacle routing, interactive labels, component mounting, or complete editor interaction, this package is not a substitute for those capabilities.
 
 ## What it provides
 
 - A synchronous `createSvgRenderer(config)` Factory bound to one existing `SVGSVGElement`;
-- Generic rectangular Nodes, straight Edges, Selection markers, and Viewport projection;
+- Generic rectangular Nodes, default straight or opt-in orthogonal/Bezier Edges, direction arrows, application text labels, Selection markers, and Viewport projection;
 - A real-DOM bridge for Pointer, Wheel, Keyboard, Focus, and Pointer Capture;
 - Node Drag, Viewport Pan, Box Selection marquee, and Connection Preview Projections plus Port or Node-level source/target Anchor Hit Results;
 - canonical boundary Geometry, stable DOM seams, and port-qualified Edge endpoints for source/target Ports;
@@ -55,6 +55,9 @@ import {
   type SvgRendererConfig,
   type SvgNodeContentContext,
   type SvgNodeContentFactory,
+  type SvgEdgePath,
+  type SvgEdgePresentation,
+  type SvgEdgeConfig,
   type SvgRendererErrorCode,
 } from '@nodebraid/renderer-svg';
 
@@ -92,6 +95,16 @@ The Provider writes geometry, stable classes, and `data-nodebraid-*` attributes,
   stroke: currentColor;
 }
 
+[data-nodebraid-edge-path] {
+  fill: none;
+}
+
+[data-nodebraid-edge-arrow],
+[data-nodebraid-edge-label] {
+  fill: currentColor;
+  stroke: none;
+}
+
 .nodebraid-renderer-svg__connection-anchor,
 .nodebraid-renderer-svg__port {
   r: 4px;
@@ -109,20 +122,21 @@ These attributes are stable seams for CSS, tests, and light DOM integration, not
 
 An available Target can host only one SVG Renderer Instance at a time. The Factory synchronously validates config, Target type, connection state, dimensions, coordinate transforms, and occupancy. The Target remains reserved from creation until asynchronous cleanup finishes so two instances cannot interleave ownership of one projection.
 
-| Code                   | Applicable failure                                                       |
-| ---------------------- | ------------------------------------------------------------------------ |
-| `INVALID_CONFIG`       | Unknown config keys, an invalid tolerance, or invalid input policies     |
-| `INVALID_NODE_CONTENT` | Invalid, mounted or already-owned SVG content                            |
-| `INVALID_TARGET`       | `target` is not a valid `SVGSVGElement`                                  |
-| `TARGET_OCCUPIED`      | Another active or still-cleaning-up Instance owns the Target             |
-| `TARGET_UNAVAILABLE`   | The Target is disconnected, has no usable size, or has no invertible CTM |
+| Code                        | Applicable failure                                                       |
+| --------------------------- | ------------------------------------------------------------------------ |
+| `INVALID_CONFIG`            | Unknown config keys, an invalid tolerance, or invalid input policies     |
+| `INVALID_NODE_CONTENT`      | Invalid, mounted or already-owned SVG content                            |
+| `INVALID_EDGE_PRESENTATION` | An application returns an invalid path or non-text label                 |
+| `INVALID_TARGET`            | `target` is not a valid `SVGSVGElement`                                  |
+| `TARGET_OCCUPIED`           | Another active or still-cleaning-up Instance owns the Target             |
+| `TARGET_UNAVAILABLE`        | The Target is disconnected, has no usable size, or has no invertible CTM |
 
 Document revision, Session, Input subscriber, Pointer, and disposed-state failures continue to use `RendererError` from `@nodebraid/renderer-api`. The Provider does not swallow failures. Structural validation occurs before projection changes, and a failure that cannot be rolled back safely explicitly requires the next `reset` to rebuild the Baseline.
 
 ## Limitations and non-goals
 
-- Requires explicit Node Size, uses rectangular interaction bounds, and renders straight Edges between valid endpoints;
-- Nodes without Ports use node-level Connection Anchors; Ports use canonical boundary Geometry, while self-loops, curved Edges, Edge markers/labels, component lifecycles and animation remain unsupported;
+- Requires explicit Node Size and rectangular interaction bounds; without configuration it still renders straight Edges between valid endpoints;
+- Nodes without Ports use node-level Connection Anchors and Ports use canonical boundary Geometry; self-loops, global obstacle routing, manual control points, HTML/React labels, component lifecycles and animation remain outside the current scope;
 - No default theme, theme Registry, component slots, or framework adapter;
 - Does not interpret Interaction behavior and provides no Commands, drag state machine, Selection writes, or persistence; it only displays an accepted semantic Projection;
 - Does not create the SVG Target or take ownership of the caller's existing Target children;
@@ -131,6 +145,35 @@ Document revision, Session, Input subscriber, Pointer, and disposed-state failur
 ## Verification evidence
 
 Type tests lock down the named synchronous Factory, Config, and error entry points. Bun tests cover config and value semantics. Real-Chromium tests cover SVG and Interaction projection, DOM identity, continuous Commits, Session, Hit Testing, screen-to-SVG coordinate conversion, ResizeObserver, native input policies, Pointer Capture, lost capture, Focus, Runtime Plugin composition, Target reservation, rollback, and disposal. Declaration-artifact checks also ensure that public entry points do not leak implementation details.
+
+## Readable connections
+
+Use `edges` to opt in. Applications synchronously provide a path and optional plain-text label for each Edge, without introducing business fields into Kernel:
+
+```ts
+const renderer = createSvgRenderer({
+  target,
+  edges: {
+    previewPath: 'bezier',
+    resolve: (edge) => ({
+      path: edge.type === 'sequence' ? 'orthogonal' : 'bezier',
+      label: edge.type,
+    }),
+  },
+});
+```
+
+`previewPath` is required: a drag preview has no Edge yet and does not call `resolve` or materialize an entity. Applications align the preview choice with the eventual Edge mapping; final lane placement is determined after its ID is known.
+
+Document updates capture and validate application results. Session, Viewport, drag previews and hits reuse accepted values. Labels retain literal text, including empty strings, without trimming or HTML interpretation. Callback exceptions preserve their identity; invalid values fail explicitly, and accepted DOM/geometry retain the existing atomic-update and rollback semantics.
+
+New paths attach ordinary Endpoints to the source's right and target's left boundary, while Port Endpoints use actual Port Geometry. Parallel Edges sharing an unordered Endpoint pair, including Port IDs, use deterministic Edge-ID lanes. Adding or removing a sibling may rearrange those paths. Short, reverse and overlapping connections remain representable; obstacle avoidance and occlusion removal are not promised. Self-loops remain rejected.
+
+Each Edge has one stable `g[data-nodebraid-edge-id]`, containing `path[data-nodebraid-edge-path]`, `path[data-nodebraid-edge-arrow]` and optional `text[data-nodebraid-edge-label]`. Path attribute values are `orthogonal` or `bezier`; commits and path-kind changes retain the outer identity. New previews use one `g[data-nodebraid-connection-preview]` with a path and arrow, without a label.
+
+Hit Test chooses the closest path/arrow within the CSS-pixel tolerance, with reverse-ID priority for exact ties. Port, Anchor and Node priority remains unchanged. Labels are decorative, with no additional text hit area. Drawing, arrows, label placement and hits share accepted geometry.
+
+Omitting `edges` preserves the original `<line>`, center-based ordinary Endpoints and hit order. Applications still own data editing and codecs; Renderer configuration is not automatically serialized and requires no property panel or new editing Command.
 
 ## Custom Node content
 
