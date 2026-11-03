@@ -87,13 +87,22 @@ export function createPreviewBrowserRunner(
 
 async function main(): Promise<void> {
   const { values } = parseArgs({
-    options: { base: { type: 'string' }, out: { type: 'string' }, all: { type: 'boolean' }, help: { type: 'boolean' } },
+    options: {
+      base: { type: 'string' },
+      out: { type: 'string' },
+      all: { type: 'boolean' },
+      plan: { type: 'boolean' },
+      help: { type: 'boolean' },
+    },
   });
   if (values.help) {
-    console.log('Usage: bun scripts/collect-preview.ts --base <commit> --out <new-directory> [--all]');
+    console.log(
+      'Usage: bun scripts/collect-preview.ts --base <commit> (--out <new-directory> [--all] | --plan [--all])',
+    );
     return;
   }
-  if (!values.base || !values.out) throw new Error('Expected --base <commit> and --out <new-directory>.');
+  if (!values.base || (!values.out && !values.plan))
+    throw new Error('Expected --base <commit> and --out <new-directory> or --plan.');
   const requestedBase = git('rev-parse', '--verify', '--end-of-options', `${values.base}^{commit}`);
   const base = git('merge-base', requestedBase, 'HEAD');
   const source = sourceAt(base);
@@ -103,7 +112,11 @@ async function main(): Promise<void> {
     .split('\0')
     .filter(Boolean);
   const selected = selectPreviewScenes(files, values.all);
-  const out = resolve(values.out);
+  if (values.plan) {
+    console.log(JSON.stringify({ base, head: source.head, scenes: selected.map((scene) => scene.id) }));
+    return;
+  }
+  const out = resolve(values.out!);
   if (existsSync(out) && readdirSync(out).length)
     throw new Error('Preview output must be empty; previous evidence is retained.');
   mkdirSync(out, { recursive: true });

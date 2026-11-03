@@ -56,6 +56,19 @@ test.each(['src/index.ts', 'packages/kernel/src/index.ts'])(
   },
 );
 
+test('test-only changes have no path floor and stay with the reviewers', () => {
+  const testFiles = [
+    'tests/pr-risk.test.ts',
+    'packages/kernel/tests/snapshot-reuse.test.ts',
+    'packages/renderer-svg/browser-tests/renderer-contract.entry.ts',
+    'examples/app/browser-tests/basic-svg.browser.ts',
+  ];
+  expect(summarizeRisk(reviews, testFiles)).toMatchObject({ level: 'low', route: 'automatic' });
+  expect(summarizeRisk({ ...reviews, standards: { risk: { ...low, level: 'medium' } } }, testFiles)).toMatchObject({
+    level: 'medium',
+  });
+});
+
 test('reviewer risk can raise a path minimum and missing assessments never infer safety from file names', () => {
   expect(summarizeRisk({ ...reviews, spec: { risk: { ...low, level: 'high' } } }, ['src/index.ts'])).toMatchObject({
     level: 'high',

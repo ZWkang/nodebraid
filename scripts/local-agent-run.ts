@@ -49,6 +49,29 @@ export interface Publication {
   localHead: string;
   parent: string;
 }
+export interface EvidenceReceipt {
+  head: string;
+  evidenceCommit: string;
+  url: string;
+  body: string;
+}
+
+function evidenceMismatch(
+  receipt: EvidenceReceipt | undefined,
+  repository: string,
+  pr: number,
+  head: string,
+): string | undefined {
+  if (!receipt) return 'Current-head report publication receipt is missing.';
+  if (
+    receipt.head !== head ||
+    receipt.url !== `https://github.com/${repository}/pull/${pr}` ||
+    !/^[a-f0-9]{40}$/.test(receipt.evidenceCommit ?? '') ||
+    typeof receipt.body !== 'string' ||
+    !receipt.body.includes(`pr-${pr}/${head}/review/report.md`)
+  )
+    return 'Report publication receipt does not show the full report on the current PR head.';
+}
 
 export function artifactDigest(value: unknown): string {
   const canonical = (item: unknown): unknown => {
@@ -150,6 +173,7 @@ export function evaluateVerifiedRun(
   verified: VerifiedRun,
   publication: Publication,
   pr: FeedbackSnapshot,
+  evidence?: EvidenceReceipt,
 ) {
   validateVerification(task, verified);
   const risk = summarizeRisk(verified.reviews, verified.changedFiles);
@@ -176,7 +200,12 @@ export function evaluateVerifiedRun(
     };
   if (publication.parent !== task.expectedParent)
     throw new Error('Publication does not match the independently prepared append parent.');
-  if (pr.headRefOid !== publication.head || pr.baseRefName !== task.baseRefName || pr.baseRefOid !== task.base)
+  // main does not require up-to-date branches; conflicts still surface as CONFLICTING.
+  if (
+    pr.headRefOid !== publication.head ||
+    pr.baseRefName !== task.baseRefName ||
+    (task.baseRefName !== 'main' && pr.baseRefOid !== task.base)
+  )
     return {
       status: 'waiting-verification' as const,
       reason: 'PR head or base changed; prepare and verify a new run.',
@@ -186,5 +215,9 @@ export function evaluateVerifiedRun(
   if (pr.statusCheckRollup.some((check) => check.headSha !== pr.headRefOid))
     throw new Error('Check head is unverified.');
   const result = evaluateFeedback(pr, task.repository, verified.decisions);
+  const missingEvidence =
+    result.status === 'ready' ? evidenceMismatch(evidence, task.repository, pr.number, publication.head) : undefined;
+  if (missingEvidence)
+    return { status: 'waiting-evidence' as const, reason: missingEvidence, risk, autoMergeCandidate: false };
   return { ...result, risk, autoMergeCandidate: result.status === 'ready' && risk.level === 'low' };
 }

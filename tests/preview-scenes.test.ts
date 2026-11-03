@@ -4,7 +4,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
-import { previewLimitations, selectPreviewScenes } from '../scripts/preview-scenarios';
+import { previewLimitations, previewScenes, selectPreviewScenes } from '../scripts/preview-scenarios';
 import { createPreviewBrowserRunner } from '../scripts/collect-preview';
 
 test('preview commands use an owned empty config and exclude inherited browser configuration', async () => {
@@ -61,6 +61,10 @@ test('the CLI records committed source for a docs-only change and rejects dirty 
     const base = git('rev-parse', 'HEAD');
     writeFileSync(join(directory, 'README.md'), 'after\n');
     git('commit', '-qam', 'after');
+    const plan = Bun.spawnSync(['bun', script, '--base', base, '--plan'], { cwd: directory });
+    expect(JSON.parse(plan.stdout.toString())).toEqual({ base, head: git('rev-parse', 'HEAD'), scenes: [] });
+    const all = Bun.spawnSync(['bun', script, '--base', base, '--plan', '--all'], { cwd: directory });
+    expect(JSON.parse(all.stdout.toString()).scenes).toEqual(previewScenes.map((scene) => scene.id));
     const out = join(directory, '.git', 'preview');
     const result = Bun.spawnSync(['bun', script, '--base', base, '--out', out], { cwd: directory });
     expect({ exitCode: result.exitCode, stderr: result.stderr.toString() }).toEqual({ exitCode: 0, stderr: '' });

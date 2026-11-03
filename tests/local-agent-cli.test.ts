@@ -204,7 +204,14 @@ test('a persisted task resumes after a failed real check and never blesses an un
         { name: 'checks', workflowName: 'Checks', headSha: 'b'.repeat(40), status: 'COMPLETED', conclusion: 'SUCCESS' },
       ],
     });
-    expect(JSON.parse(invoke('evaluate', '.tmp/run', '.tmp/snapshot.json').stdout)).toMatchObject({
+    expect(JSON.parse(invoke('evaluate', '.tmp/run', '.tmp/snapshot.json').stdout).status).toBe('waiting-evidence');
+    json('.tmp/receipt.json', {
+      head: 'b'.repeat(40),
+      evidenceCommit: 'e'.repeat(40),
+      url: 'https://github.com/ZWkang/nodebraid/pull/11',
+      body: `pr-11/${'b'.repeat(40)}/review/report.md`,
+    });
+    expect(JSON.parse(invoke('evaluate', '.tmp/run', '.tmp/snapshot.json', '.tmp/receipt.json').stdout)).toMatchObject({
       status: 'ready',
       risk: { level: 'high', route: 'full-human' },
       autoMergeCandidate: false,

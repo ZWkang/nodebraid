@@ -24,6 +24,15 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.2.19
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: bun-${{ runner.os }}-
+      - uses: actions/cache@v4
+        with:
+          path: ~/.agent-browser/browsers
+          key: agent-browser-${{ runner.os }}-${{ hashFiles('bun.lock') }}
       - run: bun install --frozen-lockfile
       - run: bun run agents:check
       - run: bunx agent-browser install --with-deps
@@ -70,9 +79,29 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.2.19
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: bun-${{ runner.os }}-
       - run: bun install --frozen-lockfile
-      - run: bunx agent-browser install --with-deps
+      - name: Select changed Examples scenes
+        id: scenes
+        env:
+          EVIDENCE_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          plan=$(bun run agents:preview --base "$EVIDENCE_BASE" --plan)
+          echo "$plan"
+          echo "visible=$(jq -r 'if (.scenes | length) > 0 then "true" else "false" end' <<<"$plan")" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        if: steps.scenes.outputs.visible == 'true'
+        with:
+          path: ~/.agent-browser/browsers
+          key: agent-browser-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+      - if: steps.scenes.outputs.visible == 'true'
+        run: bunx agent-browser install --with-deps
       - name: Install the recording encoder
+        if: steps.scenes.outputs.visible == 'true'
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Capture changed Examples behavior
         env:
