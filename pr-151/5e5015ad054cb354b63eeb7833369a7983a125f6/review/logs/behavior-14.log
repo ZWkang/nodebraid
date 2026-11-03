@@ -1,0 +1,44 @@
+bun test v1.4.2 (744846f84)
+
+tests/pr-evidence.test.ts:
+(pass) publishes actual checksummed evidence and preserves author text on repeated updates [7.53ms]
+(pass) rejects stale source, tampered bytes and files outside the evidence directory [6.09ms]
+(pass) rejects symlinks and inconsistent scene artifact references [2.13ms]
+(pass) a failed scenario stays failed in the published report [1.25ms]
+(pass) a changed PR head prevents all publication writes [6.02ms]
+(pass) publishes media through Git data, updates only the evidence block and reads it back [8.16ms]
+(pass) cannot publish claimed evidence for another source tree [2.21ms]
+(pass) rejects a success claim without screenshots and malformed PR markers [1.23ms]
+(pass) resolves an empty workflow PR association from current commit-linked PRs only [0.39ms]
+(pass) untrusted preview names cannot address the independent review namespace [1.97ms]
+(pass) preview-only publication refuses a different saved base/patch before uploading [2.84ms]
+(pass) review-only publication refuses a different saved base/patch before uploading [2.35ms]
+(pass) preserving a previous report requires its original artifact bytes to match [3.15ms]
+
+tests/preview-scenes.test.ts:
+(pass) preview commands use an owned empty config and exclude inherited browser configuration [158.87ms]
+(pass) selects visible scenes for changed public capabilities without duplicate runs [0.26ms]
+(pass) the CLI records committed source for a docs-only change and rejects dirty source [715.12ms]
+(pass) clipboard and preview maintenance select their real scenes, with uncovered Layout made explicit [0.47ms]
+(pass) a base branch that advanced independently selects the common ancestor for the PR diff [458.92ms]
+(pass) shared rendering changes exercise all scenes, while docs and tests have no visible change [0.23ms]
+(pass) Document changes select the real file round-trip scene [0.04ms]
+(pass) Node Editing changes select the real authoring workflow [0.01ms]
+
+tests/evidence-producer.test.ts:
+(pass) a closed producer is explicitly inapplicable before artifact access or publication [19.34ms]
+(pass) a superseded producer cannot publish to a PR with a newer head [16.77ms]
+(pass) a current producer enables publication only after every PR page is read [19.18ms]
+(pass) ambiguous current producers remain an error without enabling publication [19.82ms]
+(pass) GitHub read failure in runStatus is not a no-work result [20.56ms]
+(pass) GitHub read failure in pullsStatus is not a no-work result [18.70ms]
+(pass) an invalid producer event fails before reading PR pages [19.79ms]
+(pass) an invalid producer path fails before reading PR pages [19.17ms]
+(pass) an invalid producer status fails before reading PR pages [21.70ms]
+(pass) a producer from another repository remains an error [21.07ms]
+(pass) missing evidence for an eligible current producer still fails the strict publisher [21.50ms]
+
+ 32 pass
+ 0 fail
+ 108 expect() calls
+Ran 32 tests across 3 files. [1.63s]

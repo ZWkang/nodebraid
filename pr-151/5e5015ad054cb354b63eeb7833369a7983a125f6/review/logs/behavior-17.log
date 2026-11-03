@@ -1,0 +1,49 @@
+@nodebraid/renderer-svg test:browser: $ bun run ../../scripts/build-workspaces.ts --test-dependencies @nodebraid/renderer-svg
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/diagnostics
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/kernel
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/port-api
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/session-api
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/interaction-api
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/renderer-api
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/runtime-cordis
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-command
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-kernel
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-history
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-node-editing
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-port
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-session
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-renderer
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-interaction
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: $ bun run ./browser-tests/renderer-contract.browser.ts
+@nodebraid/renderer-svg test:browser: SVG readable Edges: public paths, labels, direction and semantic Hit Test passed.
+@nodebraid/renderer-svg test:browser: SVG custom Node content: public projection, update, rollback, ownership and legacy cases passed.
+@nodebraid/renderer-svg test:browser: SVG Interaction Geometry capture: 214 public browser cases passed.
+@nodebraid/renderer-svg test:browser: SVG DOM policy capture: 72 trusted native and 72 constructor failure cases passed.
+@nodebraid/renderer-svg test:browser: SVG tolerance capture: 48 public browser cases passed.
+@nodebraid/renderer-svg test:browser: Exited with code 0

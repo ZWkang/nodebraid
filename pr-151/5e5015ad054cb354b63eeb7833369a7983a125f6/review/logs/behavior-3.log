@@ -1,0 +1,12 @@
+bun test v1.4.2 (744846f84)
+
+packages/renderer-svg/tests/types.test.ts:
+(pass) publishes a synchronous typed SVG Renderer Factory [0.61ms]
+(pass) identifies SVG Provider failures structurally [0.49ms]
+(pass) publishes synchronous application-owned SVG Node content without exposing geometry writes [0.02ms]
+(pass) publishes synchronous Edge presentation with an explicit independent preview path
+
+ 4 pass
+ 0 fail
+ 8 expect() calls
+Ran 4 tests across 1 file. [31.00ms]

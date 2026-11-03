@@ -1,0 +1,69 @@
+@nodebraid/renderer-svg test:browser: $ bun run ../../scripts/build-workspaces.ts --test-dependencies @nodebraid/renderer-svg
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/diagnostics
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/kernel
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/port-api
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/session-api
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/interaction-api
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/renderer-api
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/runtime-cordis
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-command
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-kernel
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-history
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-node-editing
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-port
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-session
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-renderer
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: [build] @nodebraid/plugin-interaction
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: $ tsgo -p tsconfig.build.json && bun run test:artifacts
+@nodebraid/renderer-svg test:browser: $ bun run ./artifacts/check-declarations.ts
+@nodebraid/renderer-svg test:browser: $ bun run ./browser-tests/renderer-contract.browser.ts
+@nodebraid/renderer-svg test:browser: 1991 |   const [stdout, stderr, exitCode] = await Promise.all([
+@nodebraid/renderer-svg test:browser: 1992 |     new Response(process.stdout).text(),
+@nodebraid/renderer-svg test:browser: 1993 |     new Response(process.stderr).text(),
+@nodebraid/renderer-svg test:browser: 1994 |     process.exited,
+@nodebraid/renderer-svg test:browser: 1995 |   ]);
+@nodebraid/renderer-svg test:browser: 1996 |   assert.equal(exitCode, 0, stderr || stdout);
+@nodebraid/renderer-svg test:browser:                 ^
+@nodebraid/renderer-svg test:browser: AssertionError: {"success":false,"data":null,"error":"Evaluation error: SvgRendererError: SVG Renderer config contains an unknown field.\n    at assertKnownConfigKeys (http://127.0.0.1:49877/renderer-contract.js:5169:13)\n    at validateConfig (http://127.0.0.1:49877/renderer-contract.js:5097:5)\n    at createSvgRenderer (http://127.0.0.1:49877/renderer-contract.js:5944:91)\n    at runEdgePresentationCases (http://127.0.0.1:49877/renderer-contract.js:7084:20)\n    at <anonymous>:1:12"}
+@nodebraid/renderer-svg test:browser: 
+@nodebraid/renderer-svg test:browser: 
+@nodebraid/renderer-svg test:browser: 1 !== 0
+@nodebraid/renderer-svg test:browser: 
+@nodebraid/renderer-svg test:browser:  generatedMessage: false,
+@nodebraid/renderer-svg test:browser:      actual: 1,
+@nodebraid/renderer-svg test:browser:    expected: 0,
+@nodebraid/renderer-svg test:browser:    operator: "strictEqual",
+@nodebraid/renderer-svg test:browser:        diff: "simple",
+@nodebraid/renderer-svg test:browser:        code: "ERR_ASSERTION"
+@nodebraid/renderer-svg test:browser: 
+@nodebraid/renderer-svg test:browser:       at runAgentBrowser (/Users/zhou/.codex/worktrees/d535/cflow/packages/renderer-svg/browser-tests/renderer-contract.browser.ts:1996:10)
+@nodebraid/renderer-svg test:browser:       at evaluateBrowserScenario (/Users/zhou/.codex/worktrees/d535/cflow/packages/renderer-svg/browser-tests/renderer-contract.browser.ts:2001:24)
+@nodebraid/renderer-svg test:browser:       at assertBrowserScenario (/Users/zhou/.codex/worktrees/d535/cflow/packages/renderer-svg/browser-tests/renderer-contract.browser.ts:2009:26)
+@nodebraid/renderer-svg test:browser: 
+@nodebraid/renderer-svg test:browser: Bun v1.4.2 (macOS arm64)
+@nodebraid/renderer-svg test:browser: error: script "test:browser:self" exited with code 1
+@nodebraid/renderer-svg test:browser: Exited with code 1
