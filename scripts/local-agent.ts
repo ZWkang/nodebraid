@@ -39,7 +39,7 @@ const snapshot = (base: string) => {
 const [mode, first, second, third] = process.argv.slice(2);
 if (!first)
   throw new Error(
-    'Usage: local-agent archive-issue snapshot.json issues-dir | reconcile source.json [output.json] | normalize raw.json published.json output.json | prepare input.json run-dir | inspect run-dir | frontier run-dir completed.json | verify run-dir reviews.json decisions.json | publication run-dir remote-commit.json | evaluate run-dir snapshot.json',
+    'Usage: local-agent archive-issue snapshot.json issues-dir | reconcile source.json [output.json] | normalize raw.json published.json output.json | prepare input.json run-dir | inspect run-dir | frontier run-dir completed.json | verify run-dir reviews.json decisions.json | publication run-dir remote-commit.json | evaluate run-dir snapshot.json [publication-receipt.json]',
   );
 
 if (mode === 'archive-issue') {
@@ -172,7 +172,15 @@ if (mode === 'archive-issue') {
     const verified = read<VerifiedRun>(join(directory, 'verification.json'));
     if (!existsSync(verified.checks.log)) throw new Error('Original engineering check log is missing.');
     console.log(
-      JSON.stringify(evaluateVerifiedRun(task, verified, read(join(directory, 'publication.json')), read(second))),
+      JSON.stringify(
+        evaluateVerifiedRun(
+          task,
+          verified,
+          read(join(directory, 'publication.json')),
+          read(second),
+          third ? read(third) : undefined,
+        ),
+      ),
     );
   } else throw new Error('Unknown local-agent command.');
 }

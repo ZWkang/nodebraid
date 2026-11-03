@@ -24,41 +24,34 @@ GitHub 继续作为事实源；完整读取需求/spec 及相关任务后，将�
 
 新任务先与用户确认 grill、spec、领域文档和公共测试 seam；确认后，Agent 自主拆分任务、审查计划、实现、验证和双轴 code review，无需逐票再次确认。需求、公开契约或架构决策变化时回到前期讨论。
 
-Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执行，使用现有 ChatGPT 订阅登录；GitHub 保留任务记录和工程 CI。执行协议见 `.agents/workflows/local-agent.md`，设置与验收见 `docs/agents/agentic-workflows.md`，任务路由见 `docs/agents/issue-tracker.md`。`CONTEXT.md` 是唯一领域词汇表，skill 提到 `GLOSSARY.md` 时读取它。
+Issue 调查、自主交付和 PR 反馈修复由本地 Codex 聊天自动化执行，使用现有 ChatGPT 订阅登录；GitHub 保留任务记录和工程 CI。每条规则只在一处维护：
 
-实现阶段应用项目级 `ponytail` 的 full 模式，先读真实调用链并优先复用，再完成最小充分改动。Standards review 同时使用 `ponytail-review`；按已确认的 spec、ADR 和公共契约判断简化，不删必要的错误处理、验证或框架 seam。
+- [local-agent.md](.agents/workflows/local-agent.md)：执行协议，包括资格、实现、发布、反馈修复和按根因合并同类缺陷。
+- [agentic-workflows.md](docs/agents/agentic-workflows.md)：运行环境、`agents:run` 等命令契约和 GitHub 合并门禁。
+- [issue-tracker.md](docs/agents/issue-tracker.md)：Issue 约定、标签、`Refs #N`/`Fixes #N` 与关闭规则。
+- [pr-risk](.agents/skills/pr-risk/SKILL.md)：风险分级与合并路由；分级规则及执行权限变更本身属于 high。
+- [PR 证据](docs/agents/pr-evidence.md)：审查报告、界面证据与发布回执。
+- [legacy-recovery.md](docs/agents/legacy-recovery.md)：旧父子 Issue、叠加 PR 和旧 run，仅在恢复历史工作时读取。
 
-PR 分级以项目级 [pr-risk](.agents/skills/pr-risk/SKILL.md) 为唯一规则入口。原有 Standards/Spec 两轴分别记录绑定当前 head/tree/patch 的风险依据与回滚方案，最终取高等级并应用路径最低等级。low 在全部既有交付条件通过后可免人工即时合并；medium 重点人工审阅，high 完整人工审阅。分级规则及执行权限变更本身属于 high，不能自行使用豁免。`evaluate` 的风险与自动合并候选不替代报告发布回读及合并前验收；Issue 关闭仍需独立授权。
+`CONTEXT.md` 是唯一领域词汇表，skill 提到 `GLOSSARY.md` 时读取它。实现阶段应用项目级 `ponytail` 的 full 模式，Standards review 同时使用 `ponytail-review`；不删必要的错误处理、验证或框架 seam。可见 Canvas 变更和浏览器验证维护使用项目级 [verify-nodebraid](.agents/skills/verify-nodebraid/SKILL.md)。
 
-可见 Canvas 变更和浏览器验证维护使用项目级 [verify-nodebraid](.agents/skills/verify-nodebraid/SKILL.md)，通过锁定的 `agent-browser` 采集真实证据。完整审查报告与媒体的生成、连接器发布和权限边界见 [PR 证据](docs/agents/pr-evidence.md)；每次 ready 前必须实际发布并回读当前 head 的报告，保留报告 URL、source head 与 evidence commit。`agents:run evaluate` 尚未自动校验展示回执。
-
-开发循环使用 `bun run check:affected`，定向通过不算完成交付。托管任务先完成定向检查与双轴 review，再由 `agents:run verify` 执行本次交付验证的全量 `bun run check`，不提前人工重复执行相同全量检查。同一 head 的新验证尝试仍真实执行，保留独立日志；GitHub CI 继续全量检查。
+开发循环使用 `bun run check:affected`，定向通过不算完成交付；托管交付的全量 `bun run check` 只由 `agents:run verify` 执行，GitHub CI 另行全量检查。
 
 - `bun run agents:check`：检查本地工作流协议、skills 和残留的托管 API 执行入口；CI 在完整工程检查前执行。
 - `bun run agents:local-check`：另检查本机 ChatGPT CLI 登录；有 API-key 环境变量时明确失败，不切换计费入口。
 - `bun run agents:scan [base-sha]`：在已 fetch 的干净 main worktree 记录固定 SHA 调查范围。
-- `bun run agents:run`：归一化完整 GitHub 上下文，独立保存审查 `base` 与追加 `expectedParent`、检查依赖前沿、执行真实检查、绑定发布 tree 和判断当前 head/目标 SHA；参数见 `docs/agents/agentic-workflows.md`。
-- `bun run agents:run archive-issue <snapshot.json> <issues-dir>`：保存完整 GitHub Issue 正文与讨论的本地阅读副本和不可覆盖历史版本；输入与默认存放位置见 Issue tracker 约定。
-- `bun run agents:run reconcile <source.json> [output.json]`：在 fetch 后核对单一交付 Issue、PR、外部依赖/负责人、实际 main 集成与验收；历史父子记录继续可读。输出 GitHub 交付候选，不执行远端写入。
-- `bun run agents:run frontier <run-dir> <completed-steps.json>`：按本地 prepared plan 和实际完成记录选择可执行 ticket；ticket 不创建 GitHub Issue 或独立 PR。
-- `bun run agents:discovery init|sync <queue.json>`：显式初始化或恢复按公共 seam 保存的调查待办；无新提交也保留未检查区域。
-- `bun run agents:discovery finish <queue.json> <report.json>`：只用当前 main 的成功执行报告完成一个待办。
+- `bun run agents:run <mode> ...`：`archive-issue`、`normalize`、`reconcile`、`prepare`、`frontier`、`inspect`、`verify`、`publication`、`evaluate`；参数与输入契约见 agentic-workflows.md。
+- `bun run agents:discovery init|sync|finish <queue.json> [report.json]`：维护按公共 seam 保存的调查待办。
+- `bun run agents:retro <runs-dir> <empty-dir> [--since <ISO>]`：用户要求复盘时汇总 run 指标与 `retro.json` 摩擦记录，生成带去重标记的 `workflow:` 改进提案；只读，不写 GitHub。
 - `bun run agents:typecheck`：检查本地工作流命令及其共享状态模块的 TypeScript 类型；包含在完整工程类型检查中。
-- `bun run agents:preview --base <sha> --out <empty-dir> [--all]`：在干净提交上采集 Examples Application 场景、截图、录屏与 manifest，失败证据也保留。
+- `bun run agents:preview --base <sha> (--out <empty-dir> | --plan) [--all]`：在干净提交上采集 Examples Application 场景、截图、录屏与 manifest，失败证据也保留；`--plan` 只输出选中场景。
 - `bun run agents:report <run-dir> <output-dir>`：生成绑定发布 head 的完整审查/验证报告和声明日志；可追加到同一 preview 目录，只创建新文件。
-- `bun run agents:publish-evidence prepare <dir> <repository> <pr> <head>`：生成连接器发布计划；已有 `GITHUB_TOKEN` 和 `GITHUB_REPOSITORY` 时，使用 `bun run agents:publish-evidence <dir> <pr> <head>` 实际发布并回读。
+- `bun run agents:publish-evidence prepare <dir> <repository> <pr> <head>`：生成连接器发布计划；已有 `GITHUB_TOKEN` 和 `GITHUB_REPOSITORY` 时，使用 `bun run agents:publish-evidence <dir> <pr> <head>` 实际发布、回读并写入发布回执。
 - `bun run agents:publish-evidence preflight`：CI 下载 artifact 前只读检查源 PR 资格；已关闭或过期 head 明确记录 `not-applicable` 并禁用发布，读取或身份错误仍失败。
 - `bun test tests/pr-feedback.test.ts`：验证 PR 当前 head 的 CI／review 状态、反馈去重和交接校验。
 - `bun test tests/defect-scan.test.ts`：验证主动调查的固定 SHA 和成功运行基线。
 
-本地自动化检查新 main 变更、Issue 和托管 PR；复现并查重后记录 Issue，再实现已确认任务。
-GitHub 写入使用已连接工具或已认证 Git client，不复制订阅登录文件或连接器凭据。
-
-托管 PR 以 `[local-agent] `（兼容 `[agent] `）标题和 `feat/issue-N` 分支加入本地 CI／review 修复闭环，直接关联同一个 spec Issue。有合并后验收时用 `Refs #N` 保持 Issue 开放；只有合并是最后剩余条件且关闭已获授权时才用 `Fixes #N`，并核对提交消息和自动关闭关联。
-规格标题使用 `spec: `；获准实施后同一 Issue 可标记 `approved-spec` 和 `ready-for-agent`，批准范围内自主拆分本地 ticket。暂停、本地执行与其他活跃负责人保持可见。
-Agent 在原 PR 上追加修复并验证，需求变化返回讨论；按 pr-risk 路由执行合并，已有单 PR 明确授权仍适用。ready 前核对合并前 ticket/验收和当前 head 的检查、审查、报告，并列明待合并后才能执行的步骤。关闭 Issue 再核对独立关闭授权、实际 main 集成、全部 ticket 证据和剩余验收。旧父子 Issue、叠加 PR 及 `feat/issue-N-integration` 保留为历史恢复路径，不用于新需求拆票。
-
-修改本地工作流后格式化并执行 `agents:check` 及相关状态测试。GitHub 不保留 API Agent 或 gh-aw 编译入口。
+GitHub 写入使用已连接工具或已认证 Git client，不复制订阅登录文件或连接器凭据。修改本地工作流后格式化并执行 `agents:check` 及相关状态测试。GitHub 不保留 API Agent 或 gh-aw 编译入口。
 
 ## 项目结构与模块组织
 
