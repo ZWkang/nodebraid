@@ -174,14 +174,15 @@ bun run agents:discovery finish /absolute/path/to/discovery.json report.json
 
 ## GitHub 合并门禁
 
-默认分支使用独立的 `main-pr-and-checks` ruleset：required PR、由 GitHub Actions 上报的
+默认分支的目标配置为独立的 `main-pr-and-checks` ruleset：required PR、由 GitHub Actions 上报的
 `checks`、讨论解决、非快进/删除保护，且只允许 squash 合并。不要求分支基于最新 main
 （`strict_required_status_checks_policy: false`）：PR 已验证的 diff 合入后由 main 上的
 push `Checks` 兜底，冲突仍阻止合并。单人维护时 approving review count 为 0；分级路由不修改
 该设置，也不能绕过实际所需的批准。原 disabled `deny` 规则含限制所有更新等其他策略，不能
 直接启用代替上述配置。
 
-可审查的请求正文保存在 `docs/agents/main-ruleset.json`；它只是配置输入。只有读回 active
+可审查的请求正文保存在 `docs/agents/main-ruleset.json`；它只是配置输入，合并文件不会更新线上规则。
+实际合并必须遵守当前线上规则；只有读回 active
 rules 及默认分支后才能报告生效。管理操作需要已有 GitHub 管理登录；连接器不能写 rulesets
 或认证失效时保留错误。不能通过关闭 TLS 校验、复制连接器凭据或调用付费模型完成配置。
 

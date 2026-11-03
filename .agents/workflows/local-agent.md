@@ -210,8 +210,11 @@ metrics: the Codex chat's `~/.codex/sessions/` rollouts or Cursor's
   no `CODING_STANDARDS.md`; review standards live in `code-review`,
   `ponytail-review` and the `principle-*` skills.
 - `reflect` (user says "reflect"): three transcript reviewers plus a synthesizer
-  route durable learnings to edits of skills the session used. Without a pstack
-  models file it uses the skill's default models.
+  route durable learnings to edits of skills the session used. In Codex, inherit
+  the active model and use the runtime's available reasoning settings; the
+  vendored skill's cross-provider defaults do not apply. Use this project's
+  `ponytail` and applicable principles for delegation; `poteto-mode` is not required.
+  Other harnesses use their available configured models.
 
 Both wait for the user's choice before changing anything. In this repo, approved
 edits go to `.agents/skills/` or `docs/agents/`, never to `.cursor/skills/`. Do not
