@@ -123,6 +123,8 @@ try {
 
   assert.deepEqual(await evaluateBrowserScenario('globalThis.__nodebraidReactAdapterSnapshots()'), {
     initial: '0|1|false',
+    afterKernelUpdate: '4|1|false',
+    afterSessionUpdate: '4|2|false',
     updated: '4|2|true',
     subscriptionsWhileMounted: { kernel: 1, session: 1, history: 1 },
     subscriptionsAfterUnmount: { kernel: 0, session: 0, history: 0 },

@@ -46,23 +46,32 @@ describe('@nodebraid/plugin-node-editing', () => {
   test('creates a complete Node and updates only its data with one Undo per commit', async () => {
     const { host, kernel, commands, history } = await setup();
     try {
-      const input = node();
+      const parent = node('parent');
+      kernel.transact((transaction) => transaction.nodes.add(parent));
+      const input = { ...node(), parentId: parent.id };
       const created = await commands.execute(createNodeCommand, { node: input });
       expect(created.after).toBe(kernel.read());
       expect(created.changeSet.changes).toHaveLength(1);
       expect(history.getSnapshot().canUndo).toBe(true);
       const source = kernel.read().query.getNode(input.id)!;
+      expect(source).toEqual(input);
+      expect(source.data).toBe(input.data);
       const data = { label: 'Edited' };
       const edited = await commands.execute(updateNodeDataCommand, { expectedNode: source, data });
       expect(edited?.before).toBe(created.after);
-      expect(kernel.read().query.getNode(input.id)).toEqual({ ...source, data });
+      expect(kernel.read().query.getNode(input.id)).toEqual({ ...input, data });
       expect(kernel.read().query.getNode(input.id)?.data).toBe(data);
       await commands.execute(undoCommand, undefined);
-      expect(kernel.read().query.getNode(input.id)?.data).toBe(source.data);
+      expect(kernel.read().query.getNode(input.id)).toEqual(input);
+      expect(kernel.read().query.getNode(input.id)?.data).toBe(input.data);
       await commands.execute(undoCommand, undefined);
       expect(kernel.read().query.getNode(input.id)).toBeUndefined();
+      expect(kernel.read().query.getNode(parent.id)).toEqual(parent);
       await commands.execute(redoCommand, undefined);
+      expect(kernel.read().query.getNode(input.id)).toEqual(input);
+      expect(kernel.read().query.getNode(input.id)?.data).toBe(input.data);
       await commands.execute(redoCommand, undefined);
+      expect(kernel.read().query.getNode(input.id)).toEqual({ ...input, data });
       expect(kernel.read().query.getNode(input.id)?.data).toBe(data);
     } finally {
       await host.dispose();
