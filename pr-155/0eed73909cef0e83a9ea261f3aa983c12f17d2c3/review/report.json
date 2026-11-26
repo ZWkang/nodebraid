@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "11dfcb27b37aff24ca22e3fd7f510558c5d55c7d",
+    "expectedParent": "11dfcb27b37aff24ca22e3fd7f510558c5d55c7d",
+    "head": "0eed73909cef0e83a9ea261f3aa983c12f17d2c3",
+    "tree": "01c995d606927ddc3442b4810ee587234ba225a3",
+    "patch": "a8336d6928ef941a18c2100e713bb751a55ddca5715ec01e5b76cd3c0a1e6c30",
+    "localHead": "ba0ad85eeec7aceec1460738f0ad2cae18434a3f"
+  },
+  "task": {
+    "run": "issue-154-delivery-20261126",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 154
+    },
+    "request": "Implement approved issue #154, verify and publish one PR",
+    "plan": [
+      {
+        "id": "command",
+        "acceptance": "Command rule and input compatibility, stale and cancellation, atomic commit",
+        "blockedBy": []
+      },
+      {
+        "id": "feedback",
+        "acceptance": "Current candidate, static pointer refresh and lifecycle via public gesture and feedback APIs",
+        "blockedBy": [
+          "command"
+        ]
+      },
+      {
+        "id": "examples",
+        "acceptance": "Real Chromium SVG, examples and undo/redo, declaration, bilingual docs and evidence map",
+        "blockedBy": [
+          "feedback"
+        ]
+      },
+      {
+        "id": "verify",
+        "acceptance": "Independent Standards and Spec pass and full verify",
+        "blockedBy": [
+          "examples"
+        ]
+      },
+      {
+        "id": "publish",
+        "acceptance": "Verified PR current-head report and media",
+        "blockedBy": [
+          "verify"
+        ]
+      },
+      {
+        "id": "main",
+        "acceptance": "After main integration verify all acceptance",
+        "blockedBy": [
+          "publish"
+        ]
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "ba0ad85eeec7aceec1460738f0ad2cae18434a3f",
+      "tree": "01c995d606927ddc3442b4810ee587234ba225a3",
+      "patch": "a8336d6928ef941a18c2100e713bb751a55ddca5715ec01e5b76cd3c0a1e6c30",
+      "verdict": "passed",
+      "report": "复审 11dfcb2...ba0ad85，独立运行 Command 输入、Port 手势与 Basic Composition 三组公共测试，85 项通过，0 项失败。Port 定义回调返回后先核对取消与失效状态。回调取消保留原始 Abort reason；写入期间 Port 变化使创建回滚，活动手势在事务退出后刷新。此前报告的回调接收者、重复取消订阅和旧异常误分类均已修复。",
+      "risk": {
+        "level": "high",
+        "rationale": "公共 Plugin Host 生命周期、Interaction 服务和验证脚本发生变化，触及 high 路径下限。",
+        "evidence": "scripts/collect-preview.ts、验证技能及三组独立公共测试。",
+        "rollback": "整体回退功能和两次修正，无持久化格式迁移。"
+      }
+    },
+    "spec": {
+      "head": "ba0ad85eeec7aceec1460738f0ad2cae18434a3f",
+      "tree": "01c995d606927ddc3442b4810ee587234ba225a3",
+      "patch": "a8336d6928ef941a18c2100e713bb751a55ddca5715ec01e5b76cd3c0a1e6c30",
+      "verdict": "passed",
+      "report": "对照 #154 正文、两条讨论和基线 11dfcb2 复审 ba0ad85。此前六项发现均已修复。活动预览与另一条 Command 并存时，Edge.data getter 导致的 Port 变化使本次创建以 STALE_GESTURE 回滚，预览规则延迟到 Writer 退出后执行。新增公共测试观测到 Writer 内规则调用为零，并验证 Port 预检中 abort 的原始原因优先。独立运行配置、Command 输入、手势反馈、类型和 Basic Composition 透传五个测试文件，92 项通过，0 项失败，664 次断言。未发现剩余规格阻断项。全量工程检查、浏览器媒体验收与发布回执由交付流程单独记录。",
+      "risk": {
+        "level": "high",
+        "rationale": "涉及公开安装生命周期及创建的事务、取消语义，并修改验收工具和两处技能资料。",
+        "evidence": "ConnectionRules、CreateEdgeHandler、Interaction、Cordis 安装期配置捕获和 92 项公共测试。",
+        "rollback": "整体回退该功能，依赖新增 API 的应用同步回退，无持久化迁移。"
+      }
+    }
+  },
+  "changedFiles": [
+    ".agents/skills/control-nodebraid/references/capabilities.md",
+    ".agents/skills/verify-nodebraid/features/port-connection.md",
+    "CONTEXT.md",
+    "docs/adr/0090-evaluate-connection-rules-before-commit.md",
+    "examples/app/browser-tests/basic-svg.browser.ts",
+    "examples/app/browser-tests/node-authoring.browser.ts",
+    "examples/app/src/example-runtime/connection-rule.ts",
+    "examples/app/src/example-runtime/create-example-runtime.ts",
+    "examples/app/src/routes/basic-svg.tsx",
+    "examples/app/src/styles.css",
+    "examples/app/tests/connection-rule.test.ts",
+    "packages/interaction-api/src/contracts.ts",
+    "packages/interaction-api/src/index.ts",
+    "packages/plugin-interaction/README.md",
+    "packages/plugin-interaction/src/connection-feedback.ts",
+    "packages/plugin-interaction/src/connection-rule.ts",
+    "packages/plugin-interaction/src/contracts.ts",
+    "packages/plugin-interaction/src/create-edge-command.ts",
+    "packages/plugin-interaction/src/diagnostic-events.ts",
+    "packages/plugin-interaction/src/index.ts",
+    "packages/plugin-interaction/src/interaction-config.ts",
+    "packages/plugin-interaction/src/interaction-error.ts",
+    "packages/plugin-interaction/src/interaction-plugin.ts",
+    "packages/plugin-interaction/src/interaction-runtime.ts",
+    "packages/plugin-interaction/tests/config.test.ts",
+    "packages/plugin-interaction/tests/create-edge-input-values.test.ts",
+    "packages/plugin-interaction/tests/diagnostic-events.test.ts",
+    "packages/plugin-interaction/tests/port-connection.test.ts",
+    "packages/plugin-interaction/tests/types.test.ts",
+    "packages/preset-basic/src/preset-basic-plugin.ts",
+    "packages/preset-basic/tests/connection-values.test.ts",
+    "packages/renderer-svg/browser-tests/edge-presentation.entry.ts",
+    "packages/renderer-svg/src/interaction-projection.ts",
+    "packages/runtime-cordis/src/cordis-plugin-host.ts",
+    "packages/runtime-cordis/src/plugin-contracts.ts",
+    "packages/runtime-cordis/src/plugin-definition.ts",
+    "scripts/collect-preview.ts",
+    "tests/boundary-reads.test.ts",
+    "website/en/modules/plugin-interaction.md",
+    "website/modules/plugin-interaction.md"
+  ],
+  "risk": {
+    "level": "high",
+    "route": "full-human",
+    "reasons": [
+      "standards: high — 公共 Plugin Host 生命周期、Interaction 服务和验证脚本发生变化，触及 high 路径下限。",
+      "spec: high — 涉及公开安装生命周期及创建的事务、取消语义，并修改验收工具和两处技能资料。",
+      ".agents/skills/control-nodebraid/references/capabilities.md: minimum high risk.",
+      ".agents/skills/verify-nodebraid/features/port-connection.md: minimum high risk.",
+      "packages/interaction-api/src/contracts.ts: minimum medium risk.",
+      "packages/interaction-api/src/index.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/connection-feedback.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/connection-rule.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/contracts.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/create-edge-command.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/diagnostic-events.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/index.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/interaction-config.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/interaction-error.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/interaction-plugin.ts: minimum medium risk.",
+      "packages/plugin-interaction/src/interaction-runtime.ts: minimum medium risk.",
+      "packages/preset-basic/src/preset-basic-plugin.ts: minimum medium risk.",
+      "packages/renderer-svg/src/interaction-projection.ts: minimum medium risk.",
+      "packages/runtime-cordis/src/cordis-plugin-host.ts: minimum medium risk.",
+      "packages/runtime-cordis/src/plugin-contracts.ts: minimum medium risk.",
+      "packages/runtime-cordis/src/plugin-definition.ts: minimum medium risk.",
+      "scripts/collect-preview.ts: minimum high risk."
+    ]
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "rule-before",
+      "acceptance": "初始实现拒绝 connectionRule 配置，容量规则测试失败。",
+      "command": "bun test packages/plugin-interaction/tests/create-edge-input-values.test.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "rule-after",
+      "acceptance": "配置、手势和事务边界公共用例通过，55 项测试。",
+      "command": "bun test packages/plugin-interaction/tests/create-edge-input-values.test.ts packages/plugin-interaction/tests/port-connection.test.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "log": "logs/behavior-2.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "704f4dd4254dc0a1eab74751b0545809b456b015dbc024ac2ad4d22bd7535890"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "ccd73e3bb9eae28937fb060e646c2659a81b2830e2f5a3bd7b2190b9729edffa"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "9eb98ade14d2225ac302980644bdfd31280ea517c0d37295ffb243eac3bffffd"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "fb2357cb5148f0c64d717907c61d65c495afe116cff266aa989c3c1fd996dba6"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "e68be49cb780b146cfce5f9ed6c9b07de853d2ac866897bb02ddafca391c5252"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "c241aed3355f140fddd4c6b1c6f86cd3c6461cff4fc6447239cd1d4bef8661e0"
+    }
+  ]
+}

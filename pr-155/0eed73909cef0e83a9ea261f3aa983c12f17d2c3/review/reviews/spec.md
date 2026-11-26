@@ -1,0 +1,1 @@
+对照 #154 正文、两条讨论和基线 11dfcb2 复审 ba0ad85。此前六项发现均已修复。活动预览与另一条 Command 并存时，Edge.data getter 导致的 Port 变化使本次创建以 STALE_GESTURE 回滚，预览规则延迟到 Writer 退出后执行。新增公共测试观测到 Writer 内规则调用为零，并验证 Port 预检中 abort 的原始原因优先。独立运行配置、Command 输入、手势反馈、类型和 Basic Composition 透传五个测试文件，92 项通过，0 项失败，664 次断言。未发现剩余规格阻断项。全量工程检查、浏览器媒体验收与发布回执由交付流程单独记录。

@@ -1,0 +1,74 @@
+bun test v1.4.2 (744846f84)
+
+packages/plugin-interaction/tests/create-edge-input-values.test.ts:
+ 8 |     if (config === null || typeof config !== 'object' || Array.isArray(config)) {
+ 9 |       throw new InteractionError('INVALID_CONFIG', 'Interaction config must be an object.');
+10 |     }
+11 |     for (const field of Object.keys(config)) {
+12 |       if (!configFields.has(field)) {
+13 |         throw new InteractionError('INVALID_CONFIG', `Unknown Interaction config field: ${field}.`);
+                       ^
+InteractionError: Unknown Interaction config field: connectionRule.
+  domain: "interaction",
+   cause: undefined,
+ details: {},
+    code: "INVALID_CONFIG"
+
+      at resolveInteractionConfig (/Users/zhou/.codex/worktrees/e10c/cflow/packages/plugin-interaction/src/interaction-config.ts:13:19)
+      at setup (/Users/zhou/.codex/worktrees/e10c/cflow/packages/plugin-interaction/src/interaction-plugin.ts:25:48)
+      at run (/Users/zhou/.codex/worktrees/e10c/cflow/packages/runtime-cordis/dist/plugin-activation.js:28:50)
+      at activate (/Users/zhou/.codex/worktrees/e10c/cflow/packages/runtime-cordis/dist/plugin-installation.js:98:49)
+      at plugin (/Users/zhou/.codex/worktrees/e10c/cflow/packages/runtime-cordis/dist/cordis-plugin-host.js:130:64)
+      at /Users/zhou/.codex/worktrees/e10c/cflow/node_modules/cordis/lib/index.js:808:37
+      at #install (/Users/zhou/.codex/worktrees/e10c/cflow/packages/runtime-cordis/dist/cordis-plugin-host.js:79:41)
+      at activate (/Users/zhou/.codex/worktrees/e10c/cflow/packages/plugin-interaction/tests/create-edge-input-values.test.ts:48:10)
+      at /Users/zhou/.codex/worktrees/e10c/cflow/packages/plugin-interaction/tests/create-edge-input-values.test.ts:66:44
+(fail) the public command checks remaining capacity using the current graph before reading Edge data [29.01ms]
+(pass) Create Edge cannot replace a validated forward Edge with a later self-loop [8.33ms]
+(pass) Create Edge retains first values, receivers and late opaque data from own properties [3.08ms]
+(pass) Create Edge retains first values, receivers and late opaque data from non-enumerable properties [1.56ms]
+(pass) Create Edge retains first values, receivers and late opaque data from inherited properties [2.49ms]
+(pass) Create Edge preserves the original edge read failure and exact committed state [1.93ms]
+(pass) Create Edge preserves the original edge.id read failure and exact committed state [4.34ms]
+(pass) Create Edge preserves the original edge.type read failure and exact committed state [1.34ms]
+(pass) Create Edge preserves the original edge.source read failure and exact committed state [0.97ms]
+(pass) Create Edge preserves the original edge.source.nodeId read failure and exact committed state [0.93ms]
+(pass) Create Edge preserves the original edge.source.portId read failure and exact committed state [1.05ms]
+(pass) Create Edge preserves the original edge.target read failure and exact committed state [1.35ms]
+(pass) Create Edge preserves the original edge.target.nodeId read failure and exact committed state [0.98ms]
+(pass) Create Edge preserves the original edge.target.portId read failure and exact committed state [1.84ms]
+(pass) Create Edge preserves the original edge.data.presence read failure and exact committed state [1.29ms]
+(pass) Create Edge preserves the original source read failure and exact committed state [0.87ms]
+(pass) Create Edge preserves the original source.nodeId read failure and exact committed state [0.92ms]
+(pass) Create Edge preserves the original source.portId read failure and exact committed state [0.97ms]
+(pass) Create Edge preserves the original source.role read failure and exact committed state [1.39ms]
+(pass) Create Edge preserves the original target read failure and exact committed state [1.32ms]
+(pass) Create Edge preserves the original target.nodeId read failure and exact committed state [0.89ms]
+(pass) Create Edge preserves the original target.portId read failure and exact committed state [1.73ms]
+(pass) Create Edge preserves the original target.role read failure and exact committed state [1.06ms]
+(pass) Create Edge preserves the original edge.data read failure and exact committed state [0.96ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [1.12ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.82ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.74ms]
+(pass) Create Edge preserves a non-Error opaque-data failure %s [0.83ms]
+(pass) Create Edge observes abort before input getters [0.92ms]
+(pass) Create Edge self-loop preflight wins before the opaque-data getter [0.98ms]
+(pass) Create Edge mismatched-endpoint preflight wins before the opaque-data getter [0.73ms]
+(pass) Create Edge wrong-role preflight wins before the opaque-data getter [1.84ms]
+(pass) Create Edge missing-node preflight wins before the opaque-data getter [0.94ms]
+(pass) Create Edge missing-port preflight wins before the opaque-data getter [0.92ms]
+(pass) Create Edge duplicate-id preflight wins before the opaque-data getter [0.90ms]
+(pass) Create Edge finishes every shape check before semantic role checks [0.96ms]
+(pass) Create Edge preserves invalid-ID short circuit before Edge type reads [0.89ms]
+(pass) Create Edge validates data presence before reading Anchor roots [0.82ms]
+(pass) Create Edge retains Anchor empty-Port short circuit before the target root [0.77ms]
+(pass) Create Edge keeps an empty Endpoint Port distinct from an absent Anchor Port [0.78ms]
+(pass) Create Edge retains captured Port evidence across application Definition and data callbacks [2.87ms]
+
+1 tests failed:
+(fail) the public command checks remaining capacity using the current graph before reading Edge data [29.01ms]
+
+ 40 pass
+ 1 fail
+ 268 expect() calls
+Ran 41 tests across 1 file. [167.00ms]
