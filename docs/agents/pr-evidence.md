@@ -159,8 +159,8 @@ PR 区块明确写“独立审查与本地验证报告：未提供”。完整�
 
 证据文件保存在独立 `pr-evidence` 分支的 `pr-<number>/<完整 head SHA>/`；其中
 `preview/` 属于 PR 运行产生的视觉证据，`review/` 属于独立审查与验证报告，两个命名空间
-互不覆盖。截图在 PR
-正文展示，MP4 录屏和完整报告提供链接。分支只追加 commit，不删除旧 head 目录；同 head
+互不覆盖。PR 自动区块展示报告入口、预览结果、失败原因和覆盖限制，链接到该 head 的预览目录。
+作者在 Evidence 中选择能证明核心行为的截图或录屏，图注说明操作及观察点。分支只追加 commit，不删除旧 head 目录；同 head
 再次发布的旧版本仍可通过此前 evidence commit 查看。源码分支与 Documentation Site
 部署不被这条流程改写，Actions artifact 也不是唯一长期存储。
 
