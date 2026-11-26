@@ -523,6 +523,7 @@ async function collectScene(
         remember('restored-nodes.json', 'snapshot');
       });
       await step('Edit the title in place and undo the committed change', async () => {
+        await run(['scrollintoview', '.canvas-target']);
         await run(['dblclick', `[data-nodebraid-node-id="${createdId}"]`]);
         await run(['fill', '[aria-label="Edit node title"]', 'Inline card']);
         await capture('inline-title-draft');
