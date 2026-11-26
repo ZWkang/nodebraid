@@ -216,44 +216,17 @@ export async function loadEvidenceBundle(
 
 export function renderEvidenceBlock(bundle: EvidenceBundle, repository: string, pr: number): string {
   const prefix = `pr-${pr}/${bundle.source.head}`;
-  const raw = `https://raw.githubusercontent.com/${repository}/${BRANCH}/${prefix}/`;
   const browse = `https://github.com/${repository}/blob/${BRANCH}/${prefix}/`;
-  const lines = [
-    BEGIN,
-    '### 审查、验证与界面证据',
-    '',
-    `提交：\`${bundle.source.head}\` · tree：\`${bundle.source.tree}\``,
-    '',
-  ];
+  const lines = [BEGIN, '### 审查与验证', ''];
   if (bundle.report) lines.push(`[完整审查与验证报告](${browse}review/report.md)`, '');
   else lines.push('独立审查与本地验证报告：未提供。下面的界面证据不代表两轴审查或完整工程检查通过。', '');
   if (bundle.preview) {
     const preview = bundle.preview;
     lines.push(`界面预览：**${preview.status}**${preview.reason ? ` — ${text(preview.reason)}` : ''}`, '');
     if (preview.limitations?.length) lines.push(...preview.limitations.map((item) => `- 未覆盖：${text(item)}`), '');
-    for (const scene of preview.scenes) {
-      lines.push(
-        `#### ${text(scene.title)} · ${scene.status}`,
-        '',
-        ...scene.steps.map((step, index) => `${index + 1}. ${text(step)}`),
-        '',
-      );
-      if (scene.error) lines.push(`失败：${text(scene.error)}`, '');
-      for (const file of scene.artifacts) {
-        if (file.endsWith('.png'))
-          lines.push(`**${text(file.split('/').at(-1)!)}**`, '', `![${text(scene.title)}](${raw}preview/${file})`, '');
-        else if (file.endsWith('.mp4'))
-          lines.push(
-            `[${file.endsWith('/review.mp4') ? '慢放录屏（1/15 速，仅供审阅）' : '原始录屏 MP4'}](${raw}preview/${file})`,
-            '',
-          );
-        else lines.push(`[${text(file)}](${browse}preview/${file})`, '');
-      }
-    }
-    const shown = new Set(preview.scenes.flatMap((scene) => scene.artifacts));
-    for (const artifact of preview.artifacts.filter((artifact) => !shown.has(artifact.path)))
-      lines.push(`[${text(artifact.path)}](${browse}preview/${artifact.path})`, '');
-    lines.push(`[场景与产物清单](${browse}preview/preview.json)`, '');
+    for (const scene of preview.scenes.filter((scene) => scene.status === 'failed'))
+      lines.push(`- 失败：${text(scene.title)}${scene.error ? ` — ${text(scene.error)}` : ''}`, '');
+    lines.push(`[查看场景、截图与录屏](https://github.com/${repository}/tree/${BRANCH}/${prefix}/preview)`, '');
   } else lines.push('界面预览：未提供；不能据此认定没有可见变化。', '');
   lines.push(END);
   return lines.join('\n');

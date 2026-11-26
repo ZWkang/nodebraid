@@ -44,7 +44,9 @@ test('publishes actual checksummed evidence and preserves author text on repeate
   const block = renderEvidenceBlock(bundle, 'ZWkang/nodebraid', 45);
   const body = replaceEvidenceBlock('## Purpose\n\nKeep this explanation.', block);
   expect(body).toContain('Keep this explanation.');
-  expect(body).toContain('after.png');
+  expect(body).not.toContain('after.png');
+  expect(body).not.toContain('Click Zoom in');
+  expect(body).toContain('/preview');
   expect(body).toContain(head);
   expect(replaceEvidenceBlock(body, block)).toBe(body);
   expect(block).toContain('未提供');

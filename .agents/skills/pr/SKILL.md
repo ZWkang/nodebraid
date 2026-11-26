@@ -14,7 +14,8 @@ Use this template for writing the PR body:
 ```markdown
 ## Summary
 
-<diagram, diff-sketch, or tree>
+<In plain language, say who encounters the problem and what they can do after this change.>
+<Explain the mechanism or compatibility detail that matters. Add a diagram only if it clarifies the change.>
 
 **Delivery:** <source spec Issue and accepted scope; target: main>
 Refs #<spec-issue>
@@ -26,13 +27,13 @@ Refs #<spec-issue>
 
 ## Merge Danger
 
+**Human attention:** <the concrete behavior or decision reviewers should focus on>
+
 **Risk / Route:** <final pr-risk level and route; reviewed head>
 
 **Basis:** <both independent assessments and report link>
 
 **Rollback:** <concrete recovery and irreversible effects>
-
-**Human attention:** <required decisions or none under the verified low-risk route>
 
 **Door:** <one-way or two-way>
 
@@ -64,7 +65,7 @@ PR/commit/Issue chain and distinguish feature-branch merges from main delivery.
 Do not bulk rewrite historical links. Retargeting an old open PR requires a new
 prepared run, checks and both reviews even if its head SHA did not change.
 
-Skip all preambles and keep prose brief. Use the user's domain language from `GLOSSARY.md`.
+Skip all preambles and keep prose brief. Use the user's domain language from `CONTEXT.md`.
 
 ### Summary
 
@@ -189,7 +190,7 @@ You may use one of these, you may use several, it is unlikely you will use all o
 
 Concrete evidence that the change works. Show a before and after.
 
-Screenshots are S-tier - when the environment is set up for it and the change is visual.
+For visible changes, choose the screenshot pair or short recording that best demonstrates the acceptance criterion. Caption it with the action and what to observe. Label same-revision states by action (for example, “after selecting the second edge”). Reserve old/new labels for comparisons across revisions. Link the full evidence collection for other scenarios.
 
 Execution-based evidence is A-tier. Test results, console output. Show the exact test that now fails and passes, using pseudocode.
 
