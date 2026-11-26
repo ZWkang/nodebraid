@@ -117,7 +117,13 @@ const boundaries: [string, (track: <T extends object>(value: T, root: string) =>
         ),
       ),
   ],
-  ['definePlugin', (t) => definePlugin(t({ name: 'scan', setup: () => undefined } as never, 'plugin'))],
+  [
+    'definePlugin',
+    (t) =>
+      definePlugin(
+        t({ name: 'scan', captureConfig: (value: unknown) => value, setup: () => undefined } as never, 'plugin'),
+      ),
+  ],
   [
     'createLayoutPlugin',
     (t) =>

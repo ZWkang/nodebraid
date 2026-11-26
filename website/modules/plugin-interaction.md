@@ -56,3 +56,11 @@ Pointermove 只替换 Interaction Projection。pointerup 先清 Preview 并回�
 `nodePlacementService.begin(materializeNode)` 开始一次请求。handle 提供 `cancel()` 和 `result` Promise，结果为 `{type: 'created', nodeId, commit}` 或 `{type: 'cancelled'}`；原始失败通过 reject 暴露。应用同步 materializer 接收 `{worldPoint}` 并返回完整 Node。安装 Node Editing 以提供公开 Create Node Command；Basic Composition 已包含它。
 
 Interaction 统一路由放置与普通手势。primary 点击在空白处开始和结束、且未超过现有拖动阈值，才创建一次并选中新 Node。实体点击与拖动不放置，也不同时选择/拖动；Esc 取消。待放置期间保留平移缩放，候选点击不跨 Viewport 变化提交。示例以点击点为 Node 左上角，使用光标与提示反馈。
+
+## 连接规则与反馈
+
+在 Basic Composition 的 `interaction.connectionRule` 中提供同步函数。它接收 `{ source, target, view, ports }`，返回 `{ type: 'allow' }` 或 `{ type: 'deny', reason: { code, message } }`。两个原因字段都必须是非空字符串。规则随安装固定，仅依据输入及固定配置计算，避免写图或分配 ID。
+
+直接执行 Create Edge Command 也会按最新状态调用规则，即使没有配置鼠标 materializer。拒绝时 Promise 以 `CONNECTION_REJECTED` 失败，details 包含 `reasonCode` 与 `reasonMessage`。无效结果产生 `INVALID_CONNECTION_DECISION`；回调抛出的异常保留身份。Import、Paste、Duplicate、History 和直接 Transaction 沿用各自契约。
+
+通过 `connectionFeedbackService` 的 `getSnapshot()` 和 `subscribe(listener)` 读取 idle、preview 或 rejected。图或 Port 变化会刷新静止指针的候选。以纯文本展示 invalid 或 rejected 的 reason.message。订阅不立即调用；Activation 结束后重新获取服务。

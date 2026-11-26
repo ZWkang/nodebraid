@@ -1,6 +1,29 @@
 import type { ConnectionAnchorIdentity } from '@nodebraid/interaction-api';
-import type { CanvasCommit, CanvasEdge, CanvasSnapshot, EdgeEndpoint, NodeId, Point } from '@nodebraid/kernel';
+import type {
+  CanvasCommit,
+  CanvasEdge,
+  CanvasSnapshot,
+  CanvasView,
+  EdgeEndpoint,
+  NodeId,
+  Point,
+} from '@nodebraid/kernel';
+import type { PortSnapshot } from '@nodebraid/port-api';
 import type { SelectionSnapshot } from '@nodebraid/plugin-session';
+
+export interface ConnectionRuleContext {
+  readonly source: EdgeEndpoint;
+  readonly target: EdgeEndpoint;
+  readonly view: CanvasView;
+  readonly ports: PortSnapshot;
+}
+export interface ConnectionRuleReason {
+  readonly code: string;
+  readonly message: string;
+}
+export type ConnectionDecision =
+  { readonly type: 'allow' } | { readonly type: 'deny'; readonly reason: ConnectionRuleReason };
+export type ConnectionRule = (context: ConnectionRuleContext) => ConnectionDecision;
 
 export interface ConnectionMaterializationInput {
   readonly source: EdgeEndpoint;
@@ -18,6 +41,7 @@ export interface InteractionConfig {
   readonly wheelZoomSensitivity?: number;
   readonly minZoom?: number;
   readonly maxZoom?: number;
+  readonly connectionRule?: ConnectionRule;
   readonly connection?: ConnectionConfig;
 }
 
@@ -26,6 +50,7 @@ export interface EffectiveInteractionConfig {
   readonly wheelZoomSensitivity: number;
   readonly minZoom: number;
   readonly maxZoom: number;
+  readonly connectionRule?: ConnectionRule;
   readonly connection?: ConnectionConfig;
 }
 

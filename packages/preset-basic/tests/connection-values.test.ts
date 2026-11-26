@@ -101,6 +101,8 @@ for (const shape of shapes) {
       return current;
     });
     const originalPrototype = Object.getPrototypeOf(supplied);
+    let ruleReads = 0,
+      ruleCalls = 0;
     const plugin = createBasicCanvasPlugin(
       (configuration: Readonly<{ targetId: string }>) => {
         configurations.push(configuration);
@@ -108,7 +110,18 @@ for (const shape of shapes) {
         renderers.push(renderer);
         return renderer;
       },
-      { interaction: { connection: supplied } },
+      {
+        interaction: {
+          connection: supplied,
+          get connectionRule() {
+            if (++ruleReads > 1) throw new Error('Rule was read twice');
+            return () => {
+              ruleCalls++;
+              return { type: 'allow' as const };
+            };
+          },
+        },
+      },
     );
     expect(reads).toBe(1);
     current = (input) => {
@@ -140,6 +153,7 @@ for (const shape of shapes) {
       );
       try {
         await Promise.all([composition.whenActive(), consumer.whenActive()]);
+        expect(ruleReads).toBe(1);
         expect(services).toBeDefined();
         if (!services) throw new Error('Expected public Basic Services.');
         expect(configurations.at(-1)).toBe(configuration);
@@ -171,6 +185,7 @@ for (const shape of shapes) {
         await settleCommands();
         expect(materialized.length).toBe(countBefore + 1);
         expect(materialized.at(-1)).toEqual({ source: { nodeId: sourceId }, target: { nodeId: targetNodeId } });
+        expect(ruleCalls).toBeGreaterThan(0);
         expect(laterCalls).toBe(0);
         expect(reads).toBe(1);
         expect(commits.length).toBe(1);

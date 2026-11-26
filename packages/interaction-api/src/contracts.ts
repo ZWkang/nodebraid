@@ -8,11 +8,28 @@ export interface ConnectionAnchorIdentity extends ConnectionTargetReference {
   readonly role: ConnectionAnchorRole;
 }
 
-export type ConnectionPreviewTarget =
+export interface ConnectionFeedbackReason {
+  readonly origin: 'structure' | 'rule';
+  readonly code: string;
+  readonly message: string;
+}
+export type ConnectionFeedbackTarget =
   | { readonly type: 'none' }
+  | { readonly type: 'valid'; readonly anchor: ConnectionAnchorIdentity }
+  | { readonly type: 'invalid'; readonly anchor: ConnectionAnchorIdentity; readonly reason: ConnectionFeedbackReason };
+
+export type ConnectionPreviewTarget =
+  | Exclude<ConnectionFeedbackTarget, { type: 'invalid' }>
+  | { readonly type: 'invalid'; readonly anchor: ConnectionAnchorIdentity; readonly reason?: ConnectionFeedbackReason };
+
+export type ConnectionFeedbackSnapshot =
+  | { readonly type: 'idle' }
+  | { readonly type: 'preview'; readonly source: ConnectionAnchorIdentity; readonly target: ConnectionFeedbackTarget }
   | {
-      readonly type: 'valid' | 'invalid';
-      readonly anchor: ConnectionAnchorIdentity;
+      readonly type: 'rejected';
+      readonly source: ConnectionAnchorIdentity;
+      readonly target: ConnectionAnchorIdentity;
+      readonly reason: ConnectionFeedbackReason;
     };
 
 export interface ConnectionPreviewInteractionProjection {

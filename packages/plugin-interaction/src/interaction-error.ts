@@ -2,6 +2,9 @@ import { NodeBraidError, type DiagnosticAttributes } from '@nodebraid/diagnostic
 
 export type InteractionErrorCode =
   | 'INVALID_CONFIG'
+  | 'CONNECTION_REJECTED'
+  | 'INVALID_CONNECTION_DECISION'
+  | 'CONNECTION_FEEDBACK_DISPOSED'
   | 'INVALID_MOVE'
   | 'INVALID_CONNECTION'
   | 'INVALID_DELETE'

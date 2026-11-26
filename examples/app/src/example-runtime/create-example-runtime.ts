@@ -1,5 +1,8 @@
+import { exampleConnectionRule } from './connection-rule';
 import {
   commandService,
+  connectionFeedbackService,
+  type ConnectionFeedbackService,
   createBasicCanvasPlugin,
   createClipboardPlugin,
   createClipboardShortcutPlugin,
@@ -48,6 +51,7 @@ export interface ClipboardFailureSnapshot {
 }
 
 export interface ExampleRuntime {
+  readonly feedback: ConnectionFeedbackService;
   readonly commands: CommandService;
   readonly history: HistoryService;
   readonly kernel: KernelService;
@@ -89,6 +93,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
   let nextDuplicateEdgeSequence = 1;
   let nextClipboardNodeSequence = 1;
   let nextClipboardEdgeSequence = 1;
+  let feedback: ConnectionFeedbackService | undefined;
   let commands: CommandService | undefined;
   let history: HistoryService | undefined;
   let kernel: KernelService | undefined;
@@ -98,6 +103,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
     interaction: {
       ...exampleZoomRange,
       wheelZoomSensitivity: Math.log(2) / 100,
+      connectionRule: exampleConnectionRule,
       connection: {
         materializeEdge({ source, target: edgeTarget }) {
           const id = freshEdgeId('example-edge', () => nextEdgeSequence++);
@@ -158,6 +164,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       renderer: rendererService,
       session: sessionService,
       placement: nodePlacementService,
+      feedback: connectionFeedbackService,
     },
     setup(context) {
       commands = context.services.commands;
@@ -165,6 +172,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       kernel = context.services.kernel;
       session = context.services.session;
       placement = context.services.placement;
+      feedback = context.services.feedback;
     },
   });
   const stepPorts = host.install(stepPortsPlugin);
@@ -201,7 +209,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       clipboardShortcuts.whenActive(),
       application.whenActive(),
     ]);
-    if (!commands || !history || !kernel || !session || !placement) {
+    if (!commands || !history || !kernel || !session || !placement || !feedback) {
       throw new Error('Expected all Basic SVG Example Runtime Services.');
     }
 
@@ -247,6 +255,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       kernel,
       session,
       placement,
+      feedback,
       materializeNode(type: ExampleNodeType, position: Point, label: string): CanvasNode {
         return {
           id: freshNodeId('example-node', () => nextNodeSequence++),

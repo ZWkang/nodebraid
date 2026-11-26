@@ -93,3 +93,5 @@ bun run --filter '@nodebraid/plugin-interaction' build
 ## License
 
 [MIT](./LICENSE)
+
+Optional `connectionRule` validates both candidate previews and public Create Edge commands. Read live and rejected candidate snapshots from the bound `connectionFeedbackService`. See the Interaction module guide for decision, lifecycle and failure contracts.

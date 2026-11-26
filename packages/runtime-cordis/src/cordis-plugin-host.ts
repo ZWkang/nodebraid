@@ -100,10 +100,12 @@ class CordisPluginHost implements PluginHost {
     try {
       const getMissing = () =>
         Object.values(requires).filter((token) => this.#context.get(getServiceName(token)) === undefined);
+      const config = definition.captureConfig ? definition.captureConfig(args[0]) : args[0];
+      if (this.#closed) throw new PluginHostError('HOST_DISPOSED', 'Host disposed while capturing configuration.');
       let installation: CordisPluginInstallation;
       installation = new CordisPluginInstallation(
         definition,
-        args[0],
+        config,
         this.#diagnostics.createInstallation(plugin.name),
         getMissing(),
         getMissing,

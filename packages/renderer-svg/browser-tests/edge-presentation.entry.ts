@@ -360,6 +360,20 @@ async function previewWithoutEdge(kind: PathKind) {
         target.querySelectorAll('[data-nodebraid-connection-preview]').length === 1,
         'Updating preview must not duplicate its semantic group.',
       );
+      renderer.updateInteraction({
+        type: 'connection-preview',
+        source,
+        pointerWorldPoint: { x: 350, y: 190 },
+        target: {
+          type: 'invalid',
+          anchor: { nodeId: targetId, role: 'target' },
+          reason: { origin: 'rule', code: 'FULL', message: '<strong>Full</strong>' },
+        },
+      });
+      check(
+        target.querySelector('[data-nodebraid-connection-target="invalid"]') && !target.querySelector('strong'),
+        'Invalid preview projects state without rendering application text.',
+      );
       renderer.updateInteraction(null);
       check(
         !target.querySelector('[data-nodebraid-connection-preview]'),

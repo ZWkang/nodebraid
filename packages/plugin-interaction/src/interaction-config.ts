@@ -1,9 +1,19 @@
 import type { EffectiveInteractionConfig, InteractionConfig } from './contracts';
 import { InteractionError } from './interaction-error';
 
-const configFields = new Set(['dragThreshold', 'wheelZoomSensitivity', 'minZoom', 'maxZoom', 'connection']);
+const configFields = new Set([
+  'dragThreshold',
+  'wheelZoomSensitivity',
+  'minZoom',
+  'maxZoom',
+  'connection',
+  'connectionRule',
+]);
 
-export function resolveInteractionConfig(config: InteractionConfig | undefined): EffectiveInteractionConfig {
+export function resolveInteractionConfig(
+  config: InteractionConfig | undefined,
+  connectionRule?: InteractionConfig['connectionRule'],
+): EffectiveInteractionConfig {
   if (config !== undefined) {
     if (config === null || typeof config !== 'object' || Array.isArray(config)) {
       throw new InteractionError('INVALID_CONFIG', 'Interaction config must be an object.');
@@ -20,6 +30,7 @@ export function resolveInteractionConfig(config: InteractionConfig | undefined):
     wheelZoomSensitivity: config?.wheelZoomSensitivity ?? 0.002,
     minZoom: config?.minZoom ?? 0.1,
     maxZoom: config?.maxZoom ?? 8,
+    connectionRule,
     connection: config?.connection,
   };
   if (!Number.isFinite(resolved.dragThreshold) || resolved.dragThreshold < 0) {
@@ -37,6 +48,8 @@ export function resolveInteractionConfig(config: InteractionConfig | undefined):
   if (resolved.minZoom > resolved.maxZoom) {
     throw new InteractionError('INVALID_CONFIG', 'Interaction minZoom must not exceed maxZoom.');
   }
+  if (resolved.connectionRule !== undefined && typeof resolved.connectionRule !== 'function')
+    throw new InteractionError('INVALID_CONFIG', 'Expected a synchronous connection rule function.');
   if (resolved.connection !== undefined) {
     if (!isRecord(resolved.connection)) {
       throw new InteractionError('INVALID_CONFIG', 'Interaction connection config must be an object.');

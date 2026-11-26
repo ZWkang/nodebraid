@@ -2,6 +2,7 @@ export const interactionDiagnosticEvents = Object.freeze({
   pointerRejected: 'nodebraid.plugin.interaction.pointer.rejected',
   inputRejected: 'nodebraid.plugin.interaction.input.rejected',
   gestureCancelled: 'nodebraid.plugin.interaction.gesture.cancelled',
+  connectionFeedbackFault: 'nodebraid.plugin.interaction.connection-feedback.fault',
   connectionMaterializerFault: 'nodebraid.plugin.interaction.connection-materializer.fault',
   nodePlacementFault: 'nodebraid.plugin.interaction.node-placement.fault',
   commandFault: 'nodebraid.plugin.interaction.command.fault',

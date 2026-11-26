@@ -112,3 +112,7 @@ bun run check:affected --plan      # 仅展示范围，可与 --base 组合
 - Example 新增 `examples/app/browser-tests/node-authoring.browser.ts`；通过 Node type / Place node、真实点击和 Node label / Tags 表单驱动。创建后检查 Selection/数量；输入草稿不推进 revision，Apply 一次提交，Undo/Redo 恢复对应数据。
 - 切换属性面板对象时检查 Unsaved node changes；移动正在编辑的 Node 后检查 edit-conflict、草稿保留和显式 Reload node。文件往返比较完整 data 与连接，继续编辑后 Undo 仅撤销新操作。
 - `node-authoring` preview 采集创建、自定义内容、应用/Undo/Redo和真实文件往返；详细草稿冲突与取消仍由 browser suite 证明。
+
+### Connection Rule 与反馈
+
+Interaction 的 create-edge-input-values 和 port-connection 公共测试覆盖 Command 容量、失效回滚与静止指针反馈。Examples 的 basic-svg 与 node-authoring Chromium 场景分别验证容量与 Step/Note 类型拒绝。节点类型、容量与成环策略由示例应用解释。

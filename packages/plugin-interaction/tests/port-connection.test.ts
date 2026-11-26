@@ -1,8 +1,8 @@
 import { expect, test } from 'bun:test';
 import { edgeId, nodeId } from '@nodebraid/kernel';
-import { commandPlugin } from '@nodebraid/plugin-command';
+import { commandPlugin, commandService, type CommandService } from '@nodebraid/plugin-command';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
-import { createPortContributionPlugin, portPlugin } from '@nodebraid/plugin-port';
+import { createPortContributionPlugin, portPlugin, portService, type PortService } from '@nodebraid/plugin-port';
 import { createRendererPlugin } from '@nodebraid/plugin-renderer';
 import { sessionPlugin } from '@nodebraid/plugin-session';
 import type {
@@ -17,7 +17,13 @@ import type { InteractionProjection } from '@nodebraid/interaction-api';
 import type { SessionSnapshot } from '@nodebraid/session-api';
 import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
 
-import { interactionPlugin, type ConnectionMaterializationInput } from '../src';
+import {
+  createEdgeCommand,
+  connectionFeedbackService,
+  type ConnectionFeedbackService,
+  interactionPlugin,
+  type ConnectionMaterializationInput,
+} from '../src';
 
 test('Port Gesture tracks target loss, materializes exact Endpoints once, and cancels on source loss', async () => {
   const renderer = new PortConnectionRenderer();
@@ -264,3 +270,179 @@ function pointerInput(type: PointerInput['type'], point: Readonly<{ x: number; y
 function settleCommands(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
+
+test('a stationary candidate follows commits; rejected feedback survives release and stale services expire', async () => {
+  const renderer = new PortConnectionRenderer();
+  const faults: unknown[] = [];
+  const host = createPluginHost({ diagnostics: { faultReporter: (fault) => faults.push(fault.error) } });
+  let ports!: PortService;
+  let insideWriter = false,
+    writerRuleCalls = 0;
+  let kernel!: KernelService, feedback!: ConnectionFeedbackService, commands!: CommandService;
+  const a = nodeId('from'),
+    b = nodeId('to');
+  let materialized = 0,
+    occupyOnMaterialize = false,
+    commandEffect: (() => void) | undefined;
+  function occupy() {
+    kernel.transact((tx) =>
+      tx.edges.add({ id: edgeId('occupied'), type: 'link', source: { nodeId: a }, target: { nodeId: b }, data: null }),
+    );
+  }
+  const installations = [
+    host.install(kernelPlugin),
+    host.install(portPlugin),
+    host.install(commandPlugin),
+    host.install(sessionPlugin),
+    host.install(createRendererPlugin(() => renderer)),
+    host.install(interactionPlugin, {
+      connectionRule: ({ view, target }) => {
+        if (insideWriter) writerRuleCalls++;
+        commandEffect?.();
+        return view.query.getIncomingEdges(target.nodeId).length
+          ? { type: 'deny', reason: { code: 'FULL', message: 'Full' } }
+          : { type: 'allow' };
+      },
+      connection: {
+        materializeEdge(input) {
+          materialized++;
+          if (occupyOnMaterialize) occupy();
+          return { ...input, id: edgeId('new'), type: 'link', data: null };
+        },
+      },
+    }),
+    host.install(
+      definePlugin({
+        requires: {
+          ports: portService,
+          kernel: kernelService,
+          commands: commandService,
+          feedback: connectionFeedbackService,
+        },
+        setup({ services }) {
+          ports = services.ports;
+          kernel = services.kernel;
+          commands = services.commands;
+          feedback = services.feedback;
+        },
+      }),
+    ),
+  ];
+  try {
+    await Promise.all(installations.map((i) => i.whenActive()));
+    kernel.transact((tx) => {
+      for (const id of [a, b]) tx.nodes.add({ id, type: 'node', position: { x: 0, y: 0 }, data: null });
+    });
+    const point = { x: 0, y: 0 };
+    function start() {
+      renderer.hit = { type: 'connection-anchor', nodeId: a, role: 'source', worldPoint: point };
+      renderer.emit(pointerInput('pointer.down', point));
+      renderer.hit = { type: 'connection-anchor', nodeId: b, role: 'target', worldPoint: point };
+      renderer.emit(pointerInput('pointer.move', point));
+    }
+    let calls = 0;
+    const listener = () => {
+      calls++;
+    };
+    const stopOld = feedback.subscribe(listener);
+    stopOld();
+    const stopCurrent = feedback.subscribe(listener);
+    stopOld();
+    const failure = new Error('listener failed');
+    const stopThrowing = feedback.subscribe(() => {
+      throw failure;
+    });
+    start();
+    expect(calls).toBe(2);
+    expect(faults.splice(0)).toEqual([failure, failure]);
+    stopCurrent();
+    stopThrowing();
+    const valid = feedback.getSnapshot();
+    renderer.emit(pointerInput('pointer.move', point));
+    expect(feedback.getSnapshot()).toBe(valid);
+    const input = {
+      edge: { id: edgeId('direct'), type: 'link', source: { nodeId: a }, target: { nodeId: b }, data: null },
+      source: { nodeId: a, role: 'source' as const },
+      target: { nodeId: b, role: 'target' as const },
+    };
+    await expect(
+      commands.execute(createEdgeCommand, {
+        ...input,
+        edge: {
+          ...input.edge,
+          get data() {
+            insideWriter = true;
+            try {
+              ports.register({ id: 'late', definePorts: () => [] });
+              return null;
+            } finally {
+              insideWriter = false;
+            }
+          },
+        },
+      }),
+    ).rejects.toMatchObject({ code: 'STALE_GESTURE' });
+    expect(writerRuleCalls).toBe(0);
+    expect(feedback.getSnapshot()).toBe(valid);
+    commandEffect = () => {
+      commandEffect = undefined;
+      occupy();
+    };
+    await expect(commands.execute(createEdgeCommand, input)).rejects.toMatchObject({ code: 'STALE_GESTURE' });
+
+    expect(feedback.getSnapshot()).toMatchObject({
+      type: 'preview',
+      target: { type: 'invalid', reason: { origin: 'rule', code: 'FULL' } },
+    });
+    const previousFailure = await commands.execute(createEdgeCommand, input).catch((error: unknown) => error);
+    expect(previousFailure).toMatchObject({ code: 'CONNECTION_REJECTED' });
+    kernel.transact((tx) => tx.edges.remove(edgeId('occupied')));
+    expect(feedback.getSnapshot()).toEqual(valid);
+    occupy();
+    renderer.emit(pointerInput('pointer.up', point));
+    expect(renderer.projections.at(-1)).toBeNull();
+    expect(materialized).toBe(0);
+    expect(feedback.getSnapshot()).toMatchObject({ type: 'rejected', reason: { code: 'FULL' } });
+    kernel.transact((tx) => tx.edges.remove(edgeId('occupied')));
+    start();
+    occupyOnMaterialize = true;
+    renderer.emit(pointerInput('pointer.up', point));
+    await settleCommands();
+    expect(materialized).toBe(1);
+    expect(feedback.getSnapshot()).toMatchObject({ type: 'rejected', reason: { code: 'FULL' } });
+    expect(kernel.read().query.getEdge(edgeId('new'))).toBeUndefined();
+    kernel.transact((tx) => tx.edges.remove(edgeId('occupied')));
+    start();
+    renderer.emit(pointerInput('pointer.up', point));
+    start(); // A newer connection owns feedback before the first rejection settles.
+    await settleCommands();
+    expect(feedback.getSnapshot()).toMatchObject({ type: 'preview' });
+    occupyOnMaterialize = false;
+    kernel.transact((tx) => tx.edges.remove(edgeId('occupied')));
+    const trigger = feedback.subscribe(() => {
+      if (feedback.getSnapshot().type === 'idle')
+        commandEffect = () => {
+          throw previousFailure;
+        };
+    });
+    renderer.emit(pointerInput('pointer.up', point));
+    await settleCommands();
+    expect(faults.splice(0)).toEqual([previousFailure]);
+    expect(feedback.getSnapshot()).toMatchObject({ type: 'idle' });
+    trigger();
+    commandEffect = undefined;
+    // Subsequent listeners see the same preview before the reentrant cancellation is delivered.
+    const observations: string[] = [];
+    const cancel = feedback.subscribe(() => {
+      if (feedback.getSnapshot().type === 'preview') renderer.emit(pointerInput('pointer.cancel', point));
+    });
+    const observe = feedback.subscribe(() => observations.push(feedback.getSnapshot().type));
+    start();
+    expect(observations).toEqual(['preview', 'idle']);
+    cancel();
+    observe();
+  } finally {
+    await host.dispose();
+  }
+  expect(() => feedback.getSnapshot()).toThrow('Activation has ended');
+});

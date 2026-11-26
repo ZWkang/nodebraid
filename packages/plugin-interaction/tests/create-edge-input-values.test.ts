@@ -9,7 +9,7 @@ import {
   type HistoryService,
 } from '@nodebraid/plugin-history';
 import { kernelPlugin, kernelService, type KernelService } from '@nodebraid/plugin-kernel';
-import { createPortContributionPlugin, portPlugin } from '@nodebraid/plugin-port';
+import { createPortContributionPlugin, portPlugin, portService, type PortService } from '@nodebraid/plugin-port';
 import { createRendererPlugin } from '@nodebraid/plugin-renderer';
 import { sessionPlugin } from '@nodebraid/plugin-session';
 import type {
@@ -21,18 +21,20 @@ import type {
 } from '@nodebraid/renderer-api';
 import type { SessionSnapshot } from '@nodebraid/session-api';
 import { createPluginHost, definePlugin } from '@nodebraid/runtime-cordis';
-import { interactionPlugin, createEdgeCommand, type CreateEdgeInput } from '../src';
+import { interactionPlugin, createEdgeCommand, type CreateEdgeInput, type InteractionConfig } from '../src';
 const a = nodeId('a'),
   b = nodeId('b'),
   c = nodeId('c'),
   connectionId = edgeId('connection');
 const data = { opaque: true };
-async function activate() {
+async function activate(config?: InteractionConfig) {
+  let ports: PortService | undefined;
   let commands: CommandService | undefined, kernel: KernelService | undefined, history: HistoryService | undefined;
   const host = createPluginHost();
   const consumer = definePlugin({
-    requires: { commands: commandService, kernel: kernelService, history: historyService },
+    requires: { ports: portService, commands: commandService, kernel: kernelService, history: historyService },
     setup(context) {
+      ports = context.services.ports;
       commands = context.services.commands;
       kernel = context.services.kernel;
       history = context.services.history;
@@ -45,15 +47,15 @@ async function activate() {
     host.install(sessionPlugin),
     host.install(historyPlugin),
     host.install(createRendererPlugin(() => new CommandRenderer())),
-    host.install(interactionPlugin),
+    host.install(interactionPlugin, config),
     host.install(consumer),
   ];
   await Promise.all(installs.map((i) => i.whenActive()));
-  if (!commands || !kernel || !history) throw new Error('Expected actual Create Edge Services');
+  if (!ports || !commands || !kernel || !history) throw new Error('Expected actual Create Edge Services');
   kernel.transact((tx) => {
     for (const id of [a, b, c]) tx.nodes.add({ id, type: 'task', position: { x: 0, y: 0 }, data: null });
   });
-  return { host, commands, kernel, history };
+  return { host, commands, kernel, history, ports };
 }
 function validInput(): CreateEdgeInput {
   return {
@@ -61,6 +63,149 @@ function validInput(): CreateEdgeInput {
     source: { nodeId: a, role: 'source' },
     target: { nodeId: b, role: 'target' },
   };
+}
+test('the public command checks remaining capacity using the current graph before reading Edge data', async () => {
+  const { host, commands, kernel } = await activate({
+    connectionRule(this: void, { view, ports }) {
+      expect(this).toBeUndefined();
+      expect(ports.documentRevision).toBe(view.snapshot.revision);
+      return view.snapshot.edges.length === 0
+        ? { type: 'allow' }
+        : { type: 'deny', reason: { code: 'FULL', message: 'Input is full' } };
+    },
+  });
+  try {
+    const first = validInput();
+    await commands.execute(createEdgeCommand, first);
+    const before = kernel.read();
+    await expect(
+      commands.execute(createEdgeCommand, {
+        ...first,
+        edge: {
+          ...first.edge,
+          id: edgeId('second'),
+          get data(): never {
+            throw new Error('premature data read');
+          },
+        },
+      }),
+    ).rejects.toMatchObject({
+      code: 'CONNECTION_REJECTED',
+      details: { reasonCode: 'FULL', reasonMessage: 'Input is full' },
+    });
+    expect(kernel.read()).toBe(before);
+  } finally {
+    await host.dispose();
+  }
+});
+
+for (const stage of ['ports', 'rule', 'reason', 'data'] as const) {
+  test('Port invalidation during ' + stage + ' rolls back creation', async () => {
+    let invalidate: () => void;
+    let armed = false;
+    const change = () => {
+      if (armed) {
+        armed = false;
+        invalidate();
+      }
+    };
+    const { host, kernel, commands, ports } = await activate({
+      connectionRule() {
+        if (stage === 'rule') change();
+        if (stage === 'reason')
+          return {
+            type: 'deny',
+            reason: {
+              code: 'FULL',
+              get message() {
+                change();
+                return 'Full';
+              },
+            },
+          };
+        return { type: 'allow' };
+      },
+    });
+    try {
+      const extra = ports.register({ id: 'extra', definePorts: () => [] });
+      invalidate = () => extra.dispose();
+      ports.register({
+        id: 'trigger',
+        definePorts() {
+          if (stage === 'ports') change();
+          return [];
+        },
+      });
+      armed = true;
+      const input = validInput(),
+        before = kernel.read();
+      await expect(
+        commands.execute(createEdgeCommand, {
+          ...input,
+          edge: {
+            ...input.edge,
+            get data() {
+              if (stage === 'data') change();
+              return null;
+            },
+          },
+        }),
+      ).rejects.toMatchObject({ code: 'STALE_GESTURE' });
+      expect(kernel.read()).toBe(before);
+    } finally {
+      await host.dispose();
+    }
+  });
+}
+
+test('a late abort preserves the reason and rolls back the proposed edge', async () => {
+  const { host, commands, kernel } = await activate({ connectionRule: () => ({ type: 'allow' }) });
+  try {
+    const controller = new AbortController(),
+      reason = new Error('stop'),
+      input = validInput(),
+      before = kernel.read();
+    expect(
+      await failure(
+        commands.execute(
+          createEdgeCommand,
+          {
+            ...input,
+            edge: {
+              ...input.edge,
+              get data() {
+                controller.abort(reason);
+                return data;
+              },
+            },
+          },
+          { signal: controller.signal },
+        ),
+      ),
+    ).toBe(reason);
+    expect(kernel.read()).toBe(before);
+  } finally {
+    await host.dispose();
+  }
+});
+for (const result of [
+  null,
+  Promise.resolve({ type: 'allow' }),
+  { type: 'allow', then() {} },
+  { type: 'deny', reason: { code: '', message: 'denied' } },
+]) {
+  test('malformed decisions cannot create an edge', async () => {
+    const { host, commands, kernel } = await activate({ connectionRule: () => result as never });
+    try {
+      const before = kernel.read();
+      await expect(commands.execute(createEdgeCommand, validInput())).rejects.toMatchObject({
+        code: 'INVALID_CONNECTION_DECISION',
+      });
+      expect(kernel.read()).toBe(before);
+    } finally {
+      await host.dispose();
+    }
+  });
 }
 test('Create Edge cannot replace a validated forward Edge with a later self-loop', async () => {
   const { host, commands, kernel } = await activate();
@@ -507,6 +652,52 @@ test('Create Edge retains captured Port evidence across application Definition a
     await commands.execute(redoCommand, undefined);
     expect(kernel.read().query.getEdge(connectionId)?.target.nodeId).toBe(b);
     expect(phase.filter((p) => p === 'data')).toHaveLength(1);
+  } finally {
+    await host.dispose();
+  }
+});
+
+test('duplicate IDs fail before whole-graph port definitions for unrelated nodes are evaluated', async () => {
+  const { host, commands, ports, kernel } = await activate({ connectionRule: () => ({ type: 'allow' }) });
+  try {
+    await commands.execute(createEdgeCommand, validInput());
+    let armed = false;
+    ports.register({
+      id: 'unrelated',
+      definePorts(node) {
+        if (armed && node.id === c) throw new Error('unrelated port data');
+        return [];
+      },
+    });
+    armed = true;
+    const before = kernel.read();
+    await expect(commands.execute(createEdgeCommand, validInput())).rejects.toMatchObject({ code: 'STALE_GESTURE' });
+    expect(kernel.read()).toBe(before);
+  } finally {
+    await host.dispose();
+  }
+});
+
+test('abort in port preflight takes precedence over a stale definition', async () => {
+  const { host, ports, commands } = await activate({ connectionRule: () => ({ type: 'allow' }) });
+  try {
+    const controller = new AbortController(),
+      reason = new Error('cancel during port check');
+    let armed = false;
+    ports.register({
+      id: 'cancelling',
+      definePorts(node) {
+        if (armed && node.id === a) {
+          controller.abort(reason);
+          return [{ id: 'output', role: 'source' }];
+        }
+        return [];
+      },
+    });
+    armed = true;
+    expect(await failure(commands.execute(createEdgeCommand, validInput(), { signal: controller.signal }))).toBe(
+      reason,
+    );
   } finally {
     await host.dispose();
   }

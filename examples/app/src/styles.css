@@ -602,3 +602,30 @@ h1 {
     @apply font-sans;
   }
 }
+
+.canvas-frame {
+  position: relative;
+}
+[data-connection-feedback] {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  z-index: 1;
+  pointer-events: none;
+}
+[data-connection-feedback]:not(:empty) {
+  padding: 0.25rem 0.55rem;
+  background: var(--background);
+  color: var(--foreground);
+  border: 1px solid currentColor;
+  border-radius: 0.25rem;
+}
+[data-nodebraid-connection-preview][data-nodebraid-connection-target='valid'] {
+  color: #178350;
+  stroke: currentColor;
+}
+[data-nodebraid-connection-preview][data-nodebraid-connection-target='invalid'] {
+  color: #c44939;
+  stroke: currentColor;
+  stroke-dasharray: 5 3;
+}

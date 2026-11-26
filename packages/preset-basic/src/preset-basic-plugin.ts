@@ -53,7 +53,7 @@ function resolveInteractionOptions(options: BasicCanvasPluginOptions | undefined
 function snapshotInteractionConfig(config: InteractionConfig | undefined): InteractionConfig | undefined {
   const input: unknown = config;
   if (input === undefined || input === null || typeof input !== 'object' || Array.isArray(input)) return config;
-  const { connection, dragThreshold, wheelZoomSensitivity, minZoom, maxZoom, ...snapshot } =
+  const { connection, connectionRule, dragThreshold, wheelZoomSensitivity, minZoom, maxZoom, ...snapshot } =
     config as InteractionConfig;
   let ownedConnection = connection;
   if (connection !== undefined && connection !== null && typeof connection === 'object' && !Array.isArray(connection)) {
@@ -65,6 +65,7 @@ function snapshotInteractionConfig(config: InteractionConfig | undefined): Inter
   }
   return Object.freeze({
     ...snapshot,
+    connectionRule,
     dragThreshold,
     wheelZoomSensitivity,
     minZoom,

@@ -330,7 +330,7 @@ async function collectScene(
         await metrics({ revision: '4', nodes: '4', selection: 'None' });
       });
     } else if (scene.id === 'port-connection') {
-      const connectPorts = async (previewName: string) => {
+      const connectPorts = async (previewName: string, expected: 'valid' | 'invalid' = 'valid') => {
         await run(['scrollintoview', '.canvas-target']);
         const source = await center(
           '[data-nodebraid-port-node-id="example-compose"][data-nodebraid-port-id="output"][data-nodebraid-port-role="source"]',
@@ -353,6 +353,12 @@ async function collectScene(
             `document.querySelector('[data-nodebraid-connection-preview] [data-nodebraid-edge-path]')?.getAttribute('data-nodebraid-edge-path')`,
           ),
           'bezier',
+        );
+        assert.equal(
+          await observe(
+            `document.querySelector('[data-nodebraid-connection-preview]')?.getAttribute('data-nodebraid-connection-target')`,
+          ),
+          expected,
         );
         await capture(previewName);
         await sendPage('Input.dispatchMouseEvent', {
@@ -417,6 +423,19 @@ async function collectScene(
           await metrics({ revision: '3', selection: id });
           await capture(`selected-${id}`);
         }
+      });
+      await step('Reject a third connection and restore capacity with Undo', async () => {
+        await connectPorts('full-input', 'invalid');
+        await metrics({ revision: '3', edges: '3' });
+        assert.equal(
+          await observe(`document.querySelector('[data-connection-feedback="rejected"]')?.textContent`),
+          'This input already has two connections.',
+        );
+        await capture('connection-rejected');
+        await control('Undo');
+        await metrics({ revision: '4', edges: '2' });
+        await connectPorts('capacity-restored');
+        await metrics({ revision: '5', edges: '3' });
       });
     } else if (scene.id === 'node-authoring') {
       const createdId = 'example-node-1';

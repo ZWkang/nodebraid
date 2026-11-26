@@ -188,6 +188,20 @@ try {
   await dispatchMouseMove(movedTargetPort.x, movedTargetPort.y);
   await dispatchMouseUp(movedTargetPort.x, movedTargetPort.y);
   await waitForMetrics({ revision: '6', edges: '3' });
+  await dispatchMouseDown(movedSourcePort.x, movedSourcePort.y);
+  await dispatchMouseMove(movedTargetPort.x, movedTargetPort.y);
+  assert.equal(
+    await evaluateBrowserScenario(
+      `document.querySelector('[data-nodebraid-connection-preview]')?.getAttribute('data-nodebraid-connection-target')`,
+    ),
+    'invalid',
+  );
+  await dispatchMouseUp(movedTargetPort.x, movedTargetPort.y);
+  assert.equal(
+    await evaluateBrowserScenario(`document.querySelector('[data-connection-feedback="rejected"]')?.textContent`),
+    'This input already has two connections.',
+  );
+  await waitForMetrics({ revision: '6', edges: '3' });
   for (const id of ['example-edge-1', 'example-edge-2']) {
     const point = await readEdgeMidpoint(id);
     await dispatchMouseDown(point.x, point.y);

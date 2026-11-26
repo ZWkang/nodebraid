@@ -22,6 +22,9 @@ export function definePlugin<
   // User-defined getters may be stateful. Capture every top-level field once
   // so validation and later Activation observe the same definition.
   const name = definition.name;
+  const captureConfig = definition.captureConfig;
+  if (captureConfig !== undefined && typeof captureConfig !== 'function')
+    throw new PluginHostError('INVALID_DEFINITION', 'captureConfig must be a function.');
   const setup = definition.setup;
   const requiresInput = definition.requires;
   const providesInput = definition.provides;
@@ -47,6 +50,7 @@ export function definePlugin<
     requires,
     provides,
     setup,
+    captureConfig,
   });
   const plugin = Object.freeze({ name, requires, provides }) as Plugin<Config, Requires, Provides>;
   internalPlugins.set(plugin, { definition: frozenDefinition } as unknown as AnyInternalPlugin);
