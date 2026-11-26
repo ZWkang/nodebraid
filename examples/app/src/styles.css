@@ -629,3 +629,17 @@ h1 {
   stroke: currentColor;
   stroke-dasharray: 5 3;
 }
+
+.inline-node-title {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+.inline-node-title input,
+.inline-node-title [role='alert'] {
+  display: block;
+  background: var(--background);
+  color: var(--foreground);
+  border: 1px solid currentColor;
+  padding: 0.25rem 0.5rem;
+}

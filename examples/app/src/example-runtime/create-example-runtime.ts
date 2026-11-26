@@ -19,6 +19,7 @@ import {
   nodeId,
   nodePlacementService,
   rendererService,
+  type RendererService,
   sessionService,
   type ClipboardErrorCode,
   type CommandService,
@@ -51,6 +52,7 @@ export interface ClipboardFailureSnapshot {
 }
 
 export interface ExampleRuntime {
+  readonly renderer: RendererService;
   readonly feedback: ConnectionFeedbackService;
   readonly commands: CommandService;
   readonly history: HistoryService;
@@ -93,6 +95,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
   let nextDuplicateEdgeSequence = 1;
   let nextClipboardNodeSequence = 1;
   let nextClipboardEdgeSequence = 1;
+  let renderer: RendererService | undefined;
   let feedback: ConnectionFeedbackService | undefined;
   let commands: CommandService | undefined;
   let history: HistoryService | undefined;
@@ -173,6 +176,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       session = context.services.session;
       placement = context.services.placement;
       feedback = context.services.feedback;
+      renderer = context.services.renderer;
     },
   });
   const stepPorts = host.install(stepPortsPlugin);
@@ -209,7 +213,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       clipboardShortcuts.whenActive(),
       application.whenActive(),
     ]);
-    if (!commands || !history || !kernel || !session || !placement || !feedback) {
+    if (!commands || !history || !kernel || !session || !placement || !feedback || !renderer) {
       throw new Error('Expected all Basic SVG Example Runtime Services.');
     }
 
@@ -256,6 +260,7 @@ export async function createExampleRuntime(target: SVGSVGElement): Promise<Examp
       session,
       placement,
       feedback,
+      renderer,
       materializeNode(type: ExampleNodeType, position: Point, label: string): CanvasNode {
         return {
           id: freshNodeId('example-node', () => nextNodeSequence++),
