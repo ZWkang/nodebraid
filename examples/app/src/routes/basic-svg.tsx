@@ -14,7 +14,7 @@ import {
   Undo2,
   Upload,
 } from 'lucide-react';
-import { useCallback, useRef, useState, type ComponentProps, type ReactNode } from 'react';
+import { useCallback, useSyncExternalStore, useRef, useState, type ComponentProps, type ReactNode } from 'react';
 
 import {
   useHistorySnapshot,
@@ -48,6 +48,22 @@ export const Route = createFileRoute('/basic-svg')({
   },
   component: BasicSvgExample,
 });
+
+function ConnectionStatus({ runtime }: { runtime: ExampleRuntime }) {
+  const { getSnapshot, subscribe } = runtime.feedback;
+  const state = useSyncExternalStore(subscribe, getSnapshot);
+  const reason =
+    state.type === 'rejected'
+      ? state.reason
+      : state.type === 'preview' && state.target.type === 'invalid'
+        ? state.target.reason
+        : undefined;
+  return (
+    <span role="status" data-connection-feedback={state.type}>
+      {reason?.message}
+    </span>
+  );
+}
 
 function BasicSvgExample() {
   const { lang } = Route.useSearch();
@@ -100,6 +116,7 @@ function BasicSvgExample() {
             </>
           ) : null}
           <section className="canvas-frame" aria-label={copy.canvasLabel}>
+            {ready && <ConnectionStatus runtime={ready.runtime} />}
             <svg ref={mount.ref} className="canvas-target" width="960" height="640" tabIndex={0} />
           </section>
         </section>

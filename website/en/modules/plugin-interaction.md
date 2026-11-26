@@ -56,3 +56,11 @@ The current version has no self-loop, business validation, capacity/type rules, 
 `nodePlacementService.begin(materializeNode)` starts one request. Its handle offers `cancel()` and a `result` Promise resolving to `{type: 'created', nodeId, commit}` or `{type: 'cancelled'}`; original failures reject. The synchronous application materializer receives `{worldPoint}` and returns a complete Node. Install Node Editing for the public Create Node Command; Basic Composition already includes it.
 
 Interaction routes placement and ordinary gestures together. A primary click begins and ends on blank Canvas below the existing drag threshold, creates once and selects the new Node. Entity clicks and drags do not place or also select/drag. Esc cancels. Idle placement retains pan/zoom, while a candidate click cannot commit across a Viewport change. The Example uses the point as the Node top-left and provides cursor/prompt feedback.
+
+## Connection rules and feedback
+
+Supply a synchronous function as `interaction.connectionRule` in Basic Composition. It receives `{ source, target, view, ports }` and returns `{ type: 'allow' }` or `{ type: 'deny', reason: { code, message } }`. Both reason fields must be nonempty strings. Each installation captures its rule. Compute decisions from these inputs and fixed configuration, without writing the graph or allocating IDs.
+
+Create Edge Command also checks the latest state when called without a mouse materializer. A denial rejects with `CONNECTION_REJECTED` and details containing `reasonCode` and `reasonMessage`. Invalid results raise `INVALID_CONNECTION_DECISION`. Callback errors retain their identity. Import, Paste, Duplicate, History and direct Transactions retain their respective contracts.
+
+Read idle, preview or rejected snapshots through `connectionFeedbackService.getSnapshot()` on the bound service and subscribe with `subscribe(listener)`. Graph and Port changes refresh a stationary candidate. Render the invalid or rejected reason message as plain text. Subscription does not immediately call the listener. Obtain a new service after Activation ends.

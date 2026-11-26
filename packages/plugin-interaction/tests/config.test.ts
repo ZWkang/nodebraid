@@ -154,6 +154,41 @@ test('Interaction revalidates the materializer on recovery and preserves its rea
   }
 });
 
+test('independent installations capture the rule once and retain it through dependency recovery', async () => {
+  let reads = 0;
+  const config = {
+    get connectionRule() {
+      reads++;
+      return () => ({ type: 'allow' as const });
+    },
+  };
+  for (const expected of [1, 2]) {
+    const host = createPluginHost();
+    try {
+      const interaction = host.install(interactionPlugin, config);
+      expect(reads).toBe(expected);
+      const renderer = host.install(createRendererPlugin(() => new ConfigRenderer()));
+      await Promise.all(
+        [
+          host.install(kernelPlugin),
+          host.install(commandPlugin),
+          host.install(sessionPlugin),
+          host.install(portPlugin),
+          renderer,
+          interaction,
+        ].map((i) => i.whenActive()),
+      );
+      await renderer.dispose();
+      expect(interaction.getSnapshot().status).toBe('pending');
+      await host.install(createRendererPlugin(() => new ConfigRenderer())).whenActive();
+      await interaction.whenActive();
+      expect(reads).toBe(expected);
+    } finally {
+      await host.dispose();
+    }
+  }
+});
+
 class ConfigRenderer implements CanvasRenderer {
   updateDocument(_update: RendererDocumentUpdate): void {}
   updateSession(_snapshot: SessionSnapshot): void {}

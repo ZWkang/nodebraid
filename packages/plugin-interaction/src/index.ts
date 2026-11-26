@@ -1,4 +1,8 @@
 export type {
+  ConnectionRuleContext,
+  ConnectionRuleReason,
+  ConnectionDecision,
+  ConnectionRule,
   ConnectionConfig,
   ConnectionMaterializationInput,
   ConnectionMaterializer,
@@ -34,3 +38,4 @@ export type {
   NodePlacementResult,
   NodePlacementService,
 } from './node-placement';
+export { connectionFeedbackService, type ConnectionFeedbackService } from './connection-feedback';

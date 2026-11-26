@@ -162,6 +162,17 @@ try {
     await evaluate(`document.querySelector(${JSON.stringify(`${nodeSelector(noteId)} ellipse`)}) !== null`),
     true,
   );
+  const output = await center('[data-nodebraid-port-node-id="example-compose"][data-nodebraid-port-id="output"]');
+  const noteInput = await center(
+    '[data-nodebraid-connection-anchor-node-id="example-node-2"][data-nodebraid-connection-anchor-role="target"]',
+  );
+  await drag(output, noteInput);
+  assert.equal(
+    await evaluate(`document.querySelector('[data-connection-feedback="rejected"]')?.textContent`),
+    'Connect nodes of the same type.',
+  );
+  await waitForMetrics({ revision: '8', nodes: '5' });
+
   // Rectangle geometry remains clickable even outside the Note's ellipse.
   await browser(['click', '[data-nodebraid-node-id="example-discover"]']);
   const corner = await evaluate<{ x: number; y: number }>(`(() => {

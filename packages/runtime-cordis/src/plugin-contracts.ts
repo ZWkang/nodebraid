@@ -29,6 +29,8 @@ export interface PluginDefinition<
   readonly name?: string;
   readonly requires?: Requires;
   readonly provides?: Provides;
+  /** Called once by install; every Activation receives the returned configuration. */
+  readonly captureConfig?: (config: Config) => Config;
   readonly setup: (context: PluginContext<Requires>, config: Config) => Awaitable<NoInfer<ProvidedServices<Provides>>>;
 }
 

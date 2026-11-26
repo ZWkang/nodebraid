@@ -64,3 +64,22 @@ function expectCommand(id: string): void {
     throw new Error('Unexpected Interaction Command ID.');
   }
 }
+
+test('rule and invalid feedback declarations require synchronous complete decisions', () => {
+  // @ts-expect-error Asynchronous decisions cannot validate a synchronous transaction.
+  const asyncRule: InteractionConfig['connectionRule'] = async () => ({ type: 'allow' });
+  // @ts-expect-error Rejections must carry an application reason.
+  const incomplete: InteractionConfig['connectionRule'] = () => ({ type: 'deny' });
+  void asyncRule;
+  void incomplete;
+});
+
+function feedbackTypes(service: import('../src').ConnectionFeedbackService) {
+  const state = service.getSnapshot();
+  if (state.type === 'preview' && state.target.type === 'invalid') {
+    const message: string = state.target.reason.message;
+    // @ts-expect-error Feedback values are read-only.
+    state.target.reason.code = message;
+  }
+}
+void feedbackTypes;

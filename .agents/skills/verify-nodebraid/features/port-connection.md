@@ -33,3 +33,5 @@ The initial Edge is Discover→Compose; the tested connection is Compose→Ship.
 `data-nodebraid-edge-id` belongs only to the stable group. Read its descendant
 `[data-nodebraid-edge-path]` for SVG geometry; group bounding-box centers do not
 prove that the click lies on a path. Arrow and label children are not extra Edges.
+
+After two parallel connections, a third drag shows an invalid preview and the input-capacity message. Release keeps revision 3 and the reason; Undo frees one slot and repeating the drag commits a new edge. The scene captures both the denied and restored candidates.

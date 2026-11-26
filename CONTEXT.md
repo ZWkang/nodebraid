@@ -316,6 +316,15 @@ _Avoid_: Renderer Behavior, Native Event Handler, Direct Document Mutation
 附着于一个 Node、并以 source 或 target role 参与 Edge Connection 的 Renderer 语义命中目标；无 Port Node 使用 node-level Anchor，Port 命中则以 port-qualified Anchor identity 进入 Interaction，但两者都不是 Document 实体。
 _Avoid_: Endpoint Entity, Renderer Handle, Anchor Object
 
+**Connection Rule**:
+应用依据候选 Endpoint、当前 CanvasView 和同一 revision 的 PortSnapshot 提供的同步业务判定函数。
+
+**Connection Decision**:
+规则返回的允许或拒绝结果；拒绝携带应用提供的原因标识与纯文本消息。
+
+**Connection Feedback**:
+Interaction 为当前连接手势提供的只读状态，包括候选有效性与最近一次松手拒绝的原因。
+
 **Connection Gesture**:
 从 source Connection Anchor 开始、以瞬态 Connection Preview 评估 target Connection Anchor，并以提交一条 Edge 或取消结束的 Active Gesture。
 _Avoid_: Edge, Connection Object, Renderer Drag

@@ -1,8 +1,10 @@
+import { isConnectionTargetDefined } from '@nodebraid/port-api';
+import { createConnectionFeedback, type ConnectionFeedbackService } from './connection-feedback';
 import type { PluginDiagnostics } from '@nodebraid/diagnostics';
 import {
   createWorldRect,
   type ConnectionAnchorIdentity,
-  type ConnectionPreviewTarget,
+  type ConnectionFeedbackTarget,
   type WorldRect,
 } from '@nodebraid/interaction-api';
 import type { CanvasNode, NodeId, Point } from '@nodebraid/kernel';
@@ -23,7 +25,8 @@ import type {
   EffectiveInteractionConfig,
   MoveNodeInput,
 } from './contracts';
-import { createEdgeCommand, createEdgeHandler } from './create-edge-command';
+import { ConnectionRules, RejectedConnection, StaleConnection } from './connection-rule';
+import { creationFailures, createEdgeCommand, createEdgeHandler } from './create-edge-command';
 import { createDeleteSelectionHandler, deleteSelectionCommand } from './delete-selection-command';
 import { interactionDiagnosticEvents } from './diagnostic-events';
 import { InteractionError } from './interaction-error';
@@ -83,7 +86,7 @@ interface ConnectionGesture {
   readonly pointerId: number;
   readonly source: ConnectionAnchorIdentity;
   pointerWorldPoint: Point;
-  target: ConnectionPreviewTarget;
+  target: ConnectionFeedbackTarget;
 }
 
 interface NodePlacementRequest {
@@ -116,15 +119,24 @@ type GestureCancellationReason =
 export function activateInteractionRuntime(
   context: PluginContext<InteractionRequirements>,
   config: EffectiveInteractionConfig,
-): { readonly shortcuts: InteractionShortcutService; readonly placement: NodePlacementService } {
+): {
+  readonly feedback: ConnectionFeedbackService;
+  readonly shortcuts: InteractionShortcutService;
+  readonly placement: NodePlacementService;
+} {
   const renderer = context.services.renderer;
   const session = context.services.session;
   const kernel = context.services.kernel;
   const commands = context.services.commands;
   const ports = context.services.ports;
+  const rules = config.connectionRule && new ConnectionRules(kernel, ports, config.connectionRule, context.signal);
   let closing = false;
   let activeGesture: ActiveGesture | undefined;
   let placementRequest: NodePlacementRequest | undefined;
+  const feedback = createConnectionFeedback(context.signal, (error) =>
+    context.diagnostics.reportFault(error, { name: interactionDiagnosticEvents.connectionFeedbackFault }),
+  );
+  let latestConnection: ConnectionGesture | undefined;
   let spacePressed = false;
   const rejectedPointerIds = new Set<number>();
   let moveRegistration: CommandRegistration | undefined;
@@ -158,6 +170,8 @@ export function activateInteractionRuntime(
         pointerWorldPoint: gesture.pointerWorldPoint,
         target: gesture.target,
       });
+      if (activeGesture === gesture)
+        feedback.publish({ type: 'preview', source: gesture.source, target: gesture.target });
     } else if (gesture.type === 'box-selection' && gesture.active && gesture.rect) {
       projection.update({ type: 'box-selection', rect: gesture.rect });
     }
@@ -176,6 +190,7 @@ export function activateInteractionRuntime(
     };
     if (hasPreview(gesture)) attempt(() => projection.update(null));
     if (releasePointer) attempt(() => renderer.releasePointer(gesture.pointerId));
+    if (gesture.type === 'connection' && latestConnection === gesture) feedback.publish({ type: 'idle' });
     attempt(() => emitGestureCancellation(context.diagnostics, gesture.type, reason));
     if (errors.length === 1) throw errors[0];
     if (errors.length > 1) throw new AggregateError(errors, 'Interaction Gesture cancellation failed.');
@@ -339,10 +354,69 @@ export function activateInteractionRuntime(
   });
 
   moveRegistration = commands.register(moveNodesCommand, createMoveNodesHandler(kernel));
-  createEdgeRegistration = commands.register(createEdgeCommand, createEdgeHandler(kernel, ports));
+  createEdgeRegistration = commands.register(createEdgeCommand, createEdgeHandler(kernel, ports, rules));
   deleteSelectionRegistration = commands.register(deleteSelectionCommand, createDeleteSelectionHandler(kernel));
+  function refreshConnection(gesture: ConnectionGesture): boolean {
+    const target = gesture.target;
+    const candidate = target.type === 'none' ? undefined : target.anchor;
+    if (rules) {
+      return rules.evaluate((evidence) => {
+        const exists = (anchor: ConnectionAnchorIdentity) =>
+          !!evidence.view.query.getNode(anchor.nodeId) && isConnectionTargetDefined(evidence.ports, anchor);
+        if (!exists(gesture.source)) return false;
+        if (!candidate || !exists(candidate)) gesture.target = { type: 'none' };
+        else if (candidate.nodeId === gesture.source.nodeId) gesture.target = invalidSelfLoop(candidate);
+        else {
+          const decision = evidence.decide(gesture.source, candidate);
+          gesture.target =
+            decision.type === 'allow'
+              ? { type: 'valid', anchor: candidate }
+              : { type: 'invalid', anchor: candidate, reason: Object.freeze({ origin: 'rule', ...decision.reason }) };
+        }
+        return true;
+      });
+    }
+    const view = kernel.read();
+    if (!connectionAnchorAvailable(ports, gesture.source, view.query.getNode(gesture.source.nodeId))) return false;
+    if (candidate && !connectionAnchorAvailable(ports, candidate, view.query.getNode(candidate.nodeId)))
+      gesture.target = { type: 'none' };
+    return true;
+  }
+
+  function refreshActiveConnection(gesture: ConnectionGesture) {
+    try {
+      if (!refreshConnection(gesture)) cancelGesture(gesture, 'stale', true);
+      else if (activeGesture === gesture) reapplyGestureProjection(gesture);
+    } catch (error) {
+      try {
+        cancelGesture(gesture, 'stale', true);
+      } catch (cleanup) {
+        throw new AggregateError([error, cleanup], 'Connection refresh and cleanup failed.');
+      }
+      throw error;
+    }
+  }
+  let pendingRefresh: ConnectionGesture | undefined;
+  function graphChangedDuringEvaluation(gesture: ActiveGesture) {
+    if (gesture.type !== 'connection' || !rules?.evaluating) return false;
+    // A failed command may have invalidated a different, held gesture.
+    if (rules.evaluating === 'command' && pendingRefresh !== gesture) {
+      pendingRefresh = gesture;
+      queueMicrotask(() => {
+        if (pendingRefresh !== gesture) return;
+        pendingRefresh = undefined;
+        if (closing || activeGesture !== gesture) return;
+        try {
+          refreshActiveConnection(gesture);
+        } catch (error) {
+          context.diagnostics.reportFault(error, { name: interactionDiagnosticEvents.connectionFeedbackFault });
+        }
+      });
+    }
+    return true;
+  }
   stopKernel = kernel.observeCommits((commit) => {
-    if (closing || !activeGesture) return;
+    if (closing || !activeGesture || graphChangedDuringEvaluation(activeGesture)) return;
     const gesture = activeGesture;
     if (gesture.type === 'node-drag') {
       const stale = gesture.nodes.some((evidence) => {
@@ -354,45 +428,20 @@ export function activateInteractionRuntime(
     } else if (gesture.type === 'viewport-pan') {
       reapplyGestureProjection(gesture);
     } else if (gesture.type === 'connection') {
-      if (!connectionAnchorAvailable(ports, gesture.source, commit.after.query.getNode(gesture.source.nodeId))) {
-        cancelGesture(gesture, 'stale', true);
-      } else {
-        if (
-          gesture.target.type !== 'none' &&
-          !connectionAnchorAvailable(
-            ports,
-            gesture.target.anchor,
-            commit.after.query.getNode(gesture.target.anchor.nodeId),
-          )
-        ) {
-          gesture.target = { type: 'none' };
-        }
-        reapplyGestureProjection(gesture);
-      }
+      refreshActiveConnection(gesture);
     } else if (gesture.type === 'box-selection') {
       reapplyGestureProjection(gesture);
     }
   });
   stopPorts = ports.subscribe(() => {
-    if (closing || !activeGesture) return;
+    rules?.portsChanged();
+    if (closing || !activeGesture || graphChangedDuringEvaluation(activeGesture)) return;
     const gesture = activeGesture;
-    if (gesture.type === 'connection') {
-      const view = kernel.read();
-      if (!connectionAnchorAvailable(ports, gesture.source, view.query.getNode(gesture.source.nodeId))) {
-        cancelGesture(gesture, 'stale', true);
-        return;
-      }
-      if (
-        gesture.target.type !== 'none' &&
-        !connectionAnchorAvailable(ports, gesture.target.anchor, view.query.getNode(gesture.target.anchor.nodeId))
-      ) {
-        gesture.target = { type: 'none' };
-      }
-    }
-    reapplyGestureProjection(gesture);
+    if (gesture.type === 'connection') refreshActiveConnection(gesture);
+    else reapplyGestureProjection(gesture);
   });
   stopSession = session.subscribe(() => {
-    if (closing || !activeGesture) return;
+    if (closing || !activeGesture || (activeGesture.type === 'connection' && rules?.evaluating)) return;
     const gesture = activeGesture;
     if (gesture.type === 'viewport-pan' || gesture.type === 'box-selection' || gesture.type === 'node-placement') {
       if (!viewportsEqual(session.getSnapshot().viewport, gesture.baseViewport)) {
@@ -585,6 +634,7 @@ export function activateInteractionRuntime(
               pointerWorldPoint: input.worldPoint,
               target: { type: 'none' },
             };
+            latestConnection = gesture;
             activeGesture = gesture;
             reapplyGestureProjection(gesture);
             return;
@@ -695,7 +745,8 @@ export function activateInteractionRuntime(
           reapplyGestureProjection(gesture);
         } else if (gesture.type === 'connection') {
           updateConnectionGesture(gesture, input.worldPoint, renderer.hitTest(input.screenPoint));
-          reapplyGestureProjection(gesture);
+          if (rules) refreshActiveConnection(gesture);
+          else reapplyGestureProjection(gesture);
         } else if (gesture.type === 'box-selection') {
           if (
             !gesture.active &&
@@ -734,6 +785,7 @@ export function activateInteractionRuntime(
           const terminalErrors: unknown[] = [];
           try {
             updateConnectionGesture(gesture, input.worldPoint, renderer.hitTest(input.screenPoint));
+            if (rules && !refreshConnection(gesture)) gesture.target = { type: 'none' };
           } catch (error) {
             terminalErrors.push(error);
           }
@@ -744,11 +796,34 @@ export function activateInteractionRuntime(
               terminalErrors.push(error);
             }
           }
+          if (latestConnection === gesture) {
+            const target = gesture.target;
+            feedback.publish(
+              !terminalErrors.length && target.type === 'invalid'
+                ? { type: 'rejected', source: gesture.source, target: target.anchor, reason: target.reason }
+                : { type: 'idle' },
+            );
+          }
           if (terminalErrors.length === 1) throw terminalErrors[0];
           if (terminalErrors.length > 1)
             throw new AggregateError(terminalErrors, 'Connection Gesture terminal failed.');
           if (gesture.target.type === 'valid' && config.connection) {
-            executeCreateEdge(commands, context.diagnostics, config.connection.materializeEdge, gesture, () => closing);
+            executeCreateEdge(
+              commands,
+              context.diagnostics,
+              config.connection.materializeEdge,
+              gesture,
+              () => closing,
+              (target, error) => {
+                if (latestConnection === gesture)
+                  feedback.publish({
+                    type: 'rejected',
+                    source: gesture.source,
+                    target,
+                    reason: Object.freeze({ origin: 'rule', ...error.reason }),
+                  });
+              },
+            );
           } else {
             emitGestureCancellation(context.diagnostics, 'connection', 'invalid-target');
           }
@@ -793,7 +868,7 @@ export function activateInteractionRuntime(
         : undefined;
     },
   );
-  return { shortcuts: shortcutRuntime.service, placement };
+  return { feedback: feedback.service, shortcuts: shortcutRuntime.service, placement };
 }
 
 function hasPreview(gesture: ActiveGesture): boolean {
@@ -828,9 +903,16 @@ function updateConnectionGesture(gesture: ConnectionGesture, pointerWorldPoint: 
     gesture.target = { type: 'none' };
     return;
   }
-  gesture.target = hit.nodeId !== gesture.source.nodeId ? { type: 'valid', anchor } : { type: 'invalid', anchor };
+  gesture.target = hit.nodeId !== gesture.source.nodeId ? { type: 'valid', anchor } : invalidSelfLoop(anchor);
 }
 
+function invalidSelfLoop(anchor: ConnectionAnchorIdentity): ConnectionFeedbackTarget {
+  return {
+    type: 'invalid',
+    anchor,
+    reason: Object.freeze({ origin: 'structure', code: 'SELF_LOOP', message: 'A node cannot connect to itself.' }),
+  };
+}
 function isConnectionAnchorHit(hit: unknown): hit is Readonly<{
   type: 'connection-anchor' | 'port';
   nodeId: NodeId;
@@ -902,8 +984,10 @@ function executeCreateEdge(
   materializeEdge: ConnectionMaterializer,
   gesture: ConnectionGesture,
   isClosing: () => boolean,
+  rejected: (target: ConnectionAnchorIdentity, error: RejectedConnection) => void,
 ): void {
   if (gesture.target.type !== 'valid') return;
+  const targetAnchor = gesture.target.anchor;
   const source = Object.freeze({
     nodeId: gesture.source.nodeId,
     ...(gesture.source.portId === undefined ? {} : { portId: gesture.source.portId }),
@@ -922,23 +1006,22 @@ function executeCreateEdge(
     });
     return;
   }
-  void commands
-    .execute(createEdgeCommand, {
-      edge,
-      source: gesture.source,
-      target: gesture.target.anchor,
-    })
-    .catch((error) => {
-      if (isClosing()) return;
-      if (error instanceof InteractionError && error.code === 'STALE_GESTURE') {
-        emitGestureCancellation(diagnostics, 'connection', 'stale');
-        return;
-      }
-      diagnostics.reportFault(error, {
-        name: interactionDiagnosticEvents.commandFault,
-        attributes: { gestureType: 'connection' },
-      });
+  const input = { edge, source: gesture.source, target: targetAnchor };
+  void commands.execute(createEdgeCommand, input).catch((error) => {
+    if (isClosing()) return;
+    if (creationFailures.get(input) === error && error instanceof RejectedConnection) {
+      rejected(targetAnchor, error);
+      return;
+    }
+    if (creationFailures.get(input) === error && error instanceof StaleConnection) {
+      emitGestureCancellation(diagnostics, 'connection', 'stale');
+      return;
+    }
+    diagnostics.reportFault(error, {
+      name: interactionDiagnosticEvents.commandFault,
+      attributes: { gestureType: 'connection' },
     });
+  });
 }
 
 function executeDeleteSelection(

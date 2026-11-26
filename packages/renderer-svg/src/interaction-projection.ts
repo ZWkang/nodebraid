@@ -155,32 +155,45 @@ function acceptConnectionPreview(
   document: CanvasSnapshot,
   ports: PortSnapshot,
 ): ConnectionPreviewInteractionProjection {
-  if (!isConnectionAnchor(value.source) || !isRecord(value.pointerWorldPoint) || !isRecord(value.target)) {
-    throwInvalidProjectionStructure('connection-preview');
+  const { source, pointerWorldPoint: pointer, target } = value;
+  const anchor = (input: unknown, role: 'source' | 'target') => {
+    if (!isRecord(input)) throwInvalidProjectionStructure(role);
+    const { nodeId, portId, role: actualRole } = input;
+    const captured = { nodeId, ...(portId === undefined ? {} : { portId }), role: actualRole };
+    if (!isConnectionAnchor(captured)) throwInvalidProjectionStructure(role);
+    assertConnectionAnchorBaseline(captured, role, document, ports);
+    return Object.freeze(captured);
+  };
+  const acceptedSource = anchor(source, 'source');
+  if (!isRecord(pointer) || !isRecord(target)) throwInvalidProjectionStructure('connection-preview');
+  const point = ownGeometry(
+    pointer as unknown as Point,
+    capturePoint('pointerWorldPoint', pointer as unknown as Point),
+  );
+  function acceptTarget(raw: Record<string, unknown>): ConnectionPreviewInteractionProjection['target'] {
+    const type = raw.type;
+    if (type === 'none') return { type };
+    if (type !== 'valid' && type !== 'invalid') throwInvalidProjectionStructure('target');
+    const accepted = anchor(raw.anchor, 'target');
+    const reason = type === 'invalid' ? raw.reason : undefined;
+    if (reason === undefined) return { type, anchor: accepted };
+    if (!isRecord(reason)) throwInvalidProjectionStructure('target.reason');
+    const { origin, code, message } = reason;
+    if (
+      (origin !== 'structure' && origin !== 'rule') ||
+      typeof code !== 'string' ||
+      !code.length ||
+      typeof message !== 'string' ||
+      !message.length
+    )
+      throwInvalidProjectionStructure('target.reason');
+    return { type: 'invalid', anchor: accepted, reason: Object.freeze({ origin, code, message }) };
   }
-  if (
-    value.target.type !== 'none' &&
-    ((value.target.type !== 'valid' && value.target.type !== 'invalid') || !isConnectionAnchor(value.target.anchor))
-  ) {
-    throwInvalidProjectionStructure('target');
-  }
-  const projection = value as unknown as ConnectionPreviewInteractionProjection;
-  const pointerSource = projection.pointerWorldPoint;
-  const pointerWorldPoint = capturePoint('pointerWorldPoint', pointerSource);
-  assertConnectionAnchorBaseline(projection.source, 'source', document, ports);
-  if (projection.target.type !== 'none')
-    assertConnectionAnchorBaseline(projection.target.anchor, 'target', document, ports);
   return Object.freeze({
     type: 'connection-preview',
-    source: Object.freeze({ ...projection.source }),
-    pointerWorldPoint: ownGeometry(pointerSource, pointerWorldPoint),
-    target:
-      projection.target.type === 'none'
-        ? Object.freeze({ type: 'none' as const })
-        : Object.freeze({
-            type: projection.target.type,
-            anchor: Object.freeze({ ...projection.target.anchor }),
-          }),
+    source: acceptedSource,
+    pointerWorldPoint: point,
+    target: Object.freeze(acceptTarget(target)),
   });
 }
 
