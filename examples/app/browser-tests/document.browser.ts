@@ -93,6 +93,65 @@ try {
   );
   const saved = await download('business-saved');
   assert.deepEqual(saved.document, fixture);
+  const selectEdge = async (id: string) => {
+    await scrollCanvas();
+    const edgePath = `[data-nodebraid-edge-id="${id}"] [data-nodebraid-edge-path]`;
+    const midpoint = await evaluate<{ x: number; y: number }>(`(() => {
+    const path=document.querySelector(${JSON.stringify(edgePath)});
+    const point=path.getPointAtLength(path.getTotalLength()/2).matrixTransform(path.getScreenCTM());
+    return {x:point.x,y:point.y};
+  })()`);
+    await drag(midpoint, midpoint);
+    await waitForMetrics({ selection: id });
+  };
+  await selectEdge('example-initial-edge');
+  const fillLabel = async (text: string) => {
+    await browser(['fill', '[aria-label="Edge label"]', text]);
+  };
+  const labelText = () =>
+    evaluate(
+      `document.querySelector('[data-nodebraid-edge-id="example-initial-edge"] [data-nodebraid-edge-label]')?.textContent ?? ''`,
+    );
+  await fillLabel('Dirty');
+  await selectEdge('example-edge-1');
+  assert.equal(await evaluate(`document.querySelector('[aria-label="Edge label"]').value`), 'Dirty');
+  await fillLabel('Flow');
+  assert.equal(await evaluate(`document.querySelector('[aria-label="Edge label"]').value`), '');
+  await fillLabel('Second edge');
+  await browser(['find', 'role', 'button', 'click', '--name', 'Apply label', '--exact']);
+  assert.equal(
+    await evaluate(
+      `document.querySelector('[data-nodebraid-edge-id="example-edge-1"] [data-nodebraid-edge-label]').textContent`,
+    ),
+    'Second edge',
+  );
+  assert.equal(await labelText(), 'Flow');
+  await browser(['click', '[aria-label="Undo"]']);
+  await selectEdge('example-initial-edge');
+  await fillLabel('Discard');
+  await browser(['find', 'role', 'button', 'click', '--name', 'Cancel label edit', '--exact']);
+  assert.equal(await labelText(), 'Flow');
+  await fillLabel('If approved');
+  await browser(['find', 'role', 'button', 'click', '--name', 'Apply label', '--exact']);
+  assert.equal(await labelText(), 'If approved');
+  const labeled = await download('edited-edge');
+  assert.deepEqual(labeled.document, {
+    ...fixture,
+    edges: fixture.edges.map((e) =>
+      e.id === 'example-initial-edge' ? { ...e, data: JSON.stringify({ label: 'If approved', tags: ['edge'] }) } : e,
+    ),
+  });
+  await fillLabel('X');
+  await browser(['press', 'Backspace']);
+  assert.equal(await evaluate('document.activeElement.value'), '');
+  await browser(['find', 'role', 'button', 'click', '--name', 'Apply label', '--exact']);
+  assert.equal(await labelText(), '');
+  await browser(['click', '[aria-label="Undo"]']);
+  assert.equal(await labelText(), 'If approved');
+  await browser(['upload', '[aria-label="Document file"]', labeled.path]);
+  await waitForMetrics({ history: '— / —' });
+  assert.equal(await labelText(), 'If approved');
+  assert.equal((await download('label-restored')).text, labeled.text);
 
   await browser(['reload']);
   await waitForMetrics({ revision: '1', nodes: '3', edges: '1', history: 'Undo / —' });
