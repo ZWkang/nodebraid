@@ -1,3 +1,4 @@
+import { InlineNodeTitle } from '@/components/inline-node-title';
 import { createFileRoute } from '@tanstack/react-router';
 import {
   ClipboardX,
@@ -116,6 +117,7 @@ function BasicSvgExample() {
             </>
           ) : null}
           <section className="canvas-frame" aria-label={copy.canvasLabel}>
+            {ready && <InlineNodeTitle key={generation} runtime={ready.runtime} target={ready.target} lang={lang} />}
             {ready && <ConnectionStatus runtime={ready.runtime} />}
             <svg ref={mount.ref} className="canvas-target" width="960" height="640" tabIndex={0} />
           </section>
