@@ -1,0 +1,9 @@
+bun test v1.4.2 (744846f84)
+The following filters did not match any test files:
+ tests/collect-preview.test.ts
+1599 files were searched [5.00ms]
+
+note: Tests need ".test", "_test_", ".spec" or "_spec_" in the filename (ex: "MyApp.test.ts")
+note: To treat the "tests/collect-preview.test.ts" filter as a path, run "bun test ./tests/collect-preview.test.ts"
+
+Learn more about bun test: https://bun.com/docs/cli/test

@@ -1,0 +1,22 @@
+Document file workflow failed; evidence: <worktree>/.tmp/document-browser-rSG3fe
+155 | 
+156 |   await selectEdge('example-initial-edge');
+157 |   await fillLabel('Unsubmitted before reset');
+158 |   await browser(['click', '[aria-label="Reset example"]']);
+159 |   await waitForMetrics({ nodes: '3', edges: '1', selection: 'None' });
+160 |   assert.equal(await evaluate(`document.querySelectorAll('[aria-label="Edge label"]').length`), 0);
+               ^
+AssertionError: Expected values to be strictly equal:
+
+1 !== 0
+
+ generatedMessage: true,
+     actual: 1,
+   expected: 0,
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at <worktree>/examples/app/browser-tests/document.browser.ts:160:10
+
+Bun v1.4.2 (macOS arm64)

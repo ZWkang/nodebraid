@@ -1,0 +1,32 @@
+bun test v1.4.2 (744846f84)
+
+tests/preview-scenes.test.ts:
+(pass) preview commands use an owned empty config and exclude inherited browser configuration [675.08ms]
+(pass) selects visible scenes for changed public capabilities without duplicate runs [0.63ms]
+(pass) the CLI records committed source for a docs-only change and rejects dirty source [666.62ms]
+(pass) clipboard and preview maintenance select their real scenes, with uncovered Layout made explicit [0.21ms]
+(pass) a base branch that advanced independently selects the common ancestor for the PR diff [319.61ms]
+(pass) shared rendering changes exercise all scenes, while docs and tests have no visible change [0.12ms]
+(pass) Document changes select the real file round-trip scene [0.02ms]
+(pass) Node Editing changes select the real authoring workflow [0.01ms]
+
+tests/evidence-producer.test.ts:
+(pass) a closed producer is explicitly inapplicable before artifact access or publication [18.21ms]
+(pass) a superseded producer cannot publish to a PR with a newer head [13.93ms]
+(pass) a current producer enables publication only after every PR page is read [19.01ms]
+(pass) ambiguous current producers remain an error without enabling publication [17.77ms]
+(pass) GitHub read failure in runStatus is not a no-work result [15.95ms]
+(pass) GitHub read failure in pullsStatus is not a no-work result [16.33ms]
+(pass) an invalid producer event fails before reading PR pages [16.01ms]
+(pass) an invalid producer path fails before reading PR pages [16.31ms]
+(pass) an invalid producer status fails before reading PR pages [16.61ms]
+(pass) a producer from another repository remains an error [16.62ms]
+(pass) missing evidence for an eligible current producer still fails the strict publisher [16.80ms]
+
+examples/app/tests/edge-label.test.ts:
+(pass) label changes preserve the exact endpoints, tags and other edges and reject a replaced edge [0.80ms]
+
+ 20 pass
+ 0 fail
+ 79 expect() calls
+Ran 20 tests across 3 files. [1.88s]

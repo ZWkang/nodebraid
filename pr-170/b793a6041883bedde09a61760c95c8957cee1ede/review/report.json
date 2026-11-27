@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "base": "6579739b8b7b9987d3ff01e9408d2358b072a45f",
+    "expectedParent": "a752a65773252913a7e04b86171854dfa92ac0b6",
+    "head": "b793a6041883bedde09a61760c95c8957cee1ede",
+    "tree": "2ff8f991b25cf214d61fe7e801812b1440c3305c",
+    "patch": "a95947325d8194a8358865051946a6b3441bf38324d85c973f813c5ed0903b9a",
+    "localHead": "b793a6041883bedde09a61760c95c8957cee1ede"
+  },
+  "task": {
+    "run": "repair-170",
+    "repository": "ZWkang/nodebraid",
+    "source": {
+      "kind": "issue",
+      "number": 161
+    },
+    "request": "## 使用场景\n\n选中一条连线，为条件分支填写或清除标签。\n\n## 验收条件\n\n提交后只更新目标连线，端点和 ID 保持；取消无变化，一次撤销可还原，导出再导入仍保留标签。\n\n## 建议验证入口\n\nBasic SVG 属性编辑、SVG 投影与 Document 文件往返。\n\n实施范围及验收入口已确认。\n\n## 使用场景\n\n选中一条连线，为条件分支填写或清除标签。\n\n## 验收条件\n\n提交后只更新目标连线，端点和 ID 保持；取消无变化，一次撤销可还原，导出再导入仍保留标签。\n\n## 建议验证入口\n\nBasic SVG 属性编辑、SVG 投影与 Document 文件往返。\n\n同步已合入 #169 的 main，保留两个编辑器并按当前 head 重新验证。",
+    "plan": [
+      {
+        "id": "integrate",
+        "blockedBy": [],
+        "acceptance": "Resolve the reproduced Basic SVG import conflict while preserving edge-label and inline node-title editing."
+      },
+      {
+        "id": "behavior",
+        "blockedBy": [
+          "integrate"
+        ],
+        "acceptance": "Exercise both public editing paths, edge identity, cancellation, undo and document round-trip on the combined checkout."
+      },
+      {
+        "id": "verify",
+        "blockedBy": [
+          "behavior"
+        ],
+        "acceptance": "Review the entire candidate against the fetched main independently on both axes and pass the formal engineering verification."
+      },
+      {
+        "id": "publish",
+        "blockedBy": [
+          "verify"
+        ],
+        "acceptance": "Append to PR 170, verify the remote tree and parents, then publish and read back source-bound media and report."
+      },
+      {
+        "id": "accept",
+        "blockedBy": [
+          "publish"
+        ],
+        "acceptance": "After required human review and main integration, verify main CI, deployment and complete Issue acceptance."
+      }
+    ]
+  },
+  "checks": {
+    "command": "bun run check",
+    "exitCode": 0,
+    "log": "logs/full-check.log",
+    "stable": true
+  },
+  "reviews": {
+    "standards": {
+      "head": "b793a6041883bedde09a61760c95c8957cee1ede",
+      "tree": "2ff8f991b25cf214d61fe7e801812b1440c3305c",
+      "patch": "a95947325d8194a8358865051946a6b3441bf38324d85c973f813c5ed0903b9a",
+      "verdict": "passed",
+      "report": "## Standards 审查\n\n**结论：通过。** 复审基线为 `6579739`，修正后的合并提交为 `b793a60`。已核对完整补丁的六个文件，以及 Basic SVG 路由、Runtime 挂载、编辑草稿、Command、Kernel 事务和媒体采集的调用关系。\n\n上轮发现的侧栏重复 key 已修复。EdgeLabelEditor 使用稳定的同级位置；重置 Runtime 时，页面先卸载旧变更表单，再用新的 Runtime 建立编辑器。Chromium 回归在旧实现中重现重置后仍有一个连线输入框。修正后，记录显示重置清除未提交的草稿与输入框，重新选中连线时只出现一个输入框。回归检查用户可见的控件数量，未来重构不必保留当前 key 写法。\n\n此前的选择与草稿回归仍覆盖同一页面上的两条连线。修改中的草稿绑定原 Edge，恢复原标签后编辑器跟随当前 Selection；事务按精确源身份校验后只更新目标标签。路由保留了节点标题原位编辑、节点属性编辑与连线标签编辑的入口。\n\n独立在本提交运行四个有针对性的 Bun 测试文件，20 项通过，97 次断言。完整 diff 通过 git diff --check。浏览器验证由交付者执行，本轴核对失败、修复后通过的结果及操作记录。未发现剩余 Standards 阻断项。\n",
+      "risk": {
+        "level": "high",
+        "rationale": "改动涉及项目证据采集脚本并改变 Basic SVG 的编辑器组合，按路径规则需要完整人工复核。",
+        "evidence": "完整差异包含 scripts/collect-preview.ts 和五个应用或测试文件；节点标题与连线标签场景均保留，重置前后输入框数量的真实用例验证了挂载清理。",
+        "rollback": "回退 PR #170 相对于 main 的新增改动即可恢复原侧栏及证据流程，已合入 main 的节点原位编辑可保留，无持久化格式迁移。"
+      }
+    },
+    "spec": {
+      "head": "b793a6041883bedde09a61760c95c8957cee1ede",
+      "tree": "2ff8f991b25cf214d61fe7e801812b1440c3305c",
+      "patch": "a95947325d8194a8358865051946a6b3441bf38324d85c973f813c5ed0903b9a",
+      "report": "## Spec 审查\n\n**通过。** 已按 #161 的范围复核基线 6579739 至提交 b793a60 的全部六个变更文件，并核对 #159 的节点原位标题编辑入口。连线属性与节点编辑器分别维护草稿；取消或恢复原标签会释放连线草稿，提交在一次事务内验证并更新目标 Edge。其余连线、源与目标 Port、ID 及业务标签数组保持一致。[#161 验收条件](https://github.com/ZWkang/nodebraid/issues/161#issuecomment-7187151668) · [#159 验收条件](https://github.com/ZWkang/nodebraid/issues/159#issuecomment-7187149173)\n\n上一轮发现的 Runtime 重置问题已修复。两个同级编辑器的 React 身份现在互异，重置时旧连线属性组件随原 Runtime 卸载。Chromium 回归在旧实现中观测到新画布选区为空时残留 1 个旧输入框；修复后，相同操作得到 0 个，再选中连线仅出现 1 个输入框。\n\n独立执行边标签和节点草稿的两份定向测试，8 项通过，共 45 个断言。另核对该次 Document 浏览器场景的动作日志和导出文件，确认放弃草稿、切换连线、清空及一步撤销的可见结果，且编辑前后仅目标标签变化，带新标签的文档重新导入后导出字节一致。本轴核对已有浏览器执行产物；正式全量验证与发布回执由交付流程另行记录。未发现剩余规格阻断项。\n",
+      "verdict": "passed",
+      "risk": {
+        "level": "high",
+        "rationale": "示例应用的 Runtime 重置影响草稿和组件订阅，且 scripts/collect-preview.ts 的变更触发 high 风险下限。",
+        "evidence": "完整六文件补丁、旧实现重置失败与修复后通过的 Chromium 对照、Document 文件字节回读及 8 项独立定向测试。",
+        "rollback": "整体撤回 #161 相对基线的净变更即可恢复原有属性面板和采集场景，保留已合入的 #159，无存储格式迁移。"
+      }
+    }
+  },
+  "changedFiles": [
+    "examples/app/browser-tests/document.browser.ts",
+    "examples/app/src/components/edge-label-editor.tsx",
+    "examples/app/src/example-runtime/edge-label.ts",
+    "examples/app/src/routes/basic-svg.tsx",
+    "examples/app/tests/edge-label.test.ts",
+    "scripts/collect-preview.ts"
+  ],
+  "risk": {
+    "level": "high",
+    "route": "full-human",
+    "reasons": [
+      "standards: high — 改动涉及项目证据采集脚本并改变 Basic SVG 的编辑器组合，按路径规则需要完整人工复核。",
+      "spec: high — 示例应用的 Runtime 重置影响草稿和组件订阅，且 scripts/collect-preview.ts 的变更触发 high 风险下限。",
+      "scripts/collect-preview.ts: minimum high risk."
+    ]
+  },
+  "decisions": [],
+  "behaviorEvidence": [
+    {
+      "id": "reset-red",
+      "acceptance": "77a50ac：重置后选区为空，仍观察到 1 个旧的连线输入框，预期为 0。",
+      "command": "bun run --cwd examples/app ./browser-tests/document.browser.ts",
+      "exitCode": 1,
+      "phase": "red",
+      "status": "passed",
+      "expectedExitCode": 1,
+      "log": "logs/behavior-1.log"
+    },
+    {
+      "id": "reset-green",
+      "acceptance": "修正后的 Document 场景通过，重置后不再显示旧编辑器，重新选边时只有一个输入框。",
+      "command": "bun run --cwd examples/app ./browser-tests/document.browser.ts",
+      "exitCode": 0,
+      "phase": "green",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-2.log"
+    },
+    {
+      "id": "node-authoring",
+      "acceptance": "合并后节点标题编辑、取消及撤销的浏览器场景通过。",
+      "command": "bun run --cwd examples/app ./browser-tests/node-authoring.browser.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-3.log"
+    },
+    {
+      "id": "edge-and-preview",
+      "acceptance": "连线标签和证据场景的定向测试通过。",
+      "command": "bun test examples/app/tests/edge-label.test.ts tests/preview-scenes.test.ts tests/evidence-producer.test.ts",
+      "exitCode": 0,
+      "phase": "check",
+      "status": "passed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-4.log"
+    },
+    {
+      "id": "preview-test-path",
+      "acceptance": "首次定向调用使用了不存在的测试路径，未执行测试。后续调用已改用仓库实际的 preview-scenes 与 evidence-producer 测试。",
+      "command": "bun test tests/collect-preview.test.ts",
+      "exitCode": 1,
+      "phase": "check",
+      "status": "failed",
+      "expectedExitCode": 0,
+      "log": "logs/behavior-5.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "logs/full-check.log",
+      "kind": "log",
+      "sha256": "9706670d99d0ef735142bab89a9df1a845f4edeb599369b2dfc91974bab9d4e0"
+    },
+    {
+      "path": "reviews/standards.md",
+      "kind": "report",
+      "sha256": "f30b1820372280dd279dd4846ea2da96815d899882ea312ef3b9794d18309d76"
+    },
+    {
+      "path": "reviews/spec.md",
+      "kind": "report",
+      "sha256": "7c1146fbe4469d56c42d9472f7047573f5a7813e959e6d38370361085ceee005"
+    },
+    {
+      "path": "logs/behavior-1.log",
+      "kind": "log",
+      "sha256": "9f07de14c06518d7f4fd71b442126238fa71c13f8ba769d4d67bcf2bc9b17430"
+    },
+    {
+      "path": "logs/behavior-2.log",
+      "kind": "log",
+      "sha256": "dc0f828df00bb5d98677e508d7f712a7c73d967447593f07dbb12b282ac98b00"
+    },
+    {
+      "path": "logs/behavior-3.log",
+      "kind": "log",
+      "sha256": "f717e31f70f1d84b3b3beffd8ceba02cc07ba378cd35ba17ed486e6c2bd049a1"
+    },
+    {
+      "path": "logs/behavior-4.log",
+      "kind": "log",
+      "sha256": "7b51b1a5b220ca25c3de372d8e4aa1cb2995ef5606bbce815eb3113be4e6d2e6"
+    },
+    {
+      "path": "logs/behavior-5.log",
+      "kind": "log",
+      "sha256": "679dc41cc6e471e82585bc3cc30aa8f9812303a4adc4dddca04290c9d611ccc1"
+    },
+    {
+      "path": "report.md",
+      "kind": "report",
+      "sha256": "b28f2cb914b8d61a0326b21e328dc48151e09b0a10e7f47a372875bc637f614b"
+    }
+  ]
+}
