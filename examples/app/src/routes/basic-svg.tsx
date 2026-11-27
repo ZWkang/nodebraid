@@ -1,3 +1,4 @@
+import { EdgeLabelEditor } from '@/components/edge-label-editor';
 import { InlineNodeTitle } from '@/components/inline-node-title';
 import { createFileRoute } from '@tanstack/react-router';
 import {
@@ -123,6 +124,7 @@ function BasicSvgExample() {
           </section>
         </section>
         <aside className="example-sidebar">
+          {ready && <EdgeLabelEditor runtime={ready.runtime} lang={lang} />}
           {ready ? <NodeDataEditor key={generation} runtime={ready.runtime} lang={lang} /> : null}
           {ready ? (
             <RuntimeStatus copy={copy} runtime={ready.runtime} />

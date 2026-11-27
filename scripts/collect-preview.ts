@@ -584,6 +584,38 @@ async function collectScene(
         );
         assert.equal(await observe('document.querySelector("[aria-label=Undo]").disabled'), true);
       });
+      await step('Label a conditional edge and undo the edit', async () => {
+        await run(['scrollintoview', '.canvas-target']);
+        const edge = '[data-nodebraid-edge-id="example-initial-edge"]';
+        const point = await observe<{ x: number; y: number }>(`(() => {
+          const path=document.querySelector('${edge} [data-nodebraid-edge-path]');
+          const midpoint=path.getPointAtLength(path.getTotalLength()/2).matrixTransform(path.getScreenCTM());
+          return {x:midpoint.x,y:midpoint.y};
+        })()`);
+        await sendPage('Input.dispatchMouseEvent', {
+          type: 'mousePressed',
+          ...point,
+          button: 'left',
+          buttons: 1,
+          clickCount: 1,
+        });
+        await sendPage('Input.dispatchMouseEvent', {
+          type: 'mouseReleased',
+          ...point,
+          button: 'left',
+          buttons: 0,
+          clickCount: 1,
+        });
+        await metrics({ selection: 'example-initial-edge' });
+        const text = () => observe(`document.querySelector('${edge} [data-nodebraid-edge-label]').textContent`);
+        const before = await text();
+        await run(['fill', '[aria-label="Edge label"]', 'If approved']);
+        await run(['find', 'role', 'button', 'click', '--name', 'Apply label', '--exact']);
+        assert.equal(await text(), 'If approved');
+        await capture('edge-label-applied');
+        await control('Undo');
+        assert.equal(await text(), before);
+      });
     } else {
       await step('Grant clipboard permission only to this isolated browser context', async () => {
         assert.ok(client && browserContextId, 'Expected the owned Clipboard browser context.');
