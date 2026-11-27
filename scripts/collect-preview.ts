@@ -522,6 +522,17 @@ async function collectScene(
         assert.deepEqual(JSON.parse(readFileSync(restoredPath, 'utf8')), saved);
         remember('restored-nodes.json', 'snapshot');
       });
+      await step('Edit the title in place and undo the committed change', async () => {
+        await run(['scrollintoview', '.canvas-target']);
+        await run(['dblclick', `[data-nodebraid-node-id="${createdId}"]`]);
+        await run(['fill', '[aria-label="Edit node title"]', 'Inline card']);
+        await capture('inline-title-draft');
+        await run(['press', 'Enter']);
+        assert.equal(await label(), 'Inline card');
+        await capture('inline-title-applied');
+        await control('Undo');
+        assert.equal(await label(), 'Custom card');
+      });
     } else if (scene.id === 'document-files') {
       const documentPath = join(directory, 'document.json');
       await step('Edit and download a real complete Document file', async () => {

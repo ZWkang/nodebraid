@@ -1,4 +1,5 @@
 import { EdgeLabelEditor } from '@/components/edge-label-editor';
+import { InlineNodeTitle } from '@/components/inline-node-title';
 import { createFileRoute } from '@tanstack/react-router';
 import {
   ClipboardX,
@@ -117,12 +118,13 @@ function BasicSvgExample() {
             </>
           ) : null}
           <section className="canvas-frame" aria-label={copy.canvasLabel}>
+            {ready && <InlineNodeTitle key={generation} runtime={ready.runtime} target={ready.target} lang={lang} />}
             {ready && <ConnectionStatus runtime={ready.runtime} />}
             <svg ref={mount.ref} className="canvas-target" width="960" height="640" tabIndex={0} />
           </section>
         </section>
         <aside className="example-sidebar">
-          {ready && <EdgeLabelEditor key={generation} runtime={ready.runtime} lang={lang} />}
+          {ready && <EdgeLabelEditor runtime={ready.runtime} lang={lang} />}
           {ready ? <NodeDataEditor key={generation} runtime={ready.runtime} lang={lang} /> : null}
           {ready ? (
             <RuntimeStatus copy={copy} runtime={ready.runtime} />

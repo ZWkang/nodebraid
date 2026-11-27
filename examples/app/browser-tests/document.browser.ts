@@ -153,6 +153,14 @@ try {
   assert.equal(await labelText(), 'If approved');
   assert.equal((await download('label-restored')).text, labeled.text);
 
+  await selectEdge('example-initial-edge');
+  await fillLabel('Unsubmitted before reset');
+  await browser(['click', '[aria-label="Reset example"]']);
+  await waitForMetrics({ nodes: '3', edges: '1', selection: 'None' });
+  assert.equal(await evaluate(`document.querySelectorAll('[aria-label="Edge label"]').length`), 0);
+  await selectEdge('example-initial-edge');
+  assert.equal(await evaluate(`document.querySelectorAll('[aria-label="Edge label"]').length`), 1);
+
   await browser(['reload']);
   await waitForMetrics({ revision: '1', nodes: '3', edges: '1', history: 'Undo / —' });
   await browser(['click', '[data-nodebraid-node-id="example-discover"]']);
